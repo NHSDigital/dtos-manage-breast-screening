@@ -6,6 +6,10 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
+review: # Target the dev environment - make review <action> PR_NUMBER=123
+	$(eval include infrastructure/environments/review/variables.sh)
+	$(eval ENVIRONMENT=pr-${PR_NUMBER})
+
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)
@@ -60,6 +64,9 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 
 terraform-plan: terraform-init # Plan Terraform changes - make <env> terraform-plan DOCKER_IMAGE_TAG=abcd123
 	terraform -chdir=infrastructure/terraform plan -var-file ../environments/${ENV_CONFIG}/variables.tfvars
+
+terraform-validate: terraform-init # Plan Terraform changes - make <env> terraform-validate DOCKER_IMAGE_TAG=abcd123
+	terraform -chdir=infrastructure/terraform validate
 
 terraform-apply: terraform-init # Apply Terraform changes - make <env> terraform-apply DOCKER_IMAGE_TAG=abcd123
 	terraform -chdir=infrastructure/terraform apply -var-file ../environments/${ENV_CONFIG}/variables.tfvars ${AUTO_APPROVE}
