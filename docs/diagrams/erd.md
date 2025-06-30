@@ -139,6 +139,19 @@ AppointmentStatus {
     DateTimeField created_at
     ForeignKey appointment
 }
+ParticipantReportedMammogram {
+    UUIDField id
+    DateTimeField created_at
+    DateTimeField updated_at
+    ForeignKey participant
+    CharField location_type
+    ForeignKey provider
+    TextField location_details
+    DateField exact_date
+    CharField approx_date
+    CharField different_name
+    TextField additional_information
+}
 LogEntry }|--|| User : user
 LogEntry }|--|| ContentType : content_type
 Permission }|--|| ContentType : content_type
@@ -156,4 +169,6 @@ ScreeningEpisode }|--|| Participant : participant
 Appointment }|--|| ScreeningEpisode : screening_episode
 Appointment }|--|| ClinicSlot : clinic_slot
 AppointmentStatus }|--|| Appointment : appointment
+ParticipantReportedMammogram }|--|| Participant : participant
+ParticipantReportedMammogram }|--|| Provider : provider
 ```

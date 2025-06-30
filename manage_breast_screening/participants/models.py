@@ -6,6 +6,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import OuterRef, Subquery
 
+from ..clinics.models import Provider
 from ..core.models import BaseModel
 
 logger = getLogger(__name__)
@@ -301,3 +302,27 @@ class AppointmentStatus(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class ParticipantReportedMammogram(BaseModel):
+    class LocationType(models.TextChoices):
+        NHS_BREAST_SCREENING_UNIT = (
+            "NHS_BREAST_SCREENING_UNIT",
+            "At an NHS breast screening unit",
+        )
+        ELSEWHERE_UK = "ELSEWHERE_UK", "Elsewhere in the UK"
+        OUTSIDE_UK = "OUTSIDE_UK", "Outside the UK"
+        PREFER_NOT_TO_SAY = "PREFER_NOT_TO_SAY", "Prefer not to say"
+
+    participant = models.ForeignKey(
+        Participant, on_delete=models.PROTECT, related_name="reported_mammograms"
+    )
+    location_type = models.CharField(choices=LocationType)
+    provider = models.ForeignKey(
+        Provider, on_delete=models.PROTECT, null=True, blank=True
+    )
+    location_details = models.TextField(null=False, default="", blank=True)
+    exact_date = models.DateField(null=True, blank=True)
+    approx_date = models.CharField(null=False, default="", blank=True)
+    different_name = models.CharField(null=False, default="", blank=True)
+    additional_information = models.TextField(null=False, default="", blank=True)

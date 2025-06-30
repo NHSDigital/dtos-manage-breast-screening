@@ -1,14 +1,27 @@
 from django.contrib import admin
 
-from .models import Appointment, Participant, ParticipantAddress, ScreeningEpisode
+from .models import (
+    Appointment,
+    Participant,
+    ParticipantAddress,
+    ParticipantReportedMammogram,
+    ScreeningEpisode,
+)
 
 
 class AddressInline(admin.TabularInline):
     model = ParticipantAddress
 
 
+class ParticipantReportedMammogramInline(admin.StackedInline):
+    model = ParticipantReportedMammogram
+    extra = 1
+
+
 class ParticipantAdmin(admin.ModelAdmin):
-    inlines = [AddressInline]
+    inlines = [AddressInline, ParticipantReportedMammogramInline]
+
+    list_display = ["full_name"]
 
 
 class AppointmentAdmin(admin.ModelAdmin):
