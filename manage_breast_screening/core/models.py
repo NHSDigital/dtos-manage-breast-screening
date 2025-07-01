@@ -14,6 +14,16 @@ class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def clean(self):
+        """
+        Automatically trim whitespace from any text fields
+        """
+        for field in self._meta.fields:
+            if isinstance(field, (models.CharField, models.TextField)):
+                value = getattr(self, field.name)
+                if value:
+                    setattr(self, field.name, value.strip())
+
 
 class AuditLog(models.Model):
     class Operations:
