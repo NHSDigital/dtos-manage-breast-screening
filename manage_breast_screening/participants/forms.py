@@ -88,22 +88,31 @@ class ParticipantRecordedMammogramForm(ModelForm):
             self.WhereTaken.PREFER_NOT_TO_SAY: "Prefer not to say",
         }
 
+        self.when_taken_choices = {
+            "exact": "Enter an exact date",
+            "approx": "Enter an approximate date",
+            "not_sure": "Not sure",
+        }
+
+        self.name_is_the_same_legend = {
+            "text": f"Were they taken with the name {participant.full_name}?",
+            "classes": "nhsuk-fieldset__legend--m",
+            "isPageHeading": False,
+        }
+
+        self.name_is_the_same_choices = {
+            "yes": "Yes",
+            "no": "No, under a different name",
+        }
+
         # Add additional fields which are used on the form for progressively disclosing
         # other form fields
         self.fields["where_taken"] = ChoiceField(choices=self.where_taken_choices)
 
-        self.fields["date_accuracy"] = ChoiceField(
-            choices=(
-                ("exact", "Enter an exact date"),
-                ("approx", "Enter an approximate date"),
-            )
-        )
+        self.fields["when_taken"] = ChoiceField(choices=self.when_taken_choices)
 
         self.fields["name_is_the_same"] = ChoiceField(
-            choices=(
-                ("yes", "Yes"),
-                ("no", "Enter the previously used name"),
-            )
+            choices=self.name_is_the_same_choices
         )
 
         # Explicitly order the films so that the error summary order
@@ -113,7 +122,7 @@ class ParticipantRecordedMammogramForm(ModelForm):
                 "where_taken",
                 "provider",
                 "location_details",
-                "date_accuracy",
+                "when_taken",
                 "exact_date",
                 "approx_date",
                 "name_is_the_same",
@@ -126,7 +135,7 @@ class ParticipantRecordedMammogramForm(ModelForm):
         cleaned_data = super().clean()
 
         where_taken = cleaned_data.get("where_taken")
-        date_accuracy = cleaned_data.get("date_accuracy")
+        when_taken = cleaned_data.get("when_taken")
         name_is_the_same = cleaned_data.get("name_is_the_same")
 
         if where_taken == self.WhereTaken.SAME_UNIT:
@@ -147,26 +156,33 @@ class ParticipantRecordedMammogramForm(ModelForm):
             self.add_error(
                 "location_details",
                 ValidationError(
-                    "Provide the clinic or hospital name, or any location details.",
+                    "Enter the clinic or hospital name, or any location details",
                     code="required",
                 ),
             )
 
-        if date_accuracy == "exact" and not cleaned_data.get("exact_date"):
+        if when_taken == "exact" and not cleaned_data.get("exact_date"):
             self.add_error(
                 "exact_date",
-                ValidationError("Provide the date.", code="required"),
+                ValidationError(
+                    "Enter the date when the x-rays were taken", code="required"
+                ),
             )
-        elif date_accuracy == "approx" and not cleaned_data.get("approx_date"):
+        elif when_taken == "approx" and not cleaned_data.get("approx_date"):
             self.add_error(
                 "approx_date",
-                ValidationError("Provide the approximate date.", code="required"),
+                ValidationError(
+                    "Enter the approximate date when the x-rays were taken",
+                    code="required",
+                ),
             )
 
         if name_is_the_same == "no" and not cleaned_data.get("different_name"):
             self.add_error(
                 "different_name",
-                ValidationError("Provide the previous name.", code="required"),
+                ValidationError(
+                    "Enter the name the x-rays were taken with", code="required"
+                ),
             )
 
     def set_location_type(self, instance):
