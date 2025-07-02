@@ -62,10 +62,31 @@ variable "enable_auth" {
   type        = bool
   default     = false
 }
+
+variable "use_apex_domain" {
+  description = "Use apex domain for the Front Door endpoint. Set to true for production."
+  type        = bool
+  default     = false
+}
+
 locals {
   region              = "uksouth"
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-uks"
   hub_vnet_rg_name    = "rg-hub-${var.hub}-uks-hub-networking"
 
   postgres_sql_admin_group = "postgres_manbrs_${var.environment}_uks_admin"
+  hub_live_name_map = {
+    dev = "nonlive"
+    prod = "live"
+  }
+  hub_live_name = local.hub_live_name_map[var.hub]
+
+  dns_zone_name_map = {
+    dev = "manage-breast-screening.non-live.screening.nhs.uk"
+    prod = "manage-breast-screening.screening.nhs.uk"
+  }
+  dns_zone_name = local.dns_zone_name_map[var.hub]
+
+  # For prod it must be equal to the dns_zone_name to use apex
+  hostname      = var.use_apex_domain ? local.dns_zone_name : "${var.environment}.${local.dns_zone_name}"
 }
