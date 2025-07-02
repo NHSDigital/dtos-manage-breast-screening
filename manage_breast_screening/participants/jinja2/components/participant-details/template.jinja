@@ -1,13 +1,13 @@
 {% from 'summary-list/macro.jinja' import summaryList %}
 
 {% set dob %}
-  {{ participant.date_of_birth }}<br>
-  <span class="nhsuk-hint">({{ participant.age }})</span>
+  {{ presented_participant.date_of_birth }}<br>
+  <span class="nhsuk-hint">({{ presented_participant.age }})</span>
 {% endset %}
 
-{% set ethnic_background = participant.ethnic_background %}
-{% set ethnic_background_category = participant.ethnic_category %}
-{% set ethnicity_details_url = participant.ethnicity_url(return_url) %}
+{% set ethnic_background = presented_participant.ethnic_background %}
+{% set ethnic_background_category = presented_participant.ethnic_category %}
+{% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
 {% set ethnicity_details_link %}
   <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
 {% endset %}
@@ -32,8 +32,8 @@
   } if ethnic_background else undefined %}
 
 {% set address_html %}
-  {% if participant.address %}
-    {% for line in participant.address.lines %}
+  {% if presented_participant.address %}
+    {% for line in presented_participant.address.lines %}
       {{ line }}<br>
     {% endfor %}
     {{ address.postcode }}
@@ -41,13 +41,13 @@
 {% endset %}
 {% set address_html = address_html | trim | default("Not provided") %}
 
-{% set last_known_screening = appointment.last_known_screening %}
+{% set last_known_mammogram = presented_mammograms.last_known_mammogram %}
 {% set last_mammogram_html %}
-  {% if last_known_screening %}
-    {{ last_known_screening.date }} ({{ last_known_screening.relative_date | as_hint }})
-    {% if last_known_screening.location %}
-      </br>{{ last_known_screening.location }}
-      {% if last_known_screening.type %}</br>{{ last_known_screening.type }}{% endif %}
+  {% if last_known_mammogram %}
+    {{ last_known_mammogram.date }} ({{ last_known_mammogram.relative_date | as_hint }})
+    {% if last_known_mammogram.location %}
+      </br>{{ last_known_mammogram.location }}
+      {% if last_known_mammogram.type %}</br>{{ last_known_mammogram.type }}{% endif %}
     {% endif %}
   {% else %}
   {{ "Not known" | as_hint }}
@@ -61,7 +61,7 @@
        "text": "Full name"
      },
      "value": {
-       "text": participant.full_name
+       "text": presented_participant.full_name
      }
    },
    {
@@ -69,7 +69,7 @@
        "text": "Gender"
      },
      "value": {
-       "text": participant.gender
+       "text": presented_participant.gender
      }
    } if full_details else undefined,
    {
@@ -77,7 +77,7 @@
        "text": "NHS Number"
      },
      "value": {
-       "text": participant.nhs_number
+       "text": presented_participant.nhs_number
      }
    } if full_details else undefined,
    {
@@ -110,7 +110,7 @@
        "text": "Phone"
      },
      "value": {
-       "html": participant.phone
+       "html": presented_participant.phone
      }
    },
    {
@@ -118,7 +118,7 @@
        "text": "Email"
      },
      "value": {
-       "html": participant.email
+       "html": presented_participant.email
      }
    },
    {
@@ -137,6 +137,6 @@
           }
         ]
       }
-   } if show_last_known_mammogram else undefined
+   } if presented_mammograms else undefined
   ]
 }) }}

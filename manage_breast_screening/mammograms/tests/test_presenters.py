@@ -13,7 +13,11 @@ from manage_breast_screening.participants.models import (
     ScreeningEpisode,
 )
 
-from ..presenters import AppointmentPresenter, ClinicSlotPresenter
+from ..presenters import (
+    AppointmentPresenter,
+    ClinicSlotPresenter,
+    LastKnownMammogramPresenter,
+)
 
 
 class TestAppointmentPresenter:
@@ -68,21 +72,6 @@ class TestAppointmentPresenter:
         assert result["key"] == expected_key
         assert result["is_confirmed"] == expected_is_confirmed
 
-    @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
-    def test_last_known_screening(self, mock_appointment):
-        mock_screening = MagicMock(spec=ScreeningEpisode)
-        mock_screening.created_at = datetime(2015, 1, 1)
-        last_known_screening = mock_screening
-
-        result = AppointmentPresenter(mock_appointment, last_known_screening)
-
-        assert result.last_known_screening == {
-            "date": "1 January 2015",
-            "relative_date": "10 years ago",
-            "location": None,
-            "type": None,
-        }
-
     def test_participant_url(self, mock_appointment):
         mock_appointment.screening_episode.participant.pk = UUID(
             "ac1b68ec-06a4-40a0-a016-7108dffe4397"
@@ -92,6 +81,23 @@ class TestAppointmentPresenter:
             result.participant_url
             == "/participants/ac1b68ec-06a4-40a0-a016-7108dffe4397/"
         )
+
+
+class TestLastKnownMammogramPresenter:
+    @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
+    def test_last_known_mammogram(self):
+        mock_screening = MagicMock(spec=ScreeningEpisode)
+        mock_screening.created_at = datetime(2015, 1, 1)
+        last_known_screening = mock_screening
+
+        result = LastKnownMammogramPresenter(last_known_screening)
+
+        assert result.last_known_mammogram == {
+            "date": "1 January 2015",
+            "relative_date": "10 years ago",
+            "location": None,
+            "type": None,
+        }
 
 
 class TestClinicSlotPresenter:

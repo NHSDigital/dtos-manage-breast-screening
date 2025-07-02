@@ -21,10 +21,9 @@
 
       {% set personal_details_html %}
         {{ participant_details(
-          participant=presented_participant,
+          presented_participant=presented_participant,
           return_url=request.path,
           full_details=true,
-          show_last_known_mammogram=false
         ) }}
       {% endset %}
 

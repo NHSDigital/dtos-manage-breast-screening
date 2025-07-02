@@ -12,7 +12,11 @@ from .forms import (
     RecordMedicalInformationForm,
     ScreeningAppointmentForm,
 )
-from .presenters import AppointmentPresenter, present_secondary_nav
+from .presenters import (
+    AppointmentPresenter,
+    LastKnownMammogramPresenter,
+    present_secondary_nav,
+)
 
 APPOINTMENT_CANNOT_PROCEED = "Appointment cannot proceed"
 
@@ -44,13 +48,18 @@ class StartScreening(BaseAppointmentForm):
 
         appointment = self.get_appointment()
         last_known_screening = appointment.screening_episode.previous()
-        presenter = AppointmentPresenter(appointment, last_known_screening)
+        appointment_presenter = AppointmentPresenter(appointment)
+        last_known_mammogram_presenter = LastKnownMammogramPresenter(
+            last_known_screening
+        )
 
         context.update(
             {
-                "title": presenter.participant.full_name,
-                "caption": presenter.clinic_slot.clinic_type + " appointment",
-                "appointment": presenter,
+                "title": appointment_presenter.participant.full_name,
+                "caption": f"{appointment_presenter.clinic_slot.clinic_type} appointment",
+                "presented_appointment": appointment_presenter,
+                "presented_participant": appointment_presenter.participant,
+                "presented_mammograms": last_known_mammogram_presenter,
                 "decision_legend": "Can the appointment go ahead?",
                 "decision_hint": "Before you proceed, check the participant’s identity and confirm that their last mammogram was more than 6 months ago.",
             }

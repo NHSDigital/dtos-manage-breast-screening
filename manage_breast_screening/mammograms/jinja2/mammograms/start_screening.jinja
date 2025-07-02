@@ -17,14 +17,14 @@
 
     <div class="app-header__status-tag">
       {{ appointment_status(
-        appointment=appointment,
+        appointment=presented_appointment,
         csrf_input=csrf_input
       )}}
     </div>
 {% endblock %}
 
 {% block step_content %}
-  {{ appointment_header(appointment) }}
+  {{ appointment_header(presented_appointment) }}
 
   {% if secondary_nav_items %}
     {{ app_secondary_navigation({
@@ -34,19 +34,19 @@
   {% endif %}
 
   {% set special_appointment_html %}
-    {% if participant.extra_needs | length > 1 %}
+    {% if presented_participant.extra_needs | length > 1 %}
       <ul>
-        {% for need in participant.extra_needs %}
+        {% for need in presented_participant.extra_needs %}
           <li>{{need}}</li>
         {% endfor %}
       </ul>
     {% else %}
-      <p>{{ participant.extra_needs | first }}</p>
+      <p>{{ presented_participant.extra_needs | first }}</p>
     {% endif %}
     <p><a href="#">Change</a></p>
   {% endset %}
 
-  {% if participant.extra_needs %}
+  {% if presented_participant.extra_needs %}
     {{ warningCallout({
       "heading": "Special appointment",
       "HTML": special_appointment_html
@@ -56,10 +56,6 @@
   {{ card({
     "headingHtml": " ",
     "headingLevel": "2",
-    "descriptionHtml": participant_details(
-      participant=appointment.participant,
-      return_url=request.path,
-      last_known_screening=appointment.last_known_screening,
-    )
+    "descriptionHtml": participant_details(presented_participant=presented_participant, presented_mammograms=presented_mammograms, return_url=request.path)
   }) }}
 {% endblock %}
