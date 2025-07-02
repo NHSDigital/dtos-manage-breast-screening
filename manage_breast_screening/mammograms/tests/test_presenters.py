@@ -84,19 +84,41 @@ class TestAppointmentPresenter:
 
 
 class TestLastKnownMammogramPresenter:
-    @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
-    def test_last_known_mammogram(self):
+    @pytest.fixture()
+    def mock_screening(self):
         mock_screening = MagicMock(spec=ScreeningEpisode)
         mock_screening.created_at = datetime(2015, 1, 1)
-        last_known_screening = mock_screening
+        return mock_screening
 
-        result = LastKnownMammogramPresenter(last_known_screening)
+    @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
+    def test_last_known_mammogram(self, mock_screening):
+        result = LastKnownMammogramPresenter(
+            mock_screening,
+            participant_pk=uuid4(),
+            current_url="/mammograms/start-screening/abc",
+        )
 
         assert result.last_known_mammogram == {
             "date": "1 January 2015",
             "relative_date": "10 years ago",
             "location": None,
             "type": None,
+        }
+
+    def test_add_link(self, mock_screening):
+        participant_id = uuid4()
+        current_url = "/mammograms/start-screening/abc"
+
+        result = LastKnownMammogramPresenter(
+            mock_screening,
+            participant_pk=participant_id,
+            current_url=current_url,
+        )
+
+        assert result.add_link == {
+            "href": f"/participants/{participant_id}/previous-mammograms/add?return_url={current_url}",
+            "text": "Add another",
+            "visually_hidden_text": "mammogram",
         }
 
 
