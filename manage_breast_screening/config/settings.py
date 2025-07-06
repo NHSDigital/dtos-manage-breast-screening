@@ -179,6 +179,12 @@ STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR / "assets" / "compiled"]
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# MESH Configuration
+MESH_BASE_URL = environ.get("MESH_BASE_URL", "https://localhost:8700")
+MESH_MAILBOX_ID = environ.get("MESH_MAILBOX_ID", "X26ABC1")
+MESH_CONTAINER_NAME = environ.get("MESH_CONTAINER_NAME", "mesh-messages")
+MESH_REQUEST_TIMEOUT = int(environ.get("MESH_REQUEST_TIMEOUT", "30"))
+
 LOG_QUERIES = boolean_env("LOG_QUERIES")
 LOGGING = {
     "version": 1,  # the dictConfig format version
