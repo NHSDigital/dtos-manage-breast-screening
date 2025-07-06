@@ -46,7 +46,7 @@
   {% for presented_appointment in presented_appointment_list.appointments %}
     {% set details_html %}
       <p class="nhsuk-u-margin-bottom-1">
-        <a href="{{ url('mammograms:start_screening', kwargs={"id": presented_appointment.id}) }}" class="nhsuk-link">
+        <a href="{{ url('mammograms:start_screening', kwargs={"pk": presented_appointment.pk}) }}" class="nhsuk-link">
           {{ presented_appointment.participant.full_name }}
         </a>
       </p>
@@ -74,8 +74,8 @@
           check_in_url=url(
             'clinics:check_in',
              kwargs={
-              'id': presented_clinic.id,
-              'appointment_id': presented_appointment.id,
+              'pk': presented_clinic.pk,
+              'appointment_pk': presented_appointment.pk,
               }
           ),
           csrf_input=csrf_input

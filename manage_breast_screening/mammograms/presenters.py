@@ -7,7 +7,7 @@ from ..participants.models import AppointmentStatus
 from ..participants.presenters import ParticipantPresenter, status_colour
 
 
-def present_secondary_nav(id):
+def present_secondary_nav(pk):
     """
     Build a secondary nav for reviewing the information of screened/partially screened appointments.
     """
@@ -15,7 +15,7 @@ def present_secondary_nav(id):
         {
             "id": "all",
             "text": "Appointment details",
-            "href": reverse("mammograms:start_screening", kwargs={"id": id}),
+            "href": reverse("mammograms:start_screening", kwargs={"pk": pk}),
             "current": True,
         },
         {"id": "medical_information", "text": "Medical information", "href": "#"},
@@ -29,7 +29,7 @@ class AppointmentPresenter:
         self._last_known_screening = last_known_screening
 
         self.allStatuses = AppointmentStatus
-        self.id = appointment.id
+        self.pk = appointment.pk
         self.clinic_slot = ClinicSlotPresenter(appointment.clinic_slot)
         self.participant = ParticipantPresenter(
             appointment.screening_episode.participant

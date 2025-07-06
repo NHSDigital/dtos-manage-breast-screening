@@ -1,5 +1,6 @@
 from datetime import datetime
 from datetime import timezone as tz
+from random import choice
 
 import pytest
 from pytest_django.asserts import assertQuerySetEqual
@@ -10,6 +11,7 @@ from manage_breast_screening.clinics.tests.factories import (
 )
 
 from .. import models
+from ..models import Ethnicity
 from .factories import AppointmentFactory, ParticipantFactory, ScreeningEpisodeFactory
 
 
@@ -28,19 +30,31 @@ class TestParticipant:
         )
 
     @pytest.mark.parametrize(
-        "background_id,display_name",
+        "background_id,any_other_background_details,display_name",
         [
+            ("", None, None),
+            ("invalid_id", None, None),
             (
                 "english_welsh_scottish_ni_british",
+                None,
                 "English, Welsh, Scottish, Northern Irish or British",
             ),
-            ("pakistani", "Pakistani"),
+            ("pakistani", "custom ethnicity", "Pakistani"),
+            ("any_other_white_background", None, "Any other White background"),
+            (
+                choice(Ethnicity.non_specific_ethnic_backgrounds()),
+                "custom ethnicity",
+                "custom ethnicity",
+            ),
         ],
     )
-    def test_ethnic_background(self, background_id, display_name):
+    def test_ethnic_background(
+        self, background_id, any_other_background_details, display_name
+    ):
         assert (
             ParticipantFactory.build(
-                ethnic_background_id=background_id
+                ethnic_background_id=background_id,
+                any_other_background_details=any_other_background_details,
             ).ethnic_background
             == display_name
         )

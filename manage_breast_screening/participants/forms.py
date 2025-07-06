@@ -14,17 +14,20 @@ class EthnicityForm(forms.Form):
         if "participant" not in kwargs:
             raise ValueError("EthnicityForm requires a participant")
         self.participant = kwargs.pop("participant")
-
-        # Set initial value for ethnic_background_choice from participant
-        initial = kwargs.get("initial", {})
-        initial["ethnic_background_choice"] = self.participant.ethnic_background_id
-        kwargs["initial"] = initial
-
         super().__init__(*args, **kwargs)
 
-        for ethnic_background in self.non_specific_ethnic_backgrounds():
-            self.fields[ethnic_background + "_details"] = forms.CharField(
+        # Setup details fields for non-specific ethnicities
+        for ethnic_background_id in self.non_specific_ethnic_backgrounds():
+            self.fields[ethnic_background_id + "_details"] = forms.CharField(
                 required=False
+            )
+
+        # Set initial values
+        participant_ethnic_background_id = self.participant.ethnic_background_id
+        self.initial["ethnic_background_choice"] = participant_ethnic_background_id
+        if participant_ethnic_background_id in self.non_specific_ethnic_backgrounds():
+            self.initial[participant_ethnic_background_id + "_details"] = (
+                self.participant.any_other_background_details
             )
 
     def ethnic_backgrounds_by_category(self):
@@ -34,7 +37,15 @@ class EthnicityForm(forms.Form):
         return Ethnicity.non_specific_ethnic_backgrounds()
 
     def save(self):
-        self.participant.ethnic_background_id = self.cleaned_data[
-            "ethnic_background_choice"
-        ]
+        ethnic_background_id = self.cleaned_data["ethnic_background_choice"]
+        self.participant.ethnic_background_id = ethnic_background_id
+
+        if ethnic_background_id in self.non_specific_ethnic_backgrounds():
+            details_field = ethnic_background_id + "_details"
+            self.participant.any_other_background_details = self.cleaned_data.get(
+                details_field
+            )
+        else:
+            self.participant.any_other_background_details = ""
+
         self.participant.save()

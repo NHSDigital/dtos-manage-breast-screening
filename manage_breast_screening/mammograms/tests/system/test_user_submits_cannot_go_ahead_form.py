@@ -45,7 +45,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
             self.live_server_url
             + reverse(
                 "mammograms:appointment_cannot_go_ahead",
-                kwargs={"id": self.appointment.pk},
+                kwargs={"pk": self.appointment.pk},
             )
         )
 

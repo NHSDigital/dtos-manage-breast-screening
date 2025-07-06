@@ -14,7 +14,7 @@ def participant():
 class TestShowParticipant:
     def test_renders_template(self, client, participant):
         response = client.get(
-            reverse("participants:show", kwargs={"id": participant.pk}),
+            reverse("participants:show", kwargs={"pk": participant.pk}),
         )
         assert response.status_code == 200
         assertTemplateUsed("participants/show.jinja")

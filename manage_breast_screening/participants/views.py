@@ -10,8 +10,8 @@ from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
 logger = getLogger(__name__)
 
 
-def show(request, id):
-    participant = get_object_or_404(Participant, pk=id)
+def show(request, pk):
+    participant = get_object_or_404(Participant, pk=pk)
     presented_participant = ParticipantPresenter(participant)
 
     appointments = (
@@ -40,8 +40,8 @@ def show(request, id):
     )
 
 
-def edit_ethnicity(request, id):
-    participant = get_object_or_404(Participant, pk=id)
+def edit_ethnicity(request, pk):
+    participant = get_object_or_404(Participant, pk=pk)
 
     if request.method == "POST":
         return_url = request.POST.get("return_url")
@@ -54,7 +54,7 @@ def edit_ethnicity(request, id):
         form = EthnicityForm(participant=participant)
 
     return_url = return_url or reverse(
-        "participants:show", kwargs={"id": participant.pk}
+        "participants:show", kwargs={"pk": participant.pk}
     )
 
     return render(

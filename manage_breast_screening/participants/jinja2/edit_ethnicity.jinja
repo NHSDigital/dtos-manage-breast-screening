@@ -18,9 +18,25 @@
   {{ form_error_summary(form) }}
 {% endblock %}
 
+{% macro conditional_radio_input(params) %}
+  {% set details_field_name = params.field_name + "_details" %}
+  {% set details_field_id = params.details_field.auto_id %}
+  {% set details_field_value = params.details_field.value() %}
+  {% set input_params = {
+    "label": {
+      "text": "How do they describe their background? (optional)",
+    },
+    "id": details_field_id,
+    "name": details_field_name,
+    "value": details_field_value
+  } %}
+
+  {{ input(input_params) }}
+{% endmacro %}
+
 {% block page_content %}
   <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-full">
+    <div class="nhsuk-grid-column-two-thirds">
       <h1 class="nhsuk-heading-l">
         {{ heading }}
       </h1>
@@ -51,10 +67,17 @@
               <h2 class="nhsuk-fieldset__legend--s">{{ ethnic_category }}</h2>
                 {% set radio_items = [] %}
                 {% for ethnic_background in ethnic_backgrounds %}
+                  {% set conditional = {
+                      "html": conditional_radio_input({
+                        "field_name": ethnic_background.id,
+                        "details_field": form[ethnic_background.id + "_details"],
+                      })
+                    } if ethnic_background.id in form.non_specific_ethnic_backgrounds() else {} %}
                   {% do radio_items.append({
                     "value": ethnic_background.id,
                     "text": ethnic_background.display_name,
                     "checked": form.ethnic_background_choice.value() == ethnic_background.id,
+                    "conditional": conditional,
                   }) %}
                 {% endfor %}
                 {{ radios({

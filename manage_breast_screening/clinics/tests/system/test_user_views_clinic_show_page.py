@@ -70,7 +70,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.page.get_by_role("link", name="West London BSS").click()
 
     def then_i_should_see_the_clinic_show_page(self):
-        expect(self.page).to_have_url(re.compile(f"/clinics/{self.clinic.id}"))
+        expect(self.page).to_have_url(re.compile(f"/clinics/{self.clinic.pk}"))
         heading = self.page.get_by_role("heading", level=1)
         expect(heading).to_contain_text("West London BSS")
         expect(heading).to_contain_text(self.clinic.get_risk_type_display())

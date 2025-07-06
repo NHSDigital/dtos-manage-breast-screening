@@ -1,6 +1,6 @@
 pre-commit 3.6.0
 python 3.13.2
-nodejs v22.14.0
+nodejs 22.14.0
 
 # TODO: can we switch all these docker scripts to github actions instead? Or at least something that
 # will be maintained by Dependabot?

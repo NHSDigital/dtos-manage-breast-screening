@@ -4,7 +4,7 @@
 {% from "radios/macro.jinja" import radios %}
 
 {% block form %}
-{% macro conditionalCheckboxInput(params) %}
+{% macro conditional_checkbox_input(params) %}
   {% set details_field_name = params.field_name + "_details" %}
   {% set details_field_id = params.details_field.auto_id %}
   {% set details_field_value = params.details_field.value() %}
@@ -37,7 +37,7 @@
       "value": field_name,
       "checked": field_name in (form.stopped_reasons.value() or []),
       "conditional": {
-        "html": conditionalCheckboxInput({
+        "html": conditional_checkbox_input({
           "field_name": field_name,
           "details_field": form[field_name + "_details"],
         })

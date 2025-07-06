@@ -108,6 +108,7 @@ Participant {
     CharField email
     DateField date_of_birth
     CharField ethnic_background_id
+    TextField any_other_background_details
     TextField risk_level
     JSONField extra_needs
 }

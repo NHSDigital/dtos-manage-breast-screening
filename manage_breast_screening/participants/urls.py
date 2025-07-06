@@ -7,10 +7,10 @@ app_name = "participants"
 
 urlpatterns = [
     path(
-        "<uuid:id>/",
+        "<uuid:pk>/",
         views.show,
         name="show",
     ),
     path("", RedirectView.as_view(pattern_name="home"), name="index"),
-    path("<uuid:id>/edit-ethnicity", views.edit_ethnicity, name="edit_ethnicity"),
+    path("<uuid:pk>/edit-ethnicity", views.edit_ethnicity, name="edit_ethnicity"),
 ]

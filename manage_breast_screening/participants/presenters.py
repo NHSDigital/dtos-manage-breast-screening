@@ -38,7 +38,7 @@ class ParticipantPresenter:
     def __init__(self, participant):
         self._participant = participant
 
-        self.id = participant.pk
+        self.pk = participant.pk
         self.extra_needs = participant.extra_needs
         self.ethnic_category = participant.ethnic_category
         self.full_name = participant.full_name
@@ -49,11 +49,11 @@ class ParticipantPresenter:
         self.date_of_birth = format_date(participant.date_of_birth)
         self.age = format_age(participant.age())
         self.risk_level = sentence_case(participant.risk_level)
-        self.url = reverse("participants:show", kwargs={"id": participant.pk})
+        self.url = reverse("participants:show", kwargs={"pk": participant.pk})
 
     def ethnicity_url(self, return_url):
         url = reverse(
-            "participants:edit_ethnicity", kwargs={"id": self._participant.pk}
+            "participants:edit_ethnicity", kwargs={"pk": self._participant.pk}
         )
         if return_url:
             url += "?return_url=" + quote(return_url)
@@ -128,7 +128,7 @@ class ParticipantAppointmentsPresenter:
             clinic_type=clinic.get_type_display().capitalize(),
             setting_name=sentence_case(setting.name),
             status=self._present_status(appointment),
-            url=reverse("mammograms:start_screening", kwargs={"id": appointment.pk}),
+            url=reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
         )
 
     def _present_status(self, appointment):

@@ -82,7 +82,7 @@ class TestParticipantRecord(SystemTestCase):
             self.live_server_url
             + reverse(
                 "mammograms:start_screening",
-                kwargs={"id": self.upcoming_appointment.pk},
+                kwargs={"pk": self.upcoming_appointment.pk},
             )
         )
 
@@ -91,7 +91,7 @@ class TestParticipantRecord(SystemTestCase):
             self.live_server_url
             + reverse(
                 "participants:show",
-                kwargs={"id": self.participant.pk},
+                kwargs={"pk": self.participant.pk},
             )
         )
 
@@ -103,7 +103,7 @@ class TestParticipantRecord(SystemTestCase):
     def then_i_should_be_on_the_participant_record_page(self):
         path = reverse(
             "participants:show",
-            kwargs={"id": self.participant.pk},
+            kwargs={"pk": self.participant.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
 
@@ -118,7 +118,7 @@ class TestParticipantRecord(SystemTestCase):
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(
             "mammograms:start_screening",
-            kwargs={"id": self.upcoming_appointment.pk},
+            kwargs={"pk": self.upcoming_appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
 
@@ -149,13 +149,13 @@ class TestParticipantRecord(SystemTestCase):
     def then_i_should_be_on_the_past_appointment_page(self):
         path = reverse(
             "mammograms:start_screening",
-            kwargs={"id": self.past_appointments[0].pk},
+            kwargs={"pk": self.past_appointments[0].pk},
         )
         expect(self.page).to_have_url(re.compile(path))
 
     def then_i_should_be_on_the_upcoming_appointment_page(self):
         path = reverse(
             "mammograms:start_screening",
-            kwargs={"id": self.upcoming_appointment.pk},
+            kwargs={"pk": self.upcoming_appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))

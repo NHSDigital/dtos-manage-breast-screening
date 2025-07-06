@@ -35,7 +35,7 @@ class ClinicPresenter:
 
     def __init__(self, clinic):
         self._clinic = clinic
-        self.id = clinic.id
+        self.pk = clinic.pk
         self.starts_at = format_date(clinic.starts_at)
         self.session_type = clinic.session_type().capitalize()
         self.number_of_slots = clinic.clinic_slots.count()
@@ -61,13 +61,13 @@ class ClinicPresenter:
 
 
 class AppointmentListPresenter:
-    def __init__(self, clinic_id, appointments, filter, counts_by_filter):
+    def __init__(self, clinic_pk, appointments, filter, counts_by_filter):
         self.appointments = [
             AppointmentPresenter(appointment) for appointment in appointments
         ]
         self.filter = filter
         self.counts_by_filter = counts_by_filter
-        self.clinic_id = clinic_id
+        self.clinic_pk = clinic_pk
 
     @cached_property
     def secondary_nav_data(self):
@@ -100,7 +100,7 @@ class AppointmentListPresenter:
                     "count": count,
                     "href": reverse(
                         "clinics:show_" + filter_identifier,
-                        kwargs={"id": self.clinic_id},
+                        kwargs={"pk": self.clinic_pk},
                     ),
                     "current": filter_identifier == self.filter,
                 }

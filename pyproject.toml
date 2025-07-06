@@ -31,7 +31,7 @@ time-machine = "^2.16.0"
 pytest-playwright = "^0.7.0"
 ipdb = "^0.13.13"
 axe-playwright-python = "^0.1.5"
-ruff = "^0.12.1"
+ruff = "^0.12.2"
 django-debug-toolbar = "^5.2.0"
 django-diagram = "^0.0.1"
 

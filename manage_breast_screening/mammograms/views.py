@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 
 class BaseAppointmentForm(FormView):
     @property
-    def appointment_id(self):
-        return self.kwargs["id"]
+    def appointment_pk(self):
+        return self.kwargs["pk"]
 
     def get_appointment(self):
         return get_object_or_404(
@@ -31,7 +31,7 @@ class BaseAppointmentForm(FormView):
                 "screening_episode__participant",
                 "screening_episode__participant__address",
             ),
-            pk=self.appointment_id,
+            pk=self.appointment_pk,
         )
 
 
@@ -70,12 +70,12 @@ class StartScreening(BaseAppointmentForm):
         if form.cleaned_data["decision"] == "continue":
             return redirect(
                 "mammograms:ask_for_medical_information",
-                id=self.get_appointment().pk,
+                pk=self.get_appointment().pk,
             )
         else:
             return redirect(
                 "mammograms:appointment_cannot_go_ahead",
-                id=self.get_appointment().pk,
+                pk=self.get_appointment().pk,
             )
 
 
@@ -85,8 +85,8 @@ class AskForMedicalInformation(BaseAppointmentForm):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        id = self.kwargs["id"]
-        participant = Participant.objects.get(screeningepisode__appointment__id=id)
+        pk = self.kwargs["pk"]
+        participant = Participant.objects.get(screeningepisode__appointment__pk=pk)
 
         context.update(
             {
@@ -97,7 +97,7 @@ class AskForMedicalInformation(BaseAppointmentForm):
                 "cannot_continue_link": {
                     "href": reverse(
                         "mammograms:appointment_cannot_go_ahead",
-                        kwargs={"id": id},
+                        kwargs={"pk": pk},
                     ),
                     "text": APPOINTMENT_CANNOT_PROCEED,
                 },
@@ -112,9 +112,9 @@ class AskForMedicalInformation(BaseAppointmentForm):
         appointment = self.get_appointment()
 
         if form.cleaned_data["decision"] == "yes":
-            return redirect("mammograms:record_medical_information", id=appointment.pk)
+            return redirect("mammograms:record_medical_information", pk=appointment.pk)
         else:
-            return redirect("mammograms:awaiting_images", id=appointment.pk)
+            return redirect("mammograms:awaiting_images", pk=appointment.pk)
 
 
 class RecordMedicalInformation(BaseAppointmentForm):
@@ -123,9 +123,9 @@ class RecordMedicalInformation(BaseAppointmentForm):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        id = self.kwargs["id"]
+        pk = self.kwargs["pk"]
         participant = get_object_or_404(
-            Participant, screeningepisode__appointment__id=id
+            Participant, screeningepisode__appointment__pk=pk
         )
         context.update(
             {
@@ -143,13 +143,13 @@ class RecordMedicalInformation(BaseAppointmentForm):
         appointment = self.get_appointment()
 
         if form.cleaned_data["decision"] == "continue":
-            return redirect("mammograms:awaiting_images", id=appointment.pk)
+            return redirect("mammograms:awaiting_images", pk=appointment.pk)
         else:
-            return redirect("mammograms:appointment_cannot_go_ahead", id=appointment.pk)
+            return redirect("mammograms:appointment_cannot_go_ahead", pk=appointment.pk)
 
 
-def appointment_cannot_go_ahead(request, id):
-    appointment = get_object_or_404(Appointment, pk=id)
+def appointment_cannot_go_ahead(request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
     participant = appointment.screening_episode.participant
 
     if request.method == "POST":
@@ -172,7 +172,7 @@ def appointment_cannot_go_ahead(request, id):
     )
 
 
-def awaiting_images(request, id):
+def awaiting_images(request, pk):
     return render(
         request,
         "mammograms/awaiting_images.jinja",
@@ -181,8 +181,8 @@ def awaiting_images(request, id):
 
 
 @require_http_methods(["POST"])
-def check_in(_request, id):
-    appointment = get_object_or_404(Appointment, pk=id)
+def check_in(_request, pk):
+    appointment = get_object_or_404(Appointment, pk=pk)
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
-    return redirect("mammograms:start_screening", id=id)
+    return redirect("mammograms:start_screening", pk=pk)

@@ -116,6 +116,7 @@ class Participant(BaseModel):
     ethnic_background_id = models.CharField(
         blank=True, null=True, choices=ETHNIC_BACKGROUND_CHOICES
     )
+    any_other_background_details = models.TextField(blank=True, null=True)
     risk_level = models.TextField()
     extra_needs = models.JSONField(null=False, default=list, blank=True)
 
@@ -139,7 +140,13 @@ class Participant(BaseModel):
 
     @property
     def ethnic_background(self):
-        return Ethnicity.ethnic_background_display_name(self.ethnic_background_id)
+        if (
+            self.ethnic_background_id in Ethnicity.non_specific_ethnic_backgrounds()
+            and self.any_other_background_details
+        ):
+            return self.any_other_background_details
+        else:
+            return Ethnicity.ethnic_background_display_name(self.ethnic_background_id)
 
 
 class ParticipantAddress(models.Model):
