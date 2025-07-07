@@ -144,7 +144,7 @@ class TestParticipantRecordedMammogramForm:
         assert form.errors == {
             "approx_date": ["Enter the approximate date when the x-rays were taken"],
             "different_name": ["Enter the name the x-rays were taken with"],
-            "location_details": [
+            "somewhere_else_in_the_uk_details": [
                 "Enter the clinic or hospital name, or any location details"
             ],
         }
@@ -206,7 +206,7 @@ class TestParticipantRecordedMammogramForm:
     def test_mammogram_elsewhere_in_uk(self, participant, current_provider):
         data = {
             "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ELSEWHERE_UK,
-            "location_details": "XYZ provider",
+            "somewhere_else_in_the_uk_details": "XYZ provider",
             "when_taken": "approx",
             "name_is_the_same": "yes",
             "approx_date": "5 years ago",
@@ -242,7 +242,7 @@ class TestParticipantRecordedMammogramForm:
     def test_full_details(self, participant, current_provider):
         data = {
             "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ELSEWHERE_UK,
-            "location_details": "XYZ provider",
+            "somewhere_else_in_the_uk_details": "XYZ provider",
             "when_taken": "approx",
             "approx_date": "5 years ago",
             "name_is_the_same": "no",

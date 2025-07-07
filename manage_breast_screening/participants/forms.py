@@ -2,7 +2,13 @@ from enum import StrEnum
 from typing import cast
 
 from django import forms
-from django.forms import ChoiceField, ModelChoiceField, ModelForm, ValidationError
+from django.forms import (
+    CharField,
+    ChoiceField,
+    ModelChoiceField,
+    ModelForm,
+    ValidationError,
+)
 
 from .models import Ethnicity, ParticipantReportedMammogram
 
@@ -60,7 +66,6 @@ class ParticipantRecordedMammogramForm(ModelForm):
         model = ParticipantReportedMammogram
         fields = [
             "provider",
-            "location_details",
             "exact_date",
             "approx_date",
             "different_name",
@@ -116,6 +121,9 @@ class ParticipantRecordedMammogramForm(ModelForm):
             choices=self.name_is_the_same_choices
         )
 
+        self.fields["somewhere_else_in_the_uk_details"] = CharField(required=False)
+        self.fields["outside_the_uk_details"] = CharField(required=False)
+
         provider_field = cast(ModelChoiceField, self.fields["provider"])
         provider_field.label = "Select a unit"
 
@@ -128,7 +136,8 @@ class ParticipantRecordedMammogramForm(ModelForm):
             [
                 "where_taken",
                 "provider",
-                "location_details",
+                "somewhere_else_in_the_uk_details",
+                "outside_the_uk_details",
                 "when_taken",
                 "exact_date",
                 "approx_date",
@@ -156,12 +165,21 @@ class ParticipantRecordedMammogramForm(ModelForm):
                     "Select another breast screening unit", code="required"
                 ),
             )
-        elif where_taken in (
-            self.WhereTaken.ELSEWHERE_UK,
-            self.WhereTaken.OUTSIDE_UK,
-        ) and not cleaned_data.get("location_details"):
+        elif where_taken == self.WhereTaken.ELSEWHERE_UK and not cleaned_data.get(
+            "somewhere_else_in_the_uk_details"
+        ):
             self.add_error(
-                "location_details",
+                "somewhere_else_in_the_uk_details",
+                ValidationError(
+                    "Enter the clinic or hospital name, or any location details",
+                    code="required",
+                ),
+            )
+        elif where_taken == self.WhereTaken.OUTSIDE_UK and not cleaned_data.get(
+            "elsewhere_in_the_uk_details"
+        ):
+            self.add_error(
+                "elsewhere_in_the_uk_details",
                 ValidationError(
                     "Enter the clinic or hospital name, or any location details",
                     code="required",
@@ -192,8 +210,9 @@ class ParticipantRecordedMammogramForm(ModelForm):
                 ),
             )
 
-    def set_location_type(self, instance):
+    def set_location_fields(self, instance):
         where_taken = self.cleaned_data["where_taken"]
+
         if where_taken in (self.WhereTaken.SAME_UNIT, self.WhereTaken.ANOTHER_UNIT):
             instance.location_type = (
                 ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
@@ -201,11 +220,18 @@ class ParticipantRecordedMammogramForm(ModelForm):
         else:
             instance.location_type = where_taken
 
+        if where_taken == self.WhereTaken.ELSEWHERE_UK:
+            instance.location_details = self.cleaned_data[
+                "somewhere_else_in_the_uk_details"
+            ]
+        elif where_taken == self.WhereTaken.OUTSIDE_UK:
+            instance.location_details = self.cleaned_data["elsewhere_in_the_uk_details"]
+
     def save(self, commit=True):
         instance = super().save(commit=False)
 
         instance.participant = self.participant
-        self.set_location_type(instance)
+        self.set_location_fields(instance)
 
         if commit:
             instance.save()
