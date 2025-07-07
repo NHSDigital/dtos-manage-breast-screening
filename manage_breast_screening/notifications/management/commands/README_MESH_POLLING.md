@@ -68,9 +68,11 @@ Where:
 
 ## Testing
 
-### Unit Tests
+The MESH polling system includes comprehensive testing with multiple approaches:
 
-Run unit tests (fully mocked, no external dependencies):
+### Unit Tests (Mocked - Recommended for CI/CD)
+
+**Fast, reliable tests that work everywhere:**
 
 ```bash
 # Test MESH polling functionality
@@ -79,31 +81,155 @@ python manage.py test manage_breast_screening.notifications.mesh.tests
 # Test Azure storage functionality
 python manage.py test manage_breast_screening.notifications.storage.tests
 
-# Test management command
-python manage.py test manage_breast_screening.notifications.tests.test_mesh_integration
+# Run with pytest for more detailed output
+poetry run pytest manage_breast_screening/notifications/mesh/tests/ -v
+poetry run pytest manage_breast_screening/notifications/storage/tests/ -v
 ```
 
-### Integration Tests
+**What's tested:**
+- All business logic
+- Error handling
+- Configuration management
+- File naming logic
+- Django integration
 
-Integration tests require a running MESH client and will be skipped if unavailable:
+**What's mocked:**
+- HTTP requests to MESH API
+- Azure Blob Storage operations
+- External dependencies
+
+**Requirements:**
+- **NO MESH client needed** - All requests are mocked
+- **NO Azure connection needed** - All storage operations are mocked
+- **Works in any environment** - CI/CD, local, production
+
+### Integration Tests (Real MESH Client)
+
+**Tests that validate real API integration:**
 
 ```bash
-# Run all tests including integration tests
-python manage.py test manage_breast_screening.notifications.tests.test_mesh_integration
+# Run integration tests (requires MESH client running)
+poetry run pytest manage_breast_screening/notifications/tests/test_mesh_integration.py -v
 
-# Run with pytest for selective execution
-pytest manage_breast_screening/notifications/tests/test_mesh_integration.py -m integration
+# Run only integration tests with marker
+poetry run pytest -m integration -v
+```
+
+**What's tested:**
+- Real MESH API connectivity
+- Actual API response structures
+- End-to-end integration
+- Network timeouts and errors
+
+**Requirements:**
+- **MESH client IS needed** - Makes real HTTP requests
+- **Gracefully skips** - When MESH client unavailable
+- **Conditional execution** - Only runs when MESH available
+
+### Test Execution Strategies
+
+#### 1. **CI/CD Pipeline (Recommended)**
+```bash
+# Run only unit tests - fast and reliable
+poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breast_screening/notifications/storage/tests/ -v
+```
+
+#### 2. **Local Development**
+```bash
+# Run unit tests
+poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breast_screening/notifications/storage/tests/ -v
+
+# Run integration tests (if MESH client available)
+poetry run pytest manage_breast_screening/notifications/tests/test_mesh_integration.py -v
+```
+
+#### 3. **Selective Testing**
+```bash
+# Run specific test classes
+poetry run pytest manage_breast_screening/notifications/mesh/tests/test_polling.py::TestMeshPollingFunctions -v
+
+# Run specific test methods
+poetry run pytest manage_breast_screening/notifications/mesh/tests/test_polling.py::TestMeshPollingFunctions::test_get_mesh_inbox_messages_success -v
 ```
 
 ### Test Coverage
 
-The test suite covers:
-- ✅ Core MESH polling functions
-- ✅ Azure Blob Storage operations
-- ✅ Management command execution
-- ✅ Error handling and retry logic
-- ✅ Configuration validation
-- ✅ Integration scenarios (when MESH client available)
+| Test Type | Coverage | Speed | MESH Client | Azure Connection | Use Case |
+|-----------|----------|-------|-------------|------------------|----------|
+| **Unit Tests** | Business Logic | Fast | Not needed (mocked) | Not needed (mocked) | CI/CD, Development |
+| **Integration Tests** | API Integration | Slow | Required (real) | Not needed (mocked) | Local Validation |
+
+### Environment-Specific Testing
+
+#### **Local Development**
+```bash
+# Start MESH client locally
+# Then run both test suites
+poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breast_screening/notifications/storage/tests/ manage_breast_screening/notifications/tests/test_mesh_integration.py -v
+```
+
+#### **CI/CD Pipeline**
+```bash
+# Only unit tests - no external dependencies
+poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breast_screening/notifications/storage/tests/ -v
+```
+
+#### **Production Validation**
+```bash
+# Run integration tests against staging MESH
+MESH_BASE_URL=https://staging-mesh.example.com poetry run pytest -m integration -v
+```
+
+### Test Configuration
+
+#### **Environment Variables for Testing**
+```bash
+# Enable integration tests
+export RUN_MESH_INTEGRATION_TESTS=true
+
+# Override MESH URL for testing
+export MESH_BASE_URL=https://test-mesh.example.com
+
+# Set test timeout
+export MESH_REQUEST_TIMEOUT=10
+```
+
+#### **Django Settings for Testing**
+```python
+# settings_test.py
+MESH_BASE_URL = "https://localhost:8700"
+MESH_MAILBOX_ID = "TEST_MAILBOX"
+MESH_REQUEST_TIMEOUT = 5  # Shorter timeout for tests
+```
+
+### Troubleshooting Tests
+
+#### **Integration Tests Skipped**
+If integration tests are being skipped:
+```bash
+# Check if MESH client is running
+curl -k https://localhost:8700/health
+
+# Check configuration
+python manage.py shell -c "from django.conf import settings; print(settings.MESH_BASE_URL)"
+```
+
+#### **Test Failures**
+```bash
+# Run with verbose output
+poetry run pytest manage_breast_screening/notifications/tests/ -v -s
+
+# Run with debug logging
+poetry run pytest manage_breast_screening/notifications/tests/ --log-cli-level=DEBUG
+```
+
+### Best Practices
+
+1. **Always run unit tests** - They're fast and reliable
+2. **Run integration tests locally** - Before deploying changes
+3. **Use CI/CD for unit tests only** - Avoid external dependencies
+4. **Mock external services** - For predictable test results
+5. **Test error conditions** - Network failures, timeouts, etc.
 
 ## Error Handling
 
@@ -129,3 +255,14 @@ Required packages (already included in project dependencies):
 - `requests` - HTTP client for MESH API calls
 - `azure-storage-blob` - Azure Blob Storage client
 - `django` - Django framework integration
+
+## Future Enhancements
+
+This implementation is designed to be easily extended for:
+
+- Scheduled polling using Django Celery Beat or similar
+- Webhook-based processing instead of polling
+- Integration with Django models for message tracking
+- Retry logic for transient failures
+- Async/await for improved performance
+- Connection pooling for Azure operations
