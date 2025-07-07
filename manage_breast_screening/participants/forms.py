@@ -121,8 +121,10 @@ class ParticipantRecordedMammogramForm(ModelForm):
             choices=self.name_is_the_same_choices
         )
 
-        self.fields["somewhere_else_in_the_uk_details"] = CharField(required=False)
-        self.fields["outside_the_uk_details"] = CharField(required=False)
+        self.fields["somewhere_else_in_the_uk_details"] = CharField(
+            required=False, initial=""
+        )
+        self.fields["outside_the_uk_details"] = CharField(required=False, initial="")
 
         provider_field = cast(ModelChoiceField, self.fields["provider"])
         provider_field.label = "Select a unit"
@@ -176,10 +178,10 @@ class ParticipantRecordedMammogramForm(ModelForm):
                 ),
             )
         elif where_taken == self.WhereTaken.OUTSIDE_UK and not cleaned_data.get(
-            "elsewhere_in_the_uk_details"
+            "outside_the_uk_details"
         ):
             self.add_error(
-                "elsewhere_in_the_uk_details",
+                "outside_the_uk_details",
                 ValidationError(
                     "Enter the clinic or hospital name, or any location details",
                     code="required",
@@ -225,7 +227,7 @@ class ParticipantRecordedMammogramForm(ModelForm):
                 "somewhere_else_in_the_uk_details"
             ]
         elif where_taken == self.WhereTaken.OUTSIDE_UK:
-            instance.location_details = self.cleaned_data["elsewhere_in_the_uk_details"]
+            instance.location_details = self.cleaned_data["outside_the_uk_details"]
 
     def save(self, commit=True):
         instance = super().save(commit=False)

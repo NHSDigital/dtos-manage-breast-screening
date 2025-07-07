@@ -34,6 +34,39 @@
         {{ app_select(form.provider) }}
       {% endset %}
 
+      {% set somewhere_else_in_the_uk_details_html %}
+        {{ textarea({
+          "id": form.somewhere_else_in_the_uk_details.auto_id,
+          "name": form.somewhere_else_in_the_uk_details.html_name,
+          "rows": "2",
+          "label": {
+            "text": "Location",
+            "_classes": "nhsuk-label--s"
+          },
+          "value": form.somewhere_else_in_the_uk_details.value(),
+          "hint": {
+            "text": "Include the clinic or hospital name, or any location details"
+          }
+        }) }}
+      {% endset %}
+
+
+      {% set outside_the_uk_details_html %}
+        {{ textarea({
+          "id": form.outside_the_uk_details.auto_id,
+          "name": form.outside_the_uk_details.html_name,
+          "rows": "2",
+          "label": {
+            "text": "Location",
+            "_classes": "nhsuk-label--s"
+          },
+          "value": form.outside_the_uk_details.value(),
+          "hint": {
+            "text": "Include the clinic or hospital name, or any location details"
+          }
+        }) }}
+      {% endset %}
+
       {# Radios with conditionals #}
 
       {{ radios({
@@ -65,12 +98,14 @@
           {
             "value": form.WhereTaken.ELSEWHERE_UK,
             "text": form.where_taken_choices[form.WhereTaken.ELSEWHERE_UK],
-            "checked": form.where_taken.value() == form.WhereTaken.ELSEWHERE_UK
+            "checked": form.where_taken.value() == form.WhereTaken.ELSEWHERE_UK,
+            "conditional": {"html": somewhere_else_in_the_uk_details_html}
           },
           {
             "value": form.WhereTaken.OUTSIDE_UK,
             "text": form.where_taken_choices[form.WhereTaken.OUTSIDE_UK],
-            "checked": form.where_taken.value() == form.WhereTaken.OUTSIDE_UK
+            "checked": form.where_taken.value() == form.WhereTaken.OUTSIDE_UK,
+            "conditional": {"html": outside_the_uk_details_html}
           },
           {
             "divider": "or"
