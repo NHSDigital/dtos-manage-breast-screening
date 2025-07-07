@@ -9,14 +9,15 @@ Django settings for configuration.
 """
 
 import logging
-import os
-from datetime import datetime
 from typing import Dict, List
 
 import requests
-from azure.core.exceptions import AzureError
-from azure.storage.blob import BlobServiceClient
 from django.conf import settings
+
+from manage_breast_screening.notifications.storage.azure import (
+    get_azure_blob_client,
+    store_message_to_blob,
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -24,51 +25,7 @@ logger = logging.getLogger(__name__)
 # Configuration constants with Django settings fallbacks
 MESH_BASE_URL = getattr(settings, "MESH_BASE_URL", "https://localhost:8700")
 MAILBOX_ID = getattr(settings, "MESH_MAILBOX_ID", "X26ABC1")
-CONTAINER_NAME = getattr(settings, "MESH_CONTAINER_NAME", "mesh-messages")
 REQUEST_TIMEOUT = getattr(settings, "MESH_REQUEST_TIMEOUT", 30)  # seconds
-
-
-def get_azure_blob_client() -> BlobServiceClient:
-    """
-    Create and return an Azure Blob Service Client using Django settings
-
-    Returns:
-        BlobServiceClient instance
-
-    Raises:
-        AzureError: If connection fails
-        ValueError: If connection string not configured
-    """
-    # Get connection string from Django settings or environment
-    connection_string = getattr(settings, "AZURE_STORAGE_CONNECTION_STRING", None)
-    if not connection_string:
-        connection_string = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
-
-    if not connection_string:
-        raise ValueError(
-            "Azure Storage connection string not configured in Django settings or environment"
-        )
-
-    try:
-        blob_service_client = BlobServiceClient.from_connection_string(
-            connection_string
-        )
-        logger.info(
-            "Successfully connected to Azure Blob Storage",
-            extra={
-                "container_name": CONTAINER_NAME,
-                "connection_source": "django_settings"
-                if getattr(settings, "AZURE_STORAGE_CONNECTION_STRING", None)
-                else "environment",
-            },
-        )
-        return blob_service_client
-    except AzureError as e:
-        logger.error(
-            "Failed to connect to Azure Blob Storage",
-            extra={"error": str(e), "container_name": CONTAINER_NAME},
-        )
-        raise
 
 
 def get_mesh_inbox_messages() -> List[str]:
@@ -158,9 +115,9 @@ def get_mesh_message_content(message_id: str) -> Dict:
         # Note: Adjust parsing logic based on actual MESH API response format
         message_data = response.json()
 
-        # Extract BSO code from filename (first three letters)
+        # Extract BSO code from filename (first three letters of the .dat filename)
         filename = message_data.get("filename", "")
-        bso_code = filename[:3].upper() if filename else "UNK"
+        bso_code = filename[:3].upper() if filename and len(filename) >= 3 else "UNK"
 
         # Create message structure
         message = {
@@ -195,65 +152,6 @@ def get_mesh_message_content(message_id: str) -> Dict:
         raise
 
 
-def store_message_to_blob(
-    blob_service_client: BlobServiceClient, message: Dict
-) -> None:
-    """
-    Store message content to Azure Blob Storage with new filename structure
-
-    Args:
-        blob_service_client: Azure Blob Service Client
-        message: Dictionary containing message data
-
-    Raises:
-        AzureError: If blob upload fails
-    """
-    try:
-        # Generate timestamp for filename
-        timestamp = datetime.now().strftime("%Y%m%dT%H%M%S")
-
-        # Extract BSO code from message
-        bso_code = message.get("bso_code", "UNK")
-
-        # Create blob path with new format: yyyy-MM-dd/BSOCODE_TIMESTAMP.dat
-        today = datetime.now().strftime("%Y-%m-%d")
-        blob_name = f"{today}/{bso_code}_{timestamp}.dat"
-
-        # Get blob client and upload content
-        blob_client = blob_service_client.get_blob_client(
-            container=CONTAINER_NAME, blob=blob_name
-        )
-
-        content = message.get("content", b"")
-        if isinstance(content, str):
-            content = content.encode("utf-8")
-
-        blob_client.upload_blob(content, overwrite=True)
-
-        logger.info(
-            "Successfully stored message to blob",
-            extra={
-                "blob_name": blob_name,
-                "bso_code": bso_code,
-                "message_id": message.get("id"),
-                "content_size": len(content),
-                "container": CONTAINER_NAME,
-            },
-        )
-
-    except AzureError as e:
-        logger.error(
-            "Failed to store message to blob",
-            extra={
-                "error": str(e),
-                "blob_name": blob_name,
-                "message_id": message.get("id"),
-                "container": CONTAINER_NAME,
-            },
-        )
-        raise
-
-
 def run_mesh_polling():
     """
     Main function that orchestrates the end-to-end MESH polling and storage process
@@ -265,7 +163,7 @@ def run_mesh_polling():
         extra={
             "mesh_base_url": MESH_BASE_URL,
             "mailbox_id": MAILBOX_ID,
-            "container_name": CONTAINER_NAME,
+            "container_name": getattr(settings, "MESH_CONTAINER_NAME", "mesh-messages"),
             "request_timeout": REQUEST_TIMEOUT,
         },
     )
@@ -289,14 +187,12 @@ def run_mesh_polling():
 
         for message_id in message_ids:
             try:
-                # Retrieve full message content
                 message = get_mesh_message_content(message_id)
 
-                # Store to Azure Blob Storage
                 store_message_to_blob(blob_service_client, message)
                 successful_uploads += 1
 
-            except (requests.RequestException, AzureError) as e:
+            except Exception as e:
                 logger.error(
                     "Failed to process message",
                     extra={
@@ -309,7 +205,6 @@ def run_mesh_polling():
                 failed_uploads += 1
                 continue
 
-        # Log summary
         logger.info(
             "MESH polling process completed",
             extra={
@@ -334,14 +229,13 @@ def run_mesh_polling():
 
 if __name__ == "__main__":
     # Allow running as standalone script for testing
-    import django
-    from django.conf import settings
+    import os
 
-    # Setup Django environment
+    import django
+
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE", "manage_breast_screening.config.settings"
     )
     django.setup()
 
-    # Run the polling process
     run_mesh_polling()

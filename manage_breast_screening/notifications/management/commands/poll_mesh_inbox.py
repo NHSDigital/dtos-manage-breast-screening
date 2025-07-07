@@ -1,13 +1,10 @@
 """
 Django management command to poll MESH inbox and store messages in Azure Blob Storage
-
-Usage:
-    python manage.py poll_mesh_inbox
 """
 
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.mesh_polling import run_mesh_polling
+from manage_breast_screening.notifications.mesh.polling import run_mesh_polling
 
 
 class Command(BaseCommand):
@@ -24,7 +21,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS("Starting MESH inbox polling process..."))
 
         try:
-            # Run the MESH polling process
             run_mesh_polling()
 
             self.stdout.write(

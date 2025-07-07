@@ -12,11 +12,13 @@ from django.test import TestCase
 from manage_breast_screening.notifications.appointments.appointment_details import (
     store_new_message,
 )
-from manage_breast_screening.notifications.mesh_polling import (
-    get_azure_blob_client,
+from manage_breast_screening.notifications.mesh.polling import (
     get_mesh_inbox_messages,
     get_mesh_message_content,
     run_mesh_polling,
+)
+from manage_breast_screening.notifications.storage.azure import (
+    get_azure_blob_client,
     store_message_to_blob,
 )
 
@@ -32,13 +34,13 @@ class TestMeshPollingFunctions(TestCase):
             self.mock_blob_client
         )
 
-    @patch("manage_breast_screening.notifications.mesh_polling.settings")
+    @patch("manage_breast_screening.notifications.storage.azure.settings")
     def test_get_azure_blob_client_success(self, mock_settings):
         """Test successful Azure Blob client creation"""
         mock_settings.AZURE_STORAGE_CONNECTION_STRING = "test_connection_string"
 
         with patch(
-            "manage_breast_screening.notifications.mesh_polling.BlobServiceClient"
+            "manage_breast_screening.notifications.storage.azure.BlobServiceClient"
         ) as mock_blob_service:
             mock_blob_service.from_connection_string.return_value = (
                 self.mock_blob_service_client
@@ -51,13 +53,13 @@ class TestMeshPollingFunctions(TestCase):
             )
             self.assertEqual(result, self.mock_blob_service_client)
 
-    @patch("manage_breast_screening.notifications.mesh_polling.settings")
+    @patch("manage_breast_screening.notifications.storage.azure.settings")
     def test_get_azure_blob_client_no_connection_string(self, mock_settings):
         """Test Azure Blob client creation fails when no connection string"""
         mock_settings.AZURE_STORAGE_CONNECTION_STRING = None
 
         with patch(
-            "manage_breast_screening.notifications.mesh_polling.os.getenv"
+            "manage_breast_screening.notifications.storage.azure.os.getenv"
         ) as mock_getenv:
             mock_getenv.return_value = None
 
@@ -68,7 +70,7 @@ class TestMeshPollingFunctions(TestCase):
                 "Azure Storage connection string not configured", str(context.exception)
             )
 
-    @patch("manage_breast_screening.notifications.mesh_polling.requests.get")
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.get")
     def test_get_mesh_inbox_messages_success(self, mock_get):
         """Test successful retrieval of MESH inbox messages"""
         mock_response = Mock()
@@ -94,7 +96,7 @@ class TestMeshPollingFunctions(TestCase):
             timeout=30,
         )
 
-    @patch("manage_breast_screening.notifications.mesh_polling.requests.get")
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.get")
     def test_get_mesh_inbox_messages_empty_response(self, mock_get):
         """Test handling of empty MESH inbox response"""
         mock_response = Mock()
@@ -106,7 +108,7 @@ class TestMeshPollingFunctions(TestCase):
 
         self.assertEqual(result, [])
 
-    @patch("manage_breast_screening.notifications.mesh_polling.requests.get")
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.get")
     def test_get_mesh_inbox_messages_request_failure(self, mock_get):
         """Test handling of MESH API request failure"""
         mock_get.side_effect = Exception("Connection failed")
@@ -114,7 +116,7 @@ class TestMeshPollingFunctions(TestCase):
         with self.assertRaises(Exception):
             get_mesh_inbox_messages()
 
-    @patch("manage_breast_screening.notifications.mesh_polling.requests.get")
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.get")
     def test_get_mesh_message_content_success(self, mock_get):
         """Test successful retrieval of MESH message content"""
         mock_response = Mock()
@@ -146,7 +148,7 @@ class TestMeshPollingFunctions(TestCase):
             timeout=30,
         )
 
-    @patch("manage_breast_screening.notifications.mesh_polling.requests.get")
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.get")
     def test_get_mesh_message_content_no_filename(self, mock_get):
         """Test handling of message with no filename"""
         mock_response = Mock()
@@ -170,7 +172,7 @@ class TestMeshPollingFunctions(TestCase):
         }
         fixed_dt = datetime(2024, 1, 15, 14, 30, 22)
         with patch(
-            "manage_breast_screening.notifications.mesh_polling.datetime"
+            "manage_breast_screening.notifications.storage.azure.datetime"
         ) as mock_datetime:
             mock_datetime.now.return_value = fixed_dt
             store_message_to_blob(self.mock_blob_service_client, message)
@@ -190,7 +192,7 @@ class TestMeshPollingFunctions(TestCase):
         }
         fixed_dt = datetime(2024, 1, 15, 14, 30, 22)
         with patch(
-            "manage_breast_screening.notifications.mesh_polling.datetime"
+            "manage_breast_screening.notifications.storage.azure.datetime"
         ) as mock_datetime:
             mock_datetime.now.return_value = fixed_dt
             store_message_to_blob(self.mock_blob_service_client, message)
@@ -198,12 +200,12 @@ class TestMeshPollingFunctions(TestCase):
                 b"test message content", overwrite=True
             )
 
-    @patch("manage_breast_screening.notifications.mesh_polling.get_azure_blob_client")
-    @patch("manage_breast_screening.notifications.mesh_polling.get_mesh_inbox_messages")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_azure_blob_client")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_mesh_inbox_messages")
     @patch(
-        "manage_breast_screening.notifications.mesh_polling.get_mesh_message_content"
+        "manage_breast_screening.notifications.mesh.polling.get_mesh_message_content"
     )
-    @patch("manage_breast_screening.notifications.mesh_polling.store_message_to_blob")
+    @patch("manage_breast_screening.notifications.mesh.polling.store_message_to_blob")
     def test_run_mesh_polling_success(
         self, mock_store, mock_get_content, mock_get_inbox, mock_get_blob
     ):
@@ -233,8 +235,8 @@ class TestMeshPollingFunctions(TestCase):
         self.assertEqual(mock_get_content.call_count, 2)
         self.assertEqual(mock_store.call_count, 2)
 
-    @patch("manage_breast_screening.notifications.mesh_polling.get_azure_blob_client")
-    @patch("manage_breast_screening.notifications.mesh_polling.get_mesh_inbox_messages")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_azure_blob_client")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_mesh_inbox_messages")
     def test_run_mesh_polling_empty_inbox(self, mock_get_inbox, mock_get_blob):
         """Test MESH polling with empty inbox"""
         mock_get_blob.return_value = self.mock_blob_service_client
@@ -247,12 +249,12 @@ class TestMeshPollingFunctions(TestCase):
         mock_get_blob.assert_called_once()
         mock_get_inbox.assert_called_once()
 
-    @patch("manage_breast_screening.notifications.mesh_polling.get_azure_blob_client")
-    @patch("manage_breast_screening.notifications.mesh_polling.get_mesh_inbox_messages")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_azure_blob_client")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_mesh_inbox_messages")
     @patch(
-        "manage_breast_screening.notifications.mesh_polling.get_mesh_message_content"
+        "manage_breast_screening.notifications.mesh.polling.get_mesh_message_content"
     )
-    @patch("manage_breast_screening.notifications.mesh_polling.store_message_to_blob")
+    @patch("manage_breast_screening.notifications.mesh.polling.store_message_to_blob")
     def test_run_mesh_polling_partial_failure(
         self, mock_store, mock_get_content, mock_get_inbox, mock_get_blob
     ):
@@ -270,8 +272,7 @@ class TestMeshPollingFunctions(TestCase):
         mock_get_content.side_effect = [mock_message1, Exception("API Error")]
 
         # Run the polling process
-        with self.assertRaises(Exception):
-            run_mesh_polling()
+        run_mesh_polling()
 
         # Verify first message was processed, second was skipped
         self.assertEqual(mock_get_content.call_count, 2)
