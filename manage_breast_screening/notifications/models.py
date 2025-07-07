@@ -27,6 +27,7 @@ class MessageBatch(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     notify_id = models.CharField(max_length=50, blank=True)
+    routing_plan_id = models.UUIDField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     scheduled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
@@ -95,6 +96,7 @@ class Clinic(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=50)
+    bso_code = models.CharField(max_length=50, null=True)
     name = models.CharField(max_length=50)
     alt_name = models.CharField(max_length=50)
     holding_clinic = models.BooleanField()
