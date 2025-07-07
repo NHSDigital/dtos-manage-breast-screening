@@ -6,10 +6,6 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
-review: # Target the dev environment - make review <action> PR_NUMBER=123
-	$(eval include infrastructure/environments/review/variables.sh)
-	$(eval ENVIRONMENT=pr-${PR_NUMBER})
-
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)
@@ -36,9 +32,9 @@ get-subscription-ids: # Retrieve the hub subscription ID based on the subscripti
 	$(eval HUB_SUBSCRIPTION_ID=$(shell az account show --query id --output tsv --name ${HUB_SUBSCRIPTION}))
 	$(if ${ARM_SUBSCRIPTION_ID},,$(eval export ARM_SUBSCRIPTION_ID=$(shell az account show --query id --output tsv)))
 
-terraform-init-no-backend: # Initialise terraform modules only and update terraform lock file - make terraform-init-no-backend
+terraform-init-no-backend: # Initialise terraform modules only and update terraform lock file - make <env> terraform-init-no-backend
 	rm -rf infrastructure/modules/dtos-devops-templates
-	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch main \
+	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_REF} \
 		https://github.com/NHSDigital/dtos-devops-templates.git infrastructure/modules/dtos-devops-templates
 	terraform -chdir=infrastructure/terraform init -upgrade -backend=false
 
@@ -65,7 +61,7 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 terraform-plan: terraform-init # Plan Terraform changes - make <env> terraform-plan DOCKER_IMAGE_TAG=abcd123
 	terraform -chdir=infrastructure/terraform plan -var-file ../environments/${ENV_CONFIG}/variables.tfvars
 
-terraform-validate: terraform-init # Plan Terraform changes - make <env> terraform-validate DOCKER_IMAGE_TAG=abcd123
+terraform-validate: terraform-init-no-backend # Validate Terraform changes - make <env> terraform-validate
 	terraform -chdir=infrastructure/terraform validate
 
 terraform-apply: terraform-init # Apply Terraform changes - make <env> terraform-apply DOCKER_IMAGE_TAG=abcd123
