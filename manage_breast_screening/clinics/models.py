@@ -11,7 +11,7 @@ class Provider(BaseModel):
     name = models.TextField()
 
     def __str__(self):
-        return f"Provider: {self.name}"
+        return self.name
 
 
 class Setting(BaseModel):
@@ -19,7 +19,7 @@ class Setting(BaseModel):
     provider = models.ForeignKey(Provider, on_delete=models.PROTECT)
 
     def __str__(self):
-        return f"Setting: {self.name}"
+        return self.name
 
 
 class ClinicFilter(StrEnum):
