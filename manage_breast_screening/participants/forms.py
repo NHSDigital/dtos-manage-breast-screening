@@ -1,7 +1,8 @@
 from enum import StrEnum
+from typing import cast
 
 from django import forms
-from django.forms import ChoiceField, ModelForm, ValidationError
+from django.forms import ChoiceField, ModelChoiceField, ModelForm, ValidationError
 
 from .models import Ethnicity, ParticipantReportedMammogram
 
@@ -114,6 +115,12 @@ class ParticipantRecordedMammogramForm(ModelForm):
         self.fields["name_is_the_same"] = ChoiceField(
             choices=self.name_is_the_same_choices
         )
+
+        provider_field = cast(ModelChoiceField, self.fields["provider"])
+        provider_field.label = "Select a unit"
+
+        # By default, Django use "-----" as the empty choice. Force this to blank.
+        provider_field.empty_label = ""
 
         # Explicitly order the films so that the error summary order
         # matches the order fields are rendered in.

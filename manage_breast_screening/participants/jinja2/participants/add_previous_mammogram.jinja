@@ -4,8 +4,9 @@
 {% from 'fieldset/macro.jinja' import fieldset %}
 {% from 'input/macro.jinja' import input %}
 {% from 'radios/macro.jinja' import radios %}
+
 {% from 'textarea/macro.jinja' import textarea %}
-{% from 'django_form_helpers.jinja' import form_error_summary %}
+{% from 'django_form_helpers.jinja' import form_error_summary, app_select %}
 
 {% block beforeContent %}
   {{ backLink(back_link_params) }}
@@ -27,6 +28,13 @@
     </h1>
 
     <form action="{{request.path}}" method="POST">
+      {# Conditional fields #}
+
+      {% set provider_select_html %}
+        {{ app_select(form.provider) }}
+      {% endset %}
+
+      {# Radios with conditionals #}
 
       {{ radios({
         "idPrefix": form.where_taken.auto_id,
@@ -51,7 +59,8 @@
           {
             "value": form.WhereTaken.ANOTHER_UNIT,
             "text": form.where_taken_choices[form.WhereTaken.ANOTHER_UNIT],
-            "checked": form.where_taken.value() == form.WhereTaken.ANOTHER_UNIT
+            "checked": form.where_taken.value() == form.WhereTaken.ANOTHER_UNIT,
+            "conditional": {"html": provider_select_html}
           },
           {
             "value": form.WhereTaken.ELSEWHERE_UK,
