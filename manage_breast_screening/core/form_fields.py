@@ -65,6 +65,19 @@ class SplitDateWidget(widgets.MultiWidget):
             return [value.day, value.month, value.year]
         return [None, None, None]
 
+    def subwidgets(self, name, value, attrs=None):
+        """
+        Expose data for each subwidget, so that we can render them separately in the template.
+
+        For some reason, as of Django 5.2, `MultiWidget` does not actually override the default
+        implementation provided by `Widget`, which means you can't call `form.date.0` `form.date.1`
+        to access the individual parts.
+        (see https://stackoverflow.com/questions/24866936/render-only-one-part-of-a-multiwidget-in-django)
+        """
+        context = self.get_context(name, value, attrs)
+        for subwidget in context["widget"]["subwidgets"]:
+            yield subwidget
+
 
 class SplitHiddenDateWidget(SplitDateWidget):
     """

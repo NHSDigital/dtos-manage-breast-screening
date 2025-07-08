@@ -90,9 +90,62 @@ class TestSplitDateField:
 
     def test_form_cleaned_data(self):
         class TestForm(Form):
-            date = SplitDateField()
+            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
 
         assert f.is_valid()
         assert f.cleaned_data["date"] == datetime.date(2025, 12, 1)
+
+    def test_bound_field_subwidgets(self):
+        class TestForm(Form):
+            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+
+        f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
+        field = f["date"]
+        assert len(field.subwidgets) == 3
+
+        assert field.subwidgets[0].data == {
+            "attrs": {
+                "id": "id_date_0",
+                "max": 31,
+                "min": 1,
+                "required": True,
+            },
+            "is_hidden": False,
+            "name": "date_0",
+            "required": False,
+            "template_name": "django/forms/widgets/number.html",
+            "type": "number",
+            "value": "1",
+        }
+
+        assert field.subwidgets[1].data == {
+            "attrs": {
+                "id": "id_date_1",
+                "max": 12,
+                "min": 1,
+                "required": True,
+            },
+            "is_hidden": False,
+            "name": "date_1",
+            "required": False,
+            "template_name": "django/forms/widgets/number.html",
+            "type": "number",
+            "value": "12",
+        }
+
+        assert field.subwidgets[2].data == {
+            "attrs": {
+                "id": "id_date_2",
+                "max": 2026,
+                "min": 1900,
+                "required": True,
+            },
+            "is_hidden": False,
+            "name": "date_2",
+            "required": False,
+            "template_name": "django/forms/widgets/number.html",
+            "type": "number",
+            "value": "2025",
+        }
