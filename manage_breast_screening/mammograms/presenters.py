@@ -33,6 +33,7 @@ class AppointmentPresenter:
         self.participant = ParticipantPresenter(
             appointment.screening_episode.participant
         )
+        self.screening_protocol = appointment.screening_episode.get_protocol_display()
 
     @cached_property
     def participant_url(self):
