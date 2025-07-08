@@ -1,4 +1,5 @@
 {% from "checkboxes/macro.jinja" import checkboxes as checkboxes_component %}
+{% from 'date-input/macro.jinja' import dateInput as date_input_component %}
 {% from 'error-summary/macro.jinja' import errorSummary %}
 {% from 'radios/macro.jinja' import radios as radios_component %}
 {% from 'select/macro.jinja' import select as select_component %}
@@ -85,5 +86,48 @@
       "html": hint|e
     } if hint,
     "items": ns.items
+  }) }}
+{% endmacro %}
+
+{% macro app_date_input(form_attribute, legend=None, hint=None) %}
+  {% if form_attribute.errors %}
+    {% set error_message = {"text": form_attribute.errors | first} %}
+  {% endif %}
+  {% set ns = namespace(items=[]) %}
+  {% set widgets = form_attribute.subwidgets %}
+  {{ date_input_component({
+    "name": form_attribute.html_name,
+    "id": form_attribute.auto_id,
+    "fieldset":  {
+      "legend": {
+        "text": legend,
+        "classes": "nhsuk-fieldset__legend--m",
+        "isPageHeading": false
+      }
+    } if legend,
+    "errorMessage": error_message,
+    "hint": {
+      "html": hint|e
+    } if hint,
+    "items": [
+      {
+        "name": form_attribute.subwidgets.0.data.name,
+        "label": "Day",
+        "classes": "nhsuk-input--width-2",
+        "value": form_attribute.subwidgets.0.data.value
+      },
+      {
+        "name": form_attribute.subwidgets.1.data.name,
+        "label": "Month",
+        "classes": "nhsuk-input--width-2",
+        "value": form_attribute.subwidgets.1.data.value
+      },
+      {
+        "name": form_attribute.subwidgets.2.data.name,
+        "label": "Year",
+        "classes": "nhsuk-input--width-4",
+        "value": form_attribute.subwidgets.2.data.value
+      }
+    ]
   }) }}
 {% endmacro %}

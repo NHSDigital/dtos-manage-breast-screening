@@ -6,7 +6,7 @@
 {% from 'radios/macro.jinja' import radios %}
 
 {% from 'textarea/macro.jinja' import textarea %}
-{% from 'django_form_helpers.jinja' import form_error_summary, app_select %}
+{% from 'django_form_helpers.jinja' import form_error_summary, app_select, app_date_input %}
 
 {% block beforeContent %}
   {{ backLink(back_link_params) }}
@@ -65,6 +65,10 @@
             "text": "Include the clinic or hospital name, or any location details"
           }
         }) }}
+      {% endset %}
+
+      {% set exact_date_html %}
+        {{ app_date_input(form_attribute=form.exact_date, legend="Date of mammogram", hint="For example, 15 3 2025") }}
       {% endset %}
 
       {# Radios with conditionals #}
@@ -136,7 +140,8 @@
             "id": form.when_taken.auto_id,
             "value": "exact",
             "text": form.when_taken_choices["exact"],
-            "checked": form.when_taken.value() == "exact"
+            "checked": form.when_taken.value() == "exact",
+            "conditional": {"html": exact_date_html}
           },
           {
             "value": "approx",

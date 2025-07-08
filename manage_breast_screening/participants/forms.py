@@ -10,6 +10,7 @@ from django.forms import (
     ValidationError,
 )
 
+from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
 
 
@@ -71,6 +72,7 @@ class ParticipantRecordedMammogramForm(ModelForm):
             "different_name",
             "additional_information",
         ]
+        field_classes = {"exact_date": SplitDateField}
 
     class WhereTaken(StrEnum):
         SAME_UNIT = "same_unit"
