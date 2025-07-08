@@ -103,6 +103,7 @@ class TestSplitDateField:
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
         field = f["date"]
+
         assert len(field.subwidgets) == 3
 
         assert field.subwidgets[0].data == {
@@ -149,3 +150,11 @@ class TestSplitDateField:
             "type": "number",
             "value": "2025",
         }
+
+    def test_form_errors(self):
+        class TestForm(Form):
+            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+
+        f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2027"})
+        assert not f.is_valid()
+        assert f.errors == {"date": ["Year should be between 1900 and 2025."]}
