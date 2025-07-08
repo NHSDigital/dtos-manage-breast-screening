@@ -125,11 +125,9 @@ class SplitDateField(forms.MultiValueField):
         }
         year_kwargs = {}
 
-        max_value = kwargs.pop("max_value", None)
-        if max_value:
-            day_kwargs["max_value"] = max_value.day
-            month_kwargs["max_value"] = max_value.month
-            year_kwargs["max_value"] = max_value.year
+        max_year = kwargs.pop("max_year", None)
+        if max_year:
+            year_kwargs["max_value"] = max_year
 
         self.fields = [
             forms.IntegerField(**day_kwargs),

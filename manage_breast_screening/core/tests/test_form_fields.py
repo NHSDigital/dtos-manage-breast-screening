@@ -10,7 +10,7 @@ from ..form_fields import SplitDateField
 
 class TestSplitDateField:
     def test_clean(self):
-        f = SplitDateField(max_value=datetime.date(2026, 12, 31))
+        f = SplitDateField(max_year=2026)
 
         assert f.clean([1, 12, 2025]) == datetime.date(2025, 12, 1)
 
@@ -42,7 +42,7 @@ class TestSplitDateField:
             f.clean([0, 13, 1800])
 
     def test_has_changed(self):
-        f = SplitDateField(max_value=datetime.date(2026, 12, 31))
+        f = SplitDateField(max_year=2026)
         assert f.has_changed([1, 12, 2025], [2, 12, 2025])
         assert f.has_changed([1, 12, 2025], [1, 11, 2025])
         assert f.has_changed([1, 12, 2025], [1, 12, 2026])
@@ -50,7 +50,7 @@ class TestSplitDateField:
 
     def test_default_django_render(self):
         class TestForm(Form):
-            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+            date = SplitDateField(max_year=2026)
 
         f = TestForm()
 
@@ -70,7 +70,7 @@ class TestSplitDateField:
 
     def test_default_django_render_in_bound_form(self):
         class TestForm(Form):
-            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+            date = SplitDateField(max_year=2026)
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
 
@@ -90,7 +90,7 @@ class TestSplitDateField:
 
     def test_form_cleaned_data(self):
         class TestForm(Form):
-            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+            date = SplitDateField(max_year=2026)
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
 
@@ -99,7 +99,7 @@ class TestSplitDateField:
 
     def test_bound_field_subwidgets(self):
         class TestForm(Form):
-            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+            date = SplitDateField(max_year=2026)
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
         field = f["date"]
@@ -153,7 +153,7 @@ class TestSplitDateField:
 
     def test_form_errors(self):
         class TestForm(Form):
-            date = SplitDateField(max_value=datetime.date(2026, 12, 31))
+            date = SplitDateField(max_year=2026)
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2027"})
         assert not f.is_valid()
