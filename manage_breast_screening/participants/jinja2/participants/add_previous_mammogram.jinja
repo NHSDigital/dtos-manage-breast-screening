@@ -71,6 +71,22 @@
         {{ app_date_input(form_attribute=form.exact_date, legend="Date of mammogram", hint="For example, 15 3 2025") }}
       {% endset %}
 
+      {% set approx_date_html %}
+        {{ input({
+          "id": form.approx_date.auto_id,
+          "name": form.approx_date.html_name,
+          "label": {
+            "text": "Enter an approximate date",
+            "classes": "nhsuk-u-visually-hidden"
+          },
+          "hint": {
+            "text": "For example, 9 months ago"
+          },
+          "classes": "nhsuk-u-width-two-thirds",
+          "value": form.approx_date.value()
+        }) }}
+      {% endset %}
+
       {# Radios with conditionals #}
 
       {{ radios({
@@ -146,7 +162,8 @@
           {
             "value": "approx",
             "text": form.when_taken_choices["approx"],
-            "checked": form.when_taken.value() == "approx"
+            "checked": form.when_taken.value() == "approx",
+            "conditional": {"html": approx_date_html}
           },
           {
             "value": "not_sure",
