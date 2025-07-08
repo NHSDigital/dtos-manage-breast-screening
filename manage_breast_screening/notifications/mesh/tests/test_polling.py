@@ -13,6 +13,7 @@ from manage_breast_screening.notifications.appointments.appointment_details impo
     store_new_message,
 )
 from manage_breast_screening.notifications.mesh.polling import (
+    acknowledge_mesh_message,
     get_mesh_inbox_messages,
     get_mesh_message_content,
     run_mesh_polling,
@@ -163,6 +164,39 @@ class TestMeshPollingFunctions(TestCase):
 
         self.assertEqual(result["bso_code"], "UNK")
 
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.put")
+    def test_acknowledge_mesh_message_success(self, mock_put):
+        """Test successful acknowledgement of MESH message"""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.raise_for_status.return_value = None
+        mock_put.return_value = mock_response
+
+        result = acknowledge_mesh_message("BSO_20240115T143022")
+
+        self.assertTrue(result)
+        mock_put.assert_called_once_with(
+            "https://localhost:8700/messageexchange/X26ABC1/inbox/BSO_20240115T143022/status/acknowledged",
+            verify=False,
+            timeout=30,
+        )
+
+    @patch("manage_breast_screening.notifications.mesh.polling.requests.put")
+    def test_acknowledge_mesh_message_failure(self, mock_put):
+        """Test failed acknowledgement of MESH message"""
+        from requests import RequestException
+
+        mock_put.side_effect = RequestException("Connection failed")
+
+        result = acknowledge_mesh_message("BSO_20240115T143022")
+
+        self.assertFalse(result)
+        mock_put.assert_called_once_with(
+            "https://localhost:8700/messageexchange/X26ABC1/inbox/BSO_20240115T143022/status/acknowledged",
+            verify=False,
+            timeout=30,
+        )
+
     def test_store_message_to_blob_success(self):
         """Test successful storage of message to Azure Blob"""
         message = {
@@ -206,10 +240,18 @@ class TestMeshPollingFunctions(TestCase):
         "manage_breast_screening.notifications.mesh.polling.get_mesh_message_content"
     )
     @patch("manage_breast_screening.notifications.mesh.polling.store_message_to_blob")
+    @patch(
+        "manage_breast_screening.notifications.mesh.polling.acknowledge_mesh_message"
+    )
     def test_run_mesh_polling_success(
-        self, mock_store, mock_get_content, mock_get_inbox, mock_get_blob
+        self,
+        mock_acknowledge,
+        mock_store,
+        mock_get_content,
+        mock_get_inbox,
+        mock_get_blob,
     ):
-        """Test successful end-to-end MESH polling process"""
+        """Test successful end-to-end MESH polling process with acknowledgement"""
         # Setup mocks
         mock_get_blob.return_value = self.mock_blob_service_client
         mock_get_inbox.return_value = ["BSO_20240115T143022", "ABC_20240115T143045"]
@@ -225,6 +267,7 @@ class TestMeshPollingFunctions(TestCase):
             "bso_code": "ABC",
         }
         mock_get_content.side_effect = [mock_message1, mock_message2]
+        mock_acknowledge.side_effect = [True, True]  # Both acknowledgements succeed
 
         # Run the polling process
         run_mesh_polling()
@@ -234,6 +277,11 @@ class TestMeshPollingFunctions(TestCase):
         mock_get_inbox.assert_called_once()
         self.assertEqual(mock_get_content.call_count, 2)
         self.assertEqual(mock_store.call_count, 2)
+        self.assertEqual(mock_acknowledge.call_count, 2)
+
+        # Verify acknowledgement was called with correct message IDs
+        mock_acknowledge.assert_any_call("BSO_20240115T143022")
+        mock_acknowledge.assert_any_call("ABC_20240115T143045")
 
     @patch("manage_breast_screening.notifications.mesh.polling.get_azure_blob_client")
     @patch("manage_breast_screening.notifications.mesh.polling.get_mesh_inbox_messages")
@@ -277,6 +325,57 @@ class TestMeshPollingFunctions(TestCase):
         # Verify first message was processed, second was skipped
         self.assertEqual(mock_get_content.call_count, 2)
         self.assertEqual(mock_store.call_count, 1)
+
+    @patch("manage_breast_screening.notifications.mesh.polling.get_azure_blob_client")
+    @patch("manage_breast_screening.notifications.mesh.polling.get_mesh_inbox_messages")
+    @patch(
+        "manage_breast_screening.notifications.mesh.polling.get_mesh_message_content"
+    )
+    @patch("manage_breast_screening.notifications.mesh.polling.store_message_to_blob")
+    @patch(
+        "manage_breast_screening.notifications.mesh.polling.acknowledge_mesh_message"
+    )
+    def test_run_mesh_polling_acknowledgement_failure(
+        self,
+        mock_acknowledge,
+        mock_store,
+        mock_get_content,
+        mock_get_inbox,
+        mock_get_blob,
+    ):
+        """Test MESH polling when acknowledgement fails but storage succeeds"""
+        # Setup mocks
+        mock_get_blob.return_value = self.mock_blob_service_client
+        mock_get_inbox.return_value = ["BSO_20240115T143022", "ABC_20240115T143045"]
+
+        mock_message1 = {
+            "id": "BSO_20240115T143022",
+            "content": b"content1",
+            "bso_code": "BSO",
+        }
+        mock_message2 = {
+            "id": "ABC_20240115T143045",
+            "content": b"content2",
+            "bso_code": "ABC",
+        }
+        mock_get_content.side_effect = [mock_message1, mock_message2]
+        mock_acknowledge.side_effect = [
+            False,
+            True,
+        ]  # First acknowledgement fails, second succeeds
+
+        # Run the polling process
+        run_mesh_polling()
+
+        # Verify storage still succeeded for both messages
+        self.assertEqual(mock_store.call_count, 2)
+
+        # Verify acknowledgement was attempted for both messages
+        self.assertEqual(mock_acknowledge.call_count, 2)
+
+        # Verify the process continued despite acknowledgement failure
+        mock_acknowledge.assert_any_call("BSO_20240115T143022")
+        mock_acknowledge.assert_any_call("ABC_20240115T143045")
 
 
 class TestStoreNewMessage(TestCase):

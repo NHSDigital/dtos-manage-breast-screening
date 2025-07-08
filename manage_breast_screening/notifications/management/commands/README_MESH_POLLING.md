@@ -42,9 +42,23 @@ python manage.py poll_mesh_inbox
 - **Automatic polling** of MESH inbox for new messages
 - **Message content retrieval** for each message ID
 - **Azure Blob Storage integration** with structured filename format
+- **Message acknowledgement** - removes processed messages from MESH inbox
 - **Comprehensive logging** with structured log messages
 - **Error handling** with retry logic for transient failures
 - **BSO code extraction** from message IDs for filename organisation
+
+## Process Flow
+
+The MESH polling process follows this sequence:
+
+1. **Poll MESH inbox** - Retrieve list of available message IDs
+2. **For each message:**
+   - **Retrieve content** - Fetch full message content and metadata
+   - **Store to Azure** - Save message to Azure Blob Storage with structured filename
+   - **Acknowledge message** - Remove message from MESH inbox (prevents reprocessing)
+3. **Log results** - Report success/failure counts for monitoring
+
+**Note:** Messages are acknowledged (removed from inbox) only after successful storage to Azure. If storage fails, the message remains in the MESH inbox for retry.
 
 ## File Storage Format
 

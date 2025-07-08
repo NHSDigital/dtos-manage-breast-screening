@@ -152,6 +152,54 @@ def get_mesh_message_content(message_id: str) -> Dict:
         raise
 
 
+def acknowledge_mesh_message(message_id: str) -> bool:
+    """
+    Acknowledge a message in the MESH inbox, which removes it from the inbox
+
+    Args:
+        message_id: The message ID to acknowledge
+
+    Returns:
+        bool: True if acknowledgement was successful, False otherwise
+
+    Note:
+        Acknowledgement removes the message from the MESH inbox
+    """
+    try:
+        # MESH API endpoint for acknowledging a message
+        url = f"{MESH_BASE_URL}/messageexchange/{MAILBOX_ID}/inbox/{message_id}/status/acknowledged"
+
+        logger.info(
+            "Acknowledging message",
+            extra={"message_id": message_id, "url": url, "timeout": REQUEST_TIMEOUT},
+        )
+
+        response = requests.put(
+            url,
+            verify=False,  # Disable SSL verification for local sandbox
+            timeout=REQUEST_TIMEOUT,
+        )
+        response.raise_for_status()
+
+        logger.info(
+            "Successfully acknowledged message",
+            extra={"message_id": message_id, "status_code": response.status_code},
+        )
+        return True
+
+    except requests.RequestException as e:
+        logger.error(
+            "Failed to acknowledge message",
+            extra={
+                "error": str(e),
+                "message_id": message_id,
+                "url": url,
+                "timeout": REQUEST_TIMEOUT,
+            },
+        )
+        return False
+
+
 def run_mesh_polling():
     """
     Main function that orchestrates the end-to-end MESH polling and storage process
@@ -184,13 +232,27 @@ def run_mesh_polling():
         # Step 3: Process each message
         successful_uploads = 0
         failed_uploads = 0
+        successful_acknowledgements = 0
+        failed_acknowledgements = 0
 
         for message_id in message_ids:
             try:
+                # Step 3a: Retrieve message content
                 message = get_mesh_message_content(message_id)
 
+                # Step 3b: Store message to Azure Blob Storage
                 store_message_to_blob(blob_service_client, message)
                 successful_uploads += 1
+
+                # Step 3c: Acknowledge message in MESH inbox (removes it)
+                if acknowledge_mesh_message(message_id):
+                    successful_acknowledgements += 1
+                else:
+                    failed_acknowledgements += 1
+                    logger.warning(
+                        "Message stored but acknowledgement failed",
+                        extra={"message_id": message_id},
+                    )
 
             except Exception as e:
                 logger.error(
@@ -210,6 +272,8 @@ def run_mesh_polling():
             extra={
                 "successful_uploads": successful_uploads,
                 "failed_uploads": failed_uploads,
+                "successful_acknowledgements": successful_acknowledgements,
+                "failed_acknowledgements": failed_acknowledgements,
                 "total_messages": len(message_ids),
                 "mailbox_id": MAILBOX_ID,
             },
