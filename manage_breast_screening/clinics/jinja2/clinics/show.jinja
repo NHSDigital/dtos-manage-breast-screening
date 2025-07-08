@@ -62,10 +62,7 @@
       {{ presented_appointment.start_time }}
       {% if presented_appointment.is_special_appointment %}
         <br>
-        {{ tag({
-          "text": "Special appointment",
-          "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2"
-        })}}
+        {{ tag(presented_appointment.special_appointment_tag_properties) }}
       {% endif %}
     {% endset %}
 
