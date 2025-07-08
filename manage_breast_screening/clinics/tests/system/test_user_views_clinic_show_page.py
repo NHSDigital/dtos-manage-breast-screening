@@ -40,6 +40,10 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.then_the_appointment_is_checked_in()
         self.and_the_appointments_remain_in_the_same_order()
 
+        self.given_an_appointment_has_extra_needs()
+        self.and_i_reload_the_clinic_show_page()
+        self.then_i_can_see_the_appointment_tagged_as_special()
+
     def given_there_are_appointments(self):
         self.confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
@@ -160,3 +164,23 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             expect(row.locator("td").nth(3)).to_contain_text(
                 appointment.current_status.get_state_display()
             )
+
+    def given_an_appointment_has_extra_needs(self):
+        self.extra_needs_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            clinic_slot__starts_at=datetime.now(timezone.utc).replace(
+                hour=11, minute=10
+            ),
+            screening_episode__participant__first_name="Janet",
+            screening_episode__participant__last_name="Special Appointment",
+            screening_episode__participant__extra_needs=["Wheelchair user"],
+        )
+
+    def then_i_can_see_the_appointment_tagged_as_special(self):
+        row = self.page.locator("tr").filter(has_text="Janet Special Appointment")
+        expect(
+            row.locator(".nhsuk-tag").filter(has_text="Special appointment")
+        ).to_be_visible()
+
+    def and_i_reload_the_clinic_show_page(self):
+        self.page.reload()
