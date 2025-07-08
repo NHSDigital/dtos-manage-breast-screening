@@ -1,12 +1,18 @@
 param hub string
 param region string
 param privateDNSZoneID string
-param storageName string
-param storageAccountID string
+param name string
+param resourceID string
+param resourceServiceType string
 
 var RGName = 'rg-hub-${hub}-uks-hub-networking'
 var vnetName = 'VNET-${toUpper(hub)}-UKS-HUB'
 var subnetName = 'SN-${toUpper(hub)}-UKS-HUB-pep'
+
+var groupID = {
+  storage: 'blob'
+  keyVault: 'vault'
+}
 
 // Retrieve the existing vnet resource group
 resource vnetRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
@@ -28,7 +34,7 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-01-01' existing 
 
 // Create the private endpoint for the storage account
 resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
-  name: '${storageName}-pep'
+  name: '${name}-pep'
   location: region
   properties: {
     subnet: {
@@ -36,11 +42,11 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
     }
     privateLinkServiceConnections: [
       {
-        name: '${storageName}-connection'
+        name: '${name}-connection'
         properties: {
-          privateLinkServiceId: storageAccountID
+          privateLinkServiceId: resourceID
           groupIds: [
-            'blob'
+            groupID[resourceServiceType]
           ]
         }
       }
@@ -51,11 +57,11 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
 // Register the private endpoint in the private DNS zone
 resource dnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-05-01' = {
   parent: privateEndpoint
-  name: '${storageName}-dns'
+  name: '${name}-dns'
   properties: {
     privateDnsZoneConfigs: [
       {
-        name: '${storageName}-dns-zone-config'
+        name: '${name}-dns-zone-config'
         properties: {
           privateDnsZoneId: privateDNSZoneID
         }

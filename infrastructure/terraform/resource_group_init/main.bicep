@@ -17,6 +17,8 @@ var hubMap = {
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
 var privateDNSZoneRGName = 'rg-hub-${hubMap[envConfig]}-uks-private-dns-zones'
 var managedIdentityRGName = 'rg-mi-${envConfig}-uks'
+var infraResourceGroupName = 'rg-manbrs-${envConfig}-infra'
+var keyVaultName = 'kv-manbrs-${envConfig}-infra'
 
 // Retrieve existing terraform state resource group
 resource storageAccountRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
@@ -57,9 +59,20 @@ module terraformStateStorageAccount 'storage.bicep' = {
   }
 }
 
-// Retrieve private DNS zone
-module privateDNSZone 'dns.bicep' = {
+// Retrieve storage private DNS zone
+module storagePrivateDNSZone 'dns.bicep' = {
   scope: privateDNSZoneRG
+  params: {
+    resourceServiceType: 'storage'
+  }
+}
+
+// Retrieve key vault private DNS zone
+module keyVaultPrivateDNSZone 'dns.bicep' = {
+  scope: privateDNSZoneRG
+  params: {
+    resourceServiceType: 'keyVault'
+  }
 }
 
 // Create private endpoint and register DNS
@@ -68,9 +81,10 @@ module storageAccountPrivateEndpoint 'privateEndpoint.bicep' = {
   params: {
     hub: hubMap[envConfig]
     region: region
-    storageName: storageAccountName
-    storageAccountID: terraformStateStorageAccount.outputs.storageAccountID
-    privateDNSZoneID: privateDNSZone.outputs.privateDNSZoneID
+    name: storageAccountName
+    resourceServiceType: 'storage'
+    resourceID: terraformStateStorageAccount.outputs.storageAccountID
+    privateDNSZoneID: storagePrivateDNSZone.outputs.privateDNSZoneID
   }
 }
 
@@ -89,5 +103,34 @@ resource networkContributorAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+resource infraRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
+  name: infraResourceGroupName
+  location: region
+}
+module kvPrivateEndpoint 'privateEndpoint.bicep' = {
+  scope: resourceGroup(infraResourceGroupName)
+  params: {
+    hub: hubMap[envConfig]
+    region: region
+    name: keyVaultName
+    resourceServiceType: 'keyVault'
+    resourceID: keyVaultModule.outputs.keyVaultID
+    privateDNSZoneID: keyVaultPrivateDNSZone.outputs.privateDNSZoneID
+  }
+}
+
+// Use a module to deploy Key Vault into the RG
+module keyVaultModule 'keyVault.bicep' = {
+  name: 'keyVaultDeployment'
+  scope: resourceGroup(infraResourceGroupName)
+  params: {
+    keyVaultName: keyVaultName
+    region: region
+    enableSoftDelete : enableSoftDelete
+  }
+}
+
 output miPrincipalID string = managedIdentiy.outputs.miPrincipalID
 output miName string = managedIdentiy.outputs.miName
+output keyVaultPrivateDNSZone string = keyVaultPrivateDNSZone.outputs.privateDNSZoneID
+output storagePrivateDNSZone string = storagePrivateDNSZone.outputs.privateDNSZoneID
