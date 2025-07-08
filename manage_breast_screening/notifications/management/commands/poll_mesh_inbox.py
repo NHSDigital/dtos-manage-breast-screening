@@ -18,14 +18,32 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        self.stdout.write(self.style.SUCCESS("Starting MESH inbox polling process..."))
+        dry_run = options.get("dry_run", False)
+
+        if dry_run:
+            self.stdout.write(
+                self.style.WARNING(
+                    "Starting MESH inbox polling process in DRY-RUN mode..."
+                )
+            )
+        else:
+            self.stdout.write(
+                self.style.SUCCESS("Starting MESH inbox polling process...")
+            )
 
         try:
-            run_mesh_polling()
+            run_mesh_polling(dry_run=dry_run)
 
-            self.stdout.write(
-                self.style.SUCCESS("MESH inbox polling completed successfully")
-            )
+            if dry_run:
+                self.stdout.write(
+                    self.style.WARNING(
+                        "MESH inbox polling completed successfully (DRY-RUN)"
+                    )
+                )
+            else:
+                self.stdout.write(
+                    self.style.SUCCESS("MESH inbox polling completed successfully")
+                )
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"MESH inbox polling failed: {e}"))

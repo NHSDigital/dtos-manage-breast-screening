@@ -55,9 +55,9 @@ def get_mesh_inbox_messages() -> List[str]:
         response.raise_for_status()
 
         # Parse response to extract message IDs
-        # Note: Adjust parsing logic based on actual MESH API response format
-        messages = response.json()
-        message_ids = [msg.get("id") for msg in messages if msg.get("id")]
+        # MESH API returns: {"messages": ["id1", "id2", "id3"]}
+        response_data = response.json()
+        message_ids = response_data.get("messages", [])
 
         logger.info(
             "Successfully retrieved messages from MESH inbox",
@@ -200,11 +200,14 @@ def acknowledge_mesh_message(message_id: str) -> bool:
         return False
 
 
-def run_mesh_polling():
+def run_mesh_polling(dry_run: bool = False):
     """
     Main function that orchestrates the end-to-end MESH polling and storage process
 
     This function can be called from Django management commands or scheduled tasks
+
+    Args:
+        dry_run: If True, don't actually store to Azure or acknowledge messages
     """
     logger.info(
         "Starting MESH inbox polling and storage process",
@@ -213,12 +216,15 @@ def run_mesh_polling():
             "mailbox_id": MAILBOX_ID,
             "container_name": getattr(settings, "MESH_CONTAINER_NAME", "mesh-messages"),
             "request_timeout": REQUEST_TIMEOUT,
+            "dry_run": dry_run,
         },
     )
 
     try:
-        # Step 1: Connect to Azure Blob Storage using Django settings
-        blob_service_client = get_azure_blob_client()
+        # Step 1: Connect to Azure Blob Storage using Django settings (skip in dry-run)
+        blob_service_client = None
+        if not dry_run:
+            blob_service_client = get_azure_blob_client()
 
         # Step 2: Poll MESH inbox for message IDs
         message_ids = get_mesh_inbox_messages()
@@ -240,19 +246,37 @@ def run_mesh_polling():
                 # Step 3a: Retrieve message content
                 message = get_mesh_message_content(message_id)
 
-                # Step 3b: Store message to Azure Blob Storage
-                store_message_to_blob(blob_service_client, message)
-                successful_uploads += 1
-
-                # Step 3c: Acknowledge message in MESH inbox (removes it)
-                if acknowledge_mesh_message(message_id):
-                    successful_acknowledgements += 1
+                # Step 3b: Store message to Azure Blob Storage (skip in dry-run)
+                if dry_run:
+                    logger.info(
+                        "DRY-RUN: Would store message to Azure",
+                        extra={
+                            "message_id": message_id,
+                            "bso_code": message.get("bso_code"),
+                            "content_size": len(message.get("content", b"")),
+                        },
+                    )
+                    successful_uploads += 1
                 else:
-                    failed_acknowledgements += 1
-                    logger.warning(
-                        "Message stored but acknowledgement failed",
+                    store_message_to_blob(blob_service_client, message)
+                    successful_uploads += 1
+
+                # Step 3c: Acknowledge message in MESH inbox (skip in dry-run)
+                if dry_run:
+                    logger.info(
+                        "DRY-RUN: Would acknowledge message",
                         extra={"message_id": message_id},
                     )
+                    successful_acknowledgements += 1
+                else:
+                    if acknowledge_mesh_message(message_id):
+                        successful_acknowledgements += 1
+                    else:
+                        failed_acknowledgements += 1
+                        logger.warning(
+                            "Message stored but acknowledgement failed",
+                            extra={"message_id": message_id},
+                        )
 
             except Exception as e:
                 logger.error(
@@ -276,6 +300,7 @@ def run_mesh_polling():
                 "failed_acknowledgements": failed_acknowledgements,
                 "total_messages": len(message_ids),
                 "mailbox_id": MAILBOX_ID,
+                "dry_run": dry_run,
             },
         )
 
@@ -286,6 +311,7 @@ def run_mesh_polling():
                 "error": str(e),
                 "mailbox_id": MAILBOX_ID,
                 "mesh_base_url": MESH_BASE_URL,
+                "dry_run": dry_run,
             },
         )
         raise

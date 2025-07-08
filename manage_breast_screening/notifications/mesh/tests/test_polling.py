@@ -75,11 +75,13 @@ class TestMeshPollingFunctions(TestCase):
     def test_get_mesh_inbox_messages_success(self, mock_get):
         """Test successful retrieval of MESH inbox messages"""
         mock_response = Mock()
-        mock_response.json.return_value = [
-            {"id": "BSO_20240115T143022"},
-            {"id": "ABC_20240115T143045"},
-            {"id": "XYZ_20240115T143108"},
-        ]
+        mock_response.json.return_value = {
+            "messages": [
+                "BSO_20240115T143022",
+                "ABC_20240115T143045",
+                "XYZ_20240115T143108",
+            ]
+        }
         mock_response.raise_for_status.return_value = None
         mock_get.return_value = mock_response
 
@@ -101,7 +103,7 @@ class TestMeshPollingFunctions(TestCase):
     def test_get_mesh_inbox_messages_empty_response(self, mock_get):
         """Test handling of empty MESH inbox response"""
         mock_response = Mock()
-        mock_response.json.return_value = []
+        mock_response.json.return_value = {"messages": []}
         mock_response.raise_for_status.return_value = None
         mock_get.return_value = mock_response
 
