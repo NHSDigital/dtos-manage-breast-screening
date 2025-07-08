@@ -18,8 +18,7 @@ dependencies = [
   "azure-identity (>=1.23.0,<2.0.0)",
   "azure-storage-blob (>=12.19.0,<13.0.0)",
   "requests (>=2.31.0,<3.0.0)",
-  "celery (>=5.3.0,<6.0.0)",
-  "django-celery-beat (>=2.5.0,<3.0.0)",
+  "mesh-client (>=3.2.3,<4.0.0)",
 ]
 
 [tool.poetry]
