@@ -162,7 +162,7 @@ class TestParticipantRecordedMammogramForm:
         )
         assert not form.is_valid()
         assert form.errors == {
-            "provider": ["Select another brest screening unit."],
+            "provider": ["Select another breast screening unit"],
         }
 
     def test_mammogram_in_same_provider(self, participant, current_provider):
