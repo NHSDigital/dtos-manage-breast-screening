@@ -135,7 +135,7 @@ class TestParticipantRecordedMammogramForm:
             participant,
             current_provider,
             {
-                "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ELSEWHERE_UK.value,
+                "where_taken": ParticipantRecordedMammogramForm.WhereTaken.UK.value,
                 "when_taken": "approx",
                 "name_is_the_same": "no",
             },
@@ -144,25 +144,9 @@ class TestParticipantRecordedMammogramForm:
         assert form.errors == {
             "approx_date": ["Enter the approximate date when the x-rays were taken"],
             "different_name": ["Enter the name the x-rays were taken with"],
-            "somewhere_else_in_the_uk_details": [
+            "somewhere_in_the_uk_details": [
                 "Enter the clinic or hospital name, or any location details"
             ],
-        }
-
-    def test_no_provider_selected(self, participant, current_provider):
-        form = ParticipantRecordedMammogramForm(
-            participant,
-            current_provider,
-            {
-                "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ANOTHER_UNIT.value,
-                "when_taken": "approx",
-                "approx_date": "5 years ago",
-                "name_is_the_same": "yes",
-            },
-        )
-        assert not form.is_valid()
-        assert form.errors == {
-            "provider": ["Select another breast screening unit"],
         }
 
     def test_mammogram_in_same_provider(self, participant, current_provider):
@@ -183,30 +167,10 @@ class TestParticipantRecordedMammogramForm:
         assert instance.location_type == "NHS_BREAST_SCREENING_UNIT"
         assert instance.location_details == ""
 
-    def test_mammogram_in_different_provider(self, participant, current_provider):
-        other_provider = ProviderFactory.create()
+    def test_mammogram_in_uk(self, participant, current_provider):
         data = {
-            "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ANOTHER_UNIT,
-            "provider": other_provider.pk,
-            "when_taken": "approx",
-            "name_is_the_same": "yes",
-            "approx_date": "5 years ago",
-        }
-
-        form = ParticipantRecordedMammogramForm(participant, current_provider, data)
-        assert form.is_valid(), form.errors
-
-        instance = form.save(commit=False)
-
-        assert instance.participant == participant
-        assert instance.provider == other_provider
-        assert instance.location_type == "NHS_BREAST_SCREENING_UNIT"
-        assert instance.location_details == ""
-
-    def test_mammogram_elsewhere_in_uk(self, participant, current_provider):
-        data = {
-            "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ELSEWHERE_UK,
-            "somewhere_else_in_the_uk_details": "XYZ provider",
+            "where_taken": ParticipantRecordedMammogramForm.WhereTaken.UK,
+            "somewhere_in_the_uk_details": "XYZ provider",
             "when_taken": "approx",
             "name_is_the_same": "yes",
             "approx_date": "5 years ago",
@@ -241,8 +205,8 @@ class TestParticipantRecordedMammogramForm:
 
     def test_full_details(self, participant, current_provider):
         data = {
-            "where_taken": ParticipantRecordedMammogramForm.WhereTaken.ELSEWHERE_UK,
-            "somewhere_else_in_the_uk_details": "XYZ provider",
+            "where_taken": ParticipantRecordedMammogramForm.WhereTaken.UK,
+            "somewhere_in_the_uk_details": "XYZ provider",
             "when_taken": "approx",
             "approx_date": "5 years ago",
             "name_is_the_same": "no",

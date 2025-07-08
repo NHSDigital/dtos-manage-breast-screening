@@ -1,11 +1,9 @@
 from enum import StrEnum
-from typing import cast
 
 from django import forms
 from django.forms import (
     CharField,
     ChoiceField,
-    ModelChoiceField,
     ModelForm,
     ValidationError,
 )
@@ -66,7 +64,6 @@ class ParticipantRecordedMammogramForm(ModelForm):
     class Meta:
         model = ParticipantReportedMammogram
         fields = [
-            "provider",
             "exact_date",
             "approx_date",
             "different_name",
@@ -76,8 +73,7 @@ class ParticipantRecordedMammogramForm(ModelForm):
 
     class WhereTaken(StrEnum):
         SAME_UNIT = "same_unit"
-        ANOTHER_UNIT = "another_unit"
-        ELSEWHERE_UK = ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value
+        UK = ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value
         OUTSIDE_UK = ParticipantReportedMammogram.LocationType.OUTSIDE_UK.value
         PREFER_NOT_TO_SAY = (
             ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY.value
@@ -90,8 +86,7 @@ class ParticipantRecordedMammogramForm(ModelForm):
         self.current_provider = current_provider
         self.where_taken_choices = {
             self.WhereTaken.SAME_UNIT: f"At {current_provider.name}",
-            self.WhereTaken.ANOTHER_UNIT: "At another NHS breast screening unit",
-            self.WhereTaken.ELSEWHERE_UK: "Somewhere else in the UK",
+            self.WhereTaken.UK: "Somewhere in the UK",
             self.WhereTaken.OUTSIDE_UK: "Outside the UK",
             self.WhereTaken.PREFER_NOT_TO_SAY: "Prefer not to say",
         }
@@ -123,24 +118,17 @@ class ParticipantRecordedMammogramForm(ModelForm):
             choices=self.name_is_the_same_choices
         )
 
-        self.fields["somewhere_else_in_the_uk_details"] = CharField(
+        self.fields["somewhere_in_the_uk_details"] = CharField(
             required=False, initial=""
         )
         self.fields["outside_the_uk_details"] = CharField(required=False, initial="")
-
-        provider_field = cast(ModelChoiceField, self.fields["provider"])
-        provider_field.label = "Select a unit"
-
-        # By default, Django use "-----" as the empty choice. Force this to blank.
-        provider_field.empty_label = ""
 
         # Explicitly order the films so that the error summary order
         # matches the order fields are rendered in.
         self.order_fields(
             [
                 "where_taken",
-                "provider",
-                "somewhere_else_in_the_uk_details",
+                "somewhere_in_the_uk_details",
                 "outside_the_uk_details",
                 "when_taken",
                 "exact_date",
@@ -158,22 +146,11 @@ class ParticipantRecordedMammogramForm(ModelForm):
         when_taken = cleaned_data.get("when_taken")
         name_is_the_same = cleaned_data.get("name_is_the_same")
 
-        if where_taken == self.WhereTaken.SAME_UNIT:
-            self.cleaned_data["provider"] = self.current_provider
-        elif where_taken == self.WhereTaken.ANOTHER_UNIT and not cleaned_data.get(
-            "provider"
+        if where_taken == self.WhereTaken.UK and not cleaned_data.get(
+            "somewhere_in_the_uk_details"
         ):
             self.add_error(
-                "provider",
-                ValidationError(
-                    "Select another breast screening unit", code="required"
-                ),
-            )
-        elif where_taken == self.WhereTaken.ELSEWHERE_UK and not cleaned_data.get(
-            "somewhere_else_in_the_uk_details"
-        ):
-            self.add_error(
-                "somewhere_else_in_the_uk_details",
+                "somewhere_in_the_uk_details",
                 ValidationError(
                     "Enter the clinic or hospital name, or any location details",
                     code="required",
@@ -217,17 +194,21 @@ class ParticipantRecordedMammogramForm(ModelForm):
     def set_location_fields(self, instance):
         where_taken = self.cleaned_data["where_taken"]
 
-        if where_taken in (self.WhereTaken.SAME_UNIT, self.WhereTaken.ANOTHER_UNIT):
+        if where_taken == self.WhereTaken.SAME_UNIT:
             instance.location_type = (
                 ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+            )
+        elif where_taken == self.WhereTaken.OUTSIDE_UK:
+            instance.location_type = (
+                ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
             )
         else:
             instance.location_type = where_taken
 
-        if where_taken == self.WhereTaken.ELSEWHERE_UK:
-            instance.location_details = self.cleaned_data[
-                "somewhere_else_in_the_uk_details"
-            ]
+        if where_taken == self.WhereTaken.SAME_UNIT:
+            instance.provider = self.current_provider
+        if where_taken == self.WhereTaken.UK:
+            instance.location_details = self.cleaned_data["somewhere_in_the_uk_details"]
         elif where_taken == self.WhereTaken.OUTSIDE_UK:
             instance.location_details = self.cleaned_data["outside_the_uk_details"]
 

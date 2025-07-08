@@ -6,7 +6,7 @@
 {% from 'radios/macro.jinja' import radios %}
 
 {% from 'textarea/macro.jinja' import textarea %}
-{% from 'django_form_helpers.jinja' import form_error_summary, app_select, app_date_input %}
+{% from 'django_form_helpers.jinja' import form_error_summary, app_date_input %}
 
 {% block beforeContent %}
   {{ backLink(back_link_params) }}
@@ -30,20 +30,16 @@
     <form action="{{request.path}}" method="POST">
       {# Conditional fields #}
 
-      {% set provider_select_html %}
-        {{ app_select(form.provider) }}
-      {% endset %}
-
-      {% set somewhere_else_in_the_uk_details_html %}
+      {% set somewhere_in_the_uk_details_html %}
         {{ textarea({
-          "id": form.somewhere_else_in_the_uk_details.auto_id,
-          "name": form.somewhere_else_in_the_uk_details.html_name,
+          "id": form.somewhere_in_the_uk_details.auto_id,
+          "name": form.somewhere_in_the_uk_details.html_name,
           "rows": "2",
           "label": {
             "text": "Location",
             "_classes": "nhsuk-label--s"
           },
-          "value": form.somewhere_else_in_the_uk_details.value(),
+          "value": form.somewhere_in_the_uk_details.value(),
           "hint": {
             "text": "Include the clinic or hospital name, or any location details"
           }
@@ -122,16 +118,10 @@
             "checked": form.where_taken.value() == form.WhereTaken.SAME_UNIT
           },
           {
-            "value": form.WhereTaken.ANOTHER_UNIT,
-            "text": form.where_taken_choices[form.WhereTaken.ANOTHER_UNIT],
-            "checked": form.where_taken.value() == form.WhereTaken.ANOTHER_UNIT,
-            "conditional": {"html": provider_select_html}
-          },
-          {
-            "value": form.WhereTaken.ELSEWHERE_UK,
-            "text": form.where_taken_choices[form.WhereTaken.ELSEWHERE_UK],
-            "checked": form.where_taken.value() == form.WhereTaken.ELSEWHERE_UK,
-            "conditional": {"html": somewhere_else_in_the_uk_details_html}
+            "value": form.WhereTaken.UK,
+            "text": form.where_taken_choices[form.WhereTaken.UK],
+            "checked": form.where_taken.value() == form.WhereTaken.UK,
+            "conditional": {"html": somewhere_in_the_uk_details_html}
           },
           {
             "value": form.WhereTaken.OUTSIDE_UK,
