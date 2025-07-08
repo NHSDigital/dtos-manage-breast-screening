@@ -87,6 +87,18 @@
         }) }}
       {% endset %}
 
+      {% set different_name_html %}
+        {{ input({
+          "id": form.different_name.auto_id,
+          "name": form.different_name.html_name,
+          "label": {
+            "text": "Enter the previously used name"
+          },
+          "value": form.different_name.value(),
+          "classes": "nhsuk-u-width-two-thirds"
+        }) }}
+      {% endset %}
+
       {# Radios with conditionals #}
 
       {{ radios({
@@ -192,7 +204,8 @@
           {
             "value": "no",
             "text": form.name_is_the_same_choices["no"],
-            "checked": form.name_is_the_same.value() == "no"
+            "checked": form.name_is_the_same.value() == "no",
+            "conditional": {"html": different_name_html}
           }
         ]
       }) }}
