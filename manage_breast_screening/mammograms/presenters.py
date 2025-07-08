@@ -24,9 +24,8 @@ def present_secondary_nav(pk):
 
 
 class AppointmentPresenter:
-    def __init__(self, appointment, last_known_screening=None):
+    def __init__(self, appointment):
         self._appointment = appointment
-        self._last_known_screening = last_known_screening
 
         self.allStatuses = AppointmentStatus
         self.pk = appointment.pk
@@ -56,8 +55,15 @@ class AppointmentPresenter:
             "is_confirmed": current_status.state == AppointmentStatus.CONFIRMED,
         }
 
+
+class LastKnownMammogramPresenter:
+    def __init__(self, last_known_screening, participant_pk, current_url):
+        self._last_known_screening = last_known_screening
+        self.participant_pk = participant_pk
+        self.current_url = current_url
+
     @cached_property
-    def last_known_screening(self):
+    def last_known_mammogram(self):
         return (
             {
                 "date": format_date(self._last_known_screening.created_at),
@@ -72,6 +78,21 @@ class AppointmentPresenter:
             if self._last_known_screening
             else {}
         )
+
+    @cached_property
+    def add_link(self):
+        href = (
+            reverse(
+                "participants:add_previous_mammogram",
+                kwargs={"pk": self.participant_pk},
+            )
+            + f"?return_url={self.current_url}"
+        )
+        return {
+            "href": href,
+            "text": "Add another" if self.last_known_mammogram else "Add",
+            "visually_hidden_text": "mammogram",
+        }
 
 
 class ClinicSlotPresenter:

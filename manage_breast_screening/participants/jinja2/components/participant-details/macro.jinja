@@ -1,4 +1,4 @@
-{% macro participant_details(participant, return_url=none, last_known_screening=none, show_last_known_mammogram=true, full_details=false) %}
+{% macro participant_details(presented_participant, presented_mammograms, return_url=none, full_details=false) %}
   {% if return_url is none %}
     {{ raise('return_url is required') }}
   {% endif %}

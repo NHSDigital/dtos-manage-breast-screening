@@ -1,13 +1,30 @@
 from logging import getLogger
+from urllib.parse import urlparse
 
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from .forms import EthnicityForm
+from manage_breast_screening.participants.services import fetch_current_provider
+
+from .forms import EthnicityForm, ParticipantRecordedMammogramForm
 from .models import Appointment, Participant
 from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
 
 logger = getLogger(__name__)
+
+
+def parse_return_url(request, default: str) -> str:
+    """
+    Parse the return_url from the query params, with a fallback,
+    and validating that the URL is not external to the service.
+    """
+    query_params = request.GET
+    return_url = query_params.get("return_url")
+
+    if not return_url or urlparse(return_url).netloc:
+        return default
+
+    return return_url
 
 
 def show(request, pk):
@@ -68,5 +85,39 @@ def edit_ethnicity(request, pk):
                 "text": "Go back",
                 "href": return_url,
             },
+        },
+    )
+
+
+def add_previous_mammogram(request, pk):
+    participant = get_object_or_404(Participant, pk=pk)
+    current_provider = fetch_current_provider(pk)
+    return_url = parse_return_url(
+        request, default=reverse("participants:show", kwargs={"pk": pk})
+    )
+
+    if request.method == "POST":
+        form = ParticipantRecordedMammogramForm(
+            data=request.POST,
+            participant=participant,
+            current_provider=current_provider,
+        )
+        if form.is_valid():
+            form.save()
+
+            return redirect(return_url)
+    else:
+        form = ParticipantRecordedMammogramForm(
+            participant=participant, current_provider=current_provider
+        )
+
+    return render(
+        request,
+        "participants/add_previous_mammogram.jinja",
+        {
+            "title": "Add details of a previous mammogram",
+            "caption": participant.full_name,
+            "form": form,
+            "back_link_params": {"href": return_url, "text": "Go back"},
         },
     )
