@@ -130,7 +130,7 @@ poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breas
 
 ### Integration Tests (Real MESH Client)
 
-**Tests that validate real API integration:**
+**Tests that validate real MESH API integration:**
 
 ```bash
 # Run integration tests (requires MESH client running)
@@ -143,13 +143,18 @@ poetry run pytest -m integration -v
 **What's tested:**
 - Real MESH API connectivity
 - Actual API response structures
-- End-to-end integration
 - Network timeouts and errors
+- MESH API endpoint validation
 
 **Requirements:**
 - **MESH client IS needed** - Makes real HTTP requests
+- **Azure Storage is mocked** - Focus is on MESH API only
 - **Gracefully skips** - When MESH client unavailable
 - **Conditional execution** - Only runs when MESH available
+
+**Note:** These tests focus specifically on MESH API integration. Azure Storage operations are tested separately in the storage module.
+
+**Note:** For testing real Azure Storage operations, the storage module should include Azurite integration tests.
 
 ### Test Execution Strategies
 
@@ -182,15 +187,25 @@ poetry run pytest manage_breast_screening/notifications/mesh/tests/test_polling.
 | Test Type | Coverage | Speed | MESH Client | Azure Connection | Use Case |
 |-----------|----------|-------|-------------|------------------|----------|
 | **Unit Tests** | Business Logic | Fast | Not needed (mocked) | Not needed (mocked) | CI/CD, Development |
-| **Integration Tests** | API Integration | Slow | Required (real) | Not needed (mocked) | Local Validation |
+| **Storage Tests** | Azure Storage Logic | Medium | Not needed (mocked) | Azurite (real) | Storage validation |
+| **Integration Tests** | MESH API Integration | Medium | Required (real) | Not needed (mocked) | API connectivity |
+
+**Note:** Storage tests should include Azurite integration tests for real Azure Storage operations, while MESH integration tests focus only on MESH API connectivity.
 
 ### Environment-Specific Testing
 
 #### **Local Development**
 ```bash
-# Start MESH client locally
-# Then run both test suites
-poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breast_screening/notifications/storage/tests/ manage_breast_screening/notifications/tests/test_mesh_integration.py -v
+# Run unit tests (fastest)
+poetry run pytest manage_breast_screening/notifications/mesh/tests/ manage_breast_screening/notifications/storage/tests/ -v
+
+# Run integration tests (if MESH client available)
+poetry run pytest manage_breast_screening/notifications/tests/test_mesh_integration.py -v
+
+# Test storage with Azurite (if available)
+azurite --silent &
+export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+poetry run python manage.py test manage_breast_screening.notifications.storage.tests --verbosity=2
 ```
 
 #### **CI/CD Pipeline**
@@ -305,5 +320,11 @@ All commands in this README have been tested and verified to work correctly:
 - ✅ **Dry-run functionality** - Properly skips Azure storage and acknowledgement
 - ✅ **Troubleshooting commands** - All diagnostic tools working
 - ✅ **MESH API integration** - Correct response parsing and error handling
+- ✅ **Storage logic** - Comprehensive Azure Storage operation testing
 
 **Test Results:** 35/35 tests passing with comprehensive coverage of all functionality.
+
+**Testing Strategy:**
+- **Unit Tests** - Mock everything for fast, reliable CI/CD
+- **Storage Tests** - Test Azure Storage logic (should include Azurite integration)
+- **Integration Tests** - Real MESH API with mocked Azure Storage (single integration focus)
