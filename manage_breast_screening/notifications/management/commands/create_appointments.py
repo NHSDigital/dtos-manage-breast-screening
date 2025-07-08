@@ -10,6 +10,8 @@ from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.models import Appointment, Clinic
 
+TZ_INFO = ZoneInfo("Europe/London")
+
 
 class Command(BaseCommand):
     """
@@ -60,6 +62,7 @@ class Command(BaseCommand):
 
     def find_or_create_clinic(self, row: dict) -> Clinic:
         return Clinic.objects.get_or_create(
+            bso_code=row["BSO"],
             code=row["Clinic Code"],
             defaults={
                 "holding_clinic": True if row["Holding Clinic"] == "Y" else False,
@@ -94,7 +97,7 @@ class Command(BaseCommand):
             f"{row['Appt Date']} {row['Appt Time']}",
             "%Y%m%d %H%M",
         )
-        return dt.replace(tzinfo=ZoneInfo("Europe/London"))
+        return dt.replace(tzinfo=TZ_INFO)
 
     @cached_property
     def blob_service_client(self) -> BlobServiceClient:

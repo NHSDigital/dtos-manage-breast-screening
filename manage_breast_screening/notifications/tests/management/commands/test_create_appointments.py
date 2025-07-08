@@ -1,12 +1,13 @@
 import datetime
 import os
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
-from azure.storage.blob import ContainerClient
+from azure.storage.blob import BlobProperties, ContainerClient
 from django.core.management.base import CommandError
 
 from manage_breast_screening.notifications.management.commands.create_appointments import (
+    TZ_INFO,
     Command,
 )
 from manage_breast_screening.notifications.models import Appointment, Clinic
@@ -32,7 +33,9 @@ class TestCreateAppointments:
         subject = Command()
 
         mock_container_client = Mock(spec=ContainerClient)
-        mock_container_client.list_blobs.return_value = [f"{today_dirname}/test.dat"]
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = PropertyMock(return_value=f"{today_dirname}/test.dat")
+        mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
             raw_data
         )
@@ -40,8 +43,27 @@ class TestCreateAppointments:
 
         subject.handle()
 
-        assert len(Clinic.objects.all()) == 2
-        assert len(Appointment.objects.all()) == 3
+        assert Clinic.objects.count() == 2
+        clinics = Clinic.objects.all()
+        assert clinics[0].code == "BU003"
+        assert clinics[0].bso_code == "KMK"
+        assert clinics[0].holding_clinic is False
+        assert clinics[0].name == "BREAST CARE UNIT"
+        assert clinics[0].address_line_1 == "BREAST CARE UNIT"
+        assert clinics[0].address_line_2 == "MILTON KEYNES HOSPITAL"
+        assert clinics[0].address_line_3 == "STANDING WAY"
+        assert clinics[0].address_line_4 == "MILTON KEYNES"
+        assert clinics[0].address_line_5 == "MK6 5LD"
+        assert clinics[0].postcode == "MK6 5LD"
+
+        assert Appointment.objects.count() == 3
+        appointments = Appointment.objects.all()
+        assert appointments[0].nhs_number == 9449304424
+        assert appointments[0].starts_at == datetime.datetime(
+            2025, 1, 10, 8, 45, tzinfo=TZ_INFO
+        )
+        assert appointments[0].status == "C"
+        assert appointments[0].clinic == clinics[0]
 
     @pytest.mark.django_db
     def test_handle_with_no_data(self, mock_blob_service):
