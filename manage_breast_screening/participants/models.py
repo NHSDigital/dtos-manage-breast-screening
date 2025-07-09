@@ -160,7 +160,17 @@ class ParticipantAddress(models.Model):
 
 
 class ScreeningEpisode(BaseModel):
+    class Protocol:
+        FAMILY_HISTORY = "FAMILY_HISTORY"
+
+    PROTOCOL_CHOICES = {
+        Protocol.FAMILY_HISTORY: "Family history",
+    }
+
     participant = models.ForeignKey(Participant, on_delete=models.PROTECT)
+    protocol = models.CharField(
+        choices=PROTOCOL_CHOICES, default=Protocol.FAMILY_HISTORY, max_length=50
+    )
 
     def screening_history(self):
         """

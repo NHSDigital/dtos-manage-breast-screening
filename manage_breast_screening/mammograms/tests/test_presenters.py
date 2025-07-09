@@ -82,6 +82,15 @@ class TestAppointmentPresenter:
             == "/participants/ac1b68ec-06a4-40a0-a016-7108dffe4397/"
         )
 
+    def test_screening_protocol(self, mock_appointment):
+        mock_appointment.screening_episode.get_protocol_display.return_value = (
+            "Family history"
+        )
+
+        result = AppointmentPresenter(mock_appointment)
+
+        assert result.screening_protocol == "Family history"
+
 
 class TestLastKnownMammogramPresenter:
     @pytest.fixture()

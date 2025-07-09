@@ -56,6 +56,10 @@
   {{ card({
     "headingHtml": " ",
     "headingLevel": "2",
-    "descriptionHtml": participant_details(presented_participant=presented_participant, presented_mammograms=presented_mammograms, return_url=request.path)
+    "descriptionHtml": participant_details(
+      presented_participant=presented_participant,
+      return_url=request.path,
+      screening_protocol=presented_appointment.screening_protocol,
+    )
   }) }}
 {% endblock %}

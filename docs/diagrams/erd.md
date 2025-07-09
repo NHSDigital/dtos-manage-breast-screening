@@ -123,6 +123,7 @@ ScreeningEpisode {
     DateTimeField created_at
     DateTimeField updated_at
     ForeignKey participant
+    CharField protocol
 }
 Appointment {
     UUIDField id
