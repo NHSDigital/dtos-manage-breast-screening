@@ -76,10 +76,6 @@ models:
 shell:
 	poetry run ./manage.py shell
 
-erd:
-	poetry run python -m django_diagram --settings manage_breast_screening.config.settings --output docs/diagrams/erd.md
-	sed -i '' '1s/^/```mermaid\n/' docs/diagrams/erd.md && printf '\n```\n' >> docs/diagrams/erd.md
-
 _install-poetry:
 	if ! command -v poetry >/dev/null 2>&1; then \
 		pip install poetry; \

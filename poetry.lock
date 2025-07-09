@@ -542,21 +542,6 @@ django = ">=4.2.9"
 sqlparse = ">=0.2"
 
 [[package]]
-name = "django-diagram"
-version = "0.0.1"
-description = "Generate an Entity Relationship Diagram for a Django project in Mermaid format"
-optional = false
-python-versions = "*"
-groups = ["dev"]
-files = [
-    {file = "django-diagram-0.0.1.tar.gz", hash = "sha256:7fa243ddaf3e71c0438274424214b7fd38d68acbf3f17f015460d40a0a4a05ab"},
-    {file = "django_diagram-0.0.1-py3-none-any.whl", hash = "sha256:84fef6edc2ace54c7304c445d6f48ba9b44fd19f328410caa17b19f92013c659"},
-]
-
-[package.dependencies]
-django = ">=3.0"
-
-[[package]]
 name = "dotenv"
 version = "0.9.9"
 description = "Deprecated package"
@@ -1681,4 +1666,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "1ffb1acc4ba15538e4cb1008aa7f7d06af404bf67582ec5a0d7c6f50b1695b9b"
+content-hash = "b25a1c9594a313851fd0975c98f945b568faf9e617adce2d8cc89e1e53dad40d"

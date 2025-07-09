@@ -110,10 +110,6 @@ To generate a new app, run:
 poetry run ./manage.py startapp <app_name> manage_breast_screening/`
 ```
 
-### Entity relationship
-
-[Mermaid ERD](docs/diagrams/erd.md)
-
 ## Manual Deployment
 
 The build pipeline builds and pushes a docker image to [Github container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry). The app is deployed to an [Azure container app](https://azure.microsoft.com/en-us/products/container-apps) using terraform.
