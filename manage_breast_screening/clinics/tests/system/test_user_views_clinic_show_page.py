@@ -40,9 +40,13 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.then_the_appointment_is_checked_in()
         self.and_the_appointments_remain_in_the_same_order()
 
+    def test_user_views_clinic_show_page_with_special_appointments(self):
         self.given_an_appointment_has_extra_needs()
-        self.and_i_reload_the_clinic_show_page()
+        self.given_i_am_on_the_clinic_list()
+        self.when_i_click_on_the_clinic()
         self.then_i_can_see_the_appointment_tagged_as_special()
+        self.when_i_click_on_the_special_appointment()
+        self.then_i_can_see_the_special_appointment_banner()
 
     def given_there_are_appointments(self):
         self.confirmed_appointment = AppointmentFactory(
@@ -171,6 +175,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(
                 hour=11, minute=10
             ),
+            current_status=AppointmentStatus.CONFIRMED,
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Special Appointment",
             screening_episode__participant__extra_needs=["Wheelchair user"],
@@ -182,5 +187,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             row.locator(".nhsuk-tag").filter(has_text="Special appointment")
         ).to_be_visible()
 
-    def and_i_reload_the_clinic_show_page(self):
-        self.page.reload()
+    def when_i_click_on_the_special_appointment(self):
+        self.page.get_by_role("link", name="Janet Special Appointment").click()
+
+    def then_i_can_see_the_special_appointment_banner(self):
+        banner = self.page.locator(".nhsuk-warning-callout")
+        expect(banner).to_be_visible()
+        expect(banner).to_contain_text("Special appointment")
+        expect(banner).to_contain_text("Wheelchair user")
