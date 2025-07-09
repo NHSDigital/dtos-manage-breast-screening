@@ -60,7 +60,7 @@ class Command(BaseCommand):
             skipfooter=1,
         )
 
-    def find_or_create_clinic(self, row: dict) -> Clinic:
+    def find_or_create_clinic(self, row: dict) -> tuple[Clinic, bool]:
         return Clinic.objects.get_or_create(
             bso_code=row["BSO"],
             code=row["Clinic Code"],
@@ -78,7 +78,9 @@ class Command(BaseCommand):
             },
         )
 
-    def find_or_create_appointment(self, row: dict, clinic: Clinic) -> Appointment:
+    def find_or_create_appointment(
+        self, row: dict, clinic: Clinic
+    ) -> tuple[Appointment, bool]:
         return Appointment.objects.get_or_create(
             nhs_number=row["NHS Num"],
             nbss_id=row["Appointment ID"],
