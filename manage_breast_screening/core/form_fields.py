@@ -7,45 +7,6 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 
-class YearField(forms.IntegerField):
-    """
-    In integer field that accepts years between 1900 and now
-    Allows 2-digit year entry which is converted depending on the `era_boundary`
-    Adapted from https://github.com/ministryofjustice/django-govuk-forms/blob/master/govuk_forms/fields.py
-    """
-
-    def __init__(self, era_boundary=None, **kwargs):
-        self.current_year = now().year
-        self.century = 100 * (self.current_year // 100)
-        if era_boundary is None:
-            # 2-digit dates are a minimum of 10 years ago by default
-            era_boundary = self.current_year - self.century - 10
-        self.era_boundary = era_boundary
-        bounds_error = gettext("Year should be between 1900 and %(current_year)s.") % {
-            "current_year": self.current_year
-        }
-        options = {
-            "min_value": 1900,
-            "max_value": self.current_year,
-            "error_messages": {
-                "min_value": bounds_error,
-                "max_value": bounds_error,
-                "invalid": gettext("Enter year as a number."),
-            },
-        }
-        options.update(kwargs)
-        super().__init__(**options)
-
-    def clean(self, value):
-        value = self.to_python(value)
-        if isinstance(value, int) and value < 100:
-            if value > self.era_boundary:
-                value += self.century - 100
-            else:
-                value += self.century
-        return super().clean(value)
-
-
 class SplitDateWidget(widgets.MultiWidget):
     """
     A widget that splits a date into 3 number inputs.
@@ -102,8 +63,14 @@ class SplitDateField(forms.MultiValueField):
     default_error_messages = {"invalid": _("Enter a valid date.")}
 
     def __init__(self, *args, **kwargs):
+        min_year = kwargs.pop("min_year", 1900)
+        max_year = kwargs.pop("max_year", now().year)
+
         day_bounds_error = gettext("Day should be between 1 and 31.")
         month_bounds_error = gettext("Month should be between 1 and 12.")
+        year_bounds_error = gettext(
+            "Year should be between %(min_year)s and %(max_year)s."
+        ) % {"min_year": min_year, "max_year": max_year}
 
         day_kwargs = {
             "min_value": 1,
@@ -123,16 +90,20 @@ class SplitDateField(forms.MultiValueField):
                 "invalid": gettext("Enter month as a number."),
             },
         }
-        year_kwargs = {}
-
-        max_year = kwargs.pop("max_year", None)
-        if max_year:
-            year_kwargs["max_value"] = max_year
+        year_kwargs = {
+            "min_value": min_year,
+            "max_value": max_year,
+            "error_messages": {
+                "min_value": year_bounds_error,
+                "max_value": year_bounds_error,
+                "invalid": gettext("Enter year as a number."),
+            },
+        }
 
         self.fields = [
             forms.IntegerField(**day_kwargs),
             forms.IntegerField(**month_kwargs),
-            YearField(**year_kwargs),
+            forms.IntegerField(**year_kwargs),
         ]
 
         super().__init__(self.fields, *args, **kwargs)

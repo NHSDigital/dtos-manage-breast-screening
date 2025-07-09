@@ -157,4 +157,4 @@ class TestSplitDateField:
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2027"})
         assert not f.is_valid()
-        assert f.errors == {"date": ["Year should be between 1900 and 2025."]}
+        assert f.errors == {"date": ["Year should be between 1900 and 2026."]}
