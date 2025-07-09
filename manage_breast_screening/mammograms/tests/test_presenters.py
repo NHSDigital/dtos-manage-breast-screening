@@ -91,6 +91,20 @@ class TestAppointmentPresenter:
 
         assert result.screening_protocol == "Family history"
 
+    @pytest.mark.parametrize(
+        "extra_needs, expected_result",
+        [
+            ([], False),
+            (["Wheelchair access"], True),
+            (["Wheelchair access", "Interpreter required"], True),
+        ],
+    )
+    def test_is_special_appointment(
+        self, mock_appointment, extra_needs, expected_result
+    ):
+        mock_appointment.screening_episode.participant.extra_needs = extra_needs
+        presenter = AppointmentPresenter(mock_appointment)
+        assert presenter.is_special_appointment == expected_result
 
 class TestLastKnownMammogramPresenter:
     @pytest.fixture()

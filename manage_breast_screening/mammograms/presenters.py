@@ -44,6 +44,17 @@ class AppointmentPresenter:
         return self.clinic_slot.starts_at
 
     @cached_property
+    def is_special_appointment(self):
+        return bool(self.participant.extra_needs)
+
+    @cached_property
+    def special_appointment_tag_properties(self):
+        return {
+            "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2",
+            "text": "Special appointment",
+        }
+
+    @cached_property
     def current_status(self):
         current_status = self._appointment.current_status
 

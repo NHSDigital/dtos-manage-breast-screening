@@ -58,9 +58,17 @@
       {{ presented_appointment.participant.date_of_birth }}<br>
       <span class="nhsuk-hint">({{ presented_appointment.participant.age }})</span>
     {% endset %}
+    {% set start_time_html %}
+      {{ presented_appointment.start_time }}
+      {% if presented_appointment.is_special_appointment %}
+        <br>
+        {{ tag(presented_appointment.special_appointment_tag_properties) }}
+      {% endif %}
+    {% endset %}
+
     {% do table_rows.append([
       {
-        "text": presented_appointment.start_time
+        "html": start_time_html
       },
       {
         "html": details_html
@@ -87,7 +95,7 @@
   {{ table({
     "head": [
       {
-        "text": "Time"
+        "text": "Start time"
       },
       {
         "text": "Details"
