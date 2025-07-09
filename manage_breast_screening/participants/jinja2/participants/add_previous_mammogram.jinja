@@ -42,7 +42,10 @@
           "value": form.somewhere_in_the_uk_details.value(),
           "hint": {
             "text": "Include the clinic or hospital name, or any location details"
-          }
+          },
+          "errorMessage": {
+            "text": form.somewhere_in_the_uk_details.errors | first
+          } if form.somewhere_in_the_uk_details.errors,
         }) }}
       {% endset %}
 
@@ -59,7 +62,10 @@
           "value": form.outside_the_uk_details.value(),
           "hint": {
             "text": "Include the clinic or hospital name, or any location details"
-          }
+          },
+          "errorMessage": {
+            "text": form.outside_the_uk_details.errors | first
+          } if form.outside_the_uk_details.errors,
         }) }}
       {% endset %}
 
@@ -79,7 +85,10 @@
             "text": "For example, 9 months ago"
           },
           "classes": "nhsuk-u-width-two-thirds",
-          "value": form.approx_date.value()
+          "value": form.approx_date.value(),
+            "errorMessage": {
+            "text": form.approx_date.errors | first
+          } if form.approx_date.errors
         }) }}
       {% endset %}
 
@@ -91,7 +100,10 @@
             "text": "Enter the previously used name"
           },
           "value": form.different_name.value(),
-          "classes": "nhsuk-u-width-two-thirds"
+          "classes": "nhsuk-u-width-two-thirds",
+          "errorMessage": {
+            "text": form.different_name.errors | first
+          } if form.different_name.errors
         }) }}
       {% endset %}
 
