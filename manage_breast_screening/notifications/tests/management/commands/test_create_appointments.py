@@ -66,6 +66,35 @@ class TestCreateAppointments:
         assert appointments[0].clinic == clinics[0]
 
     @pytest.mark.django_db
+    def test_handle_accept_date_arg(self, mock_blob_service, raw_data):
+        """Test Appointment record creation when passed a specific date as argument"""
+        subject = Command()
+
+        mock_container_client = Mock(spec=ContainerClient)
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = PropertyMock(return_value="2025-07-01/test.dat")
+        mock_container_client.list_blobs.return_value = [mock_blob]
+        mock_container_client.get_blob_client().download_blob().readall.return_value = (
+            raw_data
+        )
+        subject.container_client.return_value = mock_container_client
+
+        subject.handle("20250701")
+
+        assert Clinic.objects.count() == 2
+        assert Appointment.objects.count() == 3
+
+    @pytest.mark.django_db
+    def test_handle_with_invalid_date_arg(self, mock_blob_service):
+        """Test command execution with an invalid date argument"""
+        subject = Command()
+
+        with pytest.raises(CommandError):
+            subject.handle("Noooooooo!")
+
+        assert Appointment.objects.count() == 0
+
+    @pytest.mark.django_db
     def test_handle_with_no_data(self, mock_blob_service):
         """Test that no records are created when there is no stored data"""
         subject = Command()
@@ -78,6 +107,7 @@ class TestCreateAppointments:
         assert len(Clinic.objects.all()) == 0
         assert len(Appointment.objects.all()) == 0
 
+    @pytest.mark.django_db
     def test_handle_with_error(self, mock_blob_service):
         """Test exception handling of the create_appointments command"""
         subject = Command()
@@ -85,3 +115,5 @@ class TestCreateAppointments:
 
         with pytest.raises(CommandError):
             subject.handle()
+
+        assert Appointment.objects.count() == 0
