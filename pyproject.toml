@@ -34,6 +34,7 @@ ipdb = "^0.13.13"
 axe-playwright-python = "^0.1.5"
 ruff = "^0.12.2"
 django-debug-toolbar = "^5.2.0"
+requests-mock = "^1.12.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
