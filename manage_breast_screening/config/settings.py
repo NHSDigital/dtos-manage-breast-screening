@@ -222,6 +222,7 @@ LOGGING = {
             "handlers": ["console"],
             "propagate": False,
         },
+        "faker": {"level": "INFO"},
     },
 }
 

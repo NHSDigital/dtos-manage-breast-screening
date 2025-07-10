@@ -1,13 +1,15 @@
-{% from 'radios/macro.jinja' import radios as radios_component %}
 {% from "checkboxes/macro.jinja" import checkboxes as checkboxes_component %}
+{% from 'date-input/macro.jinja' import dateInput as date_input_component %}
 {% from 'error-summary/macro.jinja' import errorSummary %}
+{% from 'radios/macro.jinja' import radios as radios_component %}
+{% from 'select/macro.jinja' import select as select_component %}
 
 {% macro form_error_summary(form, title="There is a problem") %}
     {% if form.errors %}
       {% set ns = namespace(errors=[]) %}
 
       {% for field in form %}
-        {% set ns.errors = ns.errors + [{"text": ",".join(field.errors), "href": "#" ~ field.auto_id}] %}
+        {% set ns.errors = ns.errors + [{"text": field.errors[0], "href": "#" ~ field.auto_id}] %}
       {% endfor %}
       {% for error_list in form.non_field_errors() %}
         {% set ns.errors = ns.errors + [{"text": ",".join(error_list)}] %}
@@ -58,4 +60,74 @@
 
 {% macro app_checkboxes(form_attribute, legend=None, hint=None) %}
   {{ _render(form_attribute=form_attribute, legend=legend, hint=hint, component=checkboxes_component) }}
+{% endmacro %}
+
+{% macro app_select(form_attribute, label=None, hint=None) %}
+  {% if form_attribute.errors %}
+    {% set error_message = {"text": form_attribute.errors | first} %}
+  {% endif %}
+  {% set ns = namespace(items=[]) %}
+  {% set choice_field = form_attribute.field %}
+  {% for choice in choice_field.choices %}
+    {% set ns.items = ns.items + [{
+      "id": form_attribute.auto_id if loop.first,
+      "value": choice[0],
+      "text": choice[1],
+      "selected": form_attribute.value() in ["", none] if choice[0] == "" else form_attribute.value() == choice[0],
+      "disabled": choice[0] == ""
+    }] %}
+  {% endfor %}
+  {{ select_component({
+    "name": form_attribute.html_name,
+    "id": form_attribute.auto_id,
+    "label": {"text": form_attribute.label},
+    "errorMessage": error_message,
+    "hint": {
+      "html": hint|e
+    } if hint,
+    "items": ns.items
+  }) }}
+{% endmacro %}
+
+{% macro app_date_input(form_attribute, legend=None, hint=None) %}
+  {% if form_attribute.errors %}
+    {% set error_message = {"text": form_attribute.errors | first} %}
+  {% endif %}
+  {% set ns = namespace(items=[]) %}
+  {% set widgets = form_attribute.subwidgets %}
+  {{ date_input_component({
+    "name": form_attribute.html_name,
+    "id": form_attribute.auto_id,
+    "fieldset":  {
+      "legend": {
+        "text": legend,
+        "classes": "nhsuk-fieldset__legend--m",
+        "isPageHeading": false
+      }
+    } if legend,
+    "errorMessage": error_message,
+    "hint": {
+      "html": hint|e
+    } if hint,
+    "items": [
+      {
+        "name": form_attribute.subwidgets.0.data.name,
+        "label": "Day",
+        "classes": "nhsuk-input--width-2",
+        "value": form_attribute.subwidgets.0.data.value
+      },
+      {
+        "name": form_attribute.subwidgets.1.data.name,
+        "label": "Month",
+        "classes": "nhsuk-input--width-2",
+        "value": form_attribute.subwidgets.1.data.value
+      },
+      {
+        "name": form_attribute.subwidgets.2.data.name,
+        "label": "Year",
+        "classes": "nhsuk-input--width-4",
+        "value": form_attribute.subwidgets.2.data.value
+      }
+    ]
+  }) }}
 {% endmacro %}
