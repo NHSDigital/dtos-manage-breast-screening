@@ -45,7 +45,7 @@ class Command(BaseCommand):
                     if appt_created:
                         self.stdout.write(f"{appt} created")
 
-                self.stdout.write(f"Processed {data_frame.size} rows from {blob.name}")
+                self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
             raise CommandError(e)
 
