@@ -5,7 +5,12 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView
 
-from ..participants.models import Appointment, AppointmentStatus, Participant
+from ..participants.models import (
+    Appointment,
+    AppointmentStatus,
+    Participant,
+    ParticipantReportedMammogram,
+)
 from .forms import (
     AppointmentCannotGoAheadForm,
     AskForMedicalInformationForm,
@@ -47,11 +52,14 @@ class StartScreening(BaseAppointmentForm):
         context = super().get_context_data(**kwargs)
 
         appointment = self.get_appointment()
-        last_known_screening = appointment.screening_episode.previous()
+        participant_pk = appointment.screening_episode.participant.pk
+        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
+            participant_id=participant_pk
+        ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(appointment)
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_screening,
-            participant_pk=appointment.screening_episode.participant.pk,
+            last_known_mammograms,
+            participant_pk=participant_pk,
             current_url=self.request.path,
         )
 

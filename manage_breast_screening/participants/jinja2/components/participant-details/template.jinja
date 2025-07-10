@@ -41,14 +41,24 @@
 {% endset %}
 {% set address_html = address_html | trim | default("Not provided") %}
 
-{% set last_known_mammogram = presented_mammograms.last_known_mammogram %}
+{% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
 {% set last_mammogram_html %}
-  {% if last_known_mammogram %}
-    {{ last_known_mammogram.date }} ({{ last_known_mammogram.relative_date | as_hint }})
-    {% if last_known_mammogram.location %}
-      </br>{{ last_known_mammogram.location }}
-      {% if last_known_mammogram.type %}</br>{{ last_known_mammogram.type }}{% endif %}
-    {% endif %}
+  {% if mammograms_by_date_added %}
+    {% for mammogram in mammograms_by_date_added %}
+      <p>
+      <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
+      <br>{% if mammogram.date.is_exact %}{{mammogram.date.absolute}} <span class="app-text-grey">({{mammogram.date.relative}})</span>{% else %}{{ mammogram.date.value }}{% endif %}
+      <br>{{ mammogram.location }}
+
+      {% if mammogram.different_name %}
+        <br>Previous name: {{ mammogram.different_name }}
+      {% endif %}
+
+      {% if mammogram.additional_information %}
+        <br>Additional information: {{ mammogram.additional_information | nl2br }}
+      {% endif %}
+      </p>
+    {% endfor %}
   {% else %}
   {{ "Not known" | as_hint }}
   {% endif %}
@@ -131,7 +141,7 @@
    },
    {
      "key": {
-       "text": "Last known mammogram"
+       "text": "Last known mammograms"
      },
      "value": {
        "html": last_mammogram_html
