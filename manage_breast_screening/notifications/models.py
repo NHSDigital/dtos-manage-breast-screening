@@ -27,6 +27,7 @@ class MessageBatch(BaseModel):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     notify_id = models.CharField(max_length=50, blank=True)
+    routing_plan_id = models.UUIDField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     scheduled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
@@ -74,13 +75,13 @@ class Appointment(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nbss_id = models.CharField(max_length=30)
-    nhs_number = models.IntegerField(null=False)
+    nhs_number = models.BigIntegerField(null=False)
     status = models.CharField(max_length=50)
     booked_by = models.CharField(max_length=50)
     cancelled_by = models.CharField(max_length=50)
     number = models.IntegerField(null=True, default=1)
     starts_at = models.DateTimeField(null=False)
-    created_at = models.DateTimeField(null=False)
+    created_at = models.DateTimeField(null=False, auto_now_add=True)
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
@@ -95,6 +96,7 @@ class Clinic(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     code = models.CharField(max_length=50)
+    bso_code = models.CharField(max_length=50, null=True)
     name = models.CharField(max_length=50)
     alt_name = models.CharField(max_length=50)
     holding_clinic = models.BooleanField()
@@ -106,8 +108,8 @@ class Clinic(models.Model):
     address_line_5 = models.CharField(max_length=50)
     address_line_5 = models.CharField(max_length=50)
     postcode = models.CharField(max_length=50)
-    created_at = models.DateTimeField(null=False)
-    updated_at = models.DateTimeField(null=False)
+    created_at = models.DateTimeField(null=False, auto_now_add=True)
+    updated_at = models.DateTimeField(null=False, auto_now_add=True)
 
     def __str__(self):
         return f"Clinic {self.name} ({self.code})"
