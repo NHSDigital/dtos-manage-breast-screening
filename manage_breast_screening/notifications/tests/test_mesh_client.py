@@ -1,6 +1,7 @@
 # Create your tests here.
 
 
+import pytest
 from mesh_client import MeshClient
 
 base_uri = "http://localhost:8700"  # Replace with your actual base URI
@@ -9,6 +10,9 @@ _PASSWORD = "Password"
 _SHARED_KEY = "Testkey"
 
 
+@pytest.mark.skip(
+    reason="This test depends on mesh-sandbox running in another container"
+)
 def test_get_file():
     with MeshClient(
         url=base_uri,
