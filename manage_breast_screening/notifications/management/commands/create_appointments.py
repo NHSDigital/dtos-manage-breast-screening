@@ -26,10 +26,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            for blob in self.container_client().list_blobs(
+            for blob in self.container_client.list_blobs(
                 name_starts_with=self.blob_dir_prefix(args)
             ):
-                blob_client = self.container_client().get_blob_client(blob)
+                blob_client = self.container_client.get_blob_client(blob)
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()
@@ -110,11 +110,10 @@ class Command(BaseCommand):
         return dt.replace(tzinfo=TZ_INFO)
 
     @cached_property
-    def blob_service_client(self) -> BlobServiceClient:
-        connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
-        return BlobServiceClient.from_connection_string(connection_string)
-
-    @cached_property
     def container_client(self) -> ContainerClient:
+        connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
         container_name = os.getenv("BLOB_CONTAINER_NAME")
-        return self.blob_service_client().get_container_client(container_name)
+
+        return BlobServiceClient.from_connection_string(
+            connection_string
+        ).get_container_client(container_name)
