@@ -20,3 +20,18 @@ services:
       - STORE_MODE=canned 
     volumes:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
+
+  cmapi_stub:
+    build: 
+      context: ./tests/integration/cmapi_stub
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+    healthcheck:
+      test: curl -ksf http://localhost:8888/comms/v1/message-batches || exit 1
+      interval: 3s
+      timeout: 10s

@@ -17,6 +17,7 @@ dependencies = [
   "psycopg[binary] (>=3.2.7,<4.0.0)",
   "azure-identity (>=1.23.0,<2.0.0)",
   "mesh-client (>=3.2.3,<4.0.0)",
+  "requests-mock (>=1.12.1,<2.0.0)",
 ]
 
 [tool.poetry]
