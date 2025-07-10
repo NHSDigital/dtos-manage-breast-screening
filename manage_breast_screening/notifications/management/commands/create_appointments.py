@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 
 import pandas
 from azure.storage.blob import BlobServiceClient, ContainerClient
-from dateutil import parser
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.models import Appointment, Clinic
@@ -24,10 +23,20 @@ class Command(BaseCommand):
     to connect to Azure blob storage.
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "date_str",
+            nargs="?",
+            default=datetime.today()
+            .replace(tzinfo=TZ_INFO)
+            .strftime(DIR_NAME_DATE_FORMAT),
+            help="yyy-MM-dd formatted date reflecting the Azure storage directory",
+        )
+
     def handle(self, *args, **options):
         try:
             for blob in self.container_client.list_blobs(
-                name_starts_with=self.blob_dir_prefix(args)
+                name_starts_with=options["date_str"]
             ):
                 blob_client = self.container_client.get_blob_client(blob)
                 blob_content = blob_client.download_blob(
@@ -48,14 +57,6 @@ class Command(BaseCommand):
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
             raise CommandError(e)
-
-    def blob_dir_prefix(self, args) -> str:
-        dir_date = datetime.today().replace(tzinfo=TZ_INFO)
-
-        if len(args) > 0:
-            dir_date = parser.parse(args[0])
-
-        return dir_date.strftime(DIR_NAME_DATE_FORMAT)
 
     def raw_data_to_data_frame(self, raw_data: str) -> pandas.DataFrame:
         return pandas.read_table(
