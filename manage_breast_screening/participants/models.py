@@ -265,6 +265,10 @@ class Appointment(BaseModel):
     stopped_reasons = models.JSONField(null=True, blank=True)
 
     @property
+    def provider(self):
+        return self.clinic_slot.provider
+
+    @property
     def current_status(self) -> "AppointmentStatus":
         """
         Fetch the most recent status associated with this appointment.
