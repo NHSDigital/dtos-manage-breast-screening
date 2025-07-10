@@ -76,6 +76,7 @@ module storageAccountPrivateEndpoint 'privateEndpoint.bicep' = {
 
 // See: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 var roleID = {
+  CDNContributor: 'ec156ff8-a8d1-4d15-830c-5b80698ca432'
   networkContributor: '4d97b98b-1d4f-4787-a291-c67834d212e7'
 }
 
@@ -86,6 +87,16 @@ resource networkContributorAssignment 'Microsoft.Authorization/roleAssignments@2
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.networkContributor)
     principalId: managedIdentiy.outputs.miPrincipalID
     description: '${managedIdentiy.outputs.miName} Network Contributor access to subscription'
+  }
+}
+
+// Let the managed identity configure Front door and its resources
+resource CDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, envConfig, 'CDNContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.CDNContributor)
+    principalId: managedIdentiy.outputs.miPrincipalID
+    description: '${managedIdentiy.outputs.miName} CDN Contributor access to subscription'
   }
 }
 
