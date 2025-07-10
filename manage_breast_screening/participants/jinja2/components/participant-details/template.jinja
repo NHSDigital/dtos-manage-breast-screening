@@ -43,6 +43,7 @@
 
 {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
 {% set last_mammogram_html %}
+  <div data-testid="mammograms">
   {% if mammograms_by_date_added %}
     {% for mammogram in mammograms_by_date_added %}
       <p>
@@ -62,6 +63,7 @@
   {% else %}
   {{ "Not known" | as_hint }}
   {% endif %}
+  </div>
 {% endset %}
 
 {{ summaryList({
