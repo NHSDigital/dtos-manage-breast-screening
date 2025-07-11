@@ -30,7 +30,6 @@ variable "fetch_secrets_from_app_key_vault" {
     EOT
   default     = false
 }
-
 variable "protect_keyvault" {
   description = "Ability to recover the key vault or its secrets after deletion"
   default     = true
@@ -58,7 +57,11 @@ variable "postgres_storage_tier" {
   default = "P4"
 }
 
-
+variable "enable_auth" {
+  description = "Enable authentication for the container app. If true, the app will use Azure AD authentication."
+  type        = bool
+  default     = false
+}
 locals {
   region              = "uksouth"
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-uks"

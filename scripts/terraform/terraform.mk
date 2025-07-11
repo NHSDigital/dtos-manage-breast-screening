@@ -16,8 +16,6 @@ set-azure-account: # Set the Azure account for the environment - make <env> set-
 resource-group-init: set-azure-account get-subscription-ids # Initialise the resource group - make <env> resource-group-init
 	$(eval STORAGE_ACCOUNT_NAME=sa${APP_SHORT_NAME}${ENV_CONFIG}tfstate)
 
-
-
 	$(eval output='$(shell az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/main.bicep \
 		--subscription ${HUB_SUBSCRIPTION_ID} \
 		--parameters enableSoftDelete=${ENABLE_SOFT_DELETE} envConfig=${ENV_CONFIG} region="${REGION}" \
@@ -28,7 +26,7 @@ resource-group-init: set-azure-account get-subscription-ids # Initialise the res
 
 	az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/core.bicep \
 		--subscription ${ARM_SUBSCRIPTION_ID} \
-		--parameters  miName=${miName} miPrincipalId=${miPrincipalID} --confirm-with-what-if
+		--parameters miName=${miName} miPrincipalId=${miPrincipalID} --confirm-with-what-if
 
 get-subscription-ids: # Retrieve the hub subscription ID based on the subscription name in ${HUB_SUBSCRIPTION} - make <env> get-subscription-ids
 	$(eval HUB_SUBSCRIPTION_ID=$(shell az account show --query id --output tsv --name ${HUB_SUBSCRIPTION}))
