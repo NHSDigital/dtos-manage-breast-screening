@@ -90,7 +90,7 @@ module "db_migrate" {
 module "webapp" {
   providers = {
     azurerm          = azurerm
-    azurerm.infra_kv = azurerm.hub  # alias  → infra-KV sub
+    azurerm.hub = azurerm.hub
   }
   source                             = "../modules/dtos-devops-templates/infrastructure/modules/container-app"
   name                               = "manage-breast-screening-web-${var.environment}"
