@@ -3,6 +3,7 @@ fetch_secrets_from_app_key_vault = true
 fetch_secrets_from_infra_key_vault = true
 infra_key_vault_name = "kv-manbrs-dev-infra"
 infra_key_vault_rg = "rg-manbrs-dev-infra"
+enable_auth = true
 protect_keyvault = false
 postgres_backup_retention_days = 7
 postgres_geo_redundant_backup_enabled = false
