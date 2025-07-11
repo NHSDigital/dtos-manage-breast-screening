@@ -31,6 +31,17 @@ variable "fetch_secrets_from_app_key_vault" {
   default     = false
 }
 
+variable "fetch_secrets_from_infra_key_vault" {
+  description = <<EOT
+    Fetch secrets from the infra key vault to be used to setup the identity provider. Requires app_key_vault_id.
+
+    WARNING: The key vault must be created by terraform and populated manually before setting this to true.
+    EOT
+  type        = bool
+  default     = false
+  nullable    = false
+}
+
 variable "protect_keyvault" {
   description = "Ability to recover the key vault or its secrets after deletion"
   default     = true
@@ -56,6 +67,33 @@ variable "postgres_storage_mb" {
 }
 variable "postgres_storage_tier" {
   default = "P4"
+}
+
+variable "enable_auth" {
+  description = "Enable authentication for the container app. If true, the app will use Azure AD authentication."
+  type        = bool
+  default     = false
+}
+
+variable "unauthenticated_action" {
+  description = "Action for unauthenticated requests: RedirectToLoginPage, Return401, Return403, AllowAnonymous"
+  type        = string
+  default     = "RedirectToLoginPage"
+  validation {
+    condition     = contains(["RedirectToLoginPage", "Return401", "Return403", "AllowAnonymous"], var.unauthenticated_action)
+    error_message = "Invalid unauthenticated action. Must be one of: RedirectToLoginPage, Return401, Return403, AllowAnonymous."
+  }
+}
+
+# Always fetch the AAD client secret from Key Vault
+variable "infra_key_vault_name" {
+  description = "Name of Key Vault to retrieve the AAD client secrets"
+  type        = string
+}
+
+variable "infra_key_vault_rg" {
+  description = "Resource group of the Key Vault"
+  type        = string
 }
 
 
