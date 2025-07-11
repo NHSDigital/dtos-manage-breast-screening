@@ -100,7 +100,6 @@ module "webapp" {
   fetch_secrets_from_infra_key_vault = var.fetch_secrets_from_infra_key_vault
   infra_key_vault_name               = var.infra_key_vault_name
   infra_key_vault_rg                 = var.infra_key_vault_rg
-  infra_key_vault_id                 = data.azurerm_key_vault.infra.id
   enable_auth                        = var.enable_auth
   app_key_vault_id                   = module.app-key-vault.key_vault_id
   docker_image                       = var.docker_image
