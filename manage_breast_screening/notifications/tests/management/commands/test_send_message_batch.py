@@ -88,6 +88,26 @@ class TestSendMessageBatch:
         mock_mark_batch_as_sent.assert_called_once_with(message_batches[0], ANY)
 
     @pytest.mark.django_db
+    def test_handle_with_appointments_outside_schedule_window(
+        self, mock_send_message_batch, routing_plan_id
+    ):
+        """Test that appointments with date inside the schedule period are notified"""
+        AppointmentFactory(
+            starts_at=datetime.now().replace(tzinfo=TZ_INFO)
+            + timedelta(weeks=4, days=5)
+        )
+
+        subject = Command()
+        mock_mark_batch_as_sent = MagicMock()
+        subject.mark_batch_as_sent = mock_mark_batch_as_sent
+
+        subject.handle(**{"routing_plan_id": routing_plan_id})
+
+        assert MessageBatch.objects.count() == 0
+        assert Message.objects.count() == 0
+        mock_mark_batch_as_sent.assert_not_called
+
+    @pytest.mark.django_db
     def test_handle_with_failing_notifications(
         self, mock_send_message_batch, routing_plan_id
     ):
