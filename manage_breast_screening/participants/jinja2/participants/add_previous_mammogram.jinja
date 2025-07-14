@@ -232,5 +232,7 @@
       }) }}
 
       {{csrf_input}}
+
+      <input type="hidden" name="return_url" value="{{ return_url }}"/>
   </form>
   {% endblock page_content %}
