@@ -2,7 +2,7 @@ from datetime import date
 from enum import StrEnum
 
 from django import forms
-from django.forms import CharField, ChoiceField, ModelForm, ValidationError
+from django.forms import CharField, ChoiceField, ValidationError
 
 from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
@@ -56,17 +56,7 @@ class EthnicityForm(forms.Form):
         self.participant.save()
 
 
-class ParticipantRecordedMammogramForm(ModelForm):
-    class Meta:
-        model = ParticipantReportedMammogram
-        fields = [
-            "exact_date",
-            "approx_date",
-            "different_name",
-            "additional_information",
-        ]
-        field_classes = {"exact_date": SplitDateField}
-
+class ParticipantRecordedMammogramForm(forms.Form):
     class WhereTaken(StrEnum):
         SAME_UNIT = "same_unit"
         UK = ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value
@@ -110,10 +100,6 @@ class ParticipantRecordedMammogramForm(ModelForm):
 
         self.fields["when_taken"] = ChoiceField(choices=self.when_taken_choices)
 
-        self.fields["exact_date"] = SplitDateField(
-            max_value=date.today(), required=False
-        )
-
         self.fields["name_is_the_same"] = ChoiceField(
             choices=self.name_is_the_same_choices
         )
@@ -122,6 +108,12 @@ class ParticipantRecordedMammogramForm(ModelForm):
             required=False, initial=""
         )
         self.fields["outside_the_uk_details"] = CharField(required=False, initial="")
+        self.fields["exact_date"] = SplitDateField(
+            max_value=date.today(), required=False
+        )
+        self.fields["approx_date"] = CharField(required=False, initial="")
+        self.fields["different_name"] = CharField(required=False, initial="")
+        self.fields["additional_information"] = CharField(required=False, initial="")
 
         # Explicitly order the films so that the error summary order
         # matches the order fields are rendered in.
@@ -217,9 +209,14 @@ class ParticipantRecordedMammogramForm(ModelForm):
             instance.location_details = self.cleaned_data["outside_the_uk_details"]
 
     def save(self, commit=True):
-        instance = super().save(commit=False)
+        instance = ParticipantReportedMammogram(
+            participant=self.participant,
+            exact_date=self.cleaned_data["exact_date"],
+            approx_date=self.cleaned_data["approx_date"],
+            different_name=self.cleaned_data["different_name"],
+            additional_information=self.cleaned_data["additional_information"],
+        )
 
-        instance.participant = self.participant
         self.set_location_fields(instance)
 
         if commit:
