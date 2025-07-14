@@ -1,10 +1,12 @@
 import datetime
 
 from django import forms
+from django.core import validators
 from django.forms import ValidationError, widgets
-from django.utils.timezone import now
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+
+from manage_breast_screening.core.utils.date_formatting import format_date
 
 
 class SplitDateWidget(widgets.MultiWidget):
@@ -63,14 +65,14 @@ class SplitDateField(forms.MultiValueField):
     default_error_messages = {"invalid": _("Enter a valid date.")}
 
     def __init__(self, *args, **kwargs):
-        min_year = kwargs.pop("min_year", 1900)
-        max_year = kwargs.pop("max_year", now().year)
+        max_value = kwargs.pop("max_value", datetime.date.today())
+        min_value = kwargs.pop("min_value", datetime.date(1900, 1, 1))
 
         day_bounds_error = gettext("Day should be between 1 and 31.")
         month_bounds_error = gettext("Month should be between 1 and 12.")
         year_bounds_error = gettext(
             "Year should be between %(min_year)s and %(max_year)s."
-        ) % {"min_year": min_year, "max_year": max_year}
+        ) % {"min_year": min_value.year, "max_year": max_value.year}
 
         day_kwargs = {
             "min_value": 1,
@@ -91,8 +93,8 @@ class SplitDateField(forms.MultiValueField):
             },
         }
         year_kwargs = {
-            "min_value": min_year,
-            "max_value": max_year,
+            "min_value": min_value.year,
+            "max_value": max_value.year,
             "error_messages": {
                 "min_value": year_bounds_error,
                 "max_value": year_bounds_error,
@@ -107,6 +109,17 @@ class SplitDateField(forms.MultiValueField):
         ]
 
         super().__init__(self.fields, *args, **kwargs)
+
+        self.validators.append(
+            validators.MinValueValidator(
+                min_value, f"Enter a date after {format_date(min_value)}"
+            )
+        )
+        self.validators.append(
+            validators.MaxValueValidator(
+                max_value, f"Enter a date before {format_date(max_value)}"
+            )
+        )
 
     def compress(self, data_list):
         if data_list:

@@ -1,12 +1,8 @@
+from datetime import date
 from enum import StrEnum
 
 from django import forms
-from django.forms import (
-    CharField,
-    ChoiceField,
-    ModelForm,
-    ValidationError,
-)
+from django.forms import CharField, ChoiceField, ModelForm, ValidationError
 
 from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
@@ -114,6 +110,10 @@ class ParticipantRecordedMammogramForm(ModelForm):
 
         self.fields["when_taken"] = ChoiceField(choices=self.when_taken_choices)
 
+        self.fields["exact_date"] = SplitDateField(
+            max_value=date.today(), required=False
+        )
+
         self.fields["name_is_the_same"] = ChoiceField(
             choices=self.name_is_the_same_choices
         )
@@ -167,7 +167,11 @@ class ParticipantRecordedMammogramForm(ModelForm):
                 ),
             )
 
-        if when_taken == "exact" and not cleaned_data.get("exact_date"):
+        if (
+            when_taken == "exact"
+            and not cleaned_data.get("exact_date")
+            and not self.errors.get("exact_date")
+        ):
             self.add_error(
                 "exact_date",
                 ValidationError(

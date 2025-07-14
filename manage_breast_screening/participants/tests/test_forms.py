@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 from pytest_django.asserts import assertFormError
 
@@ -227,3 +229,23 @@ class TestParticipantRecordedMammogramForm:
         assert instance.approx_date == "5 years ago"
         assert instance.different_name == "Jane Newname"
         assert instance.additional_information == "abcdef"
+
+    def test_invalid_date(self, participant, current_provider, time_machine):
+        time_machine.move_to(date(2025, 5, 1))
+        data = {
+            "where_taken": ParticipantRecordedMammogramForm.WhereTaken.UK,
+            "somewhere_in_the_uk_details": "XYZ provider",
+            "when_taken": "exact",
+            "name_is_the_same": "yes",
+            "exact_date_0": "5",
+            "exact_date_1": "12",
+            "exact_date_2": "2025",
+        }
+        form = ParticipantRecordedMammogramForm(participant, current_provider, data)
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "exact_date": [
+                "Enter a date before 1 May 2025",
+            ]
+        }
