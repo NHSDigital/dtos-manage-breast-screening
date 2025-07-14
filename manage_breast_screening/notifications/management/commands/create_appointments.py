@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 
 import pandas
 from azure.storage.blob import BlobServiceClient, ContainerClient
-from dateutil import parser
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.models import Appointment, Clinic
@@ -24,12 +23,22 @@ class Command(BaseCommand):
     to connect to Azure blob storage.
     """
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "date_str",
+            nargs="?",
+            default=datetime.today()
+            .replace(tzinfo=TZ_INFO)
+            .strftime(DIR_NAME_DATE_FORMAT),
+            help="yyy-MM-dd formatted date reflecting the Azure storage directory",
+        )
+
     def handle(self, *args, **options):
         try:
-            for blob in self.container_client().list_blobs(
-                name_starts_with=self.blob_dir_prefix(args)
+            for blob in self.container_client.list_blobs(
+                name_starts_with=options["date_str"]
             ):
-                blob_client = self.container_client().get_blob_client(blob)
+                blob_client = self.container_client.get_blob_client(blob)
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()
@@ -45,17 +54,9 @@ class Command(BaseCommand):
                     if appt_created:
                         self.stdout.write(f"{appt} created")
 
-                self.stdout.write(f"Processed {data_frame.size} rows from {blob.name}")
+                self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
             raise CommandError(e)
-
-    def blob_dir_prefix(self, args) -> str:
-        dir_date = datetime.today().replace(tzinfo=TZ_INFO)
-
-        if len(args) > 0:
-            dir_date = parser.parse(args[0])
-
-        return dir_date.strftime(DIR_NAME_DATE_FORMAT)
 
     def raw_data_to_data_frame(self, raw_data: str) -> pandas.DataFrame:
         return pandas.read_table(
@@ -110,11 +111,10 @@ class Command(BaseCommand):
         return dt.replace(tzinfo=TZ_INFO)
 
     @cached_property
-    def blob_service_client(self) -> BlobServiceClient:
-        connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
-        return BlobServiceClient.from_connection_string(connection_string)
-
-    @cached_property
     def container_client(self) -> ContainerClient:
+        connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
         container_name = os.getenv("BLOB_CONTAINER_NAME")
-        return self.blob_service_client().get_container_client(container_name)
+
+        return BlobServiceClient.from_connection_string(
+            connection_string
+        ).get_container_client(container_name)
