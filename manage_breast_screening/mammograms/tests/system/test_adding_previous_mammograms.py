@@ -38,6 +38,25 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
         self.and_i_should_see_the_mammogram_with_the_same_provider()
 
+    def test_adding_a_mammogram_taken_elsewhere_with_a_different_name(self):
+        """
+        If a mammogram was taken at another BSU, or elsewhere in the UK, the participant can report that it was taken
+        If the mammogram was taken under a different name, the mammographer can record that name.
+        """
+        self.given_i_am_on_the_start_screening_page()
+        self.then_i_should_see_no_reported_mammograms()
+
+        self.when_i_click_on_add_mammogram()
+        self.then_i_should_be_on_the_add_previous_mammogram_form()
+
+        self.when_i_enter_another_location_in_the_uk()
+        self.and_i_enter_an_approximate_date()
+        self.and_i_enter_a_different_name()
+        self.and_i_enter_additional_information()
+        self.and_i_click_continue()
+        self.then_i_should_be_back_on_the_appointment()
+        self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
+
     def test_accessibility(self):
         self.given_i_am_on_the_add_previous_mammograms_page()
         self.then_the_accessibility_baseline_is_met()
@@ -102,6 +121,31 @@ class TestAddingPreviousMammograms(SystemTestCase):
     def and_i_should_see_the_mammogram_with_the_same_provider(self):
         expected_inner_text = re.compile(
             rf"Added today\n1 December 2023 \(.* ago\)\n{self.provider.name}\nAdditional information: RR"
+        )
+        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
+            expected_inner_text,
+            use_inner_text=True,
+        )
+
+    def when_i_enter_another_location_in_the_uk(self):
+        self.page.get_by_label("Somewhere in the UK").click()
+        self.page.get_by_label("Location").first.fill("other place")
+
+    def and_i_enter_an_approximate_date(self):
+        self.page.get_by_label("Enter an approximate date").and_(
+            self.page.get_by_role("radio")
+        ).click()
+        self.page.get_by_label("Enter an approximate date").and_(
+            self.page.get_by_role("textbox")
+        ).fill("a year ago")
+
+    def and_i_enter_a_different_name(self):
+        self.page.get_by_label("No, under a different name").click()
+        self.page.get_by_label("Enter the previously used name").fill("Taylor Swift")
+
+    def and_i_should_see_the_mammogram_with_the_other_provider_and_name(self):
+        expected_inner_text = re.compile(
+            r"Added today\nApproximate date: a year ago\nIn the UK: other place\nPrevious name: Taylor Swift\nAdditional information: RR"
         )
         expect(self.page.get_by_test_id("mammograms")).to_contain_text(
             expected_inner_text,
