@@ -22,6 +22,8 @@ services:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
 
   cmapi_stub:
+    profiles:
+      - test-integration
     build: 
       context: ./tests/integration/cmapi_stub
       dockerfile: Dockerfile

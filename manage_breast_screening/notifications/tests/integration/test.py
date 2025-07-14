@@ -16,7 +16,7 @@ class TestApiClient:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
         monkeypatch.setenv(
-            "API_MESSAGE_BATCH_URL", "http://api.example.com/message/batch"
+            "API_MESSAGE_BATCH_URL", "http://cmapi_stub:8888/message/batches"
         )
         monkeypatch.setenv("OAUTH_TOKEN_URL", "http://oauth.example.com/token")
         monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
@@ -42,7 +42,6 @@ class TestApiClient:
                 json={"access_token": "000111"},
                 status_code=200,
             )
-            rm.post("http://api.example.com/message/batch", json={}, status_code=201)
 
             response = ApiClient().send_message_batch(message_batch)
             assert response.status_code == 201

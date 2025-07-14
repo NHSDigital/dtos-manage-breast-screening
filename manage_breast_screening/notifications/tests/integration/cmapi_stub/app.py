@@ -8,7 +8,7 @@ from jsonschema import ValidationError, validate
 app = Flask(__name__)
 
 
-@app.route("/comms/v1/message-batches", methods=["POST"])
+@app.route("/message/batches", methods=["POST"])
 def message_batches():
     json_data = request.json
 
@@ -42,7 +42,7 @@ def message_batches():
 def validate_with_schema(data: dict):
     try:
         schema = json.load(open("schema.json"))
-        subschema = schema["paths"]["/v1/message-batches"]["post"]["requestBody"][
+        subschema = schema["paths"]["/message/batches"]["post"]["requestBody"][
             "content"
         ]["application/vnd.api+json"]["schema"]
         validate(instance=data, schema=subschema)
