@@ -87,6 +87,17 @@ module "db_migrate" {
   }
 }
 
+resource "azapi_resource_action" "start_db_migration" {
+  resource_id = module.db_migrate.id
+  type        = "Microsoft.App/jobs@2024-03-01"
+  action      = "start"
+  body        = {}
+
+  lifecycle {
+    replace_triggered_by = [module.db_migrate]
+  }
+}
+
 module "webapp" {
   source                           = "../modules/dtos-devops-templates/infrastructure/modules/container-app"
   name                             = "manage-breast-screening-web-${var.environment}"
