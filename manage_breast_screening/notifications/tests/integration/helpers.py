@@ -3,6 +3,7 @@ from typing import Any
 
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobServiceClient, ContainerClient, ContentSettings
+from mesh_client import MeshClient
 
 
 class Helpers:
@@ -38,3 +39,19 @@ class Helpers:
             ),
             overwrite=True,
         )
+
+    def add_file_to_mesh_mailbox(self, filepath: str):
+        """Adds a file to MESH sandbox mailbox"""
+        with open(filepath) as file:
+            with MeshClient(
+                url=os.getenv("MESH_BASE_URL", "http://localhost:8700"),
+                mailbox=os.getenv("MESH_INBOX_NAME", "X26ABC1"),
+                password=os.getenv("MESH_CLIENT_PASSWORD", "password"),
+                shared_key=os.getenv("MESH_CLIENT_SHARED_KEY", "TestKey"),
+            ) as client:
+                client.send_message(
+                    os.getenv("MESH_INBOX_NAME"),
+                    file.read().encode("ASCII"),
+                    filename=os.path.basename(filepath),
+                    workflow_id="TEST_NBSS_WORKFLOW",
+                )
