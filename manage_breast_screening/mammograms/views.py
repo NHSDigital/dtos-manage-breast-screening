@@ -50,6 +50,22 @@ class AppointmentMixin:
         )
 
 
+class InProgressAppointmentMixin(AppointmentMixin):
+    """
+    A view that is only shown with in progress appointments.
+    If the appointment is not in progress, redirect to the appointment show page.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        appointment = self.appointment  # type: ignore
+        if not appointment.current_status.in_progress:
+            return redirect(
+                "mammograms:show_appointment",
+                pk=appointment.pk,
+            )
+        return super().dispatch(request, *args, **kwargs)  # type: ignore
+
+
 class StartScreening(AppointmentMixin, FormView):
     template_name = "mammograms/start_screening.jinja"
     form_class = ScreeningAppointmentForm
@@ -104,7 +120,7 @@ class StartScreening(AppointmentMixin, FormView):
             )
 
 
-class AskForMedicalInformation(AppointmentMixin, FormView):
+class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/ask_for_medical_information.jinja"
     form_class = AskForMedicalInformationForm
 
@@ -142,7 +158,7 @@ class AskForMedicalInformation(AppointmentMixin, FormView):
             return redirect("mammograms:awaiting_images", pk=appointment.pk)
 
 
-class RecordMedicalInformation(AppointmentMixin, FormView):
+class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/record_medical_information.jinja"
     form_class = RecordMedicalInformationForm
 
@@ -173,7 +189,7 @@ class RecordMedicalInformation(AppointmentMixin, FormView):
             return redirect("mammograms:appointment_cannot_go_ahead", pk=appointment.pk)
 
 
-class AppointmentCannotGoAhead(AppointmentMixin, FormView):
+class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/appointment_cannot_go_ahead.jinja"
     form_class = AppointmentCannotGoAheadForm
     success_url = reverse_lazy("clinics:index")
@@ -201,7 +217,7 @@ class AppointmentCannotGoAhead(AppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class AwaitingImages(AppointmentMixin, TemplateView):
+class AwaitingImages(InProgressAppointmentMixin, TemplateView):
     template_name = "mammograms/awaiting_images.jinja"
 
     def get_context_data(self, **kwargs):
