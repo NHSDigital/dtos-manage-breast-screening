@@ -317,6 +317,13 @@ class AppointmentStatus(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
+    @property
+    def in_progress(self):
+        """
+        Is this state one of the in-progress states?
+        """
+        return self.state in [self.CONFIRMED, self.CHECKED_IN]
+
 
 class ParticipantReportedMammogram(BaseModel):
     class LocationType(models.TextChoices):

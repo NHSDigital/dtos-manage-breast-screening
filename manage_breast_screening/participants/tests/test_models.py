@@ -11,7 +11,7 @@ from manage_breast_screening.clinics.tests.factories import (
 )
 
 from .. import models
-from ..models import Ethnicity
+from ..models import AppointmentStatus, Ethnicity
 from .factories import AppointmentFactory, ParticipantFactory, ScreeningEpisodeFactory
 
 
@@ -239,3 +239,15 @@ def test_appointment_current_status():
 
     assert appointment.statuses.first().state == models.AppointmentStatus.CHECKED_IN
     assert appointment.current_status.state == models.AppointmentStatus.CHECKED_IN
+
+
+def test_appointment_status_in_progress():
+    assert AppointmentStatus(state=AppointmentStatus.CONFIRMED).in_progress
+    assert AppointmentStatus(state=AppointmentStatus.CHECKED_IN).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.CANCELLED).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.DID_NOT_ATTEND).in_progress
+    assert not AppointmentStatus(
+        state=AppointmentStatus.ATTENDED_NOT_SCREENED
+    ).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.PARTIALLY_SCREENED).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.SCREENED).in_progress
