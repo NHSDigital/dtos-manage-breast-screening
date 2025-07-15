@@ -3,6 +3,9 @@ REGION=UK South
 APP_SHORT_NAME=manbrs
 STORAGE_ACCOUNT_RG=rg-dtos-state-files
 
+ahl: # Target the dev environment - make dev <action>
+	$(eval include infrastructure/environments/ahl/variables.sh)
+
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
