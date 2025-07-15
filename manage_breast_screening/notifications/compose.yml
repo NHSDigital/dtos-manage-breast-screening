@@ -22,6 +22,7 @@ services:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
 
   cmapi_stub:
+    container_name: "cmapi_stub"
     profiles:
       - test-integration
     build: 
@@ -29,11 +30,20 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8888:8888"
-    deploy:
-      restart_policy:
-        condition: on-failure
-        max_attempts: 3
     healthcheck:
-      test: curl -ksf http://localhost:8888/comms/v1/message-batches || exit 1
-      interval: 3s
-      timeout: 10s
+        test: curl -f http://cmapi_stub:8888/health || exit 1
+        interval: 3s
+        timeout: 10s
+
+  integration-tests:
+    container_name: "integration-tests"
+    profiles:
+      - test-integration
+    build: 
+      context: ./tests/integration/runner
+      dockerfile: Dockerfile
+      additional_contexts:
+        root_dir: ../..
+    depends_on:
+      cmapi_stub:
+        condition: service_healthy

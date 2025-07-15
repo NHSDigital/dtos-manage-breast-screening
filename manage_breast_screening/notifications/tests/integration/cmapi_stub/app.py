@@ -8,6 +8,16 @@ from jsonschema import ValidationError, validate
 app = Flask(__name__)
 
 
+@app.route("/health", methods=["GET"])
+def health():
+    return "OK"
+
+
+@app.route("/token", methods=["POST"])
+def token():
+    return json.dumps({"access_token": "000111"}), 200
+
+
 @app.route("/message/batches", methods=["POST"])
 def message_batches():
     json_data = request.json

@@ -16,6 +16,7 @@ FROM builder as dev-envs
 RUN <<EOF
 apk update
 apk add git
+apk add curl
 EOF
 
 RUN <<EOF
