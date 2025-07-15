@@ -94,7 +94,7 @@ resource "azapi_resource_action" "start_db_migration" {
   body        = {}
 
   lifecycle {
-    replace_triggered_by = [module.db_migrate]
+    replace_triggered_by = [module.db_migrate.image]
   }
 }
 
