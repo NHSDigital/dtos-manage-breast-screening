@@ -28,6 +28,7 @@ services:
       - SHARED_KEY=TestKey
       - SSL=no
       - AUTH_MODE=none
-      - STORE_MODE=canned
+      - STORE_MODE=memory
     volumes:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
+      - ./store/workflows.jsonl:/app/mesh_sandbox/store/data/workflows.jsonl:ro
