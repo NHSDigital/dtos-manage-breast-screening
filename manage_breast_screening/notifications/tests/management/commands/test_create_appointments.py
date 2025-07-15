@@ -125,7 +125,9 @@ class TestCreateAppointments:
     def test_handle_with_error(self):
         """Test exception handling of the create_appointments command"""
         subject = Command()
-        subject.container_client.list_blobs = Mock(side_effect=Exception("Oops"))
+        mock_container_client = PropertyMock(spec=ContainerClient)
+        mock_container_client.list_blobs = Mock(side_effect=Exception("Oops"))
+        subject.container_client = mock_container_client
 
         with pytest.raises(CommandError):
             subject.handle(**{"date_str": "2000-01-01"})
