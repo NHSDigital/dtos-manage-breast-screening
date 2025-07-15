@@ -133,7 +133,7 @@ class TestLastKnownMammogramPresenter:
         result = LastKnownMammogramPresenter(
             [],
             participant_pk=uuid4(),
-            current_url="/mammograms/start-screening/abc",
+            current_url="/mammograms/abc",
         )
 
         assert result.last_known_mammograms == []
@@ -143,7 +143,7 @@ class TestLastKnownMammogramPresenter:
         result = LastKnownMammogramPresenter(
             [reported_today],
             participant_pk=uuid4(),
-            current_url="/mammograms/start-screening/abc",
+            current_url="/mammograms/abc",
         )
 
         assert result.last_known_mammograms == [
@@ -165,7 +165,7 @@ class TestLastKnownMammogramPresenter:
         result = LastKnownMammogramPresenter(
             [reported_today, reported_earlier],
             participant_pk=uuid4(),
-            current_url="/mammograms/start-screening/abc",
+            current_url="/mammograms/abc",
         )
 
         assert result.last_known_mammograms == [
@@ -193,7 +193,7 @@ class TestLastKnownMammogramPresenter:
 
     def test_add_link(self, reported_today):
         participant_id = uuid4()
-        current_url = "/mammograms/start-screening/abc"
+        current_url = "/mammograms/abc"
 
         result = LastKnownMammogramPresenter(
             [reported_today],

@@ -128,7 +128,7 @@ class ParticipantAppointmentsPresenter:
             clinic_type=clinic.get_type_display().capitalize(),
             setting_name=sentence_case(setting.name),
             status=self._present_status(appointment),
-            url=reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            url=reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
         )
 
     def _present_status(self, appointment):

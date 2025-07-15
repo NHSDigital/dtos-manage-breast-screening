@@ -14,7 +14,7 @@ def appointment():
 class TestStartScreening:
     def test_appointment_continued(self, client, appointment):
         response = client.post(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
             {"decision": "continue"},
         )
         assertRedirects(
@@ -27,7 +27,7 @@ class TestStartScreening:
 
     def test_appointment_stopped(self, client, appointment):
         response = client.post(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
             {"decision": "dropout"},
         )
         assertRedirects(
@@ -40,7 +40,7 @@ class TestStartScreening:
 
     def test_renders_invalid_form(self, client, appointment):
         response = client.post(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
             {},
         )
         assertContains(response, "There is a problem")
@@ -95,10 +95,9 @@ class TestAskForMedicalInformation:
 class TestCheckIn:
     def test_known_redirect(self, client, appointment):
         response = client.post(
-            reverse("mammograms:check_in", kwargs={"pk": appointment.pk}),
-            {"next": "start-screening"},
+            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
         )
         assertRedirects(
             response,
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
         )

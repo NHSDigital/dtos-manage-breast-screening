@@ -11,9 +11,9 @@ urlpatterns = [
         name="check_in",
     ),
     path(
-        "<uuid:pk>/start-screening/",
+        "<uuid:pk>/",
         views.StartScreening.as_view(),
-        name="start_screening",
+        name="show_appointment",
     ),
     path(
         "<uuid:pk>/ask-for-medical-information/",

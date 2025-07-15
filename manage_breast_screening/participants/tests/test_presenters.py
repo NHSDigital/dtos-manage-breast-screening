@@ -154,7 +154,7 @@ class TestParticipantAppointmentPresenter:
                     "key": "CONFIRMED",
                     "text": "Confirmed",
                 },
-                "/mammograms/e3d475a6-c405-44d6-bbd7-bcb5cd4d4996/start-screening/",
+                "/mammograms/e3d475a6-c405-44d6-bbd7-bcb5cd4d4996/",
             )
         ]
 
@@ -175,7 +175,7 @@ class TestParticipantAppointmentPresenter:
                     "key": "PARTIALLY_SCREENED",
                     "text": "Partially screened",
                 },
-                "/mammograms/e76163c8-a594-4991-890d-a02097c67a2f/start-screening/",
+                "/mammograms/e76163c8-a594-4991-890d-a02097c67a2f/",
             ),
             ParticipantAppointmentsPresenter.PresentedAppointment(
                 "1 January 2019",
@@ -186,6 +186,6 @@ class TestParticipantAppointmentPresenter:
                     "key": "SCREENED",
                     "text": "Screened",
                 },
-                "/mammograms/6473a629-e7c4-43ca-87f3-ab9526aab07c/start-screening/",
+                "/mammograms/6473a629-e7c4-43ca-87f3-ab9526aab07c/",
             ),
         ]

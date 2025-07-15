@@ -204,4 +204,4 @@ def check_in(_request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
-    return redirect("mammograms:start_screening", pk=pk)
+    return redirect("mammograms:show_appointment", pk=pk)

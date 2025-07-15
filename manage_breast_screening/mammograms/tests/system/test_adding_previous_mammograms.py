@@ -24,7 +24,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         If a mammogram was taken at the same provider, but there is an error in the system, the participant can report that it was taken.
         """
-        self.given_i_am_on_the_start_screening_page()
+        self.given_i_am_on_the_appointment_show_page()
         self.then_i_should_see_no_reported_mammograms()
 
         self.when_i_click_on_add_mammogram()
@@ -43,7 +43,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         If a mammogram was taken at another BSU, or elsewhere in the UK, the participant can report that it was taken
         If the mammogram was taken under a different name, the mammographer can record that name.
         """
-        self.given_i_am_on_the_start_screening_page()
+        self.given_i_am_on_the_appointment_show_page()
         self.then_i_should_see_no_reported_mammograms()
 
         self.when_i_click_on_add_mammogram()
@@ -61,11 +61,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.given_i_am_on_the_add_previous_mammograms_page()
         self.then_the_accessibility_baseline_is_met()
 
-    def given_i_am_on_the_start_screening_page(self):
+    def given_i_am_on_the_appointment_show_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:start_screening",
+                "mammograms:show_appointment",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -94,7 +94,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(
-            "mammograms:start_screening",
+            "mammograms:show_appointment",
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))

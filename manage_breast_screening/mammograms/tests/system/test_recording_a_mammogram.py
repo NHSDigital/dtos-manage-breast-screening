@@ -23,7 +23,7 @@ class TestRecordingAMammogram(SystemTestCase):
         """
         I can record a mammogram without entering any relevant medical information.
         """
-        self.given_i_am_on_the_start_screening_page()
+        self.given_i_am_on_the_appointment_show_page()
         self.then_i_should_see_the_demographic_banner()
         self.and_i_should_see_the_participant_details()
 
@@ -39,7 +39,7 @@ class TestRecordingAMammogram(SystemTestCase):
         At each step in the flow, when I fill out the forms incorrectly,
         then I should see the errors so I can fix them.
         """
-        self.given_i_am_on_the_start_screening_page()
+        self.given_i_am_on_the_appointment_show_page()
         self.when_i_submit_the_form()
         self.then_i_am_prompted_to_answer_can_the_screening_go_ahead()
 
@@ -56,7 +56,7 @@ class TestRecordingAMammogram(SystemTestCase):
         self.then_i_am_prompted_to_confirm_whether_imaging_can_go_ahead()
 
     def test_accessibility(self):
-        self.given_i_am_on_the_start_screening_page()
+        self.given_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
 
         self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
@@ -68,11 +68,11 @@ class TestRecordingAMammogram(SystemTestCase):
         self.when_i_mark_that_imaging_can_go_ahead()
         self.then_the_accessibility_baseline_is_met()
 
-    def given_i_am_on_the_start_screening_page(self):
+    def given_i_am_on_the_appointment_show_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:start_screening",
+                "mammograms:show_appointment",
                 kwargs={"pk": self.appointment.pk},
             )
         )
