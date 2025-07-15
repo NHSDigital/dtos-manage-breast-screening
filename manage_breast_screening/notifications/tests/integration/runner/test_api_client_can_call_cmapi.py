@@ -2,8 +2,9 @@ import uuid
 from unittest.mock import patch
 
 import pytest
-from api_client import ApiClient
-from factories import (
+
+from manage_breast_screening.notifications.api_client import ApiClient
+from manage_breast_screening.notifications.factories import (
     MessageBatchFactory,
     MessageFactory,
 )
