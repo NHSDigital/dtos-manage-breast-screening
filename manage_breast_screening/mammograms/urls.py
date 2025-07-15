@@ -27,12 +27,12 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/awaiting-images/",
-        views.awaiting_images,
+        views.AwaitingImages.as_view(),
         name="awaiting_images",
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
-        views.appointment_cannot_go_ahead,
+        views.AppointmentCannotGoAhead.as_view(),
         name="appointment_cannot_go_ahead",
     ),
 ]

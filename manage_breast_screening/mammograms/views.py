@@ -1,9 +1,10 @@
 import logging
+from functools import cached_property
 
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_http_methods
-from django.views.generic import FormView
+from django.views.generic import FormView, TemplateView
 
 from ..participants.models import (
     Appointment,
@@ -28,12 +29,17 @@ APPOINTMENT_CANNOT_PROCEED = "Appointment cannot proceed"
 logger = logging.getLogger(__name__)
 
 
-class BaseAppointmentForm(FormView):
+class AppointmentMixin:
+    """
+    A view mixin that exposes the appointment.
+    """
+
     @property
     def appointment_pk(self):
         return self.kwargs["pk"]
 
-    def get_appointment(self):
+    @cached_property
+    def appointment(self):
         return get_object_or_404(
             Appointment.objects.select_related(
                 "clinic_slot__clinic",
@@ -44,14 +50,14 @@ class BaseAppointmentForm(FormView):
         )
 
 
-class StartScreening(BaseAppointmentForm):
+class StartScreening(AppointmentMixin, FormView):
     template_name = "mammograms/start_screening.jinja"
     form_class = ScreeningAppointmentForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        appointment = self.get_appointment()
+        appointment = self.appointment
         participant_pk = appointment.screening_episode.participant.pk
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
             participant_id=participant_pk
@@ -89,16 +95,16 @@ class StartScreening(BaseAppointmentForm):
         if form.cleaned_data["decision"] == "continue":
             return redirect(
                 "mammograms:ask_for_medical_information",
-                pk=self.get_appointment().pk,
+                pk=self.appointment.pk,
             )
         else:
             return redirect(
                 "mammograms:appointment_cannot_go_ahead",
-                pk=self.get_appointment().pk,
+                pk=self.appointment.pk,
             )
 
 
-class AskForMedicalInformation(BaseAppointmentForm):
+class AskForMedicalInformation(AppointmentMixin, FormView):
     template_name = "mammograms/ask_for_medical_information.jinja"
     form_class = AskForMedicalInformationForm
 
@@ -128,7 +134,7 @@ class AskForMedicalInformation(BaseAppointmentForm):
     def form_valid(self, form):
         form.save()
 
-        appointment = self.get_appointment()
+        appointment = self.appointment
 
         if form.cleaned_data["decision"] == "yes":
             return redirect("mammograms:record_medical_information", pk=appointment.pk)
@@ -136,7 +142,7 @@ class AskForMedicalInformation(BaseAppointmentForm):
             return redirect("mammograms:awaiting_images", pk=appointment.pk)
 
 
-class RecordMedicalInformation(BaseAppointmentForm):
+class RecordMedicalInformation(AppointmentMixin, FormView):
     template_name = "mammograms/record_medical_information.jinja"
     form_class = RecordMedicalInformationForm
 
@@ -159,7 +165,7 @@ class RecordMedicalInformation(BaseAppointmentForm):
     def form_valid(self, form):
         form.save()
 
-        appointment = self.get_appointment()
+        appointment = self.appointment
 
         if form.cleaned_data["decision"] == "continue":
             return redirect("mammograms:awaiting_images", pk=appointment.pk)
@@ -167,36 +173,39 @@ class RecordMedicalInformation(BaseAppointmentForm):
             return redirect("mammograms:appointment_cannot_go_ahead", pk=appointment.pk)
 
 
-def appointment_cannot_go_ahead(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
-    participant = appointment.screening_episode.participant
+class AppointmentCannotGoAhead(AppointmentMixin, FormView):
+    template_name = "mammograms/appointment_cannot_go_ahead.jinja"
+    form_class = AppointmentCannotGoAheadForm
+    success_url = reverse_lazy("clinics:index")
 
-    if request.method == "POST":
-        form = AppointmentCannotGoAheadForm(request.POST, instance=appointment)
-        if form.is_valid():
-            form.save()
-            return redirect("clinics:index")
-    else:
-        form = AppointmentCannotGoAheadForm(instance=appointment)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    return render(
-        request,
-        "mammograms/appointment_cannot_go_ahead.jinja",
-        {
-            "title": "Appointment cannot go ahead",
-            "caption": participant.full_name,
-            "form": form,
-            "decision_legend": "Does the appointment need to be rescheduled?",
-        },
-    )
+        participant = self.appointment.screening_episode.participant
+        context.update(
+            {
+                "title": "Appointment cannot go ahead",
+                "caption": participant.full_name,
+                "decision_legend": "Does the appointment need to be rescheduled?",
+            }
+        )
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = self.appointment
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
 
-def awaiting_images(request, pk):
-    return render(
-        request,
-        "mammograms/awaiting_images.jinja",
-        {"title": "Awaiting images"},
-    )
+class AwaitingImages(AppointmentMixin, TemplateView):
+    template_name = "mammograms/awaiting_images.jinja"
+
+    def get_context_data(self, **kwargs):
+        return {"title": "Awaiting images"}
 
 
 @require_http_methods(["POST"])
