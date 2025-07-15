@@ -35,8 +35,8 @@ class BaseAppointmentForm(FormView):
 
     def get_appointment(self):
         return get_object_or_404(
-            Appointment.objects.prefetch_related(
-                "clinic_slot",
+            Appointment.objects.select_related(
+                "clinic_slot__clinic",
                 "screening_episode__participant",
                 "screening_episode__participant__address",
             ),
