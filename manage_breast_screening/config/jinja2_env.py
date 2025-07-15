@@ -45,7 +45,25 @@ def raise_helper(msg):
     raise Exception(msg)
 
 
+def autoescape(template_name):
+    """
+    This is a workaround until https://nhsd-jira.digital.nhs.uk/browse/DTOSS-9978
+    is complete.
+    Going forwards, we want to use Django's default behaviour for autoescape.
+    """
+    if template_name is None:
+        return False
+    elif template_name.endswith("attributes.jinja"):
+        return False
+    else:
+        return template_name.endswith((".html", ".htm", ".xml", ".jinja"))
+
+
 def environment(**options):
+    # Temporarily override autoescape for templates in nhsuk-frontend-jinja
+    # remove after https://nhsd-jira.digital.nhs.uk/browse/DTOSS-9978 is complete
+    options["autoescape"] = autoescape
+
     env = Environment(**options, extensions=["jinja2.ext.do"])
     if env.loader:
         env.loader = ChoiceLoader(

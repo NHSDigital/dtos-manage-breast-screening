@@ -98,6 +98,10 @@ class Clinic(BaseModel):
     objects = ClinicQuerySet.as_manager()
 
     @property
+    def provider(self):
+        return self.setting.provider
+
+    @property
     def current_status(self):
         return self.statuses.order_by("-created_at").first()
 
@@ -131,6 +135,10 @@ class ClinicSlot(BaseModel):
     )
     starts_at = models.DateTimeField()
     duration_in_minutes = models.IntegerField()
+
+    @property
+    def provider(self):
+        return self.clinic.provider
 
 
 class ClinicStatus(models.Model):

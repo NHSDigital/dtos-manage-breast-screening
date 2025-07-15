@@ -6,6 +6,7 @@ from playwright.sync_api import Page
 
 AXE_VIOLATIONS_EXCLUDE_LIST = [
     "region",  # 'Some page content is not contained by landmarks' https://github.com/alphagov/govuk-frontend/issues/1604
+    "aria-allowed-attr",  # 'ARIA attribute is not allowed: aria-expanded="false"' https://github.com/alphagov/govuk-frontend/issues/979
 ]
 
 
