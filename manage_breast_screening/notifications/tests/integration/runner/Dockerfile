@@ -8,7 +8,10 @@ COPY --from=root_dir manage_breast_screening/notifications/api_client.py manage_
 COPY --from=root_dir manage_breast_screening/notifications/tests/factories.py manage_breast_screening/notifications/factories.py
 COPY --from=root_dir manage_breast_screening/notifications/models.py manage_breast_screening/notifications/models.py
 COPY --from=root_dir manage_breast_screening/__init__.py manage_breast_screening/__init__.py
-COPY --from=root_dir manage_breast_screening/notifications/__init__.py manage_breast_screening/notifications/__init__.py
+COPY --from=root_dir manage_breast_screening/notifications/__init__.py manage_breast_screening/notifications/__init__.
+COPY --from=root_dir manage_breast_screening/notifications/tests/__init__.py manage_breast_screening/notifications/tests/__init__.py
+COPY --from=root_dir manage_breast_screening/notifications/tests/integration/__init__.py manage_breast_screening/notifications/tests/integration/__init__.py
+
 COPY --from=root_dir manage.py /manage.py
 
 RUN pip install poetry
