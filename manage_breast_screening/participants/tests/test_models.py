@@ -122,13 +122,19 @@ class TestAppointment:
         time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 
         # > 00:00 so counts as upcoming still
-        earlier_today = AppointmentFactory.create(starts_at=datetime(2025, 1, 1, 9))
+        earlier_today = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc)
+        )
 
         # past
-        yesterday = AppointmentFactory.create(starts_at=datetime(2024, 12, 31, 9))
+        yesterday = AppointmentFactory.create(
+            starts_at=datetime(2024, 12, 31, 9, tzinfo=tz.utc)
+        )
 
         # upcoming
-        tomorrow = AppointmentFactory.create(starts_at=datetime(2025, 1, 2, 9))
+        tomorrow = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc)
+        )
 
         assertQuerySetEqual(
             models.Appointment.objects.past(), [yesterday], ordered=False
