@@ -1,7 +1,18 @@
+name: manage-breast-screening-notifications
+
 services:
 
+  azurite:
+    container_name: azurite
+    command: "azurite --loose --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001"
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - 10000:10000
+      - 10001:10001
+      - 10002:10002
+
   mesh_sandbox:
-    build: 
+    build:
       context: https://github.com/NHSDigital/mesh-sandbox.git#refs/tags/v1.0.4
     ports:
       - "8700:80"
@@ -17,6 +28,6 @@ services:
       - SHARED_KEY=TestKey
       - SSL=no
       - AUTH_MODE=none
-      - STORE_MODE=canned 
+      - STORE_MODE=canned
     volumes:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
