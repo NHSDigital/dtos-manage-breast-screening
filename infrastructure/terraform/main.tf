@@ -87,6 +87,10 @@ module "db_migrate" {
   }
 }
 
+resource "terraform_data" "job_image" {
+  input = module.db_migrate.image
+}
+
 resource "azapi_resource_action" "start_db_migration" {
   resource_id = module.db_migrate.id
   type        = "Microsoft.App/jobs@2024-03-01"
@@ -94,7 +98,7 @@ resource "azapi_resource_action" "start_db_migration" {
   body        = {}
 
   lifecycle {
-    replace_triggered_by = [module.db_migrate.image]
+    replace_triggered_by = [terraform_data.job_image]
   }
 }
 
