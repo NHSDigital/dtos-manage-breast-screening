@@ -12,8 +12,13 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/",
-        views.StartScreening.as_view(),
+        views.ShowAppointment.as_view(),
         name="show_appointment",
+    ),
+    path(
+        "<uuid:pk>/start-screening/",
+        views.StartScreening.as_view(),
+        name="start_screening",
     ),
     path(
         "<uuid:pk>/ask-for-medical-information/",

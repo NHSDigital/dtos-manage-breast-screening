@@ -1,8 +1,9 @@
 import logging
 from functools import cached_property
 
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
@@ -66,7 +67,47 @@ class InProgressAppointmentMixin(AppointmentMixin):
         return super().dispatch(request, *args, **kwargs)  # type: ignore
 
 
-class StartScreening(AppointmentMixin, FormView):
+class ShowAppointment(AppointmentMixin, View):
+    """
+    Show a completed appointment. Redirects to the start screening form
+    if the apppointment is in progress.
+    """
+
+    template_name = "mammograms/show.jinja"
+
+    def get(self, request, *args, **kwargs):
+        appointment = self.appointment
+        if appointment.current_status.in_progress:
+            return redirect("mammograms:start_screening", pk=self.appointment.pk)
+
+        participant_pk = appointment.screening_episode.participant.pk
+        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
+            participant_id=participant_pk
+        ).order_by("-created_at")
+        appointment_presenter = AppointmentPresenter(appointment)
+        last_known_mammogram_presenter = LastKnownMammogramPresenter(
+            last_known_mammograms,
+            participant_pk=participant_pk,
+            current_url=self.request.path,
+        )
+
+        context = {
+            "title": appointment_presenter.participant.full_name,
+            "caption": f"{appointment_presenter.clinic_slot.clinic_type} appointment",
+            "presented_appointment": appointment_presenter,
+            "presented_participant": appointment_presenter.participant,
+            "presented_mammograms": last_known_mammogram_presenter,
+            "secondary_nav_items": present_secondary_nav(appointment.pk),
+        }
+
+        return render(
+            request,
+            template_name="mammograms/show/appointment_details.jinja",
+            context=context,
+        )
+
+
+class StartScreening(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/start_screening.jinja"
     form_class = ScreeningAppointmentForm
 
@@ -96,12 +137,6 @@ class StartScreening(AppointmentMixin, FormView):
                 "decision_hint": "Before you proceed, check the participant’s identity and confirm that their last mammogram was more than 6 months ago.",
             }
         )
-
-        if AppointmentStatus in [
-            AppointmentStatus.SCREENED,
-            AppointmentStatus.PARTIALLY_SCREENED,
-        ]:
-            context["secondary_nav_items"] = present_secondary_nav(appointment.pk)
 
         return context
 
@@ -229,4 +264,4 @@ def check_in(_request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
-    return redirect("mammograms:show_appointment", pk=pk)
+    return redirect("mammograms:start_screening", pk=pk)
