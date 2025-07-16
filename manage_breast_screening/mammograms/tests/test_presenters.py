@@ -72,6 +72,13 @@ class TestAppointmentPresenter:
         assert result["key"] == expected_key
         assert result["is_confirmed"] == expected_is_confirmed
 
+    def test_clinic_url(self, mock_appointment):
+        mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
+        assert (
+            AppointmentPresenter(mock_appointment).clinic_url
+            == "/clinics/ef742f9d-76fb-47f1-8292-f7dcf456fc71/"
+        )
+
     def test_participant_url(self, mock_appointment):
         mock_appointment.screening_episode.participant.pk = UUID(
             "ac1b68ec-06a4-40a0-a016-7108dffe4397"
@@ -218,6 +225,13 @@ class TestClinicSlotPresenter:
         clinic_slot_mock.clinic.get_type_display.return_value = "Screening"
 
         assert ClinicSlotPresenter(clinic_slot_mock).clinic_type == "Screening"
+
+    def test_clinic_url(self, clinic_slot_mock):
+        clinic_slot_mock.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
+        assert (
+            ClinicSlotPresenter(clinic_slot_mock).clinic_url
+            == "/clinics/ef742f9d-76fb-47f1-8292-f7dcf456fc71/"
+        )
 
     @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
     def test_slot_time_and_clinic_date(self, clinic_slot_mock):

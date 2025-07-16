@@ -40,6 +40,10 @@ class AppointmentPresenter:
         return self.participant.url
 
     @cached_property
+    def clinic_url(self):
+        return self.clinic_slot.clinic_url
+
+    @cached_property
     def start_time(self):
         return self.clinic_slot.starts_at
 
@@ -148,6 +152,10 @@ class ClinicSlotPresenter:
     @cached_property
     def clinic_type(self):
         return self._clinic.get_type_display().capitalize()
+
+    @cached_property
+    def clinic_url(self):
+        return reverse("clinics:show", kwargs={"pk": self._clinic.pk})
 
     @cached_property
     def slot_time_and_clinic_date(self):
