@@ -6,6 +6,7 @@ from mesh_client import MeshClient
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 
+@pytest.mark.integration
 class TestMeshClient:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):

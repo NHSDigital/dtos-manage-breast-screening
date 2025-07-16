@@ -44,7 +44,7 @@ help: # Print help @Others
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	poetry run pytest -m 'not system'
+	poetry run pytest -m 'not system' -m 'not integration'
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing
@@ -53,6 +53,9 @@ test-lint: # Lint files @Testing
 
 test-ui: # Run UI tests @Testing
 	poetry run pytest -m system
+
+test-integration:
+	cd manage_breast_screening/notifications && ./tests/integration/run.sh
 
 run: manage_breast_screening/config/.env # Start the development server @Development
 	poetry run ./manage.py runserver
