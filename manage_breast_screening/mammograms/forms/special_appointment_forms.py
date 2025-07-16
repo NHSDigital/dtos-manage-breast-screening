@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import TextChoices
 
 
-class SpecialAppointmentForm(forms.Form):
+class ProvideSpecialAppointmentDetailsForm(forms.Form):
     class SupportReasons(TextChoices):
         BREAST_IMPLANTS = ("BREAST_IMPLANTS", "Breast implants")
         MEDICAL_DEVICES = ("MEDICAL_DEVICES", "Implanted medical devices")
