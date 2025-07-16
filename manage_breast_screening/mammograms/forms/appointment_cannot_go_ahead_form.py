@@ -1,48 +1,6 @@
 from django import forms
 
-from ..participants.models import AppointmentStatus
-
-
-class ScreeningAppointmentForm(forms.Form):
-    decision = forms.ChoiceField(
-        choices=(
-            ("continue", "Yes, go to medical information"),
-            ("dropout", "No, screening cannot proceed"),
-        ),
-        required=True,
-        widget=forms.RadioSelect(),
-    )
-
-    def save(self):
-        pass
-
-
-class AskForMedicalInformationForm(forms.Form):
-    decision = forms.ChoiceField(
-        choices=(
-            ("yes", "Yes"),
-            ("no", "No - proceed to imaging"),
-        ),
-        required=True,
-        widget=forms.RadioSelect(),
-    )
-
-    def save(self):
-        pass
-
-
-class RecordMedicalInformationForm(forms.Form):
-    decision = forms.ChoiceField(
-        choices=(
-            ("continue", "Yes, mark incomplete sections as ‘none’ or ‘no’"),
-            ("dropout", "No, screening cannot proceed"),
-        ),
-        required=True,
-        widget=forms.RadioSelect(),
-    )
-
-    def save(self):
-        pass
+from manage_breast_screening.participants.models import AppointmentStatus
 
 
 class AppointmentCannotGoAheadForm(forms.Form):
