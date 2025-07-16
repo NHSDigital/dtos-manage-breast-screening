@@ -1,15 +1,8 @@
 import pytest
-from pytest_django.asserts import assertFormError
 
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
-from ..forms import AppointmentCannotGoAheadForm, ScreeningAppointmentForm
-
-
-class TestScreeningAppointmentForm:
-    def test_decision_cannot_be_left_blank(self):
-        form = ScreeningAppointmentForm({})
-        assertFormError(form, "decision", ["This field is required."])
+from ...forms import AppointmentCannotGoAheadForm
 
 
 @pytest.mark.django_db
