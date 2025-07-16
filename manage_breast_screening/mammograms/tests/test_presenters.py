@@ -29,7 +29,7 @@ class TestAppointmentPresenter:
         return mock
 
     @pytest.mark.parametrize(
-        "status, expected_classes, expected_text, expected_key, expected_is_confirmed",
+        "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
         [
             (
                 AppointmentStatus.CONFIRMED,
@@ -37,12 +37,14 @@ class TestAppointmentPresenter:
                 "Confirmed",
                 "CONFIRMED",
                 True,
+                False,
             ),
             (
                 AppointmentStatus.CHECKED_IN,
                 "app-nowrap",
                 "Checked in",
                 "CHECKED_IN",
+                False,
                 False,
             ),
             (
@@ -51,6 +53,15 @@ class TestAppointmentPresenter:
                 "Attended not screened",
                 "ATTENDED_NOT_SCREENED",
                 False,
+                False,
+            ),
+            (
+                AppointmentStatus.SCREENED,
+                "nhsuk-tag--green app-nowrap",
+                "Screened",
+                "SCREENED",
+                False,
+                True,
             ),
         ],
     )
@@ -62,6 +73,7 @@ class TestAppointmentPresenter:
         expected_text,
         expected_key,
         expected_is_confirmed,
+        expected_is_screened,
     ):
         mock_appointment.current_status = AppointmentStatus(state=status)
 
@@ -71,6 +83,7 @@ class TestAppointmentPresenter:
         assert result["text"] == expected_text
         assert result["key"] == expected_key
         assert result["is_confirmed"] == expected_is_confirmed
+        assert result["is_screened"] == expected_is_screened
 
     def test_clinic_url(self, mock_appointment):
         mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"

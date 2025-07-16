@@ -69,6 +69,7 @@ class AppointmentPresenter:
             "text": current_status.get_state_display(),
             "key": current_status.state,
             "is_confirmed": current_status.state == AppointmentStatus.CONFIRMED,
+            "is_screened": current_status.state == AppointmentStatus.SCREENED,
         }
 
 
