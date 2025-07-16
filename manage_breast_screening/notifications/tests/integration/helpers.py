@@ -55,3 +55,18 @@ class Helpers:
                     filename=os.path.basename(filepath),
                     workflow_id="TEST_NBSS_WORKFLOW",
                 )
+
+    def test_dat_file_path(self):
+        return (
+            f"{os.path.dirname(os.path.realpath(__file__))}"
+            "/../management/commands/test.dat"
+        )
+
+    def azurite_connection_string(self):
+        """Default connection string for Azurite storage"""
+        return (
+            "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;"
+            "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsu"  # gitleaks:allow
+            "Fq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+            "BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
+        )
