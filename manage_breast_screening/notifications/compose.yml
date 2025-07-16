@@ -10,8 +10,11 @@ services:
       - 10000:10000
       - 10001:10001
       - 10002:10002
+    profiles:
+      - development
+      - integration
 
-  mesh_sandbox:
+  mesh-sandbox:
     build:
       context: https://github.com/NHSDigital/mesh-sandbox.git#refs/tags/v1.0.4
     ports:
@@ -21,7 +24,7 @@ services:
         condition: on-failure
         max_attempts: 3
     healthcheck:
-      test: curl -ksf https://localhost/health || exit 1
+      test: curl -ksf http://localhost/health || exit 1
       interval: 3s
       timeout: 10s
     environment:
@@ -29,6 +32,20 @@ services:
       - SSL=no
       - AUTH_MODE=none
       - STORE_MODE=memory
+    profiles:
+      - development
+      - integration
     volumes:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
       - ./store/workflows.jsonl:/app/mesh_sandbox/store/data/workflows.jsonl:ro
+
+  test-dependencies:
+    image: alpine
+    depends_on:
+      azurite:
+        condition: service_started
+      mesh-sandbox:
+        condition: service_healthy
+    profiles:
+        - integration
+
