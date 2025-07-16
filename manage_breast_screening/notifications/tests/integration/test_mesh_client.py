@@ -15,9 +15,13 @@ class TestMeshClient:
         monkeypatch.setenv("MESH_CLIENT_SHARED_KEY", "TestKey")
         monkeypatch.setenv("MESH_INBOX_NAME", "X26ABC1")
 
-    def test_retrieve_file(self):
-        test_file_path = f"{os.path.dirname(os.path.realpath(__file__))}/../management/commands/test.dat"
-        Helpers().add_file_to_mesh_mailbox(test_file_path)
+    @pytest.fixture
+    def helpers(self):
+        return Helpers()
+
+    def test_retrieve_file(self, helpers):
+        test_file_path = helpers.test_dat_file_path()
+        helpers.add_file_to_mesh_mailbox(test_file_path)
 
         with MeshClient(
             url=os.getenv("MESH_BASE_URL"),

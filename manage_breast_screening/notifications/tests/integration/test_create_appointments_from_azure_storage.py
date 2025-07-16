@@ -19,12 +19,16 @@ class TestCreateAppointmentsFromAzureStorage:
         )
         monkeypatch.setenv("BLOB_CONTAINER_NAME", "nbss-appoinments-data")
 
+    @pytest.fixture
+    def helpers(self):
+        return Helpers()
+
     @pytest.mark.django_db
-    def test_appointments_created_from_file_stored_in_azure(self):
+    def test_appointments_created_from_file_stored_in_azure(self, helpers):
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
-        with open(Helpers().test_dat_file_path()) as test_file:
-            Helpers().add_to_blob_storage(f"{today_dirname}/test.dat", test_file.read())
+        with open(helpers.test_dat_file_path()) as test_file:
+            helpers.add_to_blob_storage(f"{today_dirname}/test.dat", test_file.read())
 
         Command().handle(**{"date_str": today_dirname})
 
