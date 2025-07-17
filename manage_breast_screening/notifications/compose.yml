@@ -40,7 +40,7 @@ services:
     profiles:
       - test-integration
     build: 
-      context: ./tests/integration/runner
+      context: ./tests/integration
       dockerfile: Dockerfile
       additional_contexts:
         root_dir: ../..

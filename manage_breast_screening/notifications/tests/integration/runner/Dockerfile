@@ -12,8 +12,6 @@ COPY --from=root_dir manage_breast_screening/notifications/__init__.py manage_br
 COPY --from=root_dir manage_breast_screening/notifications/tests/__init__.py manage_breast_screening/notifications/tests/__init__.py
 COPY --from=root_dir manage_breast_screening/notifications/tests/integration/__init__.py manage_breast_screening/notifications/tests/integration/__init__.py
 
-COPY --from=root_dir manage.py /manage.py
-
 RUN pip install poetry
 RUN poetry config virtualenvs.create false
 RUN poetry remove pytest-django
