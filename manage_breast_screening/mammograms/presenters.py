@@ -44,6 +44,10 @@ class AppointmentPresenter:
         return self.clinic_slot.clinic_url
 
     @cached_property
+    def caption(self):
+        return f"{self.clinic_slot.clinic_type} appointment"
+
+    @cached_property
     def start_time(self):
         return self.clinic_slot.starts_at
 
