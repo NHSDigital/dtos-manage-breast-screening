@@ -39,7 +39,7 @@ services:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
       - ./store/workflows.jsonl:/app/mesh_sandbox/store/data/workflows.jsonl:ro
   
-  cmapi_stub:
+  cmapi-stub:
     build:
       context: ./tests/dependencies/cmapi_stub
       dockerfile: Dockerfile
@@ -61,7 +61,7 @@ services:
         condition: service_started
       mesh-sandbox:
         condition: service_healthy
-      cmapi_stub:
+      cmapi-stub:
         condition: service_healthy
     profiles:
         - integration

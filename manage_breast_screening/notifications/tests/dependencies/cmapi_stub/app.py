@@ -2,6 +2,7 @@ import json
 import time
 import uuid
 
+import requests
 from flask import Flask, request
 from jsonschema import ValidationError, validate
 
@@ -18,7 +19,7 @@ def token():
     return json.dumps({"access_token": "000111"}), 200
 
 
-@app.route("/message/batches", methods=["POST"])
+@app.route("/message/batch", methods=["POST"])
 def message_batches():
     json_data = request.json
 
@@ -51,7 +52,7 @@ def message_batches():
 
 def validate_with_schema(data: dict):
     try:
-        schema = json.load(open("schema.json"))
+        schema = requests.get("https://digital.nhs.uk/restapi/oas/540802").json()
         subschema = schema["paths"]["/message/batches"]["post"]["requestBody"][
             "content"
         ]["application/vnd.api+json"]["schema"]

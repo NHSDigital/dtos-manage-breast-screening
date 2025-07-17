@@ -16,7 +16,7 @@ class TestApiClient:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
         monkeypatch.setenv(
-            "API_MESSAGE_BATCH_URL", "http://localhost:8888/message/batches"
+            "API_MESSAGE_BATCH_URL", "http://localhost:8888/message/batch"
         )
         monkeypatch.setenv("OAUTH_TOKEN_URL", "http://localhost:8888/token")
         monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
