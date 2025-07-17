@@ -88,11 +88,18 @@ module "db_migrate" {
 }
 
 module "webapp" {
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
+  }
   source                           = "../modules/dtos-devops-templates/infrastructure/modules/container-app"
   name                             = "manage-breast-screening-web-${var.environment}"
   container_app_environment_id     = module.container-app-environment.id
   resource_group_name              = azurerm_resource_group.main.name
   fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  infra_key_vault_name             = "kv-manbrs-${var.environment}-infra"
+  infra_key_vault_rg               = "rg-manbrs-${var.environment}-infra"
+  enable_auth                      = var.enable_auth
   app_key_vault_id                 = module.app-key-vault.key_vault_id
   docker_image                     = var.docker_image
   user_assigned_identity_ids       = [module.db_connect_identity.id]
