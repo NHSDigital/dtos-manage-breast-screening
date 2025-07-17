@@ -92,7 +92,7 @@ class ShowAppointment(AppointmentMixin, View):
         )
 
         context = {
-            "title": appointment_presenter.participant.full_name,
+            "heading": appointment_presenter.participant.full_name,
             "caption": appointment_presenter.caption,
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
@@ -129,7 +129,7 @@ class StartScreening(InProgressAppointmentMixin, FormView):
 
         context.update(
             {
-                "title": appointment_presenter.participant.full_name,
+                "heading": appointment_presenter.participant.full_name,
                 "caption": appointment_presenter.caption,
                 "page_title": appointment_presenter.caption,
                 "presented_appointment": appointment_presenter,
@@ -170,7 +170,7 @@ class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
             {
                 "participant": participant,
                 "caption": participant.full_name,
-                "title": "Medical information",
+                "heading": "Medical information",
                 "page_title": "Medical information",
                 "decision_legend": "Has the participant shared any relevant medical information?",
                 "cannot_continue_link": {
@@ -208,7 +208,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         )
         context.update(
             {
-                "title": "Record medical information",
+                "heading": "Record medical information",
                 "page_title": "Record medical information",
                 "participant": participant,
                 "caption": participant.full_name,
@@ -239,7 +239,7 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         participant = self.appointment.screening_episode.participant
         context.update(
             {
-                "title": "Appointment cannot go ahead",
+                "heading": "Appointment cannot go ahead",
                 "caption": participant.full_name,
                 "page_title": "Appointment cannot go ahead",
                 "decision_legend": "Does the appointment need to be rescheduled?",
@@ -261,7 +261,7 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
     template_name = "mammograms/awaiting_images.jinja"
 
     def get_context_data(self, **kwargs):
-        return {"title": "Awaiting images", "page_title": "Awaiting images"}
+        return {"heading": "Awaiting images", "page_title": "Awaiting images"}
 
 
 @require_http_methods(["POST"])
