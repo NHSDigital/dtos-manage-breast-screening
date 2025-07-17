@@ -13,7 +13,7 @@ def clinic_list(request, filter="today"):
     return render(
         request,
         "clinics/index.jinja",
-        context={"presenter": presenter},
+        context={"presenter": presenter, "page_title": presenter.heading},
     )
 
 
@@ -36,6 +36,7 @@ def clinic(request, pk, filter="remaining"):
         context={
             "presented_clinic": presented_clinic,
             "presented_appointment_list": presented_appointment_list,
+            "page_title": presented_clinic.heading,
         },
     )
 
