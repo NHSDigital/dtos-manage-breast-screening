@@ -228,10 +228,10 @@ class AppointmentQuerySet(models.QuerySet):
         )
 
     def upcoming(self):
-        return self.filter(clinic_slot__starts_at__gte=date.today())
+        return self.filter(clinic_slot__starts_at__date__gte=date.today())
 
     def past(self):
-        return self.filter(clinic_slot__starts_at__lt=date.today())
+        return self.filter(clinic_slot__starts_at__date__lt=date.today())
 
     def for_clinic_and_filter(self, clinic, filter):
         match filter:
@@ -316,6 +316,13 @@ class AppointmentStatus(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+    @property
+    def in_progress(self):
+        """
+        Is this state one of the in-progress states?
+        """
+        return self.state in [self.CONFIRMED, self.CHECKED_IN]
 
 
 class ParticipantReportedMammogram(BaseModel):

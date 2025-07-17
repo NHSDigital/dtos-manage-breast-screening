@@ -15,7 +15,7 @@ def present_secondary_nav(pk):
         {
             "id": "all",
             "text": "Appointment details",
-            "href": reverse("mammograms:start_screening", kwargs={"pk": pk}),
+            "href": reverse("mammograms:show_appointment", kwargs={"pk": pk}),
             "current": True,
         },
         {"id": "medical_information", "text": "Medical information", "href": "#"},
@@ -38,6 +38,10 @@ class AppointmentPresenter:
     @cached_property
     def participant_url(self):
         return self.participant.url
+
+    @cached_property
+    def clinic_url(self):
+        return self.clinic_slot.clinic_url
 
     @cached_property
     def start_time(self):
@@ -65,6 +69,7 @@ class AppointmentPresenter:
             "text": current_status.get_state_display(),
             "key": current_status.state,
             "is_confirmed": current_status.state == AppointmentStatus.CONFIRMED,
+            "is_screened": current_status.state == AppointmentStatus.SCREENED,
         }
 
 
@@ -148,6 +153,10 @@ class ClinicSlotPresenter:
     @cached_property
     def clinic_type(self):
         return self._clinic.get_type_display().capitalize()
+
+    @cached_property
+    def clinic_url(self):
+        return reverse("clinics:show", kwargs={"pk": self._clinic.pk})
 
     @cached_property
     def slot_time_and_clinic_date(self):

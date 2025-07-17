@@ -1,12 +1,23 @@
-{% extends "wizard_step.jinja" %}
+{% extends 'layout-app.jinja' %}
 {% from 'card/macro.jinja' import card %}
 {% from 'warning-callout/macro.jinja' import warningCallout %}
+{% from 'back-link/macro.jinja' import backLink %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
 {% from 'components/appointment-header/macro.jinja' import appointment_header %}
 {% from 'components/participant-details/macro.jinja' import participant_details %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 
-{% block heading %}
+{% block beforeContent %}
+{{ backLink({
+  "href": presented_appointment.clinic_url,
+  "text": "Back to clinic"
+}) }}
+{% endblock beforeContent %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-full">
+
   <div class="app-header">
     <h1 class="nhsuk-heading-l">
       <span class="nhsuk-caption-l">
@@ -22,30 +33,13 @@
       )}}
     </div>
   </div>
-{% endblock %}
 
-{% block step_content %}
   {{ appointment_header(presented_appointment) }}
 
-  {% set special_appointment_html %}
-    {% if presented_participant.extra_needs | length > 1 %}
-      <ul>
-        {% for need in presented_participant.extra_needs %}
-          <li>{{need}}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>{{ presented_participant.extra_needs | first }}</p>
-    {% endif %}
-    <p><a href="#">Change</a></p>
-  {% endset %}
-
-  {% if presented_participant.extra_needs %}
-    {{ warningCallout({
-      "heading": "Special appointment",
-      "HTML": special_appointment_html
-    }) }}
-  {% endif %}
+  {{ app_secondary_navigation({
+    "visuallyHiddenTitle": "Secondary menu",
+    "items": secondary_nav_items
+  }) }}
 
   {{ card({
     "headingHtml": " ",
@@ -57,4 +51,6 @@
       screening_protocol=presented_appointment.screening_protocol
     )
   }) }}
+  </div>
+</div>
 {% endblock %}

@@ -11,7 +11,7 @@ from manage_breast_screening.clinics.tests.factories import (
 )
 
 from .. import models
-from ..models import Ethnicity
+from ..models import AppointmentStatus, Ethnicity
 from .factories import AppointmentFactory, ParticipantFactory, ScreeningEpisodeFactory
 
 
@@ -122,13 +122,19 @@ class TestAppointment:
         time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 
         # > 00:00 so counts as upcoming still
-        earlier_today = AppointmentFactory.create(starts_at=datetime(2025, 1, 1, 9))
+        earlier_today = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc)
+        )
 
         # past
-        yesterday = AppointmentFactory.create(starts_at=datetime(2024, 12, 31, 9))
+        yesterday = AppointmentFactory.create(
+            starts_at=datetime(2024, 12, 31, 9, tzinfo=tz.utc)
+        )
 
         # upcoming
-        tomorrow = AppointmentFactory.create(starts_at=datetime(2025, 1, 2, 9))
+        tomorrow = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc)
+        )
 
         assertQuerySetEqual(
             models.Appointment.objects.past(), [yesterday], ordered=False
@@ -233,3 +239,15 @@ def test_appointment_current_status():
 
     assert appointment.statuses.first().state == models.AppointmentStatus.CHECKED_IN
     assert appointment.current_status.state == models.AppointmentStatus.CHECKED_IN
+
+
+def test_appointment_status_in_progress():
+    assert AppointmentStatus(state=AppointmentStatus.CONFIRMED).in_progress
+    assert AppointmentStatus(state=AppointmentStatus.CHECKED_IN).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.CANCELLED).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.DID_NOT_ATTEND).in_progress
+    assert not AppointmentStatus(
+        state=AppointmentStatus.ATTENDED_NOT_SCREENED
+    ).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.PARTIALLY_SCREENED).in_progress
+    assert not AppointmentStatus(state=AppointmentStatus.SCREENED).in_progress

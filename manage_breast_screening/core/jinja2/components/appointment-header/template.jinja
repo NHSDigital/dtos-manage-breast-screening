@@ -3,6 +3,6 @@
 
 <p class="app-text-grey"><span>NHS Number: {{ participant.nhs_number }}</span></p>
 
-<p>{{ clinic_slot.slot_time_and_clinic_date }}<span class="nhsuk-u-margin-left-3"><a href="#">Reschedule appointment</a></span></p>
+<p>{{ clinic_slot.slot_time_and_clinic_date }}{% if not appointment.current_status.is_screened %}<span class="nhsuk-u-margin-left-3"><a href="#">Reschedule appointment</a></span>{% endif %}</p>
 
 <p class="nhsuk-u-margin-bottom-4"><a href="{{ appointment.participant_url }}">View participant record</a></p>

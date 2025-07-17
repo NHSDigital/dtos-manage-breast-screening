@@ -11,6 +11,11 @@ urlpatterns = [
         name="check_in",
     ),
     path(
+        "<uuid:pk>/",
+        views.ShowAppointment.as_view(),
+        name="show_appointment",
+    ),
+    path(
         "<uuid:pk>/start-screening/",
         views.StartScreening.as_view(),
         name="start_screening",
@@ -27,12 +32,12 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/awaiting-images/",
-        views.awaiting_images,
+        views.AwaitingImages.as_view(),
         name="awaiting_images",
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
-        views.appointment_cannot_go_ahead,
+        views.AppointmentCannotGoAhead.as_view(),
         name="appointment_cannot_go_ahead",
     ),
 ]

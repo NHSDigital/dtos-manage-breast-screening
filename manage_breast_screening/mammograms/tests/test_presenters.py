@@ -29,7 +29,7 @@ class TestAppointmentPresenter:
         return mock
 
     @pytest.mark.parametrize(
-        "status, expected_classes, expected_text, expected_key, expected_is_confirmed",
+        "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
         [
             (
                 AppointmentStatus.CONFIRMED,
@@ -37,12 +37,14 @@ class TestAppointmentPresenter:
                 "Confirmed",
                 "CONFIRMED",
                 True,
+                False,
             ),
             (
                 AppointmentStatus.CHECKED_IN,
                 "app-nowrap",
                 "Checked in",
                 "CHECKED_IN",
+                False,
                 False,
             ),
             (
@@ -51,6 +53,15 @@ class TestAppointmentPresenter:
                 "Attended not screened",
                 "ATTENDED_NOT_SCREENED",
                 False,
+                False,
+            ),
+            (
+                AppointmentStatus.SCREENED,
+                "nhsuk-tag--green app-nowrap",
+                "Screened",
+                "SCREENED",
+                False,
+                True,
             ),
         ],
     )
@@ -62,6 +73,7 @@ class TestAppointmentPresenter:
         expected_text,
         expected_key,
         expected_is_confirmed,
+        expected_is_screened,
     ):
         mock_appointment.current_status = AppointmentStatus(state=status)
 
@@ -71,6 +83,14 @@ class TestAppointmentPresenter:
         assert result["text"] == expected_text
         assert result["key"] == expected_key
         assert result["is_confirmed"] == expected_is_confirmed
+        assert result["is_screened"] == expected_is_screened
+
+    def test_clinic_url(self, mock_appointment):
+        mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
+        assert (
+            AppointmentPresenter(mock_appointment).clinic_url
+            == "/clinics/ef742f9d-76fb-47f1-8292-f7dcf456fc71/"
+        )
 
     def test_participant_url(self, mock_appointment):
         mock_appointment.screening_episode.participant.pk = UUID(
@@ -133,7 +153,7 @@ class TestLastKnownMammogramPresenter:
         result = LastKnownMammogramPresenter(
             [],
             participant_pk=uuid4(),
-            current_url="/mammograms/start-screening/abc",
+            current_url="/mammograms/abc",
         )
 
         assert result.last_known_mammograms == []
@@ -143,7 +163,7 @@ class TestLastKnownMammogramPresenter:
         result = LastKnownMammogramPresenter(
             [reported_today],
             participant_pk=uuid4(),
-            current_url="/mammograms/start-screening/abc",
+            current_url="/mammograms/abc",
         )
 
         assert result.last_known_mammograms == [
@@ -165,7 +185,7 @@ class TestLastKnownMammogramPresenter:
         result = LastKnownMammogramPresenter(
             [reported_today, reported_earlier],
             participant_pk=uuid4(),
-            current_url="/mammograms/start-screening/abc",
+            current_url="/mammograms/abc",
         )
 
         assert result.last_known_mammograms == [
@@ -193,7 +213,7 @@ class TestLastKnownMammogramPresenter:
 
     def test_add_link(self, reported_today):
         participant_id = uuid4()
-        current_url = "/mammograms/start-screening/abc"
+        current_url = "/mammograms/abc"
 
         result = LastKnownMammogramPresenter(
             [reported_today],
@@ -218,6 +238,13 @@ class TestClinicSlotPresenter:
         clinic_slot_mock.clinic.get_type_display.return_value = "Screening"
 
         assert ClinicSlotPresenter(clinic_slot_mock).clinic_type == "Screening"
+
+    def test_clinic_url(self, clinic_slot_mock):
+        clinic_slot_mock.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
+        assert (
+            ClinicSlotPresenter(clinic_slot_mock).clinic_url
+            == "/clinics/ef742f9d-76fb-47f1-8292-f7dcf456fc71/"
+        )
 
     @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
     def test_slot_time_and_clinic_date(self, clinic_slot_mock):

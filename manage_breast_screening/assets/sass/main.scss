@@ -31,7 +31,7 @@ h3 {
 Highlight in red links that don't get anywhere yet
 */
 a[href="#"] {
-  color: #c80000;
+  color: #c80000 !important;
 }
 
 // Status tag positioning within headers
