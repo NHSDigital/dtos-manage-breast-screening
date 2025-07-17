@@ -37,7 +37,7 @@
     {% else %}
       <p>{{ (presented_participant.extra_needs.values() | first).details }}</p>
     {% endif %}
-    <p><a href="#">Change</a></p>
+    <p><a href="{{ presented_appointment.special_appointment_url }}">Change</a></p>
   {% endset %}
 
   {% if presented_participant.extra_needs %}

@@ -1,0 +1,104 @@
+{% extends 'layout-app.jinja' %}
+{% from 'warning-callout/macro.jinja' import warningCallout %}
+{% from 'checkboxes/macro.jinja' import checkboxes %}
+{% from 'textarea/macro.jinja' import textarea %}
+{% from 'back-link/macro.jinja' import backLink %}
+{% from 'button/macro.jinja' import button %}
+{% from 'django_form_helpers.jinja' import app_radios, form_error_summary %}
+
+{% block beforeContent %}
+  {{ backLink(back_link_params) }}
+{% endblock beforeContent %}
+
+{% block messages %}
+  {{ form_error_summary(form) }}
+{% endblock %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <h1 class="nhsuk-heading-l">
+      <span class="nhsuk-caption-l">
+        {{ caption }}
+      </span>
+      {{ heading }}
+    </h1>
+
+    {% macro details_textarea(form, support_reasons_value) %}
+      {% set details_field_name = support_reasons_value.lower() + "_details" %}
+      {% set details_field = form[details_field_name] %}
+      {% set details_field_id = details_field.auto_id %}
+      {% set details_field_value = details_field.value() %}
+      {% set textarea_params = {
+        "label": {
+          "text": "Describe support required"
+        },
+        "id": details_field_id,
+        "name": details_field_name,
+        "value": details_field_value,
+        "hint": {
+          "text": hint
+        } if hint
+      } %}
+      {% if details_field.errors %}
+        {% set error_params = {
+          "errorMessage": {
+            "text": form[details_field_name].errors | first
+          }
+        } %}
+        {% set textarea_params = dict(textarea_params, **error_params) %}
+      {% endif %}
+      {{ textarea(textarea_params) }}
+    {% endmacro %}
+
+    <form action="{{request.path}}" method="POST">
+      {% set checkbox_items = [] %}
+
+      {% for value, label in form.support_reasons.field.choices %}
+          {% set hint = form.SupportReasonHints[value] %}
+
+          {% do checkbox_items.append({
+            "text": label,
+            "id": form.support_reasons.auto_id if loop.first,
+            "value": value,
+            "checked": value in (form.support_reasons.value() or []),
+            "conditional": {
+              "html": details_textarea(form=form, support_reasons_value=value)
+            }
+          }) %}
+      {% endfor %}
+
+      {% if form.support_reasons.errors %}
+        {% set error_message = {"text": form.support_reasons.errors | first} %}
+      {% endif %}
+
+      {{ checkboxes({
+        "name": form.support_reasons.html_name,
+        "errorMessage": error_message,
+        "fieldset": {
+          "legend": {
+            "text": support_reasons_legend,
+            "classes": "nhsuk-fieldset__legend--m",
+            "isPageHeading": false
+          }
+        },
+        "hint": {
+          "text": "Select all that apply. When describing support required, include any special requests made by the participant or their carer."
+        },
+        "items": checkbox_items
+      }) }}
+
+      {{ app_radios(form_attribute=form.any_temporary, legend="Are any of these reasons temporary?", hint="This includes issues that are likely to be resolved by their next mammogram, for example a broken foot or a short-term eye problem.") }}
+
+      {{csrf_input}}
+
+      <div class="nhsuk-button-group">
+        {{ button({
+          "text": "Continue"
+        }) }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -40,4 +40,9 @@ urlpatterns = [
         views.AppointmentCannotGoAhead.as_view(),
         name="appointment_cannot_go_ahead",
     ),
+    path(
+        "<uuid:pk>/special-appointment/",
+        views.ProvideSpecialAppointmentDetails.as_view(),
+        name="provide_special_appointment_details",
+    ),
 ]
