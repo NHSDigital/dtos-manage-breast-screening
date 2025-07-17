@@ -45,7 +45,10 @@ build-backend = "poetry.core.masonry.api"
 DJANGO_SETTINGS_MODULE = "manage_breast_screening.config.settings_test"
 python_files = "tests.py test_*.py *_tests.py"
 addopts = "--doctest-modules"
-markers = ["system: mark a test as a system test"]
+markers = [
+  "system: mark a test as a system test",
+  "integration: mark a test as an integration test"
+]
 
 [tool.ruff]
 exclude = ["*/migrations/*.py"]
