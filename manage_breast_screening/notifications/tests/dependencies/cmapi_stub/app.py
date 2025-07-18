@@ -53,7 +53,7 @@ def message_batches():
 def validate_with_schema(data: dict):
     try:
         schema = requests.get("https://digital.nhs.uk/restapi/oas/540802").json()
-        subschema = schema["paths"]["/message/batches"]["post"]["requestBody"][
+        subschema = schema["paths"]["/v1/message-batches"]["post"]["requestBody"][
             "content"
         ]["application/vnd.api+json"]["schema"]
         validate(instance=data, schema=subschema)
@@ -62,6 +62,8 @@ def validate_with_schema(data: dict):
         return False, e.message
     except KeyError as e:
         return False, f"Invalid body: {e}"
+    except Exception as e:
+        return False, str(e)
 
 
 def populate_message_ids(messages: list[dict]) -> list[dict]:
