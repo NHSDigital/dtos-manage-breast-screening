@@ -52,6 +52,7 @@ def show(request, pk):
             "presented_participant": presented_participant,
             "presented_appointments": presented_appointments,
             "heading": participant.full_name,
+            "page_title": "Participant",
             "back_link": {
                 "text": "Back to participants",
                 "href": reverse("participants:index"),
@@ -88,6 +89,7 @@ def edit_ethnicity(request, pk):
                 "text": "Go back",
                 "href": return_url,
             },
+            "page_title": "Ethnicity",
         },
     )
 
@@ -120,6 +122,7 @@ def add_previous_mammogram(request, pk):
         {
             "title": "Add details of a previous mammogram",
             "caption": participant.full_name,
+            "page_title": "Add details of a previous mammogram",
             "form": form,
             "back_link_params": {"href": return_url, "text": "Go back"},
             "return_url": return_url,

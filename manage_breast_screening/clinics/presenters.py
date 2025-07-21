@@ -59,6 +59,10 @@ class ClinicPresenter:
     def setting_name(self):
         return self._clinic.setting.name
 
+    @cached_property
+    def heading(self):
+        return f"{self.risk_type} screening clinic"
+
 
 class AppointmentListPresenter:
     def __init__(self, clinic_pk, appointments, filter, counts_by_filter):
