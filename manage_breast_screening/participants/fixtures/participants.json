@@ -14,7 +14,7 @@
       "date_of_birth": "1964-03-15",
       "ethnic_background_id": "english_welsh_scottish_ni_british",
       "risk_level": "Routine",
-      "extra_needs": []
+      "extra_needs": {}
     }
   },
   {
@@ -32,7 +32,7 @@
       "date_of_birth": "1958-06-18",
       "ethnic_background_id": null,
       "risk_level": "Routine",
-      "extra_needs": []
+      "extra_needs": {}
     }
   },
   {
@@ -50,7 +50,7 @@
       "date_of_birth": "1958-04-23",
       "ethnic_background_id": null,
       "risk_level": "Routine",
-      "extra_needs": []
+      "extra_needs": {}
     }
   },
   {
@@ -68,7 +68,7 @@
       "date_of_birth": "1977-09-15",
       "ethnic_background_id": "indian",
       "risk_level": "Moderate",
-      "extra_needs": []
+      "extra_needs": {}
     }
   },
   {
@@ -86,7 +86,11 @@
       "date_of_birth": "1959-07-22",
       "ethnic_background_id": null,
       "risk_level": "Routine",
-      "extra_needs": ["Wheelchair user"]
+      "extra_needs": {
+        "PHYSICAL_RESTRICTION": {
+          "details": "Wheelchair user"
+        }
+      }
     }
   },
   {

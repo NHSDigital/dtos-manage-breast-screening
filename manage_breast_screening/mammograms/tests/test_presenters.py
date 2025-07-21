@@ -102,6 +102,14 @@ class TestAppointmentPresenter:
             == "/participants/ac1b68ec-06a4-40a0-a016-7108dffe4397/"
         )
 
+    def test_special_appointment_url(self, mock_appointment):
+        mock_appointment.pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        result = AppointmentPresenter(mock_appointment)
+        assert (
+            result.special_appointment_url
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/"
+        )
+
     def test_screening_protocol(self, mock_appointment):
         mock_appointment.screening_episode.get_protocol_display.return_value = (
             "Family history"

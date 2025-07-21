@@ -44,6 +44,13 @@ class AppointmentPresenter:
         return self.clinic_slot.clinic_url
 
     @cached_property
+    def special_appointment_url(self):
+        return reverse(
+            "mammograms:provide_special_appointment_details",
+            kwargs={"pk": self._appointment.pk},
+        )
+
+    @cached_property
     def caption(self):
         return f"{self.clinic_slot.clinic_type} appointment"
 

@@ -178,7 +178,9 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             current_status=AppointmentStatus.CONFIRMED,
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Special Appointment",
-            screening_episode__participant__extra_needs=["Wheelchair user"],
+            screening_episode__participant__extra_needs={
+                "PHYSICAL_RESTRICTIONS": {"details": "Wheelchair user"}
+            },
         )
 
     def then_i_can_see_the_appointment_tagged_as_special(self):
