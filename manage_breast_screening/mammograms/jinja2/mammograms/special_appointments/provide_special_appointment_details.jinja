@@ -52,7 +52,7 @@
       {{ textarea(textarea_params) }}
     {% endmacro %}
 
-    <form action="{{request.path}}" method="POST">
+    <form action="{{request.path}}" method="POST" novalidate>
       {% set checkbox_items = [] %}
 
       {% for value, label in form.support_reasons.field.choices %}
