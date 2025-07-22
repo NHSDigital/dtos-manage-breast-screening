@@ -62,15 +62,40 @@ class TestSplitDateField:
 
         assertHTMLEqual(
             str(f),
-            """
-            <div>
-                <fieldset>
-                    <legend>Date:</legend>
-                    <input type="number" name="date_0" min="1" max="31" required id="id_date_0">
-                    <input type="number" name="date_1" min="1" max="12" required id="id_date_1">
-                    <input type="number" name="date_2" min="1900" max="2026" required id="id_date_2">
+            """<div>
+            <div class="nhsuk-form-group">
+                <fieldset class="nhsuk-fieldset" role="group">
+                    <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+                        Date
+                    </legend>
+                    <div class="nhsuk-date-input">
+                        <div class="nhsuk-date-input__item">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label nhsuk-date-input__label" for="id_date">
+                                Day
+                                </label>
+                                <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2" id="id_date" name="date_0" type="text" inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="nhsuk-date-input__item">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label nhsuk-date-input__label" for="id_date_1">
+                                Month
+                                </label>
+                                <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2" id="id_date_1" name="date_1" type="text" inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="nhsuk-date-input__item">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label nhsuk-date-input__label" for="id_date_2">
+                                Year
+                                </label>
+                                <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-4" id="id_date_2" name="date_2" type="text" inputmode="numeric">
+                            </div>
+                        </div>
+                    </div>
                 </fieldset>
-            </div>
+            </div></div>
             """,
         )
 
@@ -82,15 +107,40 @@ class TestSplitDateField:
 
         assertHTMLEqual(
             str(f),
-            """
-            <div>
-                <fieldset>
-                    <legend>Date:</legend>
-                    <input type="number" name="date_0" min="1" max="31" value="1" required id="id_date_0">
-                    <input type="number" name="date_1" min="1" max="12" value="12" required id="id_date_1">
-                    <input type="number" name="date_2" min="1900" max="2026" value="2025" required id="id_date_2">
+            """<div>
+            <div class="nhsuk-form-group">
+                <fieldset class="nhsuk-fieldset" role="group">
+                    <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+                        Date
+                    </legend>
+                    <div class="nhsuk-date-input">
+                        <div class="nhsuk-date-input__item">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label nhsuk-date-input__label" for="id_date">
+                                Day
+                                </label>
+                                <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2" id="id_date" name="date_0" type="text" inputmode="numeric" value="1">
+                            </div>
+                        </div>
+                        <div class="nhsuk-date-input__item">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label nhsuk-date-input__label" for="id_date_1">
+                                Month
+                                </label>
+                                <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-2" id="id_date_1" name="date_1" type="text" inputmode="numeric" value="12">
+                            </div>
+                        </div>
+                        <div class="nhsuk-date-input__item">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label nhsuk-date-input__label" for="id_date_2">
+                                Year
+                                </label>
+                                <input class="nhsuk-input nhsuk-date-input__input nhsuk-input--width-4" id="id_date_2" name="date_2" type="text" inputmode="numeric" value="2025">
+                            </div>
+                        </div>
+                    </div>
                 </fieldset>
-            </div>
+            </div></div>
             """,
         )
 

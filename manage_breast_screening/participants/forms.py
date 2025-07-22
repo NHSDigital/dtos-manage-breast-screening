@@ -109,7 +109,10 @@ class ParticipantRecordedMammogramForm(forms.Form):
         )
         self.fields["outside_the_uk_details"] = CharField(required=False, initial="")
         self.fields["exact_date"] = SplitDateField(
-            max_value=date.today(), required=False
+            max_value=date.today(),
+            required=False,
+            hint="For example, 15 3 2025",
+            label="Date of mammogram",
         )
         self.fields["approx_date"] = CharField(required=False, initial="")
         self.fields["different_name"] = CharField(required=False, initial="")

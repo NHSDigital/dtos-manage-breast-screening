@@ -70,7 +70,7 @@
       {% endset %}
 
       {% set exact_date_html %}
-        {{ app_date_input(form_attribute=form.exact_date, legend="Date of mammogram", hint="For example, 15 3 2025") }}
+        {{ form.exact_date.as_field_group() }}
       {% endset %}
 
       {% set approx_date_html %}

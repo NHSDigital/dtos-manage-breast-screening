@@ -14,6 +14,7 @@ import sys
 from os import environ
 from pathlib import Path
 
+import django
 from dotenv import load_dotenv
 from jinja2 import ChainableUndefined
 
@@ -88,7 +89,7 @@ ROOT_URLCONF = "manage_breast_screening.core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.jinja2.Jinja2",
-        "DIRS": [BASE_DIR / "jinja2"],
+        "DIRS": [BASE_DIR / "jinja2", django.__path__[0] + "/forms/jinja2"],
         "APP_DIRS": True,
         "OPTIONS": {
             "environment": "manage_breast_screening.config.jinja2_env.environment",
@@ -109,6 +110,8 @@ TEMPLATES = [
         },
     },
 ]
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 WSGI_APPLICATION = "manage_breast_screening.config.wsgi.application"
 
