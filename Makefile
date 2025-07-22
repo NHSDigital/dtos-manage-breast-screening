@@ -52,7 +52,7 @@ test-lint: # Lint files @Testing
 	poetry run ruff check manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	poetry run pytest -m system --ignore manage_breast_screening/notifications/tests/dependencies
+	poetry run pytest -m system --ignore manage_breast_screening/notifications
 
 test-integration:
 	cd manage_breast_screening/notifications && ./tests/integration/run.sh
