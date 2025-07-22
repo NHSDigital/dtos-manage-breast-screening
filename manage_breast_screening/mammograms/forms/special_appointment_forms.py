@@ -70,10 +70,16 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
         Generate JSON that can be stored on the participant record
         """
         result = {}
-        any_temporary = self.cleaned_data["any_temporary"] == self.TemporaryChoices.YES
+        any_temporary = (
+            self.cleaned_data.get("any_temporary") == self.TemporaryChoices.YES
+        )
         for reason in self.SupportReasons:
-            if reason.value in self.cleaned_data["support_reasons"]:
-                need = {"details": self.cleaned_data[reason.value.lower() + "_details"]}
+            if reason.value in self.cleaned_data.get("support_reasons", []):
+                need = {
+                    "details": self.cleaned_data.get(
+                        reason.value.lower() + "_details", ""
+                    )
+                }
                 if not any_temporary:
                     need["temporary"] = False
                 result[reason.value] = need
