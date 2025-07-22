@@ -1,16 +1,18 @@
 from django import forms
 
+from ..core.form_fields import ChoiceFieldRadios
 from ..participants.models import AppointmentStatus
 
 
 class ScreeningAppointmentForm(forms.Form):
-    decision = forms.ChoiceField(
+    decision = ChoiceFieldRadios(
         choices=(
             ("continue", "Yes, go to medical information"),
             ("dropout", "No, screening cannot proceed"),
         ),
         required=True,
-        widget=forms.RadioSelect(),
+        label="Can the appointment go ahead?",
+        hint="Before you proceed, check the participant’s identity and confirm that their last mammogram was more than 6 months ago.",
     )
 
     def save(self):
@@ -18,13 +20,13 @@ class ScreeningAppointmentForm(forms.Form):
 
 
 class AskForMedicalInformationForm(forms.Form):
-    decision = forms.ChoiceField(
+    decision = ChoiceFieldRadios(
         choices=(
             ("yes", "Yes"),
             ("no", "No - proceed to imaging"),
         ),
         required=True,
-        widget=forms.RadioSelect(),
+        label="Has the participant shared any relevant medical information?",
     )
 
     def save(self):
@@ -32,13 +34,13 @@ class AskForMedicalInformationForm(forms.Form):
 
 
 class RecordMedicalInformationForm(forms.Form):
-    decision = forms.ChoiceField(
+    decision = ChoiceFieldRadios(
         choices=(
             ("continue", "Yes, mark incomplete sections as ‘none’ or ‘no’"),
             ("dropout", "No, screening cannot proceed"),
         ),
         required=True,
-        widget=forms.RadioSelect(),
+        label="Can imaging go ahead?",
     )
 
     def save(self):
@@ -84,13 +86,13 @@ class AppointmentCannotGoAheadForm(forms.Form):
         },
     )
 
-    decision = forms.ChoiceField(
+    decision = ChoiceFieldRadios(
         choices=(
             ("True", "Yes, add participant to reinvite list"),
             ("False", "No"),
         ),
         required=True,
-        widget=forms.RadioSelect(),
+        label="Does the appointment need to be rescheduled?",
         error_messages={
             "required": "Select whether the participant needs to be invited for another appointment"
         },

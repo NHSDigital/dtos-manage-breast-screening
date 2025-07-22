@@ -144,3 +144,14 @@ class SplitDateField(forms.MultiValueField):
             if subfield.max_value is not None:
                 subwidget.attrs["max"] = subfield.max_value
         return attrs
+
+
+class ChoiceFieldRadios(forms.ChoiceField):
+    """
+    A ChoiceField that renders as a NHS.UK frontend radios component
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs["template_name"] = "forms/choice_field_radios.jinja"
+        self.hint = kwargs.pop("hint", None)
+        super().__init__(*args, **kwargs)

@@ -38,7 +38,7 @@
           {% block form %}{% endblock form %}
 
           {% if form.decision %}
-            {{ app_radios(form.decision, legend=decision_legend, hint=decision_hint) }}
+            {{ form.decision.as_field_group() }}
           {% endif %}
 
           {{ button({

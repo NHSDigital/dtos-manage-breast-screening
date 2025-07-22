@@ -1,0 +1,29 @@
+{% from 'radios/macro.jinja' import radios %}
+  {% if field.errors %}
+    {% set error_message = {"text": field.errors | first} %}
+  {% endif %}
+  {% set ns = namespace(items=[]) %}
+  {% set choice_field = field.field %}
+  {% for value, text in choice_field.choices %}
+    {% set ns.items = ns.items + [{
+      "id": field.auto_id if loop.first,
+      "value": value,
+      "text": text
+    }] %}
+  {% endfor %}
+  {{ radios({
+    "name": field.html_name,
+    "idPrefix": field.auto_id,
+    "value": field.value(),
+    "fieldset":  {
+      "legend": {
+        "text": field.label,
+        "classes": "nhsuk-fieldset__legend--m",
+      }
+    } if field.label,
+    "errorMessage": error_message,
+    "hint": {
+      "html": choice_field.hint|e
+    } if choice_field.hint,
+    "items": ns.items
+  }) }}
