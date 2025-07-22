@@ -3,6 +3,9 @@ import os
 import pytest
 from mesh_client import MeshClient
 
+from manage_breast_screening.notifications.mesh.mesh_functions import (
+    get_appointment_details,
+)
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 
@@ -33,7 +36,8 @@ class TestMeshClient:
 
             assert len(message_ids) == 1
 
-            message = client.retrieve_message(message_ids[0]).read().decode("ASCII")
+            message_id = message_ids[0]
+            message = get_appointment_details(client, message_id)
 
             with open(test_file_path) as test_file:
                 assert message == test_file.read()
