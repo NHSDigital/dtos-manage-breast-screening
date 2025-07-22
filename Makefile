@@ -44,7 +44,7 @@ help: # Print help @Others
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	poetry run pytest -m 'not system' -m 'not integration'
+	poetry run pytest -m 'not system' -m 'not integration' --ignore manage_breast_screening/notifications/tests/dependencies
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing
@@ -52,7 +52,7 @@ test-lint: # Lint files @Testing
 	poetry run ruff check manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	poetry run pytest -m system
+	poetry run pytest -m system --ignore manage_breast_screening/notifications
 
 test-integration:
 	cd manage_breast_screening/notifications && ./tests/integration/run.sh

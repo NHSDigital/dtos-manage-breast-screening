@@ -38,6 +38,21 @@ services:
     volumes:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
       - ./store/workflows.jsonl:/app/mesh_sandbox/store/data/workflows.jsonl:ro
+  
+  cmapi-stub:
+    build:
+      context: ./tests/dependencies/cmapi_stub
+      dockerfile: Dockerfile
+    container_name: cmapi_stub
+    profiles:
+      - development
+      - integration
+    ports:
+      - "8888:8888"
+    healthcheck:
+      test: curl -f http://localhost:8888/health || exit 1
+      interval: 3s
+      timeout: 10s
 
   test-dependencies:
     image: alpine
@@ -45,6 +60,8 @@ services:
       azurite:
         condition: service_started
       mesh-sandbox:
+        condition: service_healthy
+      cmapi-stub:
         condition: service_healthy
     profiles:
         - integration
