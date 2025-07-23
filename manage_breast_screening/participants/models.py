@@ -269,6 +269,10 @@ class Appointment(BaseModel):
         return self.clinic_slot.provider
 
     @property
+    def participant(self):
+        return self.screening_episode.participant
+
+    @property
     def current_status(self) -> "AppointmentStatus":
         """
         Fetch the most recent status associated with this appointment.

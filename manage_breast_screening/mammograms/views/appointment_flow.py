@@ -7,19 +7,20 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
-from ..participants.models import (
+from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
     Participant,
     ParticipantReportedMammogram,
 )
-from .forms import (
+
+from ..forms import (
     AppointmentCannotGoAheadForm,
     AskForMedicalInformationForm,
     RecordMedicalInformationForm,
     ScreeningAppointmentForm,
 )
-from .presenters import (
+from ..presenters import (
     AppointmentPresenter,
     LastKnownMammogramPresenter,
     present_secondary_nav,

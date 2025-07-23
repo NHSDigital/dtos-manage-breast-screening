@@ -25,7 +25,7 @@ class ParticipantFactory(DjangoModelFactory):
         models.Participant.ETHNIC_BACKGROUND_CHOICES, getter=lambda c: c[0]
     )
     risk_level = "Routine"
-    extra_needs = []
+    extra_needs = {}
 
 
 class ParticipantAddressFactory(DjangoModelFactory):

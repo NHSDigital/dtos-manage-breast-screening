@@ -30,14 +30,14 @@
   {% set special_appointment_html %}
     {% if presented_participant.extra_needs | length > 1 %}
       <ul>
-        {% for need in presented_participant.extra_needs %}
-          <li>{{need}}</li>
+        {% for need in presented_participant.extra_needs.values() %}
+          <li>{{need.details}}</li>
         {% endfor %}
       </ul>
     {% else %}
-      <p>{{ presented_participant.extra_needs | first }}</p>
+      <p>{{ (presented_participant.extra_needs.values() | first).details }}</p>
     {% endif %}
-    <p><a href="#">Change</a></p>
+    <p><a href="{{ presented_appointment.special_appointment_url }}">Change</a></p>
   {% endset %}
 
   {% if presented_participant.extra_needs %}
