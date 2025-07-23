@@ -1,4 +1,5 @@
 import datetime
+from typing import Mapping
 
 from django import forms
 from django.core import validators
@@ -155,3 +156,101 @@ class ChoiceFieldRadios(forms.ChoiceField):
         kwargs["template_name"] = "forms/choice_field_radios.jinja"
         self.hint = kwargs.pop("hint", None)
         super().__init__(*args, **kwargs)
+
+
+class DictMultiWidget(widgets.MultiWidget):
+    """
+    Multiwidget that decompresses from a dict
+    """
+
+    def decompress(self, value):
+        result = []
+        for widget_name in self.widgets_names:
+            if value:
+                result.append(value.get(widget_name[1:]))
+            else:
+                result.append(None)
+        return result
+
+
+class ConditionalField(forms.MultiValueField):
+    """
+    A field that groups a ChoiceField with a set of conditionally required fields.
+
+    The conditional field names are prefixed by the lowercased value of the ChoiceField.
+
+    Example usage:
+
+    >>> myfield = ConditionalField(
+    ...     choice_field=ChoiceField(choices=[('choice1', 'One', 'choice2', 'Two')]),
+    ...     revealed_fields={ 'choice2': {'details': CharField()} }
+    ... )
+    ...
+    ... myfield.clean(['choice1', 'abc'])
+    {"choice": "choice2", "choice2_details": "abc"}
+    """
+
+    widget = DictMultiWidget
+    hidden_widget = DictMultiWidget
+
+    def __init__(
+        self,
+        choice_field: forms.ChoiceField,
+        revealed_fields: Mapping[str, Mapping[str, forms.Field]],
+        **kwargs,
+    ):
+        kwargs["template_name"] = "forms/conditional.jinja"
+        self.hint = kwargs.pop("hint", None)
+        self.choice_field = choice_field
+        fields: list[forms.Field] = [choice_field]
+        self.revealed_field_names = []
+        self.revealed_field_required = {}
+
+        widgets = {"choice": choice_field.widget}
+
+        for value, fields_for_value in revealed_fields.items():
+            for name, field in fields_for_value.items():
+                fields.append(field)
+                derived_name = f"{value.lower()}_{name}"
+                self.revealed_field_names.append(derived_name)
+                widgets[derived_name] = field.widget
+
+                # Switch off required check for conditionally-revealed fields,
+                # as it does not make sense to validate this unless the relevant
+                # option has been selected. The default behaviour of MultiValueField
+                # is to respect the required flag and raise ValidationError if the
+                # field is empty.
+                # Instead, we will store this flag and apply the check conditionally.
+                self.revealed_field_required[derived_name] = field.required
+                field.required = False
+
+        super().__init__(
+            fields,
+            require_all_fields=False,
+            widget=DictMultiWidget(widgets=widgets),
+            **kwargs,
+        )
+
+    def compress(self, data_list):
+        """
+        Aggregate the data from the choice field and the conditionally-revealed fields
+        into a dictionary.
+        """
+        result = {}
+        choice_value, *other_data = data_list
+        result["choice"] = choice_value
+        prefix = f"{choice_value.lower()}_"
+
+        for field_name, value in zip(
+            self.revealed_field_names, other_data, strict=True
+        ):
+            result[field_name] = value
+            if (
+                field_name.startswith(prefix)
+                and self.revealed_field_required[field_name]
+                and value in self.empty_values
+            ):
+                # TODO: use a more specific error message
+                raise ValidationError(self.error_messages["required"], code="required")
+
+        return result

@@ -2,10 +2,10 @@ import datetime
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.forms import Form
+from django.forms import CharField, ChoiceField, Form
 from pytest_django.asserts import assertHTMLEqual
 
-from ..form_fields import SplitDateField
+from ..form_fields import ConditionalField, SplitDateField
 
 
 class TestSplitDateField:
@@ -222,3 +222,88 @@ class TestSplitDateField:
         f = TestForm({"date_0": "1", "date_1": "8", "date_2": "2026"})
         assert not f.is_valid()
         assert f.errors == {"date": ["Enter a date before 1 July 2026"]}
+
+
+class TestConditionalField:
+    def test_clean_with_revealed_field(self):
+        field = ConditionalField(
+            choice_field=ChoiceField(
+                choices=(("simple", "Simple option"), ("other", "Other"))
+            ),
+            revealed_fields={"other": {"details": CharField()}},
+        )
+
+        assert field.clean(["other", "some details"]) == {
+            "choice": "other",
+            "other_details": "some details",
+        }
+
+        with pytest.raises(
+            ValidationError,
+            match=r"\['This field is required.'\]",
+        ):
+            field.clean(["", ""])
+
+    def test_conditionally_revealed_field_is_not_required_if_unselected(self):
+        field = ConditionalField(
+            choice_field=ChoiceField(
+                choices=(("simple", "Simple option"), ("other", "Other"))
+            ),
+            revealed_fields={"other": {"details": CharField()}},
+        )
+
+        assert field.clean(["simple", ""]) == {
+            "choice": "simple",
+            "other_details": "",
+        }
+
+    def test_conditionally_revealed_field_is_required_if_selected(self):
+        field = ConditionalField(
+            choice_field=ChoiceField(
+                choices=(("simple", "Simple option"), ("other", "Other"))
+            ),
+            revealed_fields={"other": {"details": CharField()}},
+        )
+
+        with pytest.raises(
+            ValidationError,
+            match=r"\['This field is required.'\]",
+        ):
+            field.clean(["other", ""])
+
+    def test_incomplete_values(self):
+        field = ConditionalField(
+            choice_field=ChoiceField(
+                choices=(("simple", "Simple option"), ("other", "Other"))
+            ),
+            revealed_fields={"other": {"details": CharField()}},
+        )
+
+        # Required case
+        with pytest.raises(
+            ValidationError,
+            match=r"\['This field is required.'\]",
+        ):
+            field.clean(["other", None])
+
+        # Not required case
+        field.clean(["simple", None])
+
+    def test_decompress_with_revealed_field(self):
+        field = ConditionalField(
+            choice_field=ChoiceField(
+                choices=(("simple", "Simple option"), ("other", "Other"))
+            ),
+            revealed_fields={"other": {"details": CharField()}},
+        )
+
+        assert field.widget.decompress({"choice": "other", "other_details": ""}) == [
+            "other",
+            "",
+        ]
+
+        assert field.widget.decompress(
+            {"choice": "simple", "other_details": "some details"}
+        ) == ["simple", "some details"]
+
+        assert field.widget.decompress({}) == [None, None]
