@@ -6,6 +6,9 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
+ahl: # Target the dev environment - make ahl <action>
+	$(eval include infrastructure/environments/ahl/variables.sh)
+
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)
