@@ -141,3 +141,14 @@ class SplitDateField(forms.MultiValueField):
             if subfield.max_value is not None:
                 subwidget.attrs["max"] = subfield.max_value
         return attrs
+
+
+class CharField(forms.CharField):
+    def __init__(
+        self, *args, hint=None, label_visually_hidden=False, classes=None, **kwargs
+    ):
+        kwargs["template_name"] = "forms/input.jinja"
+        self.hint = hint
+        self.label_visually_hidden = label_visually_hidden
+        self.classes = classes
+        super().__init__(*args, **kwargs)

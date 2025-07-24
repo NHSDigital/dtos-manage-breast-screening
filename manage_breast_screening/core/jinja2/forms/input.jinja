@@ -1,0 +1,25 @@
+{% from "input/macro.jinja" import input %}
+{% set unbound_field = field.field %}
+{% set input_params = {
+    "label": {
+      "text": field.label,
+      "classes": "nhsuk-u-visually-hidden" if unbound_field.label_visually_hidden
+    },
+    "hint": {
+      "text": unbound_field.hint
+    } if unbound_field.hint,
+    "id": field.auto_id,
+    "name": field.html_name,
+    "value": field.value() or "",
+    "classes": unbound_field.classes if unbound_field.classes
+  } %}
+  {% if field.errors %}
+    {% set error_params = {
+      "errorMessage": {
+        "text": field.errors | first
+      }
+    } %}
+    {% set input_params = dict(input_params, **error_params) %}
+  {% endif %}
+
+{{ input(input_params) }}

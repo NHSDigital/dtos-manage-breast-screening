@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.forms import Form
 from pytest_django.asserts import assertHTMLEqual
 
-from ..form_fields import SplitDateField
+from ..form_fields import CharField, SplitDateField
 
 
 class TestSplitDateField:
@@ -172,3 +172,101 @@ class TestSplitDateField:
         f = TestForm({"date_0": "1", "date_1": "8", "date_2": "2026"})
         assert not f.is_valid()
         assert f.errors == {"date": ["Enter a date before 1 July 2026"]}
+
+
+class TestCharField:
+    @pytest.fixture
+    def form_class(self):
+        class TestForm(Form):
+            field = CharField(label="Abc", initial="somevalue", max_length=10)
+            field_with_visually_hidden_label = CharField(
+                label="Abc",
+                initial="somevalue",
+                label_visually_hidden=True,
+            )
+            field_with_hint = CharField(
+                label="With hint", initial="", hint="ALL UPPERCASE"
+            )
+            field_with_classes = CharField(
+                label="With classes", initial="", classes="nhsuk-u-width-two-thirds"
+            )
+
+        return TestForm
+
+    def test_renders_nhs_input(self, form_class):
+        assertHTMLEqual(
+            form_class()["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label><input class="nhsuk-input" id="id_field" name="field" type="text" value="somevalue">
+            </div>
+            """,
+        )
+
+    def test_renders_nhs_input_with_visually_hidden_label(self, form_class):
+        assertHTMLEqual(
+            form_class()["field_with_visually_hidden_label"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label nhsuk-u-visually-hidden" for="id_field_with_visually_hidden_label">
+                    Abc
+                </label><input class="nhsuk-input" id="id_field_with_visually_hidden_label" name="field_with_visually_hidden_label" type="text" value="somevalue">
+            </div>
+            """,
+        )
+
+    def test_renders_nhs_input_with_hint(self, form_class):
+        assertHTMLEqual(
+            form_class()["field_with_hint"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field_with_hint">
+                    With hint
+                </label>
+                <div class="nhsuk-hint" id="id_field_with_hint-hint">ALL UPPERCASE</div>
+                <input class="nhsuk-input" id="id_field_with_hint" name="field_with_hint" type="text" aria-describedby="id_field_with_hint-hint">
+            </div>
+            """,
+        )
+
+    def test_renders_nhs_input_with_classes(self, form_class):
+        assertHTMLEqual(
+            form_class()["field_with_classes"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field_with_classes">
+                    With classes
+                </label>
+                <input class="nhsuk-input nhsuk-u-width-two-thirds" id="id_field_with_classes" name="field_with_classes" type="text">
+            </div>
+            """,
+        )
+
+    def test_bound_value_reflected_in_html_value(self, form_class):
+        assertHTMLEqual(
+            form_class({"field": "othervalue"})["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label><input class="nhsuk-input" id="id_field" name="field" type="text" value="othervalue">
+            </div>
+            """,
+        )
+
+    def test_invalid_value_renders_validation_error(self, form_class):
+        assertHTMLEqual(
+            form_class({"field": "reallylongvalue"})["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group nhsuk-form-group--error">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label>
+                <span class="nhsuk-error-message" id="id_field-error">
+                <span class="nhsuk-u-visually-hidden">Error:</span> Ensure this value has at most 10 characters (it has 15).</span>
+                <input class="nhsuk-input nhsuk-input--error" id="id_field" name="field" type="text" value="reallylongvalue" aria-describedby="id_field-error">
+            </div>
+            """,
+        )
