@@ -48,12 +48,14 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        self.participant.extra_needs = form.to_json()
+        extra_needs = form.to_json()
+        self.participant.extra_needs = extra_needs
         self.participant.save()
 
         if (
             form.cleaned_data["any_temporary"]
             == ProvideSpecialAppointmentDetailsForm.TemporaryChoices.YES
+            and len(extra_needs.keys()) > 1
         ):
             return redirect("mammograms:mark_reasons_temporary", pk=self.appointment_pk)
         else:
