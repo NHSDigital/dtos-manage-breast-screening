@@ -44,7 +44,7 @@ help: # Print help @Others
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	poetry run pytest -m 'not system and not integration' --ignore manage_breast_screening/notifications/tests/dependencies
+	poetry run pytest -m 'not system and not integration' --ignore manage_breast_screening/notifications/tests/dependencies --cov --cov-report term-missing:skip-covered
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing

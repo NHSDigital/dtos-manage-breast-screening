@@ -35,6 +35,7 @@ axe-playwright-python = "^0.1.5"
 ruff = "^0.12.3"
 django-debug-toolbar = "^5.2.0"
 requests-mock = "^1.12.1"
+pytest-cov = "^6.2.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -47,7 +48,7 @@ python_files = "tests.py test_*.py *_tests.py"
 addopts = "--doctest-modules"
 markers = [
   "system: mark a test as a system test",
-  "integration: mark a test as an integration test"
+  "integration: mark a test as an integration test",
 ]
 
 [tool.ruff]
@@ -55,3 +56,13 @@ exclude = ["*/migrations/*.py"]
 
 # On top of the defaults (`E4`, E7`, `E9`, and `F`), enable isort (`I`)
 lint.select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.coverage.run]
+omit = [
+  "*/migrations/*",
+  "manage_breast_screening/config/*",
+  "*/tests/*",
+  "manage_breast_screening/core/system_test_setup.py",
+  "*/admin.py",
+  "manage.py",
+]

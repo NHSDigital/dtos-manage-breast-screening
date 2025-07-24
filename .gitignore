@@ -14,6 +14,9 @@ lines-of-code-report.json
 # Python
 __pycache__
 
+# Python coverage
+.coverage
+
 # Django
 .env
 *.sqlite3
