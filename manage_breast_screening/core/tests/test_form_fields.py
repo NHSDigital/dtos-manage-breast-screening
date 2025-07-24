@@ -1,11 +1,14 @@
 import datetime
+from unittest import TestCase
 
 import pytest
 from django.core.exceptions import ValidationError
 from django.forms import Form
 from pytest_django.asserts import assertHTMLEqual
 
-from ..form_fields import SplitDateField
+from ..form_fields import CharField, SplitDateField
+
+TestCase.maxDiff = None
 
 
 class TestSplitDateField:
@@ -172,3 +175,45 @@ class TestSplitDateField:
         f = TestForm({"date_0": "1", "date_1": "8", "date_2": "2026"})
         assert not f.is_valid()
         assert f.errors == {"date": ["Enter a date before 1 July 2026"]}
+
+
+class TestComponentRendering:
+    def test_charfield_renders_nhs_input(self):
+        class TestForm(Form):
+            field = CharField(label="Abc", initial="somevalue", max_length=10)
+
+        assertHTMLEqual(
+            TestForm()["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label><input class="nhsuk-input" id="id_field" name="field" type="text" value="somevalue">
+            </div>
+            """,
+        )
+
+        assertHTMLEqual(
+            TestForm({"field": "othervalue"})["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label><input class="nhsuk-input" id="id_field" name="field" type="text" value="othervalue">
+            </div>
+            """,
+        )
+
+        assertHTMLEqual(
+            TestForm({"field": "reallylongvalue"})["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group nhsuk-form-group--error">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label>
+                <span class="nhsuk-error-message" id="id_field-error">
+                <span class="nhsuk-u-visually-hidden">Error:</span> Ensure this value has at most 10 characters (it has 15).</span>
+                <input class="nhsuk-input nhsuk-input--error" id="id_field" name="field" type="text" value="reallylongvalue" aria-describedby="id_field-error">
+            </div>
+            """,
+        )
