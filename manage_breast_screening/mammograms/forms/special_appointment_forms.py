@@ -75,27 +75,17 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
             self.cleaned_data.get("any_temporary") == self.TemporaryChoices.YES
         )
 
-        # TODO: this can be simplified to just iterate
-        for reason in self.SupportReasons:
-            if reason.value in self.cleaned_data.get("support_reasons", []):
-                need = {
-                    "details": self.cleaned_data.get(
-                        reason.value.lower() + "_details", ""
-                    )
-                }
-                if not any_temporary:
-                    need["temporary"] = False
-                else:
-                    # TODO save a click where only a single reason is selected
+        for reason in self.cleaned_data.get("support_reasons", []):
+            need = {"details": self.cleaned_data.get(reason.lower() + "_details", "")}
+            if not any_temporary:
+                need["temporary"] = False
+            else:
+                # Preserve answers from the second form if we are editing the first form
+                existing_value = self.saved_data.get(reason, {}).get("temporary")
+                if existing_value is not None:
+                    need["temporary"] = existing_value
 
-                    # Preserve answers from the second form if we are editing the first form
-                    existing_value = self.saved_data.get(reason.value, {}).get(
-                        "temporary"
-                    )
-                    if existing_value is not None:
-                        need["temporary"] = existing_value
-
-                result[reason.value] = need
+            result[reason] = need
         return result
 
     def _init_from_json(self, json):
