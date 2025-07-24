@@ -10,7 +10,7 @@ param appShortName string
 var hubMap = {
   dev: 'dev'
   int: 'dev'
-  ahl: 'dev'
+  ali: 'dev'
   nft: 'dev'
   pre: 'prod'
   prd: 'prod'
@@ -21,21 +21,25 @@ var managedIdentityRGName = 'rg-mi-${envConfig}-uks'
 var infraResourceGroupName = 'rg-manbrs-${envConfig}-infra'
 var keyVaultName = 'kv-manbrs-${envConfig}-infra'
 
-// Retrieve existing terraform state resource group
-resource storageAccountRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+// Ensure required resource groups exist
+resource storageAccountRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: storageAccountRGName
+  location: region
 }
-// Retrieve existing private endpoint resource group
-resource privateEndpointResourceGroup 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+
+resource privateEndpointResourceGroup 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: privateEndpointRGName
+  location: region
 }
-// Retrieve existing private DNS zone resource group
-resource privateDNSZoneRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+
+resource privateDNSZoneRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: privateDNSZoneRGName
+  location: region
 }
-// Retrieve existing managed identity resource group
-resource managedIdentityRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+
+resource managedIdentityRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: managedIdentityRGName
+  location: region
 }
 
 // Create the managed identity for CD
@@ -105,20 +109,10 @@ resource networkContributorAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+// Ensure infra resource group exists
 resource infraRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: infraResourceGroupName
   location: region
-}
-module kvPrivateEndpoint 'privateEndpoint.bicep' = {
-  scope: resourceGroup(infraResourceGroupName)
-  params: {
-    hub: hubMap[envConfig]
-    region: region
-    name: keyVaultName
-    resourceServiceType: 'keyVault'
-    resourceID: keyVaultModule.outputs.keyVaultID
-    privateDNSZoneID: keyVaultPrivateDNSZone.outputs.privateDNSZoneID
-  }
 }
 
 // Use a module to deploy Key Vault into the RG
@@ -132,9 +126,21 @@ module keyVaultModule 'keyVault.bicep' = {
   }
 }
 
+module kvPrivateEndpoint 'privateEndpoint.bicep' = {
+  scope: resourceGroup(infraResourceGroupName)
+  params: {
+    hub: hubMap[envConfig]
+    region: region
+    name: keyVaultName
+    resourceServiceType: 'keyVault'
+    resourceID: keyVaultModule.outputs.keyVaultID
+    privateDNSZoneID: keyVaultPrivateDNSZone.outputs.privateDNSZoneID
+  }
+}
+
 // Let the managed identity configure Front door and its resources
 resource CDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, envConfig, 'CDNContributor')
+  name: 'fcff17e1-613b-40b6-83d8-b93e8b5556bf'
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.CDNContributor)
     principalId: managedIdentiy.outputs.miPrincipalID
