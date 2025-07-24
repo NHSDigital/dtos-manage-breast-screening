@@ -1,0 +1,20 @@
+{% from "input/macro.jinja" import input %}
+{% set input_params = {
+    "label": {
+      "text": field.label
+    },
+    "id": field.auto_id,
+    "name": field.html_name,
+    "value": field.value() or "",
+    "attributes": field.attrs
+  } %}
+  {% if field.errors %}
+    {% set error_params = {
+      "errorMessage": {
+        "text": field.errors | first
+      }
+    } %}
+    {% set input_params = dict(input_params, **error_params) %}
+  {% endif %}
+
+{{ input(input_params) }}
