@@ -103,7 +103,7 @@ var roleID = {
 
 // Let the managed identity configure vnet peering and DNS records
 resource networkContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, managedIdentiy.outputs.miPrincipalID, 'networkContributor', envConfig)
+  name: guid(subscription().subscriptionId, envConfig, 'networkContributor')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.networkContributor)
     principalId: managedIdentiy.outputs.miPrincipalID
