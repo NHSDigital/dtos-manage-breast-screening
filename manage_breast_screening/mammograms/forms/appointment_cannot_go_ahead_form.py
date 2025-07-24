@@ -1,5 +1,6 @@
 from django import forms
 
+from manage_breast_screening.core.form_fields import CharField
 from manage_breast_screening.participants.models import AppointmentStatus
 
 
@@ -26,7 +27,9 @@ class AppointmentCannotGoAheadForm(forms.Form):
 
         # Dynamically add detail fields for each choice
         for field_name, _ in self.STOPPED_REASON_CHOICES:
-            self.fields[f"{field_name}_details"] = forms.CharField(required=False)
+            self.fields[f"{field_name}_details"] = CharField(
+                required=False, label="Provide details"
+            )
 
         # Ensure that the field order matches the order we want to render in
         details_fields = [

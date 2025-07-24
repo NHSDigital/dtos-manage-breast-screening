@@ -2,14 +2,17 @@ from datetime import date
 from enum import StrEnum
 
 from django import forms
-from django.forms import CharField, ChoiceField, ValidationError
+from django.forms import ChoiceField, ValidationError
+from django.forms.widgets import Textarea
+
+from manage_breast_screening.core.form_fields import CharField
 
 from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
 
 
 class EthnicityForm(forms.Form):
-    ethnic_background_choice = forms.ChoiceField(
+    ethnic_background_choice = ChoiceField(
         choices=Ethnicity.ethnic_background_ids_with_display_names(),
         required=True,
         error_messages={"required": "Select an ethnic background"},
@@ -23,8 +26,9 @@ class EthnicityForm(forms.Form):
 
         # Setup details fields for non-specific ethnicities
         for ethnic_background_id in self.non_specific_ethnic_backgrounds():
-            self.fields[ethnic_background_id + "_details"] = forms.CharField(
-                required=False
+            self.fields[ethnic_background_id + "_details"] = CharField(
+                required=False,
+                label="How do they describe their background? (optional)",
             )
 
         # Set initial values
@@ -94,8 +98,7 @@ class ParticipantRecordedMammogramForm(forms.Form):
             "no": "No, under a different name",
         }
 
-        # Add additional fields which are used on the form for progressively disclosing
-        # other form fields
+        # Main choice fields
         self.fields["where_taken"] = ChoiceField(choices=self.where_taken_choices)
 
         self.fields["when_taken"] = ChoiceField(choices=self.when_taken_choices)
@@ -104,16 +107,50 @@ class ParticipantRecordedMammogramForm(forms.Form):
             choices=self.name_is_the_same_choices
         )
 
+        # Conditionally shown fields
         self.fields["somewhere_in_the_uk_details"] = CharField(
-            required=False, initial=""
+            required=False,
+            initial="",
+            widget=Textarea(attrs={"rows": "2"}),
+            label="Location",
         )
-        self.fields["outside_the_uk_details"] = CharField(required=False, initial="")
+
+        self.fields["outside_the_uk_details"] = CharField(
+            required=False,
+            initial="",
+            label="Location",
+            widget=Textarea(attrs={"rows": "2"}),
+        )
+
         self.fields["exact_date"] = SplitDateField(
             max_value=date.today(), required=False
         )
-        self.fields["approx_date"] = CharField(required=False, initial="")
-        self.fields["different_name"] = CharField(required=False, initial="")
-        self.fields["additional_information"] = CharField(required=False, initial="")
+
+        self.fields["approx_date"] = CharField(
+            required=False,
+            initial="",
+            label="Enter an approximate date",
+            label_classes="nhsuk-u-visually-hidden",
+            hint="For example, 9 months ago",
+            classes="nhsuk-u-width-two-thirds",
+        )
+
+        self.fields["different_name"] = CharField(
+            required=False,
+            initial="",
+            label="Enter the previously used name",
+            classes="nhsuk-u-width-two-thirds",
+        )
+
+        # Free form field at the end
+        self.fields["additional_information"] = CharField(
+            required=False,
+            label="Additional information (optional)",
+            label_classes="nhsuk-label--m",
+            initial="",
+            hint="For example, the reason for the mammograms and the outcome of the assessment",
+            widget=Textarea(attrs={"rows": "2"}),
+        )
 
         # Explicitly order the films so that the error summary order
         # matches the order fields are rendered in.

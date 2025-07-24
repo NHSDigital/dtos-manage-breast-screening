@@ -1,33 +1,8 @@
 {% extends "wizard_step.jinja" %}
 {% from "checkboxes/macro.jinja" import checkboxes %}
-{% from "input/macro.jinja" import input %}
 {% from "radios/macro.jinja" import radios %}
 
 {% block form %}
-{% macro conditional_checkbox_input(params) %}
-  {% set details_field_name = params.field_name + "_details" %}
-  {% set details_field_id = params.details_field.auto_id %}
-  {% set details_field_value = params.details_field.value() %}
-  {% set input_params = {
-    "label": {
-      "text": "Provide details"
-    },
-    "id": details_field_id,
-    "name": details_field_name,
-    "value": details_field_value
-  } %}
-  {% if params.details_field.errors %}
-    {% set error_params = {
-      "errorMessage": {
-        "text": form[details_field_name].errors | first
-      }
-    } %}
-    {% set input_params = dict(input_params, **error_params) %}
-  {% endif %}
-
-  {{ input(input_params) }}
-{% endmacro %}
-
 {% set checkboxItems = [] %}
 
 {% for field_name, label in form.stopped_reasons.field.choices %}
@@ -37,10 +12,7 @@
       "value": field_name,
       "checked": field_name in (form.stopped_reasons.value() or []),
       "conditional": {
-        "html": conditional_checkbox_input({
-          "field_name": field_name,
-          "details_field": form[field_name + "_details"],
-        })
+        "html": form[field_name + "_details"].as_field_group()
       }
     }) %}
 {% endfor %}

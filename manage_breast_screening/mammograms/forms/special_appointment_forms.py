@@ -1,6 +1,8 @@
 from django import forms
 from django.db.models import TextChoices
+from django.forms import Textarea
 
+from manage_breast_screening.core.form_fields import CharField
 from manage_breast_screening.participants.models import SupportReasons
 
 
@@ -35,7 +37,13 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
         # Each support reason has an associated field for details.
         for option in self.SupportReasons:
             field_name = option.value.lower() + "_details"
-            self.fields[field_name] = forms.CharField(required=False, initial="")
+            self.fields[field_name] = CharField(
+                required=False,
+                initial="",
+                label="Describe support required",
+                widget=Textarea,
+                hint=self.SupportReasonHints.get(option),
+            )
 
         self.fields["any_temporary"] = forms.ChoiceField(
             choices=self.TemporaryChoices,  # type: ignore
