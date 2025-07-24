@@ -45,4 +45,9 @@ urlpatterns = [
         views.ProvideSpecialAppointmentDetails.as_view(),
         name="provide_special_appointment_details",
     ),
+    path(
+        "<uuid:pk>/special-appointment/which-reasons/",
+        views.MarkReasonsTemporary.as_view(),
+        name="mark_reasons_temporary",
+    ),
 ]

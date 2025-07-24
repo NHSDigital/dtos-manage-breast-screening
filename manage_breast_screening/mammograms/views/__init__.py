@@ -7,7 +7,7 @@ from .appointment_flow import (
     StartScreening,
     check_in,
 )
-from .special_appointments import ProvideSpecialAppointmentDetails
+from .special_appointments import MarkReasonsTemporary, ProvideSpecialAppointmentDetails
 
 __all__ = [
     "check_in",
@@ -17,5 +17,6 @@ __all__ = [
     "AwaitingImages",
     "AppointmentCannotGoAhead",
     "ShowAppointment",
+    "MarkReasonsTemporary",
     "ProvideSpecialAppointmentDetails",
 ]
