@@ -22,7 +22,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render(form_attribute, legend=None, hint=None, component=radios) %}
+{% macro app_radios(form_attribute, legend=None, hint=None) %}
   {% if form_attribute.errors %}
     {% set error_message = {"text": form_attribute.errors | first} %}
   {% endif %}
@@ -36,7 +36,7 @@
       "checked": form_attribute.value() == choice[0]
     }] %}
   {% endfor %}
-  {{ component({
+  {{ radios_component({
     "name": form_attribute.html_name,
     "idPrefix": form_attribute.auto_id,
     "fieldset":  {
@@ -54,12 +54,36 @@
   }) }}
 {% endmacro %}
 
-{% macro app_radios(form_attribute, legend=None, hint=None) %}
-  {{ _render(form_attribute=form_attribute, legend=legend, hint=hint, component=radios_component) }}
-{% endmacro %}
-
 {% macro app_checkboxes(form_attribute, legend=None, hint=None) %}
-  {{ _render(form_attribute=form_attribute, legend=legend, hint=hint, component=checkboxes_component) }}
+  {% if form_attribute.errors %}
+    {% set error_message = {"text": form_attribute.errors | first} %}
+  {% endif %}
+  {% set ns = namespace(items=[]) %}
+  {% set choice_field = form_attribute.field %}
+  {% for choice in choice_field.choices %}
+    {% set ns.items = ns.items + [{
+      "id": form_attribute.auto_id if loop.first,
+      "value": choice[0],
+      "text": choice[1],
+      "checked": choice[0] in (form_attribute.value() or [])
+    }] %}
+  {% endfor %}
+  {{ checkboxes_component({
+    "name": form_attribute.html_name,
+    "idPrefix": form_attribute.auto_id,
+    "fieldset":  {
+      "legend": {
+        "text": legend,
+        "classes": "nhsuk-fieldset__legend--m",
+        "isPageHeading": false
+      }
+    } if legend,
+    "errorMessage": error_message,
+    "hint": {
+      "html": hint|e
+    } if hint,
+    "items": ns.items
+  }) }}
 {% endmacro %}
 
 {% macro app_select(form_attribute, label=None, hint=None) %}

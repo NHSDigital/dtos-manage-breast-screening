@@ -1,6 +1,9 @@
 from manage_breast_screening.mammograms.forms import (
     ProvideSpecialAppointmentDetailsForm,
 )
+from manage_breast_screening.mammograms.forms.special_appointment_forms import (
+    MarkReasonsTemporaryForm,
+)
 
 SupportReasons = ProvideSpecialAppointmentDetailsForm.SupportReasons
 TemporaryChoices = ProvideSpecialAppointmentDetailsForm.TemporaryChoices
@@ -32,6 +35,21 @@ class TestProvideSpecialAppointmentDetailsForm:
             }
         )
         assert form.is_valid()
+        assert form.cleaned_data == {
+            "any_temporary": "NO",
+            "breast_implants_details": "",
+            "gender_identity_details": "",
+            "hearing_details": "",
+            "language_details": "",
+            "medical_devices_details": "",
+            "other_details": "",
+            "physical_restriction_details": "",
+            "social_emotional_mental_health_details": "autistic",
+            "support_reasons": [
+                "SOCIAL_EMOTIONAL_MENTAL_HEALTH",
+            ],
+            "vision_details": "",
+        }
 
     def test_conditionally_required_fields(self):
         form = ProvideSpecialAppointmentDetailsForm(
@@ -92,3 +110,41 @@ class TestProvideSpecialAppointmentDetailsForm:
             "language_details": "speaks only french",
             "any_temporary": TemporaryChoices.YES,
         }
+
+
+class TestMarkReasonsTemporaryForm:
+    def test_valid_form(self):
+        saved_data = {
+            "PHYSICAL_RESTRICTION": {"details": "abc"},
+            "VISION": {"details": "def"},
+        }
+        form = MarkReasonsTemporaryForm(
+            saved_data=saved_data,
+            data={"which_are_temporary": ["PHYSICAL_RESTRICTION"]},
+        )
+        assert form.is_valid(), form.errors
+        assert form.cleaned_data == {"which_are_temporary": ["PHYSICAL_RESTRICTION"]}
+
+    def test_to_json(self):
+        saved_data = {
+            "PHYSICAL_RESTRICTION": {"details": "abc"},
+            "VISION": {"details": "def"},
+        }
+        form = MarkReasonsTemporaryForm(
+            saved_data=saved_data,
+            data={"which_are_temporary": ["PHYSICAL_RESTRICTION"]},
+        )
+        assert form.is_valid()
+        assert form.to_json() == {
+            "PHYSICAL_RESTRICTION": {"details": "abc", "temporary": True},
+            "VISION": {"details": "def", "temporary": False},
+        }
+
+    def test_initial(self):
+        saved_data = {
+            "PHYSICAL_RESTRICTION": {"details": "abc", "temporary": True},
+            "VISION": {"details": "def"},
+        }
+        form = MarkReasonsTemporaryForm(saved_data=saved_data)
+        assert form["which_are_temporary"].initial == ["PHYSICAL_RESTRICTION"]
+        assert form["which_are_temporary"].value() == ["PHYSICAL_RESTRICTION"]

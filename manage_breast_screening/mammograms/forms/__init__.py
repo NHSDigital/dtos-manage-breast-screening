@@ -2,7 +2,10 @@ from .appointment_cannot_go_ahead_form import AppointmentCannotGoAheadForm
 from .ask_for_medical_information_form import AskForMedicalInformationForm
 from .record_medical_information_form import RecordMedicalInformationForm
 from .screening_appointment_form import ScreeningAppointmentForm
-from .special_appointment_forms import ProvideSpecialAppointmentDetailsForm
+from .special_appointment_forms import (
+    MarkReasonsTemporaryForm,
+    ProvideSpecialAppointmentDetailsForm,
+)
 
 __all__ = [
     "AppointmentCannotGoAheadForm",
@@ -10,4 +13,5 @@ __all__ = [
     "RecordMedicalInformationForm",
     "ScreeningAppointmentForm",
     "ProvideSpecialAppointmentDetailsForm",
+    "MarkReasonsTemporaryForm",
 ]
