@@ -1,5 +1,4 @@
 import datetime
-from unittest import TestCase
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -7,8 +6,6 @@ from django.forms import Form
 from pytest_django.asserts import assertHTMLEqual
 
 from ..form_fields import CharField, SplitDateField
-
-TestCase.maxDiff = None
 
 
 class TestSplitDateField:
