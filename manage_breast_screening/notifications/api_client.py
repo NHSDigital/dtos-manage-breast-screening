@@ -9,6 +9,7 @@ from manage_breast_screening.notifications.models import Message, MessageBatch
 
 EXPIRES_IN_MINUTES = 5
 
+AUTHORIZATION_HEADER_NAME = "authorization"
 
 class OAuthError(Exception):
     pass
@@ -51,7 +52,7 @@ class ApiClient:
             "content-type": "application/vnd.api+json",
             "accept": "application/vnd.api+json",
             "x-correlation-id": str(uuid.uuid4()),
-            "authorization": f"Bearer {self.bearer_token()}",
+            AUTHORIZATION_HEADER_NAME: f"Bearer {self.bearer_token()}",
         }
 
     def bearer_token(self) -> str:
