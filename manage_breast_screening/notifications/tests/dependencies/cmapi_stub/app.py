@@ -21,12 +21,19 @@ def token():
 
 @app.route("/message/batch", methods=["POST"])
 def message_batches():
-    json_data = request.json
+    valid_headers, headers_error_message = verify_headers_for_consumers(
+        dict(request.headers)
+    )
 
-    messages = populate_message_ids(json_data["data"]["attributes"]["messages"])
+    if not valid_headers:
+        return json.dumps({"status": "failed", "error": headers_error_message}), 400
+
+    json_data = request.json
 
     if not validate_with_schema(json_data):
         return json.dumps({"error": "Invalid body"}), 422
+
+    messages = populate_message_ids(json_data["data"]["attributes"]["messages"])
 
     return json.dumps(
         {
@@ -64,6 +71,20 @@ def validate_with_schema(data: dict):
         return False, f"Invalid body: {e}"
     except Exception as e:
         return False, str(e)
+
+
+def verify_headers_for_consumers(headers: dict) -> tuple[bool, str]:
+    lc_headers = header_keys_to_lower(headers)
+    if lc_headers.get("authorization") is None:
+        return False, "Missing Authorization header"
+    if lc_headers.get("x-consumer-key") is None:
+        return False, "Missing Consumer key header"
+
+    return True, ""
+
+
+def header_keys_to_lower(headers: dict) -> dict:
+    return {k.lower(): v for k, v in headers.items()}
 
 
 def populate_message_ids(messages: list[dict]) -> list[dict]:
