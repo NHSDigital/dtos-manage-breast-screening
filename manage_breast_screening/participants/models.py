@@ -4,7 +4,7 @@ from logging import getLogger
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Subquery, TextChoices
 
 from ..clinics.models import Provider
 from ..core.models import BaseModel
@@ -101,6 +101,21 @@ class Ethnicity:
                 if ethnic_background_id == background["id"]:
                     return background["display_name"]
         return None
+
+
+class SupportReasons(TextChoices):
+    BREAST_IMPLANTS = ("BREAST_IMPLANTS", "Breast implants")
+    MEDICAL_DEVICES = ("MEDICAL_DEVICES", "Implanted medical devices")
+    VISION = ("VISION", "Vision")
+    HEARING = ("HEARING", "Hearing")
+    PHYSICAL_RESTRICTION = ("PHYSICAL_RESTRICTION", "Physical restriction")
+    SOCIAL_EMOTIONAL_MENTAL_HEALTH = (
+        "SOCIAL_EMOTIONAL_MENTAL_HEALTH",
+        "Social, emotional, and mental health",
+    )
+    LANGUAGE = ("LANGUAGE", "Language")
+    GENDER_IDENTITY = ("GENDER_IDENTITY", "Gender identity")
+    OTHER = ("OTHER", "Other")
 
 
 class Participant(BaseModel):
