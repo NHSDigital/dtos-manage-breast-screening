@@ -78,6 +78,9 @@ class Auditor:
             )
 
     def audit_create(self, object) -> AuditLog:
+        if object is None:
+            raise TypeError("object must not be None")
+
         return _log_action(
             object,
             operation=AuditLog.Operations.CREATE,
@@ -86,6 +89,9 @@ class Auditor:
         )
 
     def audit_update(self, object) -> AuditLog:
+        if object is None:
+            raise TypeError("object must not be None")
+
         return _log_action(
             object,
             operation=AuditLog.Operations.UPDATE,
@@ -94,6 +100,9 @@ class Auditor:
         )
 
     def audit_delete(self, object) -> AuditLog:
+        if object is None:
+            raise TypeError("object must not be None")
+
         if object.pk is None:
             raise AuditAfterDeleteError(
                 "Error auditing deletion of an unsaved object. Audit prior to deletion instead."
