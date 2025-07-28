@@ -1,5 +1,5 @@
 ENV_CONFIG=review-infra
-ENVIRONMENT=rev1
+ENVIRONMENT=review
 AZURE_SUBSCRIPTION="Digital Screening DToS - Core Services Dev"
 HUB_SUBSCRIPTION="Digital Screening DToS - DevOps"
 HUB=dev
