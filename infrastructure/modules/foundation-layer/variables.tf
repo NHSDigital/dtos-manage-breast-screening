@@ -1,10 +1,3 @@
-variable "features" {
-  type = object({
-    is_functional_infra = bool
-    is_container_apps   = bool
-  })
-}
-
 variable "app_short_name" {
   description = "Application short name (6 characters)"
 }

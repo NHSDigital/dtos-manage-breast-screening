@@ -1,5 +1,5 @@
-ENV_CONFIG=ahl
-ENVIRONMENT=ahl
+ENV_CONFIG=ali
+ENVIRONMENT=ali
 AZURE_SUBSCRIPTION="Digital Screening DToS - Core Services Dev"
 HUB_SUBSCRIPTION="Digital Screening DToS - DevOps"
 HUB=dev
