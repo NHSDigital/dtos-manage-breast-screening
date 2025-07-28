@@ -17,6 +17,7 @@ from ..presenters import (
     AppointmentPresenter,
     ClinicSlotPresenter,
     LastKnownMammogramPresenter,
+    SpecialAppointmentPresenter,
 )
 
 
@@ -264,3 +265,35 @@ class TestClinicSlotPresenter:
             ClinicSlotPresenter(clinic_slot_mock).slot_time_and_clinic_date
             == "9:30am (30 minutes) - 2 January 2025 (4 months, 17 days ago)"
         )
+
+
+class TestSpecialAppointmentPresenter:
+    def test_change_url(self):
+        appointment_pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        result = SpecialAppointmentPresenter({}, appointment_pk)
+        assert (
+            result.change_url
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/"
+        )
+
+    def test_reasons(self):
+        appointment_pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        result = SpecialAppointmentPresenter(
+            {
+                "PHYSICAL_RESTRICTION": {"details": "broken foot", "temporary": "True"},
+                "SOCIAL_EMOTIONAL_MENTAL_HEALTH": {},
+            },
+            appointment_pk,
+        )
+        assert result.reasons == [
+            {
+                "details": "broken foot",
+                "label": "Physical restriction",
+                "temporary": "True",
+            },
+            {
+                "details": None,
+                "label": "Social, emotional, and mental health",
+                "temporary": None,
+            },
+        ]

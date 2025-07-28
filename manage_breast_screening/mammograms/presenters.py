@@ -3,7 +3,7 @@ from functools import cached_property
 from django.urls import reverse
 
 from ..core.utils.date_formatting import format_date, format_relative_date, format_time
-from ..participants.models import AppointmentStatus
+from ..participants.models import AppointmentStatus, SupportReasons
 from ..participants.presenters import ParticipantPresenter, status_colour
 
 
@@ -34,6 +34,12 @@ class AppointmentPresenter:
             appointment.screening_episode.participant
         )
         self.screening_protocol = appointment.screening_episode.get_protocol_display()
+
+        self.special_appointment = (
+            SpecialAppointmentPresenter(self.participant.extra_needs, self.pk)
+            if self.is_special_appointment
+            else None
+        )
 
     @cached_property
     def participant_url(self):
@@ -179,3 +185,29 @@ class ClinicSlotPresenter:
     @cached_property
     def starts_at(self):
         return format_time(self._clinic_slot.starts_at)
+
+
+class SpecialAppointmentPresenter:
+    def __init__(self, extra_needs, appointment_pk):
+        self._extra_needs = extra_needs
+        self._appointment_pk = appointment_pk
+
+    @cached_property
+    def reasons(self):
+        result = []
+        for reason, reason_details in self._extra_needs.items():
+            result.append(
+                {
+                    "label": SupportReasons[reason].label,
+                    "temporary": reason_details.get("temporary"),
+                    "details": reason_details.get("details"),
+                }
+            )
+        return result
+
+    @cached_property
+    def change_url(self):
+        return reverse(
+            "mammograms:provide_special_appointment_details",
+            kwargs={"pk": self._appointment_pk},
+        )
