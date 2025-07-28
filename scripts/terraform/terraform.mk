@@ -6,8 +6,8 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
-ahl: # Target the dev environment - make ahl <action>
-	$(eval include infrastructure/environments/ahl/variables.sh)
+ali: # Target the dev environment - make ahl <action>
+	$(eval include infrastructure/environments/ali/variables.sh)
 
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
@@ -16,20 +16,26 @@ ci: # Skip manual approvals when running in CI - make ci <env> <action>
 set-azure-account: # Set the Azure account for the environment - make <env> set-azure-account
 	[ "${SKIP_AZURE_LOGIN}" != "true" ] && az account set -s ${AZURE_SUBSCRIPTION} || true
 
-resource-group-init: set-azure-account get-subscription-ids # Initialise the resource group - make <env> resource-group-init
+resource-group-init: set-azure-account get-subscription-ids
 	$(eval STORAGE_ACCOUNT_NAME=sa${APP_SHORT_NAME}${ENV_CONFIG}tfstate)
 
-	$(eval output='$(shell az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/main.bicep \
+	@echo "Deploying main.bicep and capturing outputs..."
+
+	@output=$$(az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/main.bicep \
 		--subscription ${HUB_SUBSCRIPTION_ID} \
 		--parameters enableSoftDelete=${ENABLE_SOFT_DELETE} envConfig=${ENV_CONFIG} region="${REGION}" \
-			storageAccountRGName=${STORAGE_ACCOUNT_RG}  storageAccountName=${STORAGE_ACCOUNT_NAME} appShortName=${APP_SHORT_NAME})')
-
-	$(eval miName=$(shell echo ${output}| jq -r '.properties.outputs.miName.value'))
-	$(eval miPrincipalID=$(shell echo ${output}| jq -r '.properties.outputs.miPrincipalID.value'))
-
+		storageAccountRGName=${STORAGE_ACCOUNT_RG}  storageAccountName=${STORAGE_ACCOUNT_NAME} appShortName=${APP_SHORT_NAME}); \
+	echo "$$output" | jq -r '.properties.outputs.miName.value'; \
+	miName=$$(echo "$$output" | jq -r '.properties.outputs.miName.value'); \
+	miPrincipalID=$$(echo "$$output" | jq -r '.properties.outputs.miPrincipalID.value'); \
+	echo "miName=$$miName"; \
+	echo "miPrincipalID=$$miPrincipalID"; \
+	\
+	echo "Deploying core.bicep with managed identity..."; \
 	az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/core.bicep \
 		--subscription ${ARM_SUBSCRIPTION_ID} \
-		--parameters miName=${miName} miPrincipalId=${miPrincipalID} --confirm-with-what-if
+		--parameters miName="$$miName" miPrincipalId="$$miPrincipalID" --confirm-with-what-if
+
 
 get-subscription-ids: # Retrieve the hub subscription ID based on the subscription name in ${HUB_SUBSCRIPTION} - make <env> get-subscription-ids
 	$(eval HUB_SUBSCRIPTION_ID=$(shell az account show --query id --output tsv --name ${HUB_SUBSCRIPTION}))
