@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
+from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.mammograms.tests.forms.test_special_appointment_forms import (
     SupportReasons,
     TemporaryChoices,
@@ -10,8 +11,8 @@ from manage_breast_screening.mammograms.tests.forms.test_special_appointment_for
 
 @pytest.mark.django_db
 class TestProvideDetails:
-    def test_get_renders_a_response(self, client, appointment):
-        response = client.get(
+    def test_get_renders_a_response(self, logged_in_client, appointment):
+        response = logged_in_client.get(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -20,9 +21,9 @@ class TestProvideDetails:
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment_if_no_temporary_reasons(
-        self, client, appointment
+        self, logged_in_client, appointment
     ):
-        response = client.post(
+        response = logged_in_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -42,9 +43,9 @@ class TestProvideDetails:
         )
 
     def test_valid_post_redirects_to_appointment_if_one_temporary_reason(
-        self, client, appointment
+        self, logged_in_client, appointment
     ):
-        response = client.post(
+        response = logged_in_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -63,10 +64,30 @@ class TestProvideDetails:
             ),
         )
 
+    def test_valid_post_creates_an_audit_record(self, logged_in_client, appointment):
+        logged_in_client.post(
+            reverse(
+                "mammograms:provide_special_appointment_details",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "support_reasons": [SupportReasons.LANGUAGE],
+                "language_details": "learning english",
+                "any_temporary": TemporaryChoices.YES,
+            },
+        )
+        assert (
+            AuditLog.objects.filter(
+                object_id=appointment.participant.pk,
+                operation=AuditLog.Operations.UPDATE,
+            ).count()
+            == 1
+        )
+
     def test_valid_post_redirects_to_next_step_if_some_temporary_reasons(
-        self, client, appointment
+        self, logged_in_client, appointment
     ):
-        response = client.post(
+        response = logged_in_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -90,9 +111,9 @@ class TestProvideDetails:
         )
 
     def test_invalid_post_to_provide_details_page_renders_response(
-        self, client, appointment
+        self, logged_in_client, appointment
     ):
-        response = client.post(
+        response = logged_in_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -104,8 +125,8 @@ class TestProvideDetails:
 
 @pytest.mark.django_db
 class TestMarkTemporary:
-    def test_get_renders_a_response(self, client, appointment):
-        response = client.get(
+    def test_get_renders_a_response(self, logged_in_client, appointment):
+        response = logged_in_client.get(
             reverse(
                 "mammograms:mark_reasons_temporary",
                 kwargs={"pk": appointment.pk},
@@ -113,18 +134,26 @@ class TestMarkTemporary:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(self, client, appointment):
+    @pytest.fixture
+    def appointment_with_selected_reasons(self, appointment):
+        """
+        Emulate the state of the appointment after the first form has been completed
+        """
         participant = appointment.participant
         participant.extra_needs = {
             SupportReasons.MEDICAL_DEVICES: {"details": "abc"},
             SupportReasons.HEARING: {"details": "abc"},
         }
         participant.save()
+        return appointment
 
-        response = client.post(
+    def test_valid_post_redirects_to_appointment(
+        self, logged_in_client, appointment_with_selected_reasons
+    ):
+        response = logged_in_client.post(
             reverse(
                 "mammograms:mark_reasons_temporary",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_with_selected_reasons.pk},
             ),
             {
                 "which_are_temporary": [SupportReasons.MEDICAL_DEVICES],
@@ -134,12 +163,33 @@ class TestMarkTemporary:
             response,
             reverse(
                 "mammograms:start_screening",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_with_selected_reasons.pk},
             ),
         )
 
-    def test_invalid_post_renders_response(self, client, appointment):
-        response = client.post(
+    def test_valid_post_creates_an_audit_record(
+        self, logged_in_client, appointment_with_selected_reasons
+    ):
+        logged_in_client.post(
+            reverse(
+                "mammograms:mark_reasons_temporary",
+                kwargs={"pk": appointment_with_selected_reasons.pk},
+            ),
+            {
+                "which_are_temporary": [SupportReasons.MEDICAL_DEVICES],
+            },
+        )
+
+        assert (
+            AuditLog.objects.filter(
+                object_id=appointment_with_selected_reasons.participant.pk,
+                operation=AuditLog.Operations.UPDATE,
+            ).count()
+            == 1
+        )
+
+    def test_invalid_post_renders_response(self, logged_in_client, appointment):
+        response = logged_in_client.post(
             reverse(
                 "mammograms:mark_reasons_temporary",
                 kwargs={"pk": appointment.pk},
