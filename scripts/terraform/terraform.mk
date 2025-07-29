@@ -12,8 +12,8 @@ ali: # Target the ali environment - make ahl <action>
 review-app: # Target the review app environment - make review <action>
 	$(eval include infrastructure/environments/review-app/variables.sh)
 
-review-infra: # Target the review environment - make review <action>
-	$(eval include infrastructure/environments/review-infra/variables.sh)
+revinfra: # Target the review environment - make review <action>
+	$(eval include infrastructure/environments/revinfra/variables.sh)
 
 
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
