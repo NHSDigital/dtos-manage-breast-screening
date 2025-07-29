@@ -86,6 +86,27 @@ class TestAppointmentPresenter:
         assert result["is_confirmed"] == expected_is_confirmed
         assert result["is_screened"] == expected_is_screened
 
+    @pytest.mark.parametrize(
+        "extra_needs, in_progress, expected_value",
+        [
+            ({}, True, True),
+            ({}, False, False),
+            (
+                {"PHYSICAL_RESTRICTION": {}},
+                True,
+                False,
+            ),
+        ],
+    )
+    def test_can_be_made_special(
+        self, mock_appointment, extra_needs, in_progress, expected_value
+    ):
+        mock_appointment.in_progress = in_progress
+        mock_appointment.screening_episode.participant.extra_needs = extra_needs
+        assert (
+            AppointmentPresenter(mock_appointment).can_be_made_special == expected_value
+        )
+
     def test_clinic_url(self, mock_appointment):
         mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
         assert (

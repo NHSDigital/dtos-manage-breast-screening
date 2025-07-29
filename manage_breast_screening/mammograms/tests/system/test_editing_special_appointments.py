@@ -5,6 +5,7 @@ from django.urls import reverse
 from playwright.sync_api import expect
 
 from manage_breast_screening.core.system_test_setup import SystemTestCase
+from manage_breast_screening.participants.models import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -15,9 +16,14 @@ from manage_breast_screening.participants.tests.factories import (
 class TestEditingSpecialAppointments(SystemTestCase):
     @pytest.fixture(autouse=True)
     def before(self):
-        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
+        self.participant = ParticipantFactory(
+            first_name="Janet", last_name="Williams", extra_needs={}
+        )
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            current_status=AppointmentStatus.CONFIRMED,
+        )
 
     def test_setting_up_a_special_appointment(self):
         self.given_i_am_on_the_appointment_show_page()

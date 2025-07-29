@@ -306,6 +306,10 @@ class Appointment(BaseModel):
 
         return statuses[0]
 
+    @property
+    def in_progress(self):
+        return self.current_status.in_progress
+
 
 class AppointmentStatus(models.Model):
     CONFIRMED = "CONFIRMED"

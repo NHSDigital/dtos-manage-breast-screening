@@ -69,6 +69,10 @@ class AppointmentPresenter:
         return bool(self.participant.extra_needs)
 
     @cached_property
+    def can_be_made_special(self):
+        return not self.is_special_appointment and self._appointment.in_progress
+
+    @cached_property
     def special_appointment_tag_properties(self):
         return {
             "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2",
