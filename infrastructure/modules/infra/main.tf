@@ -4,7 +4,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 module "shared_config" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/shared-config"
+  source = "../dtos-devops-templates/infrastructure/modules/shared-config"
 
   env         = var.environment
   location    = local.region
@@ -12,7 +12,7 @@ module "shared_config" {
 }
 
 module "hub_config" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/shared-config"
+  source = "../dtos-devops-templates/infrastructure/modules/shared-config"
 
   env         = var.hub
   location    = local.region
@@ -20,7 +20,7 @@ module "hub_config" {
 }
 
 module "app-key-vault" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/key-vault"
+  source = "../dtos-devops-templates/infrastructure/modules/key-vault"
 
   name                                             = "kv-${var.app_short_name}-${var.environment}-app"
   resource_group_name                              = azurerm_resource_group.main.name
@@ -40,7 +40,7 @@ module "app-key-vault" {
 }
 
 module "log_analytics_workspace_audit" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/log-analytics-workspace"
+  source = "../dtos-devops-templates/infrastructure/modules/log-analytics-workspace"
 
   name     = module.shared_config.names.log-analytics-workspace
   location = local.region
@@ -55,7 +55,7 @@ module "log_analytics_workspace_audit" {
 }
 
 module "container-app-environment" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/container-app-environment"
+  source = "../dtos-devops-templates/infrastructure/modules/container-app-environment"
   providers = {
     azurerm     = azurerm
     azurerm.dns = azurerm.hub
@@ -69,7 +69,7 @@ module "container-app-environment" {
 }
 
 module "db_migrate" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/container-app-job"
+  source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
   name                         = "manage-breast-screening-dbm-${var.environment}"
   container_app_environment_id = module.container-app-environment.id
@@ -92,7 +92,7 @@ module "webapp" {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
   }
-  source                           = "../modules/dtos-devops-templates/infrastructure/modules/container-app"
+  source                           = "../dtos-devops-templates/infrastructure/modules/container-app"
   name                             = "manage-breast-screening-web-${var.environment}"
   container_app_environment_id     = module.container-app-environment.id
   resource_group_name              = azurerm_resource_group.main.name

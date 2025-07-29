@@ -6,7 +6,7 @@ data "azurerm_private_dns_zone" "postgres" {
 }
 
 module "postgres_subnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/subnet"
+  source = "../dtos-devops-templates/infrastructure/modules/subnet"
 
   name                                                           = "snet-postgres"
   resource_group_name                                            = azurerm_resource_group.main.name
@@ -20,7 +20,7 @@ module "postgres_subnet" {
 }
 
 module "postgres" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/postgresql-flexible"
+  source = "../dtos-devops-templates/infrastructure/modules/postgresql-flexible"
 
   # postgresql Server
   name                = module.shared_config.names.postgres-sql-server
@@ -74,7 +74,7 @@ module "postgres" {
 }
 
 module "db_connect_identity" {
-  source              = "../modules/dtos-devops-templates/infrastructure/modules/managed-identity"
+  source              = "../dtos-devops-templates/infrastructure/modules/managed-identity"
   resource_group_name = local.resource_group_name
   location            = local.region
   uai_name            = "mi-${var.app_short_name}-${var.environment}-db-connect"

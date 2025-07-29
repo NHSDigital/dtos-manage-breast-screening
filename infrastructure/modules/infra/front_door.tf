@@ -6,7 +6,7 @@ data "azurerm_cdn_frontdoor_profile" "this" {
 }
 
 module "frontdoor_endpoint" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/cdn-frontdoor-endpoint"
+  source = "../dtos-devops-templates/infrastructure/modules/cdn-frontdoor-endpoint"
 
   providers = {
     azurerm     = azurerm.hub # Each project's Front Door profile (with secrets) resides in Hub since it's shared infra with a Non-live/Live deployment pattern

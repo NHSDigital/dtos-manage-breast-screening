@@ -1,5 +1,5 @@
 module "main_vnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/vnet"
+  source = "../dtos-devops-templates/infrastructure/modules/vnet"
 
   name                                         = module.shared_config.names.virtual-network-lowercase
   resource_group_name                          = azurerm_resource_group.main.name
@@ -34,7 +34,7 @@ data "azurerm_virtual_network" "hub" {
 }
 
 module "peering_spoke_hub" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/vnet-peering"
+  source = "../dtos-devops-templates/infrastructure/modules/vnet-peering"
 
   name                = "${module.main_vnet.name}-to-hub-peering"
   resource_group_name = azurerm_resource_group.main.name
@@ -53,7 +53,7 @@ module "peering_hub_spoke" {
     azurerm = azurerm.hub
   }
 
-  source = "../modules/dtos-devops-templates/infrastructure/modules/vnet-peering"
+  source = "../dtos-devops-templates/infrastructure/modules/vnet-peering"
 
   name                = "hub-to-${module.main_vnet.name}-peering"
   resource_group_name = local.hub_vnet_rg_name
@@ -69,7 +69,7 @@ module "peering_hub_spoke" {
 
 
 module "container_app_subnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/subnet"
+  source = "../dtos-devops-templates/infrastructure/modules/subnet"
 
   name                                                           = "snet-container-apps"
   resource_group_name                                            = azurerm_resource_group.main.name
@@ -86,7 +86,7 @@ module "container_app_subnet" {
 }
 
 module "main_subnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/subnet"
+  source = "../dtos-devops-templates/infrastructure/modules/subnet"
 
   name                                                           = "snet-main"
   resource_group_name                                            = azurerm_resource_group.main.name
