@@ -1,21 +1,11 @@
 from django import forms
 from django.db.models import TextChoices
 
+from manage_breast_screening.participants.models import SupportReasons
+
 
 class ProvideSpecialAppointmentDetailsForm(forms.Form):
-    class SupportReasons(TextChoices):
-        BREAST_IMPLANTS = ("BREAST_IMPLANTS", "Breast implants")
-        MEDICAL_DEVICES = ("MEDICAL_DEVICES", "Implanted medical devices")
-        VISION = ("VISION", "Vision")
-        HEARING = ("HEARING", "Hearing")
-        PHYSICAL_RESTRICTION = ("PHYSICAL_RESTRICTION", "Physical restriction")
-        SOCIAL_EMOTIONAL_MENTAL_HEALTH = (
-            "SOCIAL_EMOTIONAL_MENTAL_HEALTH",
-            "Social, emotional, and mental health",
-        )
-        LANGUAGE = ("LANGUAGE", "Language")
-        GENDER_IDENTITY = ("GENDER_IDENTITY", "Gender identity")
-        OTHER = ("OTHER", "Other")
+    SupportReasons = SupportReasons
 
     class TemporaryChoices(TextChoices):
         YES = ("YES", "Yes")

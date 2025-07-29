@@ -5,6 +5,7 @@
 {% from 'components/appointment-header/macro.jinja' import appointment_header %}
 {% from 'components/participant-details/macro.jinja' import participant_details %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
+{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 
 {% block heading %}
   <div class="app-header">
@@ -27,25 +28,7 @@
 {% block step_content %}
   {{ appointment_header(presented_appointment) }}
 
-  {% set special_appointment_html %}
-    {% if presented_participant.extra_needs | length > 1 %}
-      <ul>
-        {% for need in presented_participant.extra_needs.values() %}
-          <li>{{need.details}}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>{{ (presented_participant.extra_needs.values() | first).details }}</p>
-    {% endif %}
-    <p><a href="{{ presented_appointment.special_appointment_url }}">Change</a></p>
-  {% endset %}
-
-  {% if presented_participant.extra_needs %}
-    {{ warningCallout({
-      "heading": "Special appointment",
-      "HTML": special_appointment_html
-    }) }}
-  {% endif %}
+  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=True) }}
 
   {{ card({
     "headingHtml": " ",

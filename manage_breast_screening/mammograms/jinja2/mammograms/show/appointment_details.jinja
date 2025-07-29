@@ -6,6 +6,7 @@
 {% from 'components/appointment-header/macro.jinja' import appointment_header %}
 {% from 'components/participant-details/macro.jinja' import participant_details %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
+{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -35,6 +36,8 @@
   </div>
 
   {{ appointment_header(presented_appointment) }}
+
+  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=False) }}
 
   {{ app_secondary_navigation({
     "visuallyHiddenTitle": "Secondary menu",

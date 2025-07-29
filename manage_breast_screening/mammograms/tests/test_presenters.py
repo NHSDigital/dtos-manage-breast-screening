@@ -17,6 +17,7 @@ from ..presenters import (
     AppointmentPresenter,
     ClinicSlotPresenter,
     LastKnownMammogramPresenter,
+    SpecialAppointmentPresenter,
 )
 
 
@@ -84,6 +85,27 @@ class TestAppointmentPresenter:
         assert result["key"] == expected_key
         assert result["is_confirmed"] == expected_is_confirmed
         assert result["is_screened"] == expected_is_screened
+
+    @pytest.mark.parametrize(
+        "extra_needs, in_progress, expected_value",
+        [
+            ({}, True, True),
+            ({}, False, False),
+            (
+                {"PHYSICAL_RESTRICTION": {}},
+                True,
+                False,
+            ),
+        ],
+    )
+    def test_can_be_made_special(
+        self, mock_appointment, extra_needs, in_progress, expected_value
+    ):
+        mock_appointment.in_progress = in_progress
+        mock_appointment.screening_episode.participant.extra_needs = extra_needs
+        assert (
+            AppointmentPresenter(mock_appointment).can_be_made_special == expected_value
+        )
 
     def test_clinic_url(self, mock_appointment):
         mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
@@ -264,3 +286,35 @@ class TestClinicSlotPresenter:
             ClinicSlotPresenter(clinic_slot_mock).slot_time_and_clinic_date
             == "9:30am (30 minutes) - 2 January 2025 (4 months, 17 days ago)"
         )
+
+
+class TestSpecialAppointmentPresenter:
+    def test_change_url(self):
+        appointment_pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        result = SpecialAppointmentPresenter({}, appointment_pk)
+        assert (
+            result.change_url
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/"
+        )
+
+    def test_reasons(self):
+        appointment_pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        result = SpecialAppointmentPresenter(
+            {
+                "PHYSICAL_RESTRICTION": {"details": "broken foot", "temporary": "True"},
+                "SOCIAL_EMOTIONAL_MENTAL_HEALTH": {},
+            },
+            appointment_pk,
+        )
+        assert result.reasons == [
+            {
+                "details": "broken foot",
+                "label": "Physical restriction",
+                "temporary": "True",
+            },
+            {
+                "details": None,
+                "label": "Social, emotional, and mental health",
+                "temporary": None,
+            },
+        ]

@@ -1,0 +1,46 @@
+{% from 'warning-callout/macro.jinja' import warningCallout %}
+{% from 'summary-list/macro.jinja' import summaryList %}
+{% macro special_appointment_banner(presented_special_appointment, show_change_link=True) %}
+  {% if presented_special_appointment %}
+    {% set special_appointment_html %}
+      {% set rows = [] %}
+      {% for reason in presented_special_appointment.reasons %}
+        {# Build the value content (details + temporary tag if applicable) #}
+        {% set value_content = "" %}
+        {% if reason.details %}
+          {% set value_content = reason.details %}
+        {% else %}
+          {% set value_content = "<span class=\"special-appointment-banner__no-details\">No details provided</span>" %}
+        {% endif %}
+
+        {# Add temporary tag to the value content if needed #}
+        {% if reason.temporary %}
+          {% set value_content = value_content + "<br><span class=\"special-appointment-banner__temporary\">Temporary</span>" %}
+        {% endif %}
+
+        {# Add row for this support reason #}
+        {% do rows.append({
+          "key": {
+            "text": reason.label
+          },
+          "value": {
+            "html": value_content | safe
+          }
+        }) %}
+      {% endfor %}
+      {{ summaryList({
+        "rows": rows,
+        "classes": "special-appointment-banner"
+      }) }}
+      {% if show_change_link %}
+        <div class="special-appointment-banner__action">
+          <a href="{{ presented_special_appointment.change_url }}" style="font-size: 19px;">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements</span></a>
+        </div>
+      {% endif %}
+    {% endset %}
+    {{ warningCallout({
+      "heading": "Special appointment",
+      "HTML": special_appointment_html
+    }) }}
+  {% endif %}
+{% endmacro %}

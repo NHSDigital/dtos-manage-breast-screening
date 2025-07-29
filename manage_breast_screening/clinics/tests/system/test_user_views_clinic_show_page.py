@@ -179,7 +179,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Special Appointment",
             screening_episode__participant__extra_needs={
-                "PHYSICAL_RESTRICTIONS": {"details": "Wheelchair user"}
+                "PHYSICAL_RESTRICTION": {"details": "Wheelchair user"}
             },
         )
 
