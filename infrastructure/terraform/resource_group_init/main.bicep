@@ -141,7 +141,7 @@ module kvPrivateEndpoint 'privateEndpoint.bicep' = {
 
 // Let the managed identity configure Front door and its resources
 resource CDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: 'fcff17e1-613b-40b6-83d8-b93e8b5556bf'
+  name: guid(subscription().subscriptionId, envConfig, 'CDNContributor')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.CDNContributor)
     principalId: managedIdentiy.outputs.miPrincipalID
