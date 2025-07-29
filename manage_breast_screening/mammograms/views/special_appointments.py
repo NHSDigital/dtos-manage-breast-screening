@@ -4,6 +4,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
+from manage_breast_screening.core.services.auditor import Auditor
+
 from ..forms import MarkReasonsTemporaryForm, ProvideSpecialAppointmentDetailsForm
 from .appointment_flow import AppointmentMixin
 
@@ -51,6 +53,7 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
         extra_needs = form.to_json()
         self.participant.extra_needs = extra_needs
         self.participant.save()
+        Auditor.from_request(self.request).audit_update(self.participant)
 
         if (
             form.cleaned_data["any_temporary"]
@@ -103,5 +106,6 @@ class MarkReasonsTemporary(AppointmentMixin, FormView):
     def form_valid(self, form):
         self.participant.extra_needs = form.to_json()
         self.participant.save()
+        Auditor.from_request(self.request).audit_update(self.participant)
 
         return redirect("mammograms:start_screening", pk=self.appointment_pk)

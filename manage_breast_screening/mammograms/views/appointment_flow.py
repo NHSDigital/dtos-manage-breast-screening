@@ -7,6 +7,7 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
+from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
@@ -254,7 +255,8 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        form.save()
+        instance = form.save()
+        Auditor.from_request(self.request).audit_update(instance)
         return super().form_valid(form)
 
 
@@ -266,8 +268,10 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 
 @require_http_methods(["POST"])
-def check_in(_request, pk):
+def check_in(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
-    appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
+    status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
+
+    Auditor.from_request(request).audit_create(status)
 
     return redirect("mammograms:start_screening", pk=pk)
