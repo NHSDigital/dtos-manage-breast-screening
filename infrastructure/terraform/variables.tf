@@ -1,8 +1,13 @@
-variable "features" {
-  type = object({
-    is_functional_infra = bool
-    is_container_apps   = bool
-  })
+variable "deploy_infra" {
+  description = "The foundational layer of infrastructure for the application to run on"
+  type        = bool
+  default     = true
+}
+
+variable "deploy_app" {
+  description = "Deploy the container app to the foundational infra"
+  type        = bool
+  default     = true
 }
 
 variable "app_short_name" {

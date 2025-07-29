@@ -1,7 +1,7 @@
-module "foundation-infra" {
-  count = var.is_functional_infra ? 1 : 0
+module "infra" {
+  count = var.deploy_infra ? 1 : 0
 
-  source                                = "../modules/foundation-infra"
+  source                                = "../modules/infra"
   app_short_name                        = var.app_short_name
   environment                           = var.environment
   hub                                   = var.hub

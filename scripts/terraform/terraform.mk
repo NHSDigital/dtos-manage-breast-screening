@@ -9,8 +9,12 @@ dev: # Target the dev environment - make dev <action>
 ali: # Target the ali environment - make ahl <action>
 	$(eval include infrastructure/environments/ali/variables.sh)
 
-review: # Target the review environment - make review <action>
+review-app: # Target the review app environment - make review <action>
+	$(eval include infrastructure/environments/review-app/variables.sh)
+
+review-infra: # Target the review environment - make review <action>
 	$(eval include infrastructure/environments/review-infra/variables.sh)
+
 
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
