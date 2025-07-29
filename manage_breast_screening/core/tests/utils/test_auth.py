@@ -1,7 +1,6 @@
 import base64
 
 import pytest
-from django.contrib.auth import get_user_model
 
 from manage_breast_screening.core.utils.auth import (
     BasicAuthSettingsBackend,
@@ -33,17 +32,9 @@ class TestParseBasicAuth:
 
 @pytest.mark.django_db
 class TestBasicAuthSettingsBackend:
-    @pytest.fixture
-    def user(self):
-        return get_user_model().objects.create_user(
-            email="test@example.com", username="testusername"
-        )
-
     @pytest.fixture(autouse=True)
-    def setup(self, settings, user):
-        settings.BASIC_AUTH_ENABLED = True
-        settings.BASIC_AUTH_USERNAME = "testusername"
-        settings.BASIC_AUTH_PASSWORD = "testpassword"
+    def setup(self, set_basic_auth_credentials):
+        pass
 
     def test_authenticate_invalid_credentials(self, settings):
         backend = BasicAuthSettingsBackend()
