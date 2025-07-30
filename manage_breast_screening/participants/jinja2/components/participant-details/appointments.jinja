@@ -1,0 +1,57 @@
+{% from 'card/macro.jinja' import card %}
+{% from 'tag/macro.jinja' import tag %}
+
+{% macro appointment_table(presented_appointments, testid) %}
+  <table class="nhsuk-table" data-testid="{{ testid }}">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for presented_appointment in presented_appointments %}
+        <tr data-testid="appointment-row">
+          <td>{{ presented_appointment.starts_at }}</td>
+          <td>{{ presented_appointment.clinic_type }}</td>
+          <td>{{ presented_appointment.setting_name }}</td>
+          <td>
+            {{ tag({
+              "text": presented_appointment.status.text,
+              "classes": presented_appointment.status.classes
+            }) }}
+          </td>
+          <td>
+            <a href="{{ presented_appointment.url }}">
+              View details
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endmacro %}
+
+{% macro appointments(presented_appointments) %}
+  {% call card({
+    "heading": "Appointments",
+    "headingLevel": "2"
+  }) %}
+    {% if presented_appointments.upcoming %}
+      <h3>Upcoming</h3>
+      {{ appointment_table(presented_appointments.upcoming, testid="upcoming-appointments-table") }}
+    {% endif %}
+    -
+    {% if presented_appointments.past %}
+      <h3>Previous</h3>
+      {{ appointment_table(presented_appointments.past, testid="past-appointments-table") }}
+    {% endif %}
+    -
+    {% if not presented_appointments.past and not presented_appointments.upcoming %}
+      <p>No screening history found</p>
+    {% endif %}
+  {% endcall %}
+{% endmacro %}

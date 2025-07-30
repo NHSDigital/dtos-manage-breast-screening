@@ -2,7 +2,10 @@
 {% from 'back-link/macro.jinja' import backLink %}
 {% from 'card/macro.jinja' import card %}
 {% from 'tag/macro.jinja' import tag %}
-{% from 'components/participant-details/macro.jinja' import participant_details %}
+{% from 'components/participant-details/appointments.jinja' import appointments %}
+{% from 'components/participant-details/contact_details.jinja' import contact_details %}
+{% from 'components/participant-details/personal_details.jinja' import personal_details %}
+{% from 'components/participant-details/screening_details.jinja' import screening_details %}
 {% from 'summary-list/macro.jinja' import summaryList %}
 
 {% block beforeContent %}
@@ -19,75 +22,10 @@
         {{ heading }}
       </h1>
 
-      {% set personal_details_html %}
-        {{ participant_details(
-          presented_participant=presented_participant,
-          return_url=request.path,
-          full_details=true,
-        ) }}
-      {% endset %}
-
-      {{ card({
-        "heading": "Personal details",
-        "headingLevel": "2",
-        "descriptionHtml": personal_details_html
-      }) }}
-
-      {% macro appointment_table(presented_appointments, testid) %}
-          <table class="nhsuk-table" data-testid="{{ testid }}">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Type</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for presented_appointment in presented_appointments %}
-              <tr data-testid="appointment-row">
-                <td>{{ presented_appointment.starts_at }}</td>
-                <td>{{ presented_appointment.clinic_type }}</td>
-                <td>{{ presented_appointment.setting_name }}</td>
-                <td>
-                  {{ tag({
-                    "text": presented_appointment.status.text,
-                    "classes": presented_appointment.status.classes
-                  }) }}
-                </td>
-                <td>
-                  <a href="{{ presented_appointment.url }}">
-                    View details
-                  </a>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-          </table>
-      {% endmacro %}
-
-      {% set appointments_html %}
-        {% if presented_appointments.upcoming %}
-          <h3>Upcoming</h3>
-          {{ appointment_table(presented_appointments.upcoming, testid="upcoming-appointments-table") }}
-        {% endif %}
-
-        {% if presented_appointments.past %}
-          <h3>Previous</h3>
-          {{ appointment_table(presented_appointments.past, testid="past-appointments-table") }}
-        {% endif %}
-
-        {% if not presented_appointments.past and not presented_appointments.upcoming %}
-          <p>No screening history found</p>
-        {% endif %}
-      {% endset %}
-
-      {{ card({
-        "heading": "Appointments",
-        "headingLevel": "2",
-        "descriptionHtml": appointments_html
-      }) }}
+      {{ personal_details(presented_participant=presented_participant) }}
+      {{ contact_details(presented_participant=presented_participant) }}
+      {{ screening_details(presented_mammograms=presented_mammograms) }}
+      {{ appointments(presented_appointments=presented_appointments) }}
     </div>
   </div>
 {% endblock page_content %}

@@ -1,0 +1,45 @@
+{% from 'card/macro.jinja' import card %}
+{% from 'summary-list/macro.jinja' import summaryList %}
+
+{% macro contact_details(presented_participant) %}
+  {% set address_html %}
+    {% if presented_participant.address %}
+      {% for line in presented_participant.address.lines %}
+        {{ line }}<br>
+      {% endfor %}
+      {{ address.postcode }}
+    {% endif %}
+  {% endset %}
+  {% call card({
+    "heading": "Contact details"
+  }) %}
+    {{ summaryList({
+      "rows": [
+        {
+          "key": {
+            "text": "Address"
+          },
+          "value": {
+            "html": address_html
+          }
+        },
+        {
+          "key": {
+            "text": "Phone"
+          },
+          "value": {
+            "html": presented_participant.phone
+          }
+        },
+        {
+          "key": {
+            "text": "Email"
+          },
+          "value": {
+            "html": presented_participant.email
+          }
+        }
+      ]
+    }) }}
+  {% endcall %}
+{% endmacro %}
