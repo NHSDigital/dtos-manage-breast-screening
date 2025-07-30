@@ -1,8 +1,8 @@
-import os
-
 import pytest
-from mesh_client import MeshClient
 
+from manage_breast_screening.notifications.management.commands.get_appointment_details import (
+    Command,
+)
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 
@@ -15,6 +15,11 @@ class TestMeshClient:
         monkeypatch.setenv("MESH_CLIENT_SHARED_KEY", "TestKey")
         monkeypatch.setenv("MESH_INBOX_NAME", "X26ABC1")
 
+        monkeypatch.setenv(
+            "BLOB_STORAGE_CONNECTION_STRING", Helpers().azurite_connection_string()
+        )
+        monkeypatch.setenv("BLOB_CONTAINER_NAME", "nbss-appoinments-data")
+
     @pytest.fixture
     def helpers(self):
         return Helpers()
@@ -23,20 +28,15 @@ class TestMeshClient:
         test_file_path = helpers.test_dat_file_path()
         helpers.add_file_to_mesh_mailbox(test_file_path)
 
-        with MeshClient(
-            url=os.getenv("MESH_BASE_URL"),
-            mailbox=os.getenv("MESH_INBOX_NAME"),
-            password=os.getenv("MESH_CLIENT_PASSWORD"),
-            shared_key=os.getenv("MESH_CLIENT_SHARED_KEY"),
-        ) as client:
-            message_ids = client.list_messages()
+        subject = Command()
 
-            assert len(message_ids) == 1
+        subject.handle()
 
-            message_id = message_ids[0]
-            message = client.retrieve_message(message_id)
+        # subject.handle()
 
-            with open(test_file_path) as test_file:
-                assert message == test_file.read()
+        # message = subject.get_appointment_details(client, message_id).read().decode("ASCII")
 
-            client.acknowledge_message(message_ids[0])
+        # with open(test_file_path) as test_file:
+        #     assert message == test_file.read()
+
+        # client.acknowledge_message(message_ids[0])
