@@ -48,6 +48,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.when_i_click_on_the_special_appointment()
         self.then_i_can_see_the_special_appointment_banner()
 
+    def test_accessibility(self):
+        self.given_there_are_appointments()
+        self.and_i_am_on_the_clinic_show_page()
+        self.then_the_accessibility_baseline_is_met()
+
     def given_there_are_appointments(self):
         self.confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
@@ -55,6 +60,13 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             current_status=AppointmentStatus.CONFIRMED,
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Confirmed",
+        )
+        self.another_confirmed_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            clinic_slot__starts_at=datetime.now(timezone.utc).replace(hour=9, minute=0),
+            screening_episode__participant__first_name="Also",
+            screening_episode__participant__last_name="Confirmed",
+            current_status=AppointmentStatus.CONFIRMED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
@@ -74,6 +86,12 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def given_i_am_on_the_clinic_list(self):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
 
+    def and_i_am_on_the_clinic_show_page(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse("clinics:show", kwargs={"pk": self.clinic.pk})
+        )
+
     def when_i_click_on_the_clinic(self):
         self.page.get_by_role("link", name="West London BSS").click()
 
@@ -86,10 +104,15 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def and_i_can_see_remaining_appointments(self):
         remaining_link = self.page.get_by_role("link", name=re.compile("Remaining"))
         count_span = remaining_link.locator(".app-count")
-        expect(count_span).to_contain_text("2")
+        expect(count_span).to_contain_text("3")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
-            rows, [self.confirmed_appointment, self.checked_in_appointment]
+            rows,
+            [
+                self.confirmed_appointment,
+                self.another_confirmed_appointment,
+                self.checked_in_appointment,
+            ],
         )
 
     def when_i_click_on_checked_in(self):
@@ -118,19 +141,22 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def then_i_can_see_all_appointments(self):
         all_link = self.page.get_by_role("link", name=re.compile("All"))
         count_span = all_link.locator(".app-count")
-        expect(count_span).to_contain_text("3")
+        expect(count_span).to_contain_text("4")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
             rows,
             [
                 self.confirmed_appointment,
+                self.another_confirmed_appointment,
                 self.checked_in_appointment,
                 self.screened_appointment,
             ],
         )
 
     def when_i_check_in_an_appointment(self):
-        self.page.get_by_role("button", name=re.compile("Check in")).click()
+        self.page.get_by_role(
+            "button", name=re.compile("Check in Janet Confirmed")
+        ).click()
 
     def then_the_appointment_is_checked_in(self):
         row = self.page.locator("tr").filter(has_text="Janet Confirmed")
@@ -141,6 +167,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         expected_times = [
             format_time(self.confirmed_appointment.clinic_slot.starts_at),
+            format_time(self.another_confirmed_appointment.clinic_slot.starts_at),
             format_time(self.checked_in_appointment.clinic_slot.starts_at),
             format_time(self.screened_appointment.clinic_slot.starts_at),
         ]

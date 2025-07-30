@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 
 import pytest
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
@@ -56,9 +57,30 @@ class SystemTestCase(StaticLiveServerTestCase):
 
         expect(field).to_be_focused()
 
-    def then_the_accessibility_baseline_is_met(self):
+    def then_the_accessibility_baseline_is_met(self, require_unique_link_text=True):
         """
-        Check there are no Axe violations
+        Check for certain accessibility issues that can be detected automatically without
+        context of the page under test.
+
+        If require_unique_link_text is True (the default), then fail if there are
+        any links on the page with identical link text (or any buttons styled to
+        look like links). This depends on context, but generally we should be disambiguating
+        any interactive elements that appear close together, and avoiding any non-specific
+        links like "click here".
         """
         results = self.axe.run()
         self.assertEqual(results.violations_count, 0, results.generate_report())
+
+        if require_unique_link_text:
+            links = self.page.get_by_role("link").or_(
+                self.page.locator("css=.app-button--link")
+            )
+
+            counter = Counter(link.text_content().strip() for link in links.all())
+
+            # Known bug: There is an extra "home" link that is shown at mobile screen widths. This will be fixed in NHS.UK frontend 10.0.0
+            counter["Home"] -= 1
+
+            duplicates = {k: v for k, v in counter.items() if v > 1}
+
+            self.assertEqual(len(duplicates), 0, duplicates)
