@@ -34,7 +34,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         cls.browser.close()
         cls.playwright.stop()
 
-    def login(self):
+    def setup_basic_auth(self):
         get_user_model().objects.create_user(
             email="test@example.com", username="testusername"
         )
@@ -42,14 +42,12 @@ class SystemTestCase(StaticLiveServerTestCase):
         encoded = b64encode(b"testusername:testpassword").decode()
         self.context.set_extra_http_headers({"Authorization": "Basic " + encoded})
 
-        self.page.goto(self.live_server_url + "/test-login/")
-
     def setUp(self):
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
 
-        self.login()
+        self.setup_basic_auth()
         self.axe = AxeAdapter(self.page)
 
     def tearDown(self):
