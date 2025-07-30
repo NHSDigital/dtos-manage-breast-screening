@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
             self.stdout.write("Finding appointments to include in batch...")
             appointments = Appointment.objects.filter(
-                starts_at__lte=self.schedule_date(), message__isnull=True
+                starts_at__lte=self.schedule_date(), message__isnull=True, status="B"
             )
 
             if not appointments:
