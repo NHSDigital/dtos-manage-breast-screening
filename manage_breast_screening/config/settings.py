@@ -71,6 +71,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "manage_breast_screening.core.middleware.BasicAuthMiddleware",
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -239,9 +240,6 @@ BASIC_AUTH_ENABLED = (
 )
 
 if BASIC_AUTH_ENABLED:
-    LOGIN_URL = "/test-login/"
     AUTHENTICATION_BACKENDS = [
         "manage_breast_screening.core.utils.auth.BasicAuthSettingsBackend"
     ]
-else:
-    LOGIN_URL = "/login/"

@@ -20,8 +20,6 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
-from .views import test_environment_login
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
@@ -47,6 +45,3 @@ if settings.DEBUG_TOOLBAR:
     urlpatterns = [
         *urlpatterns,
     ] + debug_toolbar_urls()
-
-if settings.BASIC_AUTH_USERNAME and settings.BASIC_AUTH_PASSWORD:
-    urlpatterns += [path("test-login/", test_environment_login, name="test_login")]
