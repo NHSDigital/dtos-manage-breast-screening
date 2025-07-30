@@ -15,19 +15,24 @@ class TestMeshClient:
         monkeypatch.setenv("MESH_CLIENT_SHARED_KEY", "TestKey")
         monkeypatch.setenv("MESH_INBOX_NAME", "X26ABC1")
 
+        monkeypatch.setenv(
+            "BLOB_STORAGE_CONNECTION_STRING", Helpers().azurite_connection_string()
+        )
+        monkeypatch.setenv("BLOB_CONTAINER_NAME", "nbss-appoinments-data")
+
     @pytest.fixture
     def helpers(self):
         return Helpers()
 
     def test_retrieve_file(self, helpers):
-        subject = Command()
-
-        message_id = "AEE44F9CB5FA4E4AAAA9722BB79372CE"
-
         test_file_path = helpers.test_dat_file_path()
         helpers.add_file_to_mesh_mailbox(test_file_path)
 
-        subject.handle(**{"appointment_id": message_id})
+        subject = Command()
+
+        subject.handle()
+
+        # subject.handle()
 
         # message = subject.get_appointment_details(client, message_id).read().decode("ASCII")
 

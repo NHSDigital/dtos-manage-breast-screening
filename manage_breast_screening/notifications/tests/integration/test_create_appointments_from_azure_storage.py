@@ -7,6 +7,7 @@ from manage_breast_screening.notifications.management.commands.create_appointmen
     Command,
 )
 from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.storage import Storage
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 
@@ -28,7 +29,7 @@ class TestCreateAppointmentsFromAzureStorage:
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
         with open(helpers.test_dat_file_path()) as test_file:
-            helpers.add_to_blob_storage(f"{today_dirname}/test.dat", test_file.read())
+            Storage().add_to_blob_storage(f"{today_dirname}/test.dat", test_file.read())
 
         Command().handle(**{"date_str": today_dirname})
 

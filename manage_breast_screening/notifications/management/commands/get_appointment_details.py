@@ -1,10 +1,12 @@
 import os
 from datetime import datetime
+from functools import cached_property
 
+from azure.storage.blob import BlobServiceClient, ContainerClient
 from django.core.management.base import BaseCommand, CommandError
 from mesh_client import MeshClient
 
-from manage_breast_screening.notifications.tests.integration.helpers import Helpers
+from manage_breast_screening.notifications.storage import Storage
 
 
 class Command(BaseCommand):
@@ -13,21 +15,25 @@ class Command(BaseCommand):
     to Azure Blob Storage.
     """
 
-    def add_arguments(self, parser):
-        parser.add_argument("appointment_id")
-
     def handle(self, *args, **options):
         try:
             client = self.setup()
-            appointment = self.get_appointment_details(
-                client, options["appointment_id"]
-            )
 
-            today_dirname = datetime.today().strftime("%Y-%m-%d")
+            all_appointments = client.list_messages()
 
-            Helpers().add_to_blob_storage(
-                f"{today_dirname}/test.dat", appointment.read()
-            )
+            for x in all_appointments:
+                appointment = client.retrieve_message(x)
+
+                today_dirname = datetime.today().strftime("%Y-%m-%d")
+
+                print(appointment.filename)
+
+                print(appointment.read().decode("ASCII"))
+
+                Storage().add_to_blob_storage(
+                    f"{today_dirname}/{appointment.filename}",
+                    appointment.read().decode("ASCII"),
+                )
 
         except Exception as e:
             raise CommandError(e)
@@ -41,6 +47,11 @@ class Command(BaseCommand):
         )
         return client
 
-    def get_appointment_details(self, client: MeshClient, appointment_id: str) -> dict:
-        appointment = client.retrieve_message(appointment_id)
-        return appointment
+    @cached_property
+    def container_client(self) -> ContainerClient:
+        connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
+        container_name = os.getenv("BLOB_CONTAINER_NAME")
+
+        return BlobServiceClient.from_connection_string(
+            connection_string
+        ).get_container_client(container_name)
