@@ -14,10 +14,6 @@ variable "docker_image" {
   description = "Docker image full path including registry, repository and tag"
 }
 
-variable "hub_subscription_id" {
-  description = "ID of the hub Azure subscription"
-}
-
 variable "vnet_address_space" {
   description = "VNET address space. Must be unique across the hub."
 }
@@ -30,9 +26,35 @@ variable "fetch_secrets_from_app_key_vault" {
     EOT
   default     = false
 }
-variable "protect_keyvault" {
-  description = "Ability to recover the key vault or its secrets after deletion"
+
+variable "postgres_backup_retention_days" {
+  description = "The number of days to retain backups for the PostgreSQL Flexible Server."
+  type        = number
+  default     = 30
+}
+
+variable "postgres_geo_redundant_backup_enabled" {
+  description = "Whether geo-redundant backup is enabled for the PostgreSQL Flexible Server."
+  type        = bool
   default     = true
+}
+
+variable "postgres_sku_name" {
+  default = "B_Standard_B1ms"
+}
+
+variable "postgres_storage_mb" {
+  default = 32768
+}
+
+variable "postgres_storage_tier" {
+  default = "P4"
+}
+
+variable "enable_auth" {
+  description = "Enable authentication for the container app. If true, the app will use Azure AD authentication."
+  type        = bool
+  default     = false
 }
 
 variable "use_apex_domain" {

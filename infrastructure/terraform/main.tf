@@ -1,7 +1,27 @@
 module "infra" {
   count = var.deploy_infra ? 1 : 0
 
-  source                                = "../modules/infra"
+  source = "../modules/infra"
+
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+  app_short_name                   = var.app_short_name
+  environment                      = var.environment
+  hub                              = var.hub
+  docker_image                     = var.docker_image
+  hub_subscription_id              = var.hub_subscription_id
+  vnet_address_space               = var.vnet_address_space
+  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  protect_keyvault                 = var.protect_keyvault
+}
+
+module "container-apps" {
+  count = var.deploy_app ? 1 : 0
+
+  source = "../modules/container-apps"
 
   providers = {
     azurerm     = azurerm
