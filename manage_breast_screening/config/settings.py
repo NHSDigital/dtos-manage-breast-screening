@@ -230,6 +230,7 @@ AUDIT_EXCLUDED_FIELDS = ["password", "token", "created_at", "updated_at", "id"]
 
 BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME")
 BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
+BASIC_AUTH_REALM = ""
 BASIC_AUTH_ENABLED = (
     boolean_env("BASIC_AUTH_ENABLED", default=False)
     and BASIC_AUTH_USERNAME
