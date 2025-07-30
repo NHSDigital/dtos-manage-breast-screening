@@ -2,12 +2,20 @@ variable "app_short_name" {
   description = "Application short name (6 characters)"
 }
 
+variable "app_key_vault_id" {
+  description = "Application key vault ID"
+}
+
 variable "environment" {
   description = "Application environment name"
 }
 
 variable "hub" {
   description = "Hub name (dev or prod)"
+}
+
+variable "container_app_environment_id" {
+  description = "The ID for the environment of the container app"
 }
 
 variable "docker_image" {
@@ -63,9 +71,13 @@ variable "use_apex_domain" {
   default     = false
 }
 
+variable "vnet_name" {
+  description = "The name of the vnet that is used."
+}
+
 locals {
   region              = "uksouth"
-  resource_group_name = "rg-${var.app_short_name}-${var.environment}-uks"
+  resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
   hub_vnet_rg_name    = "rg-hub-${var.hub}-uks-hub-networking"
 
   postgres_sql_admin_group = "postgres_manbrs_${var.environment}_uks_admin"

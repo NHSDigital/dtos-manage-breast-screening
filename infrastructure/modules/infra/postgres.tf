@@ -10,7 +10,7 @@ module "postgres_subnet" {
 
   name                                                           = "snet-postgres"
   resource_group_name                                            = azurerm_resource_group.main.name
-  vnet_name                                                      = var.vnet_name
+  vnet_name                                                      = module.main_vnet.name
   address_prefixes                                               = [cidrsubnet(var.vnet_address_space, 7, 1)]
   create_nsg                                                     = false
   location                                                       = "UK South"
