@@ -70,8 +70,8 @@ rebuild-db: _clean-docker db migrate seed  # Create a fresh development database
 migrate:  # Run migrations
 	poetry run ./manage.py migrate
 
-seed:  # Load seed data
-	poetry run ./manage.py loaddata clinics participants
+seed:  # Load seed data including default users for non-production environments
+	poetry run ./manage.py loaddata clinics participants test_environment_users
 
 models:
 	poetry run ./manage.py shell -c "from django.apps import apps; print('\n'.join(f'{m._meta.app_label}.{m.__name__}' for m in apps.get_models()))"
