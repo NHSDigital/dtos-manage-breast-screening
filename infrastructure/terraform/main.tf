@@ -2,6 +2,12 @@ module "infra" {
   count = var.deploy_infra ? 1 : 0
 
   source                                = "../modules/infra"
+
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
   app_short_name                        = var.app_short_name
   environment                           = var.environment
   hub                                   = var.hub

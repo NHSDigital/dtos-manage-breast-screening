@@ -6,14 +6,11 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
-ali: # Target the ali environment - make ahl <action>
-	$(eval include infrastructure/environments/ali/variables.sh)
+review-l2: # Target the review app environment - make review <action>
+	$(eval include infrastructure/environments/review-l2/variables.sh)
 
-review-app: # Target the review app environment - make review <action>
-	$(eval include infrastructure/environments/review-app/variables.sh)
-
-revinfra: # Target the review environment - make review <action>
-	$(eval include infrastructure/environments/revinfra/variables.sh)
+review-l1: # Target the review environment - make review <action>
+	$(eval include infrastructure/environments/review-l1/variables.sh)
 
 
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
@@ -24,7 +21,6 @@ set-azure-account: # Set the Azure account for the environment - make <env> set-
 	[ "${SKIP_AZURE_LOGIN}" != "true" ] && az account set -s ${AZURE_SUBSCRIPTION} || true
 
 resource-group-init: set-azure-account get-subscription-ids
-	$(eval STORAGE_ACCOUNT_NAME=sa${APP_SHORT_NAME}${ENV_CONFIG}tfstate)
 
 	@echo "Deploying main.bicep and capturing outputs..."
 
@@ -55,7 +51,6 @@ terraform-init-no-backend: # Initialise terraform modules only and update terraf
 	terraform -chdir=infrastructure/terraform init -upgrade -backend=false
 
 terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - make <env> terraform-init
-	$(eval STORAGE_ACCOUNT_NAME=samanbrs${ENV_CONFIG}tfstate)
 	$(eval export ARM_USE_AZUREAD=true)
 
 	rm -rf infrastructure/modules/dtos-devops-templates
