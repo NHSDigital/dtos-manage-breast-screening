@@ -4,10 +4,11 @@ from urllib.parse import urlparse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
 from manage_breast_screening.participants.services import fetch_current_provider
 
 from .forms import EthnicityForm, ParticipantRecordedMammogramForm
-from .models import Appointment, Participant
+from .models import Appointment, Participant, ParticipantReportedMammogram
 from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
 
 logger = getLogger(__name__)
@@ -45,12 +46,23 @@ def show(request, pk):
         upcoming_appointments=list(appointments.upcoming()),
     )
 
+    last_known_mammograms = ParticipantReportedMammogram.objects.filter(
+        participant_id=pk
+    ).order_by("-created_at")
+
+    presented_mammograms = LastKnownMammogramPresenter(
+        last_known_mammograms,
+        participant_pk=pk,
+        current_url=request.path,
+    )
+
     return render(
         request,
         "participants/show.jinja",
         context={
             "presented_participant": presented_participant,
             "presented_appointments": presented_appointments,
+            "presented_mammograms": presented_mammograms,
             "heading": participant.full_name,
             "page_title": "Participant",
             "back_link": {
