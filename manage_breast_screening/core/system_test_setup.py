@@ -1,14 +1,25 @@
 import os
+from base64 import b64encode
 from collections import Counter
 
 import pytest
+from django.contrib.auth import get_user_model
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test import override_settings
 from playwright.sync_api import expect, sync_playwright
 
 from .utils.acessibility import AxeAdapter
 
 
 @pytest.mark.system
+@override_settings(
+    BASIC_AUTH_ENABLED=True,
+    BASIC_AUTH_USERNAME="testusername",
+    BASIC_AUTH_PASSWORD="testpassword",
+    AUTHENTICATION_BACKENDS=[
+        "manage_breast_screening.core.utils.auth.BasicAuthSettingsBackend"
+    ],
+)
 class SystemTestCase(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
@@ -23,9 +34,22 @@ class SystemTestCase(StaticLiveServerTestCase):
         cls.browser.close()
         cls.playwright.stop()
 
+    def login(self):
+        get_user_model().objects.create_user(
+            email="test@example.com", username="testusername"
+        )
+
+        encoded = b64encode(b"testusername:testpassword").decode()
+        self.context.set_extra_http_headers({"Authorization": "Basic " + encoded})
+
+        self.page.goto(self.live_server_url + "/test-login/")
+
     def setUp(self):
-        self.page = self.browser.new_page()
+        self.context = self.browser.new_context()
+        self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
+
+        self.login()
         self.axe = AxeAdapter(self.page)
 
     def tearDown(self):
