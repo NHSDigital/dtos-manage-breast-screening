@@ -1,10 +1,10 @@
 data "azurerm_container_app_environment" "this" {
-  name                = "${var.app_short_name}-${var.backend_id}"
+  name                = "${var.app_short_name}-${var.env_config}"
   resource_group_name = local.resource_group_name
 }
 
 data "azurerm_key_vault" "app_key_vault" {
-  name                = "kv-${var.app_short_name}-${var.backend_id}-app"
+  name                = "kv-${var.app_short_name}-${var.env_config}-app"
   resource_group_name = local.resource_group_name
 }
 

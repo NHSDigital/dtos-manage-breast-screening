@@ -12,6 +12,7 @@ var hubMap = {
   int:      'dev'
   ali:      'dev'
   'review-l1': 'dev'
+  review:   'dev'
   nft:      'dev'
   pre:      'prod'
   prd:      'prod'

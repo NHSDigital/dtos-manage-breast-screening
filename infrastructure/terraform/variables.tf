@@ -21,6 +21,9 @@ variable "app_short_name" {
 variable "environment" {
   description = "Application environment name"
 }
+variable "env_config" {
+  description = "Environment configuration"
+}
 
 variable "hub" {
   description = "Hub name (dev or prod)"
@@ -87,10 +90,10 @@ variable "use_apex_domain" {
 
 locals {
   region              = "uksouth"
-  resource_group_name = "rg-${var.app_short_name}-${var.environment}-uks"
+  resource_group_name = "rg-${var.app_short_name}-${var.env_config}-uks"
   hub_vnet_rg_name    = "rg-hub-${var.hub}-uks-hub-networking"
 
-  postgres_sql_admin_group = "postgres_manbrs_${var.environment}_uks_admin"
+  postgres_sql_admin_group = "postgres_manbrs_${var.env_config}_uks_admin"
   hub_live_name_map = {
     dev  = "nonlive"
     prod = "live"

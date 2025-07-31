@@ -6,6 +6,13 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
+review: # Target the review app environment - make review <action>
+	$(eval include infrastructure/environments/review/variables.sh)
+	$(if ${PR_NUMBER},, $(eval export TF_VAR_deploy_container_apps=false))
+	$(if ${PR_NUMBER},, $(eval export ENVIRONMENT=review))
+	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_infra=false),)
+	$(if ${PR_NUMBER}, $(eval export ENVIRONMENT=pr-${PR_NUMBER}),)
+
 review-l2: # Target the review app environment - make review <action>
 	$(eval include infrastructure/environments/review-l2/variables.sh)
 	$(eval export ENVIRONMENT=pr-${PR_NUMBER})
@@ -71,6 +78,7 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 	$(eval export TF_VAR_app_short_name=${APP_SHORT_NAME})
 	$(eval export TF_VAR_docker_image=${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG})
 	$(eval export TF_VAR_environment=${ENVIRONMENT})
+	$(eval export TF_VAR_env_config=${ENV_CONFIG})
 	$(eval export TF_VAR_hub=${HUB})
 	$(eval export TF_VAR_hub_subscription_id=${HUB_SUBSCRIPTION_ID})
 

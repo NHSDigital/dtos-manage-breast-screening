@@ -9,7 +9,7 @@ module "infra" {
   }
 
   app_short_name                   = var.app_short_name
-  environment                      = var.environment
+  environment                      = var.env_config
   hub                              = var.hub
   docker_image                     = var.docker_image
   hub_subscription_id              = var.hub_subscription_id
@@ -21,7 +21,7 @@ module "infra" {
 module "shared_config" {
   source = "../modules/dtos-devops-templates/infrastructure/modules/shared-config"
 
-  env         = var.environment
+  env         = var.env_config
   location    = local.region
   application = var.app_short_name
 }
