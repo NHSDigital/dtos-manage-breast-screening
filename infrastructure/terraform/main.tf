@@ -28,11 +28,12 @@ module "container-apps" {
     azurerm.hub = azurerm.hub
   }
 
-  app_short_name               = var.app_short_name
-  environment                  = var.environment
-  app_key_vault_id             = module.infra[0].app_key_vault_id
-  container_app_environment_id = module.infra[0].container_app_environment_id
-  log_analytics_workspace_audit_id = module.infra[0].log_analytics_workspace_audit_id
+  app_short_name                        = var.app_short_name
+  environment                           = var.environment
+  app_key_vault_id                      = module.infra[0].app_key_vault_id
+  container_app_environment_id          = module.infra[0].container_app_environment_id
+  log_analytics_workspace_audit_id      = module.infra[0].log_analytics_workspace_audit_id
+  default_domain                        = module.infra[0].default_domain
 
   hub                                   = var.hub
   docker_image                          = var.docker_image

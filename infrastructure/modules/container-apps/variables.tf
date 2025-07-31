@@ -18,6 +18,10 @@ variable "container_app_environment_id" {
   description = "The ID for the environment of the container app"
 }
 
+variable "default_domain" {
+  description = "The default domain"
+}
+
 variable "docker_image" {
   description = "Docker image full path including registry, repository and tag"
 }
