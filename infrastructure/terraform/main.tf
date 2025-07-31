@@ -37,7 +37,7 @@ module "container-apps" {
   hub                                   = var.hub
   docker_image                          = var.docker_image
   vnet_address_space                    = var.vnet_address_space
-  fetch_secrets_from_app_key_vfault      = var.fetch_secrets_from_app_key_vault
+  fetch_secrets_from_app_key_vault      = var.fetch_secrets_from_app_key_vault
   postgres_backup_retention_days        = var.postgres_backup_retention_days
   postgres_geo_redundant_backup_enabled = var.postgres_geo_redundant_backup_enabled
   postgres_sku_name                     = var.postgres_sku_name

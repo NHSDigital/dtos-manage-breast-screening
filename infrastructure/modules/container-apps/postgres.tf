@@ -65,10 +65,10 @@ module "postgres" {
     }
   }
 
-  depends_on = [
-    module.peering_spoke_hub,
-    module.peering_hub_spoke
-  ]
+  # depends_on = [
+  #   module.peering_spoke_hub,
+  #   module.peering_hub_spoke
+  # ]
 
   tags = {}
 }
