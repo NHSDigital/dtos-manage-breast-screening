@@ -8,10 +8,10 @@ dev: # Target the dev environment - make dev <action>
 
 review-l2: # Target the review app environment - make review <action>
 	$(eval include infrastructure/environments/review-l2/variables.sh)
+	$(eval TF_VAR_environment=pr-${PR_NUMBER})
 
 review-l1: # Target the review environment - make review <action>
 	$(eval include infrastructure/environments/review-l1/variables.sh)
-
 
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
