@@ -7,7 +7,7 @@
       {% for line in presented_participant.address.lines %}
         {{ line }}<br>
       {% endfor %}
-      {{ address.postcode }}
+      {{ presented_participant.address.postcode }}
     {% endif %}
   {% endset %}
   {% call card({

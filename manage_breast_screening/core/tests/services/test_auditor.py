@@ -1,6 +1,8 @@
 import pytest
 from django.test import RequestFactory
 
+from manage_breast_screening.clinics.models import Provider
+from manage_breast_screening.clinics.tests.factories import ProviderFactory
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import Participant
 from manage_breast_screening.participants.tests.factories import ParticipantFactory
@@ -52,18 +54,18 @@ class TestAuditor:
 
     def test_audit_delete(self):
         auditor = Auditor(system_update_id="test")
-        participant = ParticipantFactory.create()
-        pk = participant.pk
+        address = ProviderFactory.create()
+        pk = address.pk
 
         # audit_delete must be called before the record is deleted
-        log = auditor.audit_delete(participant)
+        log = auditor.audit_delete(address)
 
-        participant.delete()
+        address.delete()
         log.refresh_from_db()
 
         assert log.system_update_id == "test"
         assert log.operation == "delete"
-        assert log.content_type.model_class() == Participant
+        assert log.content_type.model_class() == Provider
         assert log.object_id == pk
 
     def test_audit_bulk_create(self):
