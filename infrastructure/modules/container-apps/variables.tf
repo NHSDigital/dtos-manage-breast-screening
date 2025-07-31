@@ -71,7 +71,7 @@ variable "use_apex_domain" {
   default     = false
 }
 
-variable "log_analytics_workspace_audit" {
+variable "log_analytics_workspace_audit_id" {
     description = "Log analytics workspace audit ID"
 
 }
