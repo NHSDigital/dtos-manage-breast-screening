@@ -32,11 +32,12 @@ module "container-apps" {
   environment                  = var.environment
   app_key_vault_id             = module.infra[0].app_key_vault_id
   container_app_environment_id = module.infra[0].container_app_environment_id
+  log_analytics_workspace_audit_id = module.infra[0].log_analytics_workspace_audit_id
 
   hub                                   = var.hub
   docker_image                          = var.docker_image
   vnet_address_space                    = var.vnet_address_space
-  fetch_secrets_from_app_key_vault      = var.fetch_secrets_from_app_key_vault
+  fetch_secrets_from_app_key_vfault      = var.fetch_secrets_from_app_key_vault
   postgres_backup_retention_days        = var.postgres_backup_retention_days
   postgres_geo_redundant_backup_enabled = var.postgres_geo_redundant_backup_enabled
   postgres_sku_name                     = var.postgres_sku_name

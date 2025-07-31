@@ -11,6 +11,6 @@ output "vnet_name" {
 }
 
 
-output  log_analytics_workspace_audit {
+output  log_analytics_workspace_audit_id {
   value = module.log_analytics_workspace_audit.id
 }

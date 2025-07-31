@@ -5,4 +5,4 @@ HUB_SUBSCRIPTION="Digital Screening DToS - DevOps"
 HUB=dev
 TERRAFORM_MODULES_REF=main
 ENABLE_SOFT_DELETE=false
-STORAGE_ACCOUNT_NAME=samanbrsreviewl2tfstate
+STORAGE_ACCOUNT_NAME=samanbrsreviewl1tfstate
