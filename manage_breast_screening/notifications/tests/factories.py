@@ -23,6 +23,7 @@ class AppointmentFactory(DjangoModelFactory):
     clinic = SubFactory(ClinicFactory)
     nhs_number = Sequence(lambda n: int("999%06d" % n))
     starts_at = datetime.now() + timedelta(weeks=4, days=4)
+    status = "B"
 
 
 class MessageFactory(DjangoModelFactory):

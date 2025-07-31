@@ -108,6 +108,33 @@ class TestSendMessageBatch:
         mock_mark_batch_as_sent.assert_not_called
 
     @pytest.mark.django_db
+    def test_handle_with_cancelled_appointments(
+        self, mock_send_message_batch, routing_plan_id
+    ):
+        """Test that that cancelled appointments are not notified"""
+        mock_send_message_batch.return_value.status_code = 201
+
+        valid_appointment = AppointmentFactory(
+            starts_at=datetime.today().replace(tzinfo=TZ_INFO)
+        )
+
+        _cancelled_appointment = AppointmentFactory(
+            starts_at=datetime.today().replace(tzinfo=TZ_INFO), status="C"
+        )
+
+        subject = Command()
+        mock_mark_batch_as_sent = MagicMock()
+        subject.mark_batch_as_sent = mock_mark_batch_as_sent
+
+        subject.handle(**{"routing_plan_id": routing_plan_id})
+
+        message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
+        assert message_batches.count() == 1
+        messages = Message.objects.filter(batch=message_batches[0])
+        assert messages.count() == 1
+        assert messages[0].appointment == valid_appointment
+
+    @pytest.mark.django_db
     def test_handle_with_failing_notifications(
         self, mock_send_message_batch, routing_plan_id
     ):
