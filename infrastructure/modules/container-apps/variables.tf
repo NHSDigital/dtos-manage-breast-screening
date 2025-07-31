@@ -71,6 +71,11 @@ variable "use_apex_domain" {
   default     = false
 }
 
+variable "log_analytics_workspace_audit" {
+    description = "Log analytics workspace audit ID"
+
+}
+
 variable "vnet_name" {
   description = "The name of the vnet that is used."
 }

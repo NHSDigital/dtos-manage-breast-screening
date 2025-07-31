@@ -15,7 +15,7 @@ module "postgres_subnet" {
   create_nsg                                                     = false
   location                                                       = "UK South"
   monitor_diagnostic_setting_network_security_group_enabled_logs = []
-  log_analytics_workspace_id                                     = module.log_analytics_workspace_audit.id
+  log_analytics_workspace_id                                     = var.log_analytics_workspace_audit_id
   network_security_group_name                                    = "nsg-postgres"
 }
 
@@ -36,7 +36,7 @@ module "postgres" {
   admin_identities                = [module.db_connect_identity]
 
   # Diagnostic Settings
-  log_analytics_workspace_id                                = module.log_analytics_workspace_audit.id
+  log_analytics_workspace_id                                = var.log_analytics_workspace_audit_id
   monitor_diagnostic_setting_postgresql_server_enabled_logs = ["PostgreSQLLogs", "PostgreSQLFlexSessions", "PostgreSQLFlexQueryStoreRuntime", "PostgreSQLFlexQueryStoreWaitStats", "PostgreSQLFlexTableStats", "PostgreSQLFlexDatabaseXacts"]
   monitor_diagnostic_setting_postgresql_server_metrics      = ["AllMetrics"]
 

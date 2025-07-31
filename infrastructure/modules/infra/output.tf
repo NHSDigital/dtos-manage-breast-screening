@@ -9,3 +9,8 @@ output "container_app_environment_id" {
 output "vnet_name" {
   value = module.main_vnet.name
 }
+
+
+output  log_analytics_workspace_audit {
+  value = module.log_analytics_workspace_audit.id
+}
