@@ -8,7 +8,9 @@ dev: # Target the dev environment - make dev <action>
 
 review-l2: # Target the review app environment - make review <action>
 	$(eval include infrastructure/environments/review-l2/variables.sh)
-	$(eval TF_VAR_environment=pr-${PR_NUMBER})
+	$(eval export ENVIRONMENT=pr-${PR_NUMBER})
+	echo ${PR_NUMBER}
+	echo ${TF_VAR_environment}
 
 review-l1: # Target the review environment - make review <action>
 	$(eval include infrastructure/environments/review-l1/variables.sh)
@@ -53,6 +55,9 @@ terraform-init-no-backend: # Initialise terraform modules only and update terraf
 terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - make <env> terraform-init
 	$(eval export ARM_USE_AZUREAD=true)
 
+	echo ${PR_NUMBER}
+	echo ${TF_VAR_environment}
+
 	rm -rf infrastructure/modules/dtos-devops-templates
 	git -c advice.detachedHead=false clone --depth=1 --single-branch --branch ${TERRAFORM_MODULES_REF} \
 		https://github.com/NHSDigital/dtos-devops-templates.git infrastructure/modules/dtos-devops-templates
@@ -69,7 +74,10 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 	$(eval export TF_VAR_hub=${HUB})
 	$(eval export TF_VAR_hub_subscription_id=${HUB_SUBSCRIPTION_ID})
 
+
 terraform-plan: terraform-init # Plan Terraform changes - make <env> terraform-plan DOCKER_IMAGE_TAG=abcd123
+	echo ${PR_NUMBER}
+	echo ${TF_VAR_environment}
 	terraform -chdir=infrastructure/terraform plan -var-file ../environments/${ENV_CONFIG}/variables.tfvars
 
 terraform-apply: terraform-init # Apply Terraform changes - make <env> terraform-apply DOCKER_IMAGE_TAG=abcd123
