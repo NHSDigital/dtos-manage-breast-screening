@@ -18,6 +18,17 @@ module "infra" {
   protect_keyvault                 = var.protect_keyvault
 }
 
+module "shared_config" {
+  source = "../modules/dtos-devops-templates/infrastructure/modules/shared-config"
+
+  env         = var.environment
+  location    = local.region
+  application = var.app_short_name
+}
+
+
+
+
 module "container-apps" {
   count = var.deploy_app ? 1 : 0
 
@@ -30,10 +41,11 @@ module "container-apps" {
 
   app_short_name                        = var.app_short_name
   environment                           = var.environment
-  app_key_vault_id                      = module.infra[0].app_key_vault_id
-  container_app_environment_id          = module.infra[0].container_app_environment_id
-  log_analytics_workspace_audit_id      = module.infra[0].log_analytics_workspace_audit_id
-  default_domain                        = module.infra[0].default_domain
+  app_key_vault_id                      = data.azurerm_key_vault.app_key_vault.id
+  container_app_environment_id          = data.azurerm_container_app_environment.this.id
+  log_analytics_workspace_audit_id      = data.azurerm_log_analytics_workspace.audit.id
+  default_domain                        = data.azurerm_container_app_environment.this.default_domain
+  vnet_name                             = module.shared_config.names.virtual-network-lowercase
 
   hub                                   = var.hub
   docker_image                          = var.docker_image
@@ -46,5 +58,4 @@ module "container-apps" {
   postgres_storage_tier                 = var.postgres_storage_tier
   enable_auth                           = var.enable_auth
   use_apex_domain                       = var.use_apex_domain
-  vnet_name                             = module.infra[0].vnet_name
 }
