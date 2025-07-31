@@ -1,13 +1,22 @@
 from datetime import date
 
-from factory import post_generation
-from factory.declarations import SubFactory
+from factory import Trait, post_generation
+from factory.declarations import RelatedFactory, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
 from manage_breast_screening.clinics.tests.factories import ClinicSlotFactory
 
 from .. import models
+
+
+class ParticipantAddressFactory(DjangoModelFactory):
+    lines = ["123 Generic Street", "Townsville"]
+    postcode = "SW1A 1AA"
+    participant = None
+
+    class Meta:
+        model = models.ParticipantAddress
 
 
 class ParticipantFactory(DjangoModelFactory):
@@ -27,14 +36,9 @@ class ParticipantFactory(DjangoModelFactory):
     risk_level = "Routine"
     extra_needs = {}
 
-
-class ParticipantAddressFactory(DjangoModelFactory):
-    lines = ["123 Generic Street", "Townsville"]
-    postcode = "SW1A 1AA"
-    participant = SubFactory(ParticipantFactory)
-
-    class Meta:
-        model = models.ParticipantAddress
+    address = RelatedFactory(
+        ParticipantAddressFactory, factory_related_name="participant"
+    )
 
 
 class ScreeningEpisodeFactory(DjangoModelFactory):
@@ -77,4 +81,20 @@ class AppointmentFactory(DjangoModelFactory):
 
         obj.statuses.add(
             AppointmentStatusFactory.create(state=extracted, appointment=obj)
+        )
+
+
+class ParticipantReportedMammogramFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ParticipantReportedMammogram
+        skip_postgeneration_save = True
+
+    class Params:
+        outside_uk = Trait(
+            location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
+            location_details="france",
+        )
+        elsewhere_uk = Trait(
+            location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
+            location_details="private provider",
         )

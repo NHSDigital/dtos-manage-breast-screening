@@ -44,12 +44,12 @@
       <h3>Upcoming</h3>
       {{ appointment_table(presented_appointments.upcoming, testid="upcoming-appointments-table") }}
     {% endif %}
-    -
+
     {% if presented_appointments.past %}
       <h3>Previous</h3>
       {{ appointment_table(presented_appointments.past, testid="past-appointments-table") }}
     {% endif %}
-    -
+
     {% if not presented_appointments.past and not presented_appointments.upcoming %}
       <p>No screening history found</p>
     {% endif %}
