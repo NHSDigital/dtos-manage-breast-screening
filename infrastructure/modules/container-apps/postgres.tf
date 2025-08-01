@@ -30,7 +30,7 @@ module "postgres" {
   backup_retention_days           = var.postgres_backup_retention_days
   geo_redundant_backup_enabled    = var.postgres_geo_redundant_backup_enabled
   postgresql_admin_object_id      = data.azuread_group.postgres_sql_admin_group.object_id
-  postgresql_admin_principal_name = local.postgres_sql_admin_group
+  postgresql_admin_principal_name = var.postgres_sql_admin_group
   postgresql_admin_principal_type = "Group"
   administrator_login             = "admin"
   admin_identities                = [module.db_connect_identity]

@@ -46,7 +46,7 @@ module "container-apps" {
   log_analytics_workspace_audit_id      = var.deploy_container_app ? data.azurerm_log_analytics_workspace.audit[0].id: null
   default_domain                        = var.deploy_container_app ? data.azurerm_container_app_environment.this[0].default_domain: null
   vnet_name                             = module.shared_config.names.virtual-network-lowercase
-  postgres_sql_admin_group              = "postgres_manbrs_${var.env_config}_uks_admin"
+  postgres_sql_admin_group              = "postgres_${var.app_short_name}_${var.env_config}_uks_admin"
   hub                                   = var.hub
   docker_image                          = var.docker_image
   vnet_address_space                    = var.vnet_address_space
