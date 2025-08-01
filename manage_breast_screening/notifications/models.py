@@ -102,6 +102,8 @@ class Clinic(models.Model):
     holding_clinic = models.BooleanField()
     location_code = models.CharField(max_length=50)
     address_description = models.CharField(max_length=200, blank=True)
+    latitude = models.DecimalField(max_digits=22, decimal_places=16, null=True)
+    longitude = models.DecimalField(max_digits=22, decimal_places=16, null=True)
     address_line_1 = models.CharField(max_length=50)
     address_line_2 = models.CharField(max_length=50)
     address_line_3 = models.CharField(max_length=50)
