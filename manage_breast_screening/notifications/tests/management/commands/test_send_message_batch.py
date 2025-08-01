@@ -12,7 +12,10 @@ from manage_breast_screening.notifications.management.commands.send_message_batc
     CommandError,
 )
 from manage_breast_screening.notifications.models import Message, MessageBatch
-from manage_breast_screening.notifications.tests.factories import AppointmentFactory
+from manage_breast_screening.notifications.tests.factories import (
+    AppointmentFactory,
+    ClinicFactory,
+)
 
 
 @patch.object(
@@ -30,8 +33,17 @@ class TestSendMessageBatch:
         """Test sending message batch with valid Appointment data"""
         mock_send_message_batch.return_value.status_code = 201
 
+        # WIP change here to test with different types of Clinics
+        _clinic_with_address = ClinicFactory(
+            postcode="SW1A 2AB", address_line_1="10 Downing Street"
+        )
+
+        clinic_with_coordinates = ClinicFactory(
+            longitude=51.5034413, latitude=-0.1311739
+        )
         appointment = AppointmentFactory(
-            starts_at=datetime.today().replace(tzinfo=TZ_INFO)
+            clinic=clinic_with_coordinates,
+            starts_at=datetime.today().replace(tzinfo=TZ_INFO),
         )
 
         subject = Command()

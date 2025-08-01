@@ -1,3 +1,4 @@
+import urllib.parse
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -43,7 +44,11 @@ class Command(BaseCommand):
             )
 
             for appointment in appointments:
-                Message.objects.create(appointment=appointment, batch=message_batch)
+                Message.objects.create(
+                    appointment=appointment,
+                    batch=message_batch,
+                    personalisation=self.message_personalisation(appointment.clinic),
+                )
 
             self.stdout.write(
                 f"Created MessageBatch with ID {message_batch.id} containing {appointments.count()} messages."
@@ -90,3 +95,22 @@ class Command(BaseCommand):
             hour=23, minute=59, second=59, microsecond=999999, tzinfo=TZ_INFO
         )
         return today_end + timedelta(weeks=4, days=4)
+
+    def message_personalisation(self, clinic) -> dict:
+        return {
+            "address_description": clinic.address_description,
+            "google_maps_link": self.google_maps_link(clinic),
+        }
+
+    def google_maps_link(self, clinic) -> str:
+        google_maps_url = "https://www.google.com/maps/search/?api=1&query="
+        if clinic.latitude is None or clinic.longitude is None:
+            query_string = urllib.parse.quote_plus(
+                f"{clinic.postcode} {clinic.address_line_1}"
+            )
+            f"{google_maps_url}{query_string}"
+        else:
+            query_string = urllib.parse.quote_plus(
+                f"{clinic.longitude},{clinic.latitude}"
+            )
+            f"{google_maps_url}{query_string}"
