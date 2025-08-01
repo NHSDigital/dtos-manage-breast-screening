@@ -11,7 +11,7 @@ variable backend_id {
 variable "deploy_app" {
   description = "Deploy the container app to the foundational infra"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "app_short_name" {
