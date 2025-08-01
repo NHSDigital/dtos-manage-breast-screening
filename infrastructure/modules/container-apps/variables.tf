@@ -84,12 +84,16 @@ variable "vnet_name" {
   description = "The name of the vnet that is used."
 }
 
+variable "postgres_sql_admin_group" {
+
+}
+
 locals {
   region              = "uksouth"
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
   hub_vnet_rg_name    = "rg-hub-${var.hub}-uks-hub-networking"
 
-  postgres_sql_admin_group = "postgres_manbrs_${var.environment}_uks_admin"
+  # postgres_sql_admin_group = "postgres_manbrs_${var.environment}_uks_admin"
   hub_live_name_map = {
     dev  = "nonlive"
     prod = "live"
