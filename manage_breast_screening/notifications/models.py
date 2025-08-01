@@ -101,6 +101,7 @@ class Clinic(models.Model):
     alt_name = models.CharField(max_length=50)
     holding_clinic = models.BooleanField()
     location_code = models.CharField(max_length=50)
+    address_description = models.CharField(max_length=200, blank=True)
     address_line_1 = models.CharField(max_length=50)
     address_line_2 = models.CharField(max_length=50)
     address_line_3 = models.CharField(max_length=50)
