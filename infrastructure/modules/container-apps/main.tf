@@ -47,7 +47,7 @@ module "webapp" {
   docker_image                     = var.docker_image
   user_assigned_identity_ids       = [module.db_connect_identity.id]
   environment_variables = {
-    ALLOWED_HOSTS   = "manage-breast-screening-web-${var.environment}.${var.default_domain}"
+    ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
     DATABASE_HOST   = module.postgres.host
     DATABASE_NAME   = module.postgres.database_names[0]
     DATABASE_USER   = module.db_connect_identity.name
