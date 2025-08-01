@@ -41,10 +41,10 @@ module "container-apps" {
 
   app_short_name                        = var.app_short_name
   environment                           = var.environment
-  app_key_vault_id                      = data.azurerm_key_vault.app_key_vault[0].id
-  container_app_environment_id          = data.azurerm_container_app_environment.this[0].id
-  log_analytics_workspace_audit_id      = data.azurerm_log_analytics_workspace.audit[0].id
-  default_domain                        = data.azurerm_container_app_environment.this[0].default_domain
+  app_key_vault_id                      = var.deploy_app ? data.azurerm_key_vault.app_key_vault[0].id: null
+  container_app_environment_id          = var.deploy_app ? data.azurerm_container_app_environment.this[0].id: null
+  log_analytics_workspace_audit_id      = var.deploy_app ? data.azurerm_log_analytics_workspace.audit[0].id: null
+  default_domain                        = var.deploy_app ? data.azurerm_container_app_environment.this[0].default_domain: null
   vnet_name                             = module.shared_config.names.virtual-network-lowercase
 
   hub                                   = var.hub

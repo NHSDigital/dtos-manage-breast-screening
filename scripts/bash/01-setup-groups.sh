@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Replace the values in the variable declarations here:
-resourceGroup='rg-mi-review-l1-uks'
-sqlGroupName='postgres_manbrs_review-l1_uks_admin'
-managedIdentityName='mi-manbrs-review-l1-uks'
+resourceGroup='rg-mi-review-uks'
+sqlGroupName='postgres_manbrs_review_uks_admin'
+managedIdentityName='mi-manbrs-review-uks'
 
 # Create the resource group
 az group create --name $resourceGroup --location uksouth
