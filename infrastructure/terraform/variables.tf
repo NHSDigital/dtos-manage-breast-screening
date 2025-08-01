@@ -4,11 +4,11 @@ variable "deploy_infra" {
   default     = true
 }
 
-variable backend_id {
-  default = "review-l1"
-}
+# variable backend_id {
+#   default = "review-l1"
+# }
 
-variable "deploy_app" {
+variable "deploy_container_app" {
   description = "Deploy the container app to the foundational infra"
   type        = bool
   default     = false

@@ -30,7 +30,7 @@ module "shared_config" {
 
 
 module "container-apps" {
-  count = var.deploy_app ? 1 : 0
+  count = var.deploy_container_app ? 1 : 0
 
   source = "../modules/container-apps"
 

@@ -129,6 +129,7 @@ For each environment, e.g. 'dev':
 1. Deploy:
    ```shell
    make dev terraform-plan DOCKER_IMAGE_TAG=git-sha-af32637e7e6a07e36158dcb8d7ed90be49be1xyz
+   make review terraform-plan DOCKER_IMAGE_TAG=git-sha-01ecb79d561f55be60072a093dd167fe8eb5b42e PR_NUMBER=123
    ```
 1. The web app URL will be displayed as output. Copy it into a browser on the AVD to access the app.
 
