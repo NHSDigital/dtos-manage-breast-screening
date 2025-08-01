@@ -82,6 +82,7 @@ class Appointment(models.Model):
     number = models.IntegerField(null=True, default=1)
     starts_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
+    nbss_updated_at = models.DateTimeField(null=True)
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
