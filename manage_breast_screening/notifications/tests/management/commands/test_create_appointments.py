@@ -1,5 +1,5 @@
-import datetime
 import os
+from datetime import datetime
 from unittest.mock import Mock, PropertyMock
 
 import pytest
@@ -11,6 +11,10 @@ from manage_breast_screening.notifications.management.commands.create_appointmen
     Command,
 )
 from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.tests.factories import (
+    AppointmentFactory,
+    ClinicFactory,
+)
 
 
 class TestCreateAppointments:
@@ -21,7 +25,7 @@ class TestCreateAppointments:
     @pytest.mark.django_db
     def test_handle_creates_records(self, raw_data):
         """Test Appointment record creation from valid NBSS data stored in Azure storage blob"""
-        today_dirname = datetime.datetime.today().strftime("%Y-%m-%d")
+        today_dirname = datetime.today().strftime("%Y-%m-%d")
 
         subject = Command()
 
@@ -58,13 +62,11 @@ class TestCreateAppointments:
         assert appointments[1].nhs_number == 9449305552
         assert appointments[2].nhs_number == 9449306621
 
-        assert appointments[0].starts_at == datetime.datetime(
-            2025, 1, 10, 8, 45, tzinfo=TZ_INFO
-        )
-        assert appointments[1].starts_at == datetime.datetime(
+        assert appointments[0].starts_at == datetime(2025, 1, 10, 8, 45, tzinfo=TZ_INFO)
+        assert appointments[1].starts_at == datetime(
             2025, 3, 14, 13, 45, tzinfo=TZ_INFO
         )
-        assert appointments[2].starts_at == datetime.datetime(
+        assert appointments[2].starts_at == datetime(
             2025, 3, 14, 14, 45, tzinfo=TZ_INFO
         )
 
@@ -72,13 +74,63 @@ class TestCreateAppointments:
         assert appointments[1].status == "B"
         assert appointments[2].status == "B"
 
-        assert appointments[0].booked_by == "C"
+        assert appointments[0].cancelled_by == "H"
         assert appointments[1].booked_by == "H"
         assert appointments[2].booked_by == "H"
 
         assert appointments[0].clinic == clinics[0]
         assert appointments[1].clinic == clinics[1]
         assert appointments[2].clinic == clinics[1]
+
+    @pytest.mark.django_db
+    def test_handle_updates_records(self):
+        """Test Appointment record update from valid NBSS data stored in Azure storage blob"""
+        starts_at = datetime.strptime(
+            "20250314 1345",
+            "%Y%m%d %H%M",
+        )
+        nbss_id = "BU011-67278-RA1-DN-Y1111-1"
+        # Setup existing appointment
+        existing_appointment = AppointmentFactory(
+            nbss_id=nbss_id,
+            nhs_number=9449305552,
+            starts_at=starts_at.replace(tzinfo=TZ_INFO),
+            clinic=ClinicFactory(
+                bso_code="KMK",
+                code="BU011",
+            ),
+            status="B",
+            cancelled_by="",
+        )
+        assert Appointment.objects.count() == 1
+
+        # Receive a cancellation for existing appointment
+        today = datetime.now()
+        raw_data = open(
+            f"{os.path.dirname(os.path.realpath(__file__))}/test_updated.dat"
+        ).read()
+        today_dirname = today.strftime("%Y-%m-%d")
+
+        subject = Command()
+
+        mock_container_client = PropertyMock(spec=ContainerClient)
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = PropertyMock(return_value=f"{today_dirname}/test_updated.dat")
+        mock_container_client.list_blobs.return_value = [mock_blob]
+        mock_container_client.get_blob_client().download_blob().readall.return_value = (
+            raw_data
+        )
+        subject.container_client = mock_container_client
+
+        subject.handle(**{"date_str": today_dirname})
+
+        # check existing appointment updated
+        assert Appointment.objects.count() == 1
+        appointments = Appointment.objects.all()
+        assert appointments[0].id == existing_appointment.id
+        assert appointments[0].nbss_id == nbss_id
+        assert appointments[0].status == "C"
+        assert appointments[0].cancelled_by == "C"
 
     @pytest.mark.django_db
     def test_handle_accept_date_arg(self, raw_data):
