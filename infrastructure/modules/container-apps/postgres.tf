@@ -9,7 +9,7 @@ module "postgres_subnet" {
   source = "../dtos-devops-templates/infrastructure/modules/subnet"
 
   name                                                           = "snet-postgres"
-  resource_group_name                                            = azurerm_resource_group.main.name
+  resource_group_name                                            = var.vnet_resource_group
   vnet_name                                                      = var.vnet_name
   address_prefixes                                               = [cidrsubnet(var.vnet_address_space, 7, 1)]
   create_nsg                                                     = false

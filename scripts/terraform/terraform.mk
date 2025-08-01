@@ -14,15 +14,6 @@ review: # Target the review app environment - make review <action>
 	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_container_app=true),)
 	$(if ${PR_NUMBER}, $(eval export ENVIRONMENT=pr-${PR_NUMBER}),)
 
-review-l2: # Target the review app environment - make review <action>
-	$(eval include infrastructure/environments/review-l2/variables.sh)
-	$(eval export ENVIRONMENT=pr-${PR_NUMBER})
-	echo ${PR_NUMBER}
-	echo ${TF_VAR_environment}
-
-review-l1: # Target the review environment - make review <action>
-	$(eval include infrastructure/environments/review-l1/variables.sh)
-
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)

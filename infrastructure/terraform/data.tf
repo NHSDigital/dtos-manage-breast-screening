@@ -1,4 +1,4 @@
-# Only do these looks ups if we are deploying the container app, else don't use it
+# Only do these looks ups if we have already deployed the infra code in a previous run, else don't use it
 data "azurerm_container_app_environment" "this" {
   count               = var.deploy_container_app ? 1 : 0
 

@@ -88,6 +88,10 @@ variable "postgres_sql_admin_group" {
 
 }
 
+variable "vnet_resource_group" {
+
+}
+
 locals {
   region              = "uksouth"
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
