@@ -59,6 +59,7 @@ class Message(models.Model):
     status = models.CharField(
         max_length=50, choices=MESSAGE_STATUSES, default="pending_enrichment"
     )
+    personalisation = models.JSONField(null=True)
 
     appointment = models.ForeignKey(
         "notifications.Appointment", on_delete=models.PROTECT
