@@ -11,6 +11,7 @@ review: # Target the review app environment - make review <action>
 	$(if ${PR_NUMBER},, $(eval export TF_VAR_deploy_container_apps=false))
 	$(if ${PR_NUMBER},, $(eval export ENVIRONMENT=review))
 	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_infra=false),)
+	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_container_app=true),)
 	$(if ${PR_NUMBER}, $(eval export ENVIRONMENT=pr-${PR_NUMBER}),)
 
 review-l2: # Target the review app environment - make review <action>
