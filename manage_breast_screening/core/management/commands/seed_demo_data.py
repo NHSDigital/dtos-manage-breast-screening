@@ -24,6 +24,11 @@ from manage_breast_screening.participants.models import (
     ParticipantAddress,
     ScreeningEpisode,
 )
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    ParticipantFactory,
+    ScreeningEpisodeFactory,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -79,11 +84,50 @@ class Command(BaseCommand):
             datetime.strptime(slot_key["starts_at_time"], "%H:%M").time(),
         )
 
-        ClinicSlotFactory(
+        clinic_slot = ClinicSlotFactory(
             clinic=clinic,
             id=slot_key["id"],
             duration_in_minutes=slot_key["duration_in_minutes"],
             starts_at=starts_at,
+        )
+
+        if "appointment" in slot_key:
+            self.create_appointment(clinic_slot, slot_key["appointment"])
+
+    def create_appointment(self, clinic_slot, appointment_key):
+        if "screening_episode" in appointment_key:
+            screening_episode = self.create_screening_episode(
+                appointment_key["screening_episode"]
+            )
+
+        return AppointmentFactory(
+            clinic_slot=clinic_slot,
+            id=appointment_key["id"],
+            screening_episode=screening_episode,
+        )
+
+    def create_screening_episode(self, screening_episode_key):
+        if "participant" in screening_episode_key:
+            participant = self.create_participant(screening_episode_key["participant"])
+
+        return ScreeningEpisodeFactory(
+            id=screening_episode_key["id"],
+            participant=participant,
+        )
+
+    def create_participant(self, participant_key):
+        return ParticipantFactory(
+            id=participant_key["id"],
+            first_name=participant_key["first_name"],
+            last_name=participant_key["last_name"],
+            gender=participant_key["gender"],
+            nhs_number=participant_key["nhs_number"],
+            phone=participant_key["phone"],
+            email=participant_key["email"],
+            date_of_birth=participant_key["date_of_birth"],
+            ethnic_background_id=participant_key["ethnic_background_id"],
+            risk_level=participant_key["risk_level"],
+            extra_needs=participant_key["extra_needs"],
         )
 
     def reset_db(self):
