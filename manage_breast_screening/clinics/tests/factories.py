@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
-from factory import post_generation
-from factory.declarations import LazyAttribute, RelatedFactoryList, Sequence, SubFactory
+from factory import LazyAttribute, post_generation
+from factory.declarations import RelatedFactoryList, Sequence, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
@@ -36,7 +36,7 @@ class ClinicStatusFactory(DjangoModelFactory):
 class ClinicFactory(DjangoModelFactory):
     class Meta:
         model = models.Clinic
-        django_get_or_create = ("starts_at", "ends_at")
+        django_get_or_create = ("starts_at", "ends_at", "setting")
         skip_postgeneration_save = True
 
     type = FuzzyChoice(models.Clinic.TYPE_CHOICES)
