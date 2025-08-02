@@ -1,10 +1,10 @@
 from datetime import date
 
-from factory import Trait, post_generation
+from factory import Trait, post_generation, Sequence
 from factory.declarations import RelatedFactory, SubFactory
+from factory.declarations import SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-
 from manage_breast_screening.clinics.tests.factories import ClinicSlotFactory
 
 from .. import models
@@ -22,12 +22,12 @@ class ParticipantAddressFactory(DjangoModelFactory):
 class ParticipantFactory(DjangoModelFactory):
     class Meta:
         model = models.Participant
-        skip_postgeneration_save = True
+        django_get_or_create = ("nhs_number",)
 
     first_name = "Janet"
     last_name = "Williams"
     gender = "Female"
-    nhs_number = "07700900829"
+    nhs_number = Sequence(lambda n: f"9{n:010d}")
     phone = "07700900829"
     email = "janet.williams@example.com"
     date_of_birth = date(1959, 7, 22)

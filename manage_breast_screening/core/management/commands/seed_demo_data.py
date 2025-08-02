@@ -24,6 +24,11 @@ from manage_breast_screening.participants.models import (
     ParticipantAddress,
     ScreeningEpisode,
 )
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    ParticipantFactory,
+    ScreeningEpisodeFactory,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -79,12 +84,39 @@ class Command(BaseCommand):
             datetime.strptime(slot_key["starts_at_time"], "%H:%M").time(),
         )
 
-        ClinicSlotFactory(
+        clinic_slot = ClinicSlotFactory(
             clinic=clinic,
             id=slot_key["id"],
             duration_in_minutes=slot_key["duration_in_minutes"],
             starts_at=starts_at,
         )
+
+        if "appointment" in slot_key:
+            self.create_appointment(clinic_slot, slot_key["appointment"])
+
+    def create_appointment(self, clinic_slot, appointment_key):
+        if "screening_episode" in appointment_key:
+            screening_episode = self.create_screening_episode(
+                appointment_key["screening_episode"]
+            )
+
+        return AppointmentFactory(
+            clinic_slot=clinic_slot,
+            id=appointment_key["id"],
+            screening_episode=screening_episode,
+        )
+
+    def create_screening_episode(self, screening_episode_key):
+        if "participant" in screening_episode_key:
+            participant = self.create_participant(**screening_episode_key["participant"])
+
+        return ScreeningEpisodeFactory(
+            id=screening_episode_key["id"],
+            participant=participant,
+        )
+
+    def create_participant(self, **participant_key):
+        return ParticipantFactory(**participant_key)
 
     def reset_db(self):
         AppointmentStatus.objects.all().delete()

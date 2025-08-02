@@ -212,6 +212,9 @@ class ScreeningEpisode(BaseModel):
         except IndexError:
             return None
 
+    def __str__(self):
+        return f"{self.participant.full_name} - {self.protocol} {self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else ''}"
+
 
 class AppointmentQuerySet(models.QuerySet):
     def in_status(self, *statuses):
