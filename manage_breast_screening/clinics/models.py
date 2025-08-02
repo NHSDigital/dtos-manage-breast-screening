@@ -128,6 +128,9 @@ class Clinic(BaseModel):
             ClinicFilter.COMPLETED: cls.objects.completed().count(),
         }
 
+    def __str__(self):
+        return self.setting.name + " " + self.starts_at.strftime("%Y-%m-%d %H:%M")
+
 
 class ClinicSlot(BaseModel):
     clinic = models.ForeignKey(
