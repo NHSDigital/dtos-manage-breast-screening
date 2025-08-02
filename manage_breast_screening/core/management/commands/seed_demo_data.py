@@ -13,6 +13,7 @@ from manage_breast_screening.clinics.models import (
 )
 from manage_breast_screening.clinics.tests.factories import (
     ClinicFactory,
+    ClinicSlotFactory,
     ProviderFactory,
     SettingFactory,
 )
@@ -63,8 +64,26 @@ class Command(BaseCommand):
             datetime.strptime(clinic_key["ends_at_time"], "%H:%M").time(),
         )
 
-        ClinicFactory(
+        clinic = ClinicFactory(
             setting=setting, id=clinic_key["id"], starts_at=starts_at, ends_at=ends_at
+        )
+
+        slots = clinic_key.get("slots")
+        if slots:
+            for slot_key in slots:
+                self.create_slot(clinic, slot_key)
+
+    def create_slot(self, clinic, slot_key):
+        starts_at = datetime.combine(
+            clinic.starts_at.date(),
+            datetime.strptime(slot_key["starts_at_time"], "%H:%M").time(),
+        )
+
+        ClinicSlotFactory(
+            clinic=clinic,
+            id=slot_key["id"],
+            duration_in_minutes=slot_key["duration_in_minutes"],
+            starts_at=starts_at,
         )
 
     def reset_db(self):

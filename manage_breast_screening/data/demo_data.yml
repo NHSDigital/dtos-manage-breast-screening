@@ -9,22 +9,70 @@ providers:
             starts_at_date_relative_to_today_in_days: -10
             starts_at_time: "12:00"
             ends_at_time: "18:00"
-            number_of_slots: 10
-          - id: 3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f
+            slots:
+              - id: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
+                duration_in_minutes: 8
+                starts_at_time: "12:00"
+              - id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
+                duration_in_minutes: 8
+                starts_at_time: "12:08"
+              - id: 3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f
+                duration_in_minutes: 8
+                starts_at_time: "12:16"
+              - id: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
+                duration_in_minutes: 8
+                starts_at_time: "12:24"
+              - id: 5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b
+                duration_in_minutes: 8
+                starts_at_time: "12:32"
+              - id: 6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c
+                duration_in_minutes: 8
+                starts_at_time: "12:40"
+              - id: 7a8b9c0d-1e2f-3a4b-5c6d-7e8f9a0b1c2d
+                duration_in_minutes: 8
+                starts_at_time: "12:48"
+              - id: 8b9c0d1e-2f3a-4b5c-6d7e-8f9a0b1c2d3e
+                duration_in_minutes: 8
+                starts_at_time: "12:56"
+              - id: 9c0d1e2f-3a4b-5c6d-7e8f-9a0b1c2d3e4f
+                duration_in_minutes: 8
+                starts_at_time: "13:04"
+              - id: 0d1e2f3a-4b5c-6d7e-8f9a-0b1c2d3e4f50
+                duration_in_minutes: 8
+                starts_at_time: "13:12"
+              - id: 1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5061
+                duration_in_minutes: 8
+                starts_at_time: "13:20"
+              - id: 2f3a4b5c-6d7e-8f9a-0b1c-2d3e4f506172
+                duration_in_minutes: 8
+                starts_at_time: "13:28"
+              - id: 3a4b5c6d-7e8f-9a0b-1c2d-3e4f50617283
+                duration_in_minutes: 8
+                starts_at_time: "13:36"
+              - id: ab3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
+                duration_in_minutes: 8
+                starts_at_time: "12:08"
+              - id: bc4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f
+                duration_in_minutes: 8
+                starts_at_time: "12:08"
+              - id: cd5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
+                duration_in_minutes: 8
+                starts_at_time: "12:00"
+          - id: dc4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f
             starts_at_date_relative_to_today_in_days: -5
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
-          - id: 4d5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
+            slots:
+          - id: ed5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
             starts_at_date_relative_to_today_in_days: 0
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
+            slots:
           - id: 6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c
             starts_at_date_relative_to_today_in_days: 10
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
+            slots:
       - name: "East Tester BSU"
         id: 7e1d2c3b-4a5f-6e7d-8c9b-0a1f2e3d4c5b
         clinics:
@@ -32,21 +80,451 @@ providers:
             starts_at_date_relative_to_today_in_days: -10
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
+            slots:
           - id: 1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b
             starts_at_date_relative_to_today_in_days: -5
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
+            slots:
           - id: 2f3a4b5c-6d7e-8f9a-0b1c-2d3e4f5a6b7c
             starts_at_date_relative_to_today_in_days: 0
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
+            slots:
           - id: 4b5c6d7e-8f9a-0b1c-2d3e-4f5a6b7c8d9e
             starts_at_date_relative_to_today_in_days: 10
             starts_at_time: "09:00"
             ends_at_time: "13:00"
-            number_of_slots: 10
+            slots:
       
     
+participants:
+  - id: 2b87d44f-637b-44a7-9dfd-1e57f37d04ea
+    first_name: "Dianna"
+    last_name: "McIntosh"
+    gender: "Female"
+    nhs_number: "9992678102"
+    phone: "01184960245"
+    email: "demetrius97@example.com"
+    date_of_birth: "1964-03-15"
+    ethnic_background_id: "english_welsh_scottish_ni_british"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 3c5e7f9a-1b2d-4e6f-8a9c-0d1e2f3a4b5c
+    first_name: "Sarah"
+    last_name: "Johnson"
+    gender: "Female"
+    nhs_number: "9992678103"
+    phone: "01234567890"
+    email: "sarah.johnson@example.com"
+    date_of_birth: "1974-05-20"
+    ethnic_background_id: "indian"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 4d6f8a0b-2c3e-5f7a-9b0d-1e2f3a4b5c6d
+    first_name: "Maria"
+    last_name: "Garcia"
+    gender: "Female"
+    nhs_number: "9992678104"
+    phone: "01234567891"
+    email: "maria.garcia@example.com"
+    date_of_birth: "1968-08-12"
+    ethnic_background_id: "any_other_mixed_multiple_ethnic_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 5e7f9a1b-3d4f-6a8b-0c1e-2f3a4b5c6d7e
+    first_name: "Jennifer"
+    last_name: "Williams"
+    gender: "Female"
+    nhs_number: "9992678105"
+    phone: "01234567892"
+    email: "jennifer.williams@example.com"
+    date_of_birth: "1972-11-03"
+    ethnic_background_id: "caribbean"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 6f8a0b1c-4e5a-7b9c-1d2f-3a4b5c6d7e8f
+    first_name: "Lisa"
+    last_name: "Brown"
+    gender: "Female"
+    nhs_number: "9992678106"
+    phone: "01234567893"
+    email: "lisa.brown@example.com"
+    date_of_birth: "1965-02-18"
+    ethnic_background_id: "chinese"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 7a9b0c1d-5f6b-8c0d-2e3a-4b5c6d7e8f9a
+    first_name: "Patricia"
+    last_name: "Davis"
+    gender: "Female"
+    nhs_number: "9992678107"
+    phone: "01234567894"
+    email: "patricia.davis@example.com"
+    date_of_birth: "1970-07-25"
+    ethnic_background_id: "pakistani"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 8b0c1d2e-6a7c-9d1e-3f4b-5c6d7e8f9a0b
+    first_name: "Linda"
+    last_name: "Miller"
+    gender: "Female"
+    nhs_number: "9992678108"
+    phone: "01234567895"
+    email: "linda.miller@example.com"
+    date_of_birth: "1963-12-09"
+    ethnic_background_id: "white_irish"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 9c1d2e3f-7b8d-0e2f-4a5c-6d7e8f9a0b1c
+    first_name: "Barbara"
+    last_name: "Wilson"
+    gender: "Female"
+    nhs_number: "9992678109"
+    phone: "01234567896"
+    email: "barbara.wilson@example.com"
+    date_of_birth: "1969-04-14"
+    ethnic_background_id: "african"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 0d2e3f4a-8c9e-1f3a-5b6d-7e8f9a0b1c2d
+    first_name: "Susan"
+    last_name: "Moore"
+    gender: "Female"
+    nhs_number: "9992678110"
+    phone: "01234567897"
+    email: "susan.moore@example.com"
+    date_of_birth: "1966-09-22"
+    ethnic_background_id: "bangladeshi"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 1e3f4a5b-9d0f-2a4b-6c7e-8f9a0b1c2d3e
+    first_name: "Jessica"
+    last_name: "Taylor"
+    gender: "Female"
+    nhs_number: "9992678111"
+    phone: "01234567898"
+    email: "jessica.taylor@example.com"
+    date_of_birth: "1971-01-30"
+    ethnic_background_id: "gypsy_or_irish_traveller"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 2f4a5b6c-0e1a-3b5c-7d8f-9a0b1c2d3e4f
+    first_name: "Dorothy"
+    last_name: "Anderson"
+    gender: "Female"
+    nhs_number: "9992678112"
+    phone: "01234567899"
+    email: "dorothy.anderson@example.com"
+    date_of_birth: "1954-06-17"
+    ethnic_background_id: "english_welsh_scottish_ni_british"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 3a5b6c7d-1f2b-4c6d-8e9a-0b1c2d3e4f5a
+    first_name: "Helen"
+    last_name: "Thomas"
+    gender: "Female"
+    nhs_number: "9992678113"
+    phone: "01234567800"
+    email: "helen.thomas@example.com"
+    date_of_birth: "1967-10-05"
+    ethnic_background_id: "any_other_asian_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 4b6c7d8e-2a3c-5d7e-9f0b-1c2d3e4f5a6b
+    first_name: "Nancy"
+    last_name: "Jackson"
+    gender: "Female"
+    nhs_number: "9992678114"
+    phone: "01234567801"
+    email: "nancy.jackson@example.com"
+    date_of_birth: "1973-03-28"
+    ethnic_background_id: "white_other"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 5c7d8e9f-3b4d-6e8f-0a1c-2d3e4f5a6b7c
+    first_name: "Betty"
+    last_name: "White"
+    gender: "Female"
+    nhs_number: "9992678115"
+    phone: "01234567802"
+    email: "betty.white@example.com"
+    date_of_birth: "1958-08-11"
+    ethnic_background_id: "any_other_black_african_caribbean_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 6d8e9f0a-4c5e-7f9a-1b2d-3e4f5a6b7c8d
+    first_name: "Sandra"
+    last_name: "Harris"
+    gender: "Female"
+    nhs_number: "9992678116"
+    phone: "01234567803"
+    email: "sandra.harris@example.com"
+    date_of_birth: "1962-12-24"
+    ethnic_background_id: "indian"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 7e9f0a1b-5d6f-8a0b-2c3e-4f5a6b7c8d9e
+    first_name: "Donna"
+    last_name: "Martin"
+    gender: "Female"
+    nhs_number: "9992678117"
+    phone: "01234567804"
+    email: "donna.martin@example.com"
+    date_of_birth: "1975-05-07"
+    ethnic_background_id: "caribbean"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 8f0a1b2c-6e7a-9b1c-3d4f-5a6b7c8d9e0f
+    first_name: "Carol"
+    last_name: "Thompson"
+    gender: "Female"
+    nhs_number: "9992678118"
+    phone: "01234567805"
+    email: "carol.thompson@example.com"
+    date_of_birth: "1960-09-15"
+    ethnic_background_id: "chinese"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 9a1b2c3d-7f8b-0c2d-4e5a-6b7c8d9e0f1a
+    first_name: "Ruth"
+    last_name: "Garcia"
+    gender: "Female"
+    nhs_number: "9992678119"
+    phone: "01234567806"
+    email: "ruth.garcia@example.com"
+    date_of_birth: "1964-01-19"
+    ethnic_background_id: "pakistani"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 0b2c3d4e-8a9c-1d3e-5f6b-7c8d9e0f1a2b
+    first_name: "Sharon"
+    last_name: "Martinez"
+    gender: "Female"
+    nhs_number: "9992678120"
+    phone: "01234567807"
+    email: "sharon.martinez@example.com"
+    date_of_birth: "1968-06-02"
+    ethnic_background_id: "white_irish"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 1c3d4e5f-9b0d-2e4f-6a7c-8d9e0f1a2b3c
+    first_name: "Michelle"
+    last_name: "Robinson"
+    gender: "Female"
+    nhs_number: "9992678121"
+    phone: "01234567808"
+    email: "michelle.robinson@example.com"
+    date_of_birth: "1972-11-26"
+    ethnic_background_id: "african"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 2d4e5f6a-0c1e-3f5a-7b8d-9e0f1a2b3c4d
+    first_name: "Laura"
+    last_name: "Clark"
+    gender: "Female"
+    nhs_number: "9992678122"
+    phone: "01234567809"
+    email: "laura.clark@example.com"
+    date_of_birth: "1965-04-13"
+    ethnic_background_id: "bangladeshi"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 3e5f6a7b-1d2f-4a6b-8c9e-0f1a2b3c4d5e
+    first_name: "Sarah"
+    last_name: "Rodriguez"
+    gender: "Female"
+    nhs_number: "9992678123"
+    phone: "01234567810"
+    email: "sarah.rodriguez@example.com"
+    date_of_birth: "1970-07-08"
+    ethnic_background_id: "any_other_mixed_multiple_ethnic_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 4f6a7b8c-2e3a-5b7c-9d0f-1a2b3c4d5e6f
+    first_name: "Kimberly"
+    last_name: "Lewis"
+    gender: "Female"
+    nhs_number: "9992678124"
+    phone: "01234567811"
+    email: "kimberly.lewis@example.com"
+    date_of_birth: "1957-12-31"
+    ethnic_background_id: "gypsy_or_irish_traveller"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 5a7b8c9d-3f4b-6c8d-0e1a-2b3c4d5e6f7a
+    first_name: "Deborah"
+    last_name: "Lee"
+    gender: "Female"
+    nhs_number: "9992678125"
+    phone: "01234567812"
+    email: "deborah.lee@example.com"
+    date_of_birth: "1963-05-16"
+    ethnic_background_id: "english_welsh_scottish_ni_british"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 6b8c9d0e-4a5c-7d9e-1f2b-3c4d5e6f7a8b
+    first_name: "Dorothy"
+    last_name: "Walker"
+    gender: "Female"
+    nhs_number: "9992678126"
+    phone: "01234567813"
+    email: "dorothy.walker@example.com"
+    date_of_birth: "1969-08-29"
+    ethnic_background_id: "any_other_asian_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 7c9d0e1f-5b6d-8e0f-2a3c-4d5e6f7a8b9c
+    first_name: "Lisa"
+    last_name: "Hall"
+    gender: "Female"
+    nhs_number: "9992678127"
+    phone: "01234567814"
+    email: "lisa.hall@example.com"
+    date_of_birth: "1974-02-04"
+    ethnic_background_id: "white_other"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 8d0e1f2a-6c7e-9f1a-3b4d-5e6f7a8b9c0d
+    first_name: "Nancy"
+    last_name: "Allen"
+    gender: "Female"
+    nhs_number: "9992678128"
+    phone: "01234567815"
+    email: "nancy.allen@example.com"
+    date_of_birth: "1961-10-12"
+    ethnic_background_id: "any_other_black_african_caribbean_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 9e1f2a3b-7d8f-0a2b-4c5e-6f7a8b9c0d1e
+    first_name: "Karen"
+    last_name: "Young"
+    gender: "Female"
+    nhs_number: "9992678129"
+    phone: "01234567816"
+    email: "karen.young@example.com"
+    date_of_birth: "1966-03-27"
+    ethnic_background_id: "indian"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 0f2a3b4c-8e9a-1b3c-5d6f-7a8b9c0d1e2f
+    first_name: "Betty"
+    last_name: "Hernandez"
+    gender: "Female"
+    nhs_number: "9992678130"
+    phone: "01234567817"
+    email: "betty.hernandez@example.com"
+    date_of_birth: "1971-06-21"
+    ethnic_background_id: "caribbean"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 1a3b4c5d-9f0b-2c4d-6e7a-8b9c0d1e2f3a
+    first_name: "Helen"
+    last_name: "King"
+    gender: "Female"
+    nhs_number: "9992678131"
+    phone: "01234567818"
+    email: "helen.king@example.com"
+    date_of_birth: "1959-11-14"
+    ethnic_background_id: "chinese"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 2b4c5d6e-0a1c-3d5e-7f8b-9c0d1e2f3a4b
+    first_name: "Sandra"
+    last_name: "Wright"
+    gender: "Female"
+    nhs_number: "9992678132"
+    phone: "01234567819"
+    email: "sandra.wright@example.com"
+    date_of_birth: "1967-04-06"
+    ethnic_background_id: "pakistani"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 3c5d6e7f-1b2d-4e6f-8a9c-0d1e2f3a4b5c
+    first_name: "Donna"
+    last_name: "Lopez"
+    gender: "Female"
+    nhs_number: "9992678133"
+    phone: "01234567820"
+    email: "donna.lopez@example.com"
+    date_of_birth: "1973-09-18"
+    ethnic_background_id: "white_irish"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 4d6e7f8a-2c3e-5f7a-9b0d-1e2f3a4b5c6d
+    first_name: "Carol"
+    last_name: "Hill"
+    gender: "Female"
+    nhs_number: "9992678134"
+    phone: "01234567821"
+    email: "carol.hill@example.com"
+    date_of_birth: "1955-01-23"
+    ethnic_background_id: "african"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 5e7f8a9b-3d4f-6a8b-0c1e-2f3a4b5c6d7e
+    first_name: "Ruth"
+    last_name: "Scott"
+    gender: "Female"
+    nhs_number: "9992678135"
+    phone: "01234567822"
+    email: "ruth.scott@example.com"
+    date_of_birth: "1962-07-10"
+    ethnic_background_id: "bangladeshi"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 6f8a9b0c-4e5a-7b9c-1d2f-3a4b5c6d7e8f
+    first_name: "Sharon"
+    last_name: "Green"
+    gender: "Female"
+    nhs_number: "9992678136"
+    phone: "01234567823"
+    email: "sharon.green@example.com"
+    date_of_birth: "1968-12-03"
+    ethnic_background_id: "any_other_mixed_multiple_ethnic_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 7a9b0c1d-5f6b-8c0d-2e3a-4b5c6d7e8f9a
+    first_name: "Michelle"
+    last_name: "Adams"
+    gender: "Female"
+    nhs_number: "9992678137"
+    phone: "01234567824"
+    email: "michelle.adams@example.com"
+    date_of_birth: "1975-05-25"
+    ethnic_background_id: "gypsy_or_irish_traveller"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 8b0c1d2e-6a7c-9d1e-3f4b-5c6d7e8f9a0b
+    first_name: "Laura"
+    last_name: "Baker"
+    gender: "Female"
+    nhs_number: "9992678138"
+    phone: "01234567825"
+    email: "laura.baker@example.com"
+    date_of_birth: "1960-08-17"
+    ethnic_background_id: "english_welsh_scottish_ni_british"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 9c1d2e3f-7b8d-0e2f-4a5c-6d7e8f9a0b1c
+    first_name: "Kimberly"
+    last_name: "Gonzalez"
+    gender: "Female"
+    nhs_number: "9992678139"
+    phone: "01234567826"
+    email: "kimberly.gonzalez@example.com"
+    date_of_birth: "1964-11-30"
+    ethnic_background_id: "any_other_asian_background"
+    risk_level: "Family History"
+    extra_needs: {}
+  - id: 0d2e3f4a-8c9e-1f3a-5b6d-7e8f9a0b1c2d
+    first_name: "Deborah"
+    last_name: "Nelson"
+    gender: "Female"
+    nhs_number: "9992678140"
+    phone: "01234567827"
+    email: "deborah.nelson@example.com"
+    date_of_birth: "1970-02-14"
+    ethnic_background_id: "white_other"
+    risk_level: "Family History"
+    extra_needs: {}

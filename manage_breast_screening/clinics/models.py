@@ -143,6 +143,11 @@ class ClinicSlot(BaseModel):
     def provider(self):
         return self.clinic.provider
 
+    def __str__(self):
+        return (
+            self.clinic.setting.name + " " + self.starts_at.strftime("%Y-%m-%d %H:%M")
+        )
+
 
 class ClinicStatus(models.Model):
     SCHEDULED = "SCHEDULED"
