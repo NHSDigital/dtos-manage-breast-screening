@@ -13,9 +13,41 @@ providers:
               - id: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
                 duration_in_minutes: 8
                 starts_at_time: "12:00"
+                appointment:
+                  id: a0990379-b65d-4d1f-b298-e09d6207198f
+                  screening_episode:
+                    id: f6c3dfd6-e45e-431f-9a54-91112170f635
+                    participant:
+                      id: 2b87d44f-637b-44a7-9dfd-1e57f37d04ea
+                      first_name: "Dianna"
+                      last_name: "McIntosh"
+                      gender: "Female"
+                      nhs_number: "9992678102"
+                      phone: "01184960245"
+                      email: "demetrius97@example.com"
+                      date_of_birth: "1964-03-15"
+                      ethnic_background_id: "english_welsh_scottish_ni_british"
+                      risk_level: "Family History"
+                      extra_needs: {}
               - id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
                 duration_in_minutes: 8
                 starts_at_time: "12:08"
+                appointment:
+                  id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e 
+                  screening_episode:
+                    id: 75cec7c1-58fc-48d7-b951-98034a4fdd4a 
+                    participant:
+                      id: 2b87d44f-637b-44a7-9dfd-1e57f37d04ea
+                      first_name: "Dianna"
+                      last_name: "McIntosh"
+                      gender: "Female"
+                      nhs_number: "9992678102"
+                      phone: "01184960245"
+                      email: "demetrius97@example.com"
+                      date_of_birth: "1964-03-15"
+                      ethnic_background_id: "english_welsh_scottish_ni_british"
+                      risk_level: "Family History"
+                      extra_needs: {}
               - id: 3c4d5e6f-7a8b-9c0d-1e2f-3a4b5c6d7e8f
                 duration_in_minutes: 8
                 starts_at_time: "12:16"
