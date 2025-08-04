@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.forms import Form
+from django.forms import Form, Textarea
 from pytest_django.asserts import assertHTMLEqual
 
 from ..form_fields import CharField, SplitDateField
@@ -182,7 +182,7 @@ class TestCharField:
             field_with_visually_hidden_label = CharField(
                 label="Abc",
                 initial="somevalue",
-                label_visually_hidden=True,
+                label_classes="nhsuk-u-visually-hidden",
             )
             field_with_hint = CharField(
                 label="With hint", initial="", hint="ALL UPPERCASE"
@@ -190,6 +190,11 @@ class TestCharField:
             field_with_classes = CharField(
                 label="With classes", initial="", classes="nhsuk-u-width-two-thirds"
             )
+            textfield = CharField(
+                label="Text",
+                widget=Textarea(attrs={"rows": "3", "autocomplete": "autocomplete"}),
+            )
+            textfield_simple = CharField(label="Text", widget=Textarea)
 
         return TestForm
 
@@ -269,4 +274,30 @@ class TestCharField:
                 <input class="nhsuk-input nhsuk-input--error" id="id_field" name="field" type="text" value="reallylongvalue" aria-describedby="id_field-error">
             </div>
             """,
+        )
+
+    def test_textarea_renders_textarea(self, form_class):
+        assertHTMLEqual(
+            form_class()["textfield"].as_field_group(),
+            """
+                <div class="nhsuk-form-group">
+                    <label class="nhsuk-label" for="id_textfield">
+                        Text
+                    </label>
+                    <textarea class="nhsuk-textarea" id="id_textfield" name="textfield" rows=" 3 " autocomplete="autocomplete"></textarea>
+                </div>
+                """,
+        )
+
+    def test_textarea_class_renders_textarea(self, form_class):
+        assertHTMLEqual(
+            form_class()["textfield_simple"].as_field_group(),
+            """
+                <div class="nhsuk-form-group">
+                    <label class="nhsuk-label" for="id_textfield_simple">
+                        Text
+                    </label>
+                    <textarea class="nhsuk-textarea" id="id_textfield_simple" name="textfield_simple" rows=" 10 "></textarea>
+                </div>
+                """,
         )

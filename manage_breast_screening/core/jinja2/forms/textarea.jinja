@@ -1,6 +1,7 @@
-{% from "input/macro.jinja" import input %}
+{% from "textarea/macro.jinja" import textarea %}
 {% set unbound_field = field.field %}
-{% set input_params = {
+{% set widget = unbound_field.widget %}
+{% set textarea_params = {
     "label": {
       "text": field.label,
       "classes": unbound_field.label_classes if unbound_field.label_classes
@@ -11,7 +12,10 @@
     "id": field.auto_id,
     "name": field.html_name,
     "value": field.value() or "",
-    "classes": unbound_field.classes if unbound_field.classes
+    "classes": unbound_field.classes if unbound_field.classes,
+    "rows": widget.attrs["rows"],
+    "cols": widget.attrs["cols"],
+    "autocomplete": widget.attrs["autocomplete"]
   } %}
   {% if field.errors %}
     {% set error_params = {
@@ -19,7 +23,8 @@
         "text": field.errors | first
       }
     } %}
-    {% set input_params = dict(input_params, **error_params) %}
+    {% set textarea_params = dict(textarea_params, **error_params) %}
   {% endif %}
 
-{{ input(input_params) }}
+{{ textarea(textarea_params) }}
+
