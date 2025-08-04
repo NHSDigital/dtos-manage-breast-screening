@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta
 
 import yaml
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from manage_breast_screening.clinics.models import (
@@ -40,8 +41,23 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     help = "Seed demo data"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--noinput", action="store_true", help="Do not prompt for confirmation"
+        )
+
     def handle(self, *args, **kwargs):
-        # TODO guard against runnning in production
+        if settings.DEBUG is False:
+            raise Exception("This command cannot be run in production")
+
+        if not kwargs["noinput"]:
+            confirm = input(
+                "You are about to delete everything and seed demo data. Are you sure? (yes/no)"
+            )
+            if confirm.strip().lower() != "yes":
+                self.stdout.write(self.style.ERROR("Cancelled."))
+                return
+
         self.reset_db()
         with open("manage_breast_screening/data/demo_data.yml", "r") as data_file:
             data = yaml.safe_load(data_file)
