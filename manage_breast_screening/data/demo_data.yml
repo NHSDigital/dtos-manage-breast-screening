@@ -9,6 +9,7 @@ providers:
             starts_at_date_relative_to_today_in_days: -10
             starts_at_time: "12:00"
             ends_at_time: "18:00"
+            status: CLOSED
             slots:
               - id: 1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d
                 duration_in_minutes: 8
@@ -33,7 +34,6 @@ providers:
                         id: 5c3e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
                         lines: [ "123 Sesame Street" ]
                         postcode: "SW1A 1BB"
-
               - id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
                 duration_in_minutes: 8
                 starts_at_time: "12:08"
@@ -99,16 +99,19 @@ providers:
             starts_at_date_relative_to_today_in_days: -5
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: CLOSED
             slots:
           - id: ed5e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
             starts_at_date_relative_to_today_in_days: 0
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: IN_PROGRESS
             slots:
           - id: 6f7a8b9c-0d1e-2f3a-4b5c-6d7e8f9a0b1c
             starts_at_date_relative_to_today_in_days: 10
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: SCHEDULED
             slots:
       - name: "East Tester BSU"
         id: 7e1d2c3b-4a5f-6e7d-8c9b-0a1f2e3d4c5b
@@ -117,21 +120,25 @@ providers:
             starts_at_date_relative_to_today_in_days: -10
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: CLOSED
             slots:
           - id: 1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b
             starts_at_date_relative_to_today_in_days: -5
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: CLOSED
             slots:
           - id: 2f3a4b5c-6d7e-8f9a-0b1c-2d3e4f5a6b7c
             starts_at_date_relative_to_today_in_days: 0
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: IN_PROGRESS
             slots:
           - id: 4b5c6d7e-8f9a-0b1c-2d3e-4f5a6b7c8d9e
             starts_at_date_relative_to_today_in_days: 10
             starts_at_time: "09:00"
             ends_at_time: "13:00"
+            status: SCHEDULED
             slots:
       
     
