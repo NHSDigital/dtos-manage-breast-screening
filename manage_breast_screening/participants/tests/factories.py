@@ -22,6 +22,7 @@ class ParticipantAddressFactory(DjangoModelFactory):
 class ParticipantFactory(DjangoModelFactory):
     class Meta:
         model = models.Participant
+        skip_postgeneration_save = True
 
     first_name = "Janet"
     last_name = "Williams"
