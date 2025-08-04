@@ -26,6 +26,7 @@ from manage_breast_screening.participants.models import (
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    ParticipantAddressFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
 )
@@ -108,7 +109,9 @@ class Command(BaseCommand):
 
     def create_screening_episode(self, screening_episode_key):
         if "participant" in screening_episode_key:
-            participant = self.create_participant(**screening_episode_key["participant"])
+            participant = self.create_participant(
+                **screening_episode_key["participant"]
+            )
 
         return ScreeningEpisodeFactory(
             id=screening_episode_key["id"],
@@ -116,7 +119,13 @@ class Command(BaseCommand):
         )
 
     def create_participant(self, **participant_key):
-        return ParticipantFactory(**participant_key)
+        address_key = participant_key.pop("address", None)
+        previous_mammograms_key = participant_key.pop("previous_mammograms", [])
+        participant = ParticipantFactory(**participant_key, address=None)
+
+        if address_key is not None:
+            ParticipantAddressFactory(**address_key, participant=participant)
+        return participant
 
     def reset_db(self):
         AppointmentStatus.objects.all().delete()
