@@ -29,6 +29,11 @@ providers:
                       ethnic_background_id: "english_welsh_scottish_ni_british"
                       risk_level: "Family History"
                       extra_needs: {}
+                      address:
+                        id: 5c3e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
+                        lines: [ "123 Sesame Street" ]
+                        postcode: "SW1A 1BB"
+
               - id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
                 duration_in_minutes: 8
                 starts_at_time: "12:08"

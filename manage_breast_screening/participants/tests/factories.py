@@ -36,6 +36,7 @@ class ParticipantAddressFactory(DjangoModelFactory):
 
     class Meta:
         model = models.ParticipantAddress
+        django_get_or_create = ("participant", "lines", "postcode")
 
 
 class ScreeningEpisodeFactory(DjangoModelFactory):
