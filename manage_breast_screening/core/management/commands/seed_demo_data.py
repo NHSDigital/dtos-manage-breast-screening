@@ -69,9 +69,14 @@ class Command(BaseCommand):
             starts_at.date(),
             datetime.strptime(clinic_key["ends_at_time"], "%H:%M").time(),
         )
+        current_status = clinic_key.get("status", ClinicStatus.SCHEDULED)
 
         clinic = ClinicFactory(
-            setting=setting, id=clinic_key["id"], starts_at=starts_at, ends_at=ends_at
+            setting=setting,
+            id=clinic_key["id"],
+            starts_at=starts_at,
+            ends_at=ends_at,
+            current_status=current_status,
         )
 
         slots = clinic_key.get("slots")
