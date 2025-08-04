@@ -16,6 +16,10 @@ providers:
                 starts_at_time: "12:00"
                 appointment:
                   id: a0990379-b65d-4d1f-b298-e09d6207198f
+                  statuses: 
+                    - CONFIRMED
+                    - CHECKED_IN
+                    - SCREENED
                   screening_episode:
                     id: f6c3dfd6-e45e-431f-9a54-91112170f635
                     participant:
@@ -39,6 +43,9 @@ providers:
                 starts_at_time: "12:08"
                 appointment:
                   id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e 
+                  statuses: 
+                    - CONFIRMED
+                    - CHECKED_IN
                   screening_episode:
                     id: 75cec7c1-58fc-48d7-b951-98034a4fdd4a 
                     participant:

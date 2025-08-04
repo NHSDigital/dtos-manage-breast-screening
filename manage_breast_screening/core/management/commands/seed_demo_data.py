@@ -26,6 +26,7 @@ from manage_breast_screening.participants.models import (
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    AppointmentStatusFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
@@ -106,11 +107,19 @@ class Command(BaseCommand):
                 appointment_key["screening_episode"]
             )
 
-        return AppointmentFactory(
+        appointment = AppointmentFactory(
             clinic_slot=clinic_slot,
             id=appointment_key["id"],
             screening_episode=screening_episode,
         )
+
+        for status_key in appointment_key.get("statuses", []):
+            AppointmentStatusFactory(
+                appointment=appointment,
+                state=status_key,
+            )
+
+        return appointment
 
     def create_screening_episode(self, screening_episode_key):
         if "participant" in screening_episode_key:
