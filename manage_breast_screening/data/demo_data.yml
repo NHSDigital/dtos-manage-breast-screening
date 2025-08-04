@@ -42,6 +42,13 @@ providers:
                         id: 5c3e6f7a-8b9c-0d1e-2f3a-4b5c6d7e8f9a
                         lines: [ "123 Sesame Street" ]
                         postcode: "SW1A 1BB"
+                      previous_mammograms:
+                        - location_type: NHS_BREAST_SCREENING_UNIT
+                          provider: 
+                            id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+                            name: "West Tester Hospital Trust"
+                          location_details: "In the radiology department"
+                          exact_date: "2025-07-25"
               - id: 2b3c4d5e-6f7a-8b9c-0d1e-2f3a4b5c6d7e
                 duration_in_minutes: 8
                 starts_at_time: "12:08"

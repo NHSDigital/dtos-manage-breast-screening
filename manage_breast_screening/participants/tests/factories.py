@@ -5,7 +5,10 @@ from factory.declarations import SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
-from manage_breast_screening.clinics.tests.factories import ClinicSlotFactory
+from manage_breast_screening.clinics.tests.factories import (
+    ClinicSlotFactory,
+    ProviderFactory,
+)
 
 from .. import models
 
@@ -37,6 +40,17 @@ class ParticipantAddressFactory(DjangoModelFactory):
     class Meta:
         model = models.ParticipantAddress
         django_get_or_create = ("participant", "lines", "postcode")
+
+
+class ParticipantReportedMammogramFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ParticipantReportedMammogram
+
+    participant = SubFactory(ParticipantFactory)
+    location_type = (
+        models.ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+    )
+    provider = SubFactory(ProviderFactory)
 
 
 class ScreeningEpisodeFactory(DjangoModelFactory):

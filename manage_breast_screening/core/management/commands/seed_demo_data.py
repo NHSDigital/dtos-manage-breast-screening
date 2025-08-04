@@ -22,6 +22,7 @@ from manage_breast_screening.participants.models import (
     AppointmentStatus,
     Participant,
     ParticipantAddress,
+    ParticipantReportedMammogram,
     ScreeningEpisode,
 )
 from manage_breast_screening.participants.tests.factories import (
@@ -29,6 +30,7 @@ from manage_breast_screening.participants.tests.factories import (
     AppointmentStatusFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
+    ParticipantReportedMammogramFactory,
     ScreeningEpisodeFactory,
 )
 
@@ -134,14 +136,30 @@ class Command(BaseCommand):
 
     def create_participant(self, **participant_key):
         address_key = participant_key.pop("address", None)
+        previous_mammograms_key = participant_key.pop("previous_mammograms", [])
         participant = ParticipantFactory(**participant_key)
         if address_key is not None:
             ParticipantAddressFactory(**address_key, participant=participant)
+
+        self.create_reported_mammograms(participant, previous_mammograms_key)
         return participant
+
+    def create_reported_mammograms(self, participant, mammograms):
+        for mammogram in mammograms:
+            if mammogram["provider"] is not None:
+                mammogram["provider"] = ProviderFactory(
+                    id=mammogram["provider"]["id"],
+                    name=mammogram["provider"]["name"],
+                )
+            ParticipantReportedMammogramFactory(
+                participant=participant,
+                **mammogram,
+            )
 
     def reset_db(self):
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
+        ParticipantReportedMammogram.objects.all().delete()
         ScreeningEpisode.objects.all().delete()
         ParticipantAddress.objects.all().delete()
         Participant.objects.all().delete()
