@@ -1,11 +1,14 @@
 from datetime import date
 
-from factory import Trait, post_generation, Sequence
+from factory import Sequence, Trait, post_generation
 from factory.declarations import RelatedFactory, SubFactory
-from factory.declarations import SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
-from manage_breast_screening.clinics.tests.factories import ClinicSlotFactory
+
+from manage_breast_screening.clinics.tests.factories import (
+    ClinicSlotFactory,
+    ProviderFactory,
+)
 
 from .. import models
 
@@ -18,6 +21,7 @@ class ParticipantAddressFactory(DjangoModelFactory):
     class Meta:
         model = models.ParticipantAddress
         django_get_or_create = ("participant", "lines", "postcode")
+
 
 class ParticipantFactory(DjangoModelFactory):
     class Meta:
@@ -40,6 +44,27 @@ class ParticipantFactory(DjangoModelFactory):
     address = RelatedFactory(
         ParticipantAddressFactory, factory_related_name="participant"
     )
+
+
+class ParticipantReportedMammogramFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ParticipantReportedMammogram
+
+    participant = SubFactory(ParticipantFactory)
+    location_type = (
+        models.ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+    )
+    provider = SubFactory(ProviderFactory)
+
+    class Params:
+        outside_uk = Trait(
+            location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
+            location_details="france",
+        )
+        elsewhere_uk = Trait(
+            location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
+            location_details="private provider",
+        )
 
 
 class ScreeningEpisodeFactory(DjangoModelFactory):
@@ -82,20 +107,4 @@ class AppointmentFactory(DjangoModelFactory):
 
         obj.statuses.add(
             AppointmentStatusFactory.create(state=extracted, appointment=obj)
-        )
-
-
-class ParticipantReportedMammogramFactory(DjangoModelFactory):
-    class Meta:
-        model = models.ParticipantReportedMammogram
-        skip_postgeneration_save = True
-
-    class Params:
-        outside_uk = Trait(
-            location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
-            location_details="france",
-        )
-        elsewhere_uk = Trait(
-            location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
-            location_details="private provider",
         )
