@@ -1,0 +1,706 @@
+clinic:
+  id: 31906a0b-7d58-41e1-a332-c63ce53cef6e
+  starts_at_date_relative_to_today_in_days: 0
+  starts_at_time: 09:00
+  ends_at_time: '12:04'
+  status: IN_PROGRESS
+  slots:
+    - id: 4c3c65ec-e5df-4169-bbb9-013e25871d24
+      duration_in_minutes: 8
+      starts_at_time: 09:00
+      appointment:
+        id: 18e767b7-243e-4d2a-b4e6-2c8d5a3c05a1
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: a4904aa9-175e-4e99-a386-c83db4d5beff
+          participant:
+            id: 3c0245d6-ab25-4407-b683-7df9759187b3
+            first_name: Claire
+            last_name: Roberts
+            gender: Female
+            nhs_number: '93789431253'
+            phone: +44 7321300223
+            email: claireroberts@example.com
+            date_of_birth: '1958-04-16'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 2ab60f7f-8b1c-40c6-a85e-b227105f0db0
+              lines:
+                - 216 Clinic Road
+                - Sheffield
+              postcode: L3 4N8
+    - id: 85c73ada-3a17-4df3-91fe-1b0ee0648670
+      duration_in_minutes: 8
+      starts_at_time: 09:08
+      appointment:
+        id: df572ff6-9720-41fc-a8a5-f5cc456f9b42
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: b33ce2c9-6b96-4975-9439-3beb60333d4e
+          participant:
+            id: a52b5473-9efa-4630-ad1b-0a47bfbe1cf5
+            first_name: Holly
+            last_name: Morgan
+            gender: Female
+            nhs_number: '9352349976'
+            phone: +44(0)20 74960337
+            email: hollymorgan@example.com
+            date_of_birth: '1964-01-30'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: bab2825e-fe34-4860-a133-74b3f95b6cdb
+              lines:
+                - 8 Joanna mill
+              postcode: DN4 5PH
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+                  name: West Tester Hospital Trust
+                location_details: In the radiology department
+                exact_date: '2025-07-25'
+    - id: eacda9e2-1df6-4c28-879a-34e32383c929
+      duration_in_minutes: 8
+      starts_at_time: 09:16
+      appointment:
+        id: 874758d2-3bfe-4374-911d-570b7d0f3616
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: 9bbdccba-ce84-4cc6-b980-da147c0d6d15
+          participant:
+            id: 354f0ad7-e13b-4409-ad6f-5444de85a155
+            first_name: Lydia
+            last_name: Moore
+            gender: Female
+            nhs_number: '9811492822'
+            phone: +44(0)117 4960377
+            email: lydiamoore@example.com
+            date_of_birth: '1955-10-30'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: cbd3c93a-4d46-47cb-adda-c5e707ab76e1
+              lines:
+                - Flat 27
+                - Stacey drive
+              postcode: N4B 3AF
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+                  name: West Tester Hospital Trust
+                location_details: In the radiology department
+                exact_date: '2025-07-25'
+    - id: 8b2d4038-9169-434e-8300-f898f288d22b
+      duration_in_minutes: 8
+      starts_at_time: 09:24
+      appointment:
+        id: 1e902fec-b085-4705-836c-a78727cc6cf3
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: 3b6b2da9-9dda-415d-89d7-f4c5b5ec029a
+          participant:
+            id: 7ecfafba-8727-4d41-8658-ecab1b077637
+            first_name: Jacqueline
+            last_name: Pickering
+            gender: Female
+            nhs_number: '9671794619'
+            phone: (0113)4960336
+            email: jacquelinepickering@example.com
+            date_of_birth: '1957-08-22'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 0946d552-b202-4848-addd-5a9ac0d94e06
+              lines:
+                - 8 Webb via
+              postcode: E0 9ST
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 9150816a-1bd1-4bb3-abdd-3670016e0d2a
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-03-08'
+    - id: 39d55eeb-d46a-474c-a368-0934168a40eb
+      duration_in_minutes: 8
+      starts_at_time: 09:32
+      appointment:
+        id: b8dd7cc9-db62-45a1-9b95-e274f71cdb70
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: 0314777f-907c-4372-a137-e067f15a7662
+          participant:
+            id: ef19c395-d24a-4cda-ae5f-5658297e3439
+            first_name: Samantha
+            last_name: Ross
+            gender: Female
+            nhs_number: '9383255126'
+            phone: '+441632960692'
+            email: samanthaross@example.com
+            date_of_birth: '1969-06-04'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 381706d2-6b1e-4d27-92fb-8e84a35448c9
+              lines:
+                - 620 Marshall spring
+              postcode: W8 9GZ
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 071ae2e4-3750-46f6-88ae-f0f2ae828fa9
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-09-10'
+    - id: 33e30fe8-0c9b-470f-9c34-c008df8ec7ed
+      duration_in_minutes: 8
+      starts_at_time: 09:40
+      appointment:
+        id: 1f76cf7f-704a-4378-8beb-28f12eadf538
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: e7863f06-9d4a-47e3-aaf3-9aaa321ef185
+          participant:
+            id: 91c01416-f18a-43ed-bff6-8c7f088079b4
+            first_name: Emily
+            last_name: Roberts
+            gender: Female
+            nhs_number: '92120397199'
+            phone: +44 7373552664
+            email: emilyroberts@example.com
+            date_of_birth: '1962-10-03'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: d0f9cf0c-777d-4198-99d1-2bc10140b31b
+              lines:
+                - 129 Clinic Road
+                - Oxford
+              postcode: N6 1H8
+    - id: 64c5b718-c946-47d7-8133-4ed8e230d1a2
+      duration_in_minutes: 8
+      starts_at_time: 09:48
+      appointment:
+        id: dad166a4-a130-4385-8289-8cadceda3134
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+        screening_episode:
+          id: ed5c05b4-dee4-4563-a8c4-91c544419cf7
+          participant:
+            id: b61fd931-60a4-415e-a4fa-d2aae6a81899
+            first_name: Claire
+            last_name: Wilson
+            gender: Female
+            nhs_number: '97181097455'
+            phone: +44 7169861622
+            email: clairewilson@example.com
+            date_of_birth: '1967-09-23'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: ab2be8eb-1a19-4280-a8bd-09999b81675c
+              lines:
+                - 521 Clinic Road
+                - Sheffield
+              postcode: L9 7E4
+    - id: 4d90dc01-aa6f-4fc3-8533-ebdf39b7620f
+      duration_in_minutes: 8
+      starts_at_time: 09:56
+      appointment:
+        id: 61c020bd-a74d-488f-b2d3-e7cfb32f5397
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: a93556f7-2b15-438d-b6a5-e3b362e3eabd
+          participant:
+            id: 86cd887d-8f0f-4cd2-a486-8151c2488143
+            first_name: Linda
+            last_name: Brown
+            gender: Female
+            nhs_number: '96220910530'
+            phone: +44 7573604447
+            email: lindabrown@example.com
+            date_of_birth: '1958-12-20'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 3d3a969e-948d-4e63-b775-c4bc6e176212
+              lines:
+                - 845 Clinic Road
+                - Oxford
+              postcode: N2 2T7
+    - id: 444165ee-efc1-4e5a-a58c-b8232c490795
+      duration_in_minutes: 8
+      starts_at_time: '10:04'
+      appointment:
+        id: 7ea8ffdb-319b-4663-9c92-0cb47f73f04f
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 75faf69a-36c0-4284-9433-361330cb3799
+          participant:
+            id: c119e4a2-314a-43e6-8f91-189e337d5fde
+            first_name: Angela
+            last_name: Jones
+            gender: Female
+            nhs_number: '94499812848'
+            phone: +44 7316627309
+            email: angelajones@example.com
+            date_of_birth: '1956-05-27'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: b967fe65-4a36-41a7-a019-13da11d6dbc9
+              lines:
+                - 958 Clinic Road
+                - Sheffield
+              postcode: M5 4D4
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: e4c7dc12-0062-4ab0-8d93-247d012b20d1
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-01-23'
+    - id: 9eb6d400-3895-4858-a7e1-bb24ce89b26a
+      duration_in_minutes: 8
+      starts_at_time: '10:12'
+      appointment:
+        id: 03b0566c-c95e-44c8-8843-aba9daf72bf4
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: b02ac8db-2d36-47b8-bebb-d47881a4a4be
+          participant:
+            id: 672d27db-f68a-4525-9929-12154e72a268
+            first_name: Paula
+            last_name: Thomas
+            gender: Female
+            nhs_number: '97443370992'
+            phone: +44 7688159865
+            email: paulathomas@example.com
+            date_of_birth: '1954-11-05'
+            ethnic_background_id: irish
+            risk_level: Family History
+            address:
+              id: 2f921b37-d4a2-4d16-bf64-47d4e4c91bd5
+              lines:
+                - 723 Clinic Road
+                - Oxford
+              postcode: N6 6R7
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 25828dd3-13ce-4099-afc8-68cb5f25ca97
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-08-26'
+    - id: afa1ff13-08fb-4f1a-9e35-bd7cd49ad143
+      duration_in_minutes: 8
+      starts_at_time: '10:20'
+      appointment:
+        id: b612d9b3-ec6d-4926-b876-d74039ac3e5b
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 40ee4233-3b26-4a55-bbce-8f4ced6f3dce
+          participant:
+            id: 3370416e-0406-4993-8184-191be88c843b
+            first_name: Sarah
+            last_name: Taylor
+            gender: Female
+            nhs_number: '94767493355'
+            phone: +44 7629212165
+            email: sarahtaylor@example.com
+            date_of_birth: '1957-10-03'
+            ethnic_background_id: chinese
+            risk_level: Family History
+            address:
+              id: 5e934a41-9570-45a0-b9ed-5ce1cba87177
+              lines:
+                - 4 Clinic Road
+                - Sheffield
+              postcode: M5 9T3
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 462f5422-729c-46bd-acda-f1efbfef004f
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-09-02'
+    - id: 28348d1a-ebd1-4609-8f56-1ff2732f26bb
+      duration_in_minutes: 8
+      starts_at_time: '10:28'
+      appointment:
+        id: 69aed1ec-cfeb-484d-9062-e4231e413abd
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 38eef545-be14-4d5d-8067-cdb707f0699c
+          participant:
+            id: e6f37bc4-6b63-41e0-9cd3-3553314230ed
+            first_name: Susan
+            last_name: Roberts
+            gender: Female
+            nhs_number: '95868538491'
+            phone: +44 7714871750
+            email: susanroberts@example.com
+            date_of_birth: '1969-04-22'
+            ethnic_background_id: african
+            risk_level: Family History
+            address:
+              id: ff55ab97-bf9b-49fb-b745-b03112c827e0
+              lines:
+                - 831 Clinic Road
+                - Cardiff
+              postcode: L4 7C7
+    - id: cf6814f7-8334-47b5-a658-12175877ddf8
+      duration_in_minutes: 8
+      starts_at_time: '10:36'
+      appointment:
+        id: 5468e8d2-52ba-49a2-86b1-ac7b397c681f
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: b192b981-61f2-47bf-b6b2-fe4431545bcc
+          participant:
+            id: 93ff2cb5-bace-404a-9732-ce781b3da136
+            first_name: Dawn
+            last_name: Nixon
+            gender: Female
+            nhs_number: '9730179171'
+            phone: 02074960254
+            email: dawnnixon@example.com
+            date_of_birth: '1962-01-14'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: fe41aa63-9277-4d85-aacf-3c36fc08a505
+              lines:
+                - Flat 2
+                - Zoe ford
+              postcode: L8 0ZG
+    - id: 062e7e2c-d5f2-4f27-be98-0cc6795197b3
+      duration_in_minutes: 8
+      starts_at_time: '10:44'
+      appointment:
+        id: dc71df54-bbef-46b0-826f-27ca904da20d
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 124e433b-115c-4453-a789-de09090356f0
+          participant:
+            id: d58a4d3a-4169-455d-ae5b-0361696cf8b0
+            first_name: Karen
+            last_name: Davies
+            gender: Female
+            nhs_number: '91368361451'
+            phone: +44 7318419738
+            email: karendavies@example.com
+            date_of_birth: '1959-02-11'
+            ethnic_background_id: any_other_white_background
+            risk_level: Family History
+            address:
+              id: f4ebbc89-0bb6-4410-aaad-9235422cc047
+              lines:
+                - 708 Clinic Road
+                - Cardiff
+              postcode: N2 9G6
+    - id: 70e2cfaf-5986-4fa7-9cc9-722580d6f35b
+      duration_in_minutes: 8
+      starts_at_time: '10:52'
+      appointment:
+        id: d93decaa-7c32-4227-893a-fd553861b809
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: e33d6b8d-f999-465b-9be2-2d2855db3de6
+          participant:
+            id: 7820c919-3fe2-4be8-b16c-834fd43d8490
+            first_name: Amanda
+            last_name: Wilson
+            gender: Female
+            nhs_number: '94766508430'
+            phone: +44 7327571049
+            email: amandawilson@example.com
+            date_of_birth: '1953-09-11'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: ac1d1a38-2f68-4629-8c9c-dfa722ea5c69
+              lines:
+                - 38 Clinic Road
+                - Sheffield
+              postcode: N5 2M9
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 05ce8efc-1bb5-41fe-8660-a466f7759dfb
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-11-05'
+    - id: cdf895d7-6d26-417e-9bb8-d0243c00263f
+      duration_in_minutes: 8
+      starts_at_time: '11:00'
+      appointment:
+        id: 689a0344-d549-4902-995f-daad31c1dc73
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: b62ec7bb-4da1-46d7-acdf-73b462c414d0
+          participant:
+            id: 1013acf5-d47e-4d64-9fb4-7596d70229b3
+            first_name: Gillian
+            last_name: Duffy
+            gender: Female
+            nhs_number: '9969985171'
+            phone: +4428 9018 0825
+            email: gillianduffy@example.com
+            date_of_birth: '1958-10-06'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: ae9cb9d1-1cf6-4bd7-8319-fee14700f839
+              lines:
+                - Flat 0
+                - Johnston light
+              postcode: E4 6HL
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+                  name: West Tester Hospital Trust
+                location_details: In the radiology department
+                exact_date: '2025-07-25'
+    - id: 160b588b-6a73-47b0-8120-8844068c9c84
+      duration_in_minutes: 8
+      starts_at_time: '11:08'
+      appointment:
+        id: 5ada971f-8be0-4dc4-8ba8-b1265cf32368
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: c4a3792e-8654-4a83-ba3e-145a158cc973
+          participant:
+            id: 216645d6-8d39-457c-b6ac-d18d20d9d22d
+            first_name: Donna
+            last_name: Walker
+            gender: Female
+            nhs_number: '93995995206'
+            phone: +44 7273338078
+            email: donnawalker@example.com
+            date_of_birth: '1973-11-15'
+            ethnic_background_id: irish
+            risk_level: Family History
+            address:
+              id: fb6111cb-da0a-4b4b-ba82-5f02b5d18dad
+              lines:
+                - 433 Clinic Road
+                - Oxford
+              postcode: L1 5L2
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 44a51eb0-00a5-41a0-966f-7de17693065a
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-09-15'
+    - id: 61657add-7f91-43a7-b60a-7ed4228fbf79
+      duration_in_minutes: 8
+      starts_at_time: '11:16'
+      appointment:
+        id: 01328da1-013a-4c1d-ba4d-558bf43e33a3
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: d390c3f9-e46a-4c30-92c3-a2a4f9935400
+          participant:
+            id: 236fb859-2d81-42a0-b0be-f9837f8e7415
+            first_name: Deborah
+            last_name: Hughes
+            gender: Female
+            nhs_number: '9873680892'
+            phone: +44(0)114 4960839
+            email: deborahhughes@example.com
+            date_of_birth: '1970-11-18'
+            ethnic_background_id: any_other_mixed_or_multiple_ethnic_background
+            risk_level: Family History
+            address:
+              id: 3decc4d8-b22c-484e-84c8-2f2c785c7d4b
+              lines:
+                - 0 Sullivan squares
+              postcode: B8C 0HT
+    - id: e7599d8d-17df-44e6-8ac5-1e7115cdb8b4
+      duration_in_minutes: 8
+      starts_at_time: '11:24'
+      appointment:
+        id: 877505c0-b904-48fe-b7fc-976f3a034113
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: a43f40f3-ffcf-437c-a841-ef7f5777f4d6
+          participant:
+            id: d430f395-8898-4f9b-aae2-debd8d398e9a
+            first_name: Ruth
+            last_name: Edwards
+            gender: Female
+            nhs_number: '9487211025'
+            phone: 0116 4960600
+            email: ruthedwards@example.com
+            date_of_birth: '1952-04-15'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 5f20d436-ec06-41aa-9597-7a9a513a1e7d
+              lines:
+                - 63 Christian mall
+              postcode: GY7Y 5AP
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 5426770d-68b3-4208-bdb8-6e1f73fedc3f
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-04-03'
+    - id: 989966b5-a4d8-4a31-8a38-7407d8df2e71
+      duration_in_minutes: 8
+      starts_at_time: '11:32'
+      appointment:
+        id: a9bd9d8c-d13a-47bd-87a4-0cddd232b050
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 37800ca4-376a-4992-8c34-b934aa4a569e
+          participant:
+            id: d2ea1ef2-c25f-43ba-a6cb-012527d29b98
+            first_name: Linda
+            last_name: Wright
+            gender: Female
+            nhs_number: '92886166850'
+            phone: +44 7165217627
+            email: lindawright@example.com
+            date_of_birth: '1972-07-04'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 7cd50d5c-2cea-4739-b129-e0488d1c6d01
+              lines:
+                - 563 Clinic Road
+                - Sheffield
+              postcode: M6 6N4
+    - id: fc38b836-22df-46c1-975d-e05d9c8140c0
+      duration_in_minutes: 8
+      starts_at_time: '11:40'
+      appointment:
+        id: 22d26fb6-b15c-4e0b-ad21-2acdd054acb3
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 6ebb5a46-5809-4fd9-bfaf-a9ba44b4a667
+          participant:
+            id: ad81963c-595a-447e-b060-f9e03f4c2e0f
+            first_name: Annette
+            last_name: Kelly
+            gender: Female
+            nhs_number: '9867699115'
+            phone: +44118 496 0193
+            email: annettekelly@example.com
+            date_of_birth: '1968-11-10'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: ad21d8c9-9c3e-4273-a199-428b9df54f1f
+              lines:
+                - 96 Ann court
+              postcode: G8 2LA
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+                  name: West Tester Hospital Trust
+                location_details: In the radiology department
+                exact_date: '2025-07-25'
+    - id: c09d8676-953d-4643-8cf7-ebb7328e4bae
+      duration_in_minutes: 8
+      starts_at_time: '11:48'
+      appointment:
+        id: 1cbea52c-e47d-45e6-a12d-360b37056131
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: d693cbd0-24f5-4d67-addd-29c608ce1537
+          participant:
+            id: 1db2243e-e710-4337-a0f0-6bcbb615985e
+            first_name: Susan
+            last_name: Edwards
+            gender: Female
+            nhs_number: '96223638758'
+            phone: +44 7248343820
+            email: susanedwards@example.com
+            date_of_birth: '1966-04-15'
+            ethnic_background_id: indian
+            risk_level: Family History
+            address:
+              id: fd3b02e1-8424-455e-a38d-5aca5a4f0c44
+              lines:
+                - 588 Clinic Road
+                - Cardiff
+              postcode: M1 3X1
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: f772c980-3ae8-4ce3-ad11-558dc1f9a43b
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-08-09'
+    - id: c021e085-1d86-4abd-92f8-da5b837f4f8c
+      duration_in_minutes: 8
+      starts_at_time: '11:56'
+      appointment:
+        id: 0a382d89-0042-49b8-87ba-fa0d9c817fd3
+        statuses:
+          - CONFIRMED
+        screening_episode:
+          id: 1ddfad46-b4de-47b9-b2ce-50a76e2d1a57
+          participant:
+            id: edfce63d-2cbf-4f2e-b994-3df190c9ab9d
+            first_name: Danielle
+            last_name: Gardner
+            gender: Female
+            nhs_number: '9972218163'
+            phone: +44191 4960373
+            email: daniellegardner@example.com
+            date_of_birth: '1955-09-20'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: af0bb112-6b2b-4b97-a020-ca50abe0eec3
+              lines:
+                - Studio 58
+                - Patrick road
+              postcode: TR25 1HS

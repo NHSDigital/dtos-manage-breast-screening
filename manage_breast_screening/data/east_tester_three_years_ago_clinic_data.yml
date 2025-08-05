@@ -1,0 +1,847 @@
+clinic:
+  id: 1a9c0e2d-3407-456e-8bb3-76148083c8dc
+  starts_at_date_relative_to_today_in_days: -1095
+  starts_at_time: 09:00
+  ends_at_time: '12:44'
+  status: CLOSED
+  slots:
+    - id: b860d233-2ab1-496c-96cb-e2dad9653a32
+      duration_in_minutes: 8
+      starts_at_time: 09:00
+      appointment:
+        id: f33dec37-7de9-40f7-8971-99abe28d9823
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 96344b59-36b9-4223-b9dd-725353c8bb41
+          participant:
+            id: 5e107b9a-6c9c-4fa0-9704-6a7862252fcf
+            first_name: Laura
+            last_name: Walker
+            gender: Female
+            nhs_number: '98249792297'
+            phone: +44 7837608469
+            email: laurawalker@example.com
+            date_of_birth: '1956-08-14'
+            ethnic_background_id: any_other_mixed_or_multiple_ethnic_background
+            risk_level: Family History
+            address:
+              id: 9cac9e60-d9a4-43e4-8f50-1c7c03466591
+              lines:
+                - 980 Clinic Road
+                - Brighton
+              postcode: N2 8M5
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 1fd2842e-5af5-462b-a83c-3c4380b62ca4
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-02-26'
+    - id: 648509e1-0f57-46a6-a6ab-13be655d1975
+      duration_in_minutes: 8
+      starts_at_time: 09:08
+      appointment:
+        id: 5d83831b-e173-4e7a-b7c1-74f7d6230059
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: b04c3f38-3871-4347-9cea-6ad1fb80d20e
+          participant:
+            id: 59ba745f-e3d0-407d-b0f6-8fb684c8dbf4
+            first_name: Donna
+            last_name: Wright
+            gender: Female
+            nhs_number: '94969501890'
+            phone: +44 7161646648
+            email: donnawright@example.com
+            date_of_birth: '1960-03-10'
+            ethnic_background_id: any_other_asian_background
+            risk_level: Family History
+            address:
+              id: d00aff22-f815-4ecb-8362-2afc6838697a
+              lines:
+                - 854 Clinic Road
+                - Birmingham
+              postcode: L6 2X4
+    - id: 067035bf-a23e-4814-8110-e3be7a15988e
+      duration_in_minutes: 8
+      starts_at_time: 09:16
+      appointment:
+        id: 3fcd62ae-699f-49ef-b3a4-4eb7b4076a51
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: c0eb0883-7138-4cc5-9643-95e4d7163a6e
+          participant:
+            id: 7be3acf6-e909-4a80-9344-4ef4f6b29188
+            first_name: Samantha
+            last_name: Thomas
+            gender: Female
+            nhs_number: '93836594649'
+            phone: +44 7862329540
+            email: samanthathomas@example.com
+            date_of_birth: '1961-09-09'
+            ethnic_background_id: white_and_black_caribbean
+            risk_level: Family History
+            address:
+              id: 817605d1-ac07-42d4-845f-4dfbab63d376
+              lines:
+                - 507 Clinic Road
+                - Brighton
+              postcode: L5 5U1
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: a918df78-d4eb-4bbe-9a35-3a650208c765
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-12-30'
+    - id: effddd1a-49f9-47ad-bcc9-4364707f8079
+      duration_in_minutes: 8
+      starts_at_time: 09:24
+      appointment:
+        id: 50b2834f-9976-4bff-b37f-4a7905e11ab3
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 8c0a1137-a0a0-41b9-8481-37103ec8a13e
+          participant:
+            id: 58f32532-16e4-479a-b093-e71f21e5370b
+            first_name: Samantha
+            last_name: Hall
+            gender: Female
+            nhs_number: '91861335818'
+            phone: +44 7665451507
+            email: samanthahall@example.com
+            date_of_birth: '1972-10-16'
+            ethnic_background_id: pakistani
+            risk_level: Family History
+            address:
+              id: 312a6a59-0efa-41c6-8731-fb0298b4a098
+              lines:
+                - 775 Clinic Road
+                - Leeds
+              postcode: L2 7A9
+    - id: 9ec30e95-5cde-46af-ac35-6a972747563c
+      duration_in_minutes: 8
+      starts_at_time: 09:32
+      appointment:
+        id: b4843161-76d8-4ded-8051-5da01c2949b5
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 8145f797-37bf-41c0-a0f5-fd4aff7d5cee
+          participant:
+            id: 878ca762-f376-4d49-8242-add577b8cc19
+            first_name: Sarah
+            last_name: Lewis
+            gender: Female
+            nhs_number: '99447990555'
+            phone: +44 7247372066
+            email: sarahlewis@example.com
+            date_of_birth: '1968-03-13'
+            ethnic_background_id: any_other_mixed_or_multiple_ethnic_background
+            risk_level: Family History
+            address:
+              id: 741d0856-e297-43f7-bacd-819627e8dc70
+              lines:
+                - 806 Clinic Road
+                - Leeds
+              postcode: B2 7E9
+    - id: 39e2922e-4107-4f4a-8703-25ad6618e67d
+      duration_in_minutes: 8
+      starts_at_time: 09:40
+      appointment:
+        id: c2ee0a38-2a3d-4f5e-8d3d-6bb04cc7a22b
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 73478e8f-a41d-40cd-8d0f-372e250658f3
+          participant:
+            id: de2870a5-c789-407d-a6aa-eb51f1165b32
+            first_name: Rachel
+            last_name: Walker
+            gender: Female
+            nhs_number: '96074491132'
+            phone: +44 7299822353
+            email: rachelwalker@example.com
+            date_of_birth: '1972-08-11'
+            ethnic_background_id: any_other_mixed_or_multiple_ethnic_background
+            risk_level: Family History
+            address:
+              id: 6e44375f-0ad2-485d-98ae-84c6e8826991
+              lines:
+                - 639 Clinic Road
+                - Brighton
+              postcode: B6 1K7
+    - id: 120870ec-7d53-4ae4-8505-968ede537a21
+      duration_in_minutes: 8
+      starts_at_time: 09:48
+      appointment:
+        id: 7d2f1772-3ebc-4971-a8c0-31e83bcc45e9
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 7170ffff-ce7e-4926-bac1-23ac9fef958b
+          participant:
+            id: 16311d66-19b4-4c2b-a8d0-5db3952fd1c5
+            first_name: Linda
+            last_name: Walker
+            gender: Female
+            nhs_number: '96832269696'
+            phone: +44 7229408359
+            email: lindawalker@example.com
+            date_of_birth: '1966-08-06'
+            ethnic_background_id: any_other_mixed_or_multiple_ethnic_background
+            risk_level: Family History
+            address:
+              id: 44f1d3d4-7005-4637-82b0-9feabf655f68
+              lines:
+                - 611 Clinic Road
+                - Leeds
+              postcode: L2 7E3
+    - id: e139bed3-7851-4a2e-85e5-c85fa267ab17
+      duration_in_minutes: 8
+      starts_at_time: 09:56
+      appointment:
+        id: 2c8a5d07-a26e-48ef-a980-8a66cc6a61b3
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: c1322603-c11c-4a0c-99e7-4865f142c547
+          participant:
+            id: c1f90827-5e8b-47e1-9f3e-736a661a44a1
+            first_name: Laura
+            last_name: Thomas
+            gender: Female
+            nhs_number: '98072825591'
+            phone: +44 7838179860
+            email: laurathomas@example.com
+            date_of_birth: '1968-03-19'
+            ethnic_background_id: indian
+            risk_level: Family History
+            address:
+              id: 4dd078b8-a7ea-4b58-ae6e-4f812774bd4e
+              lines:
+                - 90 Clinic Road
+                - Leeds
+              postcode: N4 5B2
+    - id: 7249d1a6-d8f7-420d-9133-66e14a0afb72
+      duration_in_minutes: 8
+      starts_at_time: '10:04'
+      appointment:
+        id: ef529057-3f81-4dc1-809a-3f4af756311e
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: ee8ed98c-5017-4b3b-8577-7566c31a3f3b
+          participant:
+            id: 1caff2a4-fa9c-4d0a-b073-286c3a806b8b
+            first_name: Angela
+            last_name: Green
+            gender: Female
+            nhs_number: '97148343491'
+            phone: +44 7607399235
+            email: angelagreen@example.com
+            date_of_birth: '1969-03-08'
+            ethnic_background_id: arab
+            risk_level: Family History
+            address:
+              id: 65d5339f-4d33-4d43-b4c7-95a5037506e0
+              lines:
+                - 237 Clinic Road
+                - Birmingham
+              postcode: M3 9C6
+    - id: 5a186044-60c3-4e5c-a746-816a4cd2cdf8
+      duration_in_minutes: 8
+      starts_at_time: '10:12'
+      appointment:
+        id: 3b113521-3606-46e7-b6f7-83beb0f6bd83
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 4cfafb06-20f6-4d6e-9983-1ac263d3f3ec
+          participant:
+            id: 6e9c9a0a-cf58-4988-a9d3-5e012a5e670f
+            first_name: Emily
+            last_name: Walker
+            gender: Female
+            nhs_number: '97808875527'
+            phone: +44 7788124431
+            email: emilywalker@example.com
+            date_of_birth: '1971-03-24'
+            ethnic_background_id: any_other_asian_background
+            risk_level: Family History
+            address:
+              id: 05a2e0c0-9323-471e-bf86-aa61a2cb108c
+              lines:
+                - 910 Clinic Road
+                - Brighton
+              postcode: B4 8N9
+    - id: 1caf1b5e-7c96-43a1-b047-9228413a3103
+      duration_in_minutes: 8
+      starts_at_time: '10:20'
+      appointment:
+        id: 6c3ae64c-e525-4180-b413-5cf880fa03d2
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: b545d66d-048b-4474-9037-304240bd7748
+          participant:
+            id: 34b2788b-f106-482f-80bc-a5654f672aaf
+            first_name: Rachel
+            last_name: Thomas
+            gender: Female
+            nhs_number: '97715735490'
+            phone: +44 7478045899
+            email: rachelthomas@example.com
+            date_of_birth: '1958-03-05'
+            ethnic_background_id: indian
+            risk_level: Family History
+            address:
+              id: 4989bbc9-bbd2-4455-bf35-53448caf13cd
+              lines:
+                - 85 Clinic Road
+                - Brighton
+              postcode: L9 7G8
+    - id: 3da65591-b194-4ea5-aa83-4259780e137a
+      duration_in_minutes: 8
+      starts_at_time: '10:28'
+      appointment:
+        id: b301476c-9e9a-4c12-8e4c-fffd3534557b
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: af2fc7ea-7229-4a2a-8f6e-9f4bb227e8fb
+          participant:
+            id: 393bfa77-5cff-47e5-be62-7f07f80773f1
+            first_name: Susan
+            last_name: Smith
+            gender: Female
+            nhs_number: '94083397251'
+            phone: +44 7537558841
+            email: susansmith@example.com
+            date_of_birth: '1973-05-06'
+            ethnic_background_id: english_welsh_scottish_ni_british
+            risk_level: Family History
+            address:
+              id: 15394749-67f1-4cae-9989-dcd2cdb3d62d
+              lines:
+                - 182 Clinic Road
+                - Leeds
+              postcode: L4 8M5
+    - id: 0461ac8d-f72d-4aa0-aaa7-ab1453db871f
+      duration_in_minutes: 8
+      starts_at_time: '10:36'
+      appointment:
+        id: e4f2aa16-940e-46b8-bb55-844c0b852de6
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 0ea34f83-0263-4852-833c-0031d2525a02
+          participant:
+            id: 17372fb0-7fbe-4364-8ddd-35c894ddfa44
+            first_name: Donna
+            last_name: Roberts
+            gender: Female
+            nhs_number: '91083037906'
+            phone: +44 7770853835
+            email: donnaroberts@example.com
+            date_of_birth: '1966-01-15'
+            ethnic_background_id: white_and_asian
+            risk_level: Family History
+            address:
+              id: cca03a21-4463-4a25-858b-3dc43c6289d1
+              lines:
+                - 808 Clinic Road
+                - Leeds
+              postcode: B6 6E4
+    - id: e8869699-7294-46f0-a529-a3cbb95d8f45
+      duration_in_minutes: 8
+      starts_at_time: '10:44'
+      appointment:
+        id: cc3e789b-a066-4095-ab7e-2dbade6c2ceb
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 20ffe3ad-93a3-4da0-a0a2-e3eea29178a5
+          participant:
+            id: 2d46aa1f-d5c1-4c55-8f6c-aaaf825bbbfa
+            first_name: Jacqueline
+            last_name: Davies
+            gender: Female
+            nhs_number: '94612294465'
+            phone: +44 7348277666
+            email: jacquelinedavies@example.com
+            date_of_birth: '1967-10-28'
+            ethnic_background_id: any_other_white_background
+            risk_level: Family History
+            address:
+              id: 8e14cab6-1dae-47a8-a850-b56a57ef978d
+              lines:
+                - 746 Clinic Road
+                - Leeds
+              postcode: B9 3Z8
+    - id: e14b544d-8d23-4464-980c-baf87d32196f
+      duration_in_minutes: 8
+      starts_at_time: '10:52'
+      appointment:
+        id: cb4e752d-3452-47ff-a733-d77bbbe41f0c
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 98ee6dbd-cda3-479f-957b-1b13feffe318
+          participant:
+            id: 44aff8d8-bd28-49b6-9cfd-d200c915b51a
+            first_name: Jacqueline
+            last_name: Evans
+            gender: Female
+            nhs_number: '97610051273'
+            phone: +44 7509406073
+            email: jacquelineevans@example.com
+            date_of_birth: '1973-02-05'
+            ethnic_background_id: any_other_asian_background
+            risk_level: Family History
+            address:
+              id: dfc6ede6-ab56-4112-9eec-0cde50c8d427
+              lines:
+                - 527 Clinic Road
+                - Brighton
+              postcode: B2 5N7
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 70bb7af4-a58e-44ed-ac86-bb2cf11192c3
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-01-25'
+    - id: 21b14d3d-3bb7-43cc-b0c5-79b41f26c7ae
+      duration_in_minutes: 8
+      starts_at_time: '11:00'
+      appointment:
+        id: 0bb3827d-9e98-4ee0-b62b-1225b9ee4a26
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 5aa8e3c0-0d04-4d98-8c2c-6d4faf104d24
+          participant:
+            id: f558aade-c300-46eb-97d7-28831e52aeef
+            first_name: Amanda
+            last_name: Smith
+            gender: Female
+            nhs_number: '97670248812'
+            phone: +44 7475462969
+            email: amandasmith@example.com
+            date_of_birth: '1955-03-07'
+            ethnic_background_id: any_other_mixed_or_multiple_ethnic_background
+            risk_level: Family History
+            address:
+              id: db812546-09e3-49b9-a800-5fd5f897198a
+              lines:
+                - 811 Clinic Road
+                - Brighton
+              postcode: M6 6E2
+    - id: 9d639ff4-b0f9-44e8-895f-911e075b0302
+      duration_in_minutes: 8
+      starts_at_time: '11:08'
+      appointment:
+        id: 290c194a-44ee-4b3b-8c02-f0b8c5c6423a
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: a218c1fe-7314-40e1-b912-e285232fe302
+          participant:
+            id: b233c843-c743-47e0-bed7-a08efa6a0fa4
+            first_name: Sarah
+            last_name: Hall
+            gender: Female
+            nhs_number: '92129069300'
+            phone: +44 7287478780
+            email: sarahhall@example.com
+            date_of_birth: '1966-12-10'
+            ethnic_background_id: irish
+            risk_level: Family History
+            address:
+              id: df6f0bde-2058-471f-9a7a-21682589498a
+              lines:
+                - 7 Clinic Road
+                - Leeds
+              postcode: L6 1C6
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 6b226f00-6035-4914-a4f1-ca2873de1fff
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-07-09'
+    - id: 3099e150-0ed5-4fe5-9b63-690c4048abc6
+      duration_in_minutes: 8
+      starts_at_time: '11:16'
+      appointment:
+        id: 35b4230f-7ace-4204-a254-8ed5eb445ae8
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: dc2b66df-2d64-4807-8418-000256083dfd
+          participant:
+            id: d972dc95-6827-4bb5-9f8b-b23b0e0c6a09
+            first_name: Debbie
+            last_name: Roberts
+            gender: Female
+            nhs_number: '96044060347'
+            phone: +44 7741900080
+            email: debbieroberts@example.com
+            date_of_birth: '1963-12-15'
+            ethnic_background_id: gypsy_or_irish_traveller
+            risk_level: Family History
+            address:
+              id: 534c09e4-a9cb-4afb-bf7e-f7940efa1097
+              lines:
+                - 595 Clinic Road
+                - Birmingham
+              postcode: B6 6X7
+    - id: 14bfea92-09dd-47bb-9ff9-561aa27bc080
+      duration_in_minutes: 8
+      starts_at_time: '11:24'
+      appointment:
+        id: 8a10e7a0-a008-48a6-9c41-80a1cfe5ea8b
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 725c9f30-fd6c-45fc-afe0-2da1bc2b4435
+          participant:
+            id: 9f64acd7-8022-4e1a-a730-205df0d8a4a5
+            first_name: Debbie
+            last_name: Edwards
+            gender: Female
+            nhs_number: '96934041311'
+            phone: +44 7404331882
+            email: debbieedwards@example.com
+            date_of_birth: '1969-12-01'
+            ethnic_background_id: gypsy_or_irish_traveller
+            risk_level: Family History
+            address:
+              id: 63ee0871-50ae-4a61-88a7-163d5aea8f23
+              lines:
+                - 513 Clinic Road
+                - Leeds
+              postcode: N6 9B4
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 7e8e1649-6f0a-411d-b818-48666ee611c5
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2019-09-20'
+    - id: 4ddb6492-08c8-4579-9e08-7c3c579caaf2
+      duration_in_minutes: 8
+      starts_at_time: '11:32'
+      appointment:
+        id: ea447ade-501d-4fdf-b14c-245686a757fa
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: f20427e7-e67a-4a8d-8391-4797d5bff9fc
+          participant:
+            id: 64b42241-9c47-4d52-8daa-5c010015e76f
+            first_name: Donna
+            last_name: Smith
+            gender: Female
+            nhs_number: '99729072247'
+            phone: +44 7363813875
+            email: donnasmith@example.com
+            date_of_birth: '1971-09-02'
+            ethnic_background_id: chinese
+            risk_level: Family History
+            address:
+              id: 1cd7e63b-704f-40aa-b0b6-d3b6221cc2ee
+              lines:
+                - 523 Clinic Road
+                - Birmingham
+              postcode: N4 6L8
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: 981dfbba-8cf8-4cc1-b3d2-147c281720aa
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-01-29'
+    - id: c94349a0-d680-4985-bd8e-7f7c69e4382e
+      duration_in_minutes: 8
+      starts_at_time: '11:40'
+      appointment:
+        id: 3a344e72-f604-4396-86e3-6559fedcaeba
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 0c5884dd-4d22-4281-ab1f-dd584db7009a
+          participant:
+            id: c203de0b-2537-44a5-9bc2-313e52078d2f
+            first_name: Paula
+            last_name: Taylor
+            gender: Female
+            nhs_number: '96535192104'
+            phone: +44 7568313451
+            email: paulataylor@example.com
+            date_of_birth: '1963-03-24'
+            ethnic_background_id: indian
+            risk_level: Family History
+            address:
+              id: 4c982b58-1176-4d67-921d-51deaf149712
+              lines:
+                - 689 Clinic Road
+                - Birmingham
+              postcode: B9 7W1
+    - id: 756586e5-fc7c-40df-a17e-de08753342b8
+      duration_in_minutes: 8
+      starts_at_time: '11:48'
+      appointment:
+        id: f629ac8e-ef33-42b4-aecc-c72fd98c6a31
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: adf52720-0a5d-4e18-b075-185687cbcd6b
+          participant:
+            id: ccd381e4-5f19-41e4-b7d0-a3ad9db75f53
+            first_name: Amanda
+            last_name: Wright
+            gender: Female
+            nhs_number: '94090127976'
+            phone: +44 7585846213
+            email: amandawright@example.com
+            date_of_birth: '1953-01-17'
+            ethnic_background_id: white_and_asian
+            risk_level: Family History
+            address:
+              id: 0fb6c261-83a7-4308-af73-2c8aca0cb6a0
+              lines:
+                - 207 Clinic Road
+                - Leeds
+              postcode: B3 6Z2
+    - id: cf064193-7b53-4e0d-b66f-e36d4c1912c3
+      duration_in_minutes: 8
+      starts_at_time: '11:56'
+      appointment:
+        id: 29ff1561-7eb2-4f2d-a0e2-d18878e09ca0
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: d923595b-326f-4095-b892-bee1b49a0051
+          participant:
+            id: 01699035-bc26-4e36-b592-6f6ea2ccb1b1
+            first_name: Helen
+            last_name: Smith
+            gender: Female
+            nhs_number: '93504453575'
+            phone: +44 7343467430
+            email: helensmith@example.com
+            date_of_birth: '1973-05-23'
+            ethnic_background_id: any_other_white_background
+            risk_level: Family History
+            address:
+              id: 5382deee-b8bf-4c01-a781-2129204d50d5
+              lines:
+                - 844 Clinic Road
+                - Leeds
+              postcode: L8 5Z6
+    - id: 7356e4a9-6807-40a1-a217-135698d63350
+      duration_in_minutes: 8
+      starts_at_time: '12:04'
+      appointment:
+        id: 0bde3662-c562-4047-a5de-19b976ac1c1b
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: e894a6d7-f91d-40fc-8c33-7df1835a8050
+          participant:
+            id: eecb280c-eb93-4274-89af-48f019f5b80b
+            first_name: Emily
+            last_name: Jones
+            gender: Female
+            nhs_number: '91721179845'
+            phone: +44 7968536696
+            email: emilyjones@example.com
+            date_of_birth: '1969-11-02'
+            ethnic_background_id: bangladeshi
+            risk_level: Family History
+            address:
+              id: 8ec3915a-35cb-45da-ad04-bb90e393c56a
+              lines:
+                - 614 Clinic Road
+                - Leeds
+              postcode: M2 8C5
+    - id: af003226-deb7-4d96-8d11-f0f05b0356e5
+      duration_in_minutes: 8
+      starts_at_time: '12:12'
+      appointment:
+        id: 631eb7c4-f9d9-4e7f-a4eb-d84b33a97176
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 77128af3-4656-4ae2-b94f-997ce10c1545
+          participant:
+            id: 4ffd6497-3609-4bfd-a97a-fd83d3b6adc7
+            first_name: Paula
+            last_name: Brown
+            gender: Female
+            nhs_number: '99635564041'
+            phone: +44 7531925571
+            email: paulabrown@example.com
+            date_of_birth: '1973-05-19'
+            ethnic_background_id: any_other_black_african_or_caribbean_background
+            risk_level: Family History
+            address:
+              id: 58fb43ae-9fc2-495e-bd1f-1dd02f620155
+              lines:
+                - 256 Clinic Road
+                - Birmingham
+              postcode: L4 3E7
+    - id: e9e9a30a-a124-4407-b760-c01b10f804b9
+      duration_in_minutes: 8
+      starts_at_time: '12:20'
+      appointment:
+        id: c323fa78-0b3a-49e9-a58b-1e7a38bd9ef0
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 597cd4b1-e3a9-44af-8330-0e0791b02757
+          participant:
+            id: ef86a0a4-f585-4863-bf84-9fb5fbe14670
+            first_name: Rachel
+            last_name: Wilson
+            gender: Female
+            nhs_number: '97851659018'
+            phone: +44 7941638411
+            email: rachelwilson@example.com
+            date_of_birth: '1956-05-01'
+            ethnic_background_id: any_other_white_background
+            risk_level: Family History
+            address:
+              id: 6788fa77-1896-4b5c-8e9f-7e89ff7fc100
+              lines:
+                - 164 Clinic Road
+                - Brighton
+              postcode: B1 3U3
+            previous_mammograms:
+              - location_type: NHS_BREAST_SCREENING_UNIT
+                provider:
+                  id: c2f4891d-6011-409f-8a7f-f46944803801
+                  name: West Tester Hospital Trust
+                location_details: Radiology department
+                exact_date: '2025-01-17'
+                created_at: '2020-04-24'
+    - id: eb52ef67-8854-4234-b9c0-7bb3d7720d0b
+      duration_in_minutes: 8
+      starts_at_time: '12:28'
+      appointment:
+        id: 90d019bc-4d68-4d8a-abf3-6548f6ce1868
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 229da826-dc12-4708-99d5-dac31f76f200
+          participant:
+            id: 0173883b-c5a5-4df7-b35f-3c9e73f21494
+            first_name: Helen
+            last_name: Wilson
+            gender: Female
+            nhs_number: '96836265279'
+            phone: +44 7570029709
+            email: helenwilson@example.com
+            date_of_birth: '1967-04-02'
+            ethnic_background_id: white_and_black_caribbean
+            risk_level: Family History
+            address:
+              id: 9c27a129-fc15-4289-95bf-e4afa124e050
+              lines:
+                - 336 Clinic Road
+                - Leeds
+              postcode: N3 1Y4
+    - id: 82b39737-3d6a-4774-8267-667538432883
+      duration_in_minutes: 8
+      starts_at_time: '12:36'
+      appointment:
+        id: 31f56cc8-3cfe-45b5-be7b-5abd26d76839
+        statuses:
+          - CONFIRMED
+          - CHECKED_IN
+          - SCREENED
+        screening_episode:
+          id: 07c9118e-33bb-4255-9b93-b6356e3b977d
+          participant:
+            id: 70b4098f-7213-42bf-aba7-a3248811ccd0
+            first_name: Helen
+            last_name: Hall
+            gender: Female
+            nhs_number: '95123928880'
+            phone: +44 7251025546
+            email: helenhall@example.com
+            date_of_birth: '1960-09-20'
+            ethnic_background_id: bangladeshi
+            risk_level: Family History
+            address:
+              id: 8a791878-2e92-4776-aa44-879e43d57064
+              lines:
+                - 766 Clinic Road
+                - Brighton
+              postcode: L8 7S8
