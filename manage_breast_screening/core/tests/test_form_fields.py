@@ -6,7 +6,7 @@ from django.forms import Form
 from django.forms.widgets import TelInput, Textarea, TextInput
 from pytest_django.asserts import assertHTMLEqual
 
-from ..form_fields import CharField, IntegerField, SplitDateField
+from ..form_fields import CharField, ChoiceField, IntegerField, SplitDateField
 
 
 class TestSplitDateField:
@@ -364,6 +364,75 @@ class TestIntegerField:
                 <label class="nhsuk-label" for="id_field">
                     Abc
                 </label><input class="nhsuk-input" id="id_field" name="field" type="number" value="1">
+            </div>
+            """,
+        )
+
+
+class TestChoiceField:
+    @pytest.fixture
+    def form_class(self):
+        class TestForm(Form):
+            field = ChoiceField(
+                label="Abc",
+                label_classes="app-abc",
+                choices=(("a", "A"), ("b", "B")),
+                hint="Pick either one",
+            )
+            details = CharField(label="Abc", initial="")
+
+        return TestForm
+
+    def test_renders_nhs_radios(self, form_class):
+        assertHTMLEqual(
+            form_class()["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <fieldset class="nhsuk-fieldset">
+                    <legend class="nhsuk-fieldset__legend app-abc">
+                        Abc
+                    </legend>
+                    <div class="nhsuk-radios">
+                        <div class="nhsuk-radios__item">
+                            <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
+                            <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
+                        </div>
+                        <div class="nhsuk-radios__item">
+                            <input class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                            <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            """,
+        )
+
+    def test_renders_conditional_field(self, form_class):
+        form = form_class()
+        form.fields["field"].add_conditional_field("b", "details")
+
+        assertHTMLEqual(
+            form_class()["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <fieldset class="nhsuk-fieldset">
+                    <legend class="nhsuk-fieldset__legend app-abc">
+                        Abc
+                    </legend>
+                    <div class="nhsuk-radios nhsuk-radios--conditional">
+                        <div class="nhsuk-radios__item">
+                            <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
+                            <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
+                        </div>
+                        <div class="nhsuk-radios__item">
+                            <input aria-controls="conditional-id_field-2" aria-expanded="false" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                            <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
+                        </div>
+                        <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
+                            <input id="id_details" name="details" required type="text">
+                        </div>
+                    </div>
+                </fieldset>
             </div>
             """,
         )
