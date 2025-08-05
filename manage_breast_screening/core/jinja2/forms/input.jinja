@@ -14,6 +14,7 @@
     "value": field.value() or "",
     "classes": unbound_field.classes if unbound_field.classes,
     "attributes": widget.attrs,
+    "type": widget.input_type
   } %}
   {% if field.errors %}
     {% set error_params = {

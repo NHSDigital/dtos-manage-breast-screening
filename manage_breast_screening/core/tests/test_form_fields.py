@@ -2,7 +2,8 @@ import datetime
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.forms import Form, Textarea, TextInput
+from django.forms import Form
+from django.forms.widgets import TelInput, Textarea, TextInput
 from pytest_django.asserts import assertHTMLEqual
 
 from ..form_fields import CharField, SplitDateField
@@ -202,6 +203,7 @@ class TestCharField:
                     )
                 ),
             )
+            telephone_field = CharField(label="Ring ring", widget=TelInput)
             textfield = CharField(
                 label="Text",
                 widget=Textarea(
@@ -303,6 +305,18 @@ class TestCharField:
                 <span class="nhsuk-error-message" id="id_field-error">
                 <span class="nhsuk-u-visually-hidden">Error:</span> Ensure this value has at most 10 characters (it has 15).</span>
                 <input class="nhsuk-input nhsuk-input--error" id="id_field" name="field" type="text" value="reallylongvalue" aria-describedby="id_field-error">
+            </div>
+            """,
+        )
+
+    def test_telinput_renders_input_with_type_tel(self, form_class):
+        assertHTMLEqual(
+            form_class()["telephone_field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_telephone_field">
+                    Ring ring
+                </label><input type="tel" class="nhsuk-input" id="id_telephone_field" name="telephone_field">
             </div>
             """,
         )
