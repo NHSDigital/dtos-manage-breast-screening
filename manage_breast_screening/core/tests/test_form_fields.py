@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 from django.core.exceptions import ValidationError
-from django.forms import Form, Textarea
+from django.forms import Form, Textarea, TextInput
 from pytest_django.asserts import assertHTMLEqual
 
 from ..form_fields import CharField, SplitDateField
@@ -190,9 +190,27 @@ class TestCharField:
             field_with_classes = CharField(
                 label="With classes", initial="", classes="nhsuk-u-width-two-thirds"
             )
+            field_with_extra_attrs = CharField(
+                label="Extra",
+                widget=TextInput(
+                    attrs=dict(
+                        autocomplete="off",
+                        inputmode="numeric",
+                        spellcheck="false",
+                        autocapitalize="none",
+                        pattern=r"\d{3}",
+                    )
+                ),
+            )
             textfield = CharField(
                 label="Text",
-                widget=Textarea(attrs={"rows": "3", "autocomplete": "autocomplete"}),
+                widget=Textarea(
+                    attrs={
+                        "rows": "3",
+                        "autocomplete": "autocomplete",
+                        "spellcheck": "true",
+                    }
+                ),
             )
             textfield_simple = CharField(label="Text", widget=Textarea)
 
@@ -249,6 +267,19 @@ class TestCharField:
             """,
         )
 
+    def test_renders_nhs_input_with_extra_attrs(self, form_class):
+        assertHTMLEqual(
+            form_class()["field_with_extra_attrs"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field_with_extra_attrs">
+                    Extra
+                </label>
+                <input autocomplete="off" autocapitalize="none" spellcheck="false" inputmode="numeric" pattern="\\d{3}" class="nhsuk-input" id="id_field_with_extra_attrs" name="field_with_extra_attrs" type="text">
+            </div>
+            """,
+        )
+
     def test_bound_value_reflected_in_html_value(self, form_class):
         assertHTMLEqual(
             form_class({"field": "othervalue"})["field"].as_field_group(),
@@ -284,7 +315,7 @@ class TestCharField:
                     <label class="nhsuk-label" for="id_textfield">
                         Text
                     </label>
-                    <textarea class="nhsuk-textarea" id="id_textfield" name="textfield" rows=" 3 " autocomplete="autocomplete"></textarea>
+                    <textarea class="nhsuk-textarea" id="id_textfield" name="textfield" rows=" 3 " autocomplete="autocomplete" spellcheck="true"></textarea>
                 </div>
                 """,
         )

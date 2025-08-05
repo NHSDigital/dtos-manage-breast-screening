@@ -144,7 +144,14 @@ class SplitDateField(forms.MultiValueField):
 
 
 class CharField(forms.CharField):
-    def __init__(self, *args, hint=None, label_classes=None, classes=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        hint=None,
+        label_classes=None,
+        classes=None,
+        **kwargs,
+    ):
         widget = kwargs.get("widget")
         if (isinstance(widget, type) and widget is Textarea) or isinstance(
             widget, Textarea
@@ -158,3 +165,12 @@ class CharField(forms.CharField):
         self.label_classes = label_classes
 
         super().__init__(*args, **kwargs)
+
+    def widget_attrs(self, widget):
+        attrs = super().widget_attrs(widget)
+
+        # Don't use maxlength even if there is a max length validator.
+        # This attribute prevents the user from seeing errors, so we don't use it
+        attrs.pop("maxlength", None)
+
+        return attrs
