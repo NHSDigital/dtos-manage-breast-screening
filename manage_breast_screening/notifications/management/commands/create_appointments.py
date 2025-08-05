@@ -98,13 +98,16 @@ class Command(BaseCommand):
             "status": status,
         }
         if status == "C":
-            defaults.update({
-                "cancelled_by": row["Cancelled By"],
-            })
+            defaults.update(
+                {
+                    "cancelled_by": row["Cancelled By"],
+                    "cancelled_at": self.appointment_updated_date_and_time(
+                        row["Action Timestamp"]
+                    ),
+                }
+            )
         elif status == "B":
-            defaults.update({
-                "booked_by": row["Booked By"]
-            })
+            defaults.update({"booked_by": row["Booked By"]})
 
         return Appointment.objects.update_or_create(
             nbss_id=row["Appointment ID"],
@@ -114,6 +117,9 @@ class Command(BaseCommand):
             defaults=defaults,
         )
 
+    def appointment_updated_date_and_time(self, timestamp: str) -> datetime:
+        dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
+        return dt.replace(tzinfo=TZ_INFO)
 
     def appointment_date_and_time(self, row: dict) -> datetime:
         dt = datetime.strptime(

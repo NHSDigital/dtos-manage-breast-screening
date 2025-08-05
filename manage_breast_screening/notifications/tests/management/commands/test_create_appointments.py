@@ -131,6 +131,9 @@ class TestCreateAppointments:
         assert appointments[0].nbss_id == nbss_id
         assert appointments[0].status == "C"
         assert appointments[0].cancelled_by == "C"
+        assert appointments[0].cancelled_at == datetime.strptime(
+            "20250128-154003", "%Y%m%d-%H%M%S"
+        ).replace(tzinfo=TZ_INFO)
 
     @pytest.mark.django_db
     def test_handle_accept_date_arg(self, raw_data):
