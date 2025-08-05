@@ -174,15 +174,21 @@ class Command(BaseCommand):
 
     def create_reported_mammograms(self, participant, mammograms):
         for mammogram in mammograms:
+            created_at_date = mammogram.pop("created_at", None)
             if mammogram["provider"] is not None:
                 mammogram["provider"] = ProviderFactory(
                     id=mammogram["provider"]["id"],
                     name=mammogram["provider"]["name"],
                 )
-            ParticipantReportedMammogramFactory(
+            participant_mammogram = ParticipantReportedMammogramFactory(
                 participant=participant,
                 **mammogram,
             )
+            if created_at_date is not None:
+                participant_mammogram.created_at = created_at_date
+                participant_mammogram.save()
+
+            return participant_mammogram
 
     def reset_db(self):
         AppointmentStatus.objects.all().delete()
