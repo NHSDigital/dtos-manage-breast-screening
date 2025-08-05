@@ -46,6 +46,9 @@ class Command(BaseCommand):
             "--noinput", action="store_true", help="Do not prompt for confirmation"
         )
 
+    def file_from_name(self, file_name):
+        return open("manage_breast_screening/data/" + file_name)
+
     def handle(self, *args, **kwargs):
         if settings.DEBUG is False:
             raise Exception("This command cannot be run in production")
@@ -58,8 +61,11 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR("Cancelled."))
                 return
 
+        # 🚩🚩🚩🚩🚩🚩🚩🚩🚩
         self.reset_db()
-        with open("manage_breast_screening/data/demo_data.yml", "r") as data_file:
+        # 🚩🚩🚩🚩🚩🚩🚩🚩🚩
+
+        with self.file_from_name("demo_data.yml") as data_file:
             data = yaml.safe_load(data_file)
             for provider_key in data["providers"]:
                 self.create_provider(provider_key)
@@ -73,10 +79,15 @@ class Command(BaseCommand):
         setting = SettingFactory(
             name=setting_key["name"], id=setting_key["id"], provider=provider
         )
-        for clinic_key in setting_key["clinics"]:
-            self.create_clinic(setting, clinic_key)
 
-    def create_clinic(self, setting, clinic_key):
+        for file_key in setting_key["clinics"]:
+            self.create_clinic(setting, file_key)
+
+    def create_clinic(self, setting, file_key):
+        with self.file_from_name(file_key["file"]) as data_file:
+            clinic_data = yaml.safe_load(data_file)
+            clinic_key = clinic_data["clinic"]
+
         starts_at = datetime.now() + timedelta(
             days=clinic_key["starts_at_date_relative_to_today_in_days"]
         )
