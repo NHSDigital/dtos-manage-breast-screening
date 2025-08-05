@@ -202,3 +202,74 @@ class IntegerField(forms.IntegerField):
         attrs.pop("step", None)
 
         return attrs
+
+
+class BoundChoiceField(forms.BoundField):
+    """
+    Specialisation of BoundField that knows about conditionally rendered fields.
+    This can be used to render a set of radios or checkboxes with text boxes to capture
+    more details.
+    """
+
+    def __init__(self, form: forms.Form, field: "ChoiceField", name: str):
+        super().__init__(form, field, name)
+
+        self.conditional_fields = {
+            value: form[conditional_field_name]
+            for value, conditional_field_name in field.conditional_fields.items()
+        }
+
+    def conditional_for_value(self, value):
+        return self.conditional_fields.get(value)
+
+
+class ChoiceField(forms.ChoiceField):
+    """
+    A ChoiceField that renders using NHS.UK design system radios/checkboxes/select
+    components.
+    """
+
+    widget = widgets.RadioSelect
+    bound_field_class = BoundChoiceField
+
+    def __init__(
+        self,
+        *args,
+        hint=None,
+        label_classes=None,
+        classes=None,
+        conditional_fields=None,
+        **kwargs,
+    ):
+        kwargs["template_name"] = ChoiceField._template_name(
+            kwargs.get("widget", self.widget)
+        )
+
+        self.hint = hint
+        self.classes = classes
+        self.label_classes = label_classes
+        self.conditional_fields = conditional_fields or {}
+
+        super().__init__(*args, **kwargs)
+
+    def add_conditional_field(self, value: str, field: str):
+        """
+        Mark that another field should be conditionally shown based on
+        a certain value being selected.
+        """
+        self.conditional_fields[value] = field
+
+    @staticmethod
+    def _template_name(widget):
+        if (isinstance(widget, type) and widget is widgets.RadioSelect) or isinstance(
+            widget, widgets.RadioSelect
+        ):
+            return "forms/radios.jinja"
+        elif (
+            isinstance(widget, type) and widget is widgets.CheckboxInput
+        ) or isinstance(widget, widgets.CheckboxInput):
+            return "forms/radios.jinja"
+        elif (isinstance(widget, type) and widget is widgets.Select) or isinstance(
+            widget, widgets.Select
+        ):
+            return "forms/select.jinja"
