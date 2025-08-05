@@ -72,6 +72,10 @@ class TestCreateAppointments:
         assert appointments[1].status == "B"
         assert appointments[2].status == "B"
 
+        assert appointments[0].booked_by == "C"
+        assert appointments[1].booked_by == "H"
+        assert appointments[2].booked_by == "H"
+
         assert appointments[0].clinic == clinics[0]
         assert appointments[1].clinic == clinics[1]
         assert appointments[2].clinic == clinics[1]
