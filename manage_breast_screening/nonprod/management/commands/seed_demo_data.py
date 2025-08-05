@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import yaml
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.test import override_settings
 
 from manage_breast_screening.clinics.models import (
     Clinic,
@@ -65,10 +66,12 @@ class Command(BaseCommand):
         self.reset_db()
         # 🚩🚩🚩🚩🚩🚩🚩🚩🚩
 
-        with self.file_from_name("demo_data.yml") as data_file:
-            data = yaml.safe_load(data_file)
-            for provider_key in data["providers"]:
-                self.create_provider(provider_key)
+        # silence all the timezone warnings
+        with override_settings(USE_TZ=False):
+            with self.file_from_name("demo_data.yml") as data_file:
+                data = yaml.safe_load(data_file)
+                for provider_key in data["providers"]:
+                    self.create_provider(provider_key)
 
     def create_provider(self, provider_key):
         provider = ProviderFactory(name=provider_key["name"], id=provider_key["id"])
