@@ -1,0 +1,6 @@
+/manage_breast_screening/assets @NHSDigital/dtos-manage-breast-screening-code-owners
+/manage_breast_screening/clinics @NHSDigital/dtos-manage-breast-screening-code-owners
+/manage_breast_screening/mammograms @NHSDigital/dtos-manage-breast-screening-code-owners
+/manage_breast_screening/notifications @NHSDigital/dtos-invite-team
+/manage_breast_screening/participants @NHSDigital/dtos-manage-breast-screening-code-owners
+/manage_breast_screening/static @NHSDigital/dtos-manage-breast-screening-code-owners
