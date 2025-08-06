@@ -2,7 +2,6 @@
 {% from 'back-link/macro.jinja' import backLink %}
 {% from 'radios/macro.jinja' import radios %}
 {% from 'button/macro.jinja' import button %}
-{% from 'input/macro.jinja' import input %}
 {% from 'fieldset/macro.jinja' import fieldset %}
 
 {% from 'django_form_helpers.jinja' import form_error_summary %}
@@ -17,22 +16,6 @@
 {% block messages %}
   {{ form_error_summary(form) }}
 {% endblock %}
-
-{% macro conditional_radio_input(params) %}
-  {% set details_field_name = params.field_name + "_details" %}
-  {% set details_field_id = params.details_field.auto_id %}
-  {% set details_field_value = params.details_field.value() %}
-  {% set input_params = {
-    "label": {
-      "text": "How do they describe their background? (optional)",
-    },
-    "id": details_field_id,
-    "name": details_field_name,
-    "value": details_field_value
-  } %}
-
-  {{ input(input_params) }}
-{% endmacro %}
 
 {% block page_content %}
   <div class="nhsuk-grid-row">
@@ -68,10 +51,7 @@
                 {% set radio_items = [] %}
                 {% for ethnic_background in ethnic_backgrounds %}
                   {% set conditional = {
-                      "html": conditional_radio_input({
-                        "field_name": ethnic_background.id,
-                        "details_field": form[ethnic_background.id + "_details"],
-                      })
+                      "html": form[ethnic_background.id + "_details"].as_field_group()
                     } if ethnic_background.id in form.non_specific_ethnic_backgrounds() else {} %}
                   {% do radio_items.append({
                     "value": ethnic_background.id,

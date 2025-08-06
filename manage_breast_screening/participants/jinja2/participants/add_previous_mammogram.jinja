@@ -2,10 +2,8 @@
 {% from 'button/macro.jinja' import button %}
 {% from 'back-link/macro.jinja' import backLink %}
 {% from 'fieldset/macro.jinja' import fieldset %}
-{% from 'input/macro.jinja' import input %}
 {% from 'radios/macro.jinja' import radios %}
 
-{% from 'textarea/macro.jinja' import textarea %}
 {% from 'django_form_helpers.jinja' import form_error_summary, app_date_input %}
 
 {% block beforeContent %}
@@ -28,83 +26,8 @@
     </h1>
 
     <form action="{{request.path}}" method="POST">
-      {# Conditional fields #}
-
-      {% set somewhere_in_the_uk_details_html %}
-        {{ textarea({
-          "id": form.somewhere_in_the_uk_details.auto_id,
-          "name": form.somewhere_in_the_uk_details.html_name,
-          "rows": "2",
-          "label": {
-            "text": "Location",
-            "_classes": "nhsuk-label--s"
-          },
-          "value": form.somewhere_in_the_uk_details.value(),
-          "hint": {
-            "text": "Include the clinic or hospital name, or any location details"
-          },
-          "errorMessage": {
-            "text": form.somewhere_in_the_uk_details.errors | first
-          } if form.somewhere_in_the_uk_details.errors,
-        }) }}
-      {% endset %}
-
-
-      {% set outside_the_uk_details_html %}
-        {{ textarea({
-          "id": form.outside_the_uk_details.auto_id,
-          "name": form.outside_the_uk_details.html_name,
-          "rows": "2",
-          "label": {
-            "text": "Location",
-            "_classes": "nhsuk-label--s"
-          },
-          "value": form.outside_the_uk_details.value(),
-          "hint": {
-            "text": "Include the clinic or hospital name, or any location details"
-          },
-          "errorMessage": {
-            "text": form.outside_the_uk_details.errors | first
-          } if form.outside_the_uk_details.errors,
-        }) }}
-      {% endset %}
-
       {% set exact_date_html %}
         {{ app_date_input(form_attribute=form.exact_date, legend="Date of mammogram", hint="For example, 15 3 2025") }}
-      {% endset %}
-
-      {% set approx_date_html %}
-        {{ input({
-          "id": form.approx_date.auto_id,
-          "name": form.approx_date.html_name,
-          "label": {
-            "text": "Enter an approximate date",
-            "classes": "nhsuk-u-visually-hidden"
-          },
-          "hint": {
-            "text": "For example, 9 months ago"
-          },
-          "classes": "nhsuk-u-width-two-thirds",
-          "value": form.approx_date.value(),
-            "errorMessage": {
-            "text": form.approx_date.errors | first
-          } if form.approx_date.errors
-        }) }}
-      {% endset %}
-
-      {% set different_name_html %}
-        {{ input({
-          "id": form.different_name.auto_id,
-          "name": form.different_name.html_name,
-          "label": {
-            "text": "Enter the previously used name"
-          },
-          "value": form.different_name.value(),
-          "classes": "nhsuk-u-width-two-thirds",
-          "errorMessage": {
-            "text": form.different_name.errors | first
-          } if form.different_name.errors
-        }) }}
       {% endset %}
 
       {# Radios with conditionals #}
@@ -133,13 +56,13 @@
             "value": form.WhereTaken.UK,
             "text": form.where_taken_choices[form.WhereTaken.UK],
             "checked": form.where_taken.value() == form.WhereTaken.UK,
-            "conditional": {"html": somewhere_in_the_uk_details_html}
+            "conditional": {"html": form.somewhere_in_the_uk_details.as_field_group()}
           },
           {
             "value": form.WhereTaken.OUTSIDE_UK,
             "text": form.where_taken_choices[form.WhereTaken.OUTSIDE_UK],
             "checked": form.where_taken.value() == form.WhereTaken.OUTSIDE_UK,
-            "conditional": {"html": outside_the_uk_details_html}
+            "conditional": {"html": form.outside_the_uk_details.as_field_group()}
           },
           {
             "divider": "or"
@@ -177,7 +100,7 @@
             "value": "approx",
             "text": form.when_taken_choices["approx"],
             "checked": form.when_taken.value() == "approx",
-            "conditional": {"html": approx_date_html}
+            "conditional": {"html": form.approx_date.as_field_group()}
           },
           {
             "value": "not_sure",
@@ -207,25 +130,13 @@
             "value": "no",
             "text": form.name_is_the_same_choices["no"],
             "checked": form.name_is_the_same.value() == "no",
-            "conditional": {"html": different_name_html}
+            "conditional": {"html": form.different_name.as_field_group() }
           }
         ]
       }) }}
 
       {# Textarea for any other relevant details #}
-
-      {{ textarea({
-        "name": form.additional_information.html_name,
-        "id": form.additional_information.auto_id,
-        "rows": "2",
-        "label": {
-          "text": "Additional information (optional)",
-          "classes": "nhsuk-label--m"
-        },
-        "hint": {
-          "text": "For example, the reason for the mammograms and the outcome of the assessment"
-        }
-      }) }}
+      {{ form.additional_information.as_field_group() }}
 
       {{ button({
         "text": "Continue"
