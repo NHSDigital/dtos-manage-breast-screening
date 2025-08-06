@@ -3,5 +3,10 @@
     "MD013": false,
     "MD024": { "siblings_only": true },
     "MD033": false
-  }
+  },
+  "python.testing.pytestArgs": [
+    "."
+  ],
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true
 }

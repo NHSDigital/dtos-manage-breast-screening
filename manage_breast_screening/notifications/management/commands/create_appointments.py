@@ -50,9 +50,11 @@ class Command(BaseCommand):
                     if clinic_created:
                         self.stdout.write(f"{clinic} created")
 
-                    appt, appt_created = self.find_or_create_appointment(row, clinic)
+                    appt, appt_created = self.update_or_create_appointment(row, clinic)
                     if appt_created:
                         self.stdout.write(f"{appt} created")
+                    else:
+                        self.stdout.write(f"{appt} updated")
 
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
@@ -87,21 +89,37 @@ class Command(BaseCommand):
             },
         )
 
-    def find_or_create_appointment(
+    def update_or_create_appointment(
         self, row: dict, clinic: Clinic
     ) -> tuple[Appointment, bool]:
-        return Appointment.objects.get_or_create(
-            nhs_number=row["NHS Num"],
+        status = row["Status"]
+        defaults = {
+            "number": row["Sequence"],
+            "status": status,
+        }
+        if status == "C":
+            defaults.update(
+                {
+                    "cancelled_by": row["Cancelled By"],
+                    "cancelled_at": self.appointment_updated_date_and_time(
+                        row["Action Timestamp"]
+                    ),
+                }
+            )
+        elif status == "B":
+            defaults.update({"booked_by": row["Booked By"]})
+
+        return Appointment.objects.update_or_create(
             nbss_id=row["Appointment ID"],
-            defaults={
-                "clinic": clinic,
-                "starts_at": self.appointment_date_and_time(row),
-                "number": row["Sequence"],
-                "status": row["Status"],
-                "booked_by": row["Booked By"],
-                "cancelled_by": row["Cancelled By"],
-            },
+            nhs_number=row["NHS Num"],
+            clinic=clinic,
+            starts_at=self.appointment_date_and_time(row),
+            defaults=defaults,
         )
+
+    def appointment_updated_date_and_time(self, timestamp: str) -> datetime:
+        dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
+        return dt.replace(tzinfo=TZ_INFO)
 
     def appointment_date_and_time(self, row: dict) -> datetime:
         dt = datetime.strptime(

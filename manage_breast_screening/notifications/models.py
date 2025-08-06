@@ -74,14 +74,16 @@ class Appointment(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nbss_id = models.CharField(max_length=30)
+    nbss_id = models.CharField(max_length=30, unique=True)
     nhs_number = models.BigIntegerField(null=False)
     status = models.CharField(max_length=50)
     booked_by = models.CharField(max_length=50)
     cancelled_by = models.CharField(max_length=50)
+    cancelled_at = models.DateTimeField(null=True)
     number = models.IntegerField(null=True, default=1)
     starts_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, auto_now=True)
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
