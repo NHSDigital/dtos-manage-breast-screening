@@ -392,6 +392,9 @@ class TestChoiceField:
                     <legend class="nhsuk-fieldset__legend app-abc">
                         Abc
                     </legend>
+                    <div class="nhsuk-hint" id="id_field-hint">
+                        Pick either one
+                    </div>
                     <div class="nhsuk-radios">
                         <div class="nhsuk-radios__item">
                             <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
@@ -419,6 +422,9 @@ class TestChoiceField:
                     <legend class="nhsuk-fieldset__legend app-abc">
                         Abc
                     </legend>
+                    <div class="nhsuk-hint" id="id_field-hint">
+                        Pick either one
+                    </div>
                     <div class="nhsuk-radios nhsuk-radios--conditional">
                         <div class="nhsuk-radios__item">
                             <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
@@ -429,7 +435,10 @@ class TestChoiceField:
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
                         </div>
                         <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
-                            <input id="id_details" name="details" required type="text">
+                            <div class="nhsuk-form-group">
+                                <label class="nhsuk-label" for="id_details">Abc</label>
+                                <input class="nhsuk-input" id="id_details" name="details" type="text">
+                            </div>
                         </div>
                     </div>
                 </fieldset>

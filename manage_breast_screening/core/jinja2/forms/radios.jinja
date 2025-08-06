@@ -6,9 +6,11 @@
 {% set ns = namespace(items=[]) %}
 {% for value, text in unbound_field.choices %}
   {% set conditional_field = field.conditional_for_value(value) %}
-  {% set conditional_html %}
-    {{ conditional_field }}
-  {% endset %}
+  {% if conditional_field %}
+    {% set conditional_html %}
+      {{ conditional_field.as_field_group() }}
+    {% endset %}
+  {% endif %}
   {% set ns.items = ns.items + [{
     "id": field.auto_id if loop.first,
     "value": value,
@@ -30,7 +32,7 @@
   },
   "errorMessage": error_message,
   "hint": {
-    "html": hint|e
-  } if hint,
+    "html": unbound_field.hint|e
+  } if unbound_field.hint,
   "items": ns.items
 }) }}

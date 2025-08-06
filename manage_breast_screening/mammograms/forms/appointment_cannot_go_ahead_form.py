@@ -1,6 +1,6 @@
 from django import forms
 
-from manage_breast_screening.core.form_fields import CharField
+from manage_breast_screening.core.form_fields import CharField, ChoiceField
 from manage_breast_screening.participants.models import AppointmentStatus
 
 
@@ -45,7 +45,8 @@ class AppointmentCannotGoAheadForm(forms.Form):
         },
     )
 
-    decision = forms.ChoiceField(
+    decision = ChoiceField(
+        label="Does the appointment need to be rescheduled?",
         choices=(
             ("True", "Yes, add participant to reinvite list"),
             ("False", "No"),

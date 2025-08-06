@@ -55,45 +55,6 @@ class TestDjangoFormHelpers:
             ).strip()
         )
 
-    def test_radios(self, jinja_env):
-        form = ABForm()
-        template = jinja_env.from_string(
-            dedent(
-                r"""
-                {% from 'django_form_helpers.jinja' import app_radios %}
-                {{ app_radios(form.ab_choice, legend="Legend text", hint="Hint text") }}
-                """
-            )
-        )
-
-        response = template.render({"form": form})
-
-        assert (
-            dedent(response).strip()
-            == dedent(
-                """
-            <div class="nhsuk-form-group">
-
-            <fieldset class="nhsuk-fieldset">  <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">    Legend text
-            </legend>  <div class="nhsuk-hint" id="id_ab_choice-hint">
-                Hint text
-              </div>
-              <div class="nhsuk-radios">    <div class="nhsuk-radios__item">
-                  <input class="nhsuk-radios__input" id="id_ab_choice" name="ab_choice" type="radio" value="a">
-                  <label class="nhsuk-label nhsuk-radios__label" for="id_ab_choice">
-                    A
-                  </label>    </div>
-                <div class="nhsuk-radios__item">
-                  <input class="nhsuk-radios__input" id="id_ab_choice-2" name="ab_choice" type="radio" value="b">
-                  <label class="nhsuk-label nhsuk-radios__label" for="id_ab_choice-2">
-                    B
-                  </label>    </div>
-              </div>
-            </fieldset></div>
-            """
-            ).strip()
-        )
-
     def test_checkboxes(self, jinja_env):
         form = ABForm()
         template = jinja_env.from_string(
