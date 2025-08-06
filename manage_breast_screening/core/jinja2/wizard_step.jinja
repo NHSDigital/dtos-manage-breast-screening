@@ -2,7 +2,7 @@
 {% from 'button/macro.jinja' import button %}
 {% from 'fieldset/macro.jinja' import fieldset %}
 {% from 'back-link/macro.jinja' import backLink %}
-{% from 'django_form_helpers.jinja' import app_radios, form_error_summary %}
+{% from 'django_form_helpers.jinja' import form_error_summary %}
 
 {% block beforeContent %}
 {# Using javascript temporarily - this should be replaced with proper URLs #}
@@ -38,7 +38,7 @@
           {% block form %}{% endblock form %}
 
           {% if form.decision %}
-            {{ app_radios(form.decision, legend=decision_legend, hint=decision_hint) }}
+            {{ form.decision.as_field_group() }}
           {% endif %}
 
           {{ button({

@@ -137,8 +137,6 @@ class StartScreening(InProgressAppointmentMixin, FormView):
                 "presented_appointment": appointment_presenter,
                 "presented_participant": appointment_presenter.participant,
                 "presented_mammograms": last_known_mammogram_presenter,
-                "decision_legend": "Can the appointment go ahead?",
-                "decision_hint": "Before you proceed, check the participant’s identity and confirm that their last mammogram was more than 6 months ago.",
             }
         )
 
@@ -174,7 +172,6 @@ class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
                 "caption": participant.full_name,
                 "heading": "Medical information",
                 "page_title": "Medical information",
-                "decision_legend": "Has the participant shared any relevant medical information?",
                 "cannot_continue_link": {
                     "href": reverse(
                         "mammograms:appointment_cannot_go_ahead",
@@ -214,7 +211,6 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "page_title": "Record medical information",
                 "participant": participant,
                 "caption": participant.full_name,
-                "decision_legend": "Can imaging go ahead?",
             }
         )
         return context
@@ -244,7 +240,6 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
                 "heading": "Appointment cannot go ahead",
                 "caption": participant.full_name,
                 "page_title": "Appointment cannot go ahead",
-                "decision_legend": "Does the appointment need to be rescheduled?",
             }
         )
         return context
