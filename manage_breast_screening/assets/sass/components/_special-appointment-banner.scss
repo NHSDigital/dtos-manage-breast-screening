@@ -1,13 +1,13 @@
-.special-appointment-banner__action {
+.app-special-appointment-banner__action {
   text-align: right;
   @include nhsuk-font-size(19);
 }
 
-.special-appointment-banner__no-details {
+.app-special-appointment-banner__tag--no-details {
   color: $nhsuk-secondary-text-color;
 }
 
-.special-appointment-banner__temporary {
+.app-special-appointment-banner__tag--temporary {
   @extend .nhsuk-tag;
   @extend .nhsuk-tag--white;
   margin-top: nhsuk-spacing(2);
