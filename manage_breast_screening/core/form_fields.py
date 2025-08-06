@@ -265,11 +265,42 @@ class ChoiceField(forms.ChoiceField):
             widget, widgets.RadioSelect
         ):
             return "forms/radios.jinja"
-        elif (
-            isinstance(widget, type) and widget is widgets.CheckboxInput
-        ) or isinstance(widget, widgets.CheckboxInput):
-            return "forms/radios.jinja"
         elif (isinstance(widget, type) and widget is widgets.Select) or isinstance(
             widget, widgets.Select
         ):
             return "forms/select.jinja"
+
+
+class MultipleChoiceField(forms.MultipleChoiceField):
+    """
+    A ChoiceField that renders using NHS.UK design system radios/checkboxes/select
+    components.
+    """
+
+    widget = widgets.CheckboxSelectMultiple
+    bound_field_class = BoundChoiceField
+
+    def __init__(
+        self,
+        *args,
+        hint=None,
+        label_classes=None,
+        classes=None,
+        conditional_fields=None,
+        **kwargs,
+    ):
+        kwargs["template_name"] = "forms/checkboxes.jinja"
+
+        self.hint = hint
+        self.classes = classes
+        self.label_classes = label_classes
+        self.conditional_fields = conditional_fields or {}
+
+        super().__init__(*args, **kwargs)
+
+    def add_conditional_field(self, value: str, field: str):
+        """
+        Mark that another field should be conditionally shown based on
+        a certain value being selected.
+        """
+        self.conditional_fields[value] = field
