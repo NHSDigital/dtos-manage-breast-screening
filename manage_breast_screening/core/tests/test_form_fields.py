@@ -6,7 +6,7 @@ from django.forms import Form
 from django.forms.widgets import TelInput, Textarea, TextInput
 from pytest_django.asserts import assertHTMLEqual
 
-from ..form_fields import CharField, SplitDateField
+from ..form_fields import CharField, IntegerField, SplitDateField
 
 
 class TestSplitDateField:
@@ -345,4 +345,25 @@ class TestCharField:
                     <textarea class="nhsuk-textarea" id="id_textfield_simple" name="textfield_simple" rows=" 10 "></textarea>
                 </div>
                 """,
+        )
+
+
+class TestIntegerField:
+    @pytest.fixture
+    def form_class(self):
+        class TestForm(Form):
+            field = IntegerField(label="Abc", initial=1, max_value=10)
+
+        return TestForm
+
+    def test_renders_nhs_input(self, form_class):
+        assertHTMLEqual(
+            form_class()["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field">
+                    Abc
+                </label><input class="nhsuk-input" id="id_field" name="field" type="number" value="1">
+            </div>
+            """,
         )
