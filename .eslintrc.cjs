@@ -7,6 +7,8 @@ module.exports = {
     '**/compiled/**',
     '**/coverage/**',
     '**/staticfiles/**',
+    'htmlcov/**',
+    '.mypy_cache/**',
 
     // Enable dotfile linting
     '!.*',
