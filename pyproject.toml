@@ -70,4 +70,4 @@ omit = [
 ]
 
 [tool.djlint]
-ignore = "T028,H006,J004,J018,H031,T003,H030"
+ignore = "T003"
