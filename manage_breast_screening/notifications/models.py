@@ -115,3 +115,34 @@ class Clinic(models.Model):
 
     def __str__(self):
         return f"Clinic {self.name} ({self.code})"
+
+
+class ChannelStatus(models.Model):
+    """
+    A status update event for specific message communication channel
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    message = models.ForeignKey("notifications.Message", on_delete=models.PROTECT)
+    channel = models.CharField(max_length=50, null=False)
+    status = models.CharField(max_length=50, null=False)
+    description = models.CharField(max_length=150)
+    idempotency_key = models.CharField(max_length=150)
+    status_updated_at = models.DateTimeField(null=False)
+    created_at = models.DateTimeField(null=False, auto_now_add=True)
+    updated_at = models.DateTimeField(null=False, auto_now_add=True)
+
+
+class MessageStatus(models.Model):
+    """
+    A status update event for a message
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    message = models.ForeignKey("notifications.Message", on_delete=models.PROTECT)
+    status = models.CharField(max_length=50, null=False)
+    description = models.CharField(max_length=150)
+    idempotency_key = models.CharField(max_length=150)
+    status_updated_at = models.DateTimeField(null=False)
+    created_at = models.DateTimeField(null=False, auto_now_add=True)
+    updated_at = models.DateTimeField(null=False, auto_now_add=True)
