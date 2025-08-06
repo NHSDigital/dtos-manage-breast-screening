@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0004_clinic_bso_code_messagebatch_routing_plan_id'),
+        ('notifications', '0006_alter_appointment_add_timestamps'),
     ]
 
     operations = [
