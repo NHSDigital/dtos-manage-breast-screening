@@ -77,7 +77,11 @@ migrate:  # Run migrations
 	poetry run ./manage.py migrate
 
 seed:  # Load seed data
-	poetry run ./manage.py loaddata clinics participants
+	#noop for now we'll use this to load lookup tables etc rather than test data
+
+# run with ARGS="--noinput" to bypass confirmation prompt in CI etc
+seed-demo-data:
+	poetry run ./manage.py seed_demo_data $(ARGS)
 
 models:
 	poetry run ./manage.py shell -c "from django.apps import apps; print('\n'.join(f'{m._meta.app_label}.{m.__name__}' for m in apps.get_models()))"
