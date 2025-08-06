@@ -80,6 +80,14 @@ Database migrations are handled by [Django's database migration functionality](h
 
 Note the database migration runs in the deployment pipeline _after_ the application deployment. The deployed code must be compatible with the schema before AND after the schema changes. This also removes potential errors when using a rolling app deployment as multiple app versions may access the database at the same time. To enforce it, make sure to always separate code changes and database migrations into different pull requests.
 
+#### Demo data
+
+There is a make task to seed a non-production instance of the service with example data
+
+- `make seed-demo-data` or `make seed-demo-data ARGS=--noinput` to skip the confirmation
+
+This command wipes the database entirely before populating it with fictitious data. The data is contained in yaml files in the [data directory](/data) and can be amended etc there as required.
+
 ### Django admin
 
 We'll probably remove it before deploying to production, but currently Django admin is enabled.
