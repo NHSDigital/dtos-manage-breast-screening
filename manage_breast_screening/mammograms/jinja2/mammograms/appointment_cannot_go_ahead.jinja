@@ -1,46 +1,8 @@
 {% extends "wizard_step.jinja" %}
-{% from "checkboxes/macro.jinja" import checkboxes %}
-{% from "radios/macro.jinja" import radios %}
 
 {% block form %}
-{% set checkboxItems = [] %}
-
-{% for field_name, label in form.stopped_reasons.field.choices %}
-    {% do checkboxItems.append({
-      "text": label,
-      "id": form.stopped_reasons.auto_id if loop.first,
-      "value": field_name,
-      "checked": field_name in (form.stopped_reasons.value() or []),
-      "conditional": {
-        "html": form[field_name + "_details"].as_field_group()
-      }
-    }) %}
+{% for choice_value, _ in form.STOPPED_REASON_CHOICES %}
+  {% do form.stopped_reasons.add_conditional_html(choice_value, form[choice_value + "_details"].as_field_group()) %}
 {% endfor %}
-
-{% set checkbox_params = {
-  "idPrefix": form.stopped_reasons.auto_id,
-  "name": form.stopped_reasons.html_name,
-  "fieldset": {
-    "legend": {
-      "text": "Why has this appointment been stopped?",
-      "classes": "nhsuk-fieldset__legend--m",
-      "isPageHeading": False
-    }
-  },
-  "hint": {
-    "text": "Select all that apply"
-  },
-  "items": checkboxItems,
-} %}
-{% if form.stopped_reasons.errors %}
-  {% set error_params = {
-    "errorMessage": {
-      "text": form.stopped_reasons.errors | first
-    }
-  } %}
-  {% set checkbox_params = dict(checkbox_params, **error_params) %}
-{% endif %}
-
-{{ checkboxes(checkbox_params) }}
-
+{{ form.stopped_reasons.as_field_group() }}
 {% endblock form %}

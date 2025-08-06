@@ -5,12 +5,7 @@
 {% endif %}
 {% set ns = namespace(items=[]) %}
 {% for value, text in unbound_field.choices %}
-  {% set conditional_field = field.conditional_for_value(value) %}
-  {% if conditional_field %}
-    {% set conditional_html %}
-      {{ conditional_field.as_field_group() }}
-    {% endset %}
-  {% endif %}
+  {% set conditional_html = field.conditional_html(value) %}
   {% set ns.items = ns.items + [{
     "id": field.auto_id if loop.first,
     "value": value,
@@ -18,7 +13,7 @@
     "checked": value in (field.value() or []),
     "conditional": {
       "html": conditional_html
-    } if conditional_field else undefined
+    } if conditional_html else undefined
   }] %}
   {% set divider = field.get_divider_after(value) %}
   {% if divider %}

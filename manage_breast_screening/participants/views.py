@@ -7,7 +7,7 @@ from django.urls import reverse
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
 from manage_breast_screening.participants.services import fetch_current_provider
 
-from .forms import EthnicityForm, ParticipantRecordedMammogramForm
+from .forms import EthnicityForm, ParticipantReportedMammogramForm
 from .models import Appointment, Participant, ParticipantReportedMammogram
 from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
 
@@ -114,7 +114,7 @@ def add_previous_mammogram(request, pk):
     )
 
     if request.method == "POST":
-        form = ParticipantRecordedMammogramForm(
+        form = ParticipantReportedMammogramForm(
             data=request.POST,
             participant=participant,
             current_provider=current_provider,
@@ -124,7 +124,7 @@ def add_previous_mammogram(request, pk):
 
             return redirect(return_url)
     else:
-        form = ParticipantRecordedMammogramForm(
+        form = ParticipantReportedMammogramForm(
             participant=participant, current_provider=current_provider
         )
 

@@ -1,4 +1,3 @@
-{% from "checkboxes/macro.jinja" import checkboxes as checkboxes_component %}
 {% from 'date-input/macro.jinja' import dateInput as date_input_component %}
 {% from 'error-summary/macro.jinja' import errorSummary %}
 
@@ -18,38 +17,6 @@
         "errorList": ns.errors
       }) }}
     {% endif %}
-{% endmacro %}
-
-{% macro app_checkboxes(form_attribute, legend=None, hint=None) %}
-  {% if form_attribute.errors %}
-    {% set error_message = {"text": form_attribute.errors | first} %}
-  {% endif %}
-  {% set ns = namespace(items=[]) %}
-  {% set choice_field = form_attribute.field %}
-  {% for choice in choice_field.choices %}
-    {% set ns.items = ns.items + [{
-      "id": form_attribute.auto_id if loop.first,
-      "value": choice[0],
-      "text": choice[1],
-      "checked": choice[0] in (form_attribute.value() or [])
-    }] %}
-  {% endfor %}
-  {{ checkboxes_component({
-    "name": form_attribute.html_name,
-    "idPrefix": form_attribute.auto_id,
-    "fieldset":  {
-      "legend": {
-        "text": legend,
-        "classes": "nhsuk-fieldset__legend--m",
-        "isPageHeading": false
-      }
-    } if legend,
-    "errorMessage": error_message,
-    "hint": {
-      "html": hint|e
-    } if hint,
-    "items": ns.items
-  }) }}
 {% endmacro %}
 
 {% macro app_date_input(form_attribute, legend=None, hint=None) %}
