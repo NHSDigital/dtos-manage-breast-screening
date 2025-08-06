@@ -1,6 +1,12 @@
+from typing import cast
+
 from django import forms
 
-from manage_breast_screening.core.form_fields import CharField, ChoiceField
+from manage_breast_screening.core.form_fields import (
+    CharField,
+    ChoiceField,
+    MultipleChoiceField,
+)
 from manage_breast_screening.participants.models import AppointmentStatus
 
 
@@ -25,11 +31,15 @@ class AppointmentCannotGoAheadForm(forms.Form):
         self.instance = kwargs.pop("instance")
         super().__init__(*args, **kwargs)
 
+        stopped_reasons = cast(MultipleChoiceField, self.fields["stopped_reasons"])
+
         # Dynamically add detail fields for each choice
-        for field_name, _ in self.STOPPED_REASON_CHOICES:
-            self.fields[f"{field_name}_details"] = CharField(
+        for choice_value, _ in self.STOPPED_REASON_CHOICES:
+            details_field_name = f"{choice_value}_details"
+            self.fields[details_field_name] = CharField(
                 required=False, label="Provide details"
             )
+            stopped_reasons.add_conditional_field(choice_value, details_field_name)
 
         # Ensure that the field order matches the order we want to render in
         details_fields = [
@@ -37,7 +47,10 @@ class AppointmentCannotGoAheadForm(forms.Form):
         ]
         self.order_fields(["stopped_reasons"] + details_fields + ["decision"])
 
-    stopped_reasons = forms.MultipleChoiceField(
+    stopped_reasons = MultipleChoiceField(
+        label="Why has this appointment been stopped?",
+        label_classes="nhsuk-fieldset__legend--m",
+        hint="Select all that apply",
         choices=STOPPED_REASON_CHOICES,
         required=True,
         error_messages={
