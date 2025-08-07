@@ -6,6 +6,9 @@ import pytest
 import requests
 
 from manage_breast_screening.notifications.api_client import ApiClient
+from manage_breast_screening.notifications.management.commands.command_helpers import (
+    MessageBatchHelpers,
+)
 from manage_breast_screening.notifications.management.commands.send_message_batch import (
     TZ_INFO,
     Command,
@@ -18,6 +21,7 @@ from manage_breast_screening.notifications.tests.factories import AppointmentFac
 @patch.object(
     ApiClient, "send_message_batch", return_value=MagicMock(spec=requests.Response)
 )
+@patch.object(MessageBatchHelpers, "mark_batch_as_sent")
 class TestSendMessageBatch:
     @pytest.fixture
     def routing_plan_id(self):
@@ -25,7 +29,7 @@ class TestSendMessageBatch:
 
     @pytest.mark.django_db
     def test_handle_with_a_batch_to_send(
-        self, mock_send_message_batch, routing_plan_id
+        self, mock_mark_batch_as_sent, mock_send_message_batch, routing_plan_id
     ):
         """Test sending message batch with valid Appointment data"""
         mock_send_message_batch.return_value.status_code = 201
@@ -35,8 +39,6 @@ class TestSendMessageBatch:
         )
 
         subject = Command()
-        mock_mark_batch_as_sent = MagicMock()
-        subject.mark_batch_as_sent = mock_mark_batch_as_sent
 
         subject.handle(**{"routing_plan_id": routing_plan_id})
 
@@ -62,7 +64,11 @@ class TestSendMessageBatch:
 
     @pytest.mark.django_db
     def test_handle_with_appointments_inside_schedule_window(
-        self, mock_send_message_batch, routing_plan_id
+        self,
+        mock_mark_batch_as_sent,
+        mock_send_message_batch,
+        routing_plan_id,
+        monkeypatch,
     ):
         """Test that appointments with date inside the schedule period are notified"""
         mock_send_message_batch.return_value.status_code = 201
@@ -72,8 +78,6 @@ class TestSendMessageBatch:
         )
 
         subject = Command()
-        mock_mark_batch_as_sent = MagicMock()
-        subject.mark_batch_as_sent = mock_mark_batch_as_sent
 
         subject.handle(**{"routing_plan_id": routing_plan_id})
 
@@ -89,7 +93,11 @@ class TestSendMessageBatch:
 
     @pytest.mark.django_db
     def test_handle_with_appointments_outside_schedule_window(
-        self, mock_send_message_batch, routing_plan_id
+        self,
+        mock_mark_batch_as_sent,
+        mock_send_message_batch,
+        routing_plan_id,
+        monkeypatch,
     ):
         """Test that appointments with date inside the schedule period are notified"""
         AppointmentFactory(
@@ -98,18 +106,20 @@ class TestSendMessageBatch:
         )
 
         subject = Command()
-        mock_mark_batch_as_sent = MagicMock()
-        subject.mark_batch_as_sent = mock_mark_batch_as_sent
 
         subject.handle(**{"routing_plan_id": routing_plan_id})
 
         assert MessageBatch.objects.count() == 0
         assert Message.objects.count() == 0
-        mock_mark_batch_as_sent.assert_not_called
+        mock_mark_batch_as_sent.assert_not_called()
 
     @pytest.mark.django_db
     def test_handle_with_cancelled_appointments(
-        self, mock_send_message_batch, routing_plan_id
+        self,
+        mock_mark_batch_as_sent,
+        mock_send_message_batch,
+        routing_plan_id,
+        monkeypatch,
     ):
         """Test that that cancelled appointments are not notified"""
         mock_send_message_batch.return_value.status_code = 201
@@ -123,8 +133,6 @@ class TestSendMessageBatch:
         )
 
         subject = Command()
-        mock_mark_batch_as_sent = MagicMock()
-        subject.mark_batch_as_sent = mock_mark_batch_as_sent
 
         subject.handle(**{"routing_plan_id": routing_plan_id})
 
@@ -136,7 +144,7 @@ class TestSendMessageBatch:
 
     @pytest.mark.django_db
     def test_handle_with_failing_notifications(
-        self, mock_send_message_batch, routing_plan_id
+        self, mark_batch_as_sent, mock_send_message_batch, routing_plan_id
     ):
         """Test that message batches which fail to send are marked correctly"""
         mock_send_message_batch.return_value.status_code = 400
