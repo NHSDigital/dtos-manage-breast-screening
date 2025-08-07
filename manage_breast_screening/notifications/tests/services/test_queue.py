@@ -49,3 +49,18 @@ class TestQueue:
             )
             mock_client.create_queue.assert_called_once()
             mock_client.send_message.assert_called_once_with("some data")
+
+    def test_failed_message_batches_queue(self):
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            mock_client = MagicMock()
+            queue_client.from_connection_string.return_value = mock_client
+
+            Queue.FailedMessageBatches().add("some data")
+
+            queue_client.from_connection_string.assert_called_once_with(
+                "qqq111", "failed_message_batches"
+            )
+            mock_client.create_queue.assert_called_once()
+            mock_client.send_message.assert_called_once_with("some data")
