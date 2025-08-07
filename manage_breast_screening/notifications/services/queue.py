@@ -1,7 +1,7 @@
 import os
 
 from azure.core.exceptions import ResourceExistsError
-from azure.storage.queue import QueueClient
+from azure.storage.queue import QueueClient, QueueMessage
 
 
 class Queue:
@@ -16,6 +16,12 @@ class Queue:
 
     def add(self, message: str):
         self.client.send_message(message)
+
+    def delete(self, message: str | QueueMessage):
+        self.client.delete_message(message)
+
+    def items(self, limit=50):
+        return self.client.receive_messages(max_messages=limit)
 
     @classmethod
     def MessageStatusUpdates(cls):
