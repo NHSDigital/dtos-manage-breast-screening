@@ -3,9 +3,6 @@ import os
 import pytest
 from mesh_client import MeshClient
 
-from manage_breast_screening.notifications.mesh.mesh_functions import (
-    get_appointment_details,
-)
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 
@@ -23,7 +20,7 @@ class TestMeshClient:
         return Helpers()
 
     def test_retrieve_file(self, helpers):
-        test_file_path = helpers.test_dat_file_path()
+        test_file_path = helpers.get_test_file_path("ABC_20241202091221_APPT_106.dat")
         helpers.add_file_to_mesh_mailbox(test_file_path)
 
         with MeshClient(
@@ -37,7 +34,7 @@ class TestMeshClient:
             assert len(message_ids) == 1
 
             message_id = message_ids[0]
-            message = get_appointment_details(client, message_id)
+            message = client.retrieve_message(message_id).read().decode("ASCII")
 
             with open(test_file_path) as test_file:
                 assert message == test_file.read()
