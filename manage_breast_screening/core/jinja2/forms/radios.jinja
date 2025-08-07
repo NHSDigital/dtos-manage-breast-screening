@@ -1,0 +1,37 @@
+{% from 'radios/macro.jinja' import radios %}
+{% set unbound_field = field.field %}
+{% if field.errors %}
+  {% set error_message = {"text": field.errors | first} %}
+{% endif %}
+{% set ns = namespace(items=[]) %}
+{% for value, text in unbound_field.choices %}
+  {% set conditional_html = field.conditional_html(value) %}
+  {% set ns.items = ns.items + [{
+    "id": field.auto_id if loop.first,
+    "value": value,
+    "text": text,
+    "checked": field.value() == value,
+    "conditional": {
+      "html": conditional_html
+    } if conditional_html else undefined
+  }] %}
+  {% set divider = field.get_divider_after(value) %}
+  {% if divider %}
+    {% set ns.items = ns.items + [{"divider": divider}] %}
+  {% endif %}
+{% endfor %}
+{{ radios({
+  "name": field.html_name,
+  "idPrefix": field.auto_id,
+  "fieldset":  {
+    "legend": {
+      "text": field.label,
+      "classes": unbound_field.label_classes
+    }
+  },
+  "errorMessage": error_message,
+  "hint": {
+    "html": unbound_field.hint|e
+  } if unbound_field.hint,
+  "items": ns.items
+}) }}

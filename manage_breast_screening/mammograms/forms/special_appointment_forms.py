@@ -2,7 +2,11 @@ from django import forms
 from django.db.models import TextChoices
 from django.forms import Textarea
 
-from manage_breast_screening.core.form_fields import CharField
+from manage_breast_screening.core.form_fields import (
+    CharField,
+    ChoiceField,
+    MultipleChoiceField,
+)
 from manage_breast_screening.participants.models import SupportReasons
 
 
@@ -18,17 +22,20 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
         SupportReasons.SOCIAL_EMOTIONAL_MENTAL_HEALTH: "For example, neurodiversity or agoraphobia",
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, participant, **kwargs):
         self.saved_data = kwargs.pop("saved_data", {}) or {}
 
         super().__init__(*args, **kwargs)
 
         # Populate the initial data based on the JSON field
-        self._init_from_json(self.saved_data)
+        self._init_from_json(participant.extra_needs)
 
         # Allow all reasons to be unselected if editing, rather than creating
         # a special appointment.
-        self.fields["support_reasons"] = forms.MultipleChoiceField(
+        self.fields["support_reasons"] = MultipleChoiceField(
+            label=f"Why does {participant.full_name} need additional support?",
+            label_classes="nhsuk-fieldset__legend--m",
+            hint="Select all that apply. When describing support required, include any special requests made by the participant or their carer.",
             choices=self.SupportReasons,  # type: ignore
             required=("support_reasons" not in self.initial),
             error_messages={"required": "Select a reason"},
@@ -45,7 +52,10 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
                 hint=self.SupportReasonHints.get(option),
             )
 
-        self.fields["any_temporary"] = forms.ChoiceField(
+        self.fields["any_temporary"] = ChoiceField(
+            label="Are any of these reasons temporary?",
+            label_classes="nhsuk-fieldset__legend--m",
+            hint="This includes issues that are likely to be resolved by their next mammogram, for example a broken foot or a short-term eye problem.",
             choices=self.TemporaryChoices,  # type: ignore
             required=True,
             error_messages={
@@ -119,7 +129,9 @@ class MarkReasonsTemporaryForm(forms.Form):
             if reason.value in self.saved_data
         ]
 
-        self.fields["which_are_temporary"] = forms.MultipleChoiceField(
+        self.fields["which_are_temporary"] = MultipleChoiceField(
+            label="Which of these reasons are temporary?",
+            hint="If any reasons are relevant to this appointment only, mark them as temporary so they are not retained the next time this participant is invited for breast screening",
             choices=choices,  # type: ignore
             required=True,
             error_messages={"required": "Select which reasons are temporary"},

@@ -1,6 +1,10 @@
 from django import forms
 
-from manage_breast_screening.core.form_fields import CharField
+from manage_breast_screening.core.form_fields import (
+    CharField,
+    ChoiceField,
+    MultipleChoiceField,
+)
 from manage_breast_screening.participants.models import AppointmentStatus
 
 
@@ -26,8 +30,9 @@ class AppointmentCannotGoAheadForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         # Dynamically add detail fields for each choice
-        for field_name, _ in self.STOPPED_REASON_CHOICES:
-            self.fields[f"{field_name}_details"] = CharField(
+        for choice_value, _ in self.STOPPED_REASON_CHOICES:
+            details_field_name = f"{choice_value}_details"
+            self.fields[details_field_name] = CharField(
                 required=False, label="Provide details"
             )
 
@@ -37,7 +42,10 @@ class AppointmentCannotGoAheadForm(forms.Form):
         ]
         self.order_fields(["stopped_reasons"] + details_fields + ["decision"])
 
-    stopped_reasons = forms.MultipleChoiceField(
+    stopped_reasons = MultipleChoiceField(
+        label="Why has this appointment been stopped?",
+        label_classes="nhsuk-fieldset__legend--m",
+        hint="Select all that apply",
         choices=STOPPED_REASON_CHOICES,
         required=True,
         error_messages={
@@ -45,7 +53,9 @@ class AppointmentCannotGoAheadForm(forms.Form):
         },
     )
 
-    decision = forms.ChoiceField(
+    decision = ChoiceField(
+        label="Does the appointment need to be rescheduled?",
+        label_classes="nhsuk-fieldset__legend--m",
         choices=(
             ("True", "Yes, add participant to reinvite list"),
             ("False", "No"),
@@ -68,6 +78,7 @@ class AppointmentCannotGoAheadForm(forms.Form):
                 self.add_error(
                     "other_details", "Explain why this appointment cannot proceed"
                 )
+
         return cleaned_data
 
     def save(self):
