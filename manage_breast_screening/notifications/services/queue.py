@@ -17,6 +17,9 @@ class Queue:
     def add(self, message: str):
         self.client.send_message(message)
 
+    def items(self):
+        return self.client.receive_messages()
+
     @classmethod
     def MessageStatusUpdates(cls):
         return cls("message_status_updates")
