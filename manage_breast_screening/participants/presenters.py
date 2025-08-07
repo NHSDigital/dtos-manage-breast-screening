@@ -11,7 +11,7 @@ from ..core.utils.string_formatting import (
     format_phone_number,
     sentence_case,
 )
-from .models import AppointmentStatus
+from .models import AppointmentStatus, Ethnicity
 
 
 def status_colour(status):
@@ -75,6 +75,10 @@ class ParticipantPresenter:
             return background[0].lower() + background[1:]
 
         return background
+
+    @property
+    def ethnicity_not_shared(self):
+        return self._participant.ethnic_background_id == Ethnicity.PREFER_NOT_TO_SAY
 
 
 class ScreeningHistoryPresenter:
