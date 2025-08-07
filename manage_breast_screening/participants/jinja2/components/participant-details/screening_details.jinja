@@ -17,7 +17,7 @@
         {% endif %}
 
         {% if mammogram.additional_information %}
-          <br>Additional information: {{ mammogram.additional_information | nl2br }}
+          <br>Additional information: {{ mammogram.additional_information | nl2br | indent(10) }}
         {% endif %}
         </p>
       {% endfor %}

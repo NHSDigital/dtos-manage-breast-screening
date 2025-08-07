@@ -14,7 +14,7 @@
   <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
 {% endset %}
 {% set ethnicity_html %}
-  {% if ethnic_background == "Prefer not to say" %}
+  {% if presented_participant.ethnicity_not_shared %}
     {{ ethnic_background }}
   {% elif ethnic_background %}
     {{ ethnic_background_category }} ({{ ethnic_background }})
