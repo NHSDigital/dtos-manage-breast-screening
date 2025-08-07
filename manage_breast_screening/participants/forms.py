@@ -2,10 +2,10 @@ from datetime import date
 from enum import StrEnum
 
 from django import forms
-from django.forms import ChoiceField, ValidationError
+from django.forms import ValidationError
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.form_fields import CharField
+from manage_breast_screening.core.form_fields import CharField, ChoiceField
 
 from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
@@ -99,7 +99,11 @@ class ParticipantRecordedMammogramForm(forms.Form):
         }
 
         # Main choice fields
-        self.fields["where_taken"] = ChoiceField(choices=self.where_taken_choices)
+        self.fields["where_taken"] = ChoiceField(
+            label="Where were the breast x-rays taken?",
+            label_classes="nhsuk-fieldset__legend--m",
+            choices=self.where_taken_choices,
+        )
 
         self.fields["when_taken"] = ChoiceField(choices=self.when_taken_choices)
 
