@@ -1,7 +1,6 @@
 {% from "checkboxes/macro.jinja" import checkboxes as checkboxes_component %}
 {% from 'date-input/macro.jinja' import dateInput as date_input_component %}
 {% from 'error-summary/macro.jinja' import errorSummary %}
-{% from 'select/macro.jinja' import select as select_component %}
 
 {% macro form_error_summary(form, title="There is a problem") %}
     {% if form.errors %}
@@ -45,33 +44,6 @@
         "isPageHeading": false
       }
     } if legend,
-    "errorMessage": error_message,
-    "hint": {
-      "html": hint|e
-    } if hint,
-    "items": ns.items
-  }) }}
-{% endmacro %}
-
-{% macro app_select(form_attribute, label=None, hint=None) %}
-  {% if form_attribute.errors %}
-    {% set error_message = {"text": form_attribute.errors | first} %}
-  {% endif %}
-  {% set ns = namespace(items=[]) %}
-  {% set choice_field = form_attribute.field %}
-  {% for choice in choice_field.choices %}
-    {% set ns.items = ns.items + [{
-      "id": form_attribute.auto_id if loop.first,
-      "value": choice[0],
-      "text": choice[1],
-      "selected": form_attribute.value() in ["", none] if choice[0] == "" else form_attribute.value() == choice[0],
-      "disabled": choice[0] == ""
-    }] %}
-  {% endfor %}
-  {{ select_component({
-    "name": form_attribute.html_name,
-    "id": form_attribute.auto_id,
-    "label": {"text": form_attribute.label},
     "errorMessage": error_message,
     "hint": {
       "html": hint|e
