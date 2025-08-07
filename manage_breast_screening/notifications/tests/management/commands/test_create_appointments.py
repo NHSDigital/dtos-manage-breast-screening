@@ -20,7 +20,9 @@ from manage_breast_screening.notifications.tests.factories import (
 class TestCreateAppointments:
     @pytest.fixture
     def raw_data(self):
-        return open(f"{os.path.dirname(os.path.realpath(__file__))}/test.dat").read()
+        return open(
+            f"{os.path.dirname(os.path.realpath(__file__))}/ABC_20241202091221_APPT_106.dat"
+        ).read()
 
     @pytest.mark.django_db
     def test_handle_creates_records(self, raw_data):
@@ -31,7 +33,9 @@ class TestCreateAppointments:
 
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(return_value=f"{today_dirname}/test.dat")
+        mock_blob.name = PropertyMock(
+            return_value=f"{today_dirname}/ABC_20241202091221_APPT_106.dat"
+        )
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
             raw_data
@@ -107,7 +111,7 @@ class TestCreateAppointments:
         # Receive a cancellation for existing appointment
         today = datetime.now()
         raw_data = open(
-            f"{os.path.dirname(os.path.realpath(__file__))}/test_updated.dat"
+            f"{os.path.dirname(os.path.realpath(__file__))}/ABC_20241202091321_APPT_107.dat"
         ).read()
         today_dirname = today.strftime("%Y-%m-%d")
 
@@ -115,7 +119,9 @@ class TestCreateAppointments:
 
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(return_value=f"{today_dirname}/test_updated.dat")
+        mock_blob.name = PropertyMock(
+            return_value=f"{today_dirname}/ABC_20241202091321_APPT_107.dat"
+        )
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
             raw_data
@@ -142,7 +148,9 @@ class TestCreateAppointments:
 
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(return_value="2025-07-01/test.dat")
+        mock_blob.name = PropertyMock(
+            return_value="2025-07-01/ABC_20241202091221_APPT_106.dat"
+        )
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
             raw_data
