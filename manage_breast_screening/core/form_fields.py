@@ -233,7 +233,7 @@ class BoundChoiceField(forms.BoundField):
 
 class ChoiceField(forms.ChoiceField):
     """
-    A ChoiceField that renders using NHS.UK design system radios/checkboxes/select
+    A ChoiceField that renders using NHS.UK design system radios/select
     components.
     """
 
@@ -287,8 +287,8 @@ class ChoiceField(forms.ChoiceField):
 
 class MultipleChoiceField(forms.MultipleChoiceField):
     """
-    A ChoiceField that renders using NHS.UK design system radios/checkboxes/select
-    components.
+    A MultipleChoiceField that renders using the NHS.UK design system checkboxes
+    component.
     """
 
     widget = widgets.CheckboxSelectMultiple
