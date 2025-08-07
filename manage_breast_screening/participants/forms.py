@@ -130,7 +130,7 @@ class ParticipantReportedMammogramForm(forms.Form):
             label=f"Were they taken with the name {participant.full_name}?",
             label_classes="nhsuk-fieldset__legend--m",
             choices=self.name_is_the_same_choices,
-            conditional_fields={self.NameIsTheSame.YES: "different_name"},
+            conditional_fields={self.NameIsTheSame.NO: "different_name"},
         )
 
         # Conditionally shown fields

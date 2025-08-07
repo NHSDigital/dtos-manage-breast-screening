@@ -1,7 +1,11 @@
-{% extends 'layout-form.jinja' %}
-{% from 'button/macro.jinja' import button %}
+{% extends "layout-form.jinja" %}
+{% from "button/macro.jinja" import button %}
 
 {% block form %}
+  {% for option in form.SupportReasons %}
+    {% do form.support_reasons.add_conditional_html(option.value, form[option.value.lower() + "_details"].as_field_group()) %}
+  {% endfor %}
+
   {{ form.support_reasons.as_field_group() }}
 
   {{ form.any_temporary.as_field_group() }}

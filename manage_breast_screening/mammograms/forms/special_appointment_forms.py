@@ -51,12 +51,10 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
                 widget=Textarea,
                 hint=self.SupportReasonHints.get(option),
             )
-            self.fields["support_reasons"].add_conditional_field(
-                option.value, field_name
-            )
 
         self.fields["any_temporary"] = ChoiceField(
             label="Are any of these reasons temporary?",
+            label_classes="nhsuk-fieldset__legend--m",
             hint="This includes issues that are likely to be resolved by their next mammogram, for example a broken foot or a short-term eye problem.",
             choices=self.TemporaryChoices,  # type: ignore
             required=True,

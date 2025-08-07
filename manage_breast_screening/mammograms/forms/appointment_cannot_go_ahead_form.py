@@ -1,5 +1,3 @@
-from typing import cast
-
 from django import forms
 
 from manage_breast_screening.core.form_fields import (
@@ -31,15 +29,12 @@ class AppointmentCannotGoAheadForm(forms.Form):
         self.instance = kwargs.pop("instance")
         super().__init__(*args, **kwargs)
 
-        stopped_reasons = cast(MultipleChoiceField, self.fields["stopped_reasons"])
-
         # Dynamically add detail fields for each choice
         for choice_value, _ in self.STOPPED_REASON_CHOICES:
             details_field_name = f"{choice_value}_details"
             self.fields[details_field_name] = CharField(
                 required=False, label="Provide details"
             )
-            stopped_reasons.add_conditional_field(choice_value, details_field_name)
 
         # Ensure that the field order matches the order we want to render in
         details_fields = [
@@ -60,6 +55,7 @@ class AppointmentCannotGoAheadForm(forms.Form):
 
     decision = ChoiceField(
         label="Does the appointment need to be rescheduled?",
+        label_classes="nhsuk-fieldset__legend--m",
         choices=(
             ("True", "Yes, add participant to reinvite list"),
             ("False", "No"),
@@ -82,6 +78,7 @@ class AppointmentCannotGoAheadForm(forms.Form):
                 self.add_error(
                     "other_details", "Explain why this appointment cannot proceed"
                 )
+
         return cleaned_data
 
     def save(self):

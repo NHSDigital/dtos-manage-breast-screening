@@ -1,5 +1,8 @@
 {% extends "wizard_step.jinja" %}
 
 {% block form %}
+{% for choice_value, _ in form.STOPPED_REASON_CHOICES %}
+  {% do form.stopped_reasons.add_conditional_html(choice_value, form[choice_value + "_details"].as_field_group()) %}
+{% endfor %}
 {{ form.stopped_reasons.as_field_group() }}
 {% endblock form %}
