@@ -33,12 +33,14 @@ def nl2br(value):
 
 def as_hint(value):
     """
-    Wrap a string in a span with class app-text-grey
+    Wrap a string in a span with class nhsuk-u-secondary-text-color
 
     >>> as_hint('Not provided')
-    Markup('<span class="app-text-grey">Not provided</span>')
+    Markup('<span class=nhsuk-u-secondary-text-color">Not provided</span>')
     """
-    return Markup(f'<span class="app-text-grey">{value}</span>' if value else "")
+    return Markup(
+        f'<span class=nhsuk-u-secondary-text-color">{value}</span>' if value else ""
+    )
 
 
 def raise_helper(msg):
