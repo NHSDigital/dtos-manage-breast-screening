@@ -5,7 +5,7 @@ from functools import cached_property
 import pytest
 from azure.storage.blob import BlobServiceClient, ContainerClient
 
-from manage_breast_screening.notifications.management.commands.get_appointment_details import (
+from manage_breast_screening.notifications.management.commands.store_mesh_messages import (
     Command,
 )
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers

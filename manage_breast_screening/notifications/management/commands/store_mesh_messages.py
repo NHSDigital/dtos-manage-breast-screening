@@ -4,7 +4,7 @@ from datetime import datetime
 from django.core.management.base import BaseCommand, CommandError
 from mesh_client import MeshClient
 
-from manage_breast_screening.notifications.storage import BlobStorage
+from manage_breast_screening.notifications.blob_storage import BlobStorage
 
 
 class Command(BaseCommand):

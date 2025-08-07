@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 
+from manage_breast_screening.notifications.blob_storage import BlobStorage
 from manage_breast_screening.notifications.management.commands.create_appointments import (
     TZ_INFO,
     Command,
@@ -28,7 +29,9 @@ class TestCreateAppointmentsFromAzureStorage:
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
         with open(helpers.test_dat_file_path()) as test_file:
-            helpers.add_to_blob_storage(f"{today_dirname}/test.dat", test_file.read())
+            BlobStorage().add(
+                f"{today_dirname}/ABC_20241202091221_APPT_106.dat", test_file.read()
+            )
 
         Command().handle(**{"date_str": today_dirname})
 
