@@ -5,9 +5,11 @@
   {% set address_html %}
     {% if presented_participant.address %}
       {% for line in presented_participant.address.lines %}
-        {{ line }}<br>
+        {{ line }}{% if not loop.last %}<br>{% endif %}
       {% endfor %}
-      {{ presented_participant.address.postcode }}
+      {% if presented_participant.address.postcode %}
+        <br>{{ presented_participant.address.postcode }}
+      {% endif %}
     {% endif %}
   {% endset %}
   {% call card({
