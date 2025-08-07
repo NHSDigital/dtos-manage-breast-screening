@@ -21,3 +21,5 @@ manage_breast_screening/static
 # Files that aren't checked in
 .pytest_cache
 .terraform
+htmlcov/
+.mypy_cache/

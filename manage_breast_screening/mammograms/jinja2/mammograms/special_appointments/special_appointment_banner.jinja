@@ -10,12 +10,12 @@
         {% if reason.details %}
           {% set value_content = reason.details %}
         {% else %}
-          {% set value_content = "<span class=\"special-appointment-banner__no-details\">No details provided</span>" %}
+          {% set value_content = "<span class=\"app-special-appointment-banner__tag--no-details\">No details provided</span>" %}
         {% endif %}
 
         {# Add temporary tag to the value content if needed #}
         {% if reason.temporary %}
-          {% set value_content = value_content + "<br><span class=\"special-appointment-banner__temporary\">Temporary</span>" %}
+          {% set value_content = value_content + "<br><span class=\"app-special-appointment-banner__tag--temporary\">Temporary</span>" %}
         {% endif %}
 
         {# Add row for this support reason #}
@@ -30,10 +30,10 @@
       {% endfor %}
       {{ summaryList({
         "rows": rows,
-        "classes": "special-appointment-banner"
+        "classes": "app-special-appointment-banner"
       }) }}
       {% if show_change_link %}
-        <div class="special-appointment-banner__action">
+        <div class="app-special-appointment-banner__action">
           <a href="{{ presented_special_appointment.change_url }}" style="font-size: 19px;">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements</span></a>
         </div>
       {% endif %}
