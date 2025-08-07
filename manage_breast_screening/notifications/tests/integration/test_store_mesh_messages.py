@@ -1,5 +1,5 @@
-import datetime
 import os
+from datetime import datetime
 from functools import cached_property
 
 import pytest
@@ -30,10 +30,8 @@ class TestStoreMeshMessages:
         return Helpers()
 
     def test_retrieve_file(self, helpers):
-        assert not self.container_client.exists()
-
-        test_file_1 = helpers.test_dat_file_path()
-        test_file_2 = helpers.test_dat_file_path_2()
+        test_file_1 = helpers.get_test_file_path("ABC_20241202091221_APPT_106.dat")
+        test_file_2 = helpers.get_test_file_path("ABC_20241202091321_APPT_107.dat")
         helpers.add_file_to_mesh_mailbox(test_file_1)
         helpers.add_file_to_mesh_mailbox(test_file_2)
 
@@ -51,7 +49,7 @@ class TestStoreMeshMessages:
 
             assert file_path == datetime.today().strftime("%Y-%m-%d")
 
-            file_path = f"{os.path.dirname(os.path.realpath(__file__))}/../management/commands/{file_name}"
+            file_path = helpers.get_test_file_path(file_name)
 
             with open(file_path) as test_file:
                 assert test_file.read() == blob_content

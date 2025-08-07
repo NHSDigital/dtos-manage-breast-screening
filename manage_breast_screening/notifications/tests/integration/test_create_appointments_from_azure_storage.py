@@ -28,7 +28,9 @@ class TestCreateAppointmentsFromAzureStorage:
     def test_appointments_created_from_file_stored_in_azure(self, helpers):
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
-        with open(helpers.test_dat_file_path()) as test_file:
+        with open(
+            helpers.get_test_file_path("ABC_20241202091221_APPT_106.dat")
+        ) as test_file:
             BlobStorage().add(
                 f"{today_dirname}/ABC_20241202091221_APPT_106.dat", test_file.read()
             )

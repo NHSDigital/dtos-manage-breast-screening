@@ -20,7 +20,7 @@ class TestMeshClient:
         return Helpers()
 
     def test_retrieve_file(self, helpers):
-        test_file_path = helpers.test_dat_file_path()
+        test_file_path = helpers.get_test_file_path("ABC_20241202091221_APPT_106.dat")
         helpers.add_file_to_mesh_mailbox(test_file_path)
 
         with MeshClient(

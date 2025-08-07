@@ -20,16 +20,10 @@ class Helpers:
                     workflow_id="TEST_NBSS_WORKFLOW",
                 )
 
-    def test_dat_file_path(self):
+    def get_test_file_path(self, test_file):
         return (
             f"{os.path.dirname(os.path.realpath(__file__))}"
-            "/../management/commands/ABC_20241202091221_APPT_106.dat"
-        )
-
-    def test_update_dat_file_path(self):
-        return (
-            f"{os.path.dirname(os.path.realpath(__file__))}"
-            "/../management/commands/ABC_20241202091321_APPT_107.dat"
+            f"/../management/commands/{test_file}"
         )
 
     def azurite_connection_string(self):

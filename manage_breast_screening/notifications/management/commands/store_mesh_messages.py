@@ -16,10 +16,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             with self.mesh_client() as client:
+                today_dirname = datetime.today().strftime("%Y-%m-%d")
                 for message in client.list_messages():
                     appointment = client.retrieve_message(message)
-
-                    today_dirname = datetime.today().strftime("%Y-%m-%d")
 
                     BlobStorage().add(
                         f"{today_dirname}/{appointment.filename}",
