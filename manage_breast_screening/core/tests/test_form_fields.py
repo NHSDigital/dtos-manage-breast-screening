@@ -3,7 +3,13 @@ import datetime
 import pytest
 from django.core.exceptions import ValidationError
 from django.forms import Form
-from django.forms.widgets import CheckboxSelectMultiple, TelInput, Textarea, TextInput
+from django.forms.widgets import (
+    CheckboxSelectMultiple,
+    Select,
+    TelInput,
+    Textarea,
+    TextInput,
+)
 from pytest_django.asserts import assertHTMLEqual
 
 from ..form_fields import (
@@ -385,6 +391,13 @@ class TestChoiceField:
                 choices=(("a", "A"), ("b", "B")),
                 hint="Pick either one",
             )
+            select_field = ChoiceField(
+                label="Select",
+                label_classes="app-select",
+                choices=(("a", "A"), ("b", "B")),
+                hint="Pick either one",
+                widget=Select,
+            )
             details = CharField(label="Abc", initial="")
 
         return TestForm
@@ -451,6 +464,29 @@ class TestChoiceField:
             </div>
             """,
         )
+
+    def test_renders_nhs_select(self, form_class):
+        assertHTMLEqual(
+            form_class()["select_field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label app-select"  for="id_select_field">Select</label>
+                <div class="nhsuk-hint" id="id_select_field-hint">
+                    Pick either one
+                </div>
+                <select aria-describedby="id_select_field-hint" class="nhsuk-select" id="id_select_field" name="select_field">
+                    <option value="a">A</option>
+                    <option value="b">B</option>
+                </select>
+            </div>
+            """,
+        )
+
+    def test_renders_select_with_conditional_field(self, form_class):
+        form = form_class()
+
+        with pytest.raises(ValueError):
+            form.fields["select_field"].add_conditional_field("b", "details")
 
 
 class TestMultipleChoiceField:

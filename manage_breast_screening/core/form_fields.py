@@ -252,11 +252,17 @@ class ChoiceField(forms.ChoiceField):
 
         super().__init__(*args, **kwargs)
 
+        if self.conditional_fields and isinstance(self.widget, widgets.Select):
+            raise ValueError("Select widget does not support conditional fields")
+
     def add_conditional_field(self, value: str, field: str):
         """
         Mark that another field should be conditionally shown based on
         a certain value being selected.
         """
+        if isinstance(self.widget, widgets.Select):
+            raise ValueError("Select widget does not support conditional fields")
+
         self.conditional_fields[value] = field
 
     @staticmethod
