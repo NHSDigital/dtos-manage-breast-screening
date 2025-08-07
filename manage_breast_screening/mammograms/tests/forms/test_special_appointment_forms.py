@@ -4,6 +4,7 @@ from manage_breast_screening.mammograms.forms import (
 from manage_breast_screening.mammograms.forms.special_appointment_forms import (
     MarkReasonsTemporaryForm,
 )
+from manage_breast_screening.participants.tests.factories import ParticipantFactory
 
 SupportReasons = ProvideSpecialAppointmentDetailsForm.SupportReasons
 TemporaryChoices = ProvideSpecialAppointmentDetailsForm.TemporaryChoices
@@ -11,7 +12,9 @@ TemporaryChoices = ProvideSpecialAppointmentDetailsForm.TemporaryChoices
 
 class TestProvideSpecialAppointmentDetailsForm:
     def test_dynamic_form_fields(self):
-        form = ProvideSpecialAppointmentDetailsForm()
+        form = ProvideSpecialAppointmentDetailsForm(
+            participant=ParticipantFactory.build()
+        )
         assert list(form.fields.keys()) == [
             "support_reasons",
             "breast_implants_details",
@@ -28,11 +31,12 @@ class TestProvideSpecialAppointmentDetailsForm:
 
     def test_valid_form(self):
         form = ProvideSpecialAppointmentDetailsForm(
+            participant=ParticipantFactory.build(),
             data={
                 "support_reasons": [SupportReasons.SOCIAL_EMOTIONAL_MENTAL_HEALTH],
                 "social_emotional_mental_health_details": "autistic",
                 "any_temporary": TemporaryChoices.NO,
-            }
+            },
         )
         assert form.is_valid()
         assert form.cleaned_data == {
@@ -53,16 +57,18 @@ class TestProvideSpecialAppointmentDetailsForm:
 
     def test_conditionally_required_fields(self):
         form = ProvideSpecialAppointmentDetailsForm(
+            participant=ParticipantFactory.build(),
             data={
                 "support_reasons": [SupportReasons.HEARING],
                 "any_temporary": TemporaryChoices.YES,
-            }
+            },
         )
         assert not form.is_valid()
         assert form.errors == {"hearing_details": ["Describe the support required"]}
 
     def test_to_json(self):
         form = ProvideSpecialAppointmentDetailsForm(
+            participant=ParticipantFactory.build(),
             data={
                 "support_reasons": [
                     SupportReasons.GENDER_IDENTITY,
@@ -71,7 +77,7 @@ class TestProvideSpecialAppointmentDetailsForm:
                 "gender_identity_details": "identifies as male",
                 "physical_restriction_details": "uses a mobility aid",
                 "any_temporary": TemporaryChoices.NO,
-            }
+            },
         )
         assert form.is_valid()
         assert form.to_json() == {
@@ -84,9 +90,11 @@ class TestProvideSpecialAppointmentDetailsForm:
 
     def test_init_from_json(self):
         form = ProvideSpecialAppointmentDetailsForm(
-            saved_data={
-                "MEDICAL_DEVICES": {"details": "has pacemaker", "temporary": False}
-            }
+            participant=ParticipantFactory.build(
+                extra_needs={
+                    "MEDICAL_DEVICES": {"details": "has pacemaker", "temporary": False}
+                }
+            )
         )
         assert form.initial == {
             "support_reasons": [SupportReasons.MEDICAL_DEVICES],
@@ -96,14 +104,18 @@ class TestProvideSpecialAppointmentDetailsForm:
 
     def to_and_from_json(self):
         form = ProvideSpecialAppointmentDetailsForm(
-            data={
-                "support_reasons": [SupportReasons.LANGUAGE],
-                "language_details": "speaks french",
-                "any_temporary": TemporaryChoices.YES,
-            }
+            participant=ParticipantFactory.build(
+                extra_needs={
+                    "support_reasons": [SupportReasons.LANGUAGE],
+                    "language_details": "speaks french",
+                    "any_temporary": TemporaryChoices.YES,
+                }
+            )
         )
         json = form.to_json()
-        edit_form = ProvideSpecialAppointmentDetailsForm(saved_data=json)
+        edit_form = ProvideSpecialAppointmentDetailsForm(
+            participant=ParticipantFactory.build(extra_needs=json)
+        )
 
         assert edit_form.initial == {
             "support_reasons": [SupportReasons.LANGUAGE],

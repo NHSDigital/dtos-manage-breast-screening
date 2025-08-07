@@ -22,17 +22,18 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
         SupportReasons.SOCIAL_EMOTIONAL_MENTAL_HEALTH: "For example, neurodiversity or agoraphobia",
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, participant, **kwargs):
         self.saved_data = kwargs.pop("saved_data", {}) or {}
 
         super().__init__(*args, **kwargs)
 
         # Populate the initial data based on the JSON field
-        self._init_from_json(self.saved_data)
+        self._init_from_json(participant.extra_needs)
 
         # Allow all reasons to be unselected if editing, rather than creating
         # a special appointment.
         self.fields["support_reasons"] = MultipleChoiceField(
+            label=f"Why does {participant.full_name} need additional support?",
             label_classes="nhsuk-fieldset__legend--m",
             hint="Select all that apply. When describing support required, include any special requests made by the participant or their carer.",
             choices=self.SupportReasons,  # type: ignore

@@ -28,10 +28,6 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
-        context["form"]["support_reasons"].label = (
-            f"Why does {self.participant.full_name} need additional support?",
-        )
-
         context.update(
             {
                 "back_link_params": {
@@ -49,7 +45,7 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["saved_data"] = self.participant.extra_needs
+        kwargs["participant"] = self.participant
         return kwargs
 
     def form_valid(self, form):
