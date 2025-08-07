@@ -20,6 +20,10 @@
       "html": conditional_html
     } if conditional_field else undefined
   }] %}
+  {% set divider = field.get_divider_after(value) %}
+  {% if divider %}
+    {% set ns.items = ns.items + [{"divider": divider}] %}
+  {% endif %}
 {% endfor %}
 {{ radios({
   "name": field.html_name,

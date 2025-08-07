@@ -488,6 +488,11 @@ class TestChoiceField:
         with pytest.raises(ValueError):
             form.fields["select_field"].add_conditional_field("b", "details")
 
+    def test_adding_dividers_via_boundfield(self, form_class):
+        bound_field = form_class()["field"]
+        bound_field.add_divider_after("a", "or")
+        assert bound_field.get_divider_after("a") == "or"
+
 
 class TestMultipleChoiceField:
     @pytest.fixture

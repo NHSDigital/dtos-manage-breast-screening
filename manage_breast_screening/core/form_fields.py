@@ -219,8 +219,16 @@ class BoundChoiceField(forms.BoundField):
             for value, conditional_field_name in field.conditional_fields.items()
         }
 
+        self.dividers = {}
+
     def conditional_for_value(self, value):
         return self.conditional_fields.get(value)
+
+    def add_divider_after(self, previous, divider):
+        self.dividers[previous] = divider
+
+    def get_divider_after(self, previous):
+        return self.dividers.get(previous)
 
 
 class ChoiceField(forms.ChoiceField):
