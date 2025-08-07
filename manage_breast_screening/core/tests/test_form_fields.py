@@ -429,12 +429,12 @@ class TestChoiceField:
             """,
         )
 
-    def test_renders_radios_with_conditional_field(self, form_class):
+    def test_renders_radios_with_conditional_html(self, form_class):
         form = form_class()
-        form.fields["field"].add_conditional_field("b", "details")
+        form["field"].add_conditional_html("b", "<p>Hello</p>")
 
         assertHTMLEqual(
-            form_class()["field"].as_field_group(),
+            form["field"].as_field_group(),
             """
             <div class="nhsuk-form-group">
                 <fieldset class="nhsuk-fieldset">
@@ -454,10 +454,7 @@ class TestChoiceField:
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
                         </div>
                         <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
-                            <div class="nhsuk-form-group">
-                                <label class="nhsuk-label" for="id_details">Abc</label>
-                                <input class="nhsuk-input" id="id_details" name="details" type="text">
-                            </div>
+                            <p>Hello</p>
                         </div>
                     </div>
                 </fieldset>
@@ -482,11 +479,11 @@ class TestChoiceField:
             """,
         )
 
-    def test_renders_select_with_conditional_field(self, form_class):
+    def test_renders_select_with_conditional_html(self, form_class):
         form = form_class()
 
         with pytest.raises(ValueError):
-            form.fields["select_field"].add_conditional_field("b", "details")
+            form["select_field"].add_conditional_html("b", "<p>Hello</p>")
 
     def test_adding_dividers_via_boundfield(self, form_class):
         bound_field = form_class()["field"]
@@ -536,9 +533,9 @@ class TestMultipleChoiceField:
             """,
         )
 
-    def test_renders_nhs_checkboxes_with_conditional_field(self, form_class):
+    def test_renders_nhs_checkboxes_with_conditional_html(self, form_class):
         form = form_class()
-        form.fields["checkbox_field"].add_conditional_field("b", "details")
+        form["checkbox_field"].add_conditional_html("b", "<p>Hello</p>")
 
         assertHTMLEqual(
             form["checkbox_field"].as_field_group(),
@@ -561,10 +558,7 @@ class TestMultipleChoiceField:
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
                         </div>
                         <div class="nhsuk-checkboxes__conditional nhsuk-checkboxes__conditional--hidden" id="conditional-id_checkbox_field-2">
-                            <div class="nhsuk-form-group">
-                                <label class="nhsuk-label" for="id_details">Abc</label>
-                                <input class="nhsuk-input" id="id_details" name="details" type="text">
-                            </div>
+                            <p>Hello</p>
                         </div>
                     </div>
                 </fieldset>

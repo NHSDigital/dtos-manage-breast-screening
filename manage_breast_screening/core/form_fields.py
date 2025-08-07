@@ -206,7 +206,8 @@ class IntegerField(forms.IntegerField):
 
 class BoundChoiceField(forms.BoundField):
     """
-    Specialisation of BoundField that knows about conditionally rendered fields.
+    Specialisation of BoundField that can deal with conditionally shown fields,
+    and divider content between choices.
     This can be used to render a set of radios or checkboxes with text boxes to capture
     more details.
     """
@@ -214,15 +215,17 @@ class BoundChoiceField(forms.BoundField):
     def __init__(self, form: forms.Form, field: "ChoiceField", name: str):
         super().__init__(form, field, name)
 
-        self.conditional_fields = {
-            value: form[conditional_field_name]
-            for value, conditional_field_name in field.conditional_fields.items()
-        }
-
+        self._conditional_html = {}
         self.dividers = {}
 
-    def conditional_for_value(self, value):
-        return self.conditional_fields.get(value)
+    def add_conditional_html(self, value, html):
+        if isinstance(self.field.widget, widgets.Select):
+            raise ValueError("select comonent does not support conditional fields")
+
+        self._conditional_html[value] = html
+
+    def conditional_html(self, value):
+        return self._conditional_html.get(value)
 
     def add_divider_after(self, previous, divider):
         self.dividers[previous] = divider
@@ -233,7 +236,7 @@ class BoundChoiceField(forms.BoundField):
 
 class ChoiceField(forms.ChoiceField):
     """
-    A ChoiceField that renders using NHS.UK design system radios/checkboxes/select
+    A ChoiceField that renders using NHS.UK design system radios/select
     components.
     """
 
@@ -246,7 +249,6 @@ class ChoiceField(forms.ChoiceField):
         hint=None,
         label_classes=None,
         classes=None,
-        conditional_fields=None,
         **kwargs,
     ):
         kwargs["template_name"] = ChoiceField._template_name(
@@ -256,22 +258,8 @@ class ChoiceField(forms.ChoiceField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
-        self.conditional_fields = conditional_fields or {}
 
         super().__init__(*args, **kwargs)
-
-        if self.conditional_fields and isinstance(self.widget, widgets.Select):
-            raise ValueError("Select widget does not support conditional fields")
-
-    def add_conditional_field(self, value: str, field: str):
-        """
-        Mark that another field should be conditionally shown based on
-        a certain value being selected.
-        """
-        if isinstance(self.widget, widgets.Select):
-            raise ValueError("Select widget does not support conditional fields")
-
-        self.conditional_fields[value] = field
 
     @staticmethod
     def _template_name(widget):
@@ -287,8 +275,8 @@ class ChoiceField(forms.ChoiceField):
 
 class MultipleChoiceField(forms.MultipleChoiceField):
     """
-    A ChoiceField that renders using NHS.UK design system radios/checkboxes/select
-    components.
+    A MultipleChoiceField that renders using the NHS.UK design system checkboxes
+    component.
     """
 
     widget = widgets.CheckboxSelectMultiple
@@ -300,7 +288,6 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         hint=None,
         label_classes=None,
         classes=None,
-        conditional_fields=None,
         **kwargs,
     ):
         kwargs["template_name"] = "forms/checkboxes.jinja"
@@ -308,13 +295,5 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
-        self.conditional_fields = conditional_fields or {}
 
         super().__init__(*args, **kwargs)
-
-    def add_conditional_field(self, value: str, field: str):
-        """
-        Mark that another field should be conditionally shown based on
-        a certain value being selected.
-        """
-        self.conditional_fields[value] = field
