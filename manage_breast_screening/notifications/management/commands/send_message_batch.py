@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -12,6 +13,7 @@ from manage_breast_screening.notifications.models import (
     Message,
     MessageBatch,
 )
+from manage_breast_screening.notifications.services.queue import Queue
 
 TZ_INFO = ZoneInfo("Europe/London")
 
@@ -59,6 +61,9 @@ class Command(BaseCommand):
                 self.stdout.write(f"{message_batch} sent")
             else:
                 self.mark_batch_as_failed(message_batch)
+                self.add_batch_to_failed_batch_queue(
+                    message_batch=message_batch, status_code=response.status_code
+                )
                 self.stdout.write(
                     f"Failed to send batch. Status: {response.status_code}"
                 )
@@ -72,6 +77,18 @@ class Command(BaseCommand):
         for message in message_batch.messages.all():
             message.status = "failed"
             message.save()
+
+    def add_batch_to_failed_batch_queue(
+        self, message_batch: MessageBatch, status_code: int
+    ):
+        Queue.FailedMessageBatches().add(
+            json.dumps(
+                {
+                    "message_batch_id": str(message_batch.id),
+                    "status_code": str(status_code),
+                }
+            )
+        )
 
     # TODO: Check the appointment notification rules here.
     def schedule_date(self) -> datetime:

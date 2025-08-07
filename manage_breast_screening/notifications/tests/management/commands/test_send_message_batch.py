@@ -1,3 +1,4 @@
+import json
 import uuid
 from datetime import datetime, timedelta
 from unittest.mock import ANY, MagicMock, patch
@@ -153,11 +154,23 @@ class TestSendMessageBatch:
             + timedelta(weeks=4, days=4)
         )
 
-        Command().handle(**{"routing_plan_id": routing_plan_id})
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.FailedMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            Command().handle(**{"routing_plan_id": routing_plan_id})
 
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
         assert message_batches[0].status == "failed"
+        queue_instance.add.assert_called_once_with(
+            json.dumps(
+                {"message_batch_id": str(message_batches[0].id), "status_code": "400"}
+            )
+        )
+
         messages = Message.objects.filter(
             appointment=appointment, batch=message_batches[0]
         )
