@@ -206,7 +206,8 @@ class IntegerField(forms.IntegerField):
 
 class BoundChoiceField(forms.BoundField):
     """
-    Specialisation of BoundField that knows about conditionally rendered fields.
+    Specialisation of BoundField that can deal with conditionally shown fields,
+    and divider content between choices.
     This can be used to render a set of radios or checkboxes with text boxes to capture
     more details.
     """
@@ -214,15 +215,14 @@ class BoundChoiceField(forms.BoundField):
     def __init__(self, form: forms.Form, field: "ChoiceField", name: str):
         super().__init__(form, field, name)
 
-        self.conditional_fields = {
-            value: form[conditional_field_name]
-            for value, conditional_field_name in field.conditional_fields.items()
-        }
-
+        self._conditional_html = {}
         self.dividers = {}
 
-    def conditional_for_value(self, value):
-        return self.conditional_fields.get(value)
+    def add_conditional_html(self, value, html):
+        self._conditional_html[value] = html
+
+    def conditional_html(self, value):
+        return self._conditional_html.get(value)
 
     def add_divider_after(self, previous, divider):
         self.dividers[previous] = divider
