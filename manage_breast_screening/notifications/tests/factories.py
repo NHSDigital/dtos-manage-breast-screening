@@ -4,6 +4,10 @@ from datetime import datetime, timedelta
 from factory import Sequence, SubFactory, post_generation
 from factory.django import DjangoModelFactory
 
+from manage_breast_screening.notifications.management.commands.send_message_batch import (
+    TZ_INFO,
+)
+
 from .. import models
 
 
@@ -22,7 +26,7 @@ class AppointmentFactory(DjangoModelFactory):
 
     clinic = SubFactory(ClinicFactory)
     nhs_number = Sequence(lambda n: int("999%06d" % n))
-    starts_at = datetime.now() + timedelta(weeks=4, days=4)
+    starts_at = datetime.now(tz=TZ_INFO) + timedelta(weeks=4, days=4)
     status = "B"
     nbss_id = Sequence(lambda n: int("123%06d" % n))
 

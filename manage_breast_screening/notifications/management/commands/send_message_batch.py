@@ -4,6 +4,9 @@ from zoneinfo import ZoneInfo
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.api_client import ApiClient
+from manage_breast_screening.notifications.management.commands.command_helpers import (
+    MessageBatchHelpers,
+)
 from manage_breast_screening.notifications.models import (
     Appointment,
     Message,
@@ -52,7 +55,7 @@ class Command(BaseCommand):
             response = ApiClient().send_message_batch(message_batch)
 
             if response.status_code == 201:
-                self.mark_batch_as_sent(message_batch, response.json())
+                MessageBatchHelpers.mark_batch_as_sent(message_batch, response.json())
                 self.stdout.write(f"{message_batch} sent")
             else:
                 self.mark_batch_as_failed(message_batch)
@@ -61,19 +64,6 @@ class Command(BaseCommand):
                 )
         except Exception as e:
             raise CommandError(e)
-
-    def mark_batch_as_sent(self, message_batch: MessageBatch, response_json: dict):
-        message_batch.notify_id = response_json["data"]["id"]
-        message_batch.sent_at = datetime.now(tz=TZ_INFO)
-        message_batch.status = "sent"
-        message_batch.save()
-
-        for message_json in response_json["data"]["attributes"]["messages"]:
-            message = Message.objects.get(pk=message_json["messageReference"])
-            if message:
-                message.notify_id = message_json["id"]
-                message.status = "delivered"
-                message.save()
 
     def mark_batch_as_failed(self, message_batch: MessageBatch):
         message_batch.status = "failed"
