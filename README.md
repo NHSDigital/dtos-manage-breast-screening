@@ -132,6 +132,25 @@ For each environment, e.g. 'dev':
    ```
 1. The web app URL will be displayed as output. Copy it into a browser on the AVD to access the app.
 
+## Manual deployment of the review environments
+
+Review environments differ slightly from other environments. They are lightweight versions of the application and are designed to share much of the core Azure infrastructure. As a result, there is a one-to-many relationship between the container apps and the container app environment.
+
+### Step 1
+If you run the following command *without* the `PR_NUMBER` parameter, it will apply only the infrastructure module:
+
+```shell
+make review terraform-apply
+```
+
+### Step 2
+
+If you include the `PR_NUMBER` parameter, it will apply the container_app module instead of the infrastructure module:
+
+```shell
+make review terraform-apply DOCKER_IMAGE_TAG=git-sha-01ecb79d561f55be60072a093dd167fe8eb5b42e PR_NUMBER=123
+```
+
 ## Continuous deployment
 
 When a PR is merged, Github actions securely triggers the deployment pipeline on the Azure devops pool running on the internal network. It currently deploys the dev environment automatically.
@@ -158,6 +177,9 @@ For more information, see the following developer guides:
 
 - [Bash and Make](https://github.com/NHSDigital/repository-template/blob/main/docs/developer-guides/Bash_and_Make.md)
 - [Scripting Docker](https://github.com/NHSDigital/repository-template/blob/main/docs/developer-guides/Scripting_Docker.md)
+
+### More documentation
+Explore [the docs directory](docs).
 
 ## Licence
 
