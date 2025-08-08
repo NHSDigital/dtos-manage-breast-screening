@@ -1,7 +1,8 @@
 param resourceServiceType string
 
 var dnsZoneName = {
-  storage: 'privatelink.blob.core.windows.net'
+  storage: 'privatelink.blob.${environment().suffixes.storage}'
+  // Cannot read vault URL from environment() because of https://github.com/Azure/bicep/issues/9839
   keyVault: 'privatelink.vaultcore.azure.net'
 }
 

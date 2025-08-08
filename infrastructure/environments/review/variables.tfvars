@@ -5,4 +5,4 @@ front_door_profile                    = "afd-nonlive-hub-manbrs"
 postgres_backup_retention_days        = 7
 postgres_geo_redundant_backup_enabled = false
 protect_keyvault                      = false
-vnet_address_space                    = "10.128.0.0/16"
+vnet_address_space                    = "10.142.0.0/16"

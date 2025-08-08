@@ -6,6 +6,11 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
+review: # Target the review infrastructure, or a review app if PR_NUMBER is used - make review <action> [PR_NUMBER=<pr_number>]
+	$(eval include infrastructure/environments/review/variables.sh)
+	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_infra=false), $(eval export TF_VAR_deploy_container_apps=false))
+	$(if ${PR_NUMBER}, $(eval export ENVIRONMENT=pr-${PR_NUMBER}), $(eval export ENVIRONMENT=review))
+
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)
@@ -13,20 +18,9 @@ ci: # Skip manual approvals when running in CI - make ci <env> <action>
 set-azure-account: # Set the Azure account for the environment - make <env> set-azure-account
 	[ "${SKIP_AZURE_LOGIN}" != "true" ] && az account set -s ${AZURE_SUBSCRIPTION} || true
 
-resource-group-init: set-azure-account get-subscription-ids # Initialise the resource group - make <env> resource-group-init
+resource-group-init: set-azure-account get-subscription-ids # Initialise the resources required by terraform - make <env> resource-group-init
 	$(eval STORAGE_ACCOUNT_NAME=sa${APP_SHORT_NAME}${ENV_CONFIG}tfstate)
-
-	$(eval output='$(shell az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/main.bicep \
-		--subscription ${HUB_SUBSCRIPTION_ID} \
-		--parameters enableSoftDelete=${ENABLE_SOFT_DELETE} envConfig=${ENV_CONFIG} region="${REGION}" \
-			storageAccountRGName=${STORAGE_ACCOUNT_RG}  storageAccountName=${STORAGE_ACCOUNT_NAME} appShortName=${APP_SHORT_NAME})')
-
-	$(eval miName=$(shell echo ${output}| jq -r '.properties.outputs.miName.value'))
-	$(eval miPrincipalID=$(shell echo ${output}| jq -r '.properties.outputs.miPrincipalID.value'))
-
-	az deployment sub create --location "${REGION}" --template-file infrastructure/terraform/resource_group_init/core.bicep \
-		--subscription ${ARM_SUBSCRIPTION_ID} \
-		--parameters miName=${miName} miPrincipalId=${miPrincipalID} --confirm-with-what-if
+	scripts/bash/resource_group_init.sh "${REGION}" "${HUB_SUBSCRIPTION_ID}" "${ENABLE_SOFT_DELETE}" "${ENV_CONFIG}" "${STORAGE_ACCOUNT_RG}" "${STORAGE_ACCOUNT_NAME}" "${APP_SHORT_NAME}" "${ARM_SUBSCRIPTION_ID}"
 
 get-subscription-ids: # Retrieve the hub subscription ID based on the subscription name in ${HUB_SUBSCRIPTION} - make <env> get-subscription-ids
 	$(eval HUB_SUBSCRIPTION_ID=$(shell az account show --query id --output tsv --name ${HUB_SUBSCRIPTION}))
@@ -39,7 +33,7 @@ terraform-init-no-backend: # Initialise terraform modules only and update terraf
 	terraform -chdir=infrastructure/terraform init -upgrade -backend=false
 
 terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - make <env> terraform-init
-	$(eval STORAGE_ACCOUNT_NAME=samanbrs${ENV_CONFIG}tfstate)
+	$(eval STORAGE_ACCOUNT_NAME=sa${APP_SHORT_NAME}${ENV_CONFIG}tfstate)
 	$(eval export ARM_USE_AZUREAD=true)
 
 	rm -rf infrastructure/modules/dtos-devops-templates
@@ -55,6 +49,7 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 	$(eval export TF_VAR_app_short_name=${APP_SHORT_NAME})
 	$(eval export TF_VAR_docker_image=${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG})
 	$(eval export TF_VAR_environment=${ENVIRONMENT})
+	$(eval export TF_VAR_env_config=${ENV_CONFIG})
 	$(eval export TF_VAR_hub=${HUB})
 	$(eval export TF_VAR_hub_subscription_id=${HUB_SUBSCRIPTION_ID})
 

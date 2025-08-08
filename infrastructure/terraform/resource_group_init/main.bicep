@@ -8,17 +8,18 @@ param storageAccountName string
 param appShortName string
 
 var hubMap = {
-  dev: 'dev'
-  int: 'dev'
-  nft: 'dev'
-  pre: 'prod'
-  prd: 'prod'
+  dev:      'dev'
+  int:      'dev'
+  review:   'dev'
+  nft:      'dev'
+  pre:      'prod'
+  prd:      'prod'
 }
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
 var privateDNSZoneRGName = 'rg-hub-${hubMap[envConfig]}-uks-private-dns-zones'
 var managedIdentityRGName = 'rg-mi-${envConfig}-uks'
 var infraResourceGroupName = 'rg-manbrs-${envConfig}-infra'
-var keyVaultName = 'kv-manbrs-${envConfig}-infra'
+var keyVaultName = 'kv-manbrs-${envConfig}-inf'
 
 // Retrieve existing terraform state resource group
 resource storageAccountRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
@@ -104,10 +105,13 @@ resource networkContributorAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
+// Create infra resource group
 resource infraRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: infraResourceGroupName
   location: region
 }
+
+// Private endpoint for infra key vault
 module kvPrivateEndpoint 'privateEndpoint.bicep' = {
   scope: resourceGroup(infraResourceGroupName)
   params: {
@@ -120,7 +124,7 @@ module kvPrivateEndpoint 'privateEndpoint.bicep' = {
   }
 }
 
-// Use a module to deploy Key Vault into the RG
+// Use a module to deploy Key Vault into the infra RG
 module keyVaultModule 'keyVault.bicep' = {
   name: 'keyVaultDeployment'
   scope: resourceGroup(infraResourceGroupName)
