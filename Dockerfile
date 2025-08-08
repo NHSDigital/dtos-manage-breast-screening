@@ -15,7 +15,7 @@ COPY manage_breast_screening ./manage_breast_screening
 RUN npm ci
 RUN npm run compile
 
-FROM python:3.13.5-alpine3.21@sha256:763eee4b5cf4dfcfbf76a5a5f8177317ac531c635b855cdc5a95e17fe1e4a44d AS python_builder
+FROM python:3.13.6-alpine3.21@sha256:f5f25747d6589917174824189a07ed31051ec6312a7e069a7c3498bbc935f0c3 AS python_builder
 ARG poetry_version
 
 WORKDIR /app
@@ -35,7 +35,7 @@ RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 #### FINAL RUNTIME IMAGE
 
-FROM python:3.13.5-alpine3.21@sha256:763eee4b5cf4dfcfbf76a5a5f8177317ac531c635b855cdc5a95e17fe1e4a44d
+FROM python:3.13.6-alpine3.21@sha256:f5f25747d6589917174824189a07ed31051ec6312a7e069a7c3498bbc935f0c3
 
 
 # Workaround for CVE-2024-6345 upgrade the installed version of setuptools to the latest version
