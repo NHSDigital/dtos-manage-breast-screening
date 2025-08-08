@@ -20,3 +20,7 @@ class Queue:
     @classmethod
     def MessageStatusUpdates(cls):
         return cls("message_status_updates")
+
+    @classmethod
+    def FailedMessageBatches(cls):
+        return cls("failed_message_batches")
