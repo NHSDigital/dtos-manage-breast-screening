@@ -1,16 +1,30 @@
 module "main_vnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/vnet"
+  source = "../dtos-devops-templates/infrastructure/modules/vnet"
 
   name                                         = module.shared_config.names.virtual-network-lowercase
   resource_group_name                          = azurerm_resource_group.main.name
-  location                                     = local.region
+  location                                     = var.region
   dns_servers                                  = [data.azurerm_private_dns_resolver_inbound_endpoint.this.ip_configurations[0].private_ip_address] # Use data source
   log_analytics_workspace_id                   = module.log_analytics_workspace_audit.id
   monitor_diagnostic_setting_vnet_enabled_logs = ["VMProtectionAlerts"]
   monitor_diagnostic_setting_vnet_metrics      = ["AllMetrics"]
   vnet_address_space                           = var.vnet_address_space
-
 }
+
+module "postgres_subnet" {
+  source = "../dtos-devops-templates/infrastructure/modules/subnet"
+
+  name                                                           = "snet-postgres"
+  resource_group_name                                            = azurerm_resource_group.main.name
+  vnet_name                                                      = module.main_vnet.name
+  address_prefixes                                               = [cidrsubnet(var.vnet_address_space, 7, 1)]
+  create_nsg                                                     = false
+  location                                                       = var.region
+  monitor_diagnostic_setting_network_security_group_enabled_logs = []
+  log_analytics_workspace_id                                     = module.log_analytics_workspace_audit.id
+  network_security_group_name                                    = "nsg-postgres"
+}
+
 
 data "azurerm_private_dns_resolver" "this" {
   provider = azurerm.hub
@@ -34,7 +48,7 @@ data "azurerm_virtual_network" "hub" {
 }
 
 module "peering_spoke_hub" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/vnet-peering"
+  source = "../dtos-devops-templates/infrastructure/modules/vnet-peering"
 
   name                = "${module.main_vnet.name}-to-hub-peering"
   resource_group_name = azurerm_resource_group.main.name
@@ -53,7 +67,7 @@ module "peering_hub_spoke" {
     azurerm = azurerm.hub
   }
 
-  source = "../modules/dtos-devops-templates/infrastructure/modules/vnet-peering"
+  source = "../dtos-devops-templates/infrastructure/modules/vnet-peering"
 
   name                = "hub-to-${module.main_vnet.name}-peering"
   resource_group_name = local.hub_vnet_rg_name
@@ -69,7 +83,7 @@ module "peering_hub_spoke" {
 
 
 module "container_app_subnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/subnet"
+  source = "../dtos-devops-templates/infrastructure/modules/subnet"
 
   name                                                           = "snet-container-apps"
   resource_group_name                                            = azurerm_resource_group.main.name
@@ -86,7 +100,7 @@ module "container_app_subnet" {
 }
 
 module "main_subnet" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/subnet"
+  source = "../dtos-devops-templates/infrastructure/modules/subnet"
 
   name                                                           = "snet-main"
   resource_group_name                                            = azurerm_resource_group.main.name

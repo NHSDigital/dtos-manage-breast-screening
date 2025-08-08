@@ -1,116 +1,60 @@
-resource "azurerm_resource_group" "main" {
-  name     = local.resource_group_name
-  location = local.region
+module "infra" {
+  count = var.deploy_infra ? 1 : 0
+
+  source = "../modules/infra"
+
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
+  }
+
+  region              = local.region
+  resource_group_name = local.resource_group_name
+  app_short_name      = var.app_short_name
+  environment         = var.env_config
+  hub                 = var.hub
+  protect_keyvault    = var.protect_keyvault
+  vnet_address_space  = var.vnet_address_space
 }
 
 module "shared_config" {
   source = "../modules/dtos-devops-templates/infrastructure/modules/shared-config"
 
-  env         = var.environment
+  env         = var.env_config
   location    = local.region
   application = var.app_short_name
 }
 
-module "hub_config" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/shared-config"
+module "container-apps" {
+  count = var.deploy_container_apps ? 1 : 0
 
-  env         = var.hub
-  location    = local.region
-  application = "hub"
-}
+  source = "../modules/container-apps"
 
-module "app-key-vault" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/key-vault"
-
-  name                                             = "kv-${var.app_short_name}-${var.environment}-app"
-  resource_group_name                              = azurerm_resource_group.main.name
-  enable_rbac_authorization                        = true
-  location                                         = local.region
-  log_analytics_workspace_id                       = module.log_analytics_workspace_audit.id
-  monitor_diagnostic_setting_keyvault_enabled_logs = ["AuditEvent", "AzurePolicyEvaluationDetails"]
-  monitor_diagnostic_setting_keyvault_metrics      = ["AllMetrics"]
-  private_endpoint_properties = {
-    private_dns_zone_ids_keyvault        = [data.azurerm_private_dns_zone.key-vault.id]
-    private_endpoint_enabled             = true
-    private_endpoint_subnet_id           = module.main_subnet.id
-    private_endpoint_resource_group_name = azurerm_resource_group.main.name
-    private_service_connection_is_manual = false
-  }
-  purge_protection_enabled = var.protect_keyvault
-}
-
-module "log_analytics_workspace_audit" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/log-analytics-workspace"
-
-  name     = module.shared_config.names.log-analytics-workspace
-  location = local.region
-
-  law_sku        = "PerGB2018"
-  retention_days = 30
-
-  monitor_diagnostic_setting_log_analytics_workspace_enabled_logs = ["SummaryLogs", "Audit"]
-  monitor_diagnostic_setting_log_analytics_workspace_metrics      = ["AllMetrics"]
-
-  resource_group_name = azurerm_resource_group.main.name
-}
-
-module "container-app-environment" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/container-app-environment"
-  providers = {
-    azurerm     = azurerm
-    azurerm.dns = azurerm.hub
-  }
-
-  name                       = "manage-breast-screening-${var.environment}"
-  resource_group_name        = azurerm_resource_group.main.name
-  log_analytics_workspace_id = module.log_analytics_workspace_audit.id
-  vnet_integration_subnet_id = module.container_app_subnet.id
-  private_dns_zone_rg_name   = "rg-hub-${var.hub}-uks-private-dns-zones"
-}
-
-module "db_migrate" {
-  source = "../modules/dtos-devops-templates/infrastructure/modules/container-app-job"
-
-  name                         = "manage-breast-screening-dbm-${var.environment}"
-  container_app_environment_id = module.container-app-environment.id
-  resource_group_name          = azurerm_resource_group.main.name
-  container_command            = ["python"]
-  container_args               = ["manage.py", "migrate"]
-  docker_image                 = var.docker_image
-  user_assigned_identity_ids   = [module.db_connect_identity.id]
-  environment_variables = {
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
-  }
-}
-
-module "webapp" {
   providers = {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
   }
-  source                           = "../modules/dtos-devops-templates/infrastructure/modules/container-app"
-  name                             = "manage-breast-screening-web-${var.environment}"
-  container_app_environment_id     = module.container-app-environment.id
-  resource_group_name              = azurerm_resource_group.main.name
-  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
-  infra_key_vault_name             = "kv-manbrs-${var.environment}-infra"
-  infra_key_vault_rg               = "rg-manbrs-${var.environment}-infra"
-  enable_auth                      = var.enable_auth
-  app_key_vault_id                 = module.app-key-vault.key_vault_id
-  docker_image                     = var.docker_image
-  user_assigned_identity_ids       = [module.db_connect_identity.id]
-  environment_variables = {
-    ALLOWED_HOSTS   = "manage-breast-screening-web-${var.environment}.${module.container-app-environment.default_domain}"
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
-  }
-  is_web_app = true
-  http_port  = 8000
+
+  region                                = local.region
+  app_key_vault_id                      = var.deploy_infra ? module.infra[0].app_key_vault_id : data.azurerm_key_vault.app_key_vault[0].id
+  app_short_name                        = var.app_short_name
+  container_app_environment_id          = var.deploy_infra ? module.infra[0].container_app_environment_id : data.azurerm_container_app_environment.this[0].id
+  default_domain                        = var.deploy_infra ? module.infra[0].default_domain : data.azurerm_container_app_environment.this[0].default_domain
+  dns_zone_name                         = var.dns_zone_name
+  docker_image                          = var.docker_image
+  enable_auth                           = var.enable_auth
+  environment                           = var.environment
+  env_config                            = var.env_config
+  fetch_secrets_from_app_key_vault      = var.fetch_secrets_from_app_key_vault
+  front_door_profile                    = var.front_door_profile
+  hub                                   = var.hub
+  log_analytics_workspace_audit_id      = var.deploy_infra ? module.infra[0].log_analytics_workspace_audit_id : data.azurerm_log_analytics_workspace.audit[0].id
+  postgres_backup_retention_days        = var.postgres_backup_retention_days
+  postgres_geo_redundant_backup_enabled = var.postgres_geo_redundant_backup_enabled
+  postgres_sku_name                     = var.postgres_sku_name
+  postgres_sql_admin_group              = "postgres_${var.app_short_name}_${var.env_config}_uks_admin"
+  postgres_storage_mb                   = var.postgres_storage_mb
+  postgres_storage_tier                 = var.postgres_storage_tier
+  postgres_subnet_id                    = var.deploy_infra ? module.infra[0].postgres_subnet_id : data.azurerm_subnet.postgres[0].id
+  use_apex_domain                       = var.use_apex_domain
 }

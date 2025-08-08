@@ -1,17 +1,10 @@
-variable "deploy_infra" {
-  description = "The foundational layer of infrastructure for the application to run on"
-  type        = bool
-  default     = true
-}
-
-variable "deploy_container_apps" {
-  description = "Deploy the container app to the foundational infra"
-  type        = bool
-  default     = true
-}
-
 variable "app_short_name" {
   description = "Application short name (6 characters)"
+  type        = string
+}
+
+variable "app_key_vault_id" {
+  description = "Application key vault ID"
   type        = string
 }
 
@@ -30,18 +23,23 @@ variable "hub" {
   type        = string
 }
 
+variable "container_app_environment_id" {
+  description = "The ID of the container app environment where container apps are deployed"
+  type        = string
+}
+
+variable "default_domain" {
+  description = "The container app environment default domain"
+  type        = string
+}
+
 variable "docker_image" {
   description = "Docker image full path including registry, repository and tag"
   type        = string
 }
 
-variable "hub_subscription_id" {
-  description = "ID of the hub Azure subscription"
-  type        = string
-}
-
-variable "vnet_address_space" {
-  description = "VNET address space. Must be unique across the hub."
+variable "postgres_subnet_id" {
+  description = "The postgres subnet id. Created in the infra module."
   type        = string
 }
 
@@ -51,57 +49,51 @@ variable "fetch_secrets_from_app_key_vault" {
 
     Then set to true to let the container app read secrets from the key vault."
     EOT
-  default     = false
-  type        = bool
-}
-variable "protect_keyvault" {
-  description = "Ability to recover the key vault or its secrets after deletion"
-  default     = true
   type        = bool
 }
 
 variable "postgres_backup_retention_days" {
   description = "The number of days to retain backups for the PostgreSQL Flexible Server."
   type        = number
-  default     = 30
 }
 
 variable "postgres_geo_redundant_backup_enabled" {
   description = "Whether geo-redundant backup is enabled for the PostgreSQL Flexible Server."
   type        = bool
-  default     = true
 }
 
 variable "postgres_sku_name" {
   description = "Value of the PostgreSQL Flexible Server SKU name"
-  default     = "B_Standard_B1ms"
   type        = string
 }
+
 variable "postgres_storage_mb" {
   description = "Value of the PostgreSQL Flexible Server storage in MB"
-  default     = 32768
   type        = number
 }
+
 variable "postgres_storage_tier" {
   description = "Value of the PostgreSQL Flexible Server storage tier"
-  default     = "P4"
   type        = string
 }
 
 variable "enable_auth" {
   description = "Enable authentication for the container app. If true, the app will use Azure AD authentication."
   type        = bool
-  default     = false
 }
 
 variable "use_apex_domain" {
   description = "Use apex domain for the Front Door endpoint. Set to true for production."
   type        = bool
-  default     = false
 }
 
-variable "dns_zone_name" {
-  description = "Value of the DNS zone name to use for the Front Door endpoint"
+variable "log_analytics_workspace_audit_id" {
+  description = "Log analytics workspace audit ID"
+  type        = string
+}
+
+variable "postgres_sql_admin_group" {
+  description = "Entra ID group which is granted admin access to the PostgreSQL Flexible Server."
   type        = string
 }
 
@@ -110,8 +102,18 @@ variable "front_door_profile" {
   type        = string
 }
 
-locals {
-  region = "uksouth"
+variable "dns_zone_name" {
+  description = "Public DNS zone name"
+  type        = string
+}
 
-  resource_group_name = "rg-${var.app_short_name}-${var.env_config}-uks"
+variable "region" {
+  description = "The region to deploy in"
+  type        = string
+}
+
+locals {
+  resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
+
+  hostname = var.use_apex_domain ? var.dns_zone_name : "${var.environment}.${var.dns_zone_name}"
 }
