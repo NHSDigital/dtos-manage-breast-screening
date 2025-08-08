@@ -25,6 +25,8 @@ class Command(BaseCommand):
                         appointment.read().decode("ASCII"),
                     )
 
+                    client.acknowledge_message(message)
+
         except Exception as e:
             raise CommandError(e)
 

@@ -4,6 +4,7 @@ from functools import cached_property
 
 import pytest
 from azure.storage.blob import BlobServiceClient, ContainerClient
+from mesh_client import MeshClient
 
 from manage_breast_screening.notifications.management.commands.store_mesh_messages import (
     Command,
@@ -35,26 +36,36 @@ class TestStoreMeshMessages:
         helpers.add_file_to_mesh_mailbox(test_file_1)
         helpers.add_file_to_mesh_mailbox(test_file_2)
 
-        subject = Command()
+        with MeshClient(
+            url=os.getenv("MESH_BASE_URL"),
+            mailbox=os.getenv("MESH_INBOX_NAME"),
+            password=os.getenv("MESH_CLIENT_PASSWORD"),
+            shared_key=os.getenv("MESH_CLIENT_SHARED_KEY"),
+        ) as client:
+            assert len(client.list_messages()) == 2
 
-        subject.handle()
+            subject = Command()
 
-        for blob in self.container_client.list_blobs():
-            blob_client = self.container_client.get_blob_client(blob)
-            blob_content = blob_client.download_blob(
-                max_concurrency=1, encoding="ASCII"
-            ).readall()
+            subject.handle()
 
-            file_path, file_name = blob.name.split("/")
+            for blob in self.container_client.list_blobs():
+                blob_client = self.container_client.get_blob_client(blob)
+                blob_content = blob_client.download_blob(
+                    max_concurrency=1, encoding="ASCII"
+                ).readall()
 
-            assert file_path == datetime.today().strftime("%Y-%m-%d")
+                file_path, file_name = blob.name.split("/")
 
-            file_path = helpers.get_test_file_path(file_name)
+                assert file_path == datetime.today().strftime("%Y-%m-%d")
 
-            with open(file_path) as test_file:
-                assert test_file.read() == blob_content
+                file_path = helpers.get_test_file_path(file_name)
 
-            self.container_client.delete_blob(blob)
+                with open(file_path) as test_file:
+                    assert test_file.read() == blob_content
+
+                self.container_client.delete_blob(blob)
+
+            assert len(client.list_messages()) == 0
 
     @cached_property
     def container_client(self) -> ContainerClient:
