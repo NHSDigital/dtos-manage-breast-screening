@@ -37,5 +37,5 @@ jobs:
 
       - name: Call deployment pipeline
         run: |
-          az pipelines run --commit-id ${{inputs.commit_sha}} --name "Deploy to Azure" --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening \
+          az pipelines run --commit-id ${{inputs.commit_sha}} --name "Deploy review app" --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening \
             --parameters commitSHA=${{inputs.commit_sha}} prNumber=${{inputs.pr_number}} environment=${{ matrix.environment }}
