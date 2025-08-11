@@ -25,6 +25,8 @@ class Ethnicity:
     migration.
     """
 
+    PREFER_NOT_TO_SAY = "prefer_not_to_say"
+
     # fmt: off
     DATA = {
         "White": [

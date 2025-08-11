@@ -82,6 +82,13 @@ class TestParticipantPresenter:
 
         assert result.ethnic_background == expected_display
 
+    def test_ethnicity_not_shared(self, participant):
+        assert not ParticipantPresenter(participant).ethnicity_not_shared
+
+        participant.ethnic_background_id = "prefer_not_to_say"
+
+        assert ParticipantPresenter(participant).ethnicity_not_shared
+
     @pytest.mark.parametrize(
         "return_url,expected_url",
         [

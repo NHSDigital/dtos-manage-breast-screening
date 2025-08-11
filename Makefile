@@ -51,6 +51,12 @@ test-lint: # Lint files @Testing
 	npm run lint
 	poetry run ruff check manage_breast_screening
 
+	# Enable this once we have fixed all the issues
+	# make test-lint-templates
+
+test-lint-templates: # Lint just the templates @Testing
+	poetry run djlint -e jinja --lint --profile jinja manage_breast_screening
+
 test-ui: # Run UI tests @Testing
 	poetry run pytest -m system --ignore manage_breast_screening/notifications
 

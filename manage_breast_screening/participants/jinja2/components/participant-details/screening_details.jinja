@@ -1,0 +1,63 @@
+{% from "card/macro.jinja" import card %}
+{% from "summary-list/macro.jinja" import summaryList %}
+
+{% macro screening_details(presented_mammograms, screening_protocol) %}
+  {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
+  {% set last_mammogram_html %}
+    <div data-testid="mammograms">
+    {% if mammograms_by_date_added %}
+      {% for mammogram in mammograms_by_date_added %}
+        <p>
+        <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
+        <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-color">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
+        <br>{{ mammogram.location }}
+
+        {% if mammogram.different_name %}
+          <br>Previous name: {{ mammogram.different_name }}
+        {% endif %}
+
+        {% if mammogram.additional_information %}
+          <br>Additional information: {{ mammogram.additional_information | nl2br | indent(10) }}
+        {% endif %}
+        </p>
+      {% endfor %}
+    {% else %}
+    {{ "Not known" | as_hint }}
+    {% endif %}
+    </div>
+  {% endset %}
+
+  {% call card({
+    "heading": "Screening details"
+  }) %}
+    {{ summaryList({
+      "rows": [
+        {
+          "key": {
+            "text": "Screening protocol"
+          },
+          "value": {
+            "html": screening_protocol
+          }
+        } if screening_protocol else undefined,
+        {
+          "key": {
+            "text": "Last known mammograms"
+          },
+          "value": {
+            "html": last_mammogram_html
+          },
+          "actions": {
+              "items": [
+                {
+                  "href": presented_mammograms.add_link.href,
+                  "text": presented_mammograms.add_link.text,
+                  "visuallyHiddenText": presented_mammograms.add_link.visually_hidden_text
+                }
+              ]
+            }
+        } if presented_mammograms else undefined
+      ]
+    }) }}
+  {% endcall %}
+{% endmacro %}

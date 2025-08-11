@@ -37,6 +37,7 @@ ruff = "^0.12.3"
 django-debug-toolbar = "^6.0.0"
 requests-mock = "^1.12.1"
 pytest-cov = "^6.2.1"
+djlint = "^1.36.4"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -67,3 +68,6 @@ omit = [
   "*/admin.py",
   "manage.py",
 ]
+
+[tool.djlint]
+ignore = "T003"
