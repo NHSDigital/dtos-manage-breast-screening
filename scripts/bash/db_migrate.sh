@@ -3,8 +3,8 @@
 set -euo pipefail
 
 ENV=$1
-JOB_NAME=manage-breast-screening-dbm-${ENV}
-RG_NAME=rg-manbrs-${ENV}-uks
+JOB_NAME=manbrs-dbm-${ENV}
+RG_NAME=rg-manbrs-${ENV}-container-app-uks
 TIMEOUT=300
 WAIT=5
 count=0
