@@ -1,21 +1,6 @@
 version: 2
 
-multi-ecosystem-groups:
-  templates:
-    schedule:
-      interval: weekly
-
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
-    patterns: ['nhsuk-frontend']
-    multi-ecosystem-group: templates
-
-  - package-ecosystem: 'pip'
-    directory: '/'
-    patterns: ['nhsuk-frontend-jinja']
-    multi-ecosystem-group: templates
-
   - package-ecosystem: 'docker'
     directory: '/'
     schedule:
