@@ -109,7 +109,7 @@ class SplitDateField(forms.MultiValueField):
             IntegerField(**year_kwargs),
         ]
 
-        kwargs["template_name"] = "forms/split_date_field.jinja"
+        kwargs["template_name"] = "forms/date-input.jinja"
 
         super().__init__(self.fields, *args, **kwargs)
 
