@@ -142,12 +142,16 @@ class TestSendMessageBatch:
         assert messages.count() == 1
         assert messages[0].appointment == valid_appointment
 
+    @pytest.mark.parametrize("status_code", [401, 403, 404, 405, 406, 415, 422])
     @pytest.mark.django_db
-    def test_handle_with_failing_notifications(
-        self, mark_batch_as_sent, mock_send_message_batch, routing_plan_id
+    def test_handle_with_unrecoverable_failures(
+        self, mark_batch_as_sent, mock_send_message_batch, routing_plan_id, status_code
     ):
         """Test that message batches which fail to send are marked correctly"""
-        mock_send_message_batch.return_value.status_code = 400
+        mock_send_message_batch.return_value.status_code = status_code
+        mock_send_message_batch.return_value.json.return_value = {
+            "errors": [{"some-error": "details"}]
+        }
         appointment = AppointmentFactory(
             starts_at=datetime.now().replace(tzinfo=TZ_INFO)
             + timedelta(weeks=4, days=4)
@@ -157,12 +161,34 @@ class TestSendMessageBatch:
 
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
-        assert message_batches[0].status == "failed"
+        assert message_batches[0].status == "failed_unrecoverable"
+        assert message_batches[0].notify_errors == [{"some-error": "details"}]
         messages = Message.objects.filter(
             appointment=appointment, batch=message_batches[0]
         )
         assert messages.count() == 1
         assert messages[0].status == "failed"
+
+    @pytest.mark.parametrize("status_code", [400, 408, 413, 425, 429, 500, 503, 504])
+    @pytest.mark.django_db
+    def test_handle_with_recoverable_failures(
+        self, mark_batch_as_sent, mock_send_message_batch, routing_plan_id, status_code
+    ):
+        """Test that message batches which fail to send are marked correctly"""
+        mock_send_message_batch.return_value.status_code = status_code
+        mock_send_message_batch.return_value.json.return_value = {
+            "errors": [{"some-error": "details"}]
+        }
+        _appointment = AppointmentFactory(
+            starts_at=datetime.now().replace(tzinfo=TZ_INFO)
+            + timedelta(weeks=4, days=4)
+        )
+        Command().handle(**{"routing_plan_id": routing_plan_id})
+
+        message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
+        assert message_batches.count() == 1
+        assert message_batches[0].status == "failed_recoverable"
+        assert message_batches[0].notify_errors == [{"some-error": "details"}]
 
     def test_handle_with_error(self, mock_send_message_batch, routing_plan_id):
         """Test that errors are caught and raised as CommandErrors"""
