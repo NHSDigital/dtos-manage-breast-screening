@@ -82,5 +82,9 @@ if settings.DEBUG_TOOLBAR:
         *urlpatterns,
     ] + debug_toolbar_urls()
 
-# Apply auth protection to all routes except exempt namespaces
-protect_urlpatterns(urlpatterns)
+# TODO: remove the DEV_SIGN_IN check once we've implemented CIS2 auth. For now,
+# we only apply auth protection when a viable auth method is available. This keeps our
+# tests passing and prevents us forcing a sign in without a way to do so.
+if settings.DEV_SIGN_IN:
+    # Apply auth protection to all routes except whitelisted namespaces
+    protect_urlpatterns(urlpatterns)
