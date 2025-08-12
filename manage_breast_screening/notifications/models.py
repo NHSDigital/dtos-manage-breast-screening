@@ -108,7 +108,6 @@ class Clinic(models.Model):
     address_line_3 = models.CharField(max_length=50)
     address_line_4 = models.CharField(max_length=50)
     address_line_5 = models.CharField(max_length=50)
-    address_line_5 = models.CharField(max_length=50)
     postcode = models.CharField(max_length=50)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=False, auto_now_add=True)
