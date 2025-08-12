@@ -9,7 +9,7 @@ from django.urls import reverse
 def sign_in(request):
     """Single entry point for authentication.
 
-    - In DEBUG: show a developer sign-in button.
+    - In DEV_SIGN_IN mode: show a developer sign-in button.
     - Otherwise: show a CIS2 sign-in button.
     """
     return render(
@@ -18,14 +18,14 @@ def sign_in(request):
         {
             "page_title": "Sign in",
             "navActive": "sign_in",
-            "debug": settings.DEBUG,
+            "is_dev_sign_in": settings.DEV_SIGN_IN,
         },
     )
 
 
 def dev_sign_in(request):
-    """DEBUG-only: sign in as the first user in the database and redirect to home."""
-    if not settings.DEBUG:
+    """DEV_SIGN_IN-only: sign in as the first user in the database and redirect to home."""
+    if not settings.DEV_SIGN_IN:
         return redirect(reverse("auth:sign_in"))
 
     User = get_user_model()

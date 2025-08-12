@@ -39,6 +39,9 @@ SECRET_KEY = environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = boolean_env("DEBUG", default=False)
 
+# SECURITY WARNING: don't run with dev_login turned on in production!
+DEV_SIGN_IN = boolean_env("DEV_SIGN_IN", default=False)
+
 allowed_hosts = environ.get("ALLOWED_HOSTS")
 ALLOWED_HOSTS = allowed_hosts.split(",") if allowed_hosts else []
 

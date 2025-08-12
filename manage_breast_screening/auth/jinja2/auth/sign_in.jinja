@@ -5,7 +5,7 @@
   <div class="nhsuk-grid-column-two-thirds">
     <h1 class="nhsuk-heading-l">Sign in</h1>
 
-    {% if debug %}
+    {% if is_dev_sign_in %}
       <div class="nhsuk-u-margin-bottom-4">
         <a class="nhsuk-button" href="{{ url('auth:dev_sign_in') }}">
           Sign in as dev user
