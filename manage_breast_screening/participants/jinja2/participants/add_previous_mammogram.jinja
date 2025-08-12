@@ -1,10 +1,8 @@
-{% extends 'layout-app.jinja' %}
-{% from 'button/macro.jinja' import button %}
-{% from 'back-link/macro.jinja' import backLink %}
-{% from 'fieldset/macro.jinja' import fieldset %}
-{% from 'radios/macro.jinja' import radios %}
+{% extends "layout-app.jinja" %}
+{% from "button/macro.jinja" import button %}
+{% from "back-link/macro.jinja" import backLink %}
 
-{% from 'django_form_helpers.jinja' import form_error_summary, app_date_input %}
+{% from "django_form_helpers.jinja" import form_error_summary, app_date_input %}
 
 {% block beforeContent %}
   {{ backLink(back_link_params) }}
@@ -12,7 +10,7 @@
 
 {% block messages %}
   {{ form_error_summary(form) }}
-{% endblock %}
+{% endblock messages %}
 
 {% block page_content %}
 <div class="nhsuk-grid-row">
@@ -22,118 +20,26 @@
       {% if caption %}
         <span class="nhsuk-caption-l">{{ caption }}</span>
       {% endif %}
-      {{title}}
+      {{ title }}
     </h1>
 
-    <form action="{{request.path}}" method="POST">
+    <form action="{{ request.path }}" method="post">
       {% set exact_date_html %}
         {{ app_date_input(form_attribute=form.exact_date, legend="Date of mammogram", hint="For example, 15 3 2025") }}
       {% endset %}
 
       {# Radios with conditionals #}
+      {% do form.where_taken.add_conditional_html(form.WhereTaken.UK, form.somewhere_in_the_uk_details.as_field_group()) %}
+      {% do form.where_taken.add_conditional_html(form.WhereTaken.OUTSIDE_UK, form.outside_the_uk_details.as_field_group()) %}
+      {% do form.where_taken.add_divider_after(form.WhereTaken.OUTSIDE_UK, "or") %}
+      {{ form.where_taken.as_field_group() }}
 
-      {{ radios({
-        "idPrefix": form.where_taken.auto_id,
-        "name": form.where_taken.html_name,
-        "errorMessage": {
-            "text": form.where_taken.errors | first
-        } if form.where_taken.errors,
-        "fieldset": {
-          "legend": {
-            "text": "Where were the breast x-rays taken?",
-            "classes": "nhsuk-fieldset__legend--m",
-            "isPageHeading": false
-          }
-        },
-        "items": [
-          {
-            "id": form.where_taken.auto_id,
-            "value": form.WhereTaken.SAME_UNIT,
-            "text": form.where_taken_choices[form.WhereTaken.SAME_UNIT],
-            "checked": form.where_taken.value() == form.WhereTaken.SAME_UNIT
-          },
-          {
-            "value": form.WhereTaken.UK,
-            "text": form.where_taken_choices[form.WhereTaken.UK],
-            "checked": form.where_taken.value() == form.WhereTaken.UK,
-            "conditional": {"html": form.somewhere_in_the_uk_details.as_field_group()}
-          },
-          {
-            "value": form.WhereTaken.OUTSIDE_UK,
-            "text": form.where_taken_choices[form.WhereTaken.OUTSIDE_UK],
-            "checked": form.where_taken.value() == form.WhereTaken.OUTSIDE_UK,
-            "conditional": {"html": form.outside_the_uk_details.as_field_group()}
-          },
-          {
-            "divider": "or"
-          },
-          {
-            "value": form.WhereTaken.PREFER_NOT_TO_SAY,
-            "text": form.where_taken_choices[form.WhereTaken.PREFER_NOT_TO_SAY],
-            "checked": form.where_taken.value() == form.WhereTaken.PREFER_NOT_TO_SAY
-          }
-        ]
-      }) }}
+      {% do form.when_taken.add_conditional_html(form.WhenTaken.EXACT, exact_date_html) %}
+      {% do form.when_taken.add_conditional_html(form.WhenTaken.APPROX, form.approx_date.as_field_group()) %}
+      {{ form.when_taken.as_field_group() }}
 
-      {{ radios({
-        "idPrefix": form.when_taken.auto_id,
-        "name": form.when_taken.html_name,
-        "errorMessage": {
-            "text": form.when_taken.errors | first
-        } if form.when_taken.errors,
-        "fieldset": {
-          "legend": {
-            "text": "When were the x-rays taken?",
-            "classes": "nhsuk-fieldset__legend--m",
-            "isPageHeading": false
-          }
-        },
-        "items": [
-          {
-            "id": form.when_taken.auto_id,
-            "value": "exact",
-            "text": form.when_taken_choices["exact"],
-            "checked": form.when_taken.value() == "exact",
-            "conditional": {"html": exact_date_html}
-          },
-          {
-            "value": "approx",
-            "text": form.when_taken_choices["approx"],
-            "checked": form.when_taken.value() == "approx",
-            "conditional": {"html": form.approx_date.as_field_group()}
-          },
-          {
-            "value": "not_sure",
-            "text": form.when_taken_choices["not_sure"],
-            "checked": form.when_taken.value() == "not_sure"
-          }
-        ]
-      }) }}
-
-      {{ radios({
-        "idPrefix": form.name_is_the_same.auto_id,
-        "name": form.name_is_the_same.html_name,
-        "errorMessage": {
-          "text": form.name_is_the_same.errors | first
-        } if form.name_is_the_same.errors,
-        "fieldset": {
-          "legend": form.name_is_the_same_legend,
-        },
-        "items": [
-          {
-            "id": form.name_is_the_same_choices.auto_id,
-            "value": "yes",
-            "text": form.name_is_the_same_choices["yes"],
-            "checked": form.name_is_the_same.value() == "yes"
-          },
-          {
-            "value": "no",
-            "text": form.name_is_the_same_choices["no"],
-            "checked": form.name_is_the_same.value() == "no",
-            "conditional": {"html": form.different_name.as_field_group() }
-          }
-        ]
-      }) }}
+      {% do form.name_is_the_same.add_conditional_html(form.NameIsTheSame.NO, form.different_name.as_field_group()) %}
+      {{ form.name_is_the_same.as_field_group() }}
 
       {# Textarea for any other relevant details #}
       {{ form.additional_information.as_field_group() }}
@@ -142,8 +48,10 @@
         "text": "Continue"
       }) }}
 
-      {{csrf_input}}
+      {{ csrf_input }}
 
       <input type="hidden" name="return_url" value="{{ return_url }}"/>
-  </form>
-  {% endblock page_content %}
+    </form>
+  </div>
+</div>
+{% endblock page_content %}

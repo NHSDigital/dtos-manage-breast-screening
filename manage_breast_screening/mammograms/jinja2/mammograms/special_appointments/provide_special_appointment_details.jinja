@@ -1,46 +1,14 @@
-{% extends 'layout-form.jinja' %}
-{% from 'checkboxes/macro.jinja' import checkboxes %}
-{% from 'back-link/macro.jinja' import backLink %}
-{% from 'button/macro.jinja' import button %}
-{% from 'django_form_helpers.jinja' import app_radios %}
+{% extends "layout-form.jinja" %}
+{% from "button/macro.jinja" import button %}
 
 {% block form %}
-  {% set checkbox_items = [] %}
-
-  {% for value, label in form.support_reasons.field.choices %}
-      {% set hint = form.SupportReasonHints[value] %}
-
-      {% do checkbox_items.append({
-        "text": label,
-        "id": form.support_reasons.auto_id if loop.first,
-        "value": value,
-        "checked": value in (form.support_reasons.value() or []),
-        "conditional": {
-          "html": form[value.lower() + '_details'].as_field_group()
-        }
-      }) %}
+  {% for option in form.SupportReasons %}
+    {% do form.support_reasons.add_conditional_html(option.value, form[option.value.lower() + "_details"].as_field_group()) %}
   {% endfor %}
 
-  {% if form.support_reasons.errors %}
-    {% set error_message = {"text": form.support_reasons.errors | first} %}
-  {% endif %}
+  {{ form.support_reasons.as_field_group() }}
 
-  {{ checkboxes({
-    "name": form.support_reasons.html_name,
-    "errorMessage": error_message,
-    "fieldset": {
-      "legend": {
-        "text": support_reasons_legend,
-        "classes": "nhsuk-fieldset__legend--m"
-      }
-    },
-    "hint": {
-      "text": "Select all that apply. When describing support required, include any special requests made by the participant or their carer."
-    },
-    "items": checkbox_items
-  }) }}
-
-  {{ app_radios(form_attribute=form.any_temporary, legend="Are any of these reasons temporary?", hint="This includes issues that are likely to be resolved by their next mammogram, for example a broken foot or a short-term eye problem.") }}
+  {{ form.any_temporary.as_field_group() }}
 
   <div class="nhsuk-button-group">
     {{ button({

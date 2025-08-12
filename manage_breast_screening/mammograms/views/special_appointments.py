@@ -38,7 +38,6 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
                 },
                 "caption": self.participant.full_name,
                 "heading": "Provide special appointment details",
-                "support_reasons_legend": f"Why does {self.participant.full_name} need additional support?",
             },
         )
 
@@ -46,7 +45,7 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["saved_data"] = self.participant.extra_needs
+        kwargs["participant"] = self.participant
         return kwargs
 
     def form_valid(self, form):

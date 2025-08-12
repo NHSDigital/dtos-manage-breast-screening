@@ -1,9 +1,9 @@
 {% extends 'layout-form.jinja' %}
-{% from 'django_form_helpers.jinja' import app_checkboxes %}
 {% from 'button/macro.jinja' import button %}
 
 {% block form %}
-    {{ app_checkboxes(form_attribute=form.which_are_temporary, legend="Which of these reasons are temporary?", hint="If any reasons are relevant to this appointment only, mark them as temporary so they are not retained the next time this participant is invited for breast screening") }}
+    {{ form.which_are_temporary }}
+
     <div class="nhsuk-button-group">
       {{ button({
         "text": "Continue"

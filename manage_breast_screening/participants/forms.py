@@ -2,10 +2,10 @@ from datetime import date
 from enum import StrEnum
 
 from django import forms
-from django.forms import ChoiceField, ValidationError
+from django.forms import ValidationError
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.form_fields import CharField
+from manage_breast_screening.core.form_fields import CharField, ChoiceField
 
 from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
@@ -60,7 +60,7 @@ class EthnicityForm(forms.Form):
         self.participant.save()
 
 
-class ParticipantRecordedMammogramForm(forms.Form):
+class ParticipantReportedMammogramForm(forms.Form):
     class WhereTaken(StrEnum):
         SAME_UNIT = "same_unit"
         UK = ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value
@@ -68,6 +68,15 @@ class ParticipantRecordedMammogramForm(forms.Form):
         PREFER_NOT_TO_SAY = (
             ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY.value
         )
+
+    class WhenTaken(StrEnum):
+        EXACT = "exact"
+        APPROX = "approx"
+        NOT_SURE = "not_sure"
+
+    class NameIsTheSame(StrEnum):
+        YES = "yes"
+        NO = "no"
 
     def __init__(self, participant, current_provider, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -82,29 +91,37 @@ class ParticipantRecordedMammogramForm(forms.Form):
         }
 
         self.when_taken_choices = {
-            "exact": "Enter an exact date",
-            "approx": "Enter an approximate date",
-            "not_sure": "Not sure",
+            self.WhenTaken.EXACT: "Enter an exact date",
+            self.WhenTaken.APPROX: "Enter an approximate date",
+            self.WhenTaken.NOT_SURE: "Not sure",
         }
 
         self.name_is_the_same_legend = {
-            "text": f"Were they taken with the name {participant.full_name}?",
-            "classes": "nhsuk-fieldset__legend--m",
             "isPageHeading": False,
         }
 
         self.name_is_the_same_choices = {
-            "yes": "Yes",
-            "no": "No, under a different name",
+            self.NameIsTheSame.YES: "Yes",
+            self.NameIsTheSame.NO: "No, under a different name",
         }
 
         # Main choice fields
-        self.fields["where_taken"] = ChoiceField(choices=self.where_taken_choices)
+        self.fields["where_taken"] = ChoiceField(
+            label="Where were the breast x-rays taken?",
+            label_classes="nhsuk-fieldset__legend--m",
+            choices=self.where_taken_choices,
+        )
 
-        self.fields["when_taken"] = ChoiceField(choices=self.when_taken_choices)
+        self.fields["when_taken"] = ChoiceField(
+            label="When were the x-rays taken?",
+            label_classes="nhsuk-fieldset__legend--m",
+            choices=self.when_taken_choices,
+        )
 
         self.fields["name_is_the_same"] = ChoiceField(
-            choices=self.name_is_the_same_choices
+            label=f"Were they taken with the name {participant.full_name}?",
+            label_classes="nhsuk-fieldset__legend--m",
+            choices=self.name_is_the_same_choices,
         )
 
         # Conditionally shown fields
