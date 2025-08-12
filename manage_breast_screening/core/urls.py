@@ -23,6 +23,10 @@ from django.views.generic.base import RedirectView
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
+        "auth/",
+        include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
+    ),
+    path(
         "clinics/", include("manage_breast_screening.clinics.urls", namespace="clinics")
     ),
     path(

@@ -25,6 +25,11 @@
         "url": "/clinics/",
         "label": "Clinics",
         'current': true if navActive == "clinics"
+      },
+      {
+        "url": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
+        "label": "Sign out" if request and request.user.is_authenticated else "Sign in",
+        'current': true if navActive == "sign_in"
       }
     ]
   }) }}
