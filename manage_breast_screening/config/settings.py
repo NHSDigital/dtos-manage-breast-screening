@@ -52,6 +52,8 @@ if allowed_hosts_except_localhost:
     SESSION_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = False
 
+PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,6 +71,9 @@ INSTALLED_APPS = [
     "manage_breast_screening.mammograms",
 ]
 
+if PERSONAS_ENABLED:
+    INSTALLED_APPS.append("manage_breast_screening.demo")
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -80,10 +85,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# TODO: remove the DEV_SIGN_IN check once we've implemented CIS2 auth. For now,
+# TODO: remove the check once we've implemented CIS2 auth. For now,
 # we only apply auth protection when a viable auth method is available. This keeps our
 # tests passing and prevents us forcing a sign in without a way to do so.
-if DEV_SIGN_IN:
+if DEV_SIGN_IN or PERSONAS_ENABLED:
     # Enforce auth globally only in DEV_SIGN_IN mode
     idx = (
         MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1
@@ -243,4 +248,7 @@ LOGGING = {
 
 AUDIT_EXCLUDED_FIELDS = ["password", "token", "created_at", "updated_at", "id"]
 
-LOGIN_URL = "auth:sign_in"
+if PERSONAS_ENABLED:
+    LOGIN_URL = "demo:persona_login"
+else:
+    LOGIN_URL = "auth:sign_in"

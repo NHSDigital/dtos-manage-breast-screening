@@ -49,3 +49,8 @@ if settings.DEBUG_TOOLBAR:
     urlpatterns = [
         *urlpatterns,
     ] + debug_toolbar_urls()
+
+if settings.PERSONAS_ENABLED:
+    urlpatterns.append(
+        path("demo/", include("manage_breast_screening.demo.urls", namespace="demo"))
+    )
