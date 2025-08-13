@@ -3,16 +3,28 @@ name: Deployment stage
 on:
   workflow_call:
     inputs:
+      environments:
+        description: List of environments to deploy to (String array)
+        required: true
+        type: string
       commit_sha:
         description: Commit SHA used to fetch ADO pipeline and docker image
         required: true
+        type: string
+      pr_number:
+        description: Pull request number when used in a pull request
+        required: false
         type: string
 
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: azure
+    strategy:
+      matrix:
+        environment: ${{ fromJson(inputs.environments) }}
+      max-parallel: 1
+    environment: ${{ matrix.environment }}
 
     steps:
       - name: Checkout code
@@ -26,5 +38,5 @@ jobs:
 
       - name: Call deployment pipeline
         run: |
-          az pipelines run --commit-id ${{inputs.commit_sha}} --name "Deploy to Azure" --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening \
-            --parameters commitSHA=${{inputs.commit_sha}}
+          az pipelines run --commit-id ${{inputs.commit_sha}} --name "Deploy to Azure - ${{ matrix.environment }}" --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening \
+            --parameters commitSHA=${{inputs.commit_sha}} prNumber=${{inputs.pr_number}} environment=${{ matrix.environment }}

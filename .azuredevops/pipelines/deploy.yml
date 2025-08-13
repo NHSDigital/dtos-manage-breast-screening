@@ -5,54 +5,56 @@ parameters:
   - name: commitSHA
     displayName: Commit SHA
     type: string
-  - name: environments
-    type: object
-    default:
-      - dev
+  - name: environment
+    displayName: Environment
+    type: string
+  - name: prNumber
+    displayName: Pull request number
+    type: string
+    default: ''
 
 stages:
-  - ${{ each env in parameters.environments }}:
-      - stage: ${{ env }}
-        displayName: Deploy to ${{ env }} environment
-        pool:
-          name: private-pool-dev-uks
-        lockBehavior: sequential
-        isSkippable: false
+  - stage: ${{ parameters.environment }}
+    displayName: Deploy to ${{ parameters.environment }} environment
+    pool:
+      name: private-pool-dev-uks
+    lockBehavior: sequential
+    isSkippable: false
 
-        jobs:
-          - deployment: DeployApp
-            displayName: Deploy application
-            environment: ${{ env }}
-            strategy:
-              runOnce:
-                deploy:
-                  steps:
-                    - checkout: self
+    jobs:
+      - deployment: DeployApp
+        displayName: Deploy application
+        environment: ${{ parameters.environment }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
 
-                    - task: TerraformInstaller@1
-                      displayName: Install terraform
-                      inputs:
-                        terraformVersion: 1.7.0
+                - task: TerraformInstaller@1
+                  displayName: Install terraform
+                  inputs:
+                    terraformVersion: 1.7.0
 
-                    - task: AzureCLI@2
-                      displayName: Run terraform
-                      inputs:
-                        azureSubscription: manbrs-${{ env }}
-                        scriptType: bash
-                        scriptLocation: inlineScript
-                        addSpnToEnvironment: true
-                        inlineScript: |
-                          export ARM_TENANT_ID="$tenantId"
-                          export ARM_CLIENT_ID="$servicePrincipalId"
-                          export ARM_OIDC_TOKEN="$idToken"
-                          export ARM_USE_OIDC=true
-                          make ci ${{ env }} terraform-apply DOCKER_IMAGE_TAG=git-sha-${{ parameters.commitSHA }}
+                - task: AzureCLI@2
+                  displayName: Run terraform
+                  inputs:
+                    azureSubscription: manbrs-${{ parameters.environment }}
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    addSpnToEnvironment: true
+                    inlineScript: |
+                      export ARM_TENANT_ID="$tenantId"
+                      export ARM_CLIENT_ID="$servicePrincipalId"
+                      export ARM_OIDC_TOKEN="$idToken"
+                      export ARM_USE_OIDC=true
+                      make ci ${{ parameters.environment }} terraform-apply DOCKER_IMAGE_TAG=git-sha-${{ parameters.commitSHA }} PR_NUMBER=${{ parameters.prNumber }}
 
-                    - task: AzureCLI@2
-                      displayName: Run database migration
-                      inputs:
-                        azureSubscription: manbrs-${{ env }}
-                        scriptType: bash
-                        scriptLocation: inlineScript
-                        addSpnToEnvironment: true
-                        inlineScript: ./scripts/bash/db_migrate.sh ${{ env }}
+                - task: AzureCLI@2
+                  displayName: Run database migration
+                  inputs:
+                    azureSubscription: manbrs-${{ parameters.environment }}
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    addSpnToEnvironment: true
+                    inlineScript: ./scripts/bash/db_migrate.sh ${{ parameters.environment }} ${{ parameters.prNumber }}
