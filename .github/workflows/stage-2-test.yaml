@@ -53,7 +53,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Detect notifications code changes
         uses: dorny/paths-filter@v3
@@ -111,7 +111,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Install poetry
         run: pipx install poetry
@@ -139,7 +139,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Full history is needed to improving relevancy of reporting
       - name: 'Perform static analysis'
