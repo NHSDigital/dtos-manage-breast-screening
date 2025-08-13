@@ -1,0 +1,18 @@
+name: 'Scan repository'
+
+on:
+  schedule:
+    - cron: '0 9 * * MON-FRI'
+
+jobs:
+  scan-secrets:
+    name: 'Scan secrets'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full history is needed to scan all commits
+      - name: 'Scan secrets'
+        uses: ./.github/actions/scan-secrets
