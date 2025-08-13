@@ -1,4 +1,9 @@
 # ruff: noqa: F403, F405
+from os import environ
+
+# Force the personas settings off
+# This can be switched to on when we start testing different roles
+environ["PERSONAS_ENABLED"] = "0"
 
 from .settings import *
 
