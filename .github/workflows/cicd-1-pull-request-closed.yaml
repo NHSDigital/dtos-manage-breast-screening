@@ -1,0 +1,28 @@
+name: Delete review app
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  destroy:
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
+    name: Delete review app pr-${{ github.event.pull_request.number }}
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    environment: review
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Call deployment pipeline
+        run: |
+          az pipelines run --commit-id ${{ github.event.pull_request.head.sha }} --name "Delete review app" --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening \
+            --parameters commitSHA=${{ github.event.pull_request.head.sha }} prNumber=${{ github.event.pull_request.number }}
