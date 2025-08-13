@@ -51,7 +51,7 @@ jobs:
           # To keep PRs independent of each other, we can fetch with an "infinite" depth, rather than
           # the special 0 value of actions/checkout, which means "fetch all history for all tags and branches"
           depth: 0x7fffffff # INFINITE_DEPTH
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: 'Scan secrets'
         uses: ./.github/actions/scan-secrets
   scan-dependencies:
@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 2
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: 'Scan dependencies'
         uses: ./.github/actions/scan-dependencies
         with:
