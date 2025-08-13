@@ -2,7 +2,7 @@ name: 'CI/CD pull request'
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, labeled]
 
 jobs:
   metadata:
@@ -71,4 +71,17 @@ jobs:
       python_version: '${{ needs.metadata.outputs.python_version }}'
       terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
       version: '${{ needs.metadata.outputs.version }}'
+    secrets: inherit
+
+  deploy-stage:
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
+    name: Deploy stage
+    needs: [build-stage]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/stage-4-deploy.yaml
+    with:
+      environments: "[\"review\"]"
+      commit_sha: ${{ github.event.pull_request.head.sha }}
+      pr_number: ${{ github.event.pull_request.number }}
     secrets: inherit
