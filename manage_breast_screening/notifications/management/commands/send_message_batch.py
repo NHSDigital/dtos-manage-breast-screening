@@ -16,7 +16,22 @@ from manage_breast_screening.notifications.models import (
 
 TZ_INFO = ZoneInfo("Europe/London")
 
-RECOVERABLE_STATUS_CODES = [400, 408, 413, 425, 429, 500, 503, 504]
+RECOVERABLE_STATUS_CODES = [
+    # Validation error
+    400,
+    # Client side issue
+    408,
+    # Retried too early
+    425,
+    # Too many requests
+    429,
+    # Server error
+    500,
+    # Service not accepting requests
+    503,
+    # Issue with backend services
+    504,
+]
 
 
 class Command(BaseCommand):
