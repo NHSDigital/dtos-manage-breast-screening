@@ -39,9 +39,6 @@ SECRET_KEY = environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = boolean_env("DEBUG", default=False)
 
-# SECURITY WARNING: don't run with dev_login turned on in production!
-DEV_SIGN_IN = boolean_env("DEV_SIGN_IN", default=False)
-
 allowed_hosts = environ.get("ALLOWED_HOSTS")
 ALLOWED_HOSTS = allowed_hosts.split(",") if allowed_hosts else []
 
@@ -52,6 +49,7 @@ if allowed_hosts_except_localhost:
     SESSION_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = False
 
+# SECURITY WARNING: don't run with PERSONAS_ENABLED turned on in production!
 PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 
 # Application definition
@@ -88,8 +86,8 @@ MIDDLEWARE = [
 # TODO: remove the check once we've implemented CIS2 auth. For now,
 # we only apply auth protection when a viable auth method is available. This keeps our
 # tests passing and prevents us forcing a sign in without a way to do so.
-if DEV_SIGN_IN or PERSONAS_ENABLED:
-    # Enforce auth globally only in DEV_SIGN_IN mode
+if PERSONAS_ENABLED:
+    # Enforce auth globally only in PERSONAS_ENABLED mode
     idx = (
         MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1
     )
