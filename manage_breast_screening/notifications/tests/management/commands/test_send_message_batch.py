@@ -1,3 +1,4 @@
+import json
 import uuid
 from datetime import datetime, timedelta
 from unittest.mock import ANY, MagicMock, patch
@@ -183,12 +184,23 @@ class TestSendMessageBatch:
             starts_at=datetime.now().replace(tzinfo=TZ_INFO)
             + timedelta(weeks=4, days=4)
         )
-        Command().handle(**{"routing_plan_id": routing_plan_id})
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+            Command().handle(**{"routing_plan_id": routing_plan_id})
 
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
         assert message_batches[0].status == "failed_recoverable"
         assert message_batches[0].notify_errors == [{"some-error": "details"}]
+        queue_instance.add.assert_called_once_with(
+            json.dumps(
+                {"message_batch_id": str(message_batches[0].id), "retry_count": 0}
+            )
+        )
 
     def test_handle_with_error(self, mock_send_message_batch, routing_plan_id):
         """Test that errors are caught and raised as CommandErrors"""
