@@ -2,10 +2,12 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_not_required
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
 
+@login_not_required
 def sign_in(request):
     """Single entry point for authentication.
 
@@ -23,6 +25,7 @@ def sign_in(request):
     )
 
 
+@login_not_required
 def dev_sign_in(request):
     """DEV_SIGN_IN-only: sign in as the first user in the database and redirect to home."""
     if not settings.DEV_SIGN_IN:

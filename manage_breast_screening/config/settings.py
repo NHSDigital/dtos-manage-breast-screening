@@ -80,6 +80,16 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# TODO: remove the DEV_SIGN_IN check once we've implemented CIS2 auth. For now,
+# we only apply auth protection when a viable auth method is available. This keeps our
+# tests passing and prevents us forcing a sign in without a way to do so.
+if DEV_SIGN_IN:
+    # Enforce auth globally only in DEV_SIGN_IN mode
+    idx = (
+        MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1
+    )
+    MIDDLEWARE.insert(idx, "django.contrib.auth.middleware.LoginRequiredMiddleware")
+
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]
 
@@ -232,3 +242,5 @@ LOGGING = {
 }
 
 AUDIT_EXCLUDED_FIELDS = ["password", "token", "created_at", "updated_at", "id"]
+
+LOGIN_URL = "auth:sign_in"
