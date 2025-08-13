@@ -1,21 +1,6 @@
 version: 2
 
-multi-ecosystem-groups:
-  templates:
-    schedule:
-      interval: weekly
-
 updates:
-  - package-ecosystem: 'npm'
-    directory: '/'
-    patterns: ['nhsuk-frontend']
-    multi-ecosystem-group: templates
-
-  - package-ecosystem: 'pip'
-    directory: '/'
-    patterns: ['nhsuk-frontend-jinja']
-    multi-ecosystem-group: templates
-
   - package-ecosystem: 'docker'
     directory: '/'
     schedule:
@@ -78,29 +63,14 @@ updates:
       - dependency-name: nhsuk-frontend-jinja
 
     groups:
-      frontend:
-        patterns:
-          - jinja2
-          - whitenoise
-
       infra:
         patterns:
           - azure-identity
           - gunicorn
           - psycopg
 
-      lint_and_test:
-        patterns:
-          - factory-boy
-          - 'pytest*'
-          - '*playwright*'
-          - ruff
-          - time-machine
-
-      tools:
-        patterns:
-          - 'dotenv'
-          - 'ipdb'
+      dev:
+        dependency-type: development
 
   - package-ecosystem: 'terraform'
     directory: '/'
