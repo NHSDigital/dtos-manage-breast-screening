@@ -122,6 +122,12 @@ poetry run ./manage.py startapp <app_name> manage_breast_screening/`
 
 See [Deployment](docs/infrastructure/deployment.md).
 
+## Application secrets
+
+The app requires secrets provided as environment variables. Terraform creates an Azure key vault and all its secrets are mapped directly to the app as environment variables. Devs can access the key vault to create and update the secrets manually.
+
+Note [the process requires multiple steps](https://github.com/NHSDigital/dtos-devops-templates/tree/main/infrastructure/modules/container-app#key-vault-secrets) to set up an environment initially.
+
 ## Contributing
 
 - Make sure you have `pre-commit` running so that pre-commit hooks run automatically when you commit - this should have been set up automatically when you ran `make config`.
