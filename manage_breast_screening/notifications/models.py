@@ -8,7 +8,8 @@ BATCH_STATUSES = [
     ("unscheduled", "Unscheduled"),
     ("scheduled", "Scheduled"),
     ("sent", "Sent"),
-    ("failed", "Failed"),
+    ("failed_unrecoverable", "Failed Unrecoverable"),
+    ("failed_recoverable", "Failed Recoverable"),
 ]
 
 MESSAGE_STATUSES = [
@@ -34,6 +35,7 @@ class MessageBatch(BaseModel):
     status = models.CharField(
         max_length=50, choices=BATCH_STATUSES, default="unscheduled"
     )
+    notify_errors = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f"MessageBatch {self.id} - Status: {self.status}"
