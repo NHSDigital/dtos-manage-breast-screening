@@ -281,6 +281,9 @@ class Appointment(BaseModel):
     reinvite = models.BooleanField(default=False)
     stopped_reasons = models.JSONField(null=True, blank=True)
 
+    class Meta:
+        permissions = [("perform_apppointment", "Perform mammogram appointment")]
+
     @property
     def provider(self):
         return self.clinic_slot.provider
