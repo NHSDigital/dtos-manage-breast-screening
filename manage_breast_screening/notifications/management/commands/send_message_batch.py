@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -13,6 +14,7 @@ from manage_breast_screening.notifications.models import (
     Message,
     MessageBatch,
 )
+from manage_breast_screening.notifications.services.queue import Queue
 
 TZ_INFO = ZoneInfo("Europe/London")
 
@@ -87,6 +89,14 @@ class Command(BaseCommand):
         message_batch.notify_errors = response.json()["errors"]
         if response.status_code in RECOVERABLE_STATUS_CODES:
             message_batch.status = "failed_recoverable"
+            Queue.RetryMessageBatches().add(
+                json.dumps(
+                    {
+                        "message_batch_id": str(message_batch.id),
+                        "retry_count": 0,
+                    }
+                )
+            )
         else:
             message_batch.status = "failed_unrecoverable"
         message_batch.save()

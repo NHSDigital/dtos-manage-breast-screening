@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime, timedelta
 
-from factory import Sequence, SubFactory, post_generation
+from factory.declarations import Sequence, SubFactory
 from factory.django import DjangoModelFactory
+from factory.helpers import post_generation
 
 from manage_breast_screening.notifications.management.commands.send_message_batch import (
     TZ_INFO,
@@ -41,6 +42,7 @@ class MessageFactory(DjangoModelFactory):
 class MessageBatchFactory(DjangoModelFactory):
     class Meta:
         model = models.MessageBatch
+        skip_postgeneration_save = True
 
     routing_plan_id = str(uuid.uuid4())
     status = "unscheduled"
