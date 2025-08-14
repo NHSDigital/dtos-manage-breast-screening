@@ -1,10 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from manage_breast_screening.notifications.api_client import ApiClient
 from manage_breast_screening.notifications.management.commands.command_helpers import (
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import MessageBatch
+from manage_breast_screening.notifications.services.api_client import ApiClient
 
 
 class Command(BaseCommand):

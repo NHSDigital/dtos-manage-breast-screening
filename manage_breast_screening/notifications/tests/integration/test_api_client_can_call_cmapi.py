@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from manage_breast_screening.notifications.api_client import ApiClient
+from manage_breast_screening.notifications.services.api_client import ApiClient
 from manage_breast_screening.notifications.tests.factories import (
     MessageBatchFactory,
     MessageFactory,

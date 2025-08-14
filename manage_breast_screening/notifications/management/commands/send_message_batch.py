@@ -5,7 +5,6 @@ from zoneinfo import ZoneInfo
 from django.core.management.base import BaseCommand, CommandError
 from requests import Response
 
-from manage_breast_screening.notifications.api_client import ApiClient
 from manage_breast_screening.notifications.management.commands.command_helpers import (
     MessageBatchHelpers,
 )
@@ -14,6 +13,7 @@ from manage_breast_screening.notifications.models import (
     Message,
     MessageBatch,
 )
+from manage_breast_screening.notifications.services.api_client import ApiClient
 from manage_breast_screening.notifications.services.queue import Queue
 
 TZ_INFO = ZoneInfo("Europe/London")
