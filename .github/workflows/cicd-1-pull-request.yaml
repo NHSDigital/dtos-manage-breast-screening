@@ -72,10 +72,9 @@ jobs:
       terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
       version: '${{ needs.metadata.outputs.version }}'
     secrets: inherit
-
   deploy-stage:
     if: contains(github.event.pull_request.labels.*.name, 'deploy')
-    name: Deploy stage
+    name: Deploy review app pr-${{ github.event.pull_request.number }}
     needs: [build-stage]
     permissions:
       id-token: write
