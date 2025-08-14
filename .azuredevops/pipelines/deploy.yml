@@ -49,6 +49,7 @@ stages:
                       export ARM_OIDC_TOKEN="$idToken"
                       export ARM_USE_OIDC=true
                       make ci ${{ parameters.environment }} terraform-apply DOCKER_IMAGE_TAG=git-sha-${{ parameters.commitSHA }} PR_NUMBER=${{ parameters.prNumber }}
+                      sleep 300
 
                 - task: AzureCLI@2
                   displayName: Run database migration
