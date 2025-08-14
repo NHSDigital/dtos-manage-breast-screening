@@ -1,0 +1,42 @@
+{% from 'date-input/macro.jinja' import dateInput as dateInput %}
+{% if field.errors %}
+  {% set error_message = {"text": field.errors | first} %}
+{% endif %}
+{% set hint = field.field.hint %}
+{{ dateInput({
+  "name": field.html_name,
+  "fieldset":  {
+    "legend": {
+      "text": field.label,
+      "classes": "nhsuk-fieldset__legend--m",
+      "isPageHeading": false
+    }
+  } if field.label,
+  "errorMessage": error_message,
+  "hint": {
+    "html": hint|e
+  } if hint,
+  "items": [
+    {
+      "name": field.subwidgets.0.data.name,
+      "label": "Day",
+      "classes": "nhsuk-input--width-2",
+      "value": field.subwidgets.0.data.value,
+      "id": field.auto_id
+    },
+    {
+      "name": field.subwidgets.1.data.name,
+      "label": "Month",
+      "classes": "nhsuk-input--width-2",
+      "value": field.subwidgets.1.data.value,
+      "id": field.auto_id ~ "_1"
+    },
+    {
+      "name": field.subwidgets.2.data.name,
+      "label": "Year",
+      "classes": "nhsuk-input--width-4",
+      "value": field.subwidgets.2.data.value,
+      "id": field.auto_id ~ "_2"
+    }
+  ]
+}) }}
