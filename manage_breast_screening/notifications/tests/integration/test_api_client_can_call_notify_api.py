@@ -10,7 +10,7 @@ from manage_breast_screening.notifications.tests.factories import (
 )
 
 
-@patch("manage_breast_screening.notifications.api_client.jwt.encode")
+@patch("manage_breast_screening.notifications.services.api_client.jwt.encode")
 @pytest.mark.integration
 class TestApiClient:
     @pytest.fixture(autouse=True)
@@ -29,7 +29,7 @@ class TestApiClient:
         return str(uuid.uuid4())
 
     @pytest.mark.django_db
-    def test_api_client_can_call_cmapi_and_verify_response(
+    def test_api_client_can_call_notify_api_and_verify_response(
         self, mock_jwt_encode, routing_plan_id
     ):
         message_1 = MessageFactory()
