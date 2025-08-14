@@ -4,21 +4,39 @@ from django.db import models
 
 from ..core.models import BaseModel
 
-BATCH_STATUSES = [
-    ("unscheduled", "Unscheduled"),
-    ("scheduled", "Scheduled"),
-    ("sent", "Sent"),
-    ("failed_unrecoverable", "Failed Unrecoverable"),
-    ("failed_recoverable", "Failed Recoverable"),
-]
 
-MESSAGE_STATUSES = [
-    ("pending_enrichment", "Pending enrichment"),
-    ("enriched", "Enriched"),
-    ("sending", "Sending"),
-    ("delivered", "Delivered"),
-    ("failed", "Failed"),
-]
+class MessageBatchStatusChoices(models.Choices):
+    FAILED_RECOVERABLE = "failed_recoverable"
+    FAILED_UNRECOVERABLE = "failed_unrecoverable"
+    SCHEDULED = "scheduled"
+    SENT = "sent"
+    UNSCHEDULED = "unscheduled"
+
+
+class MessageStatusChoices(models.Choices):
+    DELIVERED = "delivered"
+    ENDRICHED = "enriched"
+    FAILED = "failed"
+    PENDING_ENRICHMENT = "pending_enrichment"
+    SENDING = "sending"
+
+
+class ChannelStatusChoices(models.Choices):
+    ACCEPTED = "accepted"
+    CANCELLED = "cancelled"
+    DELIVERED = "delivered"
+    NOTIFICATION_ATTEMPTED = "notification_attempted"
+    NOTIFIED = "notified"
+    PENDING_VIRUS_CHECK = "pending_virus_check"
+    READ = "read"
+    RECEIVED = "received"
+    REJECTED = "rejected"
+    PERMANENT_FAILURE = "permanent_failure"
+    TECHNICAL_FAILURE = "technical_failure"
+    TEMPORARY_FAILURE = "temporary_failure"
+    UNKNOWN = "unknown"
+    UNNOTIFIED = "unnotified"
+    VALIDATION_FAILED = "validation_failed"
 
 
 class MessageBatch(BaseModel):
@@ -33,7 +51,7 @@ class MessageBatch(BaseModel):
     scheduled_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
-        max_length=50, choices=BATCH_STATUSES, default="unscheduled"
+        max_length=50, choices=MessageBatchStatusChoices, default="unscheduled"
     )
     notify_errors = models.JSONField(blank=True, null=True)
 
@@ -59,7 +77,7 @@ class Message(models.Model):
     created_at = models.DateTimeField(null=True, blank=True)
     sent_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(
-        max_length=50, choices=MESSAGE_STATUSES, default="pending_enrichment"
+        max_length=50, choices=MessageStatusChoices, default="pending_enrichment"
     )
 
     appointment = models.ForeignKey(
@@ -127,7 +145,7 @@ class ChannelStatus(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     message = models.ForeignKey("notifications.Message", on_delete=models.PROTECT)
     channel = models.CharField(max_length=50, null=False)
-    status = models.CharField(max_length=50, null=False)
+    status = models.CharField(max_length=50, null=False, choices=ChannelStatusChoices)
     description = models.CharField(max_length=150)
     idempotency_key = models.CharField(max_length=150)
     status_updated_at = models.DateTimeField(null=False)
@@ -142,7 +160,7 @@ class MessageStatus(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     message = models.ForeignKey("notifications.Message", on_delete=models.PROTECT)
-    status = models.CharField(max_length=50, null=False)
+    status = models.CharField(max_length=50, null=False, choices=MessageStatusChoices)
     description = models.CharField(max_length=150)
     idempotency_key = models.CharField(max_length=150)
     status_updated_at = models.DateTimeField(null=False)
