@@ -26,15 +26,15 @@ class TestQueue:
             mock_client = MagicMock()
             queue_client.from_connection_string.return_value = mock_client
 
-            Queue("new_queue")
+            Queue("new-queue")
 
             queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "new_queue"
+                "qqq111", "new-queue"
             )
             mock_client.create_queue.assert_called_once()
 
     def test_add_to_queue(self, mock_queue_client):
-        Queue("new_queue").add("a message")
+        Queue("new-queue").add("a message")
 
         mock_queue_client.send_message.assert_called_once_with("a message")
 
@@ -48,7 +48,7 @@ class TestQueue:
             Queue.MessageStatusUpdates().add("some data")
 
             queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "message_status_updates"
+                "qqq111", "message-status-updates"
             )
             mock_client.create_queue.assert_called_once()
             mock_client.send_message.assert_called_once_with("some data")
@@ -71,11 +71,11 @@ class TestQueue:
     def test_items_method_receives_messages(self, mock_queue_client):
         mock_queue_client.receive_messages.return_value = ["this", "that"]
 
-        assert Queue("new_queue").items(limit=100) == ["this", "that"]
+        assert Queue("new-queue").items(limit=100) == ["this", "that"]
 
         mock_queue_client.receive_messages.assert_called_once_with(max_messages=100)
 
     def test_delete_deletes_message(self, mock_queue_client):
-        Queue("new_queue").delete("this message")
+        Queue("new-queue").delete("this message")
 
         mock_queue_client.delete_message.assert_called_once_with("this message")
