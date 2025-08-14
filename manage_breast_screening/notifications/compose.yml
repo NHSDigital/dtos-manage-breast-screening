@@ -39,11 +39,11 @@ services:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
       - ./store/workflows.jsonl:/app/mesh_sandbox/store/data/workflows.jsonl:ro
 
-  cmapi-stub:
+  notify-api-stub:
     build:
-      context: ./tests/dependencies/cmapi_stub
+      context: ./tests/dependencies/notify_api_stub
       dockerfile: Dockerfile
-    container_name: cmapi_stub
+    container_name: notify_api_stub
     profiles:
       - development
       - integration
@@ -61,7 +61,7 @@ services:
         condition: service_started
       mesh-sandbox:
         condition: service_healthy
-      cmapi-stub:
+      notify-api-stub:
         condition: service_healthy
     profiles:
         - integration

@@ -6,7 +6,6 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 import requests
 
-from manage_breast_screening.notifications.api_client import ApiClient
 from manage_breast_screening.notifications.management.commands.command_helpers import (
     MessageBatchHelpers,
 )
@@ -16,6 +15,7 @@ from manage_breast_screening.notifications.management.commands.send_message_batc
     CommandError,
 )
 from manage_breast_screening.notifications.models import Message, MessageBatch
+from manage_breast_screening.notifications.services.api_client import ApiClient
 from manage_breast_screening.notifications.tests.factories import AppointmentFactory
 
 

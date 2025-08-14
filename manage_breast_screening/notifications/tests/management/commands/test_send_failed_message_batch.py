@@ -5,13 +5,13 @@ import pytest
 import requests
 from django.core.management.base import CommandError
 
-from manage_breast_screening.notifications.api_client import ApiClient
 from manage_breast_screening.notifications.management.commands.command_helpers import (
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.management.commands.send_failed_message_batch import (
     Command,
 )
+from manage_breast_screening.notifications.services.api_client import ApiClient
 from manage_breast_screening.notifications.tests.factories import MessageBatchFactory
 
 

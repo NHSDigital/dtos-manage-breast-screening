@@ -18,14 +18,13 @@ from manage_breast_screening.notifications.tests.factories import (
 
 
 class TestCreateAppointments:
-    @pytest.fixture
-    def raw_data(self):
-        return open(
-            f"{os.path.dirname(os.path.realpath(__file__))}/ABC_20241202091221_APPT_106.dat"
-        ).read()
+    def fixture_file_path(self, filename):
+        return (
+            f"{os.path.dirname(os.path.realpath(__file__))}/../../fixtures/{filename}"
+        )
 
     @pytest.mark.django_db
-    def test_handle_creates_records(self, raw_data):
+    def test_handle_creates_records(self):
         """Test Appointment record creation from valid NBSS data stored in Azure storage blob"""
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
@@ -38,7 +37,7 @@ class TestCreateAppointments:
         )
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            raw_data
+            open(self.fixture_file_path("ABC_20241202091221_APPT_106.dat")).read()
         )
         subject.container_client = mock_container_client
 
@@ -111,7 +110,7 @@ class TestCreateAppointments:
         # Receive a cancellation for existing appointment
         today = datetime.now()
         raw_data = open(
-            f"{os.path.dirname(os.path.realpath(__file__))}/ABC_20241202091321_APPT_107.dat"
+            self.fixture_file_path("ABC_20241202091321_APPT_107.dat")
         ).read()
         today_dirname = today.strftime("%Y-%m-%d")
 
@@ -142,7 +141,7 @@ class TestCreateAppointments:
         ).replace(tzinfo=TZ_INFO)
 
     @pytest.mark.django_db
-    def test_handle_accept_date_arg(self, raw_data):
+    def test_handle_accept_date_arg(self):
         """Test Appointment record creation when passed a specific date as argument"""
         subject = Command()
 
@@ -153,7 +152,7 @@ class TestCreateAppointments:
         )
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            raw_data
+            open(self.fixture_file_path("ABC_20241202091221_APPT_106.dat")).read()
         )
         subject.container_client = mock_container_client
 

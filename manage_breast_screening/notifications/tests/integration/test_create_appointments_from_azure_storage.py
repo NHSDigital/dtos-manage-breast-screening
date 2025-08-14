@@ -2,12 +2,12 @@ from datetime import datetime
 
 import pytest
 
-from manage_breast_screening.notifications.blob_storage import BlobStorage
 from manage_breast_screening.notifications.management.commands.create_appointments import (
     TZ_INFO,
     Command,
 )
 from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 
