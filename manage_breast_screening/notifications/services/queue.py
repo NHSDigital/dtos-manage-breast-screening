@@ -32,4 +32,4 @@ class Queue:
 
     @classmethod
     def RetryMessageBatches(cls):
-        return cls("retry_message_batches")
+        return cls("retry-message-batches")

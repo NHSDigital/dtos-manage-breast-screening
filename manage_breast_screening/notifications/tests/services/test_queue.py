@@ -63,7 +63,7 @@ class TestQueue:
             Queue.RetryMessageBatches().add("some data")
 
             queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "retry_message_batches"
+                "qqq111", "retry-message-batches"
             )
             mock_client.create_queue.assert_called_once()
             mock_client.send_message.assert_called_once_with("some data")
