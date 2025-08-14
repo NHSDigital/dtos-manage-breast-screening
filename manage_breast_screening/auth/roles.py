@@ -25,7 +25,7 @@ ROLES = {
             "change_participantaddress",
             "view_appointment",
             "change_appointment",
-            "perform_apppointment",
+            "perform_appointment",
             "view_appointmentstatus",
             "add_appointmentstatus",
             "view_screeningepisode",
