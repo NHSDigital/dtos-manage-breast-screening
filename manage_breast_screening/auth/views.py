@@ -1,6 +1,3 @@
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_not_required
 from django.shortcuts import redirect, render
@@ -9,40 +6,15 @@ from django.urls import reverse
 
 @login_not_required
 def sign_in(request):
-    """Single entry point for authentication.
-
-    - In DEV_SIGN_IN mode: show a developer sign-in button.
-    - Otherwise: show a CIS2 sign-in button.
-    """
+    """Entry point for authentication with CIS2"""
     return render(
         request,
         "auth/sign_in.jinja",
         {
             "page_title": "Sign in",
             "navActive": "sign_in",
-            "is_dev_sign_in": settings.DEV_SIGN_IN,
         },
     )
-
-
-@login_not_required
-def dev_sign_in(request):
-    """DEV_SIGN_IN-only: sign in as the first user in the database and redirect to home."""
-    if not settings.DEV_SIGN_IN:
-        return redirect(reverse("auth:sign_in"))
-
-    User = get_user_model()
-    user = User.objects.order_by("pk").first()
-    if not user:
-        return render(
-            request,
-            "404.jinja",
-            {"error": "No users in the database - can't sign in"},
-            status=404,
-        )
-
-    auth_login(request, user)
-    return redirect(reverse("home"))
 
 
 def sign_out(request):
