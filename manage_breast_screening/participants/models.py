@@ -282,7 +282,7 @@ class Appointment(BaseModel):
     stopped_reasons = models.JSONField(null=True, blank=True)
 
     class Meta:
-        permissions = [("perform_apppointment", "Perform mammogram appointment")]
+        permissions = [("perform_appointment", "Perform mammogram appointment")]
 
     @property
     def provider(self):

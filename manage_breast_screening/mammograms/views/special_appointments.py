@@ -16,6 +16,7 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
     The data for this is currently stored on a JSONField on the participant model.
     """
 
+    permission_required = "participants.change_appointment"
     form_class = ProvideSpecialAppointmentDetailsForm
     template_name = (
         "mammograms/special_appointments/provide_special_appointment_details.jinja"
