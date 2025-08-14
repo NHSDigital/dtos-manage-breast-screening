@@ -1,5 +1,6 @@
 from unittest.mock import MagicMock, patch
 
+import pytest
 import requests
 
 from manage_breast_screening.notifications.api_client import ApiClient
@@ -80,12 +81,14 @@ class TestSendFailedMessageBatch:
     #         message_batch=failed_batch, response_json=ANY
     #     )
 
+    @pytest.mark.django_db
     def test_no_batches_in_queue(
         self,
         mock_mark_batch_as_sent,
         mock_retry_message_batches,
         mock_send_message_batch,
     ):
+        mock_retry_message_batches.return_value.get.return_value = []
         subject = Command()
 
         subject.handle()
