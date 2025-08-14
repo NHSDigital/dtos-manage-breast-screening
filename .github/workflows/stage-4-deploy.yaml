@@ -25,6 +25,7 @@ jobs:
         environment: ${{ fromJson(inputs.environments) }}
       max-parallel: 1
     environment: ${{ matrix.environment }}
+    concurrency: deploy-${{ matrix.environment }}-${{ github.ref }}
 
     steps:
       - name: Checkout code

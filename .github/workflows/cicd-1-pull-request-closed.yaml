@@ -12,6 +12,8 @@ jobs:
       id-token: write
     runs-on: ubuntu-latest
     environment: review
+    concurrency: deploy-review-${{ github.ref }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
