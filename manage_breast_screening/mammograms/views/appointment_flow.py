@@ -1,6 +1,8 @@
 import logging
 from functools import cached_property
 
+from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -32,10 +34,12 @@ APPOINTMENT_CANNOT_PROCEED = "Appointment cannot proceed"
 logger = logging.getLogger(__name__)
 
 
-class AppointmentMixin:
+class AppointmentMixin(PermissionRequiredMixin):
     """
     A view mixin that exposes the appointment.
     """
+
+    permission_required = "participants.view_appointment"
 
     @property
     def appointment_pk(self):
@@ -59,6 +63,8 @@ class InProgressAppointmentMixin(AppointmentMixin):
     If the appointment is not in progress, redirect to the appointment show page.
     """
 
+    permission_required = "participants.perform_appointment"
+
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
         if not appointment.current_status.in_progress:
@@ -79,7 +85,9 @@ class ShowAppointment(AppointmentMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        if appointment.current_status.in_progress:
+        if appointment.current_status.in_progress and request.user.has_perm(
+            "participants.perform_appointment"
+        ):
             return redirect("mammograms:start_screening", pk=self.appointment.pk)
 
         participant_pk = appointment.screening_episode.participant.pk
@@ -263,6 +271,7 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 
 @require_http_methods(["POST"])
+@permission_required("participants.change_appointmentstatus")
 def check_in(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)

@@ -1,6 +1,7 @@
 from logging import getLogger
 from urllib.parse import urlparse
 
+from django.contrib.auth.decorators import permission_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
@@ -31,6 +32,7 @@ def parse_return_url(request, default: str) -> str:
     return return_url
 
 
+@permission_required("participants.view_participant")
 def show(request, pk):
     participant = get_object_or_404(Participant, pk=pk)
     presented_participant = ParticipantPresenter(participant)
@@ -73,6 +75,7 @@ def show(request, pk):
     )
 
 
+@permission_required("participants.change_participant")
 def edit_ethnicity(request, pk):
     participant = get_object_or_404(Participant, pk=pk)
 
