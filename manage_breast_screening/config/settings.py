@@ -69,9 +69,6 @@ INSTALLED_APPS = [
     "manage_breast_screening.mammograms",
 ]
 
-if PERSONAS_ENABLED:
-    INSTALLED_APPS.append("manage_breast_screening.demo")
-
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -247,6 +244,6 @@ LOGGING = {
 AUDIT_EXCLUDED_FIELDS = ["password", "token", "created_at", "updated_at", "id"]
 
 if PERSONAS_ENABLED:
-    LOGIN_URL = "demo:persona_login"
+    LOGIN_URL = "auth:persona_login"
 else:
     LOGIN_URL = "auth:sign_in"

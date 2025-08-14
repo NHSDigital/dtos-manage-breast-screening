@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML
 
-from ..models import ANNA, CHLOE
+from ..models import ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA
 
 
 @pytest.fixture
@@ -15,7 +15,9 @@ def group():
 @pytest.fixture(autouse=True)
 def anna(group):
     user = get_user_model().objects.create(
-        username=ANNA.username, first_name=ANNA.first_name, last_name=ANNA.last_name
+        username=ADMINISTRATIVE_PERSONA.username,
+        first_name=ADMINISTRATIVE_PERSONA.first_name,
+        last_name=ADMINISTRATIVE_PERSONA.last_name,
     )
     user.groups.add(group)
     return user
@@ -24,7 +26,9 @@ def anna(group):
 @pytest.fixture(autouse=True)
 def chloe(group):
     user = get_user_model().objects.create(
-        username=CHLOE.username, first_name=CHLOE.first_name, last_name=CHLOE.last_name
+        username=CLINICAL_PERSONA.username,
+        first_name=CLINICAL_PERSONA.first_name,
+        last_name=CLINICAL_PERSONA.last_name,
     )
     user.groups.add(group)
     return user
@@ -33,7 +37,7 @@ def chloe(group):
 @pytest.mark.django_db
 def test_get_persona_login(client):
     response = client.get(
-        reverse("demo:persona_login"),
+        reverse("auth:persona_login"),
         query_params={"next": "/some-url"},
     )
     assert response.status_code == 200
@@ -46,7 +50,7 @@ def test_get_persona_login(client):
 @pytest.mark.django_db
 def test_post_persona_login(client):
     response = client.post(
-        reverse("demo:persona_login"),
+        reverse("auth:persona_login"),
         {"username": "anna_davies", "next": "/some-url"},
     )
     assert response.status_code == 302
@@ -56,8 +60,8 @@ def test_post_persona_login(client):
 @pytest.mark.django_db
 def test_bad_redirect(client):
     response = client.post(
-        reverse("demo:persona_login"),
+        reverse("auth:persona_login"),
         {"username": "anna_davies", "next": "http://evil.com"},
     )
     assert response.status_code == 302
-    assert response.headers["location"] == "/demo/persona-login/"
+    assert response.headers["location"] == "/auth/persona-login/"

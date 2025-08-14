@@ -1,9 +1,9 @@
 # ruff: noqa: F403, F405
 from os import environ
 
-# Force the personas settings off
-# This can be switched to on when we start testing different roles
-environ["PERSONAS_ENABLED"] = "0"
+# Force the personas setting on, ensuring that the URL will be included in
+# the URLConf
+environ["PERSONAS_ENABLED"] = "1"
 
 from .settings import *
 
@@ -18,6 +18,12 @@ STORAGES = {
 
 MIDDLEWARE.remove(
     "whitenoise.middleware.WhiteNoiseMiddleware",
+)
+
+# Make authentication optional until we've updated the system tests to account
+# for different roles
+MIDDLEWARE.remove(
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
 )
 
 if DEBUG:
