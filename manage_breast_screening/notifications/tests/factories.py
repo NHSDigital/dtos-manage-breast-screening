@@ -55,3 +55,14 @@ class MessageBatchFactory(DjangoModelFactory):
         if extracted:
             for message in extracted:
                 self.messages.add(message)
+
+
+class ChannelStatusFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ChannelStatus
+
+    channel = "nhsapp"
+    description = "Read"
+    message = SubFactory(MessageFactory)
+    status = "read"
+    status_updated_at = datetime.now() - timedelta(minutes=10)
