@@ -31,6 +31,8 @@ module "db_migrate" {
 }
 
 module "db_seed" {
+  count = var.run_db_seed ? 1 : 0
+
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
   name                         = "${var.app_short_name}-seed-${var.environment}"

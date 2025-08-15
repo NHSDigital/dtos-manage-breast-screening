@@ -87,4 +87,5 @@ jobs:
     with:
       environments: "[\"review\",\"dev\"]"
       commit_sha: ${{ github.sha }}
+      run_database_seeding: false
     secrets: inherit

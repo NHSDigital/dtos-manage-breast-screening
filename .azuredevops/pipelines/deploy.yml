@@ -12,6 +12,10 @@ parameters:
     displayName: Pull request number
     type: string
     default: ''
+  - name: runSeed
+    displayName: Run database seeding
+    type: boolean
+    default: false
 
 stages:
   - stage: ${{ parameters.environment }}
@@ -61,6 +65,7 @@ stages:
 
                 - task: AzureCLI@2
                   displayName: Run database seeding
+                  condition: eq(${{ parameters.runSeed }}, true)
                   inputs:
                     azureSubscription: manbrs-${{ parameters.environment }}
                     scriptType: bash
