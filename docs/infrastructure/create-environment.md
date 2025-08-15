@@ -6,7 +6,7 @@ This is the initial manual process to create a new environment like review, dev,
 - Ask CCOE to assign role:
 	- [Form for PIM](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=28f3ab4f1bf3ca1078ac4337b04bcb78&sysparm_category=114fced51bdae1502eee65b9bd4bcbdc) or [Generic infrastructure form]([https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=bd7112991bdae1502eee65b9bd4bcb3b&referrer=popular_items](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=bd7112991bdae1502eee65b9bd4bcb3b&referrer=popular_items))
 	- Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
-	- role: permanent PIM Groups reader on Directory
+	- role: Group.Read.Allpermanent PIM Groups reader on Directory
 - Run bicep from AVD: `make [environment] resource-group-init`
 - Create ADO group
 	- Name: `Run pipeline - [environment]`
