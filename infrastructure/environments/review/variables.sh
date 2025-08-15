@@ -4,3 +4,4 @@ HUB_SUBSCRIPTION="Digital Screening DToS - DevOps"
 HUB=dev
 TERRAFORM_MODULES_REF=main
 ENABLE_SOFT_DELETE=false
+RUN_DB_SEED=true

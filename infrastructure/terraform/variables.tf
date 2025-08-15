@@ -110,6 +110,12 @@ variable "front_door_profile" {
   type        = string
 }
 
+variable "run_db_seed" {
+  description = "To populate the database with seed data or not."
+  type        = bool
+  default     = false
+}
+
 locals {
   region = "uksouth"
 

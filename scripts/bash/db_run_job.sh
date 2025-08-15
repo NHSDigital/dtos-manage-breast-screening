@@ -2,8 +2,24 @@
 
 set -euo pipefail
 
-ENV=$1
-JOB_NAME=manbrs-dbm-${ENV}
+ENV_CONFIG=$1
+PR_NUMBER=${2:-}
+APP_JOB_TYPE=$3
+
+if [ -z "$PR_NUMBER" ]; then
+    # On permanent environments, the environment name is the environment config name, i.e. "production"
+    ENV=${ENV_CONFIG}
+else
+    # On a review app, the environment name uses the PR number, i.e. "pr-1234"
+    ENV=pr-${PR_NUMBER}
+fi
+
+if [[ "$APP_JOB_TYPE" != "seed" && "$APP_JOB_TYPE" != "dbm" ]]; then
+    echo "Error: APP_JOB_TYPE must be either 'seed' or 'dbm', but got '$APP_JOB_TYPE'."
+    exit 1
+fi
+
+JOB_NAME=manbrs-${APP_JOB_TYPE}-${ENV}
 RG_NAME=rg-manbrs-${ENV}-container-app-uks
 TIMEOUT=300
 WAIT=5
