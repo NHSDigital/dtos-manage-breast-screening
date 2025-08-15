@@ -11,24 +11,45 @@ module "shared_config" {
   application = var.app_short_name
 }
 
-module "db_migrate" {
+# create the database
+# prod  : make migrate seed [default]
+# dev   : make migrate seed [default]
+# review: make migrate seed example_data
+# put "example_data" once the PR has been merged in.
+module "db_setup" {
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
   name                         = "${var.app_short_name}-dbm-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = azurerm_resource_group.main.name
-  container_command            = ["python"]
-  container_args               = ["manage.py", "migrate"]
-  docker_image                 = var.docker_image
-  user_assigned_identity_ids   = [module.db_connect_identity.id]
+
+  # Run everything through /bin/sh
+  container_command = ["/bin/sh", "-c"]
+
+  # Build the full command string, conditionally including example_data
+  # && python manage.py example_data"
+  container_args = [
+    var.env_config == "prod"
+    ? "python manage.py migrate"
+    : "python manage.py migrate && python manage.py seed_demo_data --noinput"
+  ]
+
+  docker_image               = var.docker_image
+  user_assigned_identity_ids = [module.db_connect_identity.id]
+
   environment_variables = {
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
+    DATABASE_HOST    = module.postgres.host
+    DATABASE_NAME    = module.postgres.database_names[0]
+    DATABASE_USER    = module.db_connect_identity.name
+    SSL_MODE         = "require"
+    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
+    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
+    DJANGO_ENV       = var.env_config
   }
 }
+
+# Seeding is required for all environments; however, for 'review' apps
+# we instead will run example_data
 
 module "webapp" {
   providers = {

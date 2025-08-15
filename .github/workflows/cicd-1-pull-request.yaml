@@ -83,6 +83,7 @@ jobs:
       environments: '["review"]'
       commit_sha: ${{ github.event.pull_request.head.sha }}
       pr_number: ${{ github.event.pull_request.number }}
+      run_database_seeding: true
     secrets: inherit
   post-url:
     if: contains(github.event.pull_request.labels.*.name, 'deploy')

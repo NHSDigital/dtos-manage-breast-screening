@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+set -x
+
 ENV_CONFIG=$1
 PR_NUMBER=${2:-}
 

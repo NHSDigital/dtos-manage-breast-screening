@@ -25,12 +25,11 @@ This is the initial manual process to create a new environment like review, dev,
 - Run bicep from AVD: `make [environment] resource-group-init`
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Infra secrets
 
 - Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[review]-inf`
 
-=======
->>>>>>> e326390 (Document deployment)
 ## Azure devops
 
 - Create ADO group

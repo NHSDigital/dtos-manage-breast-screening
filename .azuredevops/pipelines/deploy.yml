@@ -51,10 +51,10 @@ stages:
                       make ci ${{ parameters.environment }} terraform-apply DOCKER_IMAGE_TAG=git-sha-${{ parameters.commitSHA }} PR_NUMBER=${{ parameters.prNumber }}
 
                 - task: AzureCLI@2
-                  displayName: Run database migration
+                  displayName: Run database setup
                   inputs:
                     azureSubscription: manbrs-${{ parameters.environment }}
                     scriptType: bash
                     scriptLocation: inlineScript
                     addSpnToEnvironment: true
-                    inlineScript: ./scripts/bash/db_migrate.sh ${{ parameters.environment }} ${{ parameters.prNumber }}
+                    inlineScript: ./scripts/bash/db_run_job.sh ${{ parameters.environment }} ${{ parameters.prNumber }}
