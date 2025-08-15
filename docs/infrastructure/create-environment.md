@@ -28,6 +28,7 @@ This is the initial manual process to create a new environment like review, dev,
 		- Edit queue build configuration
 		- Queue builds
 		- View build pipeline
+		- View builds
 - Create ADO environment: [environment]
 	- Set: exclusive lock (except for review)
 	- Add pipeline permission for `Deploy to Azure - [environment]` pipeline
