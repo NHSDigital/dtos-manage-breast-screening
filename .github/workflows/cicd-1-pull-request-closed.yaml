@@ -10,6 +10,7 @@ jobs:
     name: Delete review app pr-${{ github.event.pull_request.number }}
     permissions:
       id-token: write
+      pull-requests: write
     runs-on: ubuntu-latest
     environment: review
     concurrency: deploy-review-${{ github.ref }}
@@ -36,3 +37,10 @@ jobs:
             --output tsv --query id)
 
           scripts/bash/wait_ado_pipeline.sh "$RUN_ID" https://dev.azure.com/nhse-dtos dtos-manage-breast-screening
+
+      - name: Post URL to PR comments
+        uses: marocchino/sticky-pull-request-comment@8ac02941f254c53fbda0cf44288785e1367e13bf
+        with:
+          message: |
+            The review app at this URL has been deleted:
+            https://pr-${{ github.event.pull_request.number }}.manage-breast-screening.non-live.screening.nhs.uk
