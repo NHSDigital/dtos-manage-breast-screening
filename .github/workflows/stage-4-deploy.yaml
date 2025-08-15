@@ -52,6 +52,8 @@ jobs:
           echo Sleeping 15s
           sleep 15
 
+          az pipelines runs list --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening -o table
+
           az pipelines runs show --id "$RUN_ID" --org https://dev.azure.com/nhse-dtos --project dtos-manage-breast-screening
 
           bash -x scripts/bash/wait_ado_pipeline.sh "$RUN_ID" https://dev.azure.com/nhse-dtos dtos-manage-breast-screening
