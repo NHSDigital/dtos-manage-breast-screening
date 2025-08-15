@@ -27,7 +27,7 @@ jobs:
       - name: Call delete review app pipeline
         run: |
           echo "Starting Azure devops pipeline \"Delete review app\"..."
-          RUN_ID=(az pipelines run \
+          RUN_ID=$(az pipelines run \
             --commit-id ${{ github.event.pull_request.head.sha }}\
             --name "Delete review app"\
             --org https://dev.azure.com/nhse-dtos \
