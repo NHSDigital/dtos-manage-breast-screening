@@ -30,16 +30,16 @@ This is the initial manual process to create a new environment like review, dev,
 	- AZURE_CLIENT_ID
 	- AZURE_SUBSCRIPTION_ID
 [TODO]- Add branch protection rule so only the main branch can be deployed (except for review) [TODO]
-- Create service connection
+- Create service connection (ADO)
 	- Connection type: `Azure Resource Manager`
 	- Identity type: `Managed identity`
 	- Subscription for managed identity: `Digital Screening DToS - Devops`
 	- Resource group for managed identity: `rg-mi-[environment]-uks`
 	- Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
 	- Scope level: `Subscription`
-	- Service Connection Name: `manbrs-[environment]`
 	- Subscription: `Digital Screening DToS - Core Services Dev`
 	- Resource group for Service connection: leave blank
+	- Service Connection Name: `manbrs-[environment]`
 	- Do NOT tick: Grant access permission to all pipelines
 	- Security: allow `Deploy to Azure - [environment]` pipeline
 - Add environment to the list of environments in `deploy-stage` step of `cicd-2-main-branch.yaml`. For the review enviornment, there is a single item in `cicd-1-pull-request.yaml`.
