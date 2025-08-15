@@ -39,7 +39,7 @@ jobs:
 
       - name: Call deployment pipeline
         run: |
-          echo "Starting pipeline \"Deploy to Azure - ${{ matrix.environment }}\"..."
+          echo "Starting Azure devops pipeline \"Deploy to Azure - ${{ matrix.environment }}\"..."
           RUN_ID=$(az pipelines run \
             --commit-id ${{inputs.commit_sha}} \
             --name "Deploy to Azure - ${{ matrix.environment }}" \
