@@ -110,52 +110,9 @@ To generate a new app, run:
 poetry run ./manage.py startapp <app_name> manage_breast_screening/`
 ```
 
-## Manual Deployment
+## Deployment
 
-The build pipeline builds and pushes a docker image to [Github container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry). The app is deployed to an [Azure container app](https://azure.microsoft.com/en-us/products/container-apps) using terraform.
-
-For each environment, e.g. 'dev':
-
-1. Connect to [Azure virtual desktop](https://azure.microsoft.com/en-us/products/virtual-desktop). Ask the platform team for access with Administrator role.
-1. If not present, install the following software: terraform (version 1.7.0), git, make, jq.
-   - Run a Command prompt as administrator
-   - choco install terraform --version 1.7.0
-   - choco install terraform git make jq
-1. Open git bash
-1. Clone the repository: `git clone https://github.com/NHSDigital/dtos-manage-breast-screening.git`
-1. Enter the directory and select the branch, tag, commit...
-1. Login: `az login`
-1. Create the resource group: `make dev resource-group-init`. This is only required when creating the environment from scratch.
-1. Deploy:
-   ```shell
-   make dev terraform-plan DOCKER_IMAGE_TAG=git-sha-af32637e7e6a07e36158dcb8d7ed90be49be1xyz
-   ```
-1. The web app URL will be displayed as output. Copy it into a browser on the AVD to access the app.
-
-## Manual deployment of the review environments
-
-Review environments differ slightly from other environments. They are lightweight versions of the application and are designed to share much of the core Azure infrastructure. As a result, there is a one-to-many relationship between the container apps and the container app environment.
-
-### Step 1
-If you run the following command *without* the `PR_NUMBER` parameter, it will apply only the infrastructure module:
-
-```shell
-make review terraform-apply
-```
-
-### Step 2
-
-If you include the `PR_NUMBER` parameter, it will apply the container_app module instead of the infrastructure module:
-
-```shell
-make review terraform-apply DOCKER_IMAGE_TAG=git-sha-01ecb79d561f55be60072a093dd167fe8eb5b42e PR_NUMBER=123
-```
-
-## Continuous deployment
-
-When a PR is merged, Github actions securely triggers the deployment pipeline on the Azure devops pool running on the internal network. It currently deploys the dev environment automatically.
-
-Access [Azure devops](https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build?definitionId=86) to see the pipeline.
+See [Deployment](docs/infrastructure/deployment.md).
 
 ## Application secrets
 

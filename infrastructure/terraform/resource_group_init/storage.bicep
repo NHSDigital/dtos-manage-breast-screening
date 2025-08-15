@@ -32,12 +32,10 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2024-01-01'
     containerDeleteRetentionPolicy: {
       days: enableSoftDelete ? 15 : null
       enabled: enableSoftDelete
-      allowPermanentDelete: enableSoftDelete
     }
     deleteRetentionPolicy: {
       days: enableSoftDelete ? 15 : null
       enabled: enableSoftDelete
-      allowPermanentDelete: enableSoftDelete
     }
     isVersioningEnabled: true
   }
