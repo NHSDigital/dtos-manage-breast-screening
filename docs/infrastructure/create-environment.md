@@ -4,9 +4,15 @@ This is the initial manual process to create a new environment like review, dev,
 - Create the configuration files in `infrastructure/environments/[environment]`
 - Create postgres Entra ID group in DTOS Administrative Unit (AU): `postgres_manbrs_[environment]_uks_admin`
 - Ask CCOE to assign role:
-	- [Form for PIM](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=28f3ab4f1bf3ca1078ac4337b04bcb78&sysparm_category=114fced51bdae1502eee65b9bd4bcbdc) or [Generic infrastructure form]([https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=bd7112991bdae1502eee65b9bd4bcb3b&referrer=popular_items](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=bd7112991bdae1502eee65b9bd4bcb3b&referrer=popular_items))
+	- [Form for PIM](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=28f3ab4f1bf3ca1078ac4337b04bcb78&sysparm_category=114fced51bdae1502eee65b9bd4bcbdc)
+	- Approver: Add someone from the infrastructure team
+	- Role Name: `Group.Read.All`
+	- Application Name: `mi-manbrs-[environment]-adotoaz-uks`
+	- Application ID: [client.id]
 	- Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
-	- role: Group.Read.Allpermanent PIM Groups reader on Directory
+	- Description:
+    	- Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
+    	- Role: permanent on Directory
 - Run bicep from AVD: `make [environment] resource-group-init`
 - Create ADO group
 	- Name: `Run pipeline - [environment]`
@@ -26,7 +32,7 @@ This is the initial manual process to create a new environment like review, dev,
 	- Set: exclusive lock (except for review)
 	- Add pipeline permission for `Deploy to Azure - [environment]` pipeline
 - Create Github environment [environment]
-- Add environment secrets, from `mi-manbrs-[environment]-ghtoado-uks`
+- Add environment secrets, from `mi-manbrs-[environment]-ghtoado-uks` in github
 	- AZURE_CLIENT_ID
 	- AZURE_SUBSCRIPTION_ID
 [TODO]- Add branch protection rule so only the main branch can be deployed (except for review) [TODO]
