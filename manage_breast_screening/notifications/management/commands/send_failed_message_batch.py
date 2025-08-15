@@ -34,14 +34,12 @@ class Command(BaseCommand):
             logger.info(e)
             return
 
-        queue.delete(failed_queue_message)
-
         message_batch = MessageBatch.objects.filter(
             id=failed_queue_message["message_batch_id"], status="failed_recoverable"
         ).first()
         if message_batch is None:
             raise CommandError(
-                f"Message Batch with id {failed_queue_message['message_batch_id']} and status of 'failed' not found"
+                f"Message Batch with id {failed_queue_message['message_batch_id']} and status of 'failed_recoverable' not found"
             )
 
         # Try to send the MessageBatch
@@ -49,6 +47,7 @@ class Command(BaseCommand):
             time.sleep(os.getenv("RETRY_DELAY") * failed_queue_message["retry_count"])
 
             try:
+                queue.delete(failed_queue_message)
                 response = ApiClient().send_message_batch(message_batch)
                 if response.status_code == 201:
                     MessageBatchHelpers.mark_batch_as_sent(

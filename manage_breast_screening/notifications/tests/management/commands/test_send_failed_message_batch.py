@@ -1,3 +1,4 @@
+import uuid
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
@@ -9,6 +10,7 @@ from manage_breast_screening.notifications.management.commands.command_helpers i
 )
 from manage_breast_screening.notifications.management.commands.send_failed_message_batch import (
     Command,
+    CommandError,
 )
 from manage_breast_screening.notifications.services.queue import Queue
 
@@ -19,20 +21,28 @@ from manage_breast_screening.notifications.services.queue import Queue
 @patch.object(Queue, "RetryMessageBatches", return_value=MagicMock(spec=Queue))
 @patch.object(MessageBatchHelpers, "mark_batch_as_sent")
 class TestSendFailedMessageBatch:
-    # @pytest.mark.django_db
-    # def test_handle_batch_not_found(
-    #     self, mock_mark_batch_as_sent, mock_retry_message_batches, mock_send_message_batch
-    # ):
-    #     subject = Command()
-    #     batch_id = uuid.uuid4()
+    @pytest.mark.django_db
+    def test_handle_batch_not_found(
+        self,
+        mock_mark_batch_as_sent,
+        mock_retry_message_batches,
+        mock_send_message_batch,
+    ):
+        batch_id = uuid.uuid4()
+        mock_retry_message_batches.return_value.items.return_value.next.return_value = {
+            "message_batch_id": str(batch_id)
+        }
+        subject = Command()
 
-    #     with pytest.raises(CommandError) as error:
-    #         subject.handle()
+        with pytest.raises(CommandError) as error:
+            subject.handle()
 
-    #     assert (
-    #         str(error.value)
-    #         == f"Message Batch with id {batch_id} and status of 'failed' not found"
-    #     )
+        assert (
+            str(error.value)
+            == f"Message Batch with id {batch_id} and status of 'failed_recoverable' not found"
+        )
+
+        assert mock_retry_message_batches.delete.call_count == 0
 
     # @pytest.mark.django_db
     # def test_not_failed_yet(self, mock_mark_batch_as_sent, mock_retry_message_batches, mock_senmock_retry_message_batchesd_message_batch):
