@@ -47,4 +47,7 @@ jobs:
             --parameters commitSHA=${{inputs.commit_sha}} prNumber=${{inputs.pr_number}} environment=${{ matrix.environment }} \
             --output tsv --query id)
 
+          echo Sleeping 15s
+          sleep 15
+
           scripts/bash/wait_ado_pipeline.sh "$RUN_ID" https://dev.azure.com/nhse-dtos dtos-manage-breast-screening
