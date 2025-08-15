@@ -106,3 +106,5 @@ class TestSendFailedMessageBatch:
         subject.handle()
 
         assert mock_retry_message_batches.delete.call_count == 0
+
+    # TODO: test that batches with retry count of more than 5 are marked as failed_unrecoverable
