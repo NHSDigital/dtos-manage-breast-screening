@@ -33,7 +33,7 @@ class ApiClient:
             "data": {
                 "type": "MessageBatch",
                 "attributes": {
-                    "routingPlanId": message_batch.routing_plan_id,
+                    "routingPlanId": str(message_batch.routing_plan_id),
                     "messageBatchReference": str(message_batch.id),
                     "messages": [
                         self.message_request_body(m)

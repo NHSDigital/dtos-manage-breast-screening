@@ -34,27 +34,33 @@ class Command(BaseCommand):
             logger.info(e)
             return
 
+        message_batch_id = json.loads(failed_queue_message.content)["message_batch_id"]
         message_batch = MessageBatch.objects.filter(
-            id=failed_queue_message["message_batch_id"], status="failed_recoverable"
+            id=message_batch_id, status="failed_recoverable"
         ).first()
+
         if message_batch is None:
             raise CommandError(
-                f"Message Batch with id {failed_queue_message['message_batch_id']} and status of 'failed_recoverable' not found"
+                f"Message Batch with id {message_batch_id} and status of 'failed_recoverable' not found"
             )
 
         # Try to send the MessageBatch
-        if failed_queue_message["retry_count"] < int(os.getenv("RETRY_LIMIT", 0)):
-            time.sleep(os.getenv("RETRY_DELAY") * failed_queue_message["retry_count"])
+        retry_count = int(json.loads(failed_queue_message.content)["retry_count"])
+        if retry_count < int(os.getenv("RETRY_LIMIT", "5")):
+            time.sleep(int(os.getenv("RETRY_DELAY", "0")) * retry_count)
 
             try:
                 queue.delete(failed_queue_message)
+
                 response = ApiClient().send_message_batch(message_batch)
+
                 if response.status_code == 201:
                     MessageBatchHelpers.mark_batch_as_sent(
                         message_batch=message_batch, response_json=response.json()
                     )
+                else:
                     raise CommandError(
-                        f"Message Batch with id {failed_queue_message['message_batch_id']} not sent: {response.status_code}, {response.reason}"
+                        f"Message Batch with id {message_batch_id} not sent: {response.status_code}, {response.reason}"
                     )
 
             except Exception as e:
@@ -62,7 +68,7 @@ class Command(BaseCommand):
                     json.dumps(
                         {
                             "message_batch_id": str(message_batch.id),
-                            "retry_count": failed_queue_message["retry_count"] + 1,
+                            "retry_count": retry_count + 1,
                         }
                     )
                 )

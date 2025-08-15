@@ -1,3 +1,4 @@
+import json
 import uuid
 from unittest.mock import MagicMock, Mock, patch
 
@@ -29,9 +30,9 @@ class TestSendFailedMessageBatch:
         mock_send_message_batch,
     ):
         batch_id = uuid.uuid4()
-        mock_retry_message_batches.return_value.items.return_value.next.return_value = {
-            "message_batch_id": str(batch_id)
-        }
+        mock_retry_message_batches.return_value.items.return_value.next.return_value.content = json.dumps(
+            {"message_batch_id": str(batch_id)}
+        )
         subject = Command()
 
         with pytest.raises(CommandError) as error:
