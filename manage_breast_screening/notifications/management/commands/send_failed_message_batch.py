@@ -25,7 +25,7 @@ class Command(BaseCommand):
         # get the batch from the queue in an iterator
 
         queue = Queue.RetryMessageBatches()
-        failed_message_batch_iterator = queue.get(1)
+        failed_message_batch_iterator = queue.items(1)
 
         failed_message_batch = None
 

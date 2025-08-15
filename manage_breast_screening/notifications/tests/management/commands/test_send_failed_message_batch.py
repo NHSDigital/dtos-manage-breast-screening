@@ -88,7 +88,7 @@ class TestSendFailedMessageBatch:
         mock_retry_message_batches,
         mock_send_message_batch,
     ):
-        mock_retry_message_batches.return_value.get.return_value = []
+        mock_retry_message_batches.return_value.items.return_value = []
         subject = Command()
 
         subject.handle()
