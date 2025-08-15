@@ -57,4 +57,13 @@ stages:
                     scriptType: bash
                     scriptLocation: inlineScript
                     addSpnToEnvironment: true
-                    inlineScript: ./scripts/bash/db_migrate.sh ${{ parameters.environment }} ${{ parameters.prNumber }}
+                    inlineScript: ./scripts/bash/db_run_job.sh ${{ parameters.environment }} ${{ parameters.prNumber }} dbm
+
+                - task: AzureCLI@2
+                  displayName: Run database seeding
+                  inputs:
+                    azureSubscription: manbrs-${{ parameters.environment }}
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    addSpnToEnvironment: true
+                    inlineScript: ./scripts/bash/db_run_job.sh ${{ parameters.environment }} ${{ parameters.prNumber }} seed

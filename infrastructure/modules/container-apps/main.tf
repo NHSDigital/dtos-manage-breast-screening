@@ -30,6 +30,25 @@ module "db_migrate" {
   }
 }
 
+module "db_seed" {
+  source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
+
+  name                         = "${var.app_short_name}-seed-${var.environment}"
+  container_app_environment_id = var.container_app_environment_id
+  resource_group_name          = azurerm_resource_group.main.name
+  container_command            = ["python"]
+  container_args               = ["manage.py", "seed"]
+  docker_image                 = var.docker_image
+  user_assigned_identity_ids   = [module.db_connect_identity.id]
+  environment_variables = {
+    DATABASE_HOST   = module.postgres.host
+    DATABASE_NAME   = module.postgres.database_names[0]
+    DATABASE_USER   = module.db_connect_identity.name
+    SSL_MODE        = "require"
+    AZURE_CLIENT_ID = module.db_connect_identity.client_id
+  }
+}
+
 module "webapp" {
   providers = {
     azurerm     = azurerm
