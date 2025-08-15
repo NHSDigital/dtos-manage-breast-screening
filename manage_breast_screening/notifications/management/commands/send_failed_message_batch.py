@@ -58,7 +58,6 @@ class Command(BaseCommand):
                     )
 
             except Exception as e:
-                raise CommandError(e)
                 queue.add(
                     json.dumps(
                         {
@@ -67,3 +66,4 @@ class Command(BaseCommand):
                         }
                     )
                 )
+                raise CommandError(e)
