@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 import requests
@@ -88,7 +88,9 @@ class TestSendFailedMessageBatch:
         mock_retry_message_batches,
         mock_send_message_batch,
     ):
-        mock_retry_message_batches.return_value.items.return_value = []
+        mock_retry_message_batches.return_value.items.return_value.next = Mock(
+            side_effect=StopIteration()
+        )
         subject = Command()
 
         subject.handle()

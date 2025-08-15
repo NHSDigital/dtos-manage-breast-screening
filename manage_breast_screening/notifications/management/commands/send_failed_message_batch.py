@@ -27,30 +27,26 @@ class Command(BaseCommand):
         queue = Queue.RetryMessageBatches()
         failed_message_batch_iterator = queue.items(1)
 
-        failed_message_batch = None
-
-        for failed_item in failed_message_batch_iterator:
-            failed_message_batch = failed_item
-
         # return if there isn't a message_batch
-
-        if failed_message_batch is None:
-            logger.info("No batches in queue")
+        try:
+            failed_queue_message = failed_message_batch_iterator.next()
+        except StopIteration as e:
+            logger.info(e)
             return
 
-        queue.delete(failed_message_batch)
+        queue.delete(failed_queue_message)
 
         message_batch = MessageBatch.objects.filter(
-            id=failed_message_batch["message_batch_id"], status="failed_recoverable"
+            id=failed_queue_message["message_batch_id"], status="failed_recoverable"
         ).first()
         if message_batch is None:
             raise CommandError(
-                f"Message Batch with id {failed_message_batch['message_batch_id']} and status of 'failed' not found"
+                f"Message Batch with id {failed_queue_message['message_batch_id']} and status of 'failed' not found"
             )
 
         # Try to send the MessageBatch
-        if failed_message_batch["retry_count"] < int(os.getenv("RETRY_LIMIT", 0)):
-            time.sleep(os.getenv("RETRY_DELAY") * failed_message_batch["retry_count"])
+        if failed_queue_message["retry_count"] < int(os.getenv("RETRY_LIMIT", 0)):
+            time.sleep(os.getenv("RETRY_DELAY") * failed_queue_message["retry_count"])
 
             try:
                 response = ApiClient().send_message_batch(message_batch)
@@ -59,7 +55,7 @@ class Command(BaseCommand):
                         message_batch=message_batch, response_json=response.json()
                     )
                     raise CommandError(
-                        f"Message Batch with id {failed_message_batch['message_batch_id']} not sent: {response.status_code}, {response.reason}"
+                        f"Message Batch with id {failed_queue_message['message_batch_id']} not sent: {response.status_code}, {response.reason}"
                     )
 
             except Exception as e:
@@ -68,7 +64,7 @@ class Command(BaseCommand):
                     json.dumps(
                         {
                             "message_batch_id": str(message_batch.id),
-                            "retry_count": failed_message_batch["retry_count"] + 1,
+                            "retry_count": failed_queue_message["retry_count"] + 1,
                         }
                     )
                 )
