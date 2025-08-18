@@ -4,12 +4,13 @@ import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.core.system_test_setup import SystemTestCase
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
 )
+
+from .system_test_setup import SystemTestCase
 
 
 class TestAddingPreviousMammograms(SystemTestCase):
