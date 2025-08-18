@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand, CommandError
@@ -13,6 +14,9 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        if not settings.PERSONAS_ENABLED:
+            raise CommandError("PERSONAS_ENABLED=False. Refusing to create.")
+
         try:
             for persona in PERSONAS:
                 group = Group.objects.get(name=persona.group)
