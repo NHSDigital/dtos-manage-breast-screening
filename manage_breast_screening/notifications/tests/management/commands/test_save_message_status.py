@@ -167,3 +167,33 @@ class TestSaveMessageStatus:
             Command().handle()
 
         assert "QUEUE_STORAGE_CONNECTION_STRING" in str(err_info.value)
+
+    @pytest.mark.django_db
+    def test_invalid_message_status_is_not_saved(self, mock_queue):
+        message = MessageFactory.create()
+        mock_queue.return_value.items.return_value = [
+            QueueMessage(
+                json.dumps(
+                    {
+                        "data": [
+                            {
+                                "type": "ChannelStatus",
+                                "attributes": {
+                                    "messageReference": str(message.id),
+                                    "channel": "nhsapp",
+                                    "channelStatusDescription": "Invalid status",
+                                    "supplierStatus": "invalid-status",
+                                    "timestamp": "2025-07-17T14:27:51.413Z",
+                                },
+                                "meta": {
+                                    "idempotencyKey": str(time.time())
+                                },  # gitleaks:allow
+                            }
+                        ]
+                    }
+                )
+            )
+        ]
+        Command().handle()
+
+        assert len(ChannelStatus.objects.filter(message=message)) == 0

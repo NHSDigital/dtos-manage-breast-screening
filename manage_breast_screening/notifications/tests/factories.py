@@ -16,7 +16,7 @@ class ClinicFactory(DjangoModelFactory):
     class Meta:
         model = models.Clinic
 
-    code = "BU001"
+    code = Sequence(lambda n: f"BU00{n}")
     name = "BREAST CARE UNIT"
     holding_clinic = False
 

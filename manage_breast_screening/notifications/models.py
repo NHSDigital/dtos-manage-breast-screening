@@ -117,7 +117,7 @@ class Clinic(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=50)
+    code = models.CharField(max_length=50, unique=True)
     bso_code = models.CharField(max_length=50, null=True)
     name = models.CharField(max_length=50)
     alt_name = models.CharField(max_length=50)
@@ -147,7 +147,7 @@ class ChannelStatus(models.Model):
     channel = models.CharField(max_length=50, null=False)
     status = models.CharField(max_length=50, null=False, choices=ChannelStatusChoices)
     description = models.CharField(max_length=150)
-    idempotency_key = models.CharField(max_length=150)
+    idempotency_key = models.CharField(max_length=150, unique=True)
     status_updated_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=False, auto_now_add=True)
@@ -162,7 +162,7 @@ class MessageStatus(models.Model):
     message = models.ForeignKey("notifications.Message", on_delete=models.PROTECT)
     status = models.CharField(max_length=50, null=False, choices=MessageStatusChoices)
     description = models.CharField(max_length=150)
-    idempotency_key = models.CharField(max_length=150)
+    idempotency_key = models.CharField(max_length=150, unique=True)
     status_updated_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=False, auto_now_add=True)
