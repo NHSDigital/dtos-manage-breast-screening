@@ -10,7 +10,7 @@ Django has a built-in forms framework which makes it possible to declare the for
 
 The `Form` class also handles all the backend validation and cleaning of data prior to doing something with it — it's a very useful building block that we want to continue using.
 
-Forms, Fields, and Widgets all have internal templates that allow you to interpolate them in a template, using constructs like `{{ form }}` or `{{ form.field.as_field_group() }}`. Out of the box, these render HTML that doesn't work with out design system, so we were instead [rendering form fields manually](https://docs.djangoproject.com/en/5.2/topics/forms/#rendering-fields-manually).
+Forms, Fields, and Widgets all have internal templates that allow you to interpolate them in a template, using constructs like `{{ form }}` or `{{ form.field.as_field_group() }}`. Out of the box, these render HTML that doesn't work with our design system, so we were instead [rendering form fields manually](https://docs.djangoproject.com/en/5.2/topics/forms/#rendering-fields-manually).
 
 This was very error prone and verbose, because we had to map between Django's form API and the API of our component macros, and we had to repeat this work for every form we added.
 

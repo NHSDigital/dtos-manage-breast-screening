@@ -14,7 +14,7 @@ At the same time, we wanted a simple way of making use of NHS.UK frontend, so th
 2. Via the Nunjucks templates bundled with nhsuk-frontend (which are mostly compatable with Jinja2)
 3. Via [NHS.UK react components](https://github.com/NHSDigital/nhsuk-react-components) (which lag behind nhsuk-frontend)
 
-We didn't pursue option 1 because it would have led to vary verbose templates, with lots of room for inconsistency.
+We didn't pursue option 1 because it would have led to very verbose templates, with lots of room for inconsistency.
 
 Option 2 seemed promising, based on the experience of other teams. For example [ONS maintain their own variant of the GOV.UK design system, and they ensure that their templates can be used in both Jinja2 and Nunjucks](https://service-manual.ons.gov.uk/design-system/guidance/templating-in-nunjucks). [govuk-frontend-jinja](https://github.com/LandRegistry/govuk-frontend-jinja) is a well established port of the GOV.UK design system to Jinja2, and we have heard that the changes required for new releases are typically quite minimal.
 
