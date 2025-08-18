@@ -14,7 +14,6 @@ import sys
 from os import environ
 from pathlib import Path
 
-import django
 from dotenv import load_dotenv
 from jinja2 import ChainableUndefined
 
@@ -58,6 +57,7 @@ INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.forms",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
@@ -103,7 +103,7 @@ ROOT_URLCONF = "manage_breast_screening.core.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.jinja2.Jinja2",
-        "DIRS": [BASE_DIR / "jinja2", django.__path__[0] + "/forms/jinja2"],
+        "DIRS": [BASE_DIR / "jinja2"],
         "APP_DIRS": True,
         "OPTIONS": {
             "environment": "manage_breast_screening.config.jinja2_env.environment",
