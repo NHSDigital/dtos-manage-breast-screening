@@ -11,9 +11,9 @@ def participant():
 
 @pytest.mark.django_db
 class TestShowParticipant:
-    def test_renders_response(self, logged_in_client, participant):
-        logged_in_client.login()
-        response = logged_in_client.get(
+    def test_renders_response(self, clinical_user_client, participant):
+        clinical_user_client.login()
+        response = clinical_user_client.get(
             reverse("participants:show", kwargs={"pk": participant.pk}),
         )
         assert response.status_code == 200

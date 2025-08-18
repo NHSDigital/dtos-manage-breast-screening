@@ -1,6 +1,7 @@
 import logging
 from functools import cached_property
 
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -53,11 +54,13 @@ class AppointmentMixin:
         )
 
 
-class InProgressAppointmentMixin(AppointmentMixin):
+class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     """
     A view that is only shown with in progress appointments.
     If the appointment is not in progress, redirect to the appointment show page.
     """
+
+    permission_required = "mammograms.perform_mammogram_appointment"
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
@@ -79,7 +82,10 @@ class ShowAppointment(AppointmentMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        if appointment.current_status.in_progress:
+        if (
+            request.user.has_perm("mammograms.perform_mammogram_appointment")
+            and appointment.current_status.in_progress
+        ):
             return redirect("mammograms:start_screening", pk=self.appointment.pk)
 
         participant_pk = appointment.screening_episode.participant.pk
