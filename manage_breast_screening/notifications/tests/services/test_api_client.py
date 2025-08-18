@@ -4,14 +4,17 @@ from unittest.mock import patch
 import pytest
 import requests_mock
 
-from manage_breast_screening.notifications.api_client import ApiClient, OAuthError
+from manage_breast_screening.notifications.services.api_client import (
+    ApiClient,
+    OAuthError,
+)
 from manage_breast_screening.notifications.tests.factories import (
     MessageBatchFactory,
     MessageFactory,
 )
 
 
-@patch("manage_breast_screening.notifications.api_client.jwt.encode")
+@patch("manage_breast_screening.notifications.services.api_client.jwt.encode")
 class TestApiClient:
     @pytest.fixture
     def routing_plan_id(self):

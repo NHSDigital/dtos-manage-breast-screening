@@ -9,7 +9,7 @@ from azure.storage.blob import (
     ContentSettings,
 )
 
-from manage_breast_screening.notifications.blob_storage import BlobStorage
+from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
 

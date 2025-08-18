@@ -25,10 +25,7 @@ class Helpers:
                 )
 
     def get_test_file_path(self, test_file):
-        return (
-            f"{os.path.dirname(os.path.realpath(__file__))}"
-            f"/../management/commands/{test_file}"
-        )
+        return f"{os.path.dirname(os.path.realpath(__file__))}/../fixtures/{test_file}"
 
     def azurite_connection_string(self):
         """Default connection string for Azurite storage"""
