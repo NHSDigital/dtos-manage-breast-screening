@@ -1,6 +1,7 @@
 import json
 
 from dateutil import parser
+from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.models import (
@@ -49,23 +50,33 @@ class Command(BaseCommand):
         if MessageStatus.objects.filter(idempotency_key=self.idempotency_key).exists():
             return
 
-        MessageStatus(
+        status_record = MessageStatus(
             message=self.message,
             description=self.data["attributes"]["messageStatusDescription"],
             idempotency_key=self.idempotency_key,
             status=self.data["attributes"]["messageStatus"],
             status_updated_at=parser.parse(self.data["attributes"]["timestamp"]),
-        ).save()
+        )
+        try:
+            status_record.full_clean()
+            status_record.save()
+        except ValidationError:
+            pass
 
     def save_channel_status(self):
         if ChannelStatus.objects.filter(idempotency_key=self.idempotency_key).exists():
             return
 
-        ChannelStatus(
+        status_record = ChannelStatus(
             message=self.message,
             channel=self.data["attributes"]["channel"],
             description=self.data["attributes"]["channelStatusDescription"],
             idempotency_key=self.idempotency_key,
             status=self.data["attributes"]["supplierStatus"],
             status_updated_at=parser.parse(self.data["attributes"]["timestamp"]),
-        ).save()
+        )
+        try:
+            status_record.full_clean()
+            status_record.save()
+        except ValidationError:
+            pass
