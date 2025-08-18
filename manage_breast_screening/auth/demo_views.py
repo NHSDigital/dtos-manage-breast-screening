@@ -11,8 +11,8 @@ def persona_login(request):
     users = _get_users(request.user)
 
     if request.method == "POST":
-        username = get_object_or_404(users, username=request.POST["username"])
-        login(request, username)
+        user = get_object_or_404(users, username=request.POST["username"])
+        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
         return redirect(_next_page(request))
 
     else:

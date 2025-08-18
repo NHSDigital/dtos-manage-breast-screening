@@ -22,6 +22,7 @@ dependencies = [
   "pandas (>=2.3.0,<3.0.0)",
   "azure-storage-queue (>=12.13.0,<13.0.0)",
   "pyyaml (>=6.0.2,<7.0.0)",
+  "rules (>=3.5,<4.0)",
 ]
 
 [tool.poetry]

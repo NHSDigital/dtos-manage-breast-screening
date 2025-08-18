@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.notifications",
     "manage_breast_screening.participants",
     "manage_breast_screening.mammograms",
+    "rules.apps.AutodiscoverRulesConfig",
 ]
 
 if getenv("DJANGO_ENV", "production") != "production":
@@ -100,6 +101,11 @@ DEBUG_TOOLBAR = DEBUG
 if DEBUG_TOOLBAR:
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+AUTHENTICATION_BACKENDS = (
+    "rules.permissions.ObjectPermissionBackend",
+    "django.contrib.auth.backends.ModelBackend",
+)
 
 ROOT_URLCONF = "manage_breast_screening.core.urls"
 
