@@ -67,6 +67,7 @@ class SplitDateField(forms.MultiValueField):
     def __init__(self, *args, **kwargs):
         max_value = kwargs.pop("max_value", datetime.date.today())
         min_value = kwargs.pop("min_value", datetime.date(1900, 1, 1))
+        self.hint = kwargs.pop("hint", None)
 
         day_bounds_error = gettext("Day should be between 1 and 31.")
         month_bounds_error = gettext("Month should be between 1 and 12.")
@@ -107,6 +108,8 @@ class SplitDateField(forms.MultiValueField):
             IntegerField(**month_kwargs),
             IntegerField(**year_kwargs),
         ]
+
+        kwargs["template_name"] = "forms/date-input.jinja"
 
         super().__init__(self.fields, *args, **kwargs)
 

@@ -24,17 +24,13 @@
     </h1>
 
     <form action="{{ request.path }}" method="post">
-      {% set exact_date_html %}
-        {{ app_date_input(form_attribute=form.exact_date, legend="Date of mammogram", hint="For example, 15 3 2025") }}
-      {% endset %}
-
       {# Radios with conditionals #}
       {% do form.where_taken.add_conditional_html(form.WhereTaken.UK, form.somewhere_in_the_uk_details.as_field_group()) %}
       {% do form.where_taken.add_conditional_html(form.WhereTaken.OUTSIDE_UK, form.outside_the_uk_details.as_field_group()) %}
       {% do form.where_taken.add_divider_after(form.WhereTaken.OUTSIDE_UK, "or") %}
       {{ form.where_taken.as_field_group() }}
 
-      {% do form.when_taken.add_conditional_html(form.WhenTaken.EXACT, exact_date_html) %}
+      {% do form.when_taken.add_conditional_html(form.WhenTaken.EXACT, form.exact_date.as_field_group()) %}
       {% do form.when_taken.add_conditional_html(form.WhenTaken.APPROX, form.approx_date.as_field_group()) %}
       {{ form.when_taken.as_field_group() }}
 
