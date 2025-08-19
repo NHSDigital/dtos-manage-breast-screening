@@ -60,10 +60,12 @@ class ParticipantReportedMammogramFactory(DjangoModelFactory):
         outside_uk = Trait(
             location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
             location_details="france",
+            provider=None,
         )
         elsewhere_uk = Trait(
             location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             location_details="private provider",
+            provider=None,
         )
 
 
