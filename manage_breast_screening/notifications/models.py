@@ -39,6 +39,22 @@ class ChannelStatusChoices(models.Choices):
     VALIDATION_FAILED = "validation_failed"
 
 
+class AppointmentStatusChoices(models.Choices):
+    BOOKED = "B"
+    CANCELLED = "C"
+    UPDATED = "U"
+
+
+class AppointmentEpisodeTypeChoices(models.Choices):
+    EARLY_RECALL = "N"
+    GP_REFERRAL = "G"
+    ROUTINE_FIRST_CALL = "F"
+    ROUTINE_RECALL = "R"
+    SELF_REFERRAL = "S"
+    VERY_HIGH_RISK = "H"
+    VHR_SHORT_TERM_RECALL = "T"
+
+
 class MessageBatch(BaseModel):
     """
     Multiple messages sent as a batch
@@ -94,10 +110,16 @@ class Appointment(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    batch_id = models.CharField(max_length=30, default="")
     nbss_id = models.CharField(max_length=30, unique=True)
     nhs_number = models.BigIntegerField(null=False)
-    status = models.CharField(max_length=50)
+    episode_type = models.CharField(
+        max_length=30, choices=AppointmentEpisodeTypeChoices, default=""
+    )
+    episode_started_at = models.DateTimeField(null=True)
+    status = models.CharField(max_length=50, choices=AppointmentStatusChoices)
     booked_by = models.CharField(max_length=50)
+    booked_at = models.DateTimeField(null=True)
     cancelled_by = models.CharField(max_length=50)
     cancelled_at = models.DateTimeField(null=True)
     number = models.IntegerField(null=True, default=1)

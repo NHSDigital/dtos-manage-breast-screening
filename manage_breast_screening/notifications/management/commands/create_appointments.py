@@ -92,22 +92,16 @@ class Command(BaseCommand):
     def update_or_create_appointment(
         self, row: dict, clinic: Clinic
     ) -> tuple[Appointment, bool]:
-        status = row["Status"]
         defaults = {
+            "batch_id": row["BatchID"],
             "number": row["Sequence"],
-            "status": status,
+            "status": row["Status"],
+            "episode_type": row["Episode Type"],
+            "episode_started_at": datetime.strptime(
+                row["Episode Start"], "%Y-%m-%d"
+            ).replace(tzinfo=TZ_INFO),
         }
-        if status == "C":
-            defaults.update(
-                {
-                    "cancelled_by": row["Cancelled By"],
-                    "cancelled_at": self.appointment_updated_date_and_time(
-                        row["Action Timestamp"]
-                    ),
-                }
-            )
-        elif status == "B":
-            defaults.update({"booked_by": row["Booked By"]})
+        defaults.update(self.workflow_action_defaults(row))
 
         return Appointment.objects.update_or_create(
             nbss_id=row["Appointment ID"],
@@ -117,7 +111,23 @@ class Command(BaseCommand):
             defaults=defaults,
         )
 
-    def appointment_updated_date_and_time(self, timestamp: str) -> datetime:
+    def workflow_action_defaults(self, row) -> dict:
+        workflow_action_timestamp = self.workflow_action_date_and_time(
+            row["Action Timestamp"]
+        )
+
+        if row["Status"] == "C":
+            return {
+                "cancelled_by": row["Cancelled By"],
+                "cancelled_at": workflow_action_timestamp,
+            }
+        elif row["Status"] == "B":
+            return {
+                "booked_by": row["Booked By"],
+                "booked_at": workflow_action_timestamp,
+            }
+
+    def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
         return dt.replace(tzinfo=TZ_INFO)
 
