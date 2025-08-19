@@ -1,10 +1,9 @@
 name: manage-breast-screening-notifications
 
 services:
-
   azurite:
     container_name: azurite
-    command: "azurite --loose --skipApiVersionCheck --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001"
+    command: 'azurite --loose --skipApiVersionCheck --blobHost 0.0.0.0 --blobPort 10000 --queueHost 0.0.0.0 --queuePort 10001'
     image: mcr.microsoft.com/azure-storage/azurite
     ports:
       - 10000:10000
@@ -18,7 +17,7 @@ services:
     build:
       context: https://github.com/NHSDigital/mesh-sandbox.git#refs/tags/v1.0.4
     ports:
-      - "8700:80"
+      - '8700:80'
     deploy:
       restart_policy:
         condition: on-failure
@@ -48,7 +47,7 @@ services:
       - development
       - integration
     ports:
-      - "8888:8888"
+      - '8888:8888'
     healthcheck:
       test: curl -f http://localhost:8888/health || exit 1
       interval: 3s
@@ -64,5 +63,4 @@ services:
       notify-api-stub:
         condition: service_healthy
     profiles:
-        - integration
-
+      - integration
