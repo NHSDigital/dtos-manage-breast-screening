@@ -138,6 +138,7 @@ For more information, see the following developer guides:
 - [Scripting Docker](https://github.com/NHSDigital/repository-template/blob/main/docs/developer-guides/Scripting_Docker.md)
 
 ### More documentation
+
 Explore [the docs directory](docs).
 
 ## Licence
