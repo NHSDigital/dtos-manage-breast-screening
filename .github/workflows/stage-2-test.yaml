@@ -82,16 +82,21 @@ jobs:
       - name: Test shell
         run: make debug-shell
 
-      - name: Test pytest exit code
-        run: poetry run pytest -m 'not system and not integration' --ignore manage_breast_screening/notifications/tests/dependencies --cov --cov-report term-missing:skip-covered; echo $$?
+      - name: Inspect tools
+        run: |
+          make --version
+          env
 
-      - name: 'Run unit test suite'
-        run: make test-unit
+      - name: Test pytest exit code
         env:
           DATABASE_NAME: postgres
           DATABASE_PASSWORD: postgres
           DATABASE_USER: postgres
           DATABASE_HOST: localhost
+        run: poetry run pytest -m 'not system and not integration' --ignore manage_breast_screening/notifications/tests/dependencies --cov --cov-report term-missing:skip-covered; echo $$?
+
+      - name: 'Run unit test suite'
+        run: make test-unit
 
       - name: 'Run system test suite'
         run: make test-ui
