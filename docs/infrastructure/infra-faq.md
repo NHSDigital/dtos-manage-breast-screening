@@ -1,4 +1,4 @@
-# Infra FAQ
+# Infrastructure FAQ
 
 - [Terraform](#terraform)
 - [Github action triggering Azure devops pipeline](#github-action-triggering-azure-devops-pipeline)
