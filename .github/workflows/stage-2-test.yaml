@@ -79,6 +79,12 @@ jobs:
       - name: Install Playwright browsers
         run: poetry run playwright install chromium --with-deps
 
+      - name: Test shell
+        run: make debug-shell
+
+      - name: Test pytest exit code
+        run: poetry run pytest -m 'not system and not integration' --ignore manage_breast_screening/notifications/tests/dependencies --cov --cov-report term-missing:skip-covered; echo $$?
+
       - name: 'Run unit test suite'
         run: make test-unit
         env:

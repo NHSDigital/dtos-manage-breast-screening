@@ -98,6 +98,10 @@ _clean-docker:
 manage_breast_screening/config/.env:
 	cp manage_breast_screening/config/.env.tpl manage_breast_screening/config/.env
 
+debug-shell:
+	echo "Testing shell exit behavior"
+	false
+	echo "This should not print if -e is working"
 
 .DEFAULT_GOAL := help
 .PHONY: clean config dependencies build deploy githooks-config githooks-run help test test-unit test-lint test-ui run _install-poetry _clean-docker rebuild-db db migrate seed shell
