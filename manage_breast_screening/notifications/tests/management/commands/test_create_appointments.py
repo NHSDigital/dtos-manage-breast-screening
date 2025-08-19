@@ -77,6 +77,14 @@ class TestCreateAppointments:
         assert appointments[1].status == "B"
         assert appointments[2].status == "B"
 
+        assert appointments[0].batch_id == "KMKS02441"
+        assert appointments[1].batch_id == "KMK001326"
+        assert appointments[2].batch_id == "KMK001326"
+
+        assert appointments[0].episode_type == "S"
+        assert appointments[1].episode_type == "F"
+        assert appointments[2].episode_type == "F"
+
         assert appointments[0].cancelled_by == "H"
         assert appointments[1].booked_by == "H"
         assert appointments[2].booked_by == "H"
