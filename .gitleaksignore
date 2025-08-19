@@ -10,5 +10,10 @@ manage_breast_screening/templates/components/pagination/template.njk:ipv4:26
 infrastructure/terraform/resource_group_init/core.bicep:generic-api-key:10
 infrastructure/terraform/resource_group_init/core.bicep:generic-api-key:11
 infrastructure/terraform/resource_group_init/core.bicep:generic-api-key:12
-infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:80
+infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:29
+infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:30
+infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:31
+infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:32
+infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:33
 infrastructure/terraform/resource_group_init/storage.bicep:generic-api-key:59
+infrastructure/terraform/resource_group_init/keyVault.bicep:generic-api-key:10

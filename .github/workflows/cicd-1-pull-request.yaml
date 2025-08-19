@@ -2,7 +2,7 @@ name: 'CI/CD pull request'
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize]
+    types: [opened, reopened, synchronize, labeled]
 
 jobs:
   metadata:
@@ -72,3 +72,30 @@ jobs:
       terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
       version: '${{ needs.metadata.outputs.version }}'
     secrets: inherit
+  deploy-stage:
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
+    name: Deploy review app pr-${{ github.event.pull_request.number }}
+    needs: [build-stage]
+    permissions:
+      id-token: write
+    uses: ./.github/workflows/stage-4-deploy.yaml
+    with:
+      environments: "[\"review\"]"
+      commit_sha: ${{ github.event.pull_request.head.sha }}
+      pr_number: ${{ github.event.pull_request.number }}
+    secrets: inherit
+  post-url:
+    if: contains(github.event.pull_request.labels.*.name, 'deploy')
+    name: Post URL pr-${{ github.event.pull_request.number }} to PR comments
+    runs-on: ubuntu-latest
+    needs: [deploy-stage]
+    permissions:
+      pull-requests: write
+    steps:
+    - name: Post URL to PR comments
+      uses: marocchino/sticky-pull-request-comment@8ac02941f254c53fbda0cf44288785e1367e13bf
+      with:
+        message: |
+          The review app is available at this URL:
+          https://pr-${{ github.event.pull_request.number }}.manage-breast-screening.non-live.screening.nhs.uk
+          You must authenticate with Entra ID
