@@ -68,4 +68,4 @@ shellscript-lint-all: # Lint all shell scripts in the scripts directory, do not 
 .ONESHELL:
 MAKEFLAGS := --no-print-directory
 SHELL := /bin/bash
-SHELLFLAGS := -cex
+.SHELLFLAGS := -cex
