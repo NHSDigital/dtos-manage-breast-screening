@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import sys
-from os import environ
+from os import environ, getenv
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -68,6 +68,9 @@ INSTALLED_APPS = [
     "manage_breast_screening.participants",
     "manage_breast_screening.mammograms",
 ]
+
+if getenv("DJANGO_ENV", "production") != "production":
+    INSTALLED_APPS.append("manage_breast_screening.nonprod")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

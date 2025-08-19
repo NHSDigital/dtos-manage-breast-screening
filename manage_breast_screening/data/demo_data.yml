@@ -1,0 +1,16 @@
+providers:
+  - name: 'West Tester Hospital Trust'
+    id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+    settings:
+      - name: 'West Tester BSU'
+        id: 8f2a1b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+        clinics:
+          - file: 'west_tester_three_years_ago_clinic_data.yml'
+          - file: 'west_tester_10_days_ago_clinic_data.yml'
+          - file: 'west_tester_today_clinic_data.yml'
+      - name: 'East Tester BSU'
+        id: 7e1d2c3b-4a5f-6e7d-8c9b-0a1f2e3d4c5b
+        clinics:
+          - file: 'east_tester_three_years_ago_clinic_data.yml'
+          - file: 'east_tester_one_week_ago_clinic_data.yml'
+          - file: 'east_tester_today_clinic_data.yml'
