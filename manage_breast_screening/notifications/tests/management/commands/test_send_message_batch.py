@@ -162,7 +162,7 @@ class TestSendMessageBatch:
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
         assert message_batches[0].status == "failed_unrecoverable"
-        assert message_batches[0].notify_errors == notify_errors
+        assert message_batches[0].nhs_notify_errors == notify_errors
         messages = Message.objects.filter(
             appointment=appointment, batch=message_batches[0]
         )
@@ -193,7 +193,7 @@ class TestSendMessageBatch:
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
         assert message_batches[0].status == "failed_recoverable"
-        assert message_batches[0].notify_errors == notify_errors
+        assert message_batches[0].nhs_notify_errors == notify_errors
         queue_instance.add.assert_called_once_with(
             json.dumps(
                 {"message_batch_id": str(message_batches[0].id), "retry_count": 0}

@@ -80,7 +80,7 @@ class TestCommandHelpers:
 
         message_batch.refresh_from_db()
         assert message_batch.status == "failed_unrecoverable"
-        assert message_batch.notify_errors == notify_errors
+        assert message_batch.nhs_notify_errors == notify_errors
         assert message_batch.messages.count() == 1
         assert message_batch.messages.all()[0].status == "failed"
 
@@ -106,7 +106,7 @@ class TestCommandHelpers:
 
             message_batch.refresh_from_db()
             assert message_batch.status == "failed_recoverable"
-            assert message_batch.notify_errors == notify_errors
+            assert message_batch.nhs_notify_errors == notify_errors
             queue_instance.add.assert_called_once_with(
                 json.dumps(
                     {"message_batch_id": str(message_batch.id), "retry_count": 0}
