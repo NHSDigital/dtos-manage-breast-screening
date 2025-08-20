@@ -48,9 +48,6 @@ module "db_setup" {
   }
 }
 
-# Seeding is required for all environments; however, for 'review' apps
-# we instead will run example_data
-
 module "webapp" {
   providers = {
     azurerm     = azurerm

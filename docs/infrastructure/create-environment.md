@@ -6,7 +6,9 @@ This is the initial manual process to create a new environment like review, dev,
 
 - Create the configuration files in `infrastructure/environments/[environment]`
 - Add the `[environment]:` target in `scripts/terraform/terraform.mk`
-- Add [environment] to the list of environments in `deploy-stage` step of `cicd-2-main-branch.yaml`. For the review enviornment, there is a single item in `cicd-1-pull-request.yaml`.
+- Add [environment] to the list of environments in `deploy-stage` step of `cicd-2-main-branch.yaml`. For the review environment, there is a single item in `cicd-1-pull-request.yaml`.
+- Set the `fetch_secrets_from_app_key_vault` terraform variable to `false`. This is to let terraform create the key vault and prevent reading before it is ready.
+
 
 ## Entra ID
 
@@ -24,8 +26,6 @@ This is the initial manual process to create a new environment like review, dev,
 
 - Run bicep from AVD: `make [environment] resource-group-init`
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Infra secrets
 
 - Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[review]-inf`

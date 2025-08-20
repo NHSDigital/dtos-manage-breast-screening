@@ -15,11 +15,6 @@ on:
         description: Pull request number when used in a pull request
         required: false
         type: string
-      run_database_seeding:
-        description: Run database seeding or not
-        required: false
-        type: boolean
-
 
 jobs:
   deploy:

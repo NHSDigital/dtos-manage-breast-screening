@@ -126,8 +126,8 @@ jobs:
       - name: Install dependencies
         run: make dependencies
 
-      # - name: Run linting
-      #   run: make test-lint
+      - name: Run linting
+        run: make test-lint
 
   perform-static-analysis:
     name: 'Perform static analysis'
