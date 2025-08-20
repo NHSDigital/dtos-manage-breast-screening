@@ -11,7 +11,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
@@ -22,7 +22,8 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
 
     def test_user_submits_cannot_go_ahead_form(self):
-        self.given_i_am_on_the_cannot_go_ahead_form()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_cannot_go_ahead_form()
         self.when_i_submit_the_form()
         self.then_i_should_see_validation_errors()
 
@@ -38,10 +39,11 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.and_the_appointment_is_updated()
 
     def test_accessibility(self):
-        self.given_i_am_on_the_cannot_go_ahead_form()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_cannot_go_ahead_form()
         self.then_the_accessibility_baseline_is_met()
 
-    def given_i_am_on_the_cannot_go_ahead_form(self):
+    def and_i_am_on_the_cannot_go_ahead_form(self):
         self.page.goto(
             self.live_server_url
             + reverse(

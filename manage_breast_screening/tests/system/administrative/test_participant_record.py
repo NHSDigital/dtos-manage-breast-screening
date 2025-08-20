@@ -13,7 +13,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestParticipantRecord(SystemTestCase):
@@ -25,8 +25,9 @@ class TestParticipantRecord(SystemTestCase):
 
     @pytest.mark.skip("not implemented yet")
     def test_viewing_participant_record_from_an_appointment(self):
-        self.given_the_participant_has_an_upcoming_appointment()
-        self.given_i_am_viewing_the_upcoming_appointment()
+        self.given_i_am_logged_in_as_an_administrative_user()
+        self.and_the_participant_has_an_upcoming_appointment()
+        self.and_i_am_viewing_the_upcoming_appointment()
         self.when_i_click_on_view_participant_record()
         self.then_i_should_be_on_the_participant_record_page()
         self.and_i_should_see_the_participant_record()
@@ -34,24 +35,27 @@ class TestParticipantRecord(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
 
     def test_accessibility(self):
-        self.given_i_am_on_the_participant_record_page()
+        self.given_i_am_logged_in_as_an_administrative_user()
+        self.and_i_am_on_the_participant_record_page()
         self.then_the_accessibility_baseline_is_met()
 
     def test_viewing_upcoming_appointments(self):
-        self.given_the_participant_has_an_upcoming_appointment()
+        self.given_i_am_logged_in_as_an_administrative_user()
+        self.and_the_participant_has_an_upcoming_appointment()
         self.and_i_am_on_the_participant_record_page()
         self.then_i_should_see_the_upcoming_appointment()
         self.when_i_click_on_the_upcoming_appointment()
         self.then_i_should_be_on_the_upcoming_appointment_page()
 
     def test_viewing_past_appointments(self):
-        self.given_i_have_past_appointments()
+        self.given_i_am_logged_in_as_an_administrative_user()
+        self.and_i_have_past_appointments()
         self.and_i_am_on_the_participant_record_page()
         self.then_i_should_see_the_past_appointments()
         self.when_i_click_on_a_past_appointment()
         self.then_i_should_be_on_the_past_appointment_page()
 
-    def given_the_participant_has_an_upcoming_appointment(self):
+    def and_the_participant_has_an_upcoming_appointment(self):
         clinic_slot = ClinicSlotFactory(
             starts_at=datetime(2025, 1, 2, 11, tzinfo=tz.utc)
         )
@@ -60,7 +64,7 @@ class TestParticipantRecord(SystemTestCase):
             clinic_slot=clinic_slot, screening_episode=screening_episode
         )
 
-    def given_i_have_past_appointments(self):
+    def and_i_have_past_appointments(self):
         clinic_slot_2022 = ClinicSlotFactory(
             starts_at=datetime(2022, 1, 2, 11, tzinfo=tz.utc)
         )
@@ -78,7 +82,7 @@ class TestParticipantRecord(SystemTestCase):
             ),
         ]
 
-    def given_i_am_viewing_the_upcoming_appointment(self):
+    def and_i_am_viewing_the_upcoming_appointment(self):
         self.page.goto(
             self.live_server_url
             + reverse(
@@ -87,7 +91,7 @@ class TestParticipantRecord(SystemTestCase):
             )
         )
 
-    def given_i_am_on_the_participant_record_page(self):
+    def and_i_am_on_the_participant_record_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
@@ -96,7 +100,7 @@ class TestParticipantRecord(SystemTestCase):
             )
         )
 
-    and_i_am_on_the_participant_record_page = given_i_am_on_the_participant_record_page
+    and_i_am_on_the_participant_record_page = and_i_am_on_the_participant_record_page
 
     def when_i_click_on_view_participant_record(self):
         self.page.get_by_text("View participant record").click()

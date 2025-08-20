@@ -10,7 +10,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestAddingPreviousMammograms(SystemTestCase):
@@ -25,7 +25,8 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         If a mammogram was taken at the same provider, but there is an error in the system, the participant can report that it was taken.
         """
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_no_reported_mammograms()
 
         self.when_i_click_on_add_mammogram()
@@ -44,7 +45,8 @@ class TestAddingPreviousMammograms(SystemTestCase):
         If a mammogram was taken at another BSU, or elsewhere in the UK, the participant can report that it was taken
         If the mammogram was taken under a different name, the mammographer can record that name.
         """
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_no_reported_mammograms()
 
         self.when_i_click_on_add_mammogram()
@@ -59,10 +61,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
 
     def test_accessibility(self):
-        self.given_i_am_on_the_add_previous_mammograms_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_add_previous_mammograms_page()
         self.then_the_accessibility_baseline_is_met()
 
-    def given_i_am_on_the_appointment_show_page(self):
+    def and_i_am_on_the_appointment_show_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
@@ -71,7 +74,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
             )
         )
 
-    def given_i_am_on_the_add_previous_mammograms_page(self):
+    def and_i_am_on_the_add_previous_mammograms_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(

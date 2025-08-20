@@ -2,9 +2,13 @@ import os
 from collections import Counter
 
 import pytest
+from django.contrib.auth.models import Group, User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from django.test.client import Client
 from playwright.sync_api import expect, sync_playwright
 
+from manage_breast_screening.auth.models import Role
+from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.core.utils.acessibility import AxeAdapter
 
 
@@ -24,12 +28,44 @@ class SystemTestCase(StaticLiveServerTestCase):
         cls.playwright.stop()
 
     def setUp(self):
-        self.page = self.browser.new_page()
+        self.context = self.browser.new_context()
+        self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
         self.axe = AxeAdapter(self.page)
 
     def tearDown(self):
         self.page.close()
+
+    def login_as_user(self, user: User):
+        """
+        Emulate logging in as a particular user, without needing
+        to visit a login page.
+        """
+        # Fake a login
+        client = Client()
+        client.force_login(user)
+
+        # Transfer the session cookie to the playwright browser
+        sessionid = client.cookies["sessionid"].value
+        self.context.add_cookies(
+            [
+                {
+                    "name": "sessionid",
+                    "value": sessionid,
+                    "url": self.live_server_url,
+                    "httpOnly": True,
+                }
+            ]
+        )
+
+    def login_as_role(self, role: Role):
+        """
+        Emulate logging in as a user having a particular role,
+        without needing to visit a login page.
+        """
+        group, _created = Group.objects.get_or_create(name=role)
+        user = UserFactory.create(groups=[group])
+        self.login_as_user(user)
 
     def expect_validation_error(
         self,
@@ -56,6 +92,15 @@ class SystemTestCase(StaticLiveServerTestCase):
             field = fieldset.get_by_label(field_label)
 
         expect(field).to_be_focused()
+
+    def given_i_am_logged_in_as_a_clinical_user(self):
+        self.login_as_role(Role.CLINICAL)
+
+    def given_i_am_logged_in_as_an_administrative_user(self):
+        self.login_as_role(Role.ADMINISTRATIVE)
+
+    def given_i_am_logged_in_as_an_superuser(self):
+        self.login_as_role(Role.SUPERUSER)
 
     def then_the_accessibility_baseline_is_met(self, require_unique_link_text=True):
         """

@@ -10,7 +10,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestEthnicityDetailsForm(SystemTestCase):
@@ -21,7 +21,8 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
 
     def test_entering_ethnicity_details_for_a_participant(self):
-        self.given_i_am_viewing_an_appointment()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_viewing_an_appointment()
         self.when_i_click_on_enter_ethnicity_details()
         self.then_i_should_be_on_the_ethnicity_details_form()
 
@@ -48,7 +49,8 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.and_the_ethnicity_is_updated_to("Prefer not to say")
 
     def test_entering_ethnicity_description_provided_by_the_participant(self):
-        self.given_i_am_viewing_an_appointment()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_viewing_an_appointment()
         self.when_i_click_on_enter_ethnicity_details()
         self.then_i_should_be_on_the_ethnicity_details_form()
 
@@ -69,7 +71,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
             "Asian or Asian British (any other Asian background)"
         )
 
-    def given_i_am_viewing_an_appointment(self):
+    def and_i_am_viewing_an_appointment(self):
         self.page.goto(
             self.live_server_url
             + reverse(

@@ -14,7 +14,7 @@ from manage_breast_screening.core.utils.string_formatting import (
 from manage_breast_screening.participants.models import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestUserViewsClinicShowPage(SystemTestCase):
@@ -24,8 +24,9 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.clinic = ClinicFactory(starts_at=today, setting__name="West London BSS")
 
     def test_user_views_clinic_show_page(self):
-        self.given_there_are_appointments()
-        self.given_i_am_on_the_clinic_list()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_are_appointments()
+        self.and_i_am_on_the_clinic_list()
         self.when_i_click_on_the_clinic()
         self.then_i_should_see_the_clinic_show_page()
         self.and_i_can_see_remaining_appointments()
@@ -42,19 +43,21 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.and_the_appointments_remain_in_the_same_order()
 
     def test_user_views_clinic_show_page_with_special_appointments(self):
-        self.given_an_appointment_has_extra_needs()
-        self.given_i_am_on_the_clinic_list()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_an_appointment_has_extra_needs()
+        self.and_i_am_on_the_clinic_list()
         self.when_i_click_on_the_clinic()
         self.then_i_can_see_the_appointment_tagged_as_special()
         self.when_i_click_on_the_special_appointment()
         self.then_i_can_see_the_special_appointment_banner()
 
     def test_accessibility(self):
-        self.given_there_are_appointments()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_are_appointments()
         self.and_i_am_on_the_clinic_show_page()
         self.then_the_accessibility_baseline_is_met()
 
-    def given_there_are_appointments(self):
+    def and_there_are_appointments(self):
         self.confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(hour=9, minute=0),
@@ -84,7 +87,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             current_status=AppointmentStatus.SCREENED,
         )
 
-    def given_i_am_on_the_clinic_list(self):
+    def and_i_am_on_the_clinic_list(self):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
 
     def and_i_am_on_the_clinic_show_page(self):
@@ -197,7 +200,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
                 appointment.current_status.get_state_display()
             )
 
-    def given_an_appointment_has_extra_needs(self):
+    def and_an_appointment_has_extra_needs(self):
         self.extra_needs_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(
