@@ -38,7 +38,7 @@ class Command(BaseCommand):
             for blob in self.container_client.list_blobs(
                 name_starts_with=options["date_str"]
             ):
-                blob_client = self.container_client.get_blob_client(blob)
+                blob_client = self.container_client.get_blob_client(blob.name)
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()

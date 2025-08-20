@@ -49,7 +49,7 @@ class TestStoreMeshMessages:
             subject.handle()
 
             for blob in self.container_client.list_blobs():
-                blob_client = self.container_client.get_blob_client(blob)
+                blob_client = self.container_client.get_blob_client(blob.name)
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()
@@ -63,7 +63,7 @@ class TestStoreMeshMessages:
                 with open(file_path) as test_file:
                     assert test_file.read() == blob_content
 
-                self.container_client.delete_blob(blob)
+                self.container_client.delete_blob(blob.name)
 
             assert len(client.list_messages()) == 0
 
