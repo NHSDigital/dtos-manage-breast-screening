@@ -27,6 +27,7 @@ class ParticipantFactory(DjangoModelFactory):
     class Meta:
         model = models.Participant
         django_get_or_create = ("nhs_number",)
+        skip_postgeneration_save = True
 
     first_name = "Janet"
     last_name = "Williams"

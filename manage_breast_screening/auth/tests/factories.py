@@ -11,6 +11,7 @@ class UserFactory(DjangoModelFactory):
     class Meta:
         model = get_user_model()
         django_get_or_create = ("first_name", "last_name")
+        skip_postgeneration_save = True
 
     username = Sequence(lambda n: "alice%d" % n)
     first_name = Sequence(lambda n: "alice%d" % n)
