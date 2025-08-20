@@ -1,3 +1,4 @@
+import secrets
 import uuid
 from datetime import datetime, timedelta
 
@@ -69,3 +70,15 @@ class ChannelStatusFactory(DjangoModelFactory):
     message = SubFactory(MessageFactory)
     status = "read"
     status_updated_at = datetime.now() - timedelta(minutes=10)
+    idempotency_key = Sequence(lambda n: f"{secrets.token_hex(18)}%09d" % n)
+
+
+class MessageStatusFactory(DjangoModelFactory):
+    class Meta:
+        model = models.MessageStatus
+
+    description = "Delivered"
+    message = SubFactory(MessageFactory)
+    status = "delivered"
+    status_updated_at = datetime.now() - timedelta(minutes=10)
+    idempotency_key = Sequence(lambda n: f"{secrets.token_hex(18)}%09d" % n)
