@@ -46,15 +46,18 @@ class Command(BaseCommand):
                 data_frame = self.raw_data_to_data_frame(blob_content)
 
                 for idx, row in data_frame.iterrows():
-                    clinic, clinic_created = self.find_or_create_clinic(row)
-                    if clinic_created:
-                        self.stdout.write(f"{clinic} created")
+                    if row.get("Holding Clinic") != "Y":
+                        clinic, clinic_created = self.find_or_create_clinic(row)
+                        if clinic_created:
+                            self.stdout.write(f"{clinic} created")
 
-                    appt, appt_created = self.update_or_create_appointment(row, clinic)
-                    if appt_created:
-                        self.stdout.write(f"{appt} created")
-                    else:
-                        self.stdout.write(f"{appt} updated")
+                        appt, appt_created = self.update_or_create_appointment(
+                            row, clinic
+                        )
+                        if appt_created:
+                            self.stdout.write(f"{appt} created")
+                        else:
+                            self.stdout.write(f"{appt} updated")
 
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
@@ -71,7 +74,7 @@ class Command(BaseCommand):
             skipfooter=1,
         )
 
-    def find_or_create_clinic(self, row: dict) -> tuple[Clinic, bool]:
+    def find_or_create_clinic(self, row: pandas.Series) -> tuple[Clinic, bool]:
         return Clinic.objects.get_or_create(
             bso_code=row["BSO"],
             code=row["Clinic Code"],
@@ -90,7 +93,7 @@ class Command(BaseCommand):
         )
 
     def update_or_create_appointment(
-        self, row: dict, clinic: Clinic
+        self, row: pandas.Series, clinic: Clinic
     ) -> tuple[Appointment, bool]:
         defaults = {
             "batch_id": row["BatchID"],
@@ -131,7 +134,7 @@ class Command(BaseCommand):
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
         return dt.replace(tzinfo=TZ_INFO)
 
-    def appointment_date_and_time(self, row: dict) -> datetime:
+    def appointment_date_and_time(self, row: pandas.Series) -> datetime:
         dt = datetime.strptime(
             f"{row['Appt Date']} {row['Appt Time']}",
             "%Y%m%d %H%M",

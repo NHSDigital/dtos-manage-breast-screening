@@ -16,6 +16,10 @@ from manage_breast_screening.notifications.tests.factories import (
     ClinicFactory,
 )
 
+VALID_DATA_FILE = "ABC_20241202091221_APPT_106.dat"
+UPDATED_APPOINTMENT_FILE = "ABC_20241202091321_APPT_107.dat"
+HOLDING_CLINIC_APPOINTMENT_FILE = "ABC_20241202091421_APPT_108.dat"
+
 
 class TestCreateAppointments:
     def fixture_file_path(self, filename):
@@ -32,12 +36,10 @@ class TestCreateAppointments:
 
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(
-            return_value=f"{today_dirname}/ABC_20241202091221_APPT_106.dat"
-        )
+        mock_blob.name = PropertyMock(return_value=f"{today_dirname}/{VALID_DATA_FILE}")
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            open(self.fixture_file_path("ABC_20241202091221_APPT_106.dat")).read()
+            open(self.fixture_file_path(VALID_DATA_FILE)).read()
         )
         subject.container_client = mock_container_client
 
@@ -94,6 +96,32 @@ class TestCreateAppointments:
         assert appointments[2].clinic == clinics[1]
 
     @pytest.mark.django_db
+    def test_handles_holding_clinics(self):
+        """Test does not create appointments for valid NBSS data marked as a Holding Clinic"""
+        today_dirname = datetime.today().strftime("%Y-%m-%d")
+
+        subject = Command()
+
+        mock_container_client = PropertyMock(spec=ContainerClient)
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = PropertyMock(
+            return_value=f"{today_dirname}/{HOLDING_CLINIC_APPOINTMENT_FILE}"
+        )
+        mock_container_client.list_blobs.return_value = [mock_blob]
+        mock_container_client.get_blob_client().download_blob().readall.return_value = (
+            open(self.fixture_file_path(HOLDING_CLINIC_APPOINTMENT_FILE)).read()
+        )
+        subject.container_client = mock_container_client
+
+        subject.handle(**{"date_str": today_dirname})
+
+        assert Clinic.objects.count() == 1
+        assert Clinic.objects.filter(code="BU011").first() is None
+
+        assert Clinic.objects.count() == 1
+        assert Appointment.objects.filter(nhs_number=9449306625).first() is None
+
+    @pytest.mark.django_db
     def test_handle_updates_records(self):
         """Test Appointment record update from valid NBSS data stored in Azure storage blob"""
         starts_at = datetime.strptime(
@@ -117,9 +145,7 @@ class TestCreateAppointments:
 
         # Receive a cancellation for existing appointment
         today = datetime.now()
-        raw_data = open(
-            self.fixture_file_path("ABC_20241202091321_APPT_107.dat")
-        ).read()
+        raw_data = open(self.fixture_file_path(UPDATED_APPOINTMENT_FILE)).read()
         today_dirname = today.strftime("%Y-%m-%d")
 
         subject = Command()
@@ -127,7 +153,7 @@ class TestCreateAppointments:
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
         mock_blob.name = PropertyMock(
-            return_value=f"{today_dirname}/ABC_20241202091321_APPT_107.dat"
+            return_value=f"{today_dirname}/{UPDATED_APPOINTMENT_FILE}"
         )
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
@@ -155,12 +181,10 @@ class TestCreateAppointments:
 
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(
-            return_value="2025-07-01/ABC_20241202091221_APPT_106.dat"
-        )
+        mock_blob.name = PropertyMock(return_value=f"2025-07-01/{VALID_DATA_FILE}")
         mock_container_client.list_blobs.return_value = [mock_blob]
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            open(self.fixture_file_path("ABC_20241202091221_APPT_106.dat")).read()
+            open(self.fixture_file_path(VALID_DATA_FILE)).read()
         )
         subject.container_client = mock_container_client
 
