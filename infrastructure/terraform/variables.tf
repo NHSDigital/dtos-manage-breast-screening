@@ -110,6 +110,12 @@ variable "front_door_profile" {
   type        = string
 }
 
+variable "personas_enabled" {
+  description = "To enable personas or not."
+  type        = bool
+  default     = false
+}
+
 locals {
   region = "uksouth"
 

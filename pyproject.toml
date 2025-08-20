@@ -11,6 +11,7 @@ dependencies = [
   "dotenv (>=0.9.9,<0.10.0)",
   "gunicorn (>=23.0.0,<24.0.0)",
   "jinja2 (>=3.1.6,<4.0.0)",
+  "factory-boy (>=3.3.3)",
   "whitenoise[brotli] (>=6.9.0,<7.0.0)",
   "nhsuk-frontend-jinja (>=0.3.0,<0.4.0)",
   "python-dateutil (>=2.9.0.post0,<3.0.0)",
@@ -29,7 +30,6 @@ package-mode = false
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"
 pytest-django = "^4.11.1"
-factory-boy = "^3.3.3"
 time-machine = "^2.17.0"
 pytest-playwright = "^0.7.0"
 ipdb = "^0.13.13"
