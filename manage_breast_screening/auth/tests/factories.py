@@ -21,6 +21,9 @@ class UserFactory(DjangoModelFactory):
         if not create:
             return
 
+        if extracted:
+            self.groups.set(extracted)
+
         if kwargs.get("administrative"):
             self.groups.add(Group.objects.get(name=Role.ADMINISTRATIVE))
 
