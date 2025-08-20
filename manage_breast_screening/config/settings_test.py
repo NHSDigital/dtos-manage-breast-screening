@@ -15,15 +15,8 @@ STORAGES = {
     },
 }
 
-
 MIDDLEWARE.remove(
     "whitenoise.middleware.WhiteNoiseMiddleware",
-)
-
-# Make authentication optional until we've updated the system tests to account
-# for different roles
-MIDDLEWARE.remove(
-    "django.contrib.auth.middleware.LoginRequiredMiddleware",
 )
 
 if DEBUG:
