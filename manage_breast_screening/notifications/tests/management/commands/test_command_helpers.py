@@ -69,7 +69,8 @@ class TestCommandHelpers:
         """Test that message batches which fail to send are marked correctly"""
         mock_response = MagicMock()
         mock_response.status_code = status_code
-        mock_response.json.return_value = {"errors": [{"some-error": "details"}]}
+        notify_errors = {"errors": [{"some-error": "details"}]}
+        mock_response.json.return_value = notify_errors
         message = MessageFactory(status="scheduled")
         message_batch = MessageBatchFactory(routing_plan_id=routing_plan_id)
         message_batch.messages.set([message])
@@ -79,7 +80,7 @@ class TestCommandHelpers:
 
         message_batch.refresh_from_db()
         assert message_batch.status == "failed_unrecoverable"
-        assert message_batch.notify_errors == [{"some-error": "details"}]
+        assert message_batch.notify_errors == notify_errors
         assert message_batch.messages.count() == 1
         assert message_batch.messages.all()[0].status == "failed"
 
@@ -91,7 +92,8 @@ class TestCommandHelpers:
         """Test that message batches which fail to send are marked correctly"""
         mock_response = MagicMock()
         mock_response.status_code = status_code
-        mock_response.json.return_value = {"errors": [{"some-error": "details"}]}
+        notify_errors = {"errors": [{"some-error": "details"}]}
+        mock_response.json.return_value = notify_errors
         message_batch = MessageBatchFactory(routing_plan_id=routing_plan_id)
 
         with patch(
@@ -104,7 +106,7 @@ class TestCommandHelpers:
 
             message_batch.refresh_from_db()
             assert message_batch.status == "failed_recoverable"
-            assert message_batch.notify_errors == [{"some-error": "details"}]
+            assert message_batch.notify_errors == notify_errors
             queue_instance.add.assert_called_once_with(
                 json.dumps(
                     {"message_batch_id": str(message_batch.id), "retry_count": 0}
