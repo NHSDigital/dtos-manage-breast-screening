@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseBadRequest, JsonResponse
@@ -55,7 +57,9 @@ def cis2_callback(request):
     if userinfo.get("family_name"):
         defaults["last_name"] = userinfo["family_name"]
 
-    user, _ = User.objects.get_or_create(uid=sub, defaults=defaults)
+    # Map CIS2 subject ('sub') to the built-in 'username' field, Django's
+    # default unique identifier for users
+    user, _ = User.objects.get_or_create(username=sub, defaults=defaults)
     auth_login(request, user)
     return redirect(reverse("home"))
 
