@@ -1,4 +1,5 @@
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from django.db.models import F, QuerySet
 
@@ -10,8 +11,9 @@ from manage_breast_screening.notifications.models import (
 
 class Failures:
     def query(self, date: datetime = datetime.today()) -> QuerySet:
-        starts_at = date.replace(hour=0, minute=0, second=0)
-        ends_at = date.replace(hour=23, minute=59, second=59)
+        tzinfo = ZoneInfo("Europe/London")
+        starts_at = date.replace(hour=0, minute=0, second=0, tzinfo=tzinfo)
+        ends_at = date.replace(hour=23, minute=59, second=59, tzinfo=tzinfo)
 
         return (
             MessageStatus.objects.filter(
