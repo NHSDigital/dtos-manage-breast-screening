@@ -11,7 +11,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestEditingSpecialAppointments(SystemTestCase):
@@ -27,7 +27,8 @@ class TestEditingSpecialAppointments(SystemTestCase):
         )
 
     def test_setting_up_a_special_appointment(self):
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
         self.and_i_add_a_reason()
         self.and_i_select_no_reasons_are_temporary()
@@ -36,7 +37,8 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.and_i_see_the_created_special_appointment()
 
     def test_setting_up_a_special_appointment_with_a_temporary_reason(self):
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
         self.and_i_add_a_reason()
         self.and_i_select_some_reasons_are_temporary()
@@ -45,7 +47,8 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.and_i_see_the_created_special_appointment()
 
     def test_setting_up_a_special_appointment_with_multiple_reasons(self):
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
         self.and_i_add_a_reason()
         self.and_i_add_another_reason()
@@ -57,7 +60,8 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.and_i_see_the_created_special_appointment_with_both_reasons()
 
     def test_adding_reasons_to_a_special_appointment(self):
-        self.given_the_participant_already_has_reasons_set()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_the_participant_already_has_reasons_set()
         self.and_i_am_on_the_appointment_show_page()
         self.then_i_see_the_special_appointment_banner()
 
@@ -68,7 +72,8 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.and_i_see_the_updated_special_appointment()
 
     def test_removing_all_reasons_removes_the_banner(self):
-        self.given_the_participant_already_has_reasons_set()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_the_participant_already_has_reasons_set()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_the_change_link()
         self.and_i_remove_the_existing_need()
@@ -77,11 +82,12 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.and_i_do_not_see_the_special_appointment_banner()
 
     def test_form_error_when_required_fields_are_missing(self):
-        self.given_i_am_on_the_form()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_form()
         self.when_i_submit_the_form()
         self.then_i_should_see_an_error_for_the_required_fields()
 
-    def given_the_participant_already_has_reasons_set(self):
+    def and_the_participant_already_has_reasons_set(self):
         self.participant.extra_needs = {
             "PHYSICAL_RESTRICTION": {
                 "details": "Uses wheelchair, needs accessible positioning and additional time for transfers"
@@ -89,7 +95,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
         }
         self.participant.save()
 
-    def given_i_am_on_the_appointment_show_page(self):
+    def and_i_am_on_the_appointment_show_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
@@ -98,7 +104,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
             )
         )
 
-    def given_i_am_on_the_form(self):
+    def and_i_am_on_the_form(self):
         self.page.goto(
             self.live_server_url
             + reverse(
@@ -107,7 +113,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
             )
         )
 
-    and_i_am_on_the_appointment_show_page = given_i_am_on_the_appointment_show_page
+    and_i_am_on_the_appointment_show_page = and_i_am_on_the_appointment_show_page
 
     def then_i_see_the_special_appointment_banner(self):
         banner = self.page.locator(".nhsuk-warning-callout")

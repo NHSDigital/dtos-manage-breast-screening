@@ -9,7 +9,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestViewingACompletedAppointment(SystemTestCase):
@@ -27,16 +27,18 @@ class TestViewingACompletedAppointment(SystemTestCase):
         The appointment page includes appointment details, medical information, and images tabs.
         Only the first one is implemented yet.
         """
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_the_demographic_banner()
         self.and_i_should_see_the_participant_details()
         self.and_i_should_not_see_a_form()
 
     def test_accessibility(self):
-        self.given_i_am_on_the_appointment_show_page()
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
 
-    def given_i_am_on_the_appointment_show_page(self):
+    def and_i_am_on_the_appointment_show_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(

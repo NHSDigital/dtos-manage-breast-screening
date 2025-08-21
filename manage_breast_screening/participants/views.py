@@ -1,9 +1,11 @@
 from logging import getLogger
 from urllib.parse import urlparse
 
+from django.contrib.auth.decorators import permission_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
+from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
 from manage_breast_screening.participants.services import fetch_current_provider
 
@@ -31,6 +33,7 @@ def parse_return_url(request, default: str) -> str:
     return return_url
 
 
+@permission_required(Permission.VIEW_PARTICIPANT_DATA)
 def show(request, pk):
     participant = get_object_or_404(Participant, pk=pk)
     presented_participant = ParticipantPresenter(participant)
@@ -73,6 +76,7 @@ def show(request, pk):
     )
 
 
+@permission_required(Permission.VIEW_PARTICIPANT_DATA)
 def edit_ethnicity(request, pk):
     participant = get_object_or_404(Participant, pk=pk)
 
@@ -106,6 +110,7 @@ def edit_ethnicity(request, pk):
     )
 
 
+@permission_required(Permission.VIEW_PARTICIPANT_DATA)
 def add_previous_mammogram(request, pk):
     participant = get_object_or_404(Participant, pk=pk)
     current_provider = fetch_current_provider(pk)
