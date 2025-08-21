@@ -60,7 +60,7 @@ class Command(BaseCommand):
                 MessageBatchHelpers.mark_batch_as_sent(message_batch, response.json())
                 self.stdout.write(f"{message_batch} sent")
             else:
-                MessageBatchHelpers.mark_batch_as_failed(message_batch, response)
+                MessageBatchHelpers.mark_batch_as_failed(message_batch, response, 0)
                 self.stdout.write(
                     f"Failed to send batch. Status: {response.status_code}"
                 )

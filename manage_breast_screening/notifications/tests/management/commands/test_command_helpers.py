@@ -76,7 +76,7 @@ class TestCommandHelpers:
         message_batch.messages.set([message])
         message_batch.save()
 
-        MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response)
+        MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response, 0)
 
         message_batch.refresh_from_db()
         assert message_batch.status == "failed_unrecoverable"
