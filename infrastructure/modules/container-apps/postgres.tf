@@ -8,7 +8,7 @@ data "azurerm_private_dns_zone" "postgres" {
 resource "azurerm_management_lock" "postgres_lock" {
   count = var.postgres_prevent_destroy ? 1 : 0
 
-  name       = "lock-${module.postgres.name}"
+  name       = "lock-${module.postgres.database_names[0]}"
   scope      = module.postgres.id
   lock_level = "CanNotDelete"
   notes      = "Lock applied to prevent accidental deletion of Postgres server."
