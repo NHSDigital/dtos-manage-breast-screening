@@ -126,6 +126,7 @@ class Appointment(models.Model):
     starts_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=True, auto_now=True)
+    blob_name = models.TextField(null=False)
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
