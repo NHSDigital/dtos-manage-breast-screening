@@ -27,13 +27,11 @@ class TestCreateAppointmentsFromAzureStorage:
     @pytest.mark.django_db
     def test_appointments_created_from_file_stored_in_azure(self, helpers):
         today_dirname = datetime.today().strftime("%Y-%m-%d")
+        test_file_path = "ABC_20241202091221_APPT_106.dat"
+        blob_name = f"{today_dirname}/{test_file_path}"
 
-        with open(
-            helpers.get_test_file_path("ABC_20241202091221_APPT_106.dat")
-        ) as test_file:
-            BlobStorage().add(
-                f"{today_dirname}/ABC_20241202091221_APPT_106.dat", test_file.read()
-            )
+        with open(helpers.get_test_file_path(test_file_path)) as test_file:
+            BlobStorage().add(blob_name, test_file.read())
 
         Command().handle(**{"date_str": today_dirname})
 
@@ -80,3 +78,7 @@ class TestCreateAppointmentsFromAzureStorage:
         assert appointments[0].clinic == clinics[0]
         assert appointments[1].clinic == clinics[1]
         assert appointments[2].clinic == clinics[1]
+
+        assert appointments[0].blob_name == blob_name
+        assert appointments[1].blob_name == blob_name
+        assert appointments[2].blob_name == blob_name

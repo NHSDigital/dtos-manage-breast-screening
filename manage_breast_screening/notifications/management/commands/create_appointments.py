@@ -52,7 +52,7 @@ class Command(BaseCommand):
                             self.stdout.write(f"{clinic} created")
 
                         appt, appt_created = self.update_or_create_appointment(
-                            row, clinic
+                            row, clinic, blob.name
                         )
                         if appt_created:
                             self.stdout.write(f"{appt} created")
@@ -93,10 +93,11 @@ class Command(BaseCommand):
         )
 
     def update_or_create_appointment(
-        self, row: pandas.Series, clinic: Clinic
+        self, row: pandas.Series, clinic: Clinic, blob_name: str
     ) -> tuple[Appointment, bool]:
         defaults = {
             "batch_id": row["BatchID"],
+            "blob_name": blob_name,
             "number": row["Sequence"],
             "status": row["Status"],
             "episode_type": row["Episode Type"],
