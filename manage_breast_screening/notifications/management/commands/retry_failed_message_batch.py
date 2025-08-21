@@ -6,6 +6,7 @@ from logging import getLogger
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.management.commands.command_helpers import (
+    RECOVERABLE_STATUS_CODES,
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import (
@@ -57,6 +58,21 @@ class Command(BaseCommand):
                         message_batch=message_batch, response_json=response.json()
                     )
                 else:
+                    if response.status_code in RECOVERABLE_STATUS_CODES:
+                        queue.add(
+                            json.dumps(
+                                {
+                                    "message_batch_id": str(message_batch.id),
+                                    "retry_count": retry_count + 1,
+                                }
+                            )
+                        )
+                    else:
+                        message_batch.status = (
+                            MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
+                        )
+                        message_batch.save()
+
                     raise CommandError(
                         f"Message Batch with id {message_batch_id} not sent: {response.status_code}, {response.reason}"
                     )
