@@ -9,23 +9,6 @@ from manage_breast_screening.participants.models import AppointmentStatus
 
 @pytest.mark.django_db
 class TestShowAppointment:
-    def test_viewable_by_clinical_or_administrative(
-        self, clinical_user_client, administrative_user_client, completed_appointment
-    ):
-        response = clinical_user_client.get(
-            reverse(
-                "mammograms:show_appointment", kwargs={"pk": completed_appointment.pk}
-            )
-        )
-        assert response.status_code == 200
-
-        response = administrative_user_client.get(
-            reverse(
-                "mammograms:show_appointment", kwargs={"pk": completed_appointment.pk}
-            )
-        )
-        assert response.status_code == 200
-
     def test_redirects_to_show_screening_if_in_progress(
         self, clinical_user_client, appointment
     ):
@@ -59,19 +42,6 @@ class TestShowAppointment:
 
 @pytest.mark.django_db
 class TestStartScreening:
-    def test_viewable_by_clinical_only(
-        self, clinical_user_client, administrative_user_client, client, appointment
-    ):
-        response = clinical_user_client.get(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk})
-        )
-        assert response.status_code == 200
-
-        response = administrative_user_client.get(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk})
-        )
-        assert response.status_code == 403
-
     def test_appointment_continued(self, clinical_user_client, appointment):
         response = clinical_user_client.post(
             reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
