@@ -51,6 +51,7 @@ module "container-apps" {
   log_analytics_workspace_audit_id      = var.deploy_infra ? module.infra[0].log_analytics_workspace_audit_id : data.azurerm_log_analytics_workspace.audit[0].id
   postgres_backup_retention_days        = var.postgres_backup_retention_days
   postgres_geo_redundant_backup_enabled = var.postgres_geo_redundant_backup_enabled
+  postgres_prevent_destroy              = var.postgres_prevent_destroy
   postgres_sku_name                     = var.postgres_sku_name
   postgres_sql_admin_group              = "postgres_${var.app_short_name}_${var.env_config}_uks_admin"
   postgres_storage_mb                   = var.postgres_storage_mb

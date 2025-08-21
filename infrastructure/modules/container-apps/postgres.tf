@@ -5,6 +5,15 @@ data "azurerm_private_dns_zone" "postgres" {
   resource_group_name = "rg-hub-${var.hub}-uks-private-dns-zones"
 }
 
+resource "azurerm_management_lock" "postgres_lock" {
+  count = var.postgres_prevent_destroy ? 1 : 0
+
+  name       = "lock-${module.postgres.database_names[0]}"
+  scope      = module.postgres.id
+  lock_level = "CanNotDelete"
+  notes      = "Lock applied to prevent accidental deletion of Postgres server."
+}
+
 module "postgres" {
   source = "../dtos-devops-templates/infrastructure/modules/postgresql-flexible"
 
@@ -26,9 +35,9 @@ module "postgres" {
   monitor_diagnostic_setting_postgresql_server_enabled_logs = ["PostgreSQLLogs", "PostgreSQLFlexSessions", "PostgreSQLFlexQueryStoreRuntime", "PostgreSQLFlexQueryStoreWaitStats", "PostgreSQLFlexTableStats", "PostgreSQLFlexDatabaseXacts"]
   monitor_diagnostic_setting_postgresql_server_metrics      = ["AllMetrics"]
 
-  sku_name     = var.postgres_sku_name
-  storage_mb   = var.postgres_storage_mb
-  storage_tier = var.postgres_storage_tier
+  sku_name        = var.postgres_sku_name
+  storage_mb      = var.postgres_storage_mb
+  storage_tier    = var.postgres_storage_tier
 
   server_version = "16"
   tenant_id      = data.azurerm_client_config.current.tenant_id
