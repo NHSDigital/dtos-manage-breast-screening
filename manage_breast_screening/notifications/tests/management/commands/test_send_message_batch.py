@@ -150,9 +150,8 @@ class TestSendMessageBatch:
     ):
         """Test that message batches which fail to send are marked correctly"""
         mock_send_message_batch.return_value.status_code = status_code
-        mock_send_message_batch.return_value.json.return_value = {
-            "errors": [{"some-error": "details"}]
-        }
+        notify_errors = {"errors": [{"some-error": "details"}]}
+        mock_send_message_batch.return_value.json.return_value = notify_errors
         appointment = AppointmentFactory(
             starts_at=datetime.now().replace(tzinfo=TZ_INFO)
             + timedelta(weeks=4, days=4)
@@ -163,7 +162,7 @@ class TestSendMessageBatch:
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
         assert message_batches[0].status == "failed_unrecoverable"
-        assert message_batches[0].notify_errors == [{"some-error": "details"}]
+        assert message_batches[0].nhs_notify_errors == notify_errors
         messages = Message.objects.filter(
             appointment=appointment, batch=message_batches[0]
         )
@@ -176,10 +175,9 @@ class TestSendMessageBatch:
         self, mark_batch_as_sent, mock_send_message_batch, routing_plan_id, status_code
     ):
         """Test that message batches which fail to send are marked correctly"""
+        notify_errors = {"errors": [{"some-error": "details"}]}
         mock_send_message_batch.return_value.status_code = status_code
-        mock_send_message_batch.return_value.json.return_value = {
-            "errors": [{"some-error": "details"}]
-        }
+        mock_send_message_batch.return_value.json.return_value = notify_errors
         _appointment = AppointmentFactory(
             starts_at=datetime.now().replace(tzinfo=TZ_INFO)
             + timedelta(weeks=4, days=4)
@@ -195,7 +193,7 @@ class TestSendMessageBatch:
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
         assert message_batches[0].status == "failed_recoverable"
-        assert message_batches[0].notify_errors == [{"some-error": "details"}]
+        assert message_batches[0].nhs_notify_errors == notify_errors
         queue_instance.add.assert_called_once_with(
             json.dumps(
                 {"message_batch_id": str(message_batches[0].id), "retry_count": 0}
