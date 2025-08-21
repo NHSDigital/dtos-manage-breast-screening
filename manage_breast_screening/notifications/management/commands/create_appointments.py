@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 data_frame = self.raw_data_to_data_frame(blob_content)
 
                 for idx, row in data_frame.iterrows():
-                    if row.get("Holding Clinic") != "Y":
+                    if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
                         if clinic_created:
                             self.stdout.write(f"{clinic} created")
@@ -62,6 +62,9 @@ class Command(BaseCommand):
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
             raise CommandError(e)
+
+    def is_not_holding_clinic(self, row):
+        return row.get("Holding Clinic") != "Y"
 
     def raw_data_to_data_frame(self, raw_data: str) -> pandas.DataFrame:
         return pandas.read_table(
