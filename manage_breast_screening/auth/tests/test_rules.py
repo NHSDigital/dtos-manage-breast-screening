@@ -1,5 +1,7 @@
 import pytest
 
+from manage_breast_screening.auth.models import Permission
+
 
 @pytest.mark.django_db
 class TestRules:
@@ -8,19 +10,19 @@ class TestRules:
     ):
         user.groups.add()
 
-        assert not user.has_perm("mammograms.perform_mammogram_appointment")
+        assert not user.has_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT)
         assert not administrative_user.has_perm(
-            "mammograms.perform_mammogram_appointment"
+            Permission.PERFORM_MAMMOGRAM_APPOINTMENT
         )
-        assert clinical_user.has_perm("mammograms.perform_mammogram_appointment")
-        assert superuser.has_perm("mammograms.perform_mammogram_appointment")
+        assert clinical_user.has_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT)
+        assert superuser.has_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT)
 
     def test_rule_requiring_clinical_or_administrative_role(
         self, user, administrative_user, clinical_user, superuser
     ):
         user.groups.add()
 
-        assert not user.has_perm("participants.view_participant_data")
-        assert administrative_user.has_perm("participants.view_participant_data")
-        assert clinical_user.has_perm("participants.view_participant_data")
-        assert superuser.has_perm("participants.view_participant_data")
+        assert not user.has_perm(Permission.VIEW_PARTICIPANT_DATA)
+        assert administrative_user.has_perm(Permission.VIEW_PARTICIPANT_DATA)
+        assert clinical_user.has_perm(Permission.VIEW_PARTICIPANT_DATA)
+        assert superuser.has_perm(Permission.VIEW_PARTICIPANT_DATA)

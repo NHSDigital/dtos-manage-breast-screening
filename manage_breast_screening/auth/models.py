@@ -8,6 +8,11 @@ class Role(StrEnum):
     SUPERUSER = "Superuser"
 
 
+class Permission(StrEnum):
+    VIEW_PARTICIPANT_DATA = "participants.view_participant_data"
+    PERFORM_MAMMOGRAM_APPOINTMENT = "mammograms.perform_mammogram_appointment"
+
+
 @dataclass
 class Persona:
     first_name: str

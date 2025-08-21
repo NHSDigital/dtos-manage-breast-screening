@@ -6,7 +6,7 @@ This file is automatically imported by rules.apps.AutodiscoverRulesConfig
 
 import rules
 
-from .models import Role
+from .models import Permission, Role
 
 
 def user_has_any_role(role, *other_roles):
@@ -22,7 +22,7 @@ def user_has_any_role(role, *other_roles):
 
 # fmt: off
 
-rules.add_perm("participants.view_participant_data", user_has_any_role(Role.CLINICAL, Role.ADMINISTRATIVE))
-rules.add_perm("mammograms.perform_mammogram_appointment", user_has_any_role(Role.CLINICAL))
+rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, user_has_any_role(Role.CLINICAL, Role.ADMINISTRATIVE))
+rules.add_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT, user_has_any_role(Role.CLINICAL))
 
 # fmt: on

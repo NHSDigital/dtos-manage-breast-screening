@@ -8,6 +8,7 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
+from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
     Appointment,
@@ -60,7 +61,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     If the appointment is not in progress, redirect to the appointment show page.
     """
 
-    permission_required = "mammograms.perform_mammogram_appointment"
+    permission_required = Permission.PERFORM_MAMMOGRAM_APPOINTMENT
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
@@ -83,7 +84,7 @@ class ShowAppointment(AppointmentMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         if (
-            request.user.has_perm("mammograms.perform_mammogram_appointment")
+            request.user.has_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT)
             and appointment.current_status.in_progress
         ):
             return redirect("mammograms:start_screening", pk=self.appointment.pk)
