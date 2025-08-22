@@ -48,7 +48,7 @@ class MessageBatchHelpers:
 
     @staticmethod
     def mark_batch_as_failed(
-        message_batch: MessageBatch, response: Response, retry_count
+        message_batch: MessageBatch, response: Response, retry_count: int
     ):
         message_batch.nhs_notify_errors = response.json()
         if response.status_code in RECOVERABLE_STATUS_CODES:

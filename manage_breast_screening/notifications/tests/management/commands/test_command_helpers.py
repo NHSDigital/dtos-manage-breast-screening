@@ -102,7 +102,9 @@ class TestCommandHelpers:
             queue_instance = MagicMock()
             mock_queue.return_value = queue_instance
 
-            MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response)
+            MessageBatchHelpers.mark_batch_as_failed(
+                message_batch, mock_response, retry_count=0
+            )
 
             message_batch.refresh_from_db()
             assert message_batch.status == "failed_recoverable"

@@ -66,14 +66,6 @@ class Command(BaseCommand):
                     )
 
             except Exception as e:
-                queue.add(
-                    json.dumps(
-                        {
-                            "message_batch_id": str(message_batch.id),
-                            "retry_count": retry_count + 1,
-                        }
-                    )
-                )
                 raise CommandError(e)
         else:
             message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
