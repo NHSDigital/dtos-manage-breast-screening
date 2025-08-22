@@ -8,7 +8,11 @@ import pandas
 from azure.storage.blob import BlobServiceClient, ContainerClient
 from django.core.management.base import BaseCommand, CommandError
 
-from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.models import (
+    Appointment,
+    AppointmentStatusChoices,
+    Clinic,
+)
 
 TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
@@ -98,24 +102,35 @@ class Command(BaseCommand):
     def update_or_create_appointment(
         self, row: pandas.Series, clinic: Clinic
     ) -> tuple[Appointment, bool]:
-        defaults = {
-            "batch_id": row["BatchID"],
-            "number": row["Sequence"],
-            "status": row["Status"],
-            "episode_type": row["Episode Type"],
-            "episode_started_at": datetime.strptime(
-                row["Episode Start"], "%Y-%m-%d"
-            ).replace(tzinfo=TZ_INFO),
-        }
-        defaults.update(self.workflow_action_defaults(row))
+        appointment = Appointment.objects.filter(nbss_id=row["Appointment ID"]).first()
 
-        return Appointment.objects.update_or_create(
-            nbss_id=row["Appointment ID"],
-            nhs_number=row["NHS Num"],
-            clinic=clinic,
-            starts_at=self.appointment_date_and_time(row),
-            defaults=defaults,
-        )
+        if appointment is None:
+            return (
+                Appointment.objects.create(
+                    nbss_id=row["Appointment ID"],
+                    nhs_number=row["NHS Num"],
+                    number=row["Sequence"],
+                    batch_id=row["BatchID"],
+                    clinic=clinic,
+                    episode_started_at=datetime.strptime(
+                        row["Episode Start"], "%Y-%m-%d"
+                    ).replace(tzinfo=TZ_INFO),
+                    episode_type=row["Episode Type"],
+                    starts_at=self.appointment_date_and_time(row),
+                    status=row["Status"],
+                    **self.workflow_action_defaults(row),
+                ),
+                True,
+            )
+        elif row["Status"] == "C":
+            appointment.status = AppointmentStatusChoices.CANCELLED.value
+            appointment.cancelled_by = row["Cancelled By"]
+            appointment.cancelled_at = self.workflow_action_date_and_time(
+                row["Action Timestamp"]
+            )
+            appointment.save()
+
+        return (appointment, False)
 
     def workflow_action_defaults(self, row) -> dict:
         workflow_action_timestamp = self.workflow_action_date_and_time(
