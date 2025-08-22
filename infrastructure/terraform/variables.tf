@@ -72,6 +72,12 @@ variable "postgres_geo_redundant_backup_enabled" {
   default     = true
 }
 
+variable "postgres_prevent_destroy" {
+  type        = bool
+  default     = true
+  description = "If true, prevents the PostgreSQL flexible server from being destroyed."
+}
+
 variable "postgres_sku_name" {
   description = "Value of the PostgreSQL Flexible Server SKU name"
   default     = "B_Standard_B1ms"
