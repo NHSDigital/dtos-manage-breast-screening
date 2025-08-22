@@ -58,7 +58,9 @@ class Command(BaseCommand):
                     )
                 else:
                     MessageBatchHelpers.mark_batch_as_failed(
-                        message_batch, response, retry_count
+                        message_batch=message_batch,
+                        response=response,
+                        retry_count=(retry_count + 1),
                     )
 
                     raise CommandError(
