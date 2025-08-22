@@ -48,12 +48,11 @@ class MessageBatchHelpers:
 
     @staticmethod
     def mark_batch_as_failed(
-        message_batch: MessageBatch, response: Response, retry_count: int
+        message_batch: MessageBatch, response: Response, retry_count: int = 0
     ):
         message_batch.nhs_notify_errors = response.json()
         if response.status_code in RECOVERABLE_STATUS_CODES:
             message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
-            retry_count = 0 if not retry_count else retry_count + 1
             Queue.RetryMessageBatches().add(
                 json.dumps(
                     {
