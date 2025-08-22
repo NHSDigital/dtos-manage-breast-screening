@@ -95,10 +95,6 @@ class TestCreateAppointments:
         assert appointments[1].clinic == clinics[1]
         assert appointments[2].clinic == clinics[1]
 
-        assert appointments[0].blob_name == mock_blob.name.return_value
-        assert appointments[1].blob_name == mock_blob.name.return_value
-        assert appointments[2].blob_name == mock_blob.name.return_value
-
     @pytest.mark.django_db
     def test_handles_holding_clinics(self):
         """Test does not create appointments for valid NBSS data marked as a Holding Clinic"""

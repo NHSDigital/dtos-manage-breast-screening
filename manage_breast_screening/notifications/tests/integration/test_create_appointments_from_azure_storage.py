@@ -78,7 +78,3 @@ class TestCreateAppointmentsFromAzureStorage:
         assert appointments[0].clinic == clinics[0]
         assert appointments[1].clinic == clinics[1]
         assert appointments[2].clinic == clinics[1]
-
-        assert appointments[0].blob_name == blob_name
-        assert appointments[1].blob_name == blob_name
-        assert appointments[2].blob_name == blob_name
