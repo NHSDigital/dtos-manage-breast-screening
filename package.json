@@ -54,7 +54,7 @@
     "jest-environment-jsdom": "^30.0.5",
     "jsdom": "^26.1.0",
     "prettier": "^3.5.3",
-    "rollup": "^4.46.2",
+    "rollup": "^4.48.1",
     "sass-embedded": "^1.90.0",
     "typescript": "^5.8.3"
   },
