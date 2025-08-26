@@ -75,6 +75,13 @@ class TestQueue:
 
         mock_queue_client.receive_messages.assert_called_once_with(max_messages=100)
 
+    def test_item_method_receives_messages(self, mock_queue_client):
+        mock_queue_client.receive_message.return_value = ["this"]
+
+        assert Queue("new-queue").item() == ["this"]
+
+        mock_queue_client.receive_message.assert_called_once()
+
     def test_delete_deletes_message(self, mock_queue_client):
         Queue("new-queue").delete("this message")
 
