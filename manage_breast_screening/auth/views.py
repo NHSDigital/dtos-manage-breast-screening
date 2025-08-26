@@ -60,7 +60,7 @@ def cis2_callback(request):
     # Map CIS2 subject ('sub') to the built-in 'username' field, Django's
     # default unique identifier for users
     user, _ = User.objects.get_or_create(username=sub, defaults=defaults)
-    auth_login(request, user)
+    auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return redirect(reverse("home"))
 
 
