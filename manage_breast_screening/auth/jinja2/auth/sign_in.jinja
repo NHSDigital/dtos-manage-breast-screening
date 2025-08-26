@@ -5,9 +5,9 @@
   <div class="nhsuk-grid-column-two-thirds">
     <h1 class="nhsuk-heading-l">Sign in</h1>
 
-    <button class="nhsuk-button nhsuk-button--secondary" type="button" disabled>
-      Sign in with CIS2 (coming soon)
-    </button>
+    <a class="nhsuk-button nhsuk-button--secondary" href="{{ url('auth:cis2_sign_in') }}">
+      Sign in with CIS2
+    </a>
   </div>
 </div>
 {% endblock %}

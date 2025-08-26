@@ -10,3 +10,11 @@ DATABASE_HOST=localhost
 LOG_QUERIES=0
 CMAPI_CONSUMER_KEY=some-consumer
 PERSONAS_ENABLED=1
+
+# CIS2 / Authlib
+CIS2_SERVER_METADATA_URL=
+CIS2_CLIENT_ID=
+# Private key for private_key_jwt: provide PEM as env var (escape newlines as \n)
+CIS2_PRIVATE_KEY=
+# Scopes to request
+CIS2_SCOPES="openid profile"
