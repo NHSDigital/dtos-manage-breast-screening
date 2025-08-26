@@ -18,3 +18,6 @@ CIS2_CLIENT_ID=changeme
 CIS2_PRIVATE_KEY="paste-pem-private-key-here"
 # Public key in PEM format (escape newlines as \n)
 CIS2_PUBLIC_KEY="paste-pem-public-key-here"
+
+NOTIFICATIONS_BATCH_RETRY_LIMIT=5
+NOTIFICATIONS_BATCH_RETRY_DELAY=10
