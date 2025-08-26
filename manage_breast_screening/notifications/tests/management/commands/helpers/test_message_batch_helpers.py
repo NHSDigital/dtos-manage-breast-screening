@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from manage_breast_screening.notifications.management.commands.command_helpers import (
+from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import (
@@ -17,7 +17,7 @@ from manage_breast_screening.notifications.tests.factories import (
 )
 
 
-class TestCommandHelpers:
+class TestMessageBatchHelpers:
     @pytest.fixture
     def routing_plan_id(self):
         return str(uuid.uuid4())
