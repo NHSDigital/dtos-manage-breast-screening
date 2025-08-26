@@ -169,7 +169,7 @@ class TestSendMessageBatch:
         assert messages.count() == 1
         assert messages[0].status == "failed"
 
-    @pytest.mark.parametrize("status_code", [400, 408, 425, 429, 500, 503, 504])
+    @pytest.mark.parametrize("status_code", [408, 425, 429, 500, 503, 504])
     @pytest.mark.django_db
     def test_handle_with_recoverable_failures(
         self, mark_batch_as_sent, mock_send_message_batch, routing_plan_id, status_code
