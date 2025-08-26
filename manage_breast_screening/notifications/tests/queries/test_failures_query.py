@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from manage_breast_screening.notifications.queries.failures import Failures
+from manage_breast_screening.notifications.queries.failures_query import FailuresQuery
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     MessageFactory,
@@ -12,7 +12,7 @@ from manage_breast_screening.notifications.tests.factories import (
 )
 
 
-class TestFailures:
+class TestFailuresQuery:
     def create_message_set(
         self,
         date: datetime,
@@ -75,7 +75,7 @@ class TestFailures:
             "No reachable communication channel",
         )
 
-        results = Failures().query().all()
+        results = FailuresQuery.query()
 
         assert len(results) == 5
 
@@ -129,7 +129,7 @@ class TestFailures:
             "No reachable communication channel",
         )
 
-        results = Failures().query(the_date)
+        results = FailuresQuery.query(the_date)
 
         assert len(results) == 1
         assert results[0]["nhs_number"] == 9990001111
