@@ -5,7 +5,7 @@ import pytest
 from django.db import connection
 
 from manage_breast_screening.notifications.models import Clinic
-from manage_breast_screening.notifications.queries.aggregate import Aggregate
+from manage_breast_screening.notifications.queries.aggregate_query import AggregateQuery
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     ChannelStatusFactory,
@@ -16,7 +16,7 @@ from manage_breast_screening.notifications.tests.factories import (
 
 
 @pytest.mark.django_db
-class TestAggregate:
+class TestAggregateQuery:
     def create_appointment_set(
         self,
         date: datetime,
@@ -79,7 +79,7 @@ class TestAggregate:
             self.create_appointment_set(*d)
 
         with connection.cursor() as cursor:
-            cursor.execute(Aggregate.sql(), ("1 month",))
+            cursor.execute(AggregateQuery.sql(), ("1 month",))
             results = cursor.fetchall()
 
         df1 = date1.strftime("%Y-%m-%d")
@@ -113,7 +113,7 @@ class TestAggregate:
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(Aggregate.sql(), ("1 week",))
+            cursor.execute(AggregateQuery.sql(), ("1 week",))
             results = cursor.fetchall()
 
         assert len(results) == 1

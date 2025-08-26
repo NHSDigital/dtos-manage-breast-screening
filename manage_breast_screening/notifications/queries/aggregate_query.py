@@ -1,7 +1,7 @@
 import os
 
 
-class Aggregate:
+class AggregateQuery:
     @staticmethod
     def sql() -> str:
         sql_file_path = f"{os.path.dirname(os.path.realpath(__file__))}/aggregate.sql"
