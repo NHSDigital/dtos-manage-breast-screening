@@ -14,8 +14,6 @@ from manage_breast_screening.notifications.services.queue import Queue
 
 TZ_INFO = ZoneInfo("Europe/London")
 RECOVERABLE_STATUS_CODES = [
-    # Validation error
-    400,
     # Client side issue
     408,
     # Retried too early
