@@ -60,21 +60,18 @@ class TestCreateAppointmentsFromAzureStorage:
         assert clinics[1].address_line_5 == "MK6 5LD"
         assert clinics[1].postcode == "MK6 5LD"
 
-        assert Appointment.objects.count() == 3
+        assert Appointment.objects.count() == 2
         appointments = Appointment.objects.all()
 
-        assert appointments[0].nhs_number == 9449304424
-        assert appointments[1].nhs_number == 9449305552
-        assert appointments[2].nhs_number == 9449306621
+        assert appointments[0].nhs_number == 9449305552
+        assert appointments[1].nhs_number == 9449306621
 
-        assert appointments[0].starts_at == datetime(2025, 1, 10, 8, 45, tzinfo=TZ_INFO)
-        assert appointments[1].starts_at == datetime(
+        assert appointments[0].starts_at == datetime(
             2025, 3, 14, 13, 45, tzinfo=TZ_INFO
         )
-        assert appointments[2].starts_at == datetime(
+        assert appointments[1].starts_at == datetime(
             2025, 3, 14, 14, 45, tzinfo=TZ_INFO
         )
 
-        assert appointments[0].clinic == clinics[0]
+        assert appointments[0].clinic == clinics[1]
         assert appointments[1].clinic == clinics[1]
-        assert appointments[2].clinic == clinics[1]

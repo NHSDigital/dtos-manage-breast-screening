@@ -101,10 +101,10 @@ class Command(BaseCommand):
 
     def update_or_create_appointment(
         self, row: pandas.Series, clinic: Clinic
-    ) -> tuple[Appointment, bool]:
+    ) -> tuple[Appointment | None, bool]:
         appointment = Appointment.objects.filter(nbss_id=row["Appointment ID"]).first()
 
-        if appointment is None:
+        if self.is_new_booking(row, appointment):
             return (
                 Appointment.objects.create(
                     nbss_id=row["Appointment ID"],
@@ -118,11 +118,14 @@ class Command(BaseCommand):
                     episode_type=row["Episode Type"],
                     starts_at=self.appointment_date_and_time(row),
                     status=row["Status"],
-                    **self.workflow_action_defaults(row),
+                    booked_by=row["Booked By"],
+                    booked_at=self.workflow_action_date_and_time(
+                        row["Action Timestamp"]
+                    ),
                 ),
                 True,
             )
-        elif row["Status"] == "C":
+        elif self.is_cancelling_existing_appointment(row, appointment):
             appointment.status = AppointmentStatusChoices.CANCELLED.value
             appointment.cancelled_by = row["Cancelled By"]
             appointment.cancelled_at = self.workflow_action_date_and_time(
@@ -132,21 +135,11 @@ class Command(BaseCommand):
 
         return (appointment, False)
 
-    def workflow_action_defaults(self, row) -> dict:
-        workflow_action_timestamp = self.workflow_action_date_and_time(
-            row["Action Timestamp"]
-        )
+    def is_cancelling_existing_appointment(self, row, appointment):
+        return appointment is not None and row["Status"] == "C"
 
-        if row["Status"] == "C":
-            return {
-                "cancelled_by": row["Cancelled By"],
-                "cancelled_at": workflow_action_timestamp,
-            }
-        elif row["Status"] == "B":
-            return {
-                "booked_by": row["Booked By"],
-                "booked_at": workflow_action_timestamp,
-            }
+    def is_new_booking(self, row, appointment):
+        return appointment is None and row["Status"] == "B"
 
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
