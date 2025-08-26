@@ -15,7 +15,7 @@ fi
 
 JOB_NAME=manbrs-dbm-${ENV}
 RG_NAME=rg-manbrs-${ENV}-container-app-uks
-TIMEOUT=400
+TIMEOUT=300
 WAIT=5
 count=0
 

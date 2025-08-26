@@ -7,7 +7,7 @@ ORG_URL="$2"
 PROJECT="$3"
 
 SLEEP_TIME=15
-TIMEOUT_SECONDS=400
+TIMEOUT_SECONDS=650
 
 echo "Waiting for Azure DevOps pipeline run $RUN_ID to complete..."
 
