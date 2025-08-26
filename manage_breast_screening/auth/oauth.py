@@ -1,3 +1,6 @@
+import logging
+from urllib.parse import parse_qs
+
 from authlib.integrations.django_client import OAuth
 from authlib.jose import JsonWebKey
 from authlib.oauth2.rfc7523 import PrivateKeyJWT, private_key_jwt_sign
@@ -32,6 +35,8 @@ def get_cis2_client():
         client_kwargs={
             "scope": settings.CIS2_SCOPES,
             "token_endpoint_auth_method": "private_key_jwt",
+            # Add a DEBUG-only hook to log OIDC requests and responses
+            "hooks": {"response": [_log_response]},
         },
         client_auth_methods=[CustomPrivateKeyJWT(headers={"kid": kid})],
     )
@@ -65,3 +70,69 @@ def jwk_from_public_key():
     """
     jwk = JsonWebKey.import_key(settings.CIS2_PUBLIC_KEY, {"kty": "RSA"})
     return jwk
+
+
+def _log_response(resp, *args, **kwargs):
+    """Requests response hook: log request/response, with added formatting/spacing.
+
+    WARNING: No redaction; intended for development diagnostics only. Set
+    DEBUG=True in settings to enable.
+    """
+    if not settings.DEBUG:
+        return
+
+    logger = logging.getLogger("authlib")
+    req = resp.request
+
+    # Request body (safe decode)
+    try:
+        req_body = req.body
+        if isinstance(req_body, (bytes, bytearray)):
+            req_body = req_body.decode(errors="replace")
+    except Exception:
+        req_body = "<un-decodable>"
+
+    # Parse x-www-form-urlencoded for readability
+    parsed = None
+    content_type = (req.headers or {}).get("Content-Type", "")
+    if "application/x-www-form-urlencoded" in content_type and isinstance(
+        req_body, str
+    ):
+        try:
+            parsed = parse_qs(req_body)
+        except Exception:
+            parsed = None
+
+    # Response body (truncate)
+    try:
+        resp_text = resp.text[:5000]
+    except Exception:
+        resp_text = "<unavailable>"
+
+    # Build a single, spaced block to avoid multiple log lines interleaving
+    sep = "=" * 80
+    lines = [
+        "",
+        sep,
+        f"HTTP {req.method} {req.url}",
+        "",
+        "-- Request --",
+        f"Headers: {dict(req.headers or {})}",
+    ]
+    if parsed is not None:
+        lines.append(f"Form: {parsed}")
+    else:
+        lines.append(f"Body: {req_body}")
+    lines.extend(
+        [
+            "",
+            "-- Response --",
+            f"Status: {resp.status_code}",
+            f"Headers: {dict(resp.headers or {})}",
+            f"Body: {resp_text}",
+            sep,
+            "",
+        ]
+    )
+
+    logger.debug("\n".join(lines))
