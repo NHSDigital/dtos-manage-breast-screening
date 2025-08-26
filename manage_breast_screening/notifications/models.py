@@ -109,6 +109,9 @@ class Appointment(models.Model):
     The screening appointment used to build the message.
     """
 
+    class Meta:
+        indexes = [models.Index(fields=["nbss_id"])]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     batch_id = models.CharField(max_length=30, default="")
     nbss_id = models.CharField(max_length=30, unique=True)
