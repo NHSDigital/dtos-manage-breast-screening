@@ -29,7 +29,7 @@ class TestCreateAppointments:
 
     @pytest.mark.django_db
     def test_handle_creates_records(self):
-        """Test Appointment record creation from valid NBSS data stored in Azure storage blob"""
+        """Test Appointment creation for new booked appointments in NBSS data, stored in Azure storage blob"""
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
         subject = Command()
@@ -60,44 +60,39 @@ class TestCreateAppointments:
         assert clinics[0].address_line_5 == "MK6 5LD"
         assert clinics[0].postcode == "MK6 5LD"
 
-        assert Appointment.objects.count() == 3
+        assert Appointment.objects.count() == 2
         appointments = Appointment.objects.all()
 
-        assert appointments[0].nhs_number == 9449304424
-        assert appointments[1].nhs_number == 9449305552
-        assert appointments[2].nhs_number == 9449306621
+        assert appointments[0].nhs_number == 9449305552
+        assert appointments[1].nhs_number == 9449306621
 
-        assert appointments[0].starts_at == datetime(2025, 1, 10, 8, 45, tzinfo=TZ_INFO)
-        assert appointments[1].starts_at == datetime(
+        assert appointments[0].starts_at == datetime(
             2025, 3, 14, 13, 45, tzinfo=TZ_INFO
         )
-        assert appointments[2].starts_at == datetime(
+        assert appointments[1].starts_at == datetime(
             2025, 3, 14, 14, 45, tzinfo=TZ_INFO
         )
 
-        assert appointments[0].status == "C"
+        assert appointments[0].status == "B"
         assert appointments[1].status == "B"
-        assert appointments[2].status == "B"
 
-        assert appointments[0].batch_id == "KMKS02441"
+        assert appointments[0].batch_id == "KMK001326"
         assert appointments[1].batch_id == "KMK001326"
-        assert appointments[2].batch_id == "KMK001326"
 
         assert appointments[0].episode_type == "S"
         assert appointments[1].episode_type == "F"
-        assert appointments[2].episode_type == "F"
 
-        assert appointments[0].cancelled_by == "H"
+        assert appointments[0].booked_by == "H"
+        assert appointments[0].booked_at == datetime.strptime(
+            "20250128-154003", "%Y%m%d-%H%M%S"
+        ).replace(tzinfo=TZ_INFO)
         assert appointments[1].booked_by == "H"
-        assert appointments[2].booked_by == "H"
+        assert appointments[1].booked_at == datetime.strptime(
+            "20250128-154004", "%Y%m%d-%H%M%S"
+        ).replace(tzinfo=TZ_INFO)
 
-        assert appointments[0].clinic == clinics[0]
+        assert appointments[0].clinic == clinics[1]
         assert appointments[1].clinic == clinics[1]
-        assert appointments[2].clinic == clinics[1]
-
-        assert appointments[0].blob_name == mock_blob.name.return_value
-        assert appointments[1].blob_name == mock_blob.name.return_value
-        assert appointments[2].blob_name == mock_blob.name.return_value
 
     @pytest.mark.django_db
     def test_handles_holding_clinics(self):
@@ -124,6 +119,30 @@ class TestCreateAppointments:
 
         assert Clinic.objects.count() == 1
         assert Appointment.objects.filter(nhs_number=9449306625).first() is None
+
+    @pytest.mark.django_db
+    def test_does_not_save_cancellations_for_new_appointments(self):
+        """Test no new Appointment created if the data shows Cancelled status"""
+        today = datetime.now()
+        raw_data = open(self.fixture_file_path(UPDATED_APPOINTMENT_FILE)).read()
+        today_dirname = today.strftime("%Y-%m-%d")
+
+        subject = Command()
+
+        mock_container_client = PropertyMock(spec=ContainerClient)
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = PropertyMock(
+            return_value=f"{today_dirname}/{UPDATED_APPOINTMENT_FILE}"
+        )
+        mock_container_client.list_blobs.return_value = [mock_blob]
+        mock_container_client.get_blob_client().download_blob().readall.return_value = (
+            raw_data
+        )
+        subject.container_client = mock_container_client
+
+        subject.handle(**{"date_str": today_dirname})
+
+        assert Appointment.objects.count() == 0
 
     @pytest.mark.django_db
     def test_handle_updates_records(self):
@@ -179,6 +198,66 @@ class TestCreateAppointments:
         ).replace(tzinfo=TZ_INFO)
 
     @pytest.mark.django_db
+    def test_only_updates_cancelled_appointments(self):
+        """We should not update Appointments unless its a Cancellation"""
+
+        starts_at = datetime.strptime(
+            "20250314 1345",
+            "%Y%m%d %H%M",
+        )
+        nbss_id_no_update = "BU011-67278-RA1-DN-Y1111-1"
+        today = datetime.now()
+        today_dirname = today.strftime("%Y-%m-%d")
+        blob_name = f"{today_dirname}/{VALID_DATA_FILE}"
+
+        existing_appt_no_update = AppointmentFactory(
+            nbss_id=nbss_id_no_update,
+            nhs_number=9449305552,
+            starts_at=starts_at.replace(tzinfo=TZ_INFO),
+            clinic=ClinicFactory(
+                bso_code="KMK",
+                code="BU011",
+            ),
+            status="C",
+        )
+
+        nbss_id_cancelled = "BU003-67215-RA1-DN-Z2222-1"
+        existing_appt_to_cancel = AppointmentFactory(
+            nbss_id=nbss_id_cancelled,
+            nhs_number=9449304424,
+            starts_at=starts_at.replace(tzinfo=TZ_INFO),
+            clinic=ClinicFactory(
+                bso_code="KMK",
+                code="BU003",
+            ),
+            status="B",
+        )
+
+        raw_data = open(self.fixture_file_path(VALID_DATA_FILE)).read()
+
+        subject = Command()
+
+        mock_container_client = PropertyMock(spec=ContainerClient)
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = blob_name
+        mock_container_client.list_blobs.return_value = [mock_blob]
+        mock_container_client.get_blob_client().download_blob().readall.return_value = (
+            raw_data
+        )
+        subject.container_client = mock_container_client
+
+        subject.handle(**{"date_str": today_dirname})
+
+        # has not been updated with test file data
+        assert (
+            Appointment.objects.filter(id=existing_appt_no_update.id)[0].status == "C"
+        )
+        # has been cancelled from test file data
+        assert (
+            Appointment.objects.filter(id=existing_appt_to_cancel.id)[0].status == "C"
+        )
+
+    @pytest.mark.django_db
     def test_handle_accept_date_arg(self):
         """Test Appointment record creation when passed a specific date as argument"""
         subject = Command()
@@ -195,7 +274,7 @@ class TestCreateAppointments:
         subject.handle(**{"date_str": "2025-07-01"})
 
         assert Clinic.objects.count() == 2
-        assert Appointment.objects.count() == 3
+        assert Appointment.objects.count() == 2
 
     @pytest.mark.django_db
     def test_handle_with_invalid_date_arg(self):

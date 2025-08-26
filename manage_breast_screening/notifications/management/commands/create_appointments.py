@@ -8,7 +8,11 @@ import pandas
 from azure.storage.blob import BlobServiceClient, ContainerClient
 from django.core.management.base import BaseCommand, CommandError
 
-from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.models import (
+    Appointment,
+    AppointmentStatusChoices,
+    Clinic,
+)
 
 TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
@@ -46,13 +50,13 @@ class Command(BaseCommand):
                 data_frame = self.raw_data_to_data_frame(blob_content)
 
                 for idx, row in data_frame.iterrows():
-                    if row.get("Holding Clinic") != "Y":
+                    if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
                         if clinic_created:
                             self.stdout.write(f"{clinic} created")
 
                         appt, appt_created = self.update_or_create_appointment(
-                            row, clinic, blob.name
+                            row, clinic
                         )
                         if appt_created:
                             self.stdout.write(f"{appt} created")
@@ -62,6 +66,9 @@ class Command(BaseCommand):
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
             raise CommandError(e)
+
+    def is_not_holding_clinic(self, row):
+        return row.get("Holding Clinic") != "Y"
 
     def raw_data_to_data_frame(self, raw_data: str) -> pandas.DataFrame:
         return pandas.read_table(
@@ -93,43 +100,46 @@ class Command(BaseCommand):
         )
 
     def update_or_create_appointment(
-        self, row: pandas.Series, clinic: Clinic, blob_name: str
-    ) -> tuple[Appointment, bool]:
-        defaults = {
-            "batch_id": row["BatchID"],
-            "blob_name": blob_name,
-            "number": row["Sequence"],
-            "status": row["Status"],
-            "episode_type": row["Episode Type"],
-            "episode_started_at": datetime.strptime(
-                row["Episode Start"], "%Y-%m-%d"
-            ).replace(tzinfo=TZ_INFO),
-        }
-        defaults.update(self.workflow_action_defaults(row))
+        self, row: pandas.Series, clinic: Clinic
+    ) -> tuple[Appointment | None, bool]:
+        appointment = Appointment.objects.filter(nbss_id=row["Appointment ID"]).first()
 
-        return Appointment.objects.update_or_create(
-            nbss_id=row["Appointment ID"],
-            nhs_number=row["NHS Num"],
-            clinic=clinic,
-            starts_at=self.appointment_date_and_time(row),
-            defaults=defaults,
-        )
+        if self.is_new_booking(row, appointment):
+            return (
+                Appointment.objects.create(
+                    nbss_id=row["Appointment ID"],
+                    nhs_number=row["NHS Num"],
+                    number=row["Sequence"],
+                    batch_id=row["BatchID"],
+                    clinic=clinic,
+                    episode_started_at=datetime.strptime(
+                        row["Episode Start"], "%Y-%m-%d"
+                    ).replace(tzinfo=TZ_INFO),
+                    episode_type=row["Episode Type"],
+                    starts_at=self.appointment_date_and_time(row),
+                    status=row["Status"],
+                    booked_by=row["Booked By"],
+                    booked_at=self.workflow_action_date_and_time(
+                        row["Action Timestamp"]
+                    ),
+                ),
+                True,
+            )
+        elif self.is_cancelling_existing_appointment(row, appointment):
+            appointment.status = AppointmentStatusChoices.CANCELLED.value
+            appointment.cancelled_by = row["Cancelled By"]
+            appointment.cancelled_at = self.workflow_action_date_and_time(
+                row["Action Timestamp"]
+            )
+            appointment.save()
 
-    def workflow_action_defaults(self, row) -> dict:
-        workflow_action_timestamp = self.workflow_action_date_and_time(
-            row["Action Timestamp"]
-        )
+        return (appointment, False)
 
-        if row["Status"] == "C":
-            return {
-                "cancelled_by": row["Cancelled By"],
-                "cancelled_at": workflow_action_timestamp,
-            }
-        elif row["Status"] == "B":
-            return {
-                "booked_by": row["Booked By"],
-                "booked_at": workflow_action_timestamp,
-            }
+    def is_cancelling_existing_appointment(self, row, appointment):
+        return appointment is not None and row["Status"] == "C"
+
+    def is_new_booking(self, row, appointment):
+        return appointment is None and row["Status"] == "B"
 
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
