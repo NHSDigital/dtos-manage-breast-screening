@@ -6,7 +6,7 @@ from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from .oauth import get_cis2_client, jwk_from_private_key
+from .oauth import get_cis2_client, jwk_from_public_key
 
 
 @login_not_required
@@ -32,6 +32,8 @@ def cis2_sign_in(request):
     """Start the CIS2 OAuth2/OIDC authorization flow."""
     client = get_cis2_client()
     redirect_uri = request.build_absolute_uri(reverse("auth:cis2_callback")).rstrip("/")
+    # The acr_values param determines which authentication options are available to the user
+    # See https://digital.nhs.uk/services/care-identity-service/applications-and-services/cis2-authentication/guidance-for-developers/detailed-guidance/acr-values#acr-values
     return client.authorize_redirect(
         request, redirect_uri, acr_values="AAL2_OR_AAL3_ANY"
     )
@@ -42,9 +44,8 @@ def cis2_callback(request):
     """Handle CIS2 OAuth2/OIDC callback, create/login the Django user, then redirect home."""
     client = get_cis2_client()
     token = client.authorize_access_token(request)
-    # Authlib parses id_token automatically for OIDC and stores userinfo
-    userinfo = token.get("userinfo") or {}
-    sub = userinfo.get("sub") or token.get("sub")
+    userinfo = client.userinfo(token=token)
+    sub = userinfo.get("sub")
     if not sub:
         return HttpResponseBadRequest("Missing subject in CIS2 response")
 
@@ -68,16 +69,16 @@ def cis2_callback(request):
 def jwks(request):
     """Publish JSON Web Key Set (JWKS) with the public key used for private_key_jwt."""
     try:
-        jwk = jwk_from_private_key()
+        jwk = jwk_from_public_key()
         if not jwk:
             return JsonResponse({"keys": []})
+        # Use the thumbprint as the KID
         kid = jwk.thumbprint()
-        if not kid:
-            return JsonResponse({"keys": []})
 
         jwk_dict = jwk.as_dict()
         jwk_dict["kid"] = kid
         jwk_dict["use"] = "sig"
+        jwk_dict["alg"] = "RS512"
         return JsonResponse({"keys": [jwk_dict]})
     except Exception:
         return JsonResponse({"keys": []})
