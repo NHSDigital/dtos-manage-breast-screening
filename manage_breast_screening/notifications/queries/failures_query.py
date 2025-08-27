@@ -9,8 +9,9 @@ from manage_breast_screening.notifications.models import (
 )
 
 
-class Failures:
-    def query(self, date: datetime = datetime.today()) -> QuerySet:
+class FailuresQuery:
+    @staticmethod
+    def query(date: datetime = datetime.today()) -> QuerySet:
         tzinfo = ZoneInfo("Europe/London")
         starts_at = date.replace(hour=0, minute=0, second=0, tzinfo=tzinfo)
         ends_at = date.replace(hour=23, minute=59, second=59, tzinfo=tzinfo)
