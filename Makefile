@@ -90,7 +90,8 @@ shell:
 	poetry run ./manage.py shell
 
 _install-poetry:
-	if ! command -v poetry >/dev/null 2>&1; then \
+	@if ! poetry --version >/dev/null 2>&1; then \
+		echo "Installing poetry..."; \
 		pip install poetry; \
 	else \
 		echo "poetry already installed"; \
