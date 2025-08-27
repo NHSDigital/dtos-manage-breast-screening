@@ -53,7 +53,7 @@ locals {
   webapp_env_vars = var.env_config == "review" ? merge(
     local.base_webapp_env_vars,
     {
-      DATABASE_HOST     = module.webapp.container_app_fqdn
+      DATABASE_HOST     = module.webapp_database.container_app_fqdn
       DATABASE_NAME     = "manage_breast_screening"
       DATABASE_USER     = "admin"
       AZURE_CLIENT_ID   = ""
@@ -74,7 +74,7 @@ locals {
   webapp_db_setup_vars = var.env_config == "review" ? merge(
     local.base_db_setup_vars,
     {
-      DATABASE_HOST     = module.webapp.container_app_fqdn
+      DATABASE_HOST     = module.webapp_database.container_app_fqdn
       DATABASE_NAME     = "manage_breast_screening"
       DATABASE_USER     = "admin"
       AZURE_CLIENT_ID   = ""
