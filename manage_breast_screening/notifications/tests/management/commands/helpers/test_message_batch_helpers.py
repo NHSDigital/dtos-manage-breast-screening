@@ -1,10 +1,12 @@
 import json
+import re
 import uuid
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
+    MESSAGE_PATH_REGEX,
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import (
@@ -114,3 +116,186 @@ class TestMessageBatchHelpers:
                     {"message_batch_id": str(message_batch.id), "retry_count": 1}
                 )
             )
+
+    @patch.object(MessageBatchHelpers, "process_validation_errors")
+    @pytest.mark.django_db
+    def test_mark_batch_as_failed_with_validation_failure(
+        self, mock_validation_method, routing_plan_id
+    ):
+        """Test that message batches with validation error are handled"""
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        notify_errors = {"errors": [{"some-error": "details"}]}
+        mock_response.json.return_value = notify_errors
+        message_batch = MessageBatchFactory(routing_plan_id=routing_plan_id)
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response, 1)
+
+            mock_validation_method.assert_called_once_with(message_batch, 1)
+
+    @pytest.mark.django_db
+    def test_remove_validation_errors(self, routing_plan_id):
+        """Test that messages which are invalid are marked correctly and removed from the message batch"""
+        notify_errors = {
+            "errors": [
+                {
+                    "status": 400,
+                    "source": {
+                        "pointer": "/data/attributes/messages/1/recipient/nhsNumber"
+                    },
+                }
+            ]
+        }
+        message_1 = MessageFactory()
+        message_2 = MessageFactory()
+        message_3 = MessageFactory()
+        message_batch = MessageBatchFactory(
+            routing_plan_id=routing_plan_id,
+            messages=[message_1, message_2, message_3],
+            nhs_notify_errors=json.dumps(notify_errors),
+        )
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            MessageBatchHelpers.process_validation_errors(message_batch)
+
+        message_batch.refresh_from_db()
+        assert message_batch.status == "failed_recoverable"
+        messages = message_batch.messages.all()
+        assert messages.count() == 2
+        assert messages[0] == message_1
+        assert messages[1] == message_3
+
+        message_2.refresh_from_db()
+        assert message_2.status == "failed"
+        assert message_2.batch is None
+
+    @pytest.mark.django_db
+    def test_save_errors_to_invalid_messages(self, routing_plan_id):
+        """Test that messages which are invalid are updated with their nhs error"""
+        message_1_errors = [
+            {
+                "status": 400,
+                "source": {
+                    "pointer": "/data/attributes/messages/0/recipient/nhsNumber"
+                },
+            }
+        ]
+        message_2_errors = [
+            {
+                "status": 400,
+                "source": {
+                    "pointer": "/data/attributes/messages/1/recipient/nhsNumber"
+                },
+            },
+            {
+                "status": 400,
+                "source": {
+                    "pointer": "/data/attributes/messages/1/recipient/nhsNumber"
+                },
+            },
+        ]
+        message_3_errors = [
+            {
+                "status": 400,
+                "source": {
+                    "pointer": "/data/attributes/messages/2/recipient/nhsNumber"
+                },
+            },
+        ]
+        notify_errors = {
+            "errors": [
+                *message_1_errors,
+                *message_2_errors,
+                *message_3_errors,
+            ]
+        }
+
+        message_1 = MessageFactory()
+        message_2 = MessageFactory()
+        message_3 = MessageFactory()
+        message_4 = MessageFactory()
+        message_batch = MessageBatchFactory(
+            routing_plan_id=routing_plan_id,
+            messages=[message_1, message_2, message_3, message_4],
+            nhs_notify_errors=json.dumps(notify_errors),
+        )
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            MessageBatchHelpers.process_validation_errors(message_batch)
+
+        message_batch.refresh_from_db()
+        assert message_batch.messages.all().count() == 1
+
+        message_1.refresh_from_db()
+        assert message_1.nhs_notify_errors == json.dumps(message_1_errors)
+
+        message_2.refresh_from_db()
+        assert message_2.nhs_notify_errors == json.dumps(message_2_errors)
+
+        message_3.refresh_from_db()
+        assert message_3.nhs_notify_errors == json.dumps(message_3_errors)
+
+        message_4.refresh_from_db()
+        assert message_4.batch == message_batch
+
+    @pytest.mark.django_db
+    def test_add_altered_batch_back_to_queue(self, routing_plan_id):
+        """Test that processing validation errors adds altered message batches back to retry queue"""
+        notify_errors = {
+            "errors": [
+                {
+                    "status": 400,
+                    "source": {
+                        "pointer": "/data/attributes/messages/1/recipient/nhsNumber"
+                    },
+                }
+            ]
+        }
+        message_1 = MessageFactory()
+        message_2 = MessageFactory()
+        message_batch = MessageBatchFactory(
+            routing_plan_id=routing_plan_id,
+            messages=[message_1, message_2],
+            nhs_notify_errors=json.dumps(notify_errors),
+        )
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            MessageBatchHelpers.process_validation_errors(message_batch, 1)
+
+            queue_instance.add.assert_called_once_with(
+                json.dumps(
+                    {"message_batch_id": str(message_batch.id), "retry_count": 1}
+                )
+            )
+
+    def test_validation_errors_regex_matches_expected_pointer(self):
+        """
+        Test the regex used to match the source pointer will recognise expected result from a 400 error from NHS Notify API
+         https://digital.nhs.uk/developer/api-catalogue/nhs-notify#post-/v1/message-batches
+        """
+        api_pointer = "/data/attributes/messages/3/recipient/nhsNumber"
+
+        message_index_result = re.search(MESSAGE_PATH_REGEX, api_pointer)
+
+        assert int(message_index_result.group(0)) == 3
