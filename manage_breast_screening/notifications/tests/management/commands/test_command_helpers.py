@@ -102,13 +102,15 @@ class TestCommandHelpers:
             queue_instance = MagicMock()
             mock_queue.return_value = queue_instance
 
-            MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response)
+            MessageBatchHelpers.mark_batch_as_failed(
+                message_batch, mock_response, retry_count=1
+            )
 
             message_batch.refresh_from_db()
             assert message_batch.status == "failed_recoverable"
             assert message_batch.nhs_notify_errors == notify_errors
             queue_instance.add.assert_called_once_with(
                 json.dumps(
-                    {"message_batch_id": str(message_batch.id), "retry_count": 0}
+                    {"message_batch_id": str(message_batch.id), "retry_count": 1}
                 )
             )

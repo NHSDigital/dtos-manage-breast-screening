@@ -26,6 +26,9 @@ class Queue:
     def peek(self):
         return self.client.peek_messages()
 
+    def item(self):
+        return self.client.receive_message()
+
     @classmethod
     def MessageStatusUpdates(cls):
         return cls("message-status-updates")
