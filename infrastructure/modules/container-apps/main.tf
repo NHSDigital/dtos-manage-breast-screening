@@ -53,11 +53,11 @@ locals {
   webapp_env_vars = var.env_config == "review" ? merge(
     local.base_webapp_env_vars,
     {
-      DATABASE_HOST     = module.webapp_database.container_app_fqdn
-      DATABASE_NAME     = "manage_breast_screening"
-      DATABASE_USER     = "admin"
-      AZURE_CLIENT_ID   = ""
-      DATABASE_PASSWORD = "secret"
+      DATABASE_HOST             = module.webapp_database.container_app_fqdn
+      DATABASE_NAME             = "manage_breast_screening"
+      DATABASE_USER             = "admin"
+      AZURE_CLIENT_ID           = ""
+      DATABASE_PASSWORD         = "secret"
     }
   ) : local.base_webapp_env_vars
 
@@ -74,11 +74,9 @@ locals {
   webapp_db_setup_vars = var.env_config == "review" ? merge(
     local.base_db_setup_vars,
     {
-      DATABASE_HOST     = module.webapp_database.container_app_fqdn
-      DATABASE_NAME     = "manage_breast_screening"
-      DATABASE_USER     = "admin"
-      AZURE_CLIENT_ID   = ""
-      DATABASE_PASSWORD = "secret"
+      DATABASE_HOST             = module.webapp_database.container_app_fqdn
+      DATABASE_NAME             = "manage_breast_screening"
+      DATABASE_USER             = "admin"
     }
   ) : local.base_db_setup_vars
 }
@@ -101,15 +99,9 @@ module "webapp" {
   user_assigned_identity_ids       = [module.db_connect_identity.id]
   environment_variables            = local.webapp_env_vars
   is_web_app                       = true
-  http_port                        = 8000
+  port                             = 8000
 }
 
-
-# if using review app, then we modify the webase to use additional settings so it does not use MI.
-# app_env_values = merge(
-#   local.standard_environment_variables,
-#   local.review_environment_variables,
-# )
 
 module "webapp_database" {
   providers = {
@@ -126,16 +118,13 @@ module "webapp_database" {
   enable_auth                      = false
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = "postgres:16"
-  is_web_app                       = true
-  http_port                        = 5432
+  is_tcp_app                       = true
+  environment_variables            =
+  {
+    POSTGRES_PASSWORD         = "secret"
+    POSTGRES_HOST_AUTH_METHOD = "trust"
+    POSTGRES_USER             = "admin"
+    POSTGRES_DB               = "manage_breast_screening"
+  }
+  port                        = 5432
 }
-
-
-# if settings_dict["USER"]:
-#             conn_params["user"] = settings_dict["USER"]
-#         if settings_dict["PASSWORD"]:
-#             conn_params["password"] = settings_dict["PASSWORD"]
-#         if settings_dict["HOST"]:
-#             conn_params["host"] = settings_dict["HOST"]
-#         if settings_dict["PORT"]:
-#             conn_params["port"] = settings_dict["PORT"]

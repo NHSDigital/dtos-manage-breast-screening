@@ -14,7 +14,11 @@ resource "azurerm_management_lock" "postgres_lock" {
   notes      = "Lock applied to prevent accidental deletion of Postgres server."
 }
 
+# Only deploy the postgres database if its not a review app; please note that the postgres db will be deployed as a container
+# app when its environment config type "review"
 module "postgres" {
+  count = var.env_config != "review" ? 1 : 0
+
   source = "../dtos-devops-templates/infrastructure/modules/postgresql-flexible"
 
   # postgresql Server
@@ -64,6 +68,8 @@ module "postgres" {
 }
 
 module "db_connect_identity" {
+  count = var.env_config != "review" ? 1 : 0
+
   source              = "../dtos-devops-templates/infrastructure/modules/managed-identity"
   resource_group_name = azurerm_resource_group.main.name
   location            = var.region
