@@ -48,6 +48,28 @@ module "db_setup" {
   }
 }
 
+locals {
+  base_env_vars = {
+    ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+    DATABASE_HOST   = module.postgres.host
+    DATABASE_NAME   = module.postgres.database_names[0]
+    DATABASE_USER   = module.db_connect_identity.name
+    SSL_MODE        = "require"
+    AZURE_CLIENT_ID = module.db_connect_identity.client_id
+  }
+
+  env_vars = var.env_config == "review" ? merge(
+    local.base_env_vars,
+    {
+      DATABASE_HOST = module.webapp.container_app_fqdn
+      DATABASE_NAME =
+      DATABASE_USER =
+      AZURE_CLIENT_ID =
+      DATABASE_PASSWORD = "secret"
+    }
+  ) : local.base_env_vars
+}
+
 module "webapp" {
   providers = {
     azurerm     = azurerm
@@ -64,14 +86,53 @@ module "webapp" {
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = var.docker_image
   user_assigned_identity_ids       = [module.db_connect_identity.id]
+  environment_variables = local.env_vars
+  is_web_app = true
+  http_port  = 8000
+}
+
+
+# if using review app, then we modify the webase to use additional settings so it does not use MI.
+# app_env_values = merge(
+#   local.standard_environment_variables,
+#   local.review_environment_variables,
+# )
+
+module "webapp_database" {
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
+  }
+  source                           = "../dtos-devops-templates/infrastructure/modules/container-app"
+  name                             = "${var.app_short_name}-db-${var.environment}"
+  container_app_environment_id     = var.container_app_environment_id
+  resource_group_name              = azurerm_resource_group.main.name
+  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
+  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
+  enable_auth                      = false
+  app_key_vault_id                 = var.app_key_vault_id
+  docker_image                     = var.docker_image
+  user_assigned_identity_ids       = [module.db_connect_identity.id]
   environment_variables = {
-    ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
+    ALLOWED_HOSTS     = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+    DATABASE_HOST     = module.postgres.host
+    DATABASE_NAME     = module.postgres.database_names[0]
+    DATABASE_USER     = module.db_connect_identity.name
+    DATABASE_PASSWORD = "default"
+    SSL_MODE          = "require"
+    AZURE_CLIENT_ID   = module.db_connect_identity.client_id
   }
   is_web_app = true
   http_port  = 8000
 }
+
+
+# if settings_dict["USER"]:
+#             conn_params["user"] = settings_dict["USER"]
+#         if settings_dict["PASSWORD"]:
+#             conn_params["password"] = settings_dict["PASSWORD"]
+#         if settings_dict["HOST"]:
+#             conn_params["host"] = settings_dict["HOST"]
+#         if settings_dict["PORT"]:
+#             conn_params["port"] = settings_dict["PORT"]
