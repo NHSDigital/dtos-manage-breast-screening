@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -27,6 +28,8 @@ RECOVERABLE_STATUS_CODES = [
     # Issue with backend services
     504,
 ]
+VALIDATION_ERROR_STATUS_CODE = 400
+MESSAGE_PATH_REGEX = r"(?<=\/messages\/)(\d*)(?=\/)"
 
 
 class MessageBatchHelpers:
@@ -59,6 +62,8 @@ class MessageBatchHelpers:
                     }
                 )
             )
+        elif response.status_code == VALIDATION_ERROR_STATUS_CODE:
+            MessageBatchHelpers.process_validation_errors(message_batch, retry_count)
         else:
             message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
         message_batch.save()
@@ -66,3 +71,29 @@ class MessageBatchHelpers:
         for message in message_batch.messages.all():
             message.status = MessageStatusChoices.FAILED.value
             message.save()
+
+    @staticmethod
+    def process_validation_errors(message_batch: MessageBatch, retry_count: int = 0):
+        message_batch_errors = json.loads(message_batch.nhs_notify_errors).get("errors")
+
+        for error in message_batch_errors:
+            message_index_result = re.search(
+                MESSAGE_PATH_REGEX, error["source"]["pointer"]
+            )
+            if message_index_result is not None:
+                message_index = int(message_index_result.group(0))
+                message = message_batch.messages.all()[message_index]
+                message.batch = None
+                message.status = MessageStatusChoices.FAILED.value
+                message.save()
+
+        message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
+        message_batch.save()
+        Queue.RetryMessageBatches().add(
+            json.dumps(
+                {
+                    "message_batch_id": str(message_batch.id),
+                    "retry_count": retry_count,
+                }
+            )
+        )
