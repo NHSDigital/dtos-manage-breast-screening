@@ -35,9 +35,9 @@ module "postgres" {
   monitor_diagnostic_setting_postgresql_server_enabled_logs = ["PostgreSQLLogs", "PostgreSQLFlexSessions", "PostgreSQLFlexQueryStoreRuntime", "PostgreSQLFlexQueryStoreWaitStats", "PostgreSQLFlexTableStats", "PostgreSQLFlexDatabaseXacts"]
   monitor_diagnostic_setting_postgresql_server_metrics      = ["AllMetrics"]
 
-  sku_name        = var.postgres_sku_name
-  storage_mb      = var.postgres_storage_mb
-  storage_tier    = var.postgres_storage_tier
+  sku_name     = var.postgres_sku_name
+  storage_mb   = var.postgres_storage_mb
+  storage_tier = var.postgres_storage_tier
 
   server_version = "16"
   tenant_id      = data.azurerm_client_config.current.tenant_id
