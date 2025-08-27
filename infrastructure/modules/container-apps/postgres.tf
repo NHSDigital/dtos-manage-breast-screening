@@ -6,6 +6,8 @@ data "azurerm_private_dns_zone" "postgres" {
 }
 
 module "postgres" {
+  count = var.env_config != "review" ? 1 : 0
+
   source = "../dtos-devops-templates/infrastructure/modules/postgresql-flexible"
 
   # postgresql Server
@@ -55,6 +57,8 @@ module "postgres" {
 }
 
 module "db_connect_identity" {
+  count = var.env_config != "review" ? 1 : 0
+
   source              = "../dtos-devops-templates/infrastructure/modules/managed-identity"
   resource_group_name = azurerm_resource_group.main.name
   location            = var.region
