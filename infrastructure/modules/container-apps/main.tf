@@ -119,8 +119,7 @@ module "webapp_database" {
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = "postgres:16"
   is_tcp_app                       = true
-  environment_variables            =
-  {
+  environment_variables            =  {
     POSTGRES_PASSWORD         = "secret"
     POSTGRES_HOST_AUTH_METHOD = "trust"
     POSTGRES_USER             = "admin"
