@@ -57,22 +57,44 @@ class TestAggregateQuery:
             "letter": "validation_failed",
         }
 
+        df1 = date1.strftime("%Y-%m-%d")
+        df2 = date2.strftime("%Y-%m-%d")
+
         test_data = [
-            [date1, clinic1, "S", "delivered", nhsapp_read],
-            [date1, clinic2, "S", "delivered", nhsapp_read],
-            [date1, clinic2, "F", "delivered", nhsapp_read],
-            [date1, clinic2, "F", "delivered", nhsapp_read],
-            [date1, clinic1, "S", "delivered", sms_delivered],
-            [date1, clinic2, "F", "delivered", sms_delivered],
+            # Date 1
+            # BU000, R, 1, 0, 0, 0, 1
             [date1, clinic1, "R", "failed", failed],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic1, "R", "delivered", letter_sent],
-            [date2, clinic1, "R", "delivered", letter_sent],
+            # BU000, S, 2, 1, 1, 0, 0
+            [date1, clinic1, "S", "delivered", nhsapp_read],
+            [date1, clinic1, "S", "delivered", sms_delivered],
+            # BU001, F, 3, 2, 1, 0, 0
+            [date1, clinic2, "F", "delivered", nhsapp_read],
+            [date1, clinic2, "F", "delivered", nhsapp_read],
+            [date1, clinic2, "F", "delivered", sms_delivered],
+            # BU001, S, 1, 1, 0, 0, 0
+            [date1, clinic2, "S", "delivered", nhsapp_read],
+            # Date 2
+            # BU000, F, 1, 0, 0, 0, 1
             [date2, clinic1, "F", "failed", failed],
+            # BU000, R, 2, 0, 0, 2, 0
+            [date2, clinic1, "R", "delivered", letter_sent],
+            [date2, clinic1, "R", "delivered", letter_sent],
+            # BU001, F, 5, 5, 0, 0, 0
+            [date2, clinic2, "F", "delivered", nhsapp_read],
+            [date2, clinic2, "F", "delivered", nhsapp_read],
+            [date2, clinic2, "F", "delivered", nhsapp_read],
+            [date2, clinic2, "F", "delivered", nhsapp_read],
+            [date2, clinic2, "F", "delivered", nhsapp_read],
+        ]
+
+        expectations = [
+            [df1, "ABC", "BU000", "BSU 1", "R", 1, 0, 0, 0, 1],
+            [df1, "ABC", "BU000", "BSU 1", "S", 2, 1, 1, 0, 0],
+            [df1, "XYZ", "BU001", "BSU 2", "F", 3, 2, 1, 0, 0],
+            [df1, "XYZ", "BU001", "BSU 2", "S", 1, 1, 0, 0, 0],
+            [df2, "ABC", "BU000", "BSU 1", "F", 1, 0, 0, 0, 1],
+            [df2, "ABC", "BU000", "BSU 1", "R", 2, 0, 0, 2, 0],
+            [df2, "XYZ", "BU001", "BSU 2", "F", 5, 5, 0, 0, 0],
         ]
 
         for d in test_data:
@@ -81,19 +103,6 @@ class TestAggregateQuery:
         with connection.cursor() as cursor:
             cursor.execute(AggregateQuery.sql(), ("1 month",))
             results = cursor.fetchall()
-
-        df1 = date1.strftime("%Y-%m-%d")
-        df2 = date2.strftime("%Y-%m-%d")
-
-        expectations = [
-            [df1, "ABC", "BU000", "BSU 1", "R", 0, 0, 0, 0, 1],
-            [df1, "ABC", "BU000", "BSU 1", "S", 2, 1, 1, 0, 0],
-            [df1, "XYZ", "BU001", "BSU 2", "F", 3, 2, 1, 0, 0],
-            [df1, "XYZ", "BU001", "BSU 2", "S", 1, 1, 0, 0, 0],
-            [df2, "ABC", "BU000", "BSU 1", "F", 0, 0, 0, 0, 1],
-            [df2, "ABC", "BU000", "BSU 1", "R", 2, 0, 0, 2, 0],
-            [df2, "XYZ", "BU001", "BSU 2", "F", 5, 5, 0, 0, 0],
-        ]
 
         for idx, res in enumerate(results):
             assert expectations[idx] == list(res)

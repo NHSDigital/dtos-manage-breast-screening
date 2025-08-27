@@ -11,7 +11,7 @@ SELECT  TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS appointment_date,
 FROM   notifications_appointment appt
 JOIN   notifications_clinic cl ON appt.clinic_id = cl.id
 LEFT OUTER JOIN notifications_message msg_snt ON msg_snt.appointment_id = appt.id
-AND    msg_snt.status IN ('sending', 'delivered')
+AND    msg_snt.status IN ('sending', 'delivered', 'failed')
 JOIN   notifications_message msg ON msg.appointment_id = appt.id
 LEFT OUTER JOIN notifications_messagestatus msg_fld ON msg_fld.message_id = msg.id
 AND    msg_fld.status = 'failed'
