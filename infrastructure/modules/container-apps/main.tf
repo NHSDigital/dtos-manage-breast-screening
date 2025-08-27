@@ -37,19 +37,11 @@ module "db_setup" {
   docker_image               = var.docker_image
   user_assigned_identity_ids = [module.db_connect_identity.id]
 
-  environment_variables = {
-    DATABASE_HOST    = module.postgres.host
-    DATABASE_NAME    = module.postgres.database_names[0]
-    DATABASE_USER    = module.db_connect_identity.name
-    SSL_MODE         = "require"
-    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
-    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-    DJANGO_ENV       = var.env_config
-  }
+  environment_variables = local.webapp_db_setup_vars
 }
 
 locals {
-  base_env_vars = {
+  base_webapp_env_vars = {
     ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
     DATABASE_HOST   = module.postgres.host
     DATABASE_NAME   = module.postgres.database_names[0]
@@ -58,16 +50,37 @@ locals {
     AZURE_CLIENT_ID = module.db_connect_identity.client_id
   }
 
-  env_vars = var.env_config == "review" ? merge(
-    local.base_env_vars,
+  webapp_env_vars = var.env_config == "review" ? merge(
+    local.base_webapp_env_vars,
     {
-      DATABASE_HOST = module.webapp.container_app_fqdn
-      DATABASE_NAME =
-      DATABASE_USER =
-      AZURE_CLIENT_ID =
+      DATABASE_HOST     = module.webapp.container_app_fqdn
+      DATABASE_NAME     = "manage_breast_screening"
+      DATABASE_USER     = "admin"
+      AZURE_CLIENT_ID   = ""
       DATABASE_PASSWORD = "secret"
     }
-  ) : local.base_env_vars
+  ) : local.base_webapp_env_vars
+
+  base_db_setup_vars = {
+    DATABASE_HOST    = module.postgres.host
+    DATABASE_NAME    = module.postgres.database_names[0]
+    DATABASE_USER    = module.db_connect_identity.name
+    SSL_MODE         = "require"
+    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
+    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
+    DJANGO_ENV       = var.env_config
+  }
+
+  webapp_db_setup_vars = var.env_config == "review" ? merge(
+    local.base_db_setup_vars,
+    {
+      DATABASE_HOST     = module.webapp.container_app_fqdn
+      DATABASE_NAME     = "manage_breast_screening"
+      DATABASE_USER     = "admin"
+      AZURE_CLIENT_ID   = ""
+      DATABASE_PASSWORD = "secret"
+    }
+  ) : local.base_db_setup_vars
 }
 
 module "webapp" {
@@ -86,9 +99,9 @@ module "webapp" {
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = var.docker_image
   user_assigned_identity_ids       = [module.db_connect_identity.id]
-  environment_variables = local.env_vars
-  is_web_app = true
-  http_port  = 8000
+  environment_variables            = local.webapp_env_vars
+  is_web_app                       = true
+  http_port                        = 8000
 }
 
 
@@ -112,19 +125,9 @@ module "webapp_database" {
   infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
   enable_auth                      = false
   app_key_vault_id                 = var.app_key_vault_id
-  docker_image                     = var.docker_image
-  user_assigned_identity_ids       = [module.db_connect_identity.id]
-  environment_variables = {
-    ALLOWED_HOSTS     = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
-    DATABASE_HOST     = module.postgres.host
-    DATABASE_NAME     = module.postgres.database_names[0]
-    DATABASE_USER     = module.db_connect_identity.name
-    DATABASE_PASSWORD = "default"
-    SSL_MODE          = "require"
-    AZURE_CLIENT_ID   = module.db_connect_identity.client_id
-  }
-  is_web_app = true
-  http_port  = 8000
+  docker_image                     = "postgres:16"
+  is_web_app                       = true
+  http_port                        = 5432
 }
 
 
