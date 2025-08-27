@@ -37,12 +37,16 @@ class TestAggregateQuery:
         return appt
 
     def test_query_aggregates_appointments_and_cascade_counts(self):
-        clinic1 = ClinicFactory(code="BU000", bso_code="ABC", name="BSU 1")
-        clinic2 = ClinicFactory(code="BU001", bso_code="XYZ", name="BSU 2")
+        clinic1 = ClinicFactory(code="BU001", bso_code="BSO1", name="BSU 1")
+        clinic2 = ClinicFactory(code="BU002", bso_code="BSO2", name="BSU 2")
+
         date1 = datetime.today() - timedelta(days=10)
         date1.replace(tzinfo=ZoneInfo("Europe/London"))
+        df1 = date1.strftime("%Y-%m-%d")
+
         date2 = datetime.today() - timedelta(days=15)
         date2.replace(tzinfo=ZoneInfo("Europe/London"))
+        df2 = date2.strftime("%Y-%m-%d")
 
         nhsapp_read = {"nhsapp": "read"}
         sms_delivered = {"nhsapp": "unnotified", "sms": "delivered"}
@@ -56,9 +60,6 @@ class TestAggregateQuery:
             "sms": "permanent_failure",
             "letter": "validation_failed",
         }
-
-        df1 = date1.strftime("%Y-%m-%d")
-        df2 = date2.strftime("%Y-%m-%d")
 
         test_data = [
             # Date 1
@@ -88,13 +89,13 @@ class TestAggregateQuery:
         ]
 
         expectations = [
-            [df1, "ABC", "BU000", "BSU 1", "R", 1, 0, 0, 0, 1],
-            [df1, "ABC", "BU000", "BSU 1", "S", 2, 1, 1, 0, 0],
-            [df1, "XYZ", "BU001", "BSU 2", "F", 3, 2, 1, 0, 0],
-            [df1, "XYZ", "BU001", "BSU 2", "S", 1, 1, 0, 0, 0],
-            [df2, "ABC", "BU000", "BSU 1", "F", 1, 0, 0, 0, 1],
-            [df2, "ABC", "BU000", "BSU 1", "R", 2, 0, 0, 2, 0],
-            [df2, "XYZ", "BU001", "BSU 2", "F", 5, 5, 0, 0, 0],
+            [df1, "BSO1", "BU001", "BSU 1", "R", 1, 0, 0, 0, 1],
+            [df1, "BSO1", "BU001", "BSU 1", "S", 2, 1, 1, 0, 0],
+            [df1, "BSO2", "BU002", "BSU 2", "F", 3, 2, 1, 0, 0],
+            [df1, "BSO2", "BU002", "BSU 2", "S", 1, 1, 0, 0, 0],
+            [df2, "BSO1", "BU001", "BSU 1", "F", 1, 0, 0, 0, 1],
+            [df2, "BSO1", "BU001", "BSU 1", "R", 2, 0, 0, 2, 0],
+            [df2, "BSO2", "BU002", "BSU 2", "F", 5, 5, 0, 0, 0],
         ]
 
         for d in test_data:
