@@ -24,12 +24,15 @@ class TestCIS2SignIn(SystemTestCase):
                     "access_token": "fake-access-token",
                     "token_type": "Bearer",
                     "id_token": "fake-id-token",
-                    "userinfo": {
-                        "sub": "cis2-user-1",
-                        "email": "jane.doe@example.com",
-                        "given_name": "Jane",
-                        "family_name": "Doe",
-                    },
+                }
+
+            def userinfo(self, token=None):
+                # Simulate retrieving user info from the OIDC provider
+                return {
+                    "sub": "cis2-user-1",
+                    "email": "jane.doe@example.com",
+                    "given_name": "Jane",
+                    "family_name": "Doe",
                 }
 
         # Patch the view-layer reference so both sign-in and callback use the fake

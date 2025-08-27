@@ -12,9 +12,9 @@ CMAPI_CONSUMER_KEY=some-consumer
 PERSONAS_ENABLED=1
 
 # CIS2 / Authlib
-CIS2_SERVER_METADATA_URL=
-CIS2_CLIENT_ID=
-# Private key for private_key_jwt: provide PEM as env var (escape newlines as \n)
-CIS2_PRIVATE_KEY=
-# Scopes to request
-CIS2_SCOPES="openid profile"
+CIS2_SERVER_METADATA_URL=changeme
+CIS2_CLIENT_ID=changeme
+# Private key in PEM format (escape newlines as \n)
+CIS2_PRIVATE_KEY="paste-pem-private-key-here"
+# Public key in PEM format (escape newlines as \n)
+CIS2_PUBLIC_KEY="paste-pem-public-key-here"
