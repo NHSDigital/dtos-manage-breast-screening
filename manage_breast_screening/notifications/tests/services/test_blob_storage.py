@@ -30,7 +30,7 @@ class TestBlobStorage:
 
         subject = BlobStorage()
         subject.service_client = mock_service_client
-        subject.find_or_create_container()
+        subject.find_or_create_container("test-container")
 
         mock_service_client.get_container_client.assert_called_once_with(
             "test-container"
@@ -42,7 +42,7 @@ class TestBlobStorage:
 
         subject = BlobStorage()
         subject.service_client = mock_service_client
-        subject.find_or_create_container()
+        subject.find_or_create_container("test-container")
 
         mock_service_client.create_container.assert_called_once_with("test-container")
 
@@ -63,6 +63,33 @@ class TestBlobStorage:
             blob_type="BlockBlob",
             content_settings=ContentSettings(
                 content_type="application/dat", content_encoding="ASCII"
+            ),
+            overwrite=True,
+        )
+
+    def test_add_blob_to_storage_with_additional_args(self):
+        """Test that the blob is added to the specified container with the correct content type"""
+
+        mock_container_client = MagicMock(spec=ContainerClient)
+        mock_blob_client = MagicMock(spec=BlobClient)
+        mock_container_client.get_blob_client.return_value = mock_blob_client
+
+        subject = BlobStorage()
+        subject.find_or_create_container = MagicMock(return_value=mock_container_client)
+        subject.add(
+            "test-blob.csv",
+            "test,content",
+            content_type="text/csv",
+            container_name="test-csv-container",
+        )
+
+        subject.find_or_create_container.assert_called_once_with("test-csv-container")
+        mock_container_client.get_blob_client.assert_called_once_with("test-blob.csv")
+        mock_blob_client.upload_blob.assert_called_once_with(
+            "test,content",
+            blob_type="BlockBlob",
+            content_settings=ContentSettings(
+                content_type="text/csv", content_encoding="ASCII"
             ),
             overwrite=True,
         )

@@ -12,11 +12,8 @@ class BlobStorage:
         connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
         return BlobServiceClient.from_connection_string(connection_string)
 
-    def find_or_create_container(self) -> ContainerClient:
+    def find_or_create_container(self, container_name: str) -> ContainerClient:
         """Find or create an Azure Storage Blob container"""
-
-        container_name = os.getenv("BLOB_CONTAINER_NAME")
-
         try:
             return self.service_client.create_container(container_name)
         except ResourceExistsError:
@@ -26,12 +23,15 @@ class BlobStorage:
         self,
         filename: str,
         content: str,
+        container_name: str | None = None,
         content_encoding="ASCII",
         content_type="application/dat",
     ) -> dict[str, Any]:
         """Write a file to the configured blob container"""
 
-        container = self.find_or_create_container()
+        if not container_name:
+            container_name = os.getenv("BLOB_CONTAINER_NAME")
+        container = self.find_or_create_container(container_name)
         blob_client = container.get_blob_client(filename)
         return blob_client.upload_blob(
             content,
