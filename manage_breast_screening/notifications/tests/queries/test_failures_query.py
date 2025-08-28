@@ -74,6 +74,7 @@ class TestFailuresQuery:
             "failed",
             "No reachable communication channel",
         )
+        today_formatted = datetime.today().strftime("%Y-%m-%d")
 
         results = FailuresQuery.query()
 
@@ -81,37 +82,37 @@ class TestFailuresQuery:
 
         assert results[0]["nhs_number"] == 9990001111
         assert results[0]["appointment_date"] == appt1.starts_at
-        assert results[0]["episode_type"] == appt1.episode_type
+        assert results[0]["episode_type"] == "Self referral"
         assert results[0]["clinic_code"] == appt1.clinic.code
-        assert is_today(results[0]["failure_date"])
+        assert results[0]["failure_date"] == today_formatted
         assert results[0]["failure_reason"] == "No reachable communication channel"
 
         assert results[1]["nhs_number"] == 9990001112
         assert results[1]["appointment_date"] == appt2.starts_at
-        assert results[1]["episode_type"] == appt2.episode_type
+        assert results[1]["episode_type"] == "Routine first call"
         assert results[1]["clinic_code"] == appt2.clinic.code
-        assert is_today(results[1]["failure_date"])
+        assert results[1]["failure_date"] == today_formatted
         assert results[1]["failure_reason"] == "Patient has an exit code"
 
         assert results[2]["nhs_number"] == 9990001113
         assert results[2]["appointment_date"] == appt3.starts_at
-        assert results[2]["episode_type"] == appt3.episode_type
+        assert results[2]["episode_type"] == "Routine recall"
         assert results[2]["clinic_code"] == appt3.clinic.code
-        assert is_today(results[2]["failure_date"])
+        assert results[2]["failure_date"] == today_formatted
         assert results[2]["failure_reason"] == "Patient is formally dead"
 
         assert results[3]["nhs_number"] == 9990001114
         assert results[3]["appointment_date"] == appt4.starts_at
-        assert results[3]["episode_type"] == appt4.episode_type
+        assert results[3]["episode_type"] == "Routine recall"
         assert results[3]["clinic_code"] == appt4.clinic.code
-        assert is_today(results[3]["failure_date"])
+        assert results[3]["failure_date"] == today_formatted
         assert results[3]["failure_reason"] == "Patient is informally dead"
 
         assert results[4]["nhs_number"] == 9990001115
         assert results[4]["appointment_date"] == appt5.starts_at
-        assert results[4]["episode_type"] == appt5.episode_type
+        assert results[4]["episode_type"] == "Self referral"
         assert results[4]["clinic_code"] == appt5.clinic.code
-        assert is_today(results[4]["failure_date"])
+        assert results[4]["failure_date"] == today_formatted
         assert results[4]["failure_reason"] == "No reachable communication channel"
 
     @pytest.mark.django_db
