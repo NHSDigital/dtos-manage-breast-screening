@@ -38,7 +38,6 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Call deployment pipeline
-        if: ${{ inputs.pr_number && inputs.pr_number != '' }}
         run: |
           echo "Starting Azure devops pipeline \"Deploy to Azure - ${{ matrix.environment }}\"..."
           RUN_ID=$(az pipelines run \
