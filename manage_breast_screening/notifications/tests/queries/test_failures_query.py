@@ -133,3 +133,16 @@ class TestFailuresQuery:
 
         assert len(results) == 1
         assert results[0]["nhs_number"] == 9990001111
+
+    def test_failures_query_columns(self):
+        assert FailuresQuery.columns() == [
+            "NHS number",
+            "Appointment date",
+            "Clinic code",
+            "Episode type",
+            "Failure date",
+            "Failure reason",
+        ]
+
+    def test_failures_query_sql(self):
+        assert 'SELECT "notifications_appointment"."nhs_number"' in FailuresQuery.sql()

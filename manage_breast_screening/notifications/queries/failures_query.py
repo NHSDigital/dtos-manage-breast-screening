@@ -10,6 +10,15 @@ from manage_breast_screening.notifications.models import (
 
 
 class FailuresQuery:
+    COLUMNS = [
+        "NHS number",
+        "Appointment date",
+        "Clinic code",
+        "Episode type",
+        "Failure date",
+        "Failure reason",
+    ]
+
     @staticmethod
     def query(date: datetime = datetime.today()) -> QuerySet:
         tzinfo = ZoneInfo("Europe/London")
@@ -39,3 +48,11 @@ class FailuresQuery:
                 failure_reason=F("description"),
             )
         )
+
+    @classmethod
+    def sql(cls, date: datetime = datetime.today()) -> str:
+        return str(cls.query(date).query)
+
+    @classmethod
+    def columns(cls) -> list:
+        return cls.COLUMNS

@@ -127,3 +127,17 @@ class TestAggregateQuery:
             results = cursor.fetchall()
 
         assert len(results) == 1
+
+    def test_aggregate_columns(self):
+        assert AggregateQuery.columns() == [
+            "Appointment date",
+            "BSO code",
+            "Clinic code",
+            "Clinic name",
+            "Episode type",
+            "Notifications sent",
+            "NHS app messages read",
+            "SMS messages delivered",
+            "Letters sent",
+            "Notifications failed",
+        ]
