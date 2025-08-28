@@ -7,4 +7,3 @@ postgres_geo_redundant_backup_enabled = false
 protect_keyvault                      = false
 vnet_address_space                    = "10.142.0.0/16"
 personas_enabled                      = true
-postgres_prevent_destroy              = false

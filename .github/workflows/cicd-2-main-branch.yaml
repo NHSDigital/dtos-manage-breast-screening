@@ -2,7 +2,7 @@ name: 'CI/CD main branch'
 
 on:
   push:
-    branches: [fix-pipeline-review-dev]
+    branches: [main]
 
 jobs:
   metadata:
@@ -33,9 +33,54 @@ jobs:
           echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "version=${GITHUB_REF}"
 
+  # Scan the commit
+  commit-stage:
+    name: 'Commit stage'
+    needs: [metadata]
+    uses: ./.github/workflows/stage-1-commit.yaml
+    with:
+      build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
+      build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
+      build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
+      nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
+      python_version: '${{ needs.metadata.outputs.python_version }}'
+      terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
+      version: '${{ needs.metadata.outputs.version }}'
+    secrets: inherit
+
+  # Test the integrated code
+  test-stage:
+    name: 'Test stage'
+    needs: [metadata]
+    uses: ./.github/workflows/stage-2-test.yaml
+    with:
+      build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
+      build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
+      build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
+      nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
+      python_version: '${{ needs.metadata.outputs.python_version }}'
+      terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
+      version: '${{ needs.metadata.outputs.version }}'
+    secrets: inherit
+
+  # Build the final artefact with the integrated code
+  build-stage: # Recommended maximum execution time is 3 minutes
+    name: 'Build stage'
+    needs: [metadata, commit-stage, test-stage]
+    uses: ./.github/workflows/stage-3-build.yaml
+    with:
+      build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
+      build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
+      build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
+      nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
+      python_version: '${{ needs.metadata.outputs.python_version }}'
+      terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
+      version: '${{ needs.metadata.outputs.version }}'
+    secrets: inherit
+
   deploy-stage:
     name: Deploy stage
-    needs: [metadata]
+    needs: [build-stage]
     permissions:
       id-token: write
     uses: ./.github/workflows/stage-4-deploy.yaml

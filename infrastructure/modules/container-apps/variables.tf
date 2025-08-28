@@ -72,12 +72,6 @@ variable "postgres_backup_retention_days" {
   type        = number
 }
 
-variable "postgres_prevent_destroy" {
-  type        = bool
-  default     = true
-  description = "If true, prevents the PostgreSQL flexible server from being destroyed."
-}
-
 variable "postgres_geo_redundant_backup_enabled" {
   description = "Whether geo-redundant backup is enabled for the PostgreSQL Flexible Server."
   type        = bool
