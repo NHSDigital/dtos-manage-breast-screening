@@ -54,15 +54,15 @@ locals {
     AZURE_CLIENT_ID = module.db_connect_identity.client_id
   }
 
-  base_db_setup_vars = {
-    DATABASE_HOST    = module.postgres.host
-    DATABASE_NAME    = module.postgres.database_names[0]
-    DATABASE_USER    = module.db_connect_identity.name
-    SSL_MODE         = "require"
-    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
-    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-    DJANGO_ENV       = var.env_config
-  }
+  # base_db_setup_vars = {
+  #   DATABASE_HOST    = module.postgres.host
+  #   DATABASE_NAME    = module.postgres.database_names[0]
+  #   DATABASE_USER    = module.db_connect_identity.name
+  #   SSL_MODE         = "require"
+  #   AZURE_CLIENT_ID  = module.db_connect_identity.client_id
+  #   PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
+  #   DJANGO_ENV       = var.env_config
+  # }
 
   db_setup_env_vars = var.env_config == "review" ? {
     DATABASE_HOST    = module.webapp_database.container_app_fqdn
