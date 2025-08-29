@@ -68,7 +68,7 @@ variable "log_analytics_workspace_audit_id" {
 }
 
 variable "deploy_database_as_container" {
-  description = "Whether to deploy the database as a container or not."
+  description = "Whether to deploy the database as a container or or as an Azure postgres flexible server."
   type        = bool
   default     = false
 }

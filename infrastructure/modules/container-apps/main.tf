@@ -37,54 +37,58 @@ module "db_setup" {
 }
 
 locals {
+  # Common environment variables for all scenarios
+  common_env = {
+    SSL_MODE         = "require"
+    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
+    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
+    DJANGO_ENV       = var.env_config
+  }
 
-  webapp_env_vars = var.deploy_database_as_container ? {
-    ALLOWED_HOSTS     = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+  # Specific overrides when using a container-based DB
+  container_db_env = {
+    DATABASE_HOST = module.webapp_database.container_app_fqdn
+    DATABASE_NAME = "manage_breast_screening"
+    DATABASE_USER = "admin"
+  }
+
+  # Specific overrides when using a serverless/postgres DB
+  vm_db_env = {
+    DATABASE_HOST = module.postgres.host
+    DATABASE_NAME = module.postgres.database_names[0]
+    DATABASE_USER = module.db_connect_identity.name
+  }
+
+  db_setup_env_vars = merge(
+    local.common_env,
+    var.deploy_database_as_container ? local.container_db_env : local.vm_db_env
+  )
+
+  # For the webapp, ALLOWED_HOSTS differs from db, so include separately
+  web_base_env = {
+    ALLOWED_HOSTS = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+  }
+  container_web_env = {
     DATABASE_HOST     = module.webapp_database.container_app_fqdn
     DATABASE_NAME     = "manage_breast_screening"
     DATABASE_USER     = "admin"
-    SSL_MODE          = "require"
     DATABASE_PASSWORD = "secret"
-    } : {
-    ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
   }
-
-  # base_db_setup_vars = {
-  #   DATABASE_HOST    = module.postgres.host
-  #   DATABASE_NAME    = module.postgres.database_names[0]
-  #   DATABASE_USER    = module.db_connect_identity.name
-  #   SSL_MODE         = "require"
-  #   AZURE_CLIENT_ID  = module.db_connect_identity.client_id
-  #   PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-  #   DJANGO_ENV       = var.env_config
-  # }
-
-  db_setup_env_vars = var.deploy_database_as_container ? {
-    DATABASE_HOST    = module.webapp_database.container_app_fqdn
-    DATABASE_NAME    = "manage_breast_screening"
-    DATABASE_USER    = "admin"
-    SSL_MODE         = "require"
-    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
-    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-    DJANGO_ENV       = var.env_config
-    } : {
-    DATABASE_HOST    = module.postgres.host
-    DATABASE_NAME    = module.postgres.database_names[0]
-    DATABASE_USER    = module.db_connect_identity.name
-    SSL_MODE         = "require"
-    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
-    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-    DJANGO_ENV       = var.env_config
+  vm_web_env = {
+    DATABASE_HOST = module.postgres.host
+    DATABASE_NAME = module.postgres.database_names[0]
+    DATABASE_USER = module.db_connect_identity.name
   }
-
+  webapp_env_vars = merge(
+    local.common_env,
+    local.web_base_env,
+    var.deploy_database_as_container ? local.container_web_env : local.vm_web_env
+  )
 }
 
+
 module "webapp" {
+
   providers = {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
@@ -107,21 +111,23 @@ module "webapp" {
 
 
 module "webapp_database" {
+  count = var.deploy_database_as_container ? 1 : 0
+
   providers = {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
   }
+  app_key_vault_id                 = var.app_key_vault_id
   source                           = "../dtos-devops-templates/infrastructure/modules/container-app"
   name                             = "${var.app_short_name}-db-${var.environment}"
   container_app_environment_id     = var.container_app_environment_id
+  docker_image                     = "postgres:16"
   resource_group_name              = azurerm_resource_group.main.name
   fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
   infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
   infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
-  enable_auth                      = false
-  app_key_vault_id                 = var.app_key_vault_id
-  docker_image                     = "postgres:16"
   is_tcp_app                       = true
+  enable_auth                      = false
   environment_variables = {
     POSTGRES_PASSWORD         = "secret"
     POSTGRES_HOST_AUTH_METHOD = "trust"
