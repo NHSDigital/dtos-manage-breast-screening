@@ -39,7 +39,7 @@ jobs:
           scripts/bash/wait_ado_pipeline.sh "$RUN_ID" https://dev.azure.com/nhse-dtos dtos-manage-breast-screening
 
       - name: Post URL to PR comments
-        uses: marocchino/sticky-pull-request-comment@9c40848920de7cd32a71773ba792d8b04f03bf7a
+        uses: marocchino/sticky-pull-request-comment@11dd26c19606e0f91e1e232bde00376700333771
         with:
           message: |
             The review app at this URL has been deleted:
