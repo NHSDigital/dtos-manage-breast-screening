@@ -38,7 +38,7 @@ module "db_setup" {
 
 locals {
 
-  webapp_env_vars = var.env_config == "review" ? {
+  webapp_env_vars = var.deploy_database_as_container ? {
     ALLOWED_HOSTS     = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
     DATABASE_HOST     = module.webapp_database.container_app_fqdn
     DATABASE_NAME     = "manage_breast_screening"
@@ -64,7 +64,7 @@ locals {
   #   DJANGO_ENV       = var.env_config
   # }
 
-  db_setup_env_vars = var.env_config == "review" ? {
+  db_setup_env_vars = var.deploy_database_as_container ? {
     DATABASE_HOST    = module.webapp_database.container_app_fqdn
     DATABASE_NAME    = "manage_breast_screening"
     DATABASE_USER    = "admin"

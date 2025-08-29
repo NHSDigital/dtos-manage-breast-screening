@@ -67,6 +67,12 @@ variable "log_analytics_workspace_audit_id" {
   type        = string
 }
 
+variable "deploy_database_as_container" {
+  description = "Whether to deploy the database as a container or not."
+  type        = bool
+  default     = false
+}
+
 variable "postgres_backup_retention_days" {
   description = "The number of days to retain backups for the PostgreSQL Flexible Server."
   type        = number

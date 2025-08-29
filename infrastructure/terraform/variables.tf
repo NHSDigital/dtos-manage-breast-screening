@@ -72,6 +72,12 @@ variable "postgres_geo_redundant_backup_enabled" {
   default     = true
 }
 
+variable "deploy_database_as_container" {
+  description = "Whether to deploy the database as a container or not."
+  type        = bool
+  default     = false
+}
+
 variable "postgres_sku_name" {
   description = "Value of the PostgreSQL Flexible Server SKU name"
   default     = "B_Standard_B1ms"

@@ -6,7 +6,7 @@ data "azurerm_private_dns_zone" "postgres" {
 }
 
 module "postgres" {
-  count = var.env_config != "review" ? 1 : 0
+  count = var.deploy_database_as_container ? 0 : 1
 
   source = "../dtos-devops-templates/infrastructure/modules/postgresql-flexible"
 

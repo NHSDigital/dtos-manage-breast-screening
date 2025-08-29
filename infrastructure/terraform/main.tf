@@ -42,6 +42,7 @@ module "container-apps" {
   default_domain                        = var.deploy_infra ? module.infra[0].default_domain : data.azurerm_container_app_environment.this[0].default_domain
   dns_zone_name                         = var.dns_zone_name
   docker_image                          = var.docker_image
+  deploy_database_as_container          = var.deploy_database_as_container
   enable_auth                           = var.enable_auth
   environment                           = var.environment
   env_config                            = var.env_config
