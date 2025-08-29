@@ -76,14 +76,21 @@ class MessageBatchHelpers:
     def process_validation_errors(message_batch: MessageBatch, retry_count: int = 0):
         message_batch_errors = json.loads(message_batch.nhs_notify_errors).get("errors")
 
+        new_message_batch = MessageBatch.objects.create(
+            routing_plan_id=message_batch.routing_plan_id,
+            status=MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value,
+            nhs_notify_errors=message_batch.nhs_notify_errors,
+        )
+
+        messages = list(Message.objects.filter(batch=message_batch).all())
         for error in message_batch_errors:
             message_index_result = re.search(
                 MESSAGE_PATH_REGEX, error["source"]["pointer"]
             )
             if message_index_result is not None:
                 message_index = int(message_index_result.group(0))
-                message = message_batch.messages.all()[message_index]
-                message.batch = None
+                message = messages[message_index]
+                message.batch = new_message_batch
                 message.status = MessageStatusChoices.FAILED.value
                 message.save()
 

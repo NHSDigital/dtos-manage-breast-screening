@@ -89,11 +89,12 @@ class TestRetryMessageBatchesFromQueue:
         )
 
         invalid_message = MessageFactory(status="failed")
-        ok_message = MessageFactory(status="failed")
+        ok_message_1 = MessageFactory(status="failed")
+        ok_message_2 = MessageFactory(status="failed")
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             status="failed_recoverable",
-            messages=[ok_message, invalid_message],
+            messages=[ok_message_1, invalid_message, ok_message_2],
         )
         queue = Queue.RetryMessageBatches()
         with Helpers().queue_listener(queue, Command().handle):
@@ -105,4 +106,4 @@ class TestRetryMessageBatchesFromQueue:
 
         invalid_message.refresh_from_db()
         assert invalid_message.status == "failed"
-        assert invalid_message.batch is None
+        assert invalid_message.batch.nhs_notify_errors == json.dumps(notify_errors)

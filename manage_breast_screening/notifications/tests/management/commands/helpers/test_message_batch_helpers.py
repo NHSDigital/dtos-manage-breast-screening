@@ -178,6 +178,63 @@ class TestMessageBatchHelpers:
         assert message_2.status == "failed"
 
     @pytest.mark.django_db
+    def test_add_invalid_messages_to_a_new_batch(self, routing_plan_id):
+        """Test that messages which are invalid are added to a new message batch with its errors"""
+        notify_errors = {
+            "errors": [
+                {
+                    "status": 400,
+                    "source": {
+                        "pointer": "/data/attributes/messages/0/recipient/nhsNumber"
+                    },
+                },
+                {
+                    "status": 400,
+                    "source": {
+                        "pointer": "/data/attributes/messages/1/recipient/nhsNumber"
+                    },
+                },
+                {
+                    "status": 400,
+                    "source": {
+                        "pointer": "/data/attributes/messages/2/recipient/nhsNumber"
+                    },
+                },
+            ]
+        }
+        message_1 = MessageFactory()
+        message_2 = MessageFactory()
+        message_3 = MessageFactory()
+        message_batch = MessageBatchFactory(
+            routing_plan_id=routing_plan_id,
+            messages=[message_1, message_2, message_3],
+            nhs_notify_errors=json.dumps(notify_errors),
+        )
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            MessageBatchHelpers.process_validation_errors(message_batch)
+
+        message_batch.refresh_from_db()
+        assert message_batch.messages.all().count() == 0
+
+        message_1.refresh_from_db()
+        assert message_1.status == "failed"
+        assert message_1.batch.nhs_notify_errors == json.dumps(notify_errors)
+
+        message_2.refresh_from_db()
+        assert message_2.status == "failed"
+        assert message_2.batch.id == message_1.batch.id
+
+        message_3.refresh_from_db()
+        assert message_3.status == "failed"
+        assert message_3.batch.id == message_1.batch.id
+
+    @pytest.mark.django_db
     def test_add_altered_batch_back_to_queue(self, routing_plan_id):
         """Test that processing validation errors adds altered message batches back to retry queue"""
         notify_errors = {
