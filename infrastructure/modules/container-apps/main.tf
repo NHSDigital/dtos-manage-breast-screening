@@ -79,7 +79,7 @@ locals {
     DATABASE_HOST     = local.webapp_database != null ? local.webapp_database.container_app_fqdn : null
     DATABASE_NAME     = "manage_breast_screening"
     DATABASE_USER     = "admin"
-    DATABASE_PASSWORD = "secret"
+    DATABASE_PASSWORD = resource.random_password.admin_password[0].result
   }
 
   vm_web_env = {
@@ -147,7 +147,7 @@ module "webapp_database" {
   docker_image                     = "postgres:16"
   enable_auth                      = false
   environment_variables = {
-    POSTGRES_PASSWORD         = "secret"
+    POSTGRES_PASSWORD         = resource.random_password.admin_password[0].result
     POSTGRES_HOST_AUTH_METHOD = "trust"
     POSTGRES_USER             = "admin"
     POSTGRES_DB               = "manage_breast_screening"
