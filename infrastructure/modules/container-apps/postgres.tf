@@ -5,6 +5,7 @@ data "azurerm_private_dns_zone" "postgres" {
   resource_group_name = "rg-hub-${var.hub}-uks-private-dns-zones"
 }
 
+# Don't deploy is deploy_database_as_container is true
 module "postgres" {
   count = var.deploy_database_as_container ? 0 : 1
 
