@@ -37,8 +37,9 @@ module "db_setup" {
 }
 
 locals {
-  # Convenience alias so we don't repeat [0] everywhere
-  postgres = module.postgres[0]
+  # Convenience aliases so we don't repeat [0] everywhere
+  postgres        = module.postgres[0]
+  webapp_database = module.webapp_database[0]
 
   # Common name prefix for this app/env
   name_prefix = "${var.app_short_name}-${var.environment}"
@@ -53,7 +54,7 @@ locals {
 
   # --- Database setup job environment ---
   container_db_env = {
-    DATABASE_HOST = module.webapp_database.container_app_fqdn
+    DATABASE_HOST = local.webapp_database.container_app_fqdn
     DATABASE_NAME = "manage_breast_screening"
     DATABASE_USER = "admin"
   }
@@ -75,7 +76,7 @@ locals {
   }
 
   container_web_env = {
-    DATABASE_HOST     = module.webapp_database.container_app_fqdn
+    DATABASE_HOST     = local.webapp_database.container_app_fqdn
     DATABASE_NAME     = "manage_breast_screening"
     DATABASE_USER     = "admin"
     DATABASE_PASSWORD = "secret"
