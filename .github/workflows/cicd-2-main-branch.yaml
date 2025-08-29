@@ -85,6 +85,6 @@ jobs:
       id-token: write
     uses: ./.github/workflows/stage-4-deploy.yaml
     with:
-      environments: '["dev"]'
+      environments: '["review","dev"]'
       commit_sha: ${{ github.sha }}
     secrets: inherit

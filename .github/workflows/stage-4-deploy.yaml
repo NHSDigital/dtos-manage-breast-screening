@@ -38,15 +38,20 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Call deployment pipeline
-        if: ${{ inputs.pr_number && inputs.pr_number != '' }}
         run: |
+          if [[ -n "${{inputs.pr_number}}" ]]; then
+            pr_argument="prNumber=${{inputs.pr_number}}"
+          else
+            pr_argument=""
+          fi
+
           echo "Starting Azure devops pipeline \"Deploy to Azure - ${{ matrix.environment }}\"..."
           RUN_ID=$(az pipelines run \
             --commit-id ${{inputs.commit_sha}} \
             --name "Deploy to Azure - ${{ matrix.environment }}" \
             --org https://dev.azure.com/nhse-dtos \
             --project dtos-manage-breast-screening \
-            --parameters commitSHA=${{inputs.commit_sha}} prNumber=${{inputs.pr_number}} environment=${{ matrix.environment }} \
+            --parameters commitSHA=${{inputs.commit_sha}} ${pr_argument} environment=${{ matrix.environment }} \
             --output tsv --query id)
 
           scripts/bash/wait_ado_pipeline.sh "$RUN_ID" https://dev.azure.com/nhse-dtos dtos-manage-breast-screening

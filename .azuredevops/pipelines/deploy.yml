@@ -57,4 +57,4 @@ stages:
                     scriptType: bash
                     scriptLocation: inlineScript
                     addSpnToEnvironment: true
-                    inlineScript: ./scripts/bash/db_run_job.sh ${{ parameters.environment }} ${{ parameters.prNumber }}
+                    inlineScript: make ci ${{ parameters.environment }} db-setup PR_NUMBER=${{ parameters.prNumber }}
