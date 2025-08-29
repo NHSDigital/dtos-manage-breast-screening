@@ -89,13 +89,13 @@ class TestAggregateQuery:
         ]
 
         expectations = [
-            [df1, "BSO1", "BU001", "BSU 1", "R", 1, 0, 0, 0, 1],
-            [df1, "BSO1", "BU001", "BSU 1", "S", 2, 1, 1, 0, 0],
-            [df1, "BSO2", "BU002", "BSU 2", "F", 3, 2, 1, 0, 0],
-            [df1, "BSO2", "BU002", "BSU 2", "S", 1, 1, 0, 0, 0],
-            [df2, "BSO1", "BU001", "BSU 1", "F", 1, 0, 0, 0, 1],
-            [df2, "BSO1", "BU001", "BSU 1", "R", 2, 0, 0, 2, 0],
-            [df2, "BSO2", "BU002", "BSU 2", "F", 5, 5, 0, 0, 0],
+            [df1, "BSO1", "BU001", "BSU 1", "Routine recall", 1, 0, 0, 0, 1],
+            [df1, "BSO1", "BU001", "BSU 1", "Self referral", 2, 1, 1, 0, 0],
+            [df1, "BSO2", "BU002", "BSU 2", "Routine first call", 3, 2, 1, 0, 0],
+            [df1, "BSO2", "BU002", "BSU 2", "Self referral", 1, 1, 0, 0, 0],
+            [df2, "BSO1", "BU001", "BSU 1", "Routine first call", 1, 0, 0, 0, 1],
+            [df2, "BSO1", "BU001", "BSU 1", "Routine recall", 2, 0, 0, 2, 0],
+            [df2, "BSO2", "BU002", "BSU 2", "Routine first call", 5, 5, 0, 0, 0],
         ]
 
         for d in test_data:
@@ -127,3 +127,17 @@ class TestAggregateQuery:
             results = cursor.fetchall()
 
         assert len(results) == 1
+
+    def test_aggregate_columns(self):
+        assert AggregateQuery.columns() == [
+            "Appointment date",
+            "BSO code",
+            "Clinic code",
+            "Clinic name",
+            "Episode type",
+            "Notifications sent",
+            "NHS app messages read",
+            "SMS messages delivered",
+            "Letters sent",
+            "Notifications failed",
+        ]

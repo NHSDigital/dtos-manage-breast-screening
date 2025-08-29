@@ -2,12 +2,19 @@ SELECT  TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS appointment_date,
         cl.bso_code AS bso_code,
         cl.code AS clinic_code,
         cl.name AS clinic_name,
-        appt.episode_type AS episode_type,
-        COUNT(msg_snt.id) AS notifications_sent,
+        CASE
+          WHEN appt.episode_type = 'F' THEN 'Routine first call'
+          WHEN appt.episode_type = 'G' THEN 'GP Referral'
+          WHEN appt.episode_type = 'H' THEN 'Very high risk'
+          WHEN appt.episode_type = 'N' THEN 'Early recall'
+          WHEN appt.episode_type = 'R' THEN 'Routine recall'
+          WHEN appt.episode_type = 'S' THEN 'Self referral'
+        END,
+        COUNT(msg_snt.id)     AS notifications_sent,
         COUNT(nhsapp_read.id) AS nhs_app_messages_read,
-        COUNT(sms_dlv.id) AS sms_messages_delivered,
-        COUNT(ltr_sent.id) AS letters_sent,
-        COUNT(msg_fld.id) AS notifications_failed
+        COUNT(sms_dlv.id)     AS sms_messages_delivered,
+        COUNT(ltr_sent.id)    AS letters_sent,
+        COUNT(msg_fld.id)     AS notifications_failed
 FROM   notifications_appointment appt
 JOIN   notifications_clinic cl ON appt.clinic_id = cl.id
 LEFT OUTER JOIN notifications_message msg_snt ON msg_snt.appointment_id = appt.id
