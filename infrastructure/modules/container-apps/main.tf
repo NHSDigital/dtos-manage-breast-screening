@@ -109,6 +109,21 @@ module "webapp" {
   port                             = 8000
 }
 
+resource "random_password" "admin_password" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  length           = 30
+  special          = true
+  override_special = "!@#$%^&*()-_=+[]{}<>:?"
+}
+
+resource "azurerm_key_vault_secret" "db_admin_pwd" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  name         = "${var.app_short_name}-db-${var.environment}-password"
+  value        = resource.random_password.admin_password[0].result
+  key_vault_id = var.app_key_vault_id
+}
 
 module "webapp_database" {
   count = var.deploy_database_as_container ? 1 : 0
@@ -122,11 +137,6 @@ module "webapp_database" {
   name                             = "${var.app_short_name}-db-${var.environment}"
   container_app_environment_id     = var.container_app_environment_id
   docker_image                     = "postgres:16"
-  resource_group_name              = azurerm_resource_group.main.name
-  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
-  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
-  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
-  is_tcp_app                       = true
   enable_auth                      = false
   environment_variables = {
     POSTGRES_PASSWORD         = "secret"
@@ -134,5 +144,10 @@ module "webapp_database" {
     POSTGRES_USER             = "admin"
     POSTGRES_DB               = "manage_breast_screening"
   }
+  resource_group_name              = azurerm_resource_group.main.name
+  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
+  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
+  is_tcp_app                       = true
   port = 5432
 }
