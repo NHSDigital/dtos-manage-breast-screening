@@ -37,7 +37,13 @@ module "db_setup" {
 }
 
 locals {
-  # Common environment variables for all scenarios
+  # Convenience alias so we don't repeat [0] everywhere
+  postgres = module.postgres[0]
+
+  # Common name prefix for this app/env
+  name_prefix = "${var.app_short_name}-${var.environment}"
+
+  # Common environment variables shared across apps
   common_env = {
     SSL_MODE         = "require"
     AZURE_CLIENT_ID  = module.db_connect_identity.client_id
@@ -45,17 +51,16 @@ locals {
     DJANGO_ENV       = var.env_config
   }
 
-  # Specific overrides when using a container-based DB
+  # --- Database setup job environment ---
   container_db_env = {
     DATABASE_HOST = module.webapp_database.container_app_fqdn
     DATABASE_NAME = "manage_breast_screening"
     DATABASE_USER = "admin"
   }
 
-  # Specific overrides when using a serverless/postgres DB
   vm_db_env = {
-    DATABASE_HOST = module.postgres.host
-    DATABASE_NAME = module.postgres.database_names[0]
+    DATABASE_HOST = local.postgres.host
+    DATABASE_NAME = local.postgres.database_names[0]
     DATABASE_USER = module.db_connect_identity.name
   }
 
@@ -64,28 +69,30 @@ locals {
     var.deploy_database_as_container ? local.container_db_env : local.vm_db_env
   )
 
-  # For the webapp, ALLOWED_HOSTS differs from db, so include separately
+  # --- Webapp environment ---
   web_base_env = {
-    ALLOWED_HOSTS = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+    ALLOWED_HOSTS = "${local.name_prefix}-web.${var.default_domain}"
   }
+
   container_web_env = {
     DATABASE_HOST     = module.webapp_database.container_app_fqdn
     DATABASE_NAME     = "manage_breast_screening"
     DATABASE_USER     = "admin"
     DATABASE_PASSWORD = "secret"
   }
+
   vm_web_env = {
-    DATABASE_HOST = module.postgres.host
-    DATABASE_NAME = module.postgres.database_names[0]
+    DATABASE_HOST = local.postgres.host
+    DATABASE_NAME = local.postgres.database_names[0]
     DATABASE_USER = module.db_connect_identity.name
   }
+
   webapp_env_vars = merge(
     local.common_env,
     local.web_base_env,
     var.deploy_database_as_container ? local.container_web_env : local.vm_web_env
   )
 }
-
 
 module "webapp" {
 
