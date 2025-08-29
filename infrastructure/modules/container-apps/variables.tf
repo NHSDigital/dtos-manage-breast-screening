@@ -124,6 +124,21 @@ variable "seed_demo_data" {
   default     = false
 }
 
+variable "storage_containers" {
+  description = "Blob storage container definitions"
+  type = map(object({
+    container_name        = string
+    container_access_type = optional(string, "private")
+  }))
+  default = {}
+}
+
+variable "storage_queues" {
+  description = "Storage queue names"
+  type        = list(string)
+  default     = []
+}
+
 variable "use_apex_domain" {
   description = "Use apex domain for the Front Door endpoint. Set to true for production."
   type        = bool
@@ -133,6 +148,8 @@ locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
   hostname = var.use_apex_domain ? var.dns_zone_name : "${var.environment}.${var.dns_zone_name}"
+
+  storage_account_name = "st${var.app_short_name}${var.environment}uks"
 
   database_user = "admin"
   database_name = "manage_breast_screening"
