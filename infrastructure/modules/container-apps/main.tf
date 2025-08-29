@@ -37,14 +37,14 @@ module "db_setup" {
 }
 
 locals {
-  # Convenience aliases so we don't repeat [0] everywhere
-  postgres        = module.postgres[0]
-  webapp_database = module.webapp_database[0]
+  # Safe access to postgres and webapp_database modules
+  postgres        = try(module.postgres[0], null)
+  webapp_database = try(module.webapp_database[0], null)
 
-  # Common name prefix for this app/env
+  # Common name prefix
   name_prefix = "${var.app_short_name}-${var.environment}"
 
-  # Common environment variables shared across apps
+  # Common environment variables
   common_env = {
     SSL_MODE         = "require"
     AZURE_CLIENT_ID  = module.db_connect_identity.client_id
@@ -54,14 +54,14 @@ locals {
 
   # --- Database setup job environment ---
   container_db_env = {
-    DATABASE_HOST = local.webapp_database.container_app_fqdn
+    DATABASE_HOST = local.webapp_database != null ? local.webapp_database.container_app_fqdn : null
     DATABASE_NAME = "manage_breast_screening"
     DATABASE_USER = "admin"
   }
 
   vm_db_env = {
-    DATABASE_HOST = local.postgres.host
-    DATABASE_NAME = local.postgres.database_names[0]
+    DATABASE_HOST = local.postgres != null ? local.postgres.host : null
+    DATABASE_NAME = local.postgres != null ? local.postgres.database_names[0] : null
     DATABASE_USER = module.db_connect_identity.name
   }
 
@@ -76,15 +76,15 @@ locals {
   }
 
   container_web_env = {
-    DATABASE_HOST     = local.webapp_database.container_app_fqdn
+    DATABASE_HOST     = local.webapp_database != null ? local.webapp_database.container_app_fqdn : null
     DATABASE_NAME     = "manage_breast_screening"
     DATABASE_USER     = "admin"
     DATABASE_PASSWORD = "secret"
   }
 
   vm_web_env = {
-    DATABASE_HOST = local.postgres.host
-    DATABASE_NAME = local.postgres.database_names[0]
+    DATABASE_HOST = local.postgres != null ? local.postgres.host : null
+    DATABASE_NAME = local.postgres != null ? local.postgres.database_names[0] : null
     DATABASE_USER = module.db_connect_identity.name
   }
 
