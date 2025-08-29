@@ -11,6 +11,11 @@ urlpatterns = [
     # CIS2 OpenID Connect
     path("cis2/sign-in/", views.cis2_sign_in, name="cis2_sign_in"),
     path("cis2/callback/", views.cis2_callback, name="cis2_callback"),
+    path(
+        "cis2/back-channel-logout/",
+        views.cis2_back_channel_logout,
+        name="cis2_back_channel_logout",
+    ),
     # JWKS endpoint for private_key_jwt
     path("cis2/jwks_uri", views.jwks, name="jwks"),
 ]
