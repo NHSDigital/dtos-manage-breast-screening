@@ -43,23 +43,19 @@ def cis2_callback(request):
     """Handle CIS2 OAuth2/OIDC callback, create/login the Django user, then redirect home."""
     client = get_cis2_client()
     token = client.authorize_access_token(request)
+
     userinfo = client.userinfo(token=token)
-    sub = userinfo.get("sub")
+    sub = userinfo.get("sub")  # Unique identifier for the user in CIS2
     if not sub:
         return HttpResponseBadRequest("Missing subject in CIS2 response")
 
     User = get_user_model()
     defaults = {}
-    if userinfo.get("email"):
-        defaults["email"] = userinfo["email"]
-    if userinfo.get("given_name"):
-        defaults["first_name"] = userinfo["given_name"]
-    if userinfo.get("family_name"):
-        defaults["last_name"] = userinfo["family_name"]
+    defaults["email"] = userinfo["email"]
+    defaults["first_name"] = userinfo["given_name"]
+    defaults["last_name"] = userinfo["family_name"]
 
-    # Map CIS2 subject ('sub') to the built-in 'username' field, Django's
-    # default unique identifier for users
-    user, _ = User.objects.get_or_create(username=sub, defaults=defaults)
+    user, _ = User.objects.update_or_create(username=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return redirect(reverse("home"))
 
