@@ -11,11 +11,7 @@ module "shared_config" {
   application = var.app_short_name
 }
 
-# create the database
-# prod  : make migrate seed [default]
-# dev   : make migrate seed [default]
-# review: make migrate seed example_data
-# put "example_data" once the PR has been merged in.
+# populate the database
 module "db_setup" {
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
@@ -37,18 +33,70 @@ module "db_setup" {
   docker_image               = var.docker_image
   user_assigned_identity_ids = [module.db_connect_identity.id]
 
-  environment_variables = {
-    DATABASE_HOST    = module.postgres.host
-    DATABASE_NAME    = module.postgres.database_names[0]
-    DATABASE_USER    = module.db_connect_identity.name
+  environment_variables = local.db_setup_env_vars
+}
+
+locals {
+  # Safe access to postgres and webapp_database modules
+  postgres        = try(module.postgres[0], null)
+  webapp_database = try(module.webapp_database[0], null)
+
+  # Common name prefix
+  name_prefix = "${var.app_short_name}-${var.environment}"
+
+  # Common environment variables
+  common_env = {
     SSL_MODE         = "require"
     AZURE_CLIENT_ID  = module.db_connect_identity.client_id
     PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
     DJANGO_ENV       = var.env_config
   }
+
+  # --- Database setup job environment ---
+  container_db_env = {
+    DATABASE_HOST = local.webapp_database != null ? local.webapp_database.container_app_fqdn : null
+    DATABASE_NAME = "manage_breast_screening"
+    DATABASE_USER = "admin"
+  }
+
+  vm_db_env = {
+    DATABASE_HOST = local.postgres != null ? local.postgres.host : null
+    DATABASE_NAME = local.postgres != null ? local.postgres.database_names[0] : null
+    DATABASE_USER = module.db_connect_identity.name
+  }
+
+  db_setup_env_vars = merge(
+    local.common_env,
+    var.deploy_database_as_container ? local.container_db_env : local.vm_db_env
+  )
+
+  # --- Webapp environment ---
+  web_base_env = {
+    ALLOWED_HOSTS = "${local.name_prefix}-web.${var.default_domain}"
+  }
+
+  container_web_env = {
+    DATABASE_HOST     = local.webapp_database != null ? local.webapp_database.container_app_fqdn : null
+    DATABASE_NAME     = "manage_breast_screening"
+    DATABASE_USER     = "admin"
+    DATABASE_PASSWORD = resource.random_password.admin_password[0].result
+  }
+
+  vm_web_env = {
+    DATABASE_HOST = local.postgres != null ? local.postgres.host : null
+    DATABASE_NAME = local.postgres != null ? local.postgres.database_names[0] : null
+    DATABASE_USER = module.db_connect_identity.name
+  }
+
+  webapp_env_vars = merge(
+    local.common_env,
+    local.web_base_env,
+    var.deploy_database_as_container ? local.container_web_env : local.vm_web_env
+  )
 }
 
 module "webapp" {
+
   providers = {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
@@ -64,14 +112,50 @@ module "webapp" {
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = var.docker_image
   user_assigned_identity_ids       = [module.db_connect_identity.id]
-  environment_variables = {
-    ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
+  environment_variables            = local.webapp_env_vars
+  is_web_app                       = true
+  port                             = 8000
+}
+
+resource "random_password" "admin_password" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  length           = 30
+  special          = true
+  override_special = "!@#$%^&*()-_=+[]{}<>:?"
+}
+
+resource "azurerm_key_vault_secret" "db_admin_pwd" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  name         = "${var.app_short_name}-db-${var.environment}-password"
+  value        = resource.random_password.admin_password[0].result
+  key_vault_id = var.app_key_vault_id
+}
+
+module "webapp_database" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
   }
-  is_web_app = true
-  http_port  = 8000
+  app_key_vault_id                 = var.app_key_vault_id
+  source                           = "../dtos-devops-templates/infrastructure/modules/container-app"
+  name                             = "${var.app_short_name}-db-${var.environment}"
+  container_app_environment_id     = var.container_app_environment_id
+  docker_image                     = "postgres:16"
+  enable_auth                      = false
+  environment_variables = {
+    POSTGRES_PASSWORD         = resource.random_password.admin_password[0].result
+    POSTGRES_HOST_AUTH_METHOD = "trust"
+    POSTGRES_USER             = "admin"
+    POSTGRES_DB               = "manage_breast_screening"
+  }
+  resource_group_name              = azurerm_resource_group.main.name
+  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
+  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
+  is_tcp_app                       = true
+  port = 5432
 }
