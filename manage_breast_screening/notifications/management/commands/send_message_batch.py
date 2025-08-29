@@ -3,7 +3,7 @@ from zoneinfo import ZoneInfo
 
 from django.core.management.base import BaseCommand, CommandError
 
-from manage_breast_screening.notifications.management.commands.command_helpers import (
+from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import (

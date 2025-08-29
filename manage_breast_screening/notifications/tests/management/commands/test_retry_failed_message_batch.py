@@ -5,7 +5,7 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 import requests
 
-from manage_breast_screening.notifications.management.commands.command_helpers import (
+from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.management.commands.retry_failed_message_batch import (
