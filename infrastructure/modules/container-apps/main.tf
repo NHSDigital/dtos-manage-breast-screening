@@ -23,6 +23,10 @@ module "db_setup" {
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = azurerm_resource_group.main.name
 
+  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  app_key_vault_id = var.app_key_vault_id
+
+
   # Run everything through /bin/sh
   container_command = ["/bin/sh", "-c"]
 
