@@ -70,6 +70,7 @@ class MessageBatchHelpers:
 
         for message in message_batch.messages.all():
             message.status = MessageStatusChoices.FAILED.value
+            message.sent_at = datetime.now(tz=TZ_INFO)
             message.save()
 
     @staticmethod
@@ -91,7 +92,6 @@ class MessageBatchHelpers:
                     message.nhs_notify_errors = json.dumps(
                         json.loads(message.nhs_notify_errors) + [error]
                     )
-                message.status = MessageStatusChoices.FAILED.value
                 message.save()
 
         message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value

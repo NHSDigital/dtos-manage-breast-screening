@@ -1,12 +1,14 @@
 import json
 import re
 import uuid
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MESSAGE_PATH_REGEX,
+    TZ_INFO,
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import (
@@ -73,18 +75,25 @@ class TestMessageBatchHelpers:
         mock_response.status_code = status_code
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_response.json.return_value = notify_errors
+        mock_now = datetime(2023, 1, 31, 0, 0, 0, tzinfo=TZ_INFO)
+
         message = MessageFactory(status="scheduled")
         message_batch = MessageBatchFactory(routing_plan_id=routing_plan_id)
         message_batch.messages.set([message])
         message_batch.save()
 
-        MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response)
+        with patch(
+            "manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers.datetime"
+        ) as mock_datetime:
+            mock_datetime.now.return_value = mock_now
+            MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response)
 
         message_batch.refresh_from_db()
         assert message_batch.status == "failed_unrecoverable"
         assert message_batch.nhs_notify_errors == notify_errors
         assert message_batch.messages.count() == 1
         assert message_batch.messages.all()[0].status == "failed"
+        assert message_batch.messages.all()[0].sent_at == mock_now
 
     @pytest.mark.parametrize("status_code", [408, 425, 429, 500, 503, 504])
     @pytest.mark.django_db
@@ -141,7 +150,7 @@ class TestMessageBatchHelpers:
 
     @pytest.mark.django_db
     def test_remove_validation_errors(self, routing_plan_id):
-        """Test that messages which are invalid are marked correctly and removed from the message batch"""
+        """Test that messages which are invalid are removed from the message batch"""
         notify_errors = {
             "errors": [
                 {
@@ -177,7 +186,6 @@ class TestMessageBatchHelpers:
         assert messages[1] == message_3
 
         message_2.refresh_from_db()
-        assert message_2.status == "failed"
         assert message_2.batch is None
 
     @pytest.mark.django_db
