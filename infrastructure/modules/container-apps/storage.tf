@@ -18,6 +18,6 @@ module "storage" {
   name                = local.storage_account_name
   resource_group_name = azurerm_resource_group.main.name
   location            = var.region
-  containers          = var.storage_containers
-  queues              = var.storage_queues
+  containers          = local.storage_containers
+  queues              = local.storage_queues
 }
