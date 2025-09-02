@@ -1,4 +1,4 @@
-import { Component } from 'nhsuk-frontend'
+import { Component, ElementError } from 'nhsuk-frontend'
 
 import setSubmit from './set-submit.js'
 
@@ -16,7 +16,11 @@ export class CheckIn extends Component {
 
     const $form = this.$root.querySelector('form')
     if (!$form) {
-      throw new Error('CheckIn initialised without a form element')
+      throw new ElementError({
+        element: $root,
+        component: CheckIn,
+        identifier: 'Form element (`$form`)'
+      })
     }
 
     this.$form = $form

@@ -1,3 +1,5 @@
+import { ElementError } from 'nhsuk-frontend'
+
 const TIMEOUT = 2000
 
 /**
@@ -13,14 +15,20 @@ const TIMEOUT = 2000
  */
 export default ($form, options = {}) => {
   if (!$form || !($form instanceof HTMLFormElement)) {
-    throw new Error('setSubmit must be called with an HTMLFormElement')
+    throw new ElementError({
+      element: $form,
+      identifier: 'setSubmit: Form element (`$form`)',
+      expectedType: 'HTMLFormElement'
+    })
   }
 
   const method = $form.method
   const action = $form.action
 
   if (!method || !action) {
-    throw new Error('Form method and action must be defined')
+    throw new ElementError({
+      identifier: 'setSubmit: Form method or action'
+    })
   }
 
   function doSubmit() {
