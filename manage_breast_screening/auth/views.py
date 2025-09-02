@@ -16,7 +16,7 @@ def sign_in(request):
         request,
         "auth/sign_in.jinja",
         {
-            "page_title": "Sign in",
+            "page_title": "Log in",
             "navActive": "sign_in",
         },
     )
