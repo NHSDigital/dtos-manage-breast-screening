@@ -10,12 +10,12 @@
         {% if reason.details %}
           {% set value_content = reason.details %}
         {% else %}
-          {% set value_content = "<span class=\"app-special-appointment-banner__tag--no-details\">No details provided</span>" %}
+          {% set value_content = "<span class=\"nhsuk-u-secondary-text-color\">No details provided</span>" %}
         {% endif %}
 
         {# Add temporary tag to the value content if needed #}
         {% if reason.temporary %}
-          {% set value_content = value_content + "<br><span class=\"app-special-appointment-banner__tag--temporary\">Temporary</span>" %}
+          {% set value_content = value_content + "<br><span class=\"nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2\">Temporary</span>" %}
         {% endif %}
 
         {# Add row for this support reason #}
