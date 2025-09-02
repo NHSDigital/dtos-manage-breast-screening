@@ -8,7 +8,7 @@ protect_keyvault                      = false
 vnet_address_space                    = "10.128.0.0/16"
 personas_enabled                      = true
 seed_demo_data                        = true
-storage_account_name                  = "stmanbrsdevuks"
+nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"
 
 storage_containers = {
   notifications-mesh-data = {
@@ -21,4 +21,4 @@ storage_containers = {
   }
 }
 
-storage_queues = ["notifications-status-updates", "notifications-retry-message-batch"]
+storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
