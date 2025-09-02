@@ -5,7 +5,10 @@ data "azurerm_private_dns_zone" "postgres" {
   resource_group_name = "rg-hub-${var.hub}-uks-private-dns-zones"
 }
 
+# Don't deploy if deploy_database_as_container is true
 module "postgres" {
+  count = var.deploy_database_as_container ? 0 : 1
+
   source = "../dtos-devops-templates/infrastructure/modules/postgresql-flexible"
 
   # postgresql Server
@@ -18,8 +21,8 @@ module "postgres" {
   postgresql_admin_object_id      = data.azuread_group.postgres_sql_admin_group.object_id
   postgresql_admin_principal_name = var.postgres_sql_admin_group
   postgresql_admin_principal_type = "Group"
-  administrator_login             = "admin"
-  admin_identities                = [module.db_connect_identity]
+  administrator_login             = local.database_user
+  admin_identities                = [module.db_connect_identity[0]]
 
   # Diagnostic Settings
   log_analytics_workspace_id                                = var.log_analytics_workspace_audit_id
@@ -47,7 +50,7 @@ module "postgres" {
       collation   = "en_US.utf8"
       charset     = "UTF8"
       max_size_gb = 10
-      name        = "manage_breast_screening"
+      name        = local.database_name
     }
   }
 
@@ -55,8 +58,44 @@ module "postgres" {
 }
 
 module "db_connect_identity" {
+  count = var.deploy_database_as_container ? 0 : 1
+
   source              = "../dtos-devops-templates/infrastructure/modules/managed-identity"
   resource_group_name = azurerm_resource_group.main.name
   location            = var.region
   uai_name            = "mi-${var.app_short_name}-${var.environment}-db-connect"
+}
+
+resource "random_password" "admin_password" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  length           = 30
+  special          = true
+  override_special = "!@#$%^&*()-_=+"
+}
+
+module "database_container" {
+  count = var.deploy_database_as_container ? 1 : 0
+
+  providers = {
+    azurerm     = azurerm
+    azurerm.hub = azurerm.hub
+  }
+  app_key_vault_id             = var.app_key_vault_id
+  source                       = "../dtos-devops-templates/infrastructure/modules/container-app"
+  name                         = "${var.app_short_name}-db-${var.environment}"
+  container_app_environment_id = var.container_app_environment_id
+  docker_image                 = "postgres:16"
+  enable_auth                  = false
+  secret_variables             = var.deploy_database_as_container ? { POSTGRES_PASSWORD = resource.random_password.admin_password[0].result } : {}
+  environment_variables = {
+    POSTGRES_USER = local.database_user
+    POSTGRES_DB   = local.database_name
+  }
+  resource_group_name              = azurerm_resource_group.main.name
+  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
+  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
+  is_tcp_app                       = true
+  port                             = 5432
 }

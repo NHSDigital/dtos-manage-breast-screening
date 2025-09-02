@@ -11,11 +11,7 @@ module "shared_config" {
   application = var.app_short_name
 }
 
-# create the database
-# prod  : make migrate seed [default]
-# dev   : make migrate seed [default]
-# review: make migrate seed example_data
-# put "example_data" once the PR has been merged in.
+# populate the database
 module "db_setup" {
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
@@ -26,29 +22,23 @@ module "db_setup" {
   # Run everything through /bin/sh
   container_command = ["/bin/sh", "-c"]
 
-  # Build the full command string, conditionally including example_data
-  # && python manage.py example_data"
   container_args = [
-    var.env_config == "prod"
-    ? "python manage.py migrate"
-    : "python manage.py migrate && python manage.py seed_demo_data --noinput"
+    var.seed_demo_data
+    ? "python manage.py migrate && python manage.py seed_demo_data --noinput"
+    : "python manage.py migrate"
   ]
-
+  secret_variables           = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   docker_image               = var.docker_image
-  user_assigned_identity_ids = [module.db_connect_identity.id]
+  user_assigned_identity_ids = var.deploy_database_as_container ? [] : [module.db_connect_identity[0].id]
+  environment_variables = merge(
+    local.common_env,
+    var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
+  )
 
-  environment_variables = {
-    DATABASE_HOST    = module.postgres.host
-    DATABASE_NAME    = module.postgres.database_names[0]
-    DATABASE_USER    = module.db_connect_identity.name
-    SSL_MODE         = "require"
-    AZURE_CLIENT_ID  = module.db_connect_identity.client_id
-    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-    DJANGO_ENV       = var.env_config
-  }
 }
 
 module "webapp" {
+
   providers = {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
@@ -63,15 +53,15 @@ module "webapp" {
   enable_auth                      = var.enable_auth
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = var.docker_image
-  user_assigned_identity_ids       = [module.db_connect_identity.id]
-  environment_variables = {
-    ALLOWED_HOSTS   = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    SSL_MODE        = "require"
-    AZURE_CLIENT_ID = module.db_connect_identity.client_id
-  }
-  is_web_app = true
-  http_port  = 8000
+  user_assigned_identity_ids       = var.deploy_database_as_container ? [] : [module.db_connect_identity[0].id]
+  environment_variables = merge(
+    local.common_env,
+    {
+      ALLOWED_HOSTS = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+    },
+    var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
+  )
+  secret_variables = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
+  is_web_app       = true
+  port             = 8000
 }

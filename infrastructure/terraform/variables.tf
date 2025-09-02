@@ -72,6 +72,12 @@ variable "postgres_geo_redundant_backup_enabled" {
   default     = true
 }
 
+variable "deploy_database_as_container" {
+  description = "Whether to deploy the database as a container or as an Azure postgres flexible server."
+  type        = bool
+  default     = false
+}
+
 variable "postgres_sku_name" {
   description = "Value of the PostgreSQL Flexible Server SKU name"
   default     = "B_Standard_B1ms"
@@ -112,6 +118,12 @@ variable "front_door_profile" {
 
 variable "personas_enabled" {
   description = "To enable personas or not."
+  type        = bool
+  default     = false
+}
+
+variable "seed_demo_data" {
+  description = "Whether or not to seed the demo data in the database."
   type        = bool
   default     = false
 }

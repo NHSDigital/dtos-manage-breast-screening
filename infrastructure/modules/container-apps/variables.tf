@@ -67,6 +67,11 @@ variable "log_analytics_workspace_audit_id" {
   type        = string
 }
 
+variable "deploy_database_as_container" {
+  description = "Whether to deploy the database as a container or as an Azure postgres flexible server."
+  type        = bool
+}
+
 variable "postgres_backup_retention_days" {
   description = "The number of days to retain backups for the PostgreSQL Flexible Server."
   type        = number
@@ -113,6 +118,12 @@ variable "personas_enabled" {
   default     = false
 }
 
+variable "seed_demo_data" {
+  description = "Whether or not to seed the demo data in the database."
+  type        = bool
+  default     = false
+}
+
 variable "use_apex_domain" {
   description = "Use apex domain for the Front Door endpoint. Set to true for production."
   type        = bool
@@ -122,4 +133,26 @@ locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
   hostname = var.use_apex_domain ? var.dns_zone_name : "${var.environment}.${var.dns_zone_name}"
+
+  database_user = "admin"
+  database_name = "manage_breast_screening"
+
+  common_env = {
+    SSL_MODE         = "require"
+    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
+    DJANGO_ENV       = var.env_config
+  }
+
+  container_db_env = {
+    DATABASE_HOST = var.deploy_database_as_container ? module.database_container[0].container_app_fqdn : null
+    DATABASE_NAME = local.database_name
+    DATABASE_USER = local.database_user
+  }
+
+  azure_db_env = {
+    AZURE_CLIENT_ID = var.deploy_database_as_container ? null : module.db_connect_identity[0].client_id
+    DATABASE_HOST   = var.deploy_database_as_container ? null : module.postgres[0].host
+    DATABASE_NAME   = var.deploy_database_as_container ? null : module.postgres[0].database_names[0]
+    DATABASE_USER   = var.deploy_database_as_container ? null : module.db_connect_identity[0].name
+  }
 }
