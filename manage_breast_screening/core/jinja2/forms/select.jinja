@@ -1,4 +1,4 @@
-{% from 'select/macro.jinja' import select as select %}
+{% from 'nhsuk/components/select/macro.jinja' import select as select %}
 {% set unbound_field = field.field %}
 {% if field.errors %}
   {% set error_message = {"text": field.errors | first} %}

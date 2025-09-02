@@ -1,6 +1,6 @@
-{% from 'header/macro.jinja' import header %}
+{% from 'nhsuk/components/header/macro.jinja' import header %}
 {% set assetPath = STATIC_URL ~ "/assets" %}
-{% extends "template.jinja" %}
+{% extends "nhsuk/template.jinja" %}
 
 {% block head %}
   <link rel="stylesheet" href="{{ static('css/main.css' )}}">
@@ -11,27 +11,28 @@
 
 {% block header %}
   {{ header({
-    "showNav": "true",
     "service": {
       "name": "Manage breast screening"
     },
-    "primaryLinks": [
-      {
-        "url": "/",
-        "label": "Home",
-        "current": true if navActive == "home"
-      },
-      {
-        "url": "/clinics/",
-        "label": "Clinics",
-        'current': true if navActive == "clinics"
-      },
-      {
-        "url": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
-        "label": "Sign out" if request and request.user.is_authenticated else "Sign in",
-        'current': true if navActive == "sign_in"
-      }
-    ]
+    "navigation": {
+      "items": [
+        {
+          "href": "/",
+          "text": "Home",
+          "current": true if navActive == "home"
+        },
+        {
+          "href": "/clinics/",
+          "text": "Clinics",
+          'current': true if navActive == "clinics"
+        },
+        {
+          "href": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
+          "text": "Sign out" if request and request.user.is_authenticated else "Sign in",
+          'current': true if navActive == "sign_in"
+        }
+      ]
+    }
   }) }}
 {% endblock %}
 

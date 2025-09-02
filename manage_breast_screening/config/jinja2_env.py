@@ -72,9 +72,11 @@ def environment(**options):
             [
                 env.loader,
                 PackageLoader(
-                    "nhsuk_frontend_jinja", package_path="templates/components"
+                    "nhsuk_frontend_jinja", package_path="templates/nhsuk/components"
                 ),
-                PackageLoader("nhsuk_frontend_jinja", package_path="templates/macros"),
+                PackageLoader(
+                    "nhsuk_frontend_jinja", package_path="templates/nhsuk/macros"
+                ),
                 PackageLoader("nhsuk_frontend_jinja"),
             ]
         )

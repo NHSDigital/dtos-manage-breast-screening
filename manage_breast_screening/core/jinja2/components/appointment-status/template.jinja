@@ -1,4 +1,4 @@
-{% from 'components/tag/macro.jinja' import tag %}
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
 {% set show_check_in = appointment.current_status.is_confirmed %}
 <div data-event-status-container="{{ appointment.id }}"
      {% if show_check_in %}data-module="app-check-in"{% endif %}>

@@ -391,7 +391,7 @@ class TestCharField:
                     <label class="nhsuk-label" for="id_textfield">
                         Text
                     </label>
-                    <textarea class="nhsuk-textarea" id="id_textfield" name="textfield" rows=" 3 " autocomplete="autocomplete" spellcheck="true"></textarea>
+                    <textarea class="nhsuk-textarea" id="id_textfield" name="textfield" rows="3" autocomplete="autocomplete" spellcheck="true"></textarea>
                 </div>
                 """,
         )
@@ -404,7 +404,7 @@ class TestCharField:
                     <label class="nhsuk-label" for="id_textfield_simple">
                         Text
                     </label>
-                    <textarea class="nhsuk-textarea" id="id_textfield_simple" name="textfield_simple" rows=" 10 "></textarea>
+                    <textarea class="nhsuk-textarea" id="id_textfield_simple" name="textfield_simple" rows="10"></textarea>
                 </div>
                 """,
         )
@@ -457,14 +457,14 @@ class TestChoiceField:
             form_class()["field"].as_field_group(),
             """
             <div class="nhsuk-form-group">
-                <fieldset class="nhsuk-fieldset">
+                <fieldset aria-describedby="id_field-hint" class="nhsuk-fieldset">
                     <legend class="nhsuk-fieldset__legend app-abc">
                         Abc
                     </legend>
                     <div class="nhsuk-hint" id="id_field-hint">
                         Pick either one
                     </div>
-                    <div class="nhsuk-radios">
+                    <div class="nhsuk-radios" data-module="nhsuk-radios">
                         <div class="nhsuk-radios__item">
                             <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
@@ -487,14 +487,14 @@ class TestChoiceField:
             form["field"].as_field_group(),
             """
             <div class="nhsuk-form-group">
-                <fieldset class="nhsuk-fieldset">
+                <fieldset aria-describedby="id_field-hint" class="nhsuk-fieldset">
                     <legend class="nhsuk-fieldset__legend app-abc">
                         Abc
                     </legend>
                     <div class="nhsuk-hint" id="id_field-hint">
                         Pick either one
                     </div>
-                    <div class="nhsuk-radios nhsuk-radios--conditional">
+                    <div class="nhsuk-radios nhsuk-radios--conditional" data-module="nhsuk-radios">
                         <div class="nhsuk-radios__item">
                             <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
@@ -561,14 +561,14 @@ class TestMultipleChoiceField:
             form_class()["checkbox_field"].as_field_group(),
             """
             <div class="nhsuk-form-group">
-                <fieldset class="nhsuk-fieldset">
+                <fieldset aria-describedby="id_checkbox_field-hint" class="nhsuk-fieldset">
                     <legend class="nhsuk-fieldset__legend app-def">
                         Def
                     </legend>
                     <div class="nhsuk-hint" id="id_checkbox_field-hint">
                         Pick any number
                     </div>
-                    <div class="nhsuk-checkboxes">
+                    <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                         <div class="nhsuk-checkboxes__item">
                             <input class="nhsuk-checkboxes__input" id="id_checkbox_field" name="checkbox_field" type="checkbox" value="a">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
@@ -591,14 +591,14 @@ class TestMultipleChoiceField:
             form["checkbox_field"].as_field_group(),
             """
             <div class="nhsuk-form-group">
-                <fieldset class="nhsuk-fieldset">
+                <fieldset aria-describedby="id_checkbox_field-hint" class="nhsuk-fieldset">
                     <legend class="nhsuk-fieldset__legend app-def">
                         Def
                     </legend>
                     <div class="nhsuk-hint" id="id_checkbox_field-hint">
                         Pick any number
                     </div>
-                    <div class="nhsuk-checkboxes nhsuk-checkboxes--conditional">
+                    <div class="nhsuk-checkboxes nhsuk-checkboxes--conditional" data-module="nhsuk-checkboxes">
                         <div class="nhsuk-checkboxes__item">
                             <input class="nhsuk-checkboxes__input" id="id_checkbox_field" name="checkbox_field" type="checkbox" value="a">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>

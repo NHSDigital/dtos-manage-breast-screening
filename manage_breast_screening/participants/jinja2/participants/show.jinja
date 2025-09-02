@@ -1,12 +1,12 @@
 {% extends 'layout-app.jinja' %}
-{% from 'back-link/macro.jinja' import backLink %}
-{% from 'card/macro.jinja' import card %}
-{% from 'tag/macro.jinja' import tag %}
+{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
+{% from 'nhsuk/components/card/macro.jinja' import card %}
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
+{% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
 {% from 'components/participant-details/appointments.jinja' import appointments %}
 {% from 'components/participant-details/contact_details.jinja' import contact_details %}
 {% from 'components/participant-details/personal_details.jinja' import personal_details %}
 {% from 'components/participant-details/screening_details.jinja' import screening_details %}
-{% from 'summary-list/macro.jinja' import summaryList %}
 
 {% block beforeContent %}
   {{ backLink({

@@ -1,4 +1,4 @@
-{% from 'checkboxes/macro.jinja' import checkboxes %}
+{% from 'nhsuk/components/checkboxes/macro.jinja' import checkboxes %}
 {% set unbound_field = field.field %}
 {% if field.errors %}
   {% set error_message = {"text": field.errors | first} %}

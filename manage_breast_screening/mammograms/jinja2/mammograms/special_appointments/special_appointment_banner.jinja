@@ -1,5 +1,5 @@
-{% from 'warning-callout/macro.jinja' import warningCallout %}
-{% from 'summary-list/macro.jinja' import summaryList %}
+{% from 'nhsuk/components/warning-callout/macro.jinja' import warningCallout %}
+{% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
 {% macro special_appointment_banner(presented_special_appointment, show_change_link=True) %}
   {% if presented_special_appointment %}
     {% set special_appointment_html %}
@@ -40,7 +40,7 @@
     {% endset %}
     {{ warningCallout({
       "heading": "Special appointment",
-      "HTML": special_appointment_html
+      "html": special_appointment_html
     }) }}
   {% endif %}
 {% endmacro %}
