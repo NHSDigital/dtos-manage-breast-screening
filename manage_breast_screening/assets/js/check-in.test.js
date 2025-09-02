@@ -1,7 +1,8 @@
 import { getByRole } from '@testing-library/dom'
 import { userEvent } from '@testing-library/user-event'
+import { createAll } from 'nhsuk-frontend'
 
-import { initCheckIn } from './check-in.js'
+import { CheckIn } from './check-in.js'
 
 describe('Check in', () => {
   const user = userEvent.setup()
@@ -20,7 +21,7 @@ describe('Check in', () => {
 
   beforeEach(() => {
     document.body.innerHTML = `
-      <div data-module="app-check-in">
+      <div data-module="${CheckIn.moduleName}">
         <div data-hide-on-submit>Not submitted</div>
         <div data-show-on-submit hidden>Submitted</div>
         <form method="post" action="/example" novalidate>
@@ -47,7 +48,7 @@ describe('Check in', () => {
       })
     )
 
-    initCheckIn()
+    createAll(CheckIn)
 
     await user.click(button)
 
@@ -65,7 +66,7 @@ describe('Check in', () => {
       })
     )
 
-    initCheckIn()
+    createAll(CheckIn)
 
     await user.click(button)
 

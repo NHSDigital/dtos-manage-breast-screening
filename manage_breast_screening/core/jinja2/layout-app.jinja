@@ -4,7 +4,6 @@
 
 {% block head %}
   <link rel="stylesheet" href="{{ static('css/main.css' )}}">
-  <script type="module" src="{{ static('js/bundle.js' )}}"></script>
 {% endblock %}
 
 {% block pageTitle %}{% if form and form.errors %}Error: {% endif %}{% if page_title %}{{page_title}} – {% endif %}Manage breast screening – NHS{% endblock %}
@@ -59,3 +58,7 @@
   {% block page_content %}
   {% endblock page_content %}
 {% endblock content %}
+
+{% block bodyEnd %}
+  <script type="module" src="{{ static('js/bundle.js' )}}"></script>
+{% endblock %}}

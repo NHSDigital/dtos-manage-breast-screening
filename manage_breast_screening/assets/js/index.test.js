@@ -1,18 +1,27 @@
 import { waitFor } from '@testing-library/dom'
+import { outdent } from 'outdent'
 
-import { initCheckIn } from './check-in.js'
-
-jest.mock('./check-in.js')
+import { CheckIn } from './check-in.js'
 
 describe('Automatic initialisation', () => {
+  beforeEach(() => {
+    jest.spyOn(CheckIn, 'checkSupport')
+
+    document.body.innerHTML = outdent`
+      <div data-module="${CheckIn.moduleName}">
+        <form method="post" action="/example" novalidate></form>
+      </div>
+    `
+  })
+
   it('should init components on DOMContentLoaded', async () => {
     await import('./index.js')
 
     // Should not initialise on import
-    expect(initCheckIn).not.toHaveBeenCalled()
+    expect(CheckIn.checkSupport).not.toHaveBeenCalled()
 
     // Should initialise on DOMContentLoaded
     window.document.dispatchEvent(new Event('DOMContentLoaded'))
-    await waitFor(() => expect(initCheckIn).toHaveBeenCalled())
+    await waitFor(() => expect(CheckIn.checkSupport).toHaveBeenCalled())
   })
 })
