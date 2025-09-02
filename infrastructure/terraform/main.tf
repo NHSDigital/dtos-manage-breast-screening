@@ -42,6 +42,7 @@ module "container-apps" {
   default_domain                        = var.deploy_infra ? module.infra[0].default_domain : data.azurerm_container_app_environment.this[0].default_domain
   dns_zone_name                         = var.dns_zone_name
   docker_image                          = var.docker_image
+  deploy_database_as_container          = var.deploy_database_as_container
   enable_auth                           = var.enable_auth
   environment                           = var.environment
   env_config                            = var.env_config
@@ -56,5 +57,6 @@ module "container-apps" {
   postgres_storage_mb                   = var.postgres_storage_mb
   postgres_storage_tier                 = var.postgres_storage_tier
   postgres_subnet_id                    = var.deploy_infra ? module.infra[0].postgres_subnet_id : data.azurerm_subnet.postgres[0].id
+  seed_demo_data                        = var.seed_demo_data
   use_apex_domain                       = var.use_apex_domain
 }
