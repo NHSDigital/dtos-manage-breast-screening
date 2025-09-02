@@ -2,49 +2,14 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.urls import reverse
 from jinja2 import ChoiceLoader, Environment, PackageLoader
-from markupsafe import Markup, escape
 
-
-def no_wrap(value):
-    """
-    Wrap a string in a span with class app-no-wrap
-
-    >>> no_wrap('a really long string')
-    Markup('<span class="nhsuk-u-nowrap">a really long string</span>')
-    """
-    return Markup(
-        f'<span class="nhsuk-u-nowrap">{escape(value)}</span>' if value else ""
-    )
-
-
-def nl2br(value):
-    """
-    Convert newline characters to html line breaks
-
-    >>> nl2br('foo\\nbar\\nbaz')
-    Markup('foo<br>bar<br>baz')
-
-    >>> nl2br('<script>\\n</script>')
-    Markup('&lt;script&gt;<br>&lt;/script&gt;')
-    """
-    lines = value.splitlines()
-    return Markup("<br>".join([escape(line) for line in lines]))
-
-
-def as_hint(value):
-    """
-    Wrap a string in a span with class nhsuk-u-secondary-text-color
-
-    >>> as_hint('Not provided')
-    Markup('<span class=nhsuk-u-secondary-text-color">Not provided</span>')
-    """
-    return Markup(
-        f'<span class=nhsuk-u-secondary-text-color">{value}</span>' if value else ""
-    )
-
-
-def raise_helper(msg):
-    raise Exception(msg)
+from manage_breast_screening.core.template_helpers import (
+    as_hint,
+    header_account_items,
+    nl2br,
+    no_wrap,
+    raise_helper,
+)
 
 
 def autoescape(template_name):
@@ -82,10 +47,17 @@ def environment(**options):
         )
 
     env.globals.update(
-        {"static": static, "url": reverse, "STATIC_URL": settings.STATIC_URL}
+        {
+            "STATIC_URL": settings.STATIC_URL,
+            "header_account_items": header_account_items,
+            "raise": raise_helper,
+            "static": static,
+            "url": reverse,
+        }
     )
+
     env.filters["no_wrap"] = no_wrap
     env.filters["as_hint"] = as_hint
     env.filters["nl2br"] = nl2br
-    env.globals["raise"] = raise_helper
+
     return env
