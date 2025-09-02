@@ -95,6 +95,7 @@ class Message(models.Model):
     status = models.CharField(
         max_length=50, choices=MessageStatusChoices, default="pending_enrichment"
     )
+    nhs_notify_errors = models.JSONField(blank=True, null=True)
 
     appointment = models.ForeignKey(
         "notifications.Appointment", on_delete=models.PROTECT
