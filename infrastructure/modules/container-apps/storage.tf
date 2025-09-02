@@ -15,7 +15,7 @@ module "azure_queue_storage_identity" {
 module "storage" {
   source = "../dtos-devops-templates/infrastructure/modules/storage"
 
-  name                = var.storage_account_name
+  name                = local.storage_account_name
   resource_group_name = azurerm_resource_group.main.name
   location            = var.region
   containers          = var.storage_containers
