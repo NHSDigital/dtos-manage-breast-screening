@@ -10,25 +10,25 @@ from .oauth import get_cis2_client, jwk_from_public_key
 
 
 @login_not_required
-def sign_in(request):
+def login(request):
     """Entry point for authentication with CIS2"""
     return render(
         request,
-        "auth/sign_in.jinja",
+        "auth/login.jinja",
         {
             "page_title": "Log in",
-            "navActive": "sign_in",
+            "navActive": "login",
         },
     )
 
 
-def sign_out(request):
+def logout(request):
     auth_logout(request)
     return redirect(reverse("home"))
 
 
 @login_not_required
-def cis2_sign_in(request):
+def cis2_login(request):
     """Start the CIS2 OAuth2/OIDC authorization flow."""
     client = get_cis2_client()
     redirect_uri = request.build_absolute_uri(reverse("auth:cis2_callback")).rstrip("/")

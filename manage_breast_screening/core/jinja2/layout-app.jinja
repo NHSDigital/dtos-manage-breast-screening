@@ -18,7 +18,7 @@
   {% endif %}
 
   {% do account_items.append({
-      "href": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
+      "href": url('auth:logout') if request and request.user.is_authenticated else url('auth:login'),
       "text": "Log out" if request and request.user.is_authenticated else "Log in",
   }) %}
 

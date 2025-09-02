@@ -18,7 +18,7 @@ def persona_login(request):
     else:
         return render(
             request,
-            "auth/persona_sign_in.jinja",
+            "auth/persona_login.jinja",
             context={
                 "users": users,
                 "page_title": "Personas",
