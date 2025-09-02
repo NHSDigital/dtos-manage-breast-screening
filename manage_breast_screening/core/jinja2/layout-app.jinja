@@ -10,9 +10,25 @@
 {% block pageTitle %}{% if form and form.errors %}Error: {% endif %}{% if page_title %}{{page_title}} – {% endif %}Manage breast screening – NHS{% endblock %}
 
 {% block header %}
+  {% set account_items = [] %}
+  {% if request.user.is_authenticated %}
+    {% do account_items.append({
+      "text": request.user.first_name ~ ' ' ~ request.user.last_name,
+      "icon": true
+    }) %}
+  {% endif %}
+
+  {% do account_items.append({
+      "href": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
+      "text": "Sign out" if request and request.user.is_authenticated else "Sign in",
+  }) %}
+
   {{ header({
     "service": {
       "name": "Manage breast screening"
+    },
+    "account": {
+      "items": account_items
     },
     "navigation": {
       "items": [
@@ -25,11 +41,6 @@
           "href": "/clinics/",
           "text": "Clinics",
           'current': true if navActive == "clinics"
-        },
-        {
-          "href": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
-          "text": "Sign out" if request and request.user.is_authenticated else "Sign in",
-          'current': true if navActive == "sign_in"
         }
       ]
     }
