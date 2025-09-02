@@ -1,12 +1,13 @@
-// Import NHS.UK frontend library
-@import "nhsuk-frontend/dist/nhsuk";
+// NHS.UK frontend library
+@use "vendor/nhsuk-frontend/base" as *;
+@forward "vendor/nhsuk-frontend";
 
 // Components that are not in the NHS.UK frontend library
-@import "components/button";
-@import "components/count";
-@import "components/appointment-status";
-@import "components/secondary-navigation";
-@import "components/special-appointment-banner";
+@forward "components/button";
+@forward "components/count";
+@forward "components/appointment-status";
+@forward "components/secondary-navigation";
+@forward "components/special-appointment-banner";
 
 h1 {
   @extend %nhsuk-heading-l;
