@@ -31,9 +31,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "date_str",
             nargs="?",
-            default=datetime.today()
-            .replace(tzinfo=TZ_INFO)
-            .strftime(DIR_NAME_DATE_FORMAT),
+            default=datetime.now(tz=TZ_INFO).strftime(DIR_NAME_DATE_FORMAT),
             help="yyy-MM-dd formatted date reflecting the Azure storage directory",
         )
 
