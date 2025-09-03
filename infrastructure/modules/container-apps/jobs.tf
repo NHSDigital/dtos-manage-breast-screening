@@ -106,9 +106,9 @@ module "scheduled_jobs" {
     SSL_MODE        = "require"
   })
 
-  schedule_trigger_config {
-    cron_expression          = each.value.cron_expression
-    parallelism              = 1
-    replica_completion_count = 1
-  }
+  # schedule_trigger_config {
+  #  cron_expression          = each.value.cron_expression
+  #  parallelism              = 1
+  #  replica_completion_count = 1
+  #}
 }
