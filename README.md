@@ -10,7 +10,6 @@ The new service is a system for managing breast screening clinics, including:
 
 ## Running the app
 
-
 ## Setup
 
 To install the toolchain dependencies and setup the project, run
