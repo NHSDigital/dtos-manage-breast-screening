@@ -8,7 +8,7 @@ dev: # Target the dev environment - make dev <action>
 
 review: # Target the review infrastructure, or a review app if PR_NUMBER is used - make review <action> [PR_NUMBER=<pr_number>]
 	$(eval include infrastructure/environments/review/variables.sh)
-	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_infra=true), $(eval export TF_VAR_deploy_container_apps=false))
+	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_infra=false), $(eval export TF_VAR_deploy_container_apps=false))
 	$(if ${PR_NUMBER}, $(eval export ENVIRONMENT=pr-${PR_NUMBER}), $(eval export ENVIRONMENT=review))
 
 db-setup:
