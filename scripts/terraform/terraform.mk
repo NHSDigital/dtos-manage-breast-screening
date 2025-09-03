@@ -49,6 +49,13 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 		-backend-config=storage_account_name=${STORAGE_ACCOUNT_NAME} \
 		-backend-config=key=${ENVIRONMENT}.tfstate
 
+	export ARM_USE_AZUREAD=true
+	export MSYS_NO_PATHCONV=true
+
+	terraform -chdir=infrastructure/terraform import -var-file=../environments/${ENV_CONFIG}/variables.tfvars module.infra[0].module.app-key-vault.azurerm_key_vault.keyvault  /subscriptions/67aab2fa-fcc7-49da-9dc6-cb90f0fa0628/resourceGroups/rg-manbrs-review-uks/providers/Microsoft.KeyVault/vaults/kv-manbrs-review-app
+	terraform -chdir=infrastructure/terraform import -var-file=../environments/${ENV_CONFIG}/variables.tfvars module.infra[0].module.log_analytics_workspace_audit.azurerm_log_analytics_workspace.log_analytics_workspace  /subscriptions/67aab2fa-fcc7-49da-9dc6-cb90f0fa0628/resourceGroups/rg-manbrs-review-uks/providers/Microsoft.OperationalInsights/workspaces/law-review-uks-manbrs
+	terraform -chdir=infrastructure/terraform import -var-file=../environments/${ENV_CONFIG}/variables.tfvars module.infra[0].module.main_vnet.azurerm_virtual_network.vnet /subscriptions/67aab2fa-fcc7-49da-9dc6-cb90f0fa0628/resourceGroups/rg-manbrs-review-uks/providers/Microsoft.Network/virtualNetworks/vnet-review-uks-manbrs
+
 	$(eval export TF_VAR_app_short_name=${APP_SHORT_NAME})
 	$(eval export TF_VAR_docker_image=${DOCKER_IMAGE}:${DOCKER_IMAGE_TAG})
 	$(eval export TF_VAR_environment=${ENVIRONMENT})
