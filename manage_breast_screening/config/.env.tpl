@@ -15,9 +15,9 @@ PERSONAS_ENABLED=1
 CIS2_SERVER_METADATA_URL=changeme
 CIS2_CLIENT_ID=changeme
 # Private key in PEM format (escape newlines as \n)
-CIS2_PRIVATE_KEY="paste-pem-private-key-here"
+CIS2_CLIENT_PRIVATE_KEY="paste-pem-private-key-here"
 # Public key in PEM format (escape newlines as \n)
-CIS2_PUBLIC_KEY="paste-pem-public-key-here"
+CIS2_CLIENT_PUBLIC_KEY="paste-pem-public-key-here"
 
 NOTIFICATIONS_BATCH_RETRY_LIMIT=5
 NOTIFICATIONS_BATCH_RETRY_DELAY=10

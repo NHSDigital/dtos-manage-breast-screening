@@ -262,10 +262,12 @@ else:
 CIS2_SERVER_METADATA_URL = environ.get("CIS2_SERVER_METADATA_URL")
 CIS2_CLIENT_ID = environ.get("CIS2_CLIENT_ID")
 # Load the private key used for private_key_jwt from environment (PEM). Newlines may be provided as \n.
-private_key_inline = environ.get("CIS2_PRIVATE_KEY")
-CIS2_PRIVATE_KEY = (
+private_key_inline = environ.get("CIS2_CLIENT_PRIVATE_KEY")
+CIS2_CLIENT_PRIVATE_KEY = (
     private_key_inline.replace("\\n", "\n") if private_key_inline else None
 )
-public_key_inline = environ.get("CIS2_PUBLIC_KEY")
-CIS2_PUBLIC_KEY = public_key_inline.replace("\\n", "\n") if public_key_inline else None
+public_key_inline = environ.get("CIS2_CLIENT_PUBLIC_KEY")
+CIS2_CLIENT_PUBLIC_KEY = (
+    public_key_inline.replace("\\n", "\n") if public_key_inline else None
+)
 CIS2_SCOPES = "openid profile email nhsperson associatedorgs"
