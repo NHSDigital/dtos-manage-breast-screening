@@ -15,6 +15,8 @@ from django.views.decorators.http import require_http_methods
 from .oauth import get_cis2_client, jwk_from_public_key
 from .services import DecodeLogoutToken, InvalidLogoutToken
 
+logger = logging.getLogger(__name__)
+
 
 @login_not_required
 def login(request):
@@ -68,7 +70,7 @@ def cis2_callback(request):
         if value:
             defaults[db_field] = value
         else:
-            logging.warning(
+            logger.warning(
                 f"Missing or empty {userinfo_field} in CIS2 userinfo response"
             )
 

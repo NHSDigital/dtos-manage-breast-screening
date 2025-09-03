@@ -9,6 +9,8 @@ from authlib.jose.errors import (
     MissingClaimError,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class InvalidLogoutToken(Exception):
     """Raised when a CIS2 back-channel logout token is invalid."""
@@ -65,5 +67,5 @@ class DecodeLogoutToken:
             JoseError,
             MissingClaimError,
         ) as e:
-            logging.error(f"Invalid logout token: {str(e)}")
+            logger.exception("Invalid logout token")
             raise InvalidLogoutToken(cause=e) from e
