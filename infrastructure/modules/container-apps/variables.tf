@@ -137,7 +137,7 @@ locals {
   database_user = "admin"
   database_name = "manage_breast_screening"
   # Here we expect the environment to be in format pr-XXX.
-  database_port = var.deploy_database_as_container ? min(max(1024, tonumber(regex("\\d+", var.environment)[0]) + 1000), 65535) : 5432
+  database_port = var.deploy_database_as_container ? tonumber(regex("\\d+", var.environment)) + 1000 : 5432
 
   common_env = {
     SSL_MODE         = "require"
