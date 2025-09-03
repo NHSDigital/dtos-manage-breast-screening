@@ -1,7 +1,11 @@
-import 'nhsuk-frontend/packages/nhsuk.js'
+import { createAll, initAll } from 'nhsuk-frontend'
 
-import { initCheckIn } from './check-in.js'
+import { CheckIn } from './check-in.js'
 
 document.addEventListener('DOMContentLoaded', () => {
-  initCheckIn()
+  // Initialise NHS.UK frontend components
+  initAll()
+
+  // Initialise application components
+  createAll(CheckIn)
 })

@@ -41,32 +41,32 @@ class TestCIS2SignIn(SystemTestCase):
             lambda: FakeCIS2Client(),
         )
 
-    def test_sign_in_and_sign_out_via_cis2(self):
-        self.given_i_am_on_the_sign_in_page()
-        self.when_i_sign_in_via_cis2()
+    def test_log_in_and_log_out_via_cis2(self):
+        self.given_i_am_on_the_login_page()
+        self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_home()
-        self.then_header_shows_sign_out()
-        self.when_i_click_sign_out()
-        self.then_header_shows_sign_in()
+        self.then_header_shows_log_out()
+        self.when_i_click_log_out()
+        self.then_header_shows_log_in()
 
-    def given_i_am_on_the_sign_in_page(self):
-        self.page.goto(self.live_server_url + reverse("auth:sign_in"))
+    def given_i_am_on_the_login_page(self):
+        self.page.goto(self.live_server_url + reverse("auth:login"))
 
-    def when_i_sign_in_via_cis2(self):
-        self.page.get_by_text("Sign in with CIS2").click()
+    def when_i_log_in_via_cis2(self):
+        self.page.get_by_text("Log in with CIS2").click()
 
     def then_i_am_redirected_to_home(self):
         home_path = reverse("clinics:index")
         expect(self.page).to_have_url(re.compile(home_path))
 
-    def then_header_shows_sign_out(self):
+    def then_header_shows_log_out(self):
         header = self.page.get_by_role("navigation")
-        expect(header.get_by_text("Sign out")).to_be_visible()
+        expect(header.get_by_text("Log out")).to_be_visible()
 
-    def when_i_click_sign_out(self):
+    def when_i_click_log_out(self):
         header = self.page.get_by_role("navigation")
-        header.get_by_text("Sign out").click()
+        header.get_by_text("Log out").click()
 
-    def then_header_shows_sign_in(self):
+    def then_header_shows_log_in(self):
         header = self.page.get_by_role("navigation")
-        expect(header.get_by_text("Sign in")).to_be_visible()
+        expect(header.get_by_text("Log in")).to_be_visible()

@@ -42,7 +42,7 @@ class TestDjangoFormHelpers:
             dedent(response).strip()
             == dedent(
                 """
-                <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1">
+                <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="nhsuk-error-summary">
                   <h2 class="nhsuk-error-summary__title" id="error-summary-title">
                     There is a problem
                   </h2>

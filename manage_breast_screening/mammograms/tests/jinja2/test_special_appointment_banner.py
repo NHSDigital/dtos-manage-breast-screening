@@ -44,7 +44,7 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
                     Physical restriction
                     </dt>
                     <dd class="nhsuk-summary-list__value">
-                    broken foot<br><span class="app-special-appointment-banner__tag--temporary">Temporary</span>
+                    broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
                     </dd>
                 </div>
                 <div class="nhsuk-summary-list__row">
@@ -52,7 +52,7 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
                     Social, emotional, and mental health
                     </dt>
                     <dd class="nhsuk-summary-list__value">
-                    <span class="app-special-appointment-banner__tag--no-details">No details provided</span>
+                    <span class="nhsuk-u-secondary-text-color">No details provided</span>
                     </dd>
                 </div>
             </dl>
@@ -91,7 +91,7 @@ def test_special_appointment_banner_without_change_link(jinja_env, presenter):
                     Physical restriction
                     </dt>
                     <dd class="nhsuk-summary-list__value">
-                    broken foot<br><span class="app-special-appointment-banner__tag--temporary">Temporary</span>
+                    broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
                     </dd>
                 </div>
                 <div class="nhsuk-summary-list__row">
@@ -99,7 +99,7 @@ def test_special_appointment_banner_without_change_link(jinja_env, presenter):
                     Social, emotional, and mental health
                     </dt>
                     <dd class="nhsuk-summary-list__value">
-                    <span class="app-special-appointment-banner__tag--no-details">No details provided</span>
+                    <span class="nhsuk-u-secondary-text-color">No details provided</span>
                     </dd>
                 </div>
             </dl>

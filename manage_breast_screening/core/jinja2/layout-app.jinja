@@ -1,37 +1,35 @@
-{% from 'header/macro.jinja' import header %}
+{% from 'nhsuk/components/header/macro.jinja' import header %}
 {% set assetPath = STATIC_URL ~ "/assets" %}
-{% extends "template.jinja" %}
+{% extends "nhsuk/template.jinja" %}
 
 {% block head %}
   <link rel="stylesheet" href="{{ static('css/main.css' )}}">
-  <script type="module" src="{{ static('js/bundle.js' )}}"></script>
 {% endblock %}
 
-{% block pageTitle %}{% if form and form.errors %}Error: {% endif %}{% if page_title %}{{page_title}} – {% endif %}Manage breast screening – NHS{% endblock %}
+{% block pageTitle %}{% if form and form.errors %}Error: {% endif %}{% if page_title %}{{ page_title }} – {% endif %}Manage breast screening – NHS{% endblock %}
 
 {% block header %}
   {{ header({
-    "showNav": "true",
     "service": {
       "name": "Manage breast screening"
     },
-    "primaryLinks": [
-      {
-        "url": "/",
-        "label": "Home",
-        "current": true if navActive == "home"
-      },
-      {
-        "url": "/clinics/",
-        "label": "Clinics",
-        'current': true if navActive == "clinics"
-      },
-      {
-        "url": url('auth:sign_out') if request and request.user.is_authenticated else url('auth:sign_in'),
-        "label": "Sign out" if request and request.user.is_authenticated else "Sign in",
-        'current': true if navActive == "sign_in"
-      }
-    ]
+    "account": {
+      "items": header_account_items(request.user)
+    },
+    "navigation": {
+      "items": [
+        {
+          "href": "/",
+          "text": "Home",
+          "current": true if navActive == "home"
+        },
+        {
+          "href": "/clinics/",
+          "text": "Clinics",
+          'current': true if navActive == "clinics"
+        }
+      ]
+    }
   }) }}
 {% endblock %}
 
@@ -47,3 +45,7 @@
   {% block page_content %}
   {% endblock page_content %}
 {% endblock content %}
+
+{% block bodyEnd %}
+  <script type="module" src="{{ static('js/bundle.js' )}}"></script>
+{% endblock %}}

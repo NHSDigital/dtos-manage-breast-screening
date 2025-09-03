@@ -1,5 +1,5 @@
-{% from "card/macro.jinja" import card %}
-{% from "summary-list/macro.jinja" import summaryList %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 
 {% macro screening_details(presented_mammograms, screening_protocol) %}
   {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}

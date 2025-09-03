@@ -255,7 +255,7 @@ AUDIT_EXCLUDED_FIELDS = ["password", "token", "created_at", "updated_at", "id"]
 if PERSONAS_ENABLED:
     LOGIN_URL = "auth:persona_login"
 else:
-    LOGIN_URL = "auth:sign_in"
+    LOGIN_URL = "auth:login"
 
 # CIS2 / Authlib configuration
 # These settings configure Authlib's Django client to use CIS2 via private_key_jwt
