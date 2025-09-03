@@ -59,9 +59,19 @@ def cis2_callback(request):
 
     User = get_user_model()
     defaults = {}
-    defaults["email"] = userinfo["email"]
-    defaults["first_name"] = userinfo["given_name"]
-    defaults["last_name"] = userinfo["family_name"]
+
+    for db_field, userinfo_field in [
+        ("email", "email"),
+        ("first_name", "given_name"),
+        ("last_name", "family_name"),
+    ]:
+        value = userinfo.get(userinfo_field, "")
+        if value:
+            defaults[db_field] = value
+        else:
+            logging.warning(
+                f"Missing or empty {userinfo_field} in CIS2 userinfo response"
+            )
 
     user, _ = User.objects.update_or_create(username=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
