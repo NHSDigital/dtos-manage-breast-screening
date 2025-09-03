@@ -140,7 +140,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-     = {
+DATABASES = {
     "default": {
         "ENGINE": "manage_breast_screening.config.postgresql",
         "NAME": environ.get("DATABASE_NAME", ""),
