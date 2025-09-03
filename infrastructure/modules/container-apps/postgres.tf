@@ -98,4 +98,5 @@ module "database_container" {
   infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
   is_tcp_app                       = true
   port                             = 5432
+  exposed_port                     = local.database_port
 }
