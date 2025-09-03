@@ -136,6 +136,8 @@ locals {
 
   database_user = "admin"
   database_name = "manage_breast_screening"
+  # Here we expect the environment to be in format pr-XXX.
+  database_port = var.deploy_database_as_container ? min(max(1024, tonumber(regex("\\d+", var.environment)[0]) + 1000), 65535) : 5432
 
   common_env = {
     SSL_MODE         = "require"
@@ -147,6 +149,7 @@ locals {
     DATABASE_HOST = var.deploy_database_as_container ? module.database_container[0].container_app_fqdn : null
     DATABASE_NAME = local.database_name
     DATABASE_USER = local.database_user
+    DATABASE_PORT = local.database_port
   }
 
   azure_db_env = {

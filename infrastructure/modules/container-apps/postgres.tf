@@ -91,11 +91,12 @@ module "database_container" {
   environment_variables = {
     POSTGRES_USER = local.database_user
     POSTGRES_DB   = local.database_name
+    POSTGRES_PORT = local.database_port
   }
   resource_group_name              = azurerm_resource_group.main.name
   fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
   infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
   infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
   is_tcp_app                       = true
-  port                             = 5432
+  port                             = local.database_port
 }
