@@ -1,7 +1,5 @@
 import logging
 
-from authlib.jose import JoseError, jwt
-from authlib.jose.errors import ExpiredTokenError, InvalidClaimError, InvalidTokenError
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -15,6 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .oauth import get_cis2_client, jwk_from_public_key
+from .services import DecodeLogoutToken, InvalidLogoutToken
 
 
 @login_not_required
@@ -116,26 +115,13 @@ def cis2_back_channel_logout(request):
     metadata = client.load_server_metadata()
     key_loader = client.create_load_key()
     try:
-        verification_rules = {
-            "iss": {"values": [metadata["issuer"]], "essential": True},
-            "aud": {"values": [client.client_id], "essential": True},
-            "exp": {"essential": True},
-            "iat": {"essential": True},
-            "events": {
-                "essential": True,
-                "validate": lambda claim, value: isinstance(value, dict)
-                and "http://schemas.openid.net/event/backchannel-logout" in value,
-            },
-            "nonce": {"validate": lambda claim, value: value is None},
-        }
-        claims = jwt.decode(
-            logout_token,
-            key=key_loader,
-            claims_options=verification_rules,
+        claims = DecodeLogoutToken().call(
+            metadata=metadata,
+            logout_token=logout_token,
+            client_id=client.client_id,
+            key_loader=key_loader,
         )
-        claims.validate(leeway=60)
-    except (JoseError, InvalidClaimError, ExpiredTokenError, InvalidTokenError) as e:
-        logging.error(f"Invalid logout token: {str(e)}")
+    except InvalidLogoutToken:
         return HttpResponseBadRequest("Invalid logout token")
 
     if "sub" not in claims:
