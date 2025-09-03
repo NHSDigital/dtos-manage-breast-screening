@@ -14,7 +14,11 @@ from .system_test_setup import SystemTestCase
 
 
 class TestCIS2BackChannelLogout(SystemTestCase):
-    """System test for CIS2 back-channel logout endpoint."""
+    """
+    System test for CIS2 back-channel logout endpoint. This test uses an
+    actual instance of our CIS2 OAuth client (instantiated with test settings),
+    and mocks calls to the CIS2 server metadata and JWKS endpoints.
+    """
 
     def test_back_channel_logout_invalidates_user_sessions(self):
         self.given_i_am_signed_in()
