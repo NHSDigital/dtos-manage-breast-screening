@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
             message_batch = MessageBatch.objects.create(
                 routing_plan_id=routing_plan_id,
-                scheduled_at=datetime.today().replace(tzinfo=TZ_INFO),
+                scheduled_at=datetime.now(tz=TZ_INFO),
                 status=MessageBatchStatusChoices.SCHEDULED.value,
             )
 
