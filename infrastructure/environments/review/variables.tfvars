@@ -7,5 +7,5 @@ postgres_geo_redundant_backup_enabled = false
 protect_keyvault                      = false
 vnet_address_space                    = "10.142.0.0/16"
 personas_enabled                      = true
-deploy_database_as_container          = true
+deploy_database_as_container          = false
 seed_demo_data                        = true
