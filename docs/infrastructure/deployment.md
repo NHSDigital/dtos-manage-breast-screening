@@ -43,9 +43,9 @@ When a pull request is raised, add a "deploy" label to deploy a _review app_ (co
 
 To make this process faster and less costly, most of the infrastructure is reused for all review apps: networking, key vaults, container app environments... The base infrastructure is only updated by the pipeline on the main branch.
 
-When the pull request is closed or merged, and if it has the "deploy" label, the [Delete review app](https://github.com/NHSDigital/dtos-manage-breast-screening/actions/workflows/cicd-1-pull-request-closed.yaml) workflow is triggered, followed by the [Delete review app](https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build?definitionId=103) Azure devops pipeline. It runs _terraform destroy_ to delete the resources.
+Also, by default a container version of postgres is deployed, as opposed to a full Azure postgres server. This behaviour can be changed by setting `deploy_database_as_container` to false. Note: each postgres container exposes a unique port, based on the PR number.
 
-Note: terraform currently deploys a postgres server with a locked database. It must be deleted manually from the Azure portal before the pipeline runs.
+When the pull request is closed or merged, and if it has the "deploy" label, the [Delete review app](https://github.com/NHSDigital/dtos-manage-breast-screening/actions/workflows/cicd-1-pull-request-closed.yaml) workflow is triggered, followed by the [Delete review app](https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build?definitionId=103) Azure devops pipeline. It runs _terraform destroy_ to delete the resources.
 
 ### Main branch
 
