@@ -147,7 +147,7 @@ DATABASES = {
         "USER": environ.get("DATABASE_USER", ""),
         "PASSWORD": environ.get("DATABASE_PASSWORD", ""),
         "HOST": environ.get("DATABASE_HOST", ""),
-        "PORT": "5432",
+        "PORT": environ.get("DATABASE_PORT", "5432"),
         "OPTIONS": {"sslmode": environ.get("DATABASE_SSLMODE", "prefer")},
     }
 }
