@@ -4,10 +4,8 @@ import requests_mock
 from authlib.jose import JsonWebKey, jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.sessions.models import Session
 from django.test.client import Client as TestClient
 from django.urls import reverse
-from django.utils import timezone
 from playwright.sync_api import expect
 
 from .system_test_setup import SystemTestCase
@@ -95,12 +93,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
 
         User = get_user_model()
         user = User.objects.get(username=self.user_id)
-        active_sessions = [
-            s
-            for s in Session.objects.filter(expire_date__gte=timezone.now())
-            if str(s.get_decoded().get("_auth_user_id")) == str(user.pk)
-        ]
-        assert active_sessions == []
+        assert user.session_set.all().count() == 0
 
         self.page.goto(self.live_server_url + reverse("home"))
         header = self.page.get_by_role("navigation")
@@ -113,12 +106,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
         # Session for the user should still exist
         User = get_user_model()
         user = User.objects.get(username=self.user_id)
-        active_sessions = [
-            s
-            for s in Session.objects.filter(expire_date__gte=timezone.now())
-            if str(s.get_decoded().get("_auth_user_id")) == str(user.pk)
-        ]
-        assert active_sessions != []
+        assert user.session_set.all().count() == 1
 
         # UI should still show user as logged in
         self.page.goto(self.live_server_url + reverse("home"))

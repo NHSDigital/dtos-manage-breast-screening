@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.forms",
-    "django.contrib.sessions",
+    "qsessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "manage_breast_screening.core",
@@ -76,7 +76,7 @@ if getenv("DJANGO_ENV", "production") != "production":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "qsessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -136,6 +136,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "manage_breast_screening.config.wsgi.application"
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+SESSION_ENGINE = "qsessions.backends.db"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
