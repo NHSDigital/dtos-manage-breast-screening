@@ -81,7 +81,7 @@ module "database_container" {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
   }
-  app_key_vault_id             = var.app_key_vault_id
+  # app_key_vault_id             = var.app_key_vault_id
   source                       = "../dtos-devops-templates/infrastructure/modules/container-app"
   name                         = "${var.app_short_name}-db-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
@@ -93,7 +93,7 @@ module "database_container" {
     POSTGRES_DB   = local.database_name
   }
   resource_group_name              = azurerm_resource_group.main.name
-  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
+  # fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
   infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
   infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
   is_tcp_app                       = true
