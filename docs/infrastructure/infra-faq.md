@@ -3,6 +3,7 @@
 - [Terraform](#terraform)
 - [Github action triggering Azure devops pipeline](#github-action-triggering-azure-devops-pipeline)
 - [Bicep errors](#bicep-errors)
+- [Front door](#front-door)
 
 ## Terraform
 
@@ -171,3 +172,28 @@ Race condition: the managed identity is not created in time for the resources th
 ```
 
 Request Owner role on subscriptions via PIM.
+
+## Front door
+
+### Error 504
+
+When an environment is freshly created, accessing the app via fornt door may result in a blank page and 504 HTTP error.
+
+This is because the private link between front door and the container app environment must be manually approved:
+
+- Navigate to the container app environment, Settings, Networking, Private Endpoints
+- It should show "1 Private Endpoint". Click on it.
+- You should see a connection with Connection State = "Pending"
+- Click on the connection name (a long ID in black, not the blue private endpoint link)
+- Click "✔️ Approve" at the top
+- Wait a few minutes until Connection State shows Approved
+
+### Private link not created
+
+When an origin is created, it must create a unique private link between front door and the container app environment. The private link automatically creates a private endpoint associated with the container app environment. When more origins are added, the same link is used.
+
+If the private endpoint is deleted, for example if container app environment is deleted, the private link is gone and the origins are silently orphans. When the container app environment is recreated, even if the apps and origins are redeployed, azure will not recreate the private link.
+
+All the deployed apps show a blank page and 504 HTTP error.
+
+The solution is to delete all the origins to this particular container app environment. Then when the first origin is readded, the private link will be created. Recreate the other origins and they will use the same link.
