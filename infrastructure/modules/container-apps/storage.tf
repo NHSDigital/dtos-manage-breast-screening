@@ -33,7 +33,7 @@ module "storage" {
   name = local.storage_account_name
 
   private_endpoint_properties = {
-    private_endpoint_enabled             = true
+    private_endpoint_enabled = true
     # private_endpoint_subnet_id           = module.main_subnet.id
     private_endpoint_subnet_id           = var.main_subnet_id
     private_endpoint_resource_group_name = azurerm_resource_group.main.name
