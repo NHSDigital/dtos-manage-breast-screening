@@ -113,6 +113,11 @@ variable "postgres_subnet_id" {
   type        = string
 }
 
+variable "main_subnet_id" {
+  description = "The main subnet id. Created in the infra module."
+  type        = string
+}
+
 variable "region" {
   description = "The region to deploy in"
   type        = string

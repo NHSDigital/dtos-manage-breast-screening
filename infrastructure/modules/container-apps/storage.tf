@@ -24,7 +24,8 @@ module "storage" {
 
   containers                 = local.storage_containers
   location                   = var.region
-  log_analytics_workspace_id = module.log_analytics_workspace_audit.id
+  log_analytics_workspace_id = var.log_analytics_workspace_audit_id
+  # log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 
   monitor_diagnostic_setting_storage_account_enabled_logs = ["AuditEvent", "AzurePolicyEvaluationDetails"]
   monitor_diagnostic_setting_storage_account_metrics      = ["AllMetrics"]
@@ -33,7 +34,8 @@ module "storage" {
 
   private_endpoint_properties = {
     private_endpoint_enabled             = true
-    private_endpoint_subnet_id           = module.main_subnet.id
+    # private_endpoint_subnet_id           = module.main_subnet.id
+    private_endpoint_subnet_id           = var.main_subnet_id
     private_endpoint_resource_group_name = azurerm_resource_group.main.name
     private_service_connection_is_manual = false
   }
