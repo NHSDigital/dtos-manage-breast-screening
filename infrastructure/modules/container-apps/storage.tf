@@ -27,7 +27,7 @@ module "storage" {
   log_analytics_workspace_id = var.log_analytics_workspace_audit_id
   # log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 
-  monitor_diagnostic_setting_storage_account_enabled_logs = ["AuditEvent", "AzurePolicyEvaluationDetails"]
+  monitor_diagnostic_setting_storage_account_enabled_logs = ["AzurePolicyEvaluationDetails"]
   monitor_diagnostic_setting_storage_account_metrics      = ["AllMetrics"]
 
   name = replace(lower(local.storage_account_name), "-", "")
