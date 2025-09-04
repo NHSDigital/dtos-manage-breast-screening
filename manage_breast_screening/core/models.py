@@ -6,6 +6,21 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 
+class ReferenceDataModel(models.Model):
+    """
+    Base class for reference data - static data that categorises other data
+
+    All records should have predictable IDs so we can refer to them directly in code.
+    """
+
+    class Meta:
+        abstract = True
+
+    id = models.CharField(editable=False, primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
 class BaseModel(models.Model):
     class Meta:
         abstract = True
