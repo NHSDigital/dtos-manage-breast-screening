@@ -69,10 +69,7 @@ class Command(BaseCommand):
         except Exception as e:
             raise CommandError(e)
 
-    # TODO: Check the appointment notification rules here.
     def schedule_date(self) -> datetime:
-        today = datetime.today()
-        today_end = today.replace(
-            hour=23, minute=59, second=59, microsecond=999999, tzinfo=TZ_INFO
-        )
-        return today_end + timedelta(weeks=4, days=4)
+        today = datetime.now(tz=TZ_INFO)
+        today_end = today.replace(hour=23, minute=59, second=59, microsecond=999999)
+        return today_end + timedelta(weeks=4)
