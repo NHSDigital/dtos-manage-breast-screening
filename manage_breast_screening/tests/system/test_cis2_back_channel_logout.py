@@ -56,6 +56,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
 
     def test_back_channel_logout_invalidates_user_sessions(self):
         self.given_i_am_signed_in()
+        self.and_someone_else_is_signed_in()
         self.and_there_is_a_cis2_logout_token()
         self.when_the_back_channel_logout_endpoint_is_called()
         self.then_i_am_logged_out()
@@ -68,13 +69,21 @@ class TestCIS2BackChannelLogout(SystemTestCase):
 
     def given_i_am_signed_in(self):
         User = get_user_model()
-        self.user_id = "user-123"
-        user = User.objects.create_user(username=self.user_id, password="irrelevant")
+        self.user = User.objects.create_user(username="user-123", password="irrelevant")
 
-        self.login_as_user(user)
+        self.login_as_user(self.user)
         self.page.goto(self.live_server_url + reverse("clinics:index"))
         header = self.page.get_by_role("navigation")
         expect(header.get_by_text("Log out")).to_be_visible()
+
+    def and_someone_else_is_signed_in(self):
+        User = get_user_model()
+        self.another_user = User.objects.create_user(
+            username="another-user", password="irrelevant"
+        )
+        # Log in with a different session
+        client = TestClient()
+        client.login(username=self.another_user.username, password="irrelevant")
 
     def and_there_is_a_cis2_logout_token(self):
         self.token = self._create_logout_token()
@@ -96,9 +105,8 @@ class TestCIS2BackChannelLogout(SystemTestCase):
     def then_i_am_logged_out(self):
         assert self.response.status_code == 200
 
-        User = get_user_model()
-        user = User.objects.get(username=self.user_id)
-        assert user.session_set.all().count() == 0
+        assert self.user.session_set.all().count() == 0
+        assert self.another_user.session_set.all().count() == 1
 
         self.page.goto(self.live_server_url + reverse("home"))
         header = self.page.get_by_role("navigation")
@@ -109,9 +117,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
         assert self.response.status_code == 400
 
         # Session for the user should still exist
-        User = get_user_model()
-        user = User.objects.get(username=self.user_id)
-        assert user.session_set.all().count() == 1
+        assert self.user.session_set.all().count() == 1
 
         # UI should still show user as logged in
         self.page.goto(self.live_server_url + reverse("home"))
@@ -127,7 +133,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
             "iat": now,
             "exp": now + 300,
             "events": {"http://schemas.openid.net/event/backchannel-logout": {}},
-            "sub": self.user_id,  # We currently key on sub to find the local user
+            "sub": self.user.username,  # We currently key on sub to find the local user
             "sid": "not-used",
             "jti": "not-used",
         }
