@@ -30,7 +30,7 @@ module "storage" {
   monitor_diagnostic_setting_storage_account_enabled_logs = ["AuditEvent", "AzurePolicyEvaluationDetails"]
   monitor_diagnostic_setting_storage_account_metrics      = ["AllMetrics"]
 
-  name = local.storage_account_name
+  name = replace(lower(local.storage_account_name), "-", "")
 
   private_endpoint_properties = {
     private_endpoint_enabled = true
