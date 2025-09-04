@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 from .oauth import get_cis2_client, jwk_from_public_key
-from .services import DecodeLogoutToken, InvalidLogoutToken
+from .services import InvalidLogoutToken, decode_logout_token
 
 logger = logging.getLogger(__name__)
 
@@ -115,12 +115,7 @@ def cis2_back_channel_logout(request):
     metadata = client.load_server_metadata()
     key_loader = client.create_load_key()
     try:
-        claims = DecodeLogoutToken().call(
-            metadata=metadata,
-            logout_token=logout_token,
-            client_id=client.client_id,
-            key_loader=key_loader,
-        )
+        claims = decode_logout_token(metadata["issuer"], key_loader, logout_token)
     except InvalidLogoutToken:
         return HttpResponseBadRequest("Invalid logout token")
 
