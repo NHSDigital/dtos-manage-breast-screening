@@ -24,6 +24,11 @@ def get_cis2_client():
     if missing:
         raise ValueError(f"Missing required CIS2 OAuth settings: {', '.join(missing)}")
 
+    # Return existing client if already registered
+    client = oauth._clients.get("cis2")
+    if client:
+        return client
+
     jwk = jwk_from_public_key()
     kid = jwk.thumbprint()
 
