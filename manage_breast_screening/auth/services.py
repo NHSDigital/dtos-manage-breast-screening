@@ -15,16 +15,6 @@ logger = logging.getLogger(__name__)
 class InvalidLogoutToken(Exception):
     """Raised when a CIS2 back-channel logout token is invalid."""
 
-    def __init__(self, cause=None):
-        """
-        Initialize with optional cause.
-
-        Args:
-            cause: The original exception that caused this error
-        """
-        self.cause = cause
-        super().__init__(str(cause) if cause else "Invalid logout token")
-
 
 class DecodeLogoutToken:
     def call(
@@ -68,4 +58,4 @@ class DecodeLogoutToken:
             MissingClaimError,
         ) as e:
             logger.exception("Invalid logout token")
-            raise InvalidLogoutToken(cause=e) from e
+            raise InvalidLogoutToken() from e

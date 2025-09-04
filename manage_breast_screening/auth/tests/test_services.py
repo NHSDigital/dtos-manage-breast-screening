@@ -124,9 +124,8 @@ class TestDecodeLogoutToken:
                 key_loader=self._key_loader(public_jwk),
             )
 
-        # Assert on the cause type and error message content
-        assert isinstance(excinfo.value.cause, expected_error_type)
-        assert expected_error_text in str(excinfo.value.cause)
+        assert isinstance(excinfo.value.__cause__, expected_error_type)
+        assert expected_error_text in str(excinfo.value.__cause__)
 
     def test_invalid_signature_raises_error(self):
         kid = "k1"
@@ -147,9 +146,8 @@ class TestDecodeLogoutToken:
                 key_loader=self._key_loader(public_jwk_1),
             )
 
-        # Invalid signature should raise a JoseError
-        assert isinstance(excinfo.value.cause, JoseError)
-        assert "signature" in str(excinfo.value.cause).lower()
+        assert isinstance(excinfo.value.__cause__, JoseError)
+        assert "signature" in str(excinfo.value.__cause__)
 
     def test_expired_token_raises_error(self):
         kid = "k1"
@@ -173,10 +171,8 @@ class TestDecodeLogoutToken:
                 client_id=client_id,
                 key_loader=self._key_loader(public_jwk),
             )
-
-        # Expired token should raise an ExpiredTokenError
-        assert isinstance(excinfo.value.cause, ExpiredTokenError)
-        assert "expired" in str(excinfo.value.cause).lower()
+        assert isinstance(excinfo.value.__cause__, ExpiredTokenError)
+        assert "expired" in str(excinfo.value.__cause__)
 
     def test_missing_iat_raises_error(self):
         kid = "k1"
@@ -197,6 +193,5 @@ class TestDecodeLogoutToken:
                 key_loader=self._key_loader(public_jwk),
             )
 
-        # Missing iat should raise a MissingClaimError
-        assert isinstance(excinfo.value.cause, MissingClaimError)
-        assert "iat" in str(excinfo.value.cause).lower()
+        assert isinstance(excinfo.value.__cause__, MissingClaimError)
+        assert "iat" in str(excinfo.value.__cause__)
