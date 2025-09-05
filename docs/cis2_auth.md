@@ -40,8 +40,8 @@ The following settings in `manage_breast_screening/config/settings.py` provide t
 
 - **`CIS2_SERVER_METADATA_URL`** - URL to CIS2's OpenID Connect discovery document
 - **`CIS2_CLIENT_ID`** - Client identifier registered with CIS2
-- **`CIS2_PRIVATE_KEY`** - RSA private key in PEM format for JWT signing (supports `\n` escaped newlines)
-- **`CIS2_PUBLIC_KEY`** - Corresponding RSA public key in PEM format (supports `\n` escaped newlines)
+- **`CIS2_CLIENT_PRIVATE_KEY`** - RSA private key in PEM format for JWT signing (supports `\n` escaped newlines)
+- **`CIS2_CLIENT_PUBLIC_KEY`** - Corresponding RSA public key in PEM format (supports `\n` escaped newlines)
 - **`CIS2_SCOPES`** - OAuth scopes requested
 
 The private and public keys form a keypair used for the `private_key_jwt` client authentication method.
