@@ -54,4 +54,6 @@ jobs:
             --parameters commitSHA=${{inputs.commit_sha}} ${pr_argument} environment=${{ matrix.environment }} \
             --output tsv --query id)
 
+          echo "See pipeline run in Azure devops: https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build/results?buildId=${RUN_ID}&view=results"
+
           scripts/bash/wait_ado_pipeline.sh "$RUN_ID" https://dev.azure.com/nhse-dtos dtos-manage-breast-screening
