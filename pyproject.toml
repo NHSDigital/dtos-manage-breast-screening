@@ -31,13 +31,13 @@ dependencies = [
 package-mode = false
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.4.1"
+pytest = "^8.4.2"
 pytest-django = "^4.11.1"
 time-machine = "^2.17.0"
 pytest-playwright = "^0.7.0"
 ipdb = "^0.13.13"
 axe-playwright-python = "^0.1.5"
-ruff = "^0.12.11"
+ruff = "^0.12.12"
 django-debug-toolbar = "^6.0.0"
 requests-mock = "^1.12.1"
 pytest-cov = "^6.2.1"
