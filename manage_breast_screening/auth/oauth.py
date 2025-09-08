@@ -15,8 +15,8 @@ def get_cis2_client():
         name
         for name in [
             "CIS2_CLIENT_ID",
-            "CIS2_PRIVATE_KEY",
-            "CIS2_PUBLIC_KEY",
+            "CIS2_CLIENT_PRIVATE_KEY",
+            "CIS2_CLIENT_PUBLIC_KEY",
             "CIS2_SERVER_METADATA_URL",
         ]
         if not getattr(settings, name, None)
@@ -24,13 +24,18 @@ def get_cis2_client():
     if missing:
         raise ValueError(f"Missing required CIS2 OAuth settings: {', '.join(missing)}")
 
+    # Return existing client if already registered
+    client = oauth._clients.get("cis2")
+    if client:
+        return client
+
     jwk = jwk_from_public_key()
     kid = jwk.thumbprint()
 
     client = oauth.register(
         "cis2",
         client_id=settings.CIS2_CLIENT_ID,
-        client_secret=settings.CIS2_PRIVATE_KEY,
+        client_secret=settings.CIS2_CLIENT_PRIVATE_KEY,
         server_metadata_url=settings.CIS2_SERVER_METADATA_URL,
         client_kwargs={
             "scope": settings.CIS2_SCOPES,
@@ -68,7 +73,7 @@ def jwk_from_public_key():
     Returns:
         JsonWebKey | None: Public JWK or None on failure.
     """
-    jwk = JsonWebKey.import_key(settings.CIS2_PUBLIC_KEY, {"kty": "RSA"})
+    jwk = JsonWebKey.import_key(settings.CIS2_CLIENT_PUBLIC_KEY, {"kty": "RSA"})
     return jwk
 
 

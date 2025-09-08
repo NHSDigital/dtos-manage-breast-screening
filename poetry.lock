@@ -713,6 +713,25 @@ django = ">=4.2.9"
 sqlparse = ">=0.2"
 
 [[package]]
+name = "django-qsessions"
+version = "2.0.0"
+description = "Extended session backends for Django"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "django_qsessions-2.0.0-py3-none-any.whl", hash = "sha256:505837d25d4857696c1b9dc553b02a5dca5f3d761bd6a0a127e9f468bf22dc09"},
+    {file = "django_qsessions-2.0.0.tar.gz", hash = "sha256:d3efc4151fbd732d7aaa5452a0e1bae49829db7962f1bf7942b4ed370699e470"},
+]
+
+[package.dependencies]
+Django = ">=4.2"
+ua-parser = {version = ">=1.0.1", extras = ["regex"]}
+
+[package.extras]
+dev = ["geoip2", "pre-commit", "pytest (>=7)", "pytest-cov", "pytest-django"]
+
+[[package]]
 name = "djlint"
 version = "1.36.4"
 description = "HTML Template Linter and Formatter"
@@ -2348,6 +2367,77 @@ files = [
 markers = {dev = "sys_platform == \"win32\""}
 
 [[package]]
+name = "ua-parser"
+version = "1.0.1"
+description = "Python port of Browserscope's user agent parser"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "ua_parser-1.0.1-py3-none-any.whl", hash = "sha256:b059f2cb0935addea7e551251cbbf42e9a8872f86134163bc1a4f79e0945ffea"},
+    {file = "ua_parser-1.0.1.tar.gz", hash = "sha256:f9d92bf19d4329019cef91707aecc23c6d65143ad7e29a233f0580fb0d15547d"},
+]
+
+[package.dependencies]
+ua-parser-builtins = "*"
+ua-parser-rs = {version = "*", optional = true, markers = "extra == \"regex\""}
+
+[package.extras]
+re2 = ["google-re2"]
+regex = ["ua-parser-rs"]
+yaml = ["PyYaml"]
+
+[[package]]
+name = "ua-parser-builtins"
+version = "0.18.0.post1"
+description = "Precompiled rules for User Agent Parser"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "ua_parser_builtins-0.18.0.post1-py3-none-any.whl", hash = "sha256:eb4f93504040c3a990a6b0742a2afd540d87d7f9f05fd66e94c101db1564674d"},
+]
+
+[[package]]
+name = "ua-parser-rs"
+version = "0.1.3"
+description = "native accelerator for ua-parser"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-macosx_10_12_x86_64.whl", hash = "sha256:baa85a995eb34d53802036b0a09ce1afb290be87f78948d91cbc2ed79b48336c"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-macosx_11_0_arm64.whl", hash = "sha256:271372f504cab7850262c12db2eba70bc367abf728e08acae1495c048d947fff"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:fc34e3cd4b5f8675475c968788c1c4ce7f2e0d1457a1ba5582a2e9e6e2889789"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:afbeafa81f62308ea86b74c71aece44fa232af8b012a847e39adfd92903e1bc2"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-manylinux_2_34_aarch64.whl", hash = "sha256:6f7f1b3d3efb59a6eac60f9651a7e1450ff9ca8c078a838bf00afa68aeea658f"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-manylinux_2_34_x86_64.whl", hash = "sha256:a9e5ead1f8e1399ca99e3a5c8e402f6c7b563f0af3e6009188593082ebc52eb5"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-win_amd64.whl", hash = "sha256:730d416e30e57cc6295963cf093220100e6a64acc2105eb860aa174633ad3b13"},
+    {file = "ua_parser_rs-0.1.3-cp39-abi3-win_arm64.whl", hash = "sha256:ae8e3825b729e89f3ec5c213b9a5bdfadc6461bad3b4ac5bd2187aea7ad78595"},
+    {file = "ua_parser_rs-0.1.3-graalpy311-graalpy242_311_native-macosx_10_12_x86_64.whl", hash = "sha256:b624a5b1c0afa9e218838fc19135d69bd127a8b9b4e3cdd304ab47ce6435328c"},
+    {file = "ua_parser_rs-0.1.3-graalpy311-graalpy242_311_native-macosx_11_0_arm64.whl", hash = "sha256:b0234c9645cb60de024035470e7d9b4a946d289d9d14c6c2ad72011113b7487f"},
+    {file = "ua_parser_rs-0.1.3-graalpy311-graalpy242_311_native-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:10f8e13de9491db5527bcc68d94e01fe67d8b5412229416465dff7a3a82e9a50"},
+    {file = "ua_parser_rs-0.1.3-graalpy311-graalpy242_311_native-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9c56c2ed1380f7a551f50f16c69e968dda2e89a3ca5a4d5713890045bcc7a183"},
+    {file = "ua_parser_rs-0.1.3-graalpy311-graalpy242_311_native-manylinux_2_34_aarch64.whl", hash = "sha256:a52e0b121e43ddfc526f0667c3aa43c86801c3462fbf1cf1ae36eca8288268c0"},
+    {file = "ua_parser_rs-0.1.3-graalpy311-graalpy242_311_native-manylinux_2_34_x86_64.whl", hash = "sha256:bf70dd8142a8cd2e5b3724b2e98c9c1659ab2ec70febd0608d12fcd9a12eeb63"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-macosx_10_12_x86_64.whl", hash = "sha256:acd5db6ab642bdcf079bdf905c5ffa2ec971e154b5610ad48ca162b851fc4142"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-macosx_11_0_arm64.whl", hash = "sha256:dca20ec9f3edb272570e41be1a51d96f18e01c344b5dd50dcc7fef1b59102d87"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:41c8866379172d6448642c9e64384ff90527856567ee73e10be949ff8dddfb30"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e84f79528a9cbb03557b7f53248cef12b82935a9a62142aeda19231828fa040c"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-manylinux_2_34_aarch64.whl", hash = "sha256:4a86c662fef8d720d180c910fd1d4d1cab5d6ff3611fe36039538bc1e43b26a9"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:61ea14de0a1ef9492201fd530540151d6b7d29f4f2cc1c9a637d86825877770a"},
+    {file = "ua_parser_rs-0.1.3-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:915b5b53b25dc8827bbc0c83f1784430115e024504951e75f8a9a53d6f7b2917"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-macosx_10_12_x86_64.whl", hash = "sha256:668071f010bc47bd88c6f08624268732fe53c926d71e4bf3ad6ef7f0b582481f"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-macosx_11_0_arm64.whl", hash = "sha256:f01ad6fb97a888a350bd977a7c166682c0ad9a888dcdf12cbdf3acb631309475"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ce7acabdb2e4f5b517bc8dc56ca95a9522281e493db1b3e091b5bc78fa8bccf2"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:8d2e03972990e26f542d7b5c386785697d4f5591f79cf35a31a504927b0679a4"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-manylinux_2_34_aarch64.whl", hash = "sha256:4d0d82d4a42796ec6efe6fed58b0ac876211e4049f59cb905d0b7137284a9bc1"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:e3e232268b181b5d27c8d9bacedec881b5e02bd6651cb617968ec70abaa73d16"},
+    {file = "ua_parser_rs-0.1.3-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:74f98b200ca4c6db2eec450f66fc1d95ec82516ab604e2bcd774d2f5444db75c"},
+    {file = "ua_parser_rs-0.1.3.tar.gz", hash = "sha256:afd40e64ffce5f629bc09d415100d409455af5f6439cac0278d6bf03c46d3262"},
+]
+
+[[package]]
 name = "urllib3"
 version = "2.5.0"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
@@ -2398,4 +2488,4 @@ brotli = ["brotli"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13"
-content-hash = "1dda3f27b1b040087995299d8cb61042d0f6162255d5014b3d5def2e24fac4f1"
+content-hash = "9f096368d08bf89359f16608254c9076ed0e9a2da3f2c3a07b9142bfead4a7af"
