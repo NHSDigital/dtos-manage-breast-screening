@@ -5,8 +5,8 @@ from .models import (
     Participant,
     ParticipantAddress,
     ParticipantReportedMammogram,
-    ParticipantReportedSymptom,
     ScreeningEpisode,
+    Symptom,
     SymptomSubType,
     SymptomType,
 )
@@ -21,8 +21,8 @@ class ParticipantReportedMammogramInline(admin.StackedInline):
     extra = 1
 
 
-class ParticipantReportedSymptomInline(admin.StackedInline):
-    model = ParticipantReportedSymptom
+class SymptomInline(admin.StackedInline):
+    model = Symptom
     extra = 0
 
 
@@ -55,7 +55,7 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 
 class AppointmentAdmin(admin.ModelAdmin):
-    inlines = [ParticipantReportedSymptomInline]
+    inlines = [SymptomInline]
 
     list_display = [
         "name",

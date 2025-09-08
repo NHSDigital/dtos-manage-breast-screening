@@ -27,7 +27,7 @@ class SymptomAreas(models.TextChoices):
     OTHER = ("OTHER", "Other")
 
 
-class ParticipantReportedSymptom(BaseModel):
+class Symptom(BaseModel):
     symptom_type = models.ForeignKey(SymptomType, on_delete=models.PROTECT)
     symptom_sub_type = models.ForeignKey(
         SymptomSubType, on_delete=models.PROTECT, null=True, blank=True
