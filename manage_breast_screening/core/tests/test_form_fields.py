@@ -67,15 +67,15 @@ class TestSplitDateField:
         assert f.has_changed([1, 12, 2025], [1, 12, 2026])
         assert not f.has_changed([1, 12, 2025], [1, 12, 2025])
 
-    def test_default_django_render(self):
+    def test_renders_split_date_input(self):
         class TestForm(Form):
             date = SplitDateField(max_value=datetime.date(2026, 12, 31))
 
         f = TestForm()
 
         assertHTMLEqual(
-            str(f),
-            """<div>
+            f["date"].as_field_group(),
+            """
             <div class="nhsuk-form-group">
                 <fieldset class="nhsuk-fieldset" role="group">
                     <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
@@ -108,19 +108,19 @@ class TestSplitDateField:
                         </div>
                     </div>
                 </fieldset>
-            </div></div>
+            </div>
             """,
         )
 
-    def test_default_django_render_in_bound_form(self):
+    def test_bound_form_renders_values(self):
         class TestForm(Form):
             date = SplitDateField(max_value=datetime.date(2026, 12, 31))
 
         f = TestForm({"date_0": "1", "date_1": "12", "date_2": "2025"})
 
         assertHTMLEqual(
-            str(f),
-            """<div>
+            f["date"].as_field_group(),
+            """
             <div class="nhsuk-form-group">
                 <fieldset class="nhsuk-fieldset" role="group">
                     <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
@@ -153,7 +153,7 @@ class TestSplitDateField:
                         </div>
                     </div>
                 </fieldset>
-            </div></div>
+            </div>
             """,
         )
 
