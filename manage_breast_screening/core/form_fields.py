@@ -9,9 +9,25 @@ from django.utils.translation import gettext_lazy as _
 from manage_breast_screening.core.utils.date_formatting import format_date
 
 
-class SplitDateWidget(widgets.MultiWidget):
+class BetterMultiWidget(widgets.MultiWidget):
+    def subwidgets(self, name, value, attrs=None):
+        """
+        Expose data for each subwidget, so that we can render them separately in the template.
+
+        For some reason, as of Django 5.2, `MultiWidget` does not actually override the default
+        implementation provided by `Widget`, which means you can't call `form.date.0` `form.date.1`
+        to access the individual parts.
+        (see https://stackoverflow.com/questions/24866936/render-only-one-part-of-a-multiwidget-in-django)
+        """
+        context = self.get_context(name, value, attrs)
+        for subwidget in context["widget"]["subwidgets"]:
+            yield subwidget
+
+
+class DayMonthYearWidget(BetterMultiWidget):
     """
     A widget that splits a date into 3 number inputs.
+
     Adapted from https://github.com/ministryofjustice/django-govuk-forms/blob/master/govuk_forms/widgets.py
     """
 
@@ -28,45 +44,48 @@ class SplitDateWidget(widgets.MultiWidget):
             return [value.day, value.month, value.year]
         return [None, None, None]
 
-    def subwidgets(self, name, value, attrs=None):
-        """
-        Expose data for each subwidget, so that we can render them separately in the template.
 
-        For some reason, as of Django 5.2, `MultiWidget` does not actually override the default
-        implementation provided by `Widget`, which means you can't call `form.date.0` `form.date.1`
-        to access the individual parts.
-        (see https://stackoverflow.com/questions/24866936/render-only-one-part-of-a-multiwidget-in-django)
-        """
-        context = self.get_context(name, value, attrs)
-        for subwidget in context["widget"]["subwidgets"]:
-            yield subwidget
-
-
-class SplitHiddenDateWidget(SplitDateWidget):
+class MonthYearWidget(BetterMultiWidget):
     """
-    A widget that splits a date into 3 number inputs (hidden variant)
+    A widget that splits a date into 2 number inputs.
+
     Adapted from https://github.com/ministryofjustice/django-govuk-forms/blob/master/govuk_forms/widgets.py
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for widget in self.widgets:
-            widget.input_type = "hidden"
+    def __init__(self, attrs=None):
+        date_widgets = (
+            widgets.NumberInput(attrs=attrs),
+            widgets.NumberInput(attrs=attrs),
+        )
+        super().__init__(date_widgets, attrs)
+
+    def decompress(self, value):
+        if value:
+            return [value.month, value.year]
+        return [None, None]
 
 
 class SplitDateField(forms.MultiValueField):
     """
-    A form field that can be rendered as 3 inputs using the dateInput component in the design system.
+    A form field that can be rendered as 2 or 3 inputs using the dateInput component in the design system.
+
+    By default, the date is validated to be between 1st January 1900
+    and today's date. This can be customised with the `min_value` and
+    `max_value` arguments.
+
+    If you pass `include_day=False`, then the day input will be dropped,
+    and the date will be assumed to be the first of the month.
+
     Adapted from https://github.com/ministryofjustice/django-govuk-forms/blob/master/govuk_forms/fields.py
     """
 
-    widget = SplitDateWidget
-    hidden_widget = SplitHiddenDateWidget
     default_error_messages = {"invalid": _("Enter a valid date.")}
 
     def __init__(self, *args, **kwargs):
         max_value = kwargs.pop("max_value", datetime.date.today())
         min_value = kwargs.pop("min_value", datetime.date(1900, 1, 1))
+
+        self.include_day = kwargs.pop("include_day", True)
         self.hint = kwargs.pop("hint", None)
 
         day_bounds_error = gettext("Day should be between 1 and 31.")
@@ -104,12 +123,19 @@ class SplitDateField(forms.MultiValueField):
         }
 
         self.fields = [
-            IntegerField(**day_kwargs),
             IntegerField(**month_kwargs),
             IntegerField(**year_kwargs),
         ]
 
-        kwargs["template_name"] = "forms/date-input.jinja"
+        if self.include_day:
+            self.fields.insert(0, IntegerField(**day_kwargs))
+
+        if self.include_day:
+            kwargs["widget"] = DayMonthYearWidget
+            kwargs["template_name"] = "forms/day-month-year-date-input.jinja"
+        else:
+            kwargs["widget"] = MonthYearWidget
+            kwargs["template_name"] = "forms/month-year-date-input.jinja"
 
         super().__init__(self.fields, *args, **kwargs)
 
@@ -129,14 +155,17 @@ class SplitDateField(forms.MultiValueField):
             try:
                 if any(item in self.empty_values for item in data_list):
                     raise ValueError
-                return datetime.date(data_list[2], data_list[1], data_list[0])
+                if self.include_day:
+                    return datetime.date(data_list[2], data_list[1], data_list[0])
+                else:
+                    return datetime.date(data_list[1], data_list[0], 1)
             except ValueError:
                 raise ValidationError(self.error_messages["invalid"], code="invalid")
         return None
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
-        if not isinstance(widget, SplitDateWidget):
+        if not isinstance(widget, widgets.MultiWidget):
             return attrs
         for subfield, subwidget in zip(self.fields, widget.widgets):
             if subfield.min_value is not None:
