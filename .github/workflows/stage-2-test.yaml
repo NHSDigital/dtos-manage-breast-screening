@@ -37,6 +37,8 @@ jobs:
     name: 'Tests'
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    outputs:
+      notifications-changed: ${{ steps.notifications-changes.outputs.notifications == 'true' }}
 
     services:
       postgres:
@@ -54,6 +56,14 @@ jobs:
     steps:
       - name: 'Checkout code'
         uses: actions/checkout@v5
+
+      - name: Detect notifications code changes
+        uses: dorny/paths-filter@v3
+        id: notifications-changes
+        with:
+          filters: |
+            notifications:
+              - 'manage_breast_screening/notifications/**'
 
       - name: Install poetry
         run: pipx install poetry
@@ -89,6 +99,7 @@ jobs:
 
   notifications-integration-test:
     needs: test
+    if: needs.test.outputs.notifications-changed
     name: 'Notifications Integration Tests'
     runs-on: ubuntu-latest
     timeout-minutes: 5
