@@ -121,14 +121,6 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v5
 
-      - name: Detect notifications code changes
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            notifications:
-              - 'manage_breast_screening/notifications/**'
-
       - name: Install poetry
         run: pipx install poetry
 
@@ -143,7 +135,6 @@ jobs:
         run: make dependencies
 
       - name: 'Run notifications integration test suite'
-        if: steps.filter.outputs.notifications == 'true'
         run: make test-integration
         env:
           DATABASE_NAME: postgres
