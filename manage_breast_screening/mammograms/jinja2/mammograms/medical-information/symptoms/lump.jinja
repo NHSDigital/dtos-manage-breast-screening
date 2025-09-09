@@ -1,0 +1,31 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+
+{% block form %}
+  {% do form.where_located.add_conditional_html(
+    'OTHER',
+    form.other_area_description.as_field_group()
+  ) %}
+  {% do form.how_long.add_conditional_html(
+    'SINCE_A_SPECIFIC_DATE',
+    form.specific_date.as_field_group()
+  ) %}
+  {# TODO: the symptom has recently resolved details #}
+
+  {{ form.where_located.as_field_group() }}
+
+  {{ form.how_long.as_field_group() }}
+
+  {# TODO: figure out how to do extra checkboxes - they belong in the same fieldset as the radios #}
+  {{ form.any_temporary.as_field_group() }}
+
+  {{ form.investigated.as_field_group() }}
+
+  {{ form.additional_info.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save symptom"
+    }) }}
+  </div>
+{% endblock %}
