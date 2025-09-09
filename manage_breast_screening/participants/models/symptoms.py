@@ -2,7 +2,6 @@ from django.db import models
 
 from ...core.models import BaseModel, ReferenceDataModel
 from .appointment import Appointment
-from .participant import Participant
 
 
 class SymptomType(ReferenceDataModel):
@@ -32,7 +31,6 @@ class Symptom(BaseModel):
     symptom_sub_type = models.ForeignKey(
         SymptomSubType, on_delete=models.PROTECT, null=True, blank=True
     )
-    participant = models.ForeignKey(Participant, on_delete=models.PROTECT)
     appointment = models.ForeignKey(Appointment, on_delete=models.PROTECT)
     reported_at = models.DateField()
 
@@ -55,3 +53,7 @@ class Symptom(BaseModel):
     when_resolved = models.CharField(blank=True, null=False)
 
     additional_information = models.CharField(blank=True, null=False)
+
+    @property
+    def participant(self):
+        return self.appointment.participant
