@@ -27,3 +27,11 @@ data "azurerm_subnet" "postgres" {
   virtual_network_name = module.shared_config.names.virtual-network-lowercase
   resource_group_name  = local.resource_group_name
 }
+
+data "azurerm_subnet" "main" {
+  count = var.deploy_infra ? 0 : 1
+
+  name                 = "snet-main"
+  virtual_network_name = module.shared_config.names.virtual-network-lowercase
+  resource_group_name  = local.resource_group_name
+}
