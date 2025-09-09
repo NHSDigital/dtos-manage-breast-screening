@@ -97,14 +97,16 @@ module "scheduled_jobs" {
   docker_image               = var.docker_image
   user_assigned_identity_ids = [module.azure_blob_storage_identity.id, module.azure_queue_storage_identity.id, module.db_connect_identity.id]
 
-  environment_variables = merge(each.value.environment_variables, {
-    AZURE_CLIENT_ID = module.azure_blob_storage_identity.client_id
-    DATABASE_HOST   = module.postgres.host
-    DATABASE_NAME   = module.postgres.database_names[0]
-    DATABASE_USER   = module.db_connect_identity.name
-    DJANGO_ENV      = var.env_config
-    SSL_MODE        = "require"
-  })
+  environment_variables = merge(
+    local.common_env,
+    {
+      "STORAGE_ACCOUNT_NAME" = module.storage.storage_account_name,
+      "BLOB_MI_CLIENT_ID"    = module.azure_blob_storage_identity.client_id,
+      "QUEUE_MI_CLIENT_ID"   = module.azure_queue_storage_identity.client_id
+    },
+    each.value.environment_variables,
+    var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
+  )
 
   # schedule_trigger_config {
   #  cron_expression          = each.value.cron_expression
