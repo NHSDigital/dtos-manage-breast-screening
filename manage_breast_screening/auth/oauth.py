@@ -5,6 +5,7 @@ from authlib.integrations.django_client import OAuth
 from authlib.jose import JsonWebKey
 from authlib.oauth2.rfc7523 import PrivateKeyJWT, private_key_jwt_sign
 from django.conf import settings
+from django.urls import reverse
 
 oauth = OAuth()
 
@@ -47,6 +48,14 @@ def get_cis2_client():
     )
 
     return client
+
+
+def cis2_redirect_uri():
+    """Return the redirect URI for the CIS2 callback."""
+    # Handle trailing slashes
+    base_url = settings.BASE_URL.rstrip("/") if settings.BASE_URL else ""
+    callback_path = reverse("auth:cis2_callback").rstrip("/")
+    return f"{base_url}{callback_path}"
 
 
 # Authlib's PrivateKeyJWT doesn't allow us to change the default exp value set in the JWT, so we

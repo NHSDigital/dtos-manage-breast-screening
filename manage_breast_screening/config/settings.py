@@ -272,3 +272,5 @@ CIS2_CLIENT_PUBLIC_KEY = (
     public_key_inline.replace("\\n", "\n") if public_key_inline else None
 )
 CIS2_SCOPES = "openid profile email nhsperson associatedorgs"
+
+BASE_URL = environ.get("BASE_URL")
