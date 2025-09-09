@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 5
     outputs:
       notifications-changed: ${{ steps.notifications-changes.outputs.notifications == 'true' }}
-
+      playwright-version: ${{ steps.get-playwright-version.outputs.playwright-version }}
     services:
       postgres:
         image: postgres:17.4-alpine3.21
@@ -78,19 +78,14 @@ jobs:
       - name: Install dependencies
         run: make dependencies
 
-      - name: Install Playwright browsers
-        run: poetry run playwright install chromium --with-deps
+      - name: Get installed Playwright version
+        id: get-playwright-version
+        run: |
+          echo "playwright-version=$(poetry show playwright | awk '/version/ { print $3 }')"
+          echo "playwright-version=$(poetry show playwright | awk '/version/ { print $3 }')" >> "$GITHUB_OUTPUT"
 
       - name: 'Run unit test suite'
         run: make test-unit
-        env:
-          DATABASE_NAME: postgres
-          DATABASE_PASSWORD: postgres
-          DATABASE_USER: postgres
-          DATABASE_HOST: localhost
-
-      - name: 'Run system test suite'
-        run: make test-ui
         env:
           DATABASE_NAME: postgres
           DATABASE_PASSWORD: postgres
@@ -133,14 +128,6 @@ jobs:
 
       - name: Install dependencies
         run: make dependencies
-
-      - name: 'Run notifications integration test suite'
-        run: make test-integration
-        env:
-          DATABASE_NAME: postgres
-          DATABASE_PASSWORD: postgres
-          DATABASE_USER: postgres
-          DATABASE_HOST: localhost
 
   test-lint:
     name: 'Linting'
@@ -186,3 +173,64 @@ jobs:
           sonar_organisation_key: '${{ vars.SONAR_ORGANISATION_KEY }}'
           sonar_project_key: '${{ vars.SONAR_PROJECT_KEY }}'
           sonar_token: '${{ secrets.SONAR_TOKEN }}'
+
+  playwright-integration-test:
+    # TODO: add path-filter
+    needs: test
+    name: 'Tests (playwright)'
+    runs-on: ubuntu-latest
+
+    # Use the containerised version of playwright, to avoid the additional step
+    # of downloading and installing browsers, which is slow.
+    container:
+      image: 'mcr.microsoft.com/playwright/python:v${{needs.test.outputs.playwright-version}}-noble'
+      options: --user 1001
+    timeout-minutes: 5
+
+    services:
+      postgres:
+        image: postgres:17.4-alpine3.21
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v4
+
+      - name: Install poetry
+        # poetry must be installed first to use setup-python's
+        # caching.
+        # pipx is not available in this image, so just use pip.
+        # this defaults to a user installation, so make sure the path
+        # is properly set up for this.
+        run: |
+          echo "/github/home/.local/bin" >> $GITHUB_PATH
+          pip install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '${{inputs.python_version}}'
+          cache: poetry
+          cache-dependency-path: ./poetry.lock
+
+      - name: Install python and node dependencies
+        # Make is not available in this image, so just use poetry/npm directly
+        run: |
+          poetry install
+          npm ci
+
+      - name: 'Run system test suite'
+        run: make test-ui
+        env:
+          DATABASE_NAME: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_USER: postgres
+          DATABASE_HOST: localhost
