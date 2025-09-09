@@ -81,6 +81,11 @@ locals {
 module "db_setup" {
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
+  providers = {
+    azurerm     = azurerm
+    azurerm.dns = azurerm.hub
+  }
+
   name                         = "${var.app_short_name}-dbm-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = azurerm_resource_group.main.name
@@ -105,12 +110,21 @@ module "db_setup" {
     local.common_env,
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
+  depends_on = [
+    module.queue_storage_role_assignment,
+    module.blob_storage_role_assignment
+  ]
 
 }
 
 module "scheduled_jobs" {
   source   = "../dtos-devops-templates/infrastructure/modules/container-app-job"
   for_each = local.scheduled_jobs
+
+  providers = {
+    azurerm     = azurerm
+    azurerm.dns = azurerm.hub
+  }
 
   name                         = "${var.app_short_name}-${each.value.job_short_name}-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
@@ -146,7 +160,7 @@ module "scheduled_jobs" {
   # Ensure RBAC role assignments are created before the job definition finalizes
   depends_on = [
     module.blob_storage_role_assignment,
-    module.queue_storage_role_assignment,
+    module.queue_storage_role_assignment
   ]
 
   # schedule_trigger_config {

@@ -38,4 +38,5 @@ module "webapp" {
   secret_variables = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   is_web_app       = true
   port             = 8000
+  depends_on = [  ]
 }
