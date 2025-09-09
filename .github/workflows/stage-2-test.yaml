@@ -99,7 +99,7 @@ jobs:
 
   notifications-integration-test:
     needs: test
-    if: needs.test.outputs.notifications-changed
+    if: needs.test.outputs.notifications-changed == 'true'
     name: 'Notifications Integration Tests'
     runs-on: ubuntu-latest
     timeout-minutes: 5
