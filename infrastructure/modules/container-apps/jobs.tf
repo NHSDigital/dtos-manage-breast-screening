@@ -143,6 +143,12 @@ module "scheduled_jobs" {
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
 
+  # Ensure RBAC role assignments are created before the job definition finalizes
+  depends_on = [
+    module.blob_storage_role_assignment,
+    module.queue_storage_role_assignment,
+  ]
+
   # schedule_trigger_config {
   #  cron_expression          = each.value.cron_expression
   #  parallelism              = 1
