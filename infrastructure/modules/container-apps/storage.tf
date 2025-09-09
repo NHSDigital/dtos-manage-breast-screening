@@ -33,6 +33,8 @@ module "storage" {
   name = replace(lower(local.storage_account_name), "-", "")
 
   private_endpoint_properties = {
+    private_dns_zone_ids_blob            = [data.azurerm_private_dns_zone.storage.id]
+    private_dns_zone_ids_queue           = [data.azurerm_private_dns_zone.storage.id]
     private_endpoint_enabled             = true
     private_endpoint_subnet_id           = var.main_subnet_id
     private_endpoint_resource_group_name = azurerm_resource_group.main.name
