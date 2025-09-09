@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -5,8 +7,13 @@ from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 
 from .oauth import get_cis2_client, jwk_from_public_key
+from .services import InvalidLogoutToken, decode_logout_token
+
+logger = logging.getLogger(__name__)
 
 
 @login_not_required
@@ -43,23 +50,29 @@ def cis2_callback(request):
     """Handle CIS2 OAuth2/OIDC callback, create/login the Django user, then redirect home."""
     client = get_cis2_client()
     token = client.authorize_access_token(request)
+
     userinfo = client.userinfo(token=token)
-    sub = userinfo.get("sub")
+    sub = userinfo.get("sub")  # Unique identifier for the user in CIS2
     if not sub:
         return HttpResponseBadRequest("Missing subject in CIS2 response")
 
     User = get_user_model()
     defaults = {}
-    if userinfo.get("email"):
-        defaults["email"] = userinfo["email"]
-    if userinfo.get("given_name"):
-        defaults["first_name"] = userinfo["given_name"]
-    if userinfo.get("family_name"):
-        defaults["last_name"] = userinfo["family_name"]
 
-    # Map CIS2 subject ('sub') to the built-in 'username' field, Django's
-    # default unique identifier for users
-    user, _ = User.objects.get_or_create(username=sub, defaults=defaults)
+    for db_field, userinfo_field in [
+        ("email", "email"),
+        ("first_name", "given_name"),
+        ("last_name", "family_name"),
+    ]:
+        value = userinfo.get(userinfo_field, "")
+        if value:
+            defaults[db_field] = value
+        else:
+            logger.warning(
+                f"Missing or empty {userinfo_field} in CIS2 userinfo response"
+            )
+
+    user, _ = User.objects.update_or_create(username=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return redirect(reverse("home"))
 
@@ -81,3 +94,44 @@ def jwks(request):
         return JsonResponse({"keys": [jwk_dict]})
     except Exception:
         return JsonResponse({"keys": []})
+
+
+@require_http_methods(["POST"])
+@csrf_exempt
+@login_not_required
+def cis2_back_channel_logout(request):
+    """Handle CIS2 back-channel logout notifications.
+
+    This endpoint receives logout tokens from CIS2 when a user's session is terminated.
+    See: https://openid.net/specs/openid-connect-backchannel-1_0.html
+    See: https://digital.nhs.uk/services/care-identity-service/applications-and-services/cis2-authentication/guidance-for-developers/detailed-guidance/session-management#back-channel-logout
+    """
+    logout_token = request.POST.get("logout_token")
+    if not logout_token:
+        return HttpResponseBadRequest("Missing logout_token")
+
+    # Get the CIS2 client and prepare key loader for token verification
+    client = get_cis2_client()
+    metadata = client.load_server_metadata()
+    key_loader = client.create_load_key()
+    try:
+        claims = decode_logout_token(metadata["issuer"], key_loader, logout_token)
+    except InvalidLogoutToken:
+        return HttpResponseBadRequest("Invalid logout token")
+
+    if "sub" not in claims:
+        return HttpResponseBadRequest("Invalid logout token: Missing 'sub' claim")
+
+    # CIS2 also sends a sid claim identifying the session being terminated. For
+    # simplicity, we ignore that for now and look up the user by the sub claim
+    # (a uid in CIS2) before invalidating all of their sessions.
+    User = get_user_model()
+    try:
+        user = User.objects.get(username=claims["sub"])
+    except User.DoesNotExist:
+        # Nothing to do if the user doesn't exist locally
+        return JsonResponse({"status": "ok"})
+    # Invalidate all sessions for this user
+    user.session_set.all().delete()
+
+    return JsonResponse({"status": "ok"})

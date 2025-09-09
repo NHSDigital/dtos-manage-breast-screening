@@ -81,21 +81,18 @@ module "database_container" {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
   }
-  app_key_vault_id             = var.app_key_vault_id
   source                       = "../dtos-devops-templates/infrastructure/modules/container-app"
   name                         = "${var.app_short_name}-db-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
   docker_image                 = "postgres:16"
-  enable_auth                  = false
   secret_variables             = var.deploy_database_as_container ? { POSTGRES_PASSWORD = resource.random_password.admin_password[0].result } : {}
   environment_variables = {
     POSTGRES_USER = local.database_user
     POSTGRES_DB   = local.database_name
   }
   resource_group_name              = azurerm_resource_group.main.name
-  fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
-  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
-  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
   is_tcp_app                       = true
-  port                             = 5432
+  # postgres has a port of 5432
+  port         = 5432
+  exposed_port = local.database_port
 }

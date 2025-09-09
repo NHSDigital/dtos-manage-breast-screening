@@ -17,3 +17,5 @@ infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:32
 infrastructure/terraform/resource_group_init/main.bicep:generic-api-key:33
 infrastructure/terraform/resource_group_init/storage.bicep:generic-api-key:59
 infrastructure/terraform/resource_group_init/keyVault.bicep:generic-api-key:10
+manage_breast_screening/config/settings_test.py:private-key:34
+manage_breast_screening/config/settings_test.py:public-key:61

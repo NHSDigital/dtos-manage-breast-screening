@@ -98,8 +98,7 @@ class TestSendMessageBatch:
         """Test that appointments with date inside the schedule period are notified"""
         mock_send_message_batch.return_value.status_code = 201
         appointment = AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO)
-            + timedelta(weeks=4, days=4)
+            starts_at=datetime.now().replace(tzinfo=TZ_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -125,7 +124,7 @@ class TestSendMessageBatch:
         """Test that appointments with date inside the schedule period are notified"""
         AppointmentFactory(
             starts_at=datetime.now().replace(tzinfo=TZ_INFO)
-            + timedelta(weeks=4, days=5)
+            + timedelta(weeks=4, days=1)
         )
 
         Command().handle()
@@ -173,8 +172,7 @@ class TestSendMessageBatch:
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_send_message_batch.return_value.json.return_value = notify_errors
         appointment = AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO)
-            + timedelta(weeks=4, days=4)
+            starts_at=datetime.now().replace(tzinfo=TZ_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -199,9 +197,9 @@ class TestSendMessageBatch:
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_send_message_batch.return_value.status_code = status_code
         mock_send_message_batch.return_value.json.return_value = notify_errors
+
         appointment = AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO)
-            + timedelta(weeks=4, days=4)
+            starts_at=datetime.now().replace(tzinfo=TZ_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 

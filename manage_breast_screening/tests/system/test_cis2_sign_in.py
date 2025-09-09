@@ -9,6 +9,13 @@ from .system_test_setup import SystemTestCase
 
 
 class TestCIS2SignIn(SystemTestCase):
+    """
+    System test for CIS2 sign-in flow. This test uses a fake CIS2 OAuth client
+    which mocks the function calls made by Authlib during the sign-in process.
+    This allows us to test the sign-in flow without making actual calls to the
+    CIS2 server.
+    """
+
     @pytest.fixture(autouse=True)
     def setup_oauth_stub(self, settings, monkeypatch):
         class FakeCIS2Client:

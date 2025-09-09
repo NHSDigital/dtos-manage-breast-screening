@@ -37,15 +37,14 @@ class TestAggregateQuery:
         return appt
 
     def test_query_aggregates_appointments_and_cascade_counts(self):
+        now = datetime.now(tz=ZoneInfo("Europe/London"))
         clinic1 = ClinicFactory(code="BU001", bso_code="BSO1", name="BSU 1")
         clinic2 = ClinicFactory(code="BU002", bso_code="BSO2", name="BSU 2")
 
-        date1 = datetime.today() - timedelta(days=10)
-        date1.replace(tzinfo=ZoneInfo("Europe/London"))
+        date1 = now - timedelta(days=10)
         df1 = date1.strftime("%Y-%m-%d")
 
-        date2 = datetime.today() - timedelta(days=15)
-        date2.replace(tzinfo=ZoneInfo("Europe/London"))
+        date2 = now - timedelta(days=15)
         df2 = date2.strftime("%Y-%m-%d")
 
         nhsapp_read = {"nhsapp": "read"}
