@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from .oauth import get_cis2_client, jwk_from_public_key
+from .oauth import cis2_redirect_uri, get_cis2_client, jwk_from_public_key
 from .services import InvalidLogoutToken, decode_logout_token
 
 logger = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ def logout(request):
 def cis2_login(request):
     """Start the CIS2 OAuth2/OIDC authorization flow."""
     client = get_cis2_client()
-    redirect_uri = request.build_absolute_uri(reverse("auth:cis2_callback")).rstrip("/")
+    redirect_uri = cis2_redirect_uri()
     # The acr_values param determines which authentication options are available to the user
     # See https://digital.nhs.uk/services/care-identity-service/applications-and-services/cis2-authentication/guidance-for-developers/detailed-guidance/acr-values#acr-values
     return client.authorize_redirect(

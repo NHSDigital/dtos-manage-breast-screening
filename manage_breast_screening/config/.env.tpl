@@ -11,6 +11,9 @@ LOG_QUERIES=0
 CMAPI_CONSUMER_KEY=some-consumer
 PERSONAS_ENABLED=1
 
+# Set to FQDN in deployed environments
+BASE_URL=http://localhost:8000
+
 # CIS2 / Authlib
 CIS2_SERVER_METADATA_URL=changeme
 CIS2_CLIENT_ID=changeme

@@ -2,6 +2,7 @@ import os
 from collections import Counter
 
 import pytest
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.client import Client
@@ -32,6 +33,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
         self.axe = AxeAdapter(self.page)
+        settings.BASE_URL = self.live_server_url
 
     def tearDown(self):
         self.page.close()
