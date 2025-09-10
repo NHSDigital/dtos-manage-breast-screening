@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+from business.calendar import Calendar
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
@@ -28,6 +29,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
+            if not self.bso_working_day():
+                return
+
             for routing_plan in RoutingPlan.all():
                 self.stdout.write(
                     f"Finding appointments of episode type {routing_plan.episode_types} to include in batch."
@@ -45,7 +49,6 @@ class Command(BaseCommand):
                         f"No appointments found to batch for episode types {routing_plan.episode_types}"
                     )
                     continue
-
 
                 self.stdout.write(
                     f"Found {appointments.count()} appointments to batch."
@@ -80,6 +83,9 @@ class Command(BaseCommand):
                     )
         except Exception as e:
             raise CommandError(e)
+
+    def bso_working_day(self):
+        return Calendar().is_business_day(datetime.now(tz=TZ_INFO))
 
     def schedule_date(self) -> datetime:
         today = datetime.now(tz=TZ_INFO)
