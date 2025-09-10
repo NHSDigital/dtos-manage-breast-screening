@@ -49,7 +49,7 @@ locals {
       cron_expression = "*/30 * * * *"
       environment_variables = {
         API_MESSAGE_BATCH_URL     = var.nhs_notify_api_message_batch_url
-        STATUS_UPDATES_QUEUE_NAME = "message-status-updates"
+        STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
       }
       job_short_name     = "sms"
       job_container_args = "save_message_status"
