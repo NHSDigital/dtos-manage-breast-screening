@@ -81,11 +81,6 @@ locals {
 module "db_setup" {
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
 
-  providers = {
-    azurerm     = azurerm
-    azurerm.dns = azurerm.hub
-  }
-
   name                         = "${var.app_short_name}-dbm-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = azurerm_resource_group.main.name
@@ -120,11 +115,6 @@ module "db_setup" {
 module "scheduled_jobs" {
   source   = "../dtos-devops-templates/infrastructure/modules/container-app-job"
   for_each = local.scheduled_jobs
-
-  providers = {
-    azurerm     = azurerm
-    azurerm.dns = azurerm.hub
-  }
 
   name                         = "${var.app_short_name}-${each.value.job_short_name}-${var.environment}"
   container_app_environment_id = var.container_app_environment_id
