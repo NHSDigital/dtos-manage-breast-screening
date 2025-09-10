@@ -4,6 +4,7 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 import requests
+from dateutil import relativedelta
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
@@ -25,8 +26,9 @@ from manage_breast_screening.notifications.tests.factories import AppointmentFac
     ApiClient, "send_message_batch", return_value=MagicMock(spec=requests.Response)
 )
 @patch.object(MessageBatchHelpers, "mark_batch_as_sent")
+@pytest.mark.time_machine(datetime.today() + relativedelta.relativedelta(weekday=0))
+@pytest.mark.django_db
 class TestSendMessageBatch:
-    @pytest.mark.django_db
     def test_handle_with_a_batch_to_send(
         self, mock_mark_batch_as_sent, mock_send_message_batch
     ):
@@ -48,7 +50,6 @@ class TestSendMessageBatch:
         )
         mock_mark_batch_as_sent.assert_called_once_with(message_batches[0], ANY)
 
-    @pytest.mark.django_db
     def test_handle_for_all_routing_plans(
         self, mock_mark_batch_as_sent, mock_send_message_batch
     ):
@@ -78,7 +79,6 @@ class TestSendMessageBatch:
         mock_mark_batch_as_sent.assert_any_call(message_batches[0], ANY)
         mock_mark_batch_as_sent.assert_any_call(message_batches[1], ANY)
 
-    @pytest.mark.django_db
     def test_handle_with_nothing_to_send(
         self, mock_mark_batch_as_sent, mock_send_message_batch
     ):
@@ -88,7 +88,6 @@ class TestSendMessageBatch:
         assert MessageBatch.objects.count() == 0
         assert Message.objects.count() == 0
 
-    @pytest.mark.django_db
     def test_handle_with_appointments_inside_schedule_window(
         self,
         mock_mark_batch_as_sent,
@@ -98,7 +97,7 @@ class TestSendMessageBatch:
         """Test that appointments with date inside the schedule period are notified"""
         mock_send_message_batch.return_value.status_code = 201
         appointment = AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO) + timedelta(weeks=4)
+            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -114,7 +113,6 @@ class TestSendMessageBatch:
         )
         mock_mark_batch_as_sent.assert_called_once_with(message_batches[0], ANY)
 
-    @pytest.mark.django_db
     def test_handle_with_appointments_outside_schedule_window(
         self,
         mock_mark_batch_as_sent,
@@ -123,8 +121,7 @@ class TestSendMessageBatch:
     ):
         """Test that appointments with date inside the schedule period are notified"""
         AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO)
-            + timedelta(weeks=4, days=1)
+            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4, days=1)
         )
 
         Command().handle()
@@ -133,7 +130,6 @@ class TestSendMessageBatch:
         assert Message.objects.count() == 0
         mock_mark_batch_as_sent.assert_not_called()
 
-    @pytest.mark.django_db
     def test_handle_with_cancelled_appointments(
         self,
         mock_mark_batch_as_sent,
@@ -143,15 +139,13 @@ class TestSendMessageBatch:
         """Test that that cancelled appointments are not notified"""
         mock_send_message_batch.return_value.status_code = 201
 
-        valid_appointment = AppointmentFactory(
-            starts_at=datetime.today().replace(tzinfo=TZ_INFO)
-        )
+        valid_appointment = AppointmentFactory(starts_at=datetime.now(tz=TZ_INFO))
         routing_plan_id = RoutingPlan.for_episode_type(
             valid_appointment.episode_type
         ).id
 
         _cancelled_appointment = AppointmentFactory(
-            starts_at=datetime.today().replace(tzinfo=TZ_INFO), status="C"
+            starts_at=datetime.now(tz=TZ_INFO), status="C"
         )
 
         Command().handle()
@@ -163,7 +157,6 @@ class TestSendMessageBatch:
         assert messages[0].appointment == valid_appointment
 
     @pytest.mark.parametrize("status_code", [401, 403, 404, 405, 406, 413, 415, 422])
-    @pytest.mark.django_db
     def test_handle_with_unrecoverable_failures(
         self, mark_batch_as_sent, mock_send_message_batch, status_code
     ):
@@ -172,7 +165,7 @@ class TestSendMessageBatch:
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_send_message_batch.return_value.json.return_value = notify_errors
         appointment = AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO) + timedelta(weeks=4)
+            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -189,7 +182,6 @@ class TestSendMessageBatch:
         assert messages[0].status == "failed"
 
     @pytest.mark.parametrize("status_code", [408, 425, 429, 500, 503, 504])
-    @pytest.mark.django_db
     def test_handle_with_recoverable_failures(
         self, mark_batch_as_sent, mock_send_message_batch, status_code
     ):
@@ -199,7 +191,7 @@ class TestSendMessageBatch:
         mock_send_message_batch.return_value.json.return_value = notify_errors
 
         appointment = AppointmentFactory(
-            starts_at=datetime.now().replace(tzinfo=TZ_INFO) + timedelta(weeks=4)
+            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -220,7 +212,24 @@ class TestSendMessageBatch:
             )
         )
 
-    def test_handle_with_error(self, mark_batch_as_sent, mock_send_message_batch):
+    def test_handle_does_nothing_on_weekend(
+        self, mock_mark_batch_as_sent, mock_send_message_batch, time_machine
+    ):
+        AppointmentFactory(starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4))
+        time_machine.move_to(datetime.now() + relativedelta.relativedelta(weekday=5))
+
+        Command().handle()
+
+        mock_send_message_batch.assert_not_called()
+
+        time_machine.move_to(datetime.now() + relativedelta.relativedelta(weekday=6))
+
+        Command().handle()
+
+        mock_send_message_batch.assert_not_called()
+
+    def test_handle_with_error(self, mock_mark_batch_as_sent, mock_send_message_batch):
         """Test that errors are caught and raised as CommandErrors"""
-        with pytest.raises(CommandError):
-            Command().handle()
+        with patch.object(RoutingPlan, "all", side_effect=Exception("Nooooo!")):
+            with pytest.raises(CommandError):
+                Command().handle()
