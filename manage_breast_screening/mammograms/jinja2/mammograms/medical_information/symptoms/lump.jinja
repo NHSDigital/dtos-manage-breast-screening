@@ -2,10 +2,14 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 
 {% block form %}
+  {% do form.where_located.add_divider_after("LEFT", "or") %}
   {% do form.where_located.add_conditional_html(
     'OTHER',
     form.other_area_description.as_field_group()
   ) %}
+
+  {% do form.how_long.add_divider_after("OVER_THREE_YEARS", "or") %}
+  {% do form.how_long.add_divider_after("SINCE_A_SPECIFIC_DATE", "or") %}
   {% do form.how_long.add_conditional_html(
     'SINCE_A_SPECIFIC_DATE',
     form.specific_date.as_field_group()

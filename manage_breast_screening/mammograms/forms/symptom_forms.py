@@ -3,6 +3,7 @@ from django.forms import (  # FIXME: create our own version of BooleanField
     BooleanField,
     Form,
 )
+from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.form_fields import (
     CharField,
@@ -33,20 +34,26 @@ class HowLongChoices(TextChoices):
 
 class LumpForm(Form):
     where_located = ChoiceField(
-        choices=RightLeftOtherChoices, label="Where is the lump located?"
+        choices=RightLeftOtherChoices,
+        label="Where is the lump located?",
+        label_classes="nhsuk-fieldset__legend--m",
     )
     other_area_description = CharField(
         required=False,
         label="Describe the specific area",
+        label_classes="nhsuk-fieldset__legend--m",
         hint="For example, the left armpit",
     )
     how_long = ChoiceField(
-        choices=HowLongChoices, label="How long has this symptom existed?"
+        choices=HowLongChoices,
+        label="How long has this symptom existed?",
+        label_classes="nhsuk-fieldset__legend--m",
     )
     specific_date = SplitDateField(
         hint="For example, 3 2025",
         label="Date symptom started",
         label_classes="nhsuk-u-visually-hidden",
+        required=False,
     )  # TODO rebase and pick up the include_day param
     intermittent = BooleanField(required=False, label="The symptom is intermittent")
     recently_resolved = BooleanField(
@@ -55,8 +62,16 @@ class LumpForm(Form):
     when_resolved = CharField(
         required=False, label="Describe when", hint="For example, 3 days ago"
     )
-    investigated = yes_no_field(label="Has this been investigated?")
-    additional_info = CharField(required=False, label="Additional info (optional)")
+    investigated = yes_no_field(
+        label="Has this been investigated?",
+        label_classes="nhsuk-fieldset__legend--m",
+    )
+    additional_info = CharField(
+        required=False,
+        label="Additional info (optional)",
+        label_classes="nhsuk-fieldset__legend--m",
+        widget=Textarea(attrs={"rows": 4}),
+    )
 
     def __init__(self, instance=None, **kwargs):
         self.instance = instance
