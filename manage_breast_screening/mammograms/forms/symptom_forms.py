@@ -54,7 +54,8 @@ class LumpForm(Form):
         label="Date symptom started",
         label_classes="nhsuk-u-visually-hidden",
         required=False,
-    )  # TODO rebase and pick up the include_day param
+        include_day=False,
+    )
     intermittent = BooleanField(required=False, label="The symptom is intermittent")
     recently_resolved = BooleanField(
         required=False, label="The symptom has recently resolved"
