@@ -11,22 +11,13 @@ from manage_breast_screening.core.form_fields import (
     SplitDateField,
 )
 from manage_breast_screening.forms.fields import yes_no_field
+from manage_breast_screening.participants.models import SymptomAreas, WhenStartedChoices
 
 
-# TODO: delegate values to model changes
 class RightLeftOtherChoices(TextChoices):
-    RIGHT = "RIGHT", "Right breast"
-    LEFT = "LEFT", "Left breast"
-    OTHER = "OTHER", "Other"
-
-
-class HowLongChoices(TextChoices):
-    LESS_THAN_THREE_MONTHS = "LESS_THAN_THREE_MONTHS", "Less than 3 months"
-    THREE_MONTHS_TO_A_YEAR = "THREE MONTHS TO A YEAR", "3 months to a year"
-    ONE_TO_THREE_YEARS = "ONE_TO_THREE_YEARS", "1 to 3 years"
-    OVER_THREE_YEARS = "OVER_THREE_YEARS", "Over 3 years"
-    SINCE_A_SPECIFIC_DATE = "SINCE_A_SPECIFIC_DATE", "Since a specific date"
-    NOT_SURE = "NOT_SURE", "Not sure"
+    RIGHT_BREAST = SymptomAreas.RIGHT_BREAST
+    LEFT_BREAST = SymptomAreas.LEFT_BREAST
+    OTHER = SymptomAreas.OTHER
 
 
 # TODO: create mixin for conditional field validation
@@ -45,7 +36,7 @@ class LumpForm(Form):
         hint="For example, the left armpit",
     )
     how_long = ChoiceField(
-        choices=HowLongChoices,
+        choices=WhenStartedChoices,
         label="How long has this symptom existed?",
         label_classes="nhsuk-fieldset__legend--m",
     )
