@@ -1,10 +1,3 @@
-data "azurerm_private_dns_zone" "storage" {
-  provider = azurerm.hub
-
-  name                = "privatelink.blob.core.windows.net"
-  resource_group_name = "rg-hub-${var.hub}-uks-private-dns-zones"
-}
-
 module "azure_blob_storage_identity" {
   source              = "../dtos-devops-templates/infrastructure/modules/managed-identity"
   resource_group_name = azurerm_resource_group.main.name
