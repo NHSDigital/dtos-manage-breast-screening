@@ -6,6 +6,9 @@ from .models import (
     ParticipantAddress,
     ParticipantReportedMammogram,
     ScreeningEpisode,
+    Symptom,
+    SymptomSubType,
+    SymptomType,
 )
 
 
@@ -18,6 +21,33 @@ class ParticipantReportedMammogramInline(admin.StackedInline):
     extra = 1
 
 
+class SymptomInline(admin.StackedInline):
+    model = Symptom
+    extra = 0
+
+
+class SymptomTypeAdmin(admin.ModelAdmin):
+    readonly_fields = ["id"]
+    list_display = ["name"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+class SymptomSubTypeAdmin(admin.ModelAdmin):
+    readonly_fields = ["id"]
+    list_display = ["symptom_type__name", "name"]
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class ParticipantAdmin(admin.ModelAdmin):
     inlines = [AddressInline, ParticipantReportedMammogramInline]
 
@@ -25,6 +55,8 @@ class ParticipantAdmin(admin.ModelAdmin):
 
 
 class AppointmentAdmin(admin.ModelAdmin):
+    inlines = [SymptomInline]
+
     list_display = [
         "name",
         "clinic_slot__starts_at",
@@ -55,3 +87,5 @@ class ScreeningEpisodeAdmin(admin.ModelAdmin):
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(Appointment, AppointmentAdmin)
 admin.site.register(ScreeningEpisode, ScreeningEpisodeAdmin)
+admin.site.register(SymptomType, SymptomTypeAdmin)
+admin.site.register(SymptomSubType, SymptomSubTypeAdmin)
