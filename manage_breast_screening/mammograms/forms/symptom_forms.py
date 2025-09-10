@@ -70,7 +70,7 @@ class LumpForm(Form):
     additional_info = CharField(
         required=False,
         label="Additional info (optional)",
-        label_classes="nhsuk-fieldset__legend--m",
+        label_classes="nhsuk-label--m",
         widget=Textarea(attrs={"rows": 4}),
     )
 
