@@ -30,7 +30,6 @@ class TestSendMessageBatch:
         monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
         monkeypatch.setenv("OAUTH_API_KID", "test-1")
         monkeypatch.setenv("PRIVATE_KEY", "test-key")
-        monkeypatch.setenv("CMAPI_CONSUMER_KEY", "consumer-key")
 
     @pytest.mark.django_db
     def test_message_batch_is_sent_for_all_routing_plans(

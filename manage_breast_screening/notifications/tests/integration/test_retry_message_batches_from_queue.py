@@ -30,7 +30,6 @@ class TestRetryMessageBatchesFromQueue:
         monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
         monkeypatch.setenv("OAUTH_API_KID", "test-1")
         monkeypatch.setenv("PRIVATE_KEY", "test-key")
-        monkeypatch.setenv("CMAPI_CONSUMER_KEY", "consumer-key")
 
     @pytest.fixture
     def routing_plan_id(self):

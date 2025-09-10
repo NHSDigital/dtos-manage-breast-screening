@@ -77,8 +77,6 @@ def verify_headers_for_consumers(headers: dict) -> tuple[bool, str]:
     lc_headers = header_keys_to_lower(headers)
     if lc_headers.get("authorization") is None:
         return False, "Missing Authorization header"
-    if lc_headers.get("x-consumer-key") is None:
-        return False, "Missing Consumer key header"
 
     return True, ""
 
