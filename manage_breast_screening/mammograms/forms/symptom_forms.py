@@ -57,4 +57,4 @@ class LumpForm(Form):
     additional_info = CharField(required=False, label="Additional info (optional)")
 
     def __init__(self, instance=None):
-        pass
+        self.instance = instance
