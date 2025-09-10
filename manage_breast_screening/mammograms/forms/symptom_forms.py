@@ -44,7 +44,9 @@ class LumpForm(Form):
         choices=HowLongChoices, label="How long has this symptom existed?"
     )
     specific_date = SplitDateField(
-        hint="For example, 3 2025"
+        hint="For example, 3 2025",
+        label="Date symptom started",
+        label_classes="nhsuk-u-visually-hidden",
     )  # TODO rebase and pick up the include_day param
     intermittent = BooleanField(required=False, label="The symptom is intermittent")
     recently_resolved = BooleanField(
@@ -56,5 +58,6 @@ class LumpForm(Form):
     investigated = yes_no_field(label="Has this been investigated?")
     additional_info = CharField(required=False, label="Additional info (optional)")
 
-    def __init__(self, instance=None):
+    def __init__(self, instance=None, **kwargs):
         self.instance = instance
+        super().__init__(**kwargs)
