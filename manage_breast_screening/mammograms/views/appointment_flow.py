@@ -24,6 +24,7 @@ from ..forms import (
 from ..presenters import (
     AppointmentPresenter,
     LastKnownMammogramPresenter,
+    MedicalInformationPresenter,
     present_secondary_nav,
 )
 from .mixins import AppointmentMixin, InProgressAppointmentMixin
@@ -178,6 +179,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "page_title": "Record medical information",
                 "participant": participant,
                 "caption": participant.full_name,
+                "presenter": MedicalInformationPresenter(self.appointment),
             }
         )
         return context

@@ -6,7 +6,7 @@
 {% block step_content %}
 
 {% set symptoms_card_html %}
-    {% set has_symptoms = false %}
+    {% set has_lump_symptom = false %}
 
     {% set inset_html %}
     <p>No symptoms have been recorded for this participant.</p>
@@ -17,7 +17,7 @@
     }) }}
 
     <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-      <a href="#" class="nhsuk-link">{{ "Add another symptom" if has_symptoms else "Add a symptom" }}</a>
+      <a href="{{ presenter.add_lump_link.href }}">{{ presenter.add_lump_link.text }}</a>
     </p>
 {% endset %}
 {{ card({
