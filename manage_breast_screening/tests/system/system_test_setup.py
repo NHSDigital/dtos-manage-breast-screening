@@ -1,4 +1,5 @@
 import os
+import re
 from collections import Counter
 
 import pytest
@@ -6,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.client import Client
+from django.urls import reverse
 from playwright.sync_api import expect, sync_playwright
 
 from manage_breast_screening.auth.models import Role
@@ -68,6 +70,11 @@ class SystemTestCase(StaticLiveServerTestCase):
         group, _created = Group.objects.get_or_create(name=role)
         user = UserFactory.create(groups=[group])
         self.login_as_user(user)
+
+    def expect_url(self, url, **kwargs):
+        path = reverse(url, kwargs=kwargs)
+        url = re.compile(f"^{self.live_server_url}{re.escape(path)}$")
+        expect(self.page).to_have_url(url)
 
     def expect_validation_error(
         self,
