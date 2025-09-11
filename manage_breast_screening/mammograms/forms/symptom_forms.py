@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db.models import TextChoices
 from django.forms import (  # FIXME: create our own version of BooleanField
     BooleanField,
@@ -102,14 +104,15 @@ class LumpForm(Form):
                     )
 
     def save(self, appointment):
-        specific_date = self.cleaned_data.get("cleaned_data")
+        specific_date = self.cleaned_data.get("specific_date")
 
-        appointment.symptom_set.create(
+        return appointment.symptom_set.create(
             appointment=appointment,
-            symptom_type=SymptomType.LUMP,
+            symptom_type_id=SymptomType.LUMP,
+            reported_at=date.today(),
             area=self.cleaned_data["where_located"],
             area_description=self.cleaned_data.get("other_area_description"),
-            investigated=self.cleaned_data.get("investigated", False),
+            investigated=self.cleaned_data.get("investigated") == YesNo.YES,
             when_started=self.cleaned_data.get("how_long"),
             year_started=specific_date.year if specific_date else None,
             month_started=specific_date.month if specific_date else None,

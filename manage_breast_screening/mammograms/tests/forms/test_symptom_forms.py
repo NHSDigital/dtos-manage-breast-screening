@@ -1,9 +1,16 @@
+import pytest
+
 from manage_breast_screening.forms.choices import YesNo
 from manage_breast_screening.mammograms.forms.symptom_forms import (
     LumpForm,
     RightLeftOtherChoices,
     WhenStartedChoices,
 )
+from manage_breast_screening.participants.models.symptoms import (
+    SymptomAreas,
+    SymptomType,
+)
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 class TestLumpForm:
@@ -56,5 +63,35 @@ class TestLumpForm:
         )
         assert form.is_valid()
 
+    @pytest.mark.django_db
     def test_save(self):
-        pass
+        appointment = AppointmentFactory.create()
+
+        form = LumpForm(
+            data={
+                "where_located": RightLeftOtherChoices.OTHER,
+                "how_long": WhenStartedChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+                "other_area_description": "abc",
+                "specific_date_0": "2",
+                "specific_date_1": "2025",
+                "investigated_details": "def",
+            }
+        )
+
+        assert form.is_valid()
+
+        obj = form.save(appointment=appointment)
+
+        assert obj.appointment == appointment
+        assert obj.symptom_type_id == SymptomType.LUMP
+        assert obj.area == SymptomAreas.OTHER
+        assert obj.area_description == "abc"
+        assert obj.investigated
+
+        # FIXME: need to add a new field to the model
+        # assert obj.investigated_details == "def"
+
+        assert obj.when_started == WhenStartedChoices.SINCE_A_SPECIFIC_DATE
+        assert obj.year_started == 2025
+        assert obj.month_started == 2
