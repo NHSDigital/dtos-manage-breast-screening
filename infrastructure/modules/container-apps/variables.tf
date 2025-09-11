@@ -1,3 +1,9 @@
+variable "api_oauth_token_url" {
+  description = "The OAuth API endpoint URL used to request client credentials for NHS Notify API"
+  type        = string
+  default     = null
+}
+
 variable "app_key_vault_id" {
   description = "Application key vault ID"
   type        = string
