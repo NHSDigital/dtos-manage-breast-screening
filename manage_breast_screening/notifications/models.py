@@ -156,6 +156,8 @@ class Clinic(models.Model):
     address_line_5 = models.CharField(max_length=50)
     address_line_5 = models.CharField(max_length=50)
     postcode = models.CharField(max_length=50)
+    location_description = models.TextField(blank=True)
+    location_url = models.TextField(blank=True)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=False, auto_now_add=True)
 
