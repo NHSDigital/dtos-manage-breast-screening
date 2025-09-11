@@ -37,5 +37,7 @@ class AddLump(InProgressAppointmentMixin, FormView):
 
         return context
 
-    def form_valid(self, form):
-        pass
+    def get_success_url(self):
+        return reverse(
+            "mammograms:record_medical_information", kwargs={"pk": self.appointment.pk}
+        )
