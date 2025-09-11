@@ -24,12 +24,12 @@ class TestRetryMessageBatchesFromQueue:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
         monkeypatch.setenv(
-            "API_MESSAGE_BATCH_URL", "http://localhost:8888/message/batch"
+            "NHS_NOTIFY_API_MESSAGE_BATCH_URL", "http://localhost:8888/message/batch"
         )
-        monkeypatch.setenv("OAUTH_TOKEN_URL", "http://localhost:8888/token")
-        monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
-        monkeypatch.setenv("OAUTH_API_KID", "test-1")
-        monkeypatch.setenv("PRIVATE_KEY", "test-key")
+        monkeypatch.setenv("API_OAUTH_TOKEN_URL", "http://localhost:8888/token")
+        monkeypatch.setenv("API_OAUTH_API_KEY", "a1b2c3d4")
+        monkeypatch.setenv("API_OAUTH_API_KID", "test-1")
+        monkeypatch.setenv("API_OAUTH_PRIVATE_KEY", "test-key")
 
     @pytest.fixture
     def routing_plan_id(self):
