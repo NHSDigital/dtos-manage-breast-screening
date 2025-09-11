@@ -2,6 +2,7 @@ from django.db.models import TextChoices
 from django.forms import (  # FIXME: create our own version of BooleanField
     BooleanField,
     Form,
+    ValidationError,
 )
 from django.forms.widgets import Textarea
 
@@ -10,17 +11,19 @@ from manage_breast_screening.core.form_fields import (
     ChoiceField,
     SplitDateField,
 )
+from manage_breast_screening.forms.choices import YesNo
 from manage_breast_screening.forms.fields import yes_no_field
-from manage_breast_screening.participants.models import SymptomAreas, WhenStartedChoices
+from manage_breast_screening.participants.models import (
+    SymptomAreas,
+    SymptomType,
+    WhenStartedChoices,
+)
 
 
 class RightLeftOtherChoices(TextChoices):
     RIGHT_BREAST = SymptomAreas.RIGHT_BREAST
     LEFT_BREAST = SymptomAreas.LEFT_BREAST
     OTHER = SymptomAreas.OTHER
-
-
-# TODO: create mixin for conditional field validation
 
 
 class LumpForm(Form):
@@ -58,6 +61,11 @@ class LumpForm(Form):
         label="Has this been investigated?",
         label_classes="nhsuk-fieldset__legend--m",
     )
+    investigated_details = CharField(
+        required=False,
+        label="Provide details",
+        hint="Include where, when and the outcome",
+    )
     additional_info = CharField(
         required=False,
         label="Additional info (optional)",
@@ -68,3 +76,45 @@ class LumpForm(Form):
     def __init__(self, instance=None, **kwargs):
         self.instance = instance
         super().__init__(**kwargs)
+
+    def clean(self):
+        rules = [
+            ("where_located", RightLeftOtherChoices.OTHER, "other_area_description"),
+            ("how_long", WhenStartedChoices.SINCE_A_SPECIFIC_DATE, "specific_date"),
+            ("investigated", YesNo.YES, "investigated_details"),
+        ]
+
+        for selected_field, selected_value, required_field in rules:
+            if self.cleaned_data.get(selected_field) == selected_value:
+                cleaned_value = self.cleaned_data.get(required_field)
+                if isinstance(cleaned_value, str):
+                    cleaned_value = cleaned_value.strip()
+
+                if not cleaned_value:
+                    self.add_error(
+                        required_field,
+                        ValidationError(
+                            message=self.fields[required_field].error_messages[
+                                "required"
+                            ],
+                            code="required",
+                        ),
+                    )
+
+    def save(self, appointment):
+        specific_date = self.cleaned_data.get("cleaned_data")
+
+        appointment.symptom_set.create(
+            appointment=appointment,
+            symptom_type=SymptomType.LUMP,
+            area=self.cleaned_data["where_located"],
+            area_description=self.cleaned_data.get("other_area_description"),
+            investigated=self.cleaned_data.get("investigated", False),
+            when_started=self.cleaned_data.get("how_long"),
+            year_started=specific_date.year if specific_date else None,
+            month_started=specific_date.month if specific_date else None,
+            intermittent=self.cleaned_data.get("intermittent", False),
+            recently_resolved=self.cleaned_data.get("recently_resolved", False),
+            when_resolved=self.cleaned_data.get("when_resolved"),
+            additional_information=self.cleaned_data.get("additional_info"),
+        )
