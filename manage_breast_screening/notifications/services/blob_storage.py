@@ -1,23 +1,33 @@
 import os
-from functools import cached_property
 from typing import Any
 
 from azure.core.exceptions import ResourceExistsError
+from azure.identity import ManagedIdentityCredential
 from azure.storage.blob import BlobServiceClient, ContainerClient, ContentSettings
 
 
 class BlobStorage:
-    @cached_property
-    def service_client(self) -> BlobServiceClient:
+    def __init__(self):
+        blob_mi_client_id = os.getenv("BLOB_MI_CLIENT_ID")
+        storage_account_name = os.getenv("STORAGE_ACCOUNT_NAME")
         connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
-        return BlobServiceClient.from_connection_string(connection_string)
+
+        # We use Managed Identity credentials for deployed environments
+        if blob_mi_client_id and storage_account_name:
+            self.client = BlobServiceClient(
+                f"https://{storage_account_name}.blob.core.windows.net",
+                credential=ManagedIdentityCredential(client_id=blob_mi_client_id),
+            )
+
+        if connection_string:
+            self.client = BlobServiceClient.from_connection_string(connection_string)
 
     def find_or_create_container(self, container_name: str) -> ContainerClient:
         """Find or create an Azure Storage Blob container"""
         try:
-            return self.service_client.create_container(container_name)
+            return self.client.create_container(container_name)
         except ResourceExistsError:
-            return self.service_client.get_container_client(container_name)
+            return self.client.get_container_client(container_name)
 
     def add(
         self,

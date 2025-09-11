@@ -48,7 +48,7 @@ class TestQueue:
             Queue.MessageStatusUpdates().add("some data")
 
             queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "message-status-updates"
+                "qqq111", "notifications-message-status-updates"
             )
             mock_client.create_queue.assert_called_once()
             mock_client.send_message.assert_called_once_with("some data")
@@ -63,7 +63,7 @@ class TestQueue:
             Queue.RetryMessageBatches().add("some data")
 
             queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "retry-message-batches"
+                "qqq111", "notifications-message-batch-retries"
             )
             mock_client.create_queue.assert_called_once()
             mock_client.send_message.assert_called_once_with("some data")
@@ -86,3 +86,52 @@ class TestQueue:
         Queue("new-queue").delete("this message")
 
         mock_queue_client.delete_message.assert_called_once_with("this message")
+
+    def test_queue_initialises_using_managed_identity_credentials(self, monkeypatch):
+        monkeypatch.setenv("STORAGE_ACCOUNT_NAME", "mystorageaccount")
+        monkeypatch.setenv("QUEUE_MI_CLIENT_ID", "my-mi-id")
+        mock_mi_cred = MagicMock()
+
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            with patch(
+                "manage_breast_screening.notifications.services.queue.ManagedIdentityCredential"
+            ) as managed_identity_constructor:
+                managed_identity_constructor.return_value = mock_mi_cred
+
+                Queue("new-queue")
+
+                queue_client.assert_called_once_with(
+                    "https://mystorageaccount.queue.core.windows.net",
+                    queue_name="new-queue",
+                    credential=mock_mi_cred,
+                )
+                managed_identity_constructor.assert_called_once_with(
+                    client_id="my-mi-id"
+                )
+
+    def test_update_queue_prefers_queue_name_from_env(self, monkeypatch):
+        monkeypatch.setenv("STATUS_UPDATES_QUEUE_NAME", "updates")
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            mock_client = MagicMock()
+            queue_client.from_connection_string.return_value = mock_client
+
+            Queue.MessageStatusUpdates()
+
+            queue_client.from_connection_string.assert_called_once_with(
+                "qqq111", "updates"
+            )
+
+    def test_retry_queue_prefers_queue_name_from_env(self, monkeypatch):
+        monkeypatch.setenv("RETRY_QUEUE_NAME", "retries")
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            Queue.RetryMessageBatches()
+
+            queue_client.from_connection_string.assert_called_once_with(
+                "qqq111", "retries"
+            )
