@@ -10,6 +10,8 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
+from manage_breast_screening.core.decorators import basic_auth_exempt
+
 from .oauth import cis2_redirect_uri, get_cis2_client, jwk_from_public_key
 from .services import InvalidLogoutToken, decode_logout_token
 
@@ -78,6 +80,7 @@ def cis2_callback(request):
 
 
 @login_not_required
+@basic_auth_exempt
 def jwks(request):
     """Publish JSON Web Key Set (JWKS) with the public key used for private_key_jwt."""
     try:
