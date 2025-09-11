@@ -1,3 +1,6 @@
+from django.urls import reverse
+from playwright.sync_api import expect
+
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -11,9 +14,9 @@ class TestRecordingSymptoms(SystemTestCase):
     def test_adding_a_symptom(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        # self.and_i_am_on_the_medical_information_page()
-        # self.when_i_click_on_add_a_lump()
-        # self.then_i_see_the_add_a_lump_form()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.when_i_click_on_add_a_lump()
+        self.then_i_see_the_add_a_lump_form()
 
         # self.when_i_select_right_breast()
         # self.and_i_select_less_than_three_months()
@@ -48,3 +51,18 @@ class TestRecordingSymptoms(SystemTestCase):
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
         self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
         self.provider = self.appointment.provider
+
+    def and_i_am_on_the_record_medical_information_page(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+
+    def when_i_click_on_add_a_lump(self):
+        self.page.get_by_text("Add a lump").click()
+
+    def then_i_see_the_add_a_lump_form(self):
+        expect(self.page.get_by_text("Details of the lump")).to_be_visible()
