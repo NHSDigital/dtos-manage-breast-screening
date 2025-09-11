@@ -52,8 +52,8 @@ urlpatterns = [
         name="mark_reasons_temporary",
     ),
     path(
-        "<uuid:pk>/medical-information/lump/",
+        "<uuid:pk>/record-medical-information/lump/",
         symptoms.AddLump.as_view(),
-        name="mark_reasons_temporary",
+        name="add_symptom_lump",
     ),
 ]
