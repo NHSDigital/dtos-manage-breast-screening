@@ -17,18 +17,21 @@ from ..presenters import (
     AppointmentPresenter,
     ClinicSlotPresenter,
     LastKnownMammogramPresenter,
+    MedicalInformationPresenter,
     SpecialAppointmentPresenter,
 )
 
 
-class TestAppointmentPresenter:
-    @pytest.fixture
-    def mock_appointment(self):
-        mock = MagicMock(spec=Appointment)
-        mock.screening_episode.participant.nhs_number = "99900900829"
-        mock.screening_episode.participant.pk = uuid4()
-        return mock
+@pytest.fixture
+def mock_appointment():
+    mock = MagicMock(spec=Appointment)
+    mock.pk = uuid4()
+    mock.screening_episode.participant.nhs_number = "99900900829"
+    mock.screening_episode.participant.pk = uuid4()
+    return mock
 
+
+class TestAppointmentPresenter:
     @pytest.mark.parametrize(
         "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
         [
@@ -318,3 +321,12 @@ class TestSpecialAppointmentPresenter:
                 "temporary": None,
             },
         ]
+
+
+class TestRecordMedicalInformationPresenter:
+    def test_add_lump_link(self, mock_appointment):
+        presenter = MedicalInformationPresenter(mock_appointment)
+        assert presenter.add_lump_link == {
+            "href": f"/mammograms/{mock_appointment.pk}/record-medical-information/lump/",
+            "text": "Add a lump",
+        }

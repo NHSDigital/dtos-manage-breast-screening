@@ -215,3 +215,17 @@ class SpecialAppointmentPresenter:
             "mammograms:provide_special_appointment_details",
             kwargs={"pk": self._appointment_pk},
         )
+
+
+class MedicalInformationPresenter:
+    def __init__(self, appointment):
+        self.appointment = AppointmentPresenter(appointment)
+
+    @property
+    def add_lump_link(self):
+        has_lump_symptom = False
+        url = reverse("mammograms:add_symptom_lump", kwargs={"pk": self.appointment.pk})
+        return {
+            "href": url,
+            "text": "Add another lump" if has_lump_symptom else "Add a lump",
+        }
