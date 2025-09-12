@@ -41,7 +41,7 @@ def get_cis2_client():
         client_kwargs={
             "scope": settings.CIS2_SCOPES,
             "token_endpoint_auth_method": "private_key_jwt",
-            # Add a DEBUG-only hook to log OIDC requests and responses
+            # Add a CIS2_DEBUG-only hook to log OIDC requests and responses
             "hooks": {"response": [_log_response]},
         },
         client_auth_methods=[CustomPrivateKeyJWT(headers={"kid": kid})],
@@ -90,9 +90,9 @@ def _log_response(resp, *args, **kwargs):
     """Requests response hook: log request/response, with added formatting/spacing.
 
     WARNING: No redaction; intended for development diagnostics only. Set
-    DEBUG=True in settings to enable.
+    CIS2_DEBUG=True in settings to enable.
     """
-    if not settings.DEBUG:
+    if not settings.CIS2_DEBUG:
         return
 
     logger = logging.getLogger("authlib")
