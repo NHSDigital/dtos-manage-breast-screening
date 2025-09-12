@@ -172,7 +172,24 @@ class CIS2CLI:
 
     def setup_credentials(self):
         """Prompt user for secret and team ID, then authenticate."""
-        print("NHS CIS2 Connection Manager CLI")
+        # ANSI color codes
+        BLUE = "\033[94m"
+        WHITE = "\033[97m"
+        RESET = "\033[0m"
+
+        print(f"""
+{BLUE}    ╔═══════════════════════════════════════════════════════════════╗
+    ║                                                               ║
+    ║{WHITE}    ███    ██ ██   ██ ███████     ██████ ██ ███████ ██████{BLUE}     ║
+    ║{WHITE}    ████   ██ ██   ██ ██         ██      ██ ██           ██{BLUE}    ║
+    ║{WHITE}    ██ ██  ██ ███████ ███████    ██      ██ ███████  █████{BLUE}     ║
+    ║{WHITE}    ██  ██ ██ ██   ██      ██    ██      ██      ██ ██{BLUE}         ║
+    ║{WHITE}    ██   ████ ██   ██ ███████     ██████ ██ ███████ ███████{BLUE}    ║
+    ║                                                               ║
+    ║{WHITE}                Connection Manager CLI Tool                    {BLUE}║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝{RESET}
+        """)
         print("=" * 40)
 
         # Get secret
