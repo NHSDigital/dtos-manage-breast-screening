@@ -15,8 +15,8 @@ class TestRequestValidator:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
         """Set up environment variables for tests."""
-        monkeypatch.setenv("APPLICATION_ID", "application_id")
-        monkeypatch.setenv("NOTIFY_API_KEY", "api_key")
+        monkeypatch.setenv("NHS_NOTIFY_APPLICATION_ID", "application_id")
+        monkeypatch.setenv("NHS_NOTIFY_API_KEY", "api_key")
 
     def mock_request(self, headers={}, body="{}"):
         req = MagicMock()
@@ -74,7 +74,7 @@ class TestRequestValidator:
     def test_valid(self):
         """Test that valid API key and signature headers pass verification."""
         body = '{"this": "that"}'
-        secret = f"{os.getenv('APPLICATION_ID')}.{os.getenv('NOTIFY_API_KEY')}"
+        secret = f"{os.getenv('NHS_NOTIFY_APPLICATION_ID')}.{os.getenv('NHS_NOTIFY_API_KEY')}"
         signature = self.create_digest(secret, body)
 
         headers = {

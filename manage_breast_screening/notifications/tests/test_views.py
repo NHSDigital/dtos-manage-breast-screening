@@ -12,8 +12,8 @@ from manage_breast_screening.notifications.views import create_message_status
 
 @pytest.fixture(autouse=True)
 def setup(monkeypatch):
-    monkeypatch.setenv("APPLICATION_ID", "application_id")
-    monkeypatch.setenv("NOTIFY_API_KEY", "api_key")
+    monkeypatch.setenv("NHS_NOTIFY_APPLICATION_ID", "application_id")
+    monkeypatch.setenv("NHS_NOTIFY_API_KEY", "api_key")
 
 
 def test_create_message_status_with_valid_request():
