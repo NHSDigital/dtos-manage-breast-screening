@@ -17,7 +17,7 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 
 
 @patch("manage_breast_screening.notifications.services.api_client.jwt.encode")
-@pytest.mark.integration
+@pytest.mark.end_to_end
 class TestEndToEnd:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):

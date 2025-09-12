@@ -104,6 +104,15 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_HOST: localhost
 
+      - name: 'Run notifications end to end test suite'
+        if: steps.filter.outputs.notifications == 'true'
+        run: make test-end-to-end
+        env:
+          DATABASE_NAME: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_USER: postgres
+          DATABASE_HOST: localhost
+
   test-lint:
     name: 'Linting'
     runs-on: ubuntu-latest
