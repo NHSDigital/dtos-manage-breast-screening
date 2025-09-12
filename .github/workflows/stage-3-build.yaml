@@ -67,6 +67,7 @@ jobs:
           tags: |
             type=ref,event=tag
             type=raw,value=${{ github.event_name == 'pull_request' && github.event.pull_request.head.ref || '{{branch}}' }}
+            type=raw,value=${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
             type=sha,format=long,prefix=git-sha-
 
       - name: Build and push Docker image
