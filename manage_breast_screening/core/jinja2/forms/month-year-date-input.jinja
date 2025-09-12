@@ -2,8 +2,8 @@
 {% if field.errors %}
   {% set error_message = {"text": field.errors | first} %}
 {% endif %}
-{% set labels = field.field.labels %}
-{% set hint = field.field.hint %}
+{% set unbound_field = field.field %}
+{% set hint = unbound_field.hint %}
 {{ dateInput({
   "name": field.html_name,
   "fieldset":  {
@@ -20,24 +20,17 @@
   "items": [
     {
       "name": field.subwidgets.0.data.name,
-      "label": labels.0,
+      "label": "Month",
       "classes": "nhsuk-input--width-2",
       "value": field.subwidgets.0.data.value,
       "id": field.auto_id
     },
     {
       "name": field.subwidgets.1.data.name,
-      "label": labels.1,
-      "classes": "nhsuk-input--width-2",
+      "label": "Year",
+      "classes": "nhsuk-input--width-4",
       "value": field.subwidgets.1.data.value,
       "id": field.auto_id ~ "_1"
-    },
-    {
-      "name": field.subwidgets.2.data.name,
-      "label": labels.2,
-      "classes": "nhsuk-input--width-4",
-      "value": field.subwidgets.2.data.value,
-      "id": field.auto_id ~ "_2"
-    } if false
+    }
   ]
 }) }}

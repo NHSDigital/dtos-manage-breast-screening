@@ -43,6 +43,7 @@ The following settings in `manage_breast_screening/config/settings.py` provide t
 - **`CIS2_CLIENT_PRIVATE_KEY`** - RSA private key in PEM format for JWT signing (supports `\n` escaped newlines)
 - **`CIS2_CLIENT_PUBLIC_KEY`** - Corresponding RSA public key in PEM format (supports `\n` escaped newlines)
 - **`CIS2_SCOPES`** - OAuth scopes requested
+- **`BASE_URL`** - Base URL for building absolute URLs (specifically for OAuth callbacks)
 
 The private and public keys form a keypair used for the `private_key_jwt` client authentication method.
 

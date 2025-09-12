@@ -76,6 +76,7 @@ if getenv("DJANGO_ENV", "production") != "production":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "manage_breast_screening.core.middleware.basic_auth.BasicAuthMiddleware",
     "qsessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -272,3 +273,11 @@ CIS2_CLIENT_PUBLIC_KEY = (
     public_key_inline.replace("\\n", "\n") if public_key_inline else None
 )
 CIS2_SCOPES = "openid profile email nhsperson associatedorgs"
+
+BASE_URL = environ.get("BASE_URL")
+
+# HTTP Basic Auth (optional; off by default)
+BASIC_AUTH_ENABLED = boolean_env("BASIC_AUTH_ENABLED", default=False)
+BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME")
+BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
+BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")

@@ -29,7 +29,6 @@ class TestApiClient:
         monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
         monkeypatch.setenv("OAUTH_API_KID", "test-1")
         monkeypatch.setenv("PRIVATE_KEY", "test-key")
-        monkeypatch.setenv("CMAPI_CONSUMER_KEY", "consumer-key")
 
     @pytest.mark.django_db
     def test_send_message_batch(self, mock_jwt_encode, routing_plan_id):
@@ -58,7 +57,6 @@ class TestApiClient:
             assert request.headers["Authorization"] == "Bearer 000111"
             assert request.headers["Content-Type"] == "application/vnd.api+json"
             assert request.headers["Accept"] == "application/vnd.api+json"
-            assert request.headers["X-Consumer-Key"] == "consumer-key"
 
             assert attributes["messageBatchReference"] == str(message_batch.id)
             assert attributes["routingPlanId"] == message_batch.routing_plan_id
