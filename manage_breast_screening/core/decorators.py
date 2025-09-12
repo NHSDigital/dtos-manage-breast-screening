@@ -1,19 +1,17 @@
-import functools
 from typing import Callable
+
+_basic_auth_exempt_views = set()
 
 
 def basic_auth_exempt(view_func: Callable) -> Callable:
     """Mark a view function as exempt from BasicAuthMiddleware.
 
-    This sets an attribute on both the original view and the wrapped function so
-    the middleware can detect the exemption regardless of decorator ordering.
+    Uses a registry approach that is decorator-order independent.
     """
+    _basic_auth_exempt_views.add(view_func)
+    return view_func
 
-    setattr(view_func, "basic_auth_exempt", True)
 
-    @functools.wraps(view_func)
-    def _wrapped(*args, **kwargs):
-        return view_func(*args, **kwargs)
-
-    setattr(_wrapped, "basic_auth_exempt", True)
-    return _wrapped
+def is_basic_auth_exempt(view_func: Callable) -> bool:
+    """Check if a view function is exempt from BasicAuthMiddleware."""
+    return view_func in _basic_auth_exempt_views

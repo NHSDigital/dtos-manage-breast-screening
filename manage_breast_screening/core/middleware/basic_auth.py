@@ -6,6 +6,8 @@ from typing import Callable, Optional
 from django.conf import settings
 from django.http import HttpResponse
 
+from manage_breast_screening.core.decorators import is_basic_auth_exempt
+
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +41,7 @@ class BasicAuthMiddleware:
             return None
 
         # Skip if the view has been marked as exempt
-        if getattr(view_func, "basic_auth_exempt", False):
+        if is_basic_auth_exempt(view_func):
             return None
 
         # Validate Authorization header
