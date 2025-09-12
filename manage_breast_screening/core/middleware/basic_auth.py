@@ -31,7 +31,7 @@ class BasicAuthMiddleware:
     def process_view(
         self, request, view_func, view_args, view_kwargs
     ) -> Optional[HttpResponse]:
-        if not getattr(settings, "BASIC_AUTH_ENABLED", False):
+        if not getattr(settings, "BASIC_AUTH_ENABLED"):
             return None
 
         # Skip debug toolbar explicitly
