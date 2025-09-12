@@ -21,3 +21,7 @@ output "default_domain" {
 output "postgres_subnet_id" {
   value = module.postgres_subnet.id
 }
+
+output "main_subnet_id" {
+  value = module.main_subnet.id
+}
