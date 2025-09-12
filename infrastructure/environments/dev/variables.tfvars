@@ -1,5 +1,5 @@
 dns_zone_name                         = "manage-breast-screening.non-live.screening.nhs.uk"
-enable_auth                           = true
+enable_auth                           = false
 fetch_secrets_from_app_key_vault      = true
 front_door_profile                    = "afd-nonlive-hub-manbrs"
 postgres_backup_retention_days        = 7
