@@ -1,8 +1,12 @@
 import re
+from datetime import timedelta
 
 import pytest
+import time_machine
+from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.utils import timezone
 from playwright.sync_api import expect
 
 from .system_test_setup import SystemTestCase
@@ -55,6 +59,20 @@ class TestCIS2SignIn(SystemTestCase):
         self.then_header_shows_log_out()
         self.when_i_click_log_out()
         self.then_header_shows_log_in()
+
+    def test_session_expires_after_one_hour(self):
+        self.given_i_am_on_the_login_page()
+        self.when_i_log_in_via_cis2()
+        self.then_i_am_redirected_to_home()
+        self.then_header_shows_log_out()
+        User = get_user_model()
+        user = User.objects.get(username="cis2-user-1")
+        assert user.session_set.filter(expire_date__gt=timezone.now()).count() == 1
+        future = timezone.now() + timedelta(seconds=43205)
+        with time_machine.travel(future, tick=False):
+            self.page.reload()
+            self.then_header_shows_log_in()
+            assert user.session_set.filter(expire_date__gt=timezone.now()).count() == 0
 
     def given_i_am_on_the_login_page(self):
         self.page.goto(self.live_server_url + reverse("auth:login"))
