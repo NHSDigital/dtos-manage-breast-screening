@@ -164,6 +164,12 @@ class CIS2Client:
 class CIS2CLI:
     """Command-line interface for the CIS2 Connection Manager."""
 
+    # ANSI color codes
+    BLUE = "\033[94m"
+    WHITE = "\033[97m"
+    GREEN = "\033[92m"
+    RESET = "\033[0m"
+
     def __init__(self):
         self.client = CIS2Client()
         self.authenticated = False
@@ -172,23 +178,19 @@ class CIS2CLI:
 
     def setup_credentials(self):
         """Prompt user for secret and team ID, then authenticate."""
-        # ANSI color codes
-        BLUE = "\033[94m"
-        WHITE = "\033[97m"
-        RESET = "\033[0m"
 
         print(f"""
-{BLUE}    ╔═══════════════════════════════════════════════════════════════╗
+{self.BLUE}    ╔═══════════════════════════════════════════════════════════════╗
     ║                                                               ║
-    ║{WHITE}    ███    ██ ██   ██ ███████     ██████ ██ ███████ ██████{BLUE}     ║
-    ║{WHITE}    ████   ██ ██   ██ ██         ██      ██ ██           ██{BLUE}    ║
-    ║{WHITE}    ██ ██  ██ ███████ ███████    ██      ██ ███████  █████{BLUE}     ║
-    ║{WHITE}    ██  ██ ██ ██   ██      ██    ██      ██      ██ ██{BLUE}         ║
-    ║{WHITE}    ██   ████ ██   ██ ███████     ██████ ██ ███████ ███████{BLUE}    ║
+    ║{self.WHITE}    ███    ██ ██   ██ ███████     ██████ ██ ███████ ██████{self.BLUE}     ║
+    ║{self.WHITE}    ████   ██ ██   ██ ██         ██      ██ ██           ██{self.BLUE}    ║
+    ║{self.WHITE}    ██ ██  ██ ███████ ███████    ██      ██ ███████  █████{self.BLUE}     ║
+    ║{self.WHITE}    ██  ██ ██ ██   ██      ██    ██      ██      ██ ██{self.BLUE}         ║
+    ║{self.WHITE}    ██   ████ ██   ██ ███████     ██████ ██ ███████ ███████{self.BLUE}    ║
     ║                                                               ║
-    ║{WHITE}                Connection Manager CLI Tool                    {BLUE}║
+    ║{self.WHITE}                Connection Manager CLI Tool                    {self.BLUE}║
     ║                                                               ║
-    ╚═══════════════════════════════════════════════════════════════╝{RESET}
+    ╚═══════════════════════════════════════════════════════════════╝{self.RESET}
         """)
         print("=" * 40)
 
@@ -202,7 +204,7 @@ class CIS2CLI:
         try:
             print("Authenticating...")
             auth_result = self.client.authenticate(secret)
-            print("✓ Authentication successful")
+            print(f"{self.GREEN}✓ Authentication successful{self.RESET}")
 
             self.authenticated = True
 
@@ -228,7 +230,9 @@ class CIS2CLI:
                     if 1 <= choice_num <= len(team_ids):
                         selected_team_id = team_ids[choice_num - 1]
                         self.client.team_id = selected_team_id
-                        print(f"✓ Team ID set to: {selected_team_id}")
+                        print(
+                            f"{self.GREEN}✓ Team ID set to: {selected_team_id}{self.RESET}"
+                        )
                         break
                     else:
                         print(
@@ -296,7 +300,7 @@ class CIS2CLI:
                 self.last_config_hash = config["hash"]
                 self.last_config_id = config_id
                 print(
-                    f"✓ Config hash cached for updates: {self.last_config_hash[:8]}..."
+                    f"{self.GREEN}✓ Config hash cached for updates: {self.last_config_hash[:8]}...{self.RESET}"
                 )
 
             print(f"\nConfiguration Details for '{config_id}':")
@@ -381,7 +385,7 @@ class CIS2CLI:
 
             result = self.client.create_config_advanced(self.client.team_id, payload)
 
-            print("✓ Configuration created successfully")
+            print(f"{self.GREEN}✓ Configuration created successfully{self.RESET}")
             print(json.dumps(result, indent=2))
 
         except Exception as e:
@@ -442,13 +446,15 @@ class CIS2CLI:
                 self.last_config_hash,
             )
 
-            print("✓ Configuration updated successfully")
+            print(f"{self.GREEN}✓ Configuration updated successfully{self.RESET}")
             print(json.dumps(result, indent=2))
 
             # Update the cached hash if provided in response
             if isinstance(result, dict) and "hash" in result:
                 self.last_config_hash = result["hash"]
-                print(f"✓ New hash cached: {self.last_config_hash[:8]}...")
+                print(
+                    f"{self.GREEN}✓ New hash cached: {self.last_config_hash[:8]}...{self.RESET}"
+                )
 
         except Exception as e:
             print(f"✗ Error updating config: {e}")
@@ -463,7 +469,7 @@ class CIS2CLI:
         try:
             print("Re-authenticating...")
             self.client.authenticate(secret)
-            print("✓ Re-authentication successful")
+            print(f"{self.GREEN}✓ Re-authentication successful{self.RESET}")
             self.authenticated = True
         except Exception as e:
             print(f"✗ Re-authentication failed: {e}")
@@ -477,7 +483,7 @@ class CIS2CLI:
             return
 
         self.client.team_id = team_id
-        print(f"✓ Team ID changed to: {team_id}")
+        print(f"{self.GREEN}✓ Team ID changed to: {team_id}{self.RESET}")
 
     def run(self):
         """Run the CLI application."""
