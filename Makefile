@@ -63,6 +63,9 @@ test-ui: # Run UI tests @Testing
 test-integration:
 	cd manage_breast_screening/notifications && ./tests/integration/run.sh
 
+test-end-to-end:
+	cd manage_breast_screening/notifications && ./tests/end_to_end/run.sh
+
 run: manage_breast_screening/config/.env # Start the development server @Development
 	poetry run ./manage.py runserver
 

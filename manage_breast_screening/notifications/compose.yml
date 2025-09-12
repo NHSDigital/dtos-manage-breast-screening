@@ -12,6 +12,7 @@ services:
     profiles:
       - development
       - integration
+      - end-to-end
 
   mesh-sandbox:
     build:
@@ -34,6 +35,7 @@ services:
     profiles:
       - development
       - integration
+      - end-to-end
     volumes:
       - ./store/mailboxes.jsonl:/app/mesh_sandbox/store/data/mailboxes.jsonl:ro
       - ./store/workflows.jsonl:/app/mesh_sandbox/store/data/workflows.jsonl:ro
@@ -46,6 +48,7 @@ services:
     profiles:
       - development
       - integration
+      - end-to-end
     ports:
       - '8888:8888'
     healthcheck:
@@ -64,3 +67,15 @@ services:
         condition: service_healthy
     profiles:
       - integration
+
+  end-to-end:
+    image: alpine
+    depends_on:
+      azurite:
+        condition: service_started
+      mesh-sandbox:
+        condition: service_healthy
+      notify-api-stub:
+        condition: service_healthy
+    profiles:
+      - end-to-end
