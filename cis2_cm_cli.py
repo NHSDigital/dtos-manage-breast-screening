@@ -204,24 +204,46 @@ class CIS2CLI:
             auth_result = self.client.authenticate(secret)
             print("✓ Authentication successful")
 
-            # Show available team IDs if provided
-            if "team_ids" in auth_result:
-                print(f"Available team IDs: {', '.join(auth_result['team_ids'])}")
-
             self.authenticated = True
+
+            # Handle team ID selection
+            if "team_ids" not in auth_result or not auth_result["team_ids"]:
+                print("✗ Error: No team IDs available for this account")
+                print(
+                    "Please contact your administrator to ensure your account has team access."
+                )
+                sys.exit(1)
+
+            team_ids = auth_result["team_ids"]
+
+            print("\nAvailable team IDs:")
+            for i, team_id in enumerate(team_ids, 1):
+                print(f"{i}. {team_id}")
+
+            while True:
+                try:
+                    choice = input(f"Select team ID (1-{len(team_ids)}): ").strip()
+                    choice_num = int(choice)
+
+                    if 1 <= choice_num <= len(team_ids):
+                        selected_team_id = team_ids[choice_num - 1]
+                        self.client.team_id = selected_team_id
+                        print(f"✓ Team ID set to: {selected_team_id}")
+                        break
+                    else:
+                        print(
+                            f"Invalid choice. Please enter a number between 1 and {len(team_ids)}."
+                        )
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+                except KeyboardInterrupt:
+                    print("\nOperation cancelled.")
+                    sys.exit(1)
 
         except Exception as e:
             print(f"✗ Authentication failed: {e}")
             sys.exit(1)
 
-        # Get team ID
-        team_id = input("Enter your team ID: ").strip()
-        if not team_id:
-            print("Error: Team ID is required")
-            sys.exit(1)
-
-        self.client.team_id = team_id
-        print(f"✓ Team ID set to: {team_id}")
         print()
 
     def show_menu(self):
