@@ -284,26 +284,64 @@ class CIS2CLI:
 
     def display_config(self):
         """Display details of a specific configuration."""
-        config_id = input("Enter configuration ID: ").strip()
-        if not config_id:
-            print("Error: Configuration ID is required")
-            return
-
         try:
-            print(
-                f"Fetching configuration '{config_id}' for team: {self.client.team_id}"
-            )
-            config = self.client.get_config(self.client.team_id, config_id)
+            # First, get the list of available configurations
+            print(f"Fetching configurations for team: {self.client.team_id}")
+            configs_response = self.client.get_configs(self.client.team_id)
+
+            # Extract config IDs from the response
+            config_ids = []
+            if isinstance(configs_response, dict) and "configs" in configs_response:
+                config_ids = configs_response["configs"]
+            elif isinstance(configs_response, list):
+                config_ids = configs_response
+            else:
+                print("✗ Error: Unexpected configuration list format")
+                print(json.dumps(configs_response, indent=2))
+                return
+
+            if not config_ids:
+                print("✗ Error: No configurations available for this team")
+                return
+
+            # Show numbered menu for selection
+            print("\nAvailable configurations:")
+            for i, config_id in enumerate(config_ids, 1):
+                print(f"{i}. {config_id}")
+
+            while True:
+                try:
+                    choice = input(
+                        f"Select configuration (1-{len(config_ids)}): "
+                    ).strip()
+                    choice_num = int(choice)
+
+                    if 1 <= choice_num <= len(config_ids):
+                        selected_config_id = config_ids[choice_num - 1]
+                        break
+                    else:
+                        print(
+                            f"Invalid choice. Please enter a number between 1 and {len(config_ids)}."
+                        )
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+                except KeyboardInterrupt:
+                    print("\nOperation cancelled.")
+                    return
+
+            # Fetch and display the selected configuration
+            print(f"Fetching configuration '{selected_config_id}'...")
+            config = self.client.get_config(self.client.team_id, selected_config_id)
 
             # Store config hash and ID for future updates
             if isinstance(config, dict) and "hash" in config:
                 self.last_config_hash = config["hash"]
-                self.last_config_id = config_id
+                self.last_config_id = selected_config_id
                 print(
                     f"{self.GREEN}✓ Config hash cached for updates: {self.last_config_hash[:8]}...{self.RESET}"
                 )
 
-            print(f"\nConfiguration Details for '{config_id}':")
+            print(f"\nConfiguration Details for '{selected_config_id}':")
             print("=" * 40)
             print(json.dumps(config, indent=2))
 
