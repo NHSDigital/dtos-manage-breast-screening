@@ -90,8 +90,8 @@ module "database_container" {
     POSTGRES_USER = local.database_user
     POSTGRES_DB   = local.database_name
   }
-  resource_group_name              = azurerm_resource_group.main.name
-  is_tcp_app                       = true
+  resource_group_name = azurerm_resource_group.main.name
+  is_tcp_app          = true
   # postgres has a port of 5432
   port         = 5432
   exposed_port = local.database_port

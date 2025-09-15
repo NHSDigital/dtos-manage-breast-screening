@@ -45,13 +45,15 @@ jobs:
             pr_argument=""
           fi
 
+          source infrastructure/environments/${{ matrix.environment }}/variables.sh
+
           echo "Starting Azure devops pipeline \"Deploy to Azure - ${{ matrix.environment }}\"..."
           RUN_ID=$(az pipelines run \
             --commit-id ${{inputs.commit_sha}} \
             --name "Deploy to Azure - ${{ matrix.environment }}" \
             --org https://dev.azure.com/nhse-dtos \
             --project dtos-manage-breast-screening \
-            --parameters commitSHA=${{inputs.commit_sha}} ${pr_argument} environment=${{ matrix.environment }} \
+            --parameters commitSHA=${{inputs.commit_sha}} ${pr_argument} environment=${{ matrix.environment }} pool=${ADO_MANAGEMENT_POOL} \
             --output tsv --query id)
 
           echo "See pipeline run in Azure devops: https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build/results?buildId=${RUN_ID}&view=results"
