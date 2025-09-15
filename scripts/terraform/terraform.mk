@@ -6,6 +6,9 @@ STORAGE_ACCOUNT_RG=rg-dtos-state-files
 dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
+pre-production: # Target the pre-production environment - make pre-production <action>
+	$(eval include infrastructure/environments/pre-production/variables.sh)
+
 review: # Target the review infrastructure, or a review app if PR_NUMBER is used - make review <action> [PR_NUMBER=<pr_number>]
 	$(eval include infrastructure/environments/review/variables.sh)
 	$(if ${PR_NUMBER}, $(eval export TF_VAR_deploy_infra=false), $(eval export TF_VAR_deploy_container_apps=false))
