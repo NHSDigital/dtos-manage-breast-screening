@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from functools import cached_property
+from itertools import groupby
 
 from django.urls import reverse
 
@@ -218,8 +220,37 @@ class SpecialAppointmentPresenter:
 
 
 class MedicalInformationPresenter:
+    @dataclass
+    class PresentedSymptom:
+        location: str
+        started: str
+        investigated: str
+
     def __init__(self, appointment):
         self.appointment = AppointmentPresenter(appointment)
+
+        symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
+            "symptom_type__name", "reported_at"
+        )
+        self.symptoms_by_type = {
+            group: [self._map_symptom(symptom) for symptom in values]
+            for group, values in groupby(symptoms, lambda s: s.symptom_type_id)
+        }
+
+    def _map_symptom(self, symptom):
+        # TODO: check proto logic
+
+        location = symptom.get_area_display()
+        started = symptom.get_when_started_display()
+        if symptom.year_started is not None and symptom.month_started is not None:
+            # FIXME: extract a helper to format this properly
+            started = f"{symptom.month_started}, {symptom.year_started}"
+
+        investigated = "Investigated" if symptom.investigated else "Not investigated"
+
+        return self.PresentedSymptom(
+            location=location, started=started, investigated=investigated
+        )
 
     @property
     def add_lump_link(self):

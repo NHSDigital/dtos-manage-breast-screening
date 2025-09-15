@@ -1,13 +1,24 @@
 from datetime import date
 
-from factory import Sequence, Trait, post_generation
-from factory.declarations import RelatedFactory, SubFactory
+from factory import post_generation
+from factory.declarations import (
+    Iterator,
+    LazyFunction,
+    RelatedFactory,
+    Sequence,
+    SubFactory,
+    Trait,
+)
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
 from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
+)
+from manage_breast_screening.participants.models.symptoms import (
+    SymptomAreas,
+    SymptomType,
 )
 
 from .. import models
@@ -110,4 +121,22 @@ class AppointmentFactory(DjangoModelFactory):
 
         obj.statuses.add(
             AppointmentStatusFactory.create(state=extracted, appointment=obj)
+        )
+
+
+class SymptomFactory(DjangoModelFactory):
+    class Meta:
+        model = models.Symptom
+        skip_postgeneration_save = True
+
+    reported_at = LazyFunction(date.today)
+    area = Iterator(SymptomAreas)
+    intermittent = False
+    investigated = False
+    recently_resolved = False
+    appointment = SubFactory(AppointmentFactory)
+
+    class Params:
+        lump = Trait(
+            symptom_type_id=SymptomType.LUMP,
         )

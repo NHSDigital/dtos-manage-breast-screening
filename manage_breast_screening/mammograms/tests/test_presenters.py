@@ -12,6 +12,11 @@ from manage_breast_screening.participants.models import (
     AppointmentStatus,
     ParticipantReportedMammogram,
 )
+from manage_breast_screening.participants.models.symptoms import (
+    SymptomAreas,
+    WhenStartedChoices,
+)
+from manage_breast_screening.participants.tests.factories import SymptomFactory
 
 from ..presenters import (
     AppointmentPresenter,
@@ -330,3 +335,30 @@ class TestRecordMedicalInformationPresenter:
             "href": f"/mammograms/{mock_appointment.pk}/record-medical-information/lump/",
             "text": "Add a lump",
         }
+
+    @pytest.mark.django_db
+    def test_returns_symptoms(self):
+        symptom = SymptomFactory.create(
+            lump=True,
+            when_started=WhenStartedChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.RIGHT_BREAST,
+            investigated=False,
+        )
+        appointment = symptom.appointment
+
+        presenter = MedicalInformationPresenter(appointment)
+        assert presenter.symptoms_by_type == {
+            "lump": [
+                MedicalInformationPresenter.PresentedSymptom(
+                    location="Right",
+                    started="Less than 3 months",
+                    investigated="Not investigated",
+                ),
+            ],
+        }
+
+    def test_formats_exact_date(self):
+        pass
+
+    def test_groups_by_type(self):
+        pass
