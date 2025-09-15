@@ -3,8 +3,6 @@ from functools import cached_property
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.core.services.auditor import Auditor
-
 from ..forms.symptom_forms import LumpForm
 from .mixins import InProgressAppointmentMixin
 
@@ -40,8 +38,7 @@ class AddLump(InProgressAppointmentMixin, FormView):
         return context
 
     def form_valid(self, form):
-        symptom = form.save(appointment=self.appointment)
-        Auditor.from_request(self.request).audit_create(symptom)
+        form.save(appointment=self.appointment)
 
         return super().form_valid(form)
 

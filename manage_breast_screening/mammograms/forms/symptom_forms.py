@@ -13,6 +13,7 @@ from manage_breast_screening.core.form_fields import (
     ChoiceField,
     SplitDateField,
 )
+from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.forms.choices import YesNo
 from manage_breast_screening.forms.fields import yes_no_field
 from manage_breast_screening.participants.models import (
@@ -103,10 +104,11 @@ class LumpForm(Form):
                         ),
                     )
 
-    def save(self, appointment):
+    def save(self, appointment, request):
         specific_date = self.cleaned_data.get("specific_date")
+        auditor = Auditor.from_request(request)
 
-        return appointment.symptom_set.create(
+        symptom = appointment.symptom_set.create(
             appointment=appointment,
             symptom_type_id=SymptomType.LUMP,
             reported_at=date.today(),
@@ -121,3 +123,7 @@ class LumpForm(Form):
             when_resolved=self.cleaned_data.get("when_resolved"),
             additional_information=self.cleaned_data.get("additional_info"),
         )
+
+        auditor.audit_create(symptom)
+
+        return symptom
