@@ -89,6 +89,7 @@ class SplitDateField(forms.MultiValueField):
 
         self.include_day = kwargs.pop("include_day", True)
         self.hint = kwargs.pop("hint", None)
+        self.label_classes = kwargs.pop("label_classes", "nhsuk-fieldset__legend--m")
 
         day_bounds_error = gettext("Day should be between 1 and 31.")
         month_bounds_error = gettext("Month should be between 1 and 12.")
