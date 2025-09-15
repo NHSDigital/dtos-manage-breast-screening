@@ -44,7 +44,6 @@ class AppointmentCannotGoAheadForm(forms.Form):
 
     stopped_reasons = MultipleChoiceField(
         label="Why has this appointment been stopped?",
-        label_classes="nhsuk-fieldset__legend--m",
         hint="Select all that apply",
         choices=STOPPED_REASON_CHOICES,
         required=True,
@@ -55,7 +54,6 @@ class AppointmentCannotGoAheadForm(forms.Form):
 
     decision = ChoiceField(
         label="Does the appointment need to be rescheduled?",
-        label_classes="nhsuk-fieldset__legend--m",
         choices=(
             ("True", "Yes, add participant to reinvite list"),
             ("False", "No"),
