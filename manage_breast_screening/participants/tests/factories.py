@@ -1,7 +1,14 @@
 from datetime import date
 
-from factory import Sequence, Trait, post_generation
-from factory.declarations import RelatedFactory, SubFactory
+from factory import post_generation
+from factory.declarations import (
+    Iterator,
+    LazyFunction,
+    RelatedFactory,
+    Sequence,
+    SubFactory,
+    Trait,
+)
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
@@ -110,4 +117,38 @@ class AppointmentFactory(DjangoModelFactory):
 
         obj.statuses.add(
             AppointmentStatusFactory.create(state=extracted, appointment=obj)
+        )
+
+
+class SymptomFactory(DjangoModelFactory):
+    class Meta:
+        model = models.Symptom
+        skip_postgeneration_save = True
+
+    reported_at = LazyFunction(date.today)
+    area = Iterator(models.SymptomAreas)
+    intermittent = False
+    investigated = False
+    recently_resolved = False
+    appointment = SubFactory(AppointmentFactory)
+
+    class Params:
+        lump = Trait(
+            symptom_type_id=models.SymptomType.LUMP,
+        )
+
+        nipple_change = Trait(
+            symptom_type_id=models.SymptomType.NIPPLE_CHANGE,
+        )
+
+        skin_change = Trait(
+            symptom_type_id=models.SymptomType.SKIN_CHANGE,
+        )
+
+        swelling_or_shape_change = Trait(
+            symptom_type_id=models.SymptomType.SWELLING_OR_SHAPE_CHANGE,
+        )
+
+        other = Trait(
+            symptom_type_id=models.SymptomType.OTHER,
         )
