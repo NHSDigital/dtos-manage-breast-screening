@@ -4,7 +4,6 @@ from zoneinfo import ZoneInfo
 
 from business.calendar import Calendar
 from django.core.management.base import BaseCommand, CommandError
-from logger import getLogger
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
