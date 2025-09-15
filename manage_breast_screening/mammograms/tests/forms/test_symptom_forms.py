@@ -1,4 +1,6 @@
 import pytest
+from django.test import RequestFactory
+from django.urls import reverse
 
 from manage_breast_screening.forms.choices import YesNo
 from manage_breast_screening.mammograms.forms.symptom_forms import (
@@ -64,8 +66,12 @@ class TestLumpForm:
         assert form.is_valid()
 
     @pytest.mark.django_db
-    def test_save(self):
+    def test_save(self, clinical_user):
         appointment = AppointmentFactory.create()
+        request = RequestFactory().get(
+            reverse("mammograms:add_symptom_lump", kwargs={"pk": appointment.pk})
+        )
+        request.user = clinical_user
 
         form = LumpForm(
             data={
@@ -81,7 +87,7 @@ class TestLumpForm:
 
         assert form.is_valid()
 
-        obj = form.save(appointment=appointment)
+        obj = form.save(appointment=appointment, request=request)
 
         assert obj.appointment == appointment
         assert obj.symptom_type_id == SymptomType.LUMP

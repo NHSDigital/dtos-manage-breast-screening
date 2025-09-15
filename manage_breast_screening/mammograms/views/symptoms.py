@@ -38,7 +38,7 @@ class AddLump(InProgressAppointmentMixin, FormView):
         return context
 
     def form_valid(self, form):
-        form.save(appointment=self.appointment)
+        form.save(appointment=self.appointment, request=self.request)
 
         return super().form_valid(form)
 
