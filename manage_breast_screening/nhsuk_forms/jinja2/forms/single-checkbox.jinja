@@ -1,0 +1,27 @@
+{% from 'nhsuk/components/checkboxes/macro.jinja' import checkboxes %}
+{% set unbound_field = field.field %}
+{% if field.errors %}
+  {% set error_message = {"text": field.errors | first} %}
+{% endif %}
+{% set conditional_html = field.conditional_html(value) %}
+{% set widget = unbound_field.widget %}
+
+{{ checkboxes({
+  "name": field.html_name,
+  "idPrefix": field.auto_id,
+  "errorMessage": error_message,
+  "hint": {
+    "html": unbound_field.hint|e
+  } if unbound_field.hint,
+  "items": [
+    {
+      "id": field.auto_id,
+      "value": "true",
+      "text": field.label,
+      "checked": widget.check_test(field.value()),
+      "conditional": {
+        "html": conditional_html
+      } if conditional_html else undefined
+    }
+  ]
+}) }}
