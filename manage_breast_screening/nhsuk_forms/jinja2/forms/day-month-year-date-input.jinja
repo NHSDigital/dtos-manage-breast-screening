@@ -9,7 +9,7 @@
   "fieldset":  {
     "legend": {
       "text": field.label,
-      "classes": "nhsuk-fieldset__legend--m",
+      "classes": unbound_field.label_classes if unbound_field.label_classes,
       "isPageHeading": false
     }
   } if field.label,
