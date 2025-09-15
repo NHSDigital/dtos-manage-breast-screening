@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 
 from business.calendar import Calendar
 from django.core.management.base import BaseCommand, CommandError
+from logger import getLogger
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
@@ -18,6 +19,8 @@ from manage_breast_screening.notifications.models import (
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
 
+logger = getLogger(__name__)
+
 TZ_INFO = ZoneInfo("Europe/London")
 
 
@@ -28,11 +31,13 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        logger.info("Send Message Batch Command started")
         try:
             if not self.bso_working_day():
                 return
 
             for routing_plan in RoutingPlan.all():
+                logger.info(f"Processing Routing Plan {routing_plan.name}")
                 self.stdout.write(
                     f"Finding appointments of episode type {routing_plan.episode_types} to include in batch."
                 )
@@ -45,6 +50,9 @@ class Command(BaseCommand):
                 )
 
                 if not appointments:
+                    logger.info(
+                        f"No appointments found to batch for episode types {routing_plan.episode_types}"
+                    )
                     self.stdout.write(
                         f"No appointments found to batch for episode types {routing_plan.episode_types}"
                     )
@@ -74,7 +82,9 @@ class Command(BaseCommand):
                         message_batch, response.json()
                     )
                     self.stdout.write(f"{message_batch} sent")
+                    logger.info(f"{message_batch} sent successfully")
                 else:
+                    logger.info(f"Failed to send batch. Status: {response.status_code}")
                     MessageBatchHelpers.mark_batch_as_failed(
                         message_batch, response, retry_count=0
                     )
