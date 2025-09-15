@@ -5,9 +5,12 @@ from django import forms
 from django.forms import ValidationError
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.form_fields import CharField, ChoiceField
+from manage_breast_screening.nhsuk_forms.fields import (
+    CharField,
+    ChoiceField,
+    SplitDateField,
+)
 
-from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
 
 

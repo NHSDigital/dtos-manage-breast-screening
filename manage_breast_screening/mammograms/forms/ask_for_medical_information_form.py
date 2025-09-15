@@ -1,6 +1,6 @@
 from django import forms
 
-from manage_breast_screening.core.form_fields import ChoiceField
+from manage_breast_screening.nhsuk_forms.fields import ChoiceField
 
 
 class AskForMedicalInformationForm(forms.Form):

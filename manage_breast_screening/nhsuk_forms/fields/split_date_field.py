@@ -2,11 +2,13 @@ import datetime
 
 from django import forms
 from django.core import validators
-from django.forms import Textarea, ValidationError, widgets
+from django.forms import ValidationError, widgets
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from manage_breast_screening.core.utils.date_formatting import format_date
+
+from .integer_field import IntegerField
 
 
 class BetterMultiWidget(widgets.MultiWidget):
@@ -173,159 +175,3 @@ class SplitDateField(forms.MultiValueField):
             if subfield.max_value is not None:
                 subwidget.attrs["max"] = subfield.max_value
         return attrs
-
-
-class CharField(forms.CharField):
-    def __init__(
-        self,
-        *args,
-        hint=None,
-        label_classes=None,
-        classes=None,
-        **kwargs,
-    ):
-        widget = kwargs.get("widget")
-        if (isinstance(widget, type) and widget is Textarea) or isinstance(
-            widget, Textarea
-        ):
-            kwargs["template_name"] = "forms/textarea.jinja"
-        else:
-            kwargs["template_name"] = "forms/input.jinja"
-
-        self.hint = hint
-        self.classes = classes
-        self.label_classes = label_classes
-
-        super().__init__(*args, **kwargs)
-
-    def widget_attrs(self, widget):
-        attrs = super().widget_attrs(widget)
-
-        # Don't use maxlength even if there is a max length validator.
-        # This attribute prevents the user from seeing errors, so we don't use it
-        attrs.pop("maxlength", None)
-
-        return attrs
-
-
-class IntegerField(forms.IntegerField):
-    def __init__(
-        self,
-        *args,
-        hint=None,
-        label_classes=None,
-        classes=None,
-        **kwargs,
-    ):
-        kwargs["template_name"] = "forms/input.jinja"
-
-        self.hint = hint
-        self.classes = classes
-        self.label_classes = label_classes
-
-        super().__init__(*args, **kwargs)
-
-    def widget_attrs(self, widget):
-        attrs = super().widget_attrs(widget)
-
-        # Don't use min/max/step attributes.
-        attrs.pop("min", None)
-        attrs.pop("max", None)
-        attrs.pop("step", None)
-
-        return attrs
-
-
-class BoundChoiceField(forms.BoundField):
-    """
-    Specialisation of BoundField that can deal with conditionally shown fields,
-    and divider content between choices.
-    This can be used to render a set of radios or checkboxes with text boxes to capture
-    more details.
-    """
-
-    def __init__(self, form: forms.Form, field: "ChoiceField", name: str):
-        super().__init__(form, field, name)
-
-        self._conditional_html = {}
-        self.dividers = {}
-
-    def add_conditional_html(self, value, html):
-        if isinstance(self.field.widget, widgets.Select):
-            raise ValueError("select comonent does not support conditional fields")
-
-        self._conditional_html[value] = html
-
-    def conditional_html(self, value):
-        return self._conditional_html.get(value)
-
-    def add_divider_after(self, previous, divider):
-        self.dividers[previous] = divider
-
-    def get_divider_after(self, previous):
-        return self.dividers.get(previous)
-
-
-class ChoiceField(forms.ChoiceField):
-    """
-    A ChoiceField that renders using NHS.UK design system radios/select
-    components.
-    """
-
-    widget = widgets.RadioSelect
-    bound_field_class = BoundChoiceField
-
-    def __init__(
-        self,
-        *args,
-        hint=None,
-        label_classes=None,
-        classes=None,
-        **kwargs,
-    ):
-        kwargs["template_name"] = ChoiceField._template_name(
-            kwargs.get("widget", self.widget)
-        )
-
-        self.hint = hint
-        self.classes = classes
-        self.label_classes = label_classes
-
-        super().__init__(*args, **kwargs)
-
-    @staticmethod
-    def _template_name(widget):
-        if (isinstance(widget, type) and widget is widgets.RadioSelect) or isinstance(
-            widget, widgets.RadioSelect
-        ):
-            return "forms/radios.jinja"
-        elif (isinstance(widget, type) and widget is widgets.Select) or isinstance(
-            widget, widgets.Select
-        ):
-            return "forms/select.jinja"
-
-
-class MultipleChoiceField(forms.MultipleChoiceField):
-    """
-    A MultipleChoiceField that renders using the NHS.UK design system checkboxes
-    component.
-    """
-
-    widget = widgets.CheckboxSelectMultiple
-    bound_field_class = BoundChoiceField
-
-    def __init__(
-        self,
-        *args,
-        hint=None,
-        label_classes=None,
-        classes=None,
-        **kwargs,
-    ):
-        kwargs["template_name"] = "forms/checkboxes.jinja"
-
-        self.hint = hint
-        self.classes = classes
-        self.label_classes = label_classes
-
-        super().__init__(*args, **kwargs)

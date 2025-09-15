@@ -1,6 +1,5 @@
-from manage_breast_screening.core.form_fields import ChoiceField
-
 from .choices import YesNo
+from .fields.choice_fields import ChoiceField
 
 
 def yes_no_field(**kwargs) -> ChoiceField:
