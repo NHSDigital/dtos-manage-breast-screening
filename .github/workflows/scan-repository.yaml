@@ -3,6 +3,7 @@ name: 'Scan repository'
 on:
   schedule:
     - cron: '0 9 * * MON-FRI'
+  workflow_dispatch:
 
 jobs:
   scan-secrets:
@@ -16,3 +17,30 @@ jobs:
           fetch-depth: 0 # Full history is needed to scan all commits
       - name: 'Scan secrets'
         uses: ./.github/actions/scan-secrets
+
+      - name: Notify slack
+        if: ${{ failure() }}
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            blocks:
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ":warning: Repository scan failed:"
+              - type: section
+                fields:
+                - type: mrkdwn
+                  text: |-
+                    *Workflow:*
+                    <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>
+                - type: mrkdwn
+                  text: |-
+                    *Job:*
+                    ${{ github.job }}
+                - type: mrkdwn
+                  text: |-
+                    *Repo:*
+                    ${{ github.repository }}
