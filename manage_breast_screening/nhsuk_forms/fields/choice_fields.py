@@ -45,7 +45,7 @@ class ChoiceField(forms.ChoiceField):
         self,
         *args,
         hint=None,
-        label_classes=None,
+        label_classes="nhsuk-fieldset__legend--m",
         classes=None,
         **kwargs,
     ):
@@ -84,7 +84,7 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         self,
         *args,
         hint=None,
-        label_classes=None,
+        label_classes="nhsuk-fieldset__legend--m",
         classes=None,
         **kwargs,
     ):

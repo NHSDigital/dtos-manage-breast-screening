@@ -111,19 +111,16 @@ class ParticipantReportedMammogramForm(forms.Form):
         # Main choice fields
         self.fields["where_taken"] = ChoiceField(
             label="Where were the breast x-rays taken?",
-            label_classes="nhsuk-fieldset__legend--m",
             choices=self.where_taken_choices,
         )
 
         self.fields["when_taken"] = ChoiceField(
             label="When were the x-rays taken?",
-            label_classes="nhsuk-fieldset__legend--m",
             choices=self.when_taken_choices,
         )
 
         self.fields["name_is_the_same"] = ChoiceField(
             label=f"Were they taken with the name {participant.full_name}?",
-            label_classes="nhsuk-fieldset__legend--m",
             choices=self.name_is_the_same_choices,
         )
 

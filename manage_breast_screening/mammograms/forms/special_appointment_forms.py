@@ -34,7 +34,6 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
         # a special appointment.
         self.fields["support_reasons"] = MultipleChoiceField(
             label=f"Why does {participant.full_name} need additional support?",
-            label_classes="nhsuk-fieldset__legend--m",
             hint="Select all that apply. When describing support required, include any special requests made by the participant or their carer.",
             choices=self.SupportReasons,  # type: ignore
             required=("support_reasons" not in self.initial),
@@ -54,7 +53,6 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
 
         self.fields["any_temporary"] = ChoiceField(
             label="Are any of these reasons temporary?",
-            label_classes="nhsuk-fieldset__legend--m",
             hint="This includes issues that are likely to be resolved by their next mammogram, for example a broken foot or a short-term eye problem.",
             choices=self.TemporaryChoices,  # type: ignore
             required=True,
