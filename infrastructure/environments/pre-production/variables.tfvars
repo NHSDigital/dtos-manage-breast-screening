@@ -1,6 +1,6 @@
 dns_zone_name                         = "pre-production.manage.breast.screening.nhs.uk"
 enable_auth                           = false
-fetch_secrets_from_app_key_vault      = true
+fetch_secrets_from_app_key_vault      = false
 front_door_profile                    = "afd-live-hub-manbrs"
 postgres_backup_retention_days        = 7
 postgres_geo_redundant_backup_enabled = false
