@@ -2,7 +2,7 @@ from django import forms
 from django.db.models import TextChoices
 from django.forms import Textarea
 
-from manage_breast_screening.core.form_fields import (
+from manage_breast_screening.nhsuk_forms.fields import (
     CharField,
     ChoiceField,
     MultipleChoiceField,
