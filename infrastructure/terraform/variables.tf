@@ -116,12 +116,6 @@ variable "front_door_profile" {
   type        = string
 }
 
-variable "personas_enabled" {
-  description = "To enable personas or not."
-  type        = bool
-  default     = false
-}
-
 variable "seed_demo_data" {
   description = "Whether or not to seed the demo data in the database."
   type        = bool
