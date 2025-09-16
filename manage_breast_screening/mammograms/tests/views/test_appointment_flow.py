@@ -138,6 +138,18 @@ class TestAskForMedicalInformation:
 
 
 @pytest.mark.django_db
+class TestRecordMedicalInformation:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+
+@pytest.mark.django_db
 class TestCheckIn:
     def test_known_redirect(self, clinical_user_client, appointment):
         response = clinical_user_client.post(

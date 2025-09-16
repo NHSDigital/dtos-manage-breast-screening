@@ -11,9 +11,9 @@
 }) %}
   <p>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
   {% if presenter.symptom_rows %}
-    {{ summaryList({
-      "rows": presenter.symptom_rows
-    }) }}
+     {{ summaryList({
+        "rows": presenter.symptom_rows
+      }) }}
   {% else %}
     <p>No symptoms have been recorded for this participant.</p>
   {% endif %}
