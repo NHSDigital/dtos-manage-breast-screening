@@ -88,6 +88,6 @@ This is the initial manual process to create a new environment like review, dev,
 - Test running terraform manually from the AVD (Optional)
 - Raise a pull request, review and merge to trigger the pipeline
 
-
 ## Add
-- 
+
+-
