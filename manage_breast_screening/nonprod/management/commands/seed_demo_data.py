@@ -27,6 +27,7 @@ from manage_breast_screening.participants.models import (
     ParticipantReportedMammogram,
     ScreeningEpisode,
 )
+from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     AppointmentStatusFactory,
@@ -34,6 +35,7 @@ from manage_breast_screening.participants.tests.factories import (
     ParticipantFactory,
     ParticipantReportedMammogramFactory,
     ScreeningEpisodeFactory,
+    SymptomFactory,
 )
 
 logger = logging.getLogger(__name__)
@@ -151,6 +153,9 @@ class Command(BaseCommand):
                 state=status_key,
             )
 
+        for symptom in appointment_key.get("symptoms", []):
+            self.create_symptom(appointment, symptom)
+
         return appointment
 
     def create_screening_episode(self, screening_episode_key):
@@ -175,6 +180,9 @@ class Command(BaseCommand):
         self.create_reported_mammograms(participant, previous_mammograms_key)
         return participant
 
+    def create_symptom(self, appointment, symptom):
+        SymptomFactory(appointment=appointment, **symptom)
+
     def create_reported_mammograms(self, participant, mammograms):
         for mammogram in mammograms:
             created_at_date = mammogram.pop("created_at", None)
@@ -194,6 +202,7 @@ class Command(BaseCommand):
             return participant_mammogram
 
     def reset_db(self):
+        Symptom.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
         ParticipantReportedMammogram.objects.all().delete()

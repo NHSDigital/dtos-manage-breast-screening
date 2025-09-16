@@ -86,6 +86,12 @@ clinic:
                 - 806 Clinic Road
                 - Leeds
               postcode: B2 7E9
+        symptoms:
+          - id: e9cc27f6-8e6f-4b83-890c-d73590c40f81
+            symptom_type_id: lump
+            area: RIGHT_BREAST
+            when_started: LESS_THAN_THREE_MONTHS
+
     - id: 309b6d74-7776-44e3-8ea7-9c5fd8e72a0b
       duration_in_minutes: 8
       starts_at_time: 09:24
