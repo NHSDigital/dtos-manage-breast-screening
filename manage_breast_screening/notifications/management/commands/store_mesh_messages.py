@@ -32,9 +32,9 @@ class Command(BaseCommand):
 
     def mesh_client(self):
         client = MeshClient(
-            url=os.getenv("MESH_BASE_URL"),
-            mailbox=os.getenv("MESH_INBOX_NAME"),
-            password=os.getenv("MESH_CLIENT_PASSWORD"),
-            shared_key=os.getenv("MESH_CLIENT_SHARED_KEY"),
+            url=os.getenv("NBSS_MESH_HOST"),
+            mailbox=os.getenv("NBSS_MESH_INBOX_NAME"),
+            password=os.getenv("NBSS_MESH_PASSWORD"),
+            shared_key=os.getenv("NBSS_MESH_SHARED_KEY"),
         )
         return client
