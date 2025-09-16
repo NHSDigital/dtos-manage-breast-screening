@@ -18,7 +18,7 @@ class Helpers:
                 shared_key=os.getenv("NBSS_MESH_SHARED_KEY", "TestKey"),
             ) as client:
                 client.send_message(
-                    os.getenv("MESH_INBOX_NAME"),
+                    os.getenv("NBSS_MESH_INBOX_NAME"),
                     file.read().encode("ASCII"),
                     filename=os.path.basename(filepath),
                     workflow_id="TEST_NBSS_WORKFLOW",

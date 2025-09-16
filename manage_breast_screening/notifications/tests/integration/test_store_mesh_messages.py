@@ -20,6 +20,9 @@ class TestStoreMeshMessages:
         monkeypatch.setenv("NBSS_MESH_PASSWORD", "password")
         monkeypatch.setenv("NBSS_MESH_SHARED_KEY", "TestKey")
         monkeypatch.setenv("NBSS_MESH_INBOX_NAME", "X26ABC1")
+        monkeypatch.setenv("NBSS_MESH_CERT", "mesh-cert")
+        monkeypatch.setenv("NBSS_MESH_PRIVATE_KEY", "mesh-private-key")
+        monkeypatch.setenv("NBSS_MESH_CA_CERT", "mesh-ca-cert")
 
         monkeypatch.setenv(
             "BLOB_STORAGE_CONNECTION_STRING", Helpers().azurite_connection_string()
