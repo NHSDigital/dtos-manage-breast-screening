@@ -17,7 +17,7 @@ This is the initial manual process to create a new environment like review, dev,
   - Approver: Add someone from the infrastructure team
   - Role Name: `Group.Read.All`
   - Application Name: `mi-manbrs-[environment]-adotoaz-uks`
-  - Application ID: [client.id]
+  - Application ID: [client.id]  (would be of `mi-manbrs-[environment]-ghtoado-uks`)
   - Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
   - Description: - Managed identity: `mi-manbrs-[environment]-adotoaz-uks` - Role: permanent on Directory
 
