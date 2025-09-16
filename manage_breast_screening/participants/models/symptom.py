@@ -52,6 +52,7 @@ class Symptom(BaseModel):
 
     # Has the symptom been investigated already?
     investigated = models.BooleanField(null=False, default=False)
+    investigation_details = models.CharField(blank=True, null=False)
 
     # Onset information
     when_started = models.CharField(blank=True, null=False, choices=RelativeDateChoices)
