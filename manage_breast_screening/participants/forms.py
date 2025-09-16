@@ -5,9 +5,12 @@ from django import forms
 from django.forms import ValidationError
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.form_fields import CharField, ChoiceField
+from manage_breast_screening.nhsuk_forms.fields import (
+    CharField,
+    ChoiceField,
+    SplitDateField,
+)
 
-from ..core.form_fields import SplitDateField
 from .models import Ethnicity, ParticipantReportedMammogram
 
 
@@ -108,19 +111,16 @@ class ParticipantReportedMammogramForm(forms.Form):
         # Main choice fields
         self.fields["where_taken"] = ChoiceField(
             label="Where were the breast x-rays taken?",
-            label_classes="nhsuk-fieldset__legend--m",
             choices=self.where_taken_choices,
         )
 
         self.fields["when_taken"] = ChoiceField(
             label="When were the x-rays taken?",
-            label_classes="nhsuk-fieldset__legend--m",
             choices=self.when_taken_choices,
         )
 
         self.fields["name_is_the_same"] = ChoiceField(
             label=f"Were they taken with the name {participant.full_name}?",
-            label_classes="nhsuk-fieldset__legend--m",
             choices=self.name_is_the_same_choices,
         )
 

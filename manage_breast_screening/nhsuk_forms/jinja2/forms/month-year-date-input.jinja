@@ -9,7 +9,7 @@
   "fieldset":  {
     "legend": {
       "text": field.label,
-      "classes": "nhsuk-fieldset__legend--m",
+      "classes": unbound_field.label_classes if unbound_field.label_classes,
       "isPageHeading": false
     }
   } if field.label,
@@ -20,24 +20,17 @@
   "items": [
     {
       "name": field.subwidgets.0.data.name,
-      "label": "Day",
+      "label": "Month",
       "classes": "nhsuk-input--width-2",
       "value": field.subwidgets.0.data.value,
       "id": field.auto_id
     },
     {
       "name": field.subwidgets.1.data.name,
-      "label": "Month",
-      "classes": "nhsuk-input--width-2",
-      "value": field.subwidgets.1.data.value,
-      "id": field.auto_id ~ "_1"
-    },
-    {
-      "name": field.subwidgets.2.data.name,
       "label": "Year",
       "classes": "nhsuk-input--width-4",
-      "value": field.subwidgets.2.data.value,
-      "id": field.auto_id ~ "_2"
+      "value": field.subwidgets.1.data.value,
+      "id": field.auto_id ~ "_1"
     }
   ]
 }) }}
