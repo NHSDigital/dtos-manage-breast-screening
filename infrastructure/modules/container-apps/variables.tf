@@ -1,3 +1,9 @@
+variable "api_oauth_token_url" {
+  description = "The OAuth API endpoint URL used to request client credentials for NHS Notify API"
+  type        = string
+  default     = null
+}
+
 variable "app_key_vault_id" {
   description = "Application key vault ID"
   type        = string
@@ -72,6 +78,12 @@ variable "deploy_database_as_container" {
   type        = bool
 }
 
+variable "nhs_notify_api_message_batch_url" {
+  description = "The API endpoint URL used to send message batches to NHS Notify"
+  type        = string
+  default     = null
+}
+
 variable "postgres_backup_retention_days" {
   description = "The number of days to retain backups for the PostgreSQL Flexible Server."
   type        = number
@@ -104,6 +116,11 @@ variable "postgres_storage_tier" {
 
 variable "postgres_subnet_id" {
   description = "The postgres subnet id. Created in the infra module."
+  type        = string
+}
+
+variable "main_subnet_id" {
+  description = "The main subnet id. Created in the infra module."
   type        = string
 }
 
@@ -158,4 +175,17 @@ locals {
     DATABASE_NAME   = var.deploy_database_as_container ? null : module.postgres[0].database_names[0]
     DATABASE_USER   = var.deploy_database_as_container ? null : module.db_connect_identity[0].name
   }
+
+  storage_account_name = "st${var.app_short_name}${var.environment}uks"
+  storage_containers = {
+    notifications-mesh-data = {
+      container_name        = "notifications-mesh-data"
+      container_access_type = "private"
+    }
+    notifications-reports = {
+      container_name        = "notifications-reports"
+      container_access_type = "private"
+    }
+  }
+  storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
 }

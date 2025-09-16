@@ -1,3 +1,4 @@
+api_oauth_token_url                   = "https://int.api.service.nhs.uk/oauth2/token"
 dns_zone_name                         = "manage-breast-screening.non-live.screening.nhs.uk"
 enable_auth                           = false
 fetch_secrets_from_app_key_vault      = true
@@ -8,3 +9,4 @@ protect_keyvault                      = false
 vnet_address_space                    = "10.128.0.0/16"
 personas_enabled                      = true
 seed_demo_data                        = true
+nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"
