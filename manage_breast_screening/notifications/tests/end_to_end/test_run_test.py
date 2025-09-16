@@ -17,7 +17,6 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 
 
 @patch("manage_breast_screening.notifications.services.api_client.jwt.encode")
-@pytest.mark.end_to_end
 class TestEndToEnd:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
@@ -39,7 +38,6 @@ class TestEndToEnd:
         monkeypatch.setenv("OAUTH_API_KEY", "a1b2c3d4")
         monkeypatch.setenv("OAUTH_API_KID", "test-1")
         monkeypatch.setenv("PRIVATE_KEY", "test-key")
-        monkeypatch.setenv("CMAPI_CONSUMER_KEY", "consumer-key")
 
     @pytest.mark.django_db
     def test_end_to_end(self, mock_jwt_encode):

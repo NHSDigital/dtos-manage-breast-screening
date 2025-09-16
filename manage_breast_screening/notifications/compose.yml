@@ -67,15 +67,4 @@ services:
         condition: service_healthy
     profiles:
       - integration
-
-  end-to-end:
-    image: alpine
-    depends_on:
-      azurite:
-        condition: service_started
-      mesh-sandbox:
-        condition: service_healthy
-      notify-api-stub:
-        condition: service_healthy
-    profiles:
-      - end-to-end
+      - end_to_end
