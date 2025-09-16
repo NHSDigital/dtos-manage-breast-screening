@@ -27,7 +27,7 @@ This is the initial manual process to create a new environment like review, dev,
 
 ## Infra secrets
 
-- Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[review]-inf`
+- Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[environment]-inf`
 
 ## Azure devops
 
@@ -83,7 +83,7 @@ This is the initial manual process to create a new environment like review, dev,
 
 ## App secrets
 
-- Add the application secrets to the _app_ key vault `kv-manbrs-[review]-app`
+- Add the application secrets to the _app_ key vault `kv-manbrs-[environment]-app`
 - Set `fetch_secrets_from_app_key_vault` terraform variable to `true`
 - Test running terraform manually from the AVD (Optional)
 - Raise a pull request, review and merge to trigger the pipeline
