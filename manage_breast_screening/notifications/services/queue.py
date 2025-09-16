@@ -1,18 +1,31 @@
 import os
 
 from azure.core.exceptions import ResourceExistsError
+from azure.identity import ManagedIdentityCredential
 from azure.storage.queue import QueueClient, QueueMessage
 
 
 class Queue:
     def __init__(self, queue_name):
-        try:
-            self.client = QueueClient.from_connection_string(
-                os.getenv("QUEUE_STORAGE_CONNECTION_STRING"), queue_name
+        storage_account_name = os.getenv("STORAGE_ACCOUNT_NAME")
+        queue_mi_client_id = os.getenv("QUEUE_MI_CLIENT_ID")
+        connection_string = os.getenv("QUEUE_STORAGE_CONNECTION_STRING")
+
+        if storage_account_name and queue_mi_client_id:
+            self.client = QueueClient(
+                f"https://{storage_account_name}.queue.core.windows.net",
+                queue_name=queue_name,
+                credential=ManagedIdentityCredential(client_id=queue_mi_client_id),
             )
-            self.client.create_queue()
-        except ResourceExistsError:
-            pass
+
+        elif connection_string:
+            try:
+                self.client = QueueClient.from_connection_string(
+                    os.getenv("QUEUE_STORAGE_CONNECTION_STRING"), queue_name
+                )
+                self.client.create_queue()
+            except ResourceExistsError:
+                pass
 
     def add(self, message: str):
         self.client.send_message(message)
@@ -31,8 +44,12 @@ class Queue:
 
     @classmethod
     def MessageStatusUpdates(cls):
-        return cls("message-status-updates")
+        return cls(
+            os.getenv(
+                "STATUS_UPDATES_QUEUE_NAME", "notifications-message-status-updates"
+            )
+        )
 
     @classmethod
     def RetryMessageBatches(cls):
-        return cls("retry-message-batches")
+        return cls(os.getenv("RETRY_QUEUE_NAME", "notifications-message-batch-retries"))
