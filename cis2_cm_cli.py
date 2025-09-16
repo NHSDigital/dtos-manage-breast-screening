@@ -253,34 +253,13 @@ class CIS2CLI:
     def show_menu(self):
         """Display the main menu options."""
         print("Available options:")
-        print("1. List configurations")
-        print("2. Display specific configuration")
-        print("3. Create new configuration")
-        print("4. Update existing configuration")
-        print("5. Re-authenticate")
-        print("6. Change team ID")
-        print("7. Quit")
+        print("1. Display specific configuration")
+        print("2. Create new configuration")
+        print("3. Update existing configuration")
+        print("4. Re-authenticate")
+        print("5. Change team ID")
+        print("6. Quit")
         print()
-
-    def list_configs(self):
-        """List all configurations for the current team."""
-        try:
-            print(f"Fetching configurations for team: {self.client.team_id}")
-            configs = self.client.get_configs(self.client.team_id)
-
-            print("\nConfigurations:")
-            print("-" * 20)
-            if isinstance(configs, dict) and "configs" in configs:
-                for config in configs["configs"]:
-                    print(f"• {config}")
-            elif isinstance(configs, list):
-                for config in configs:
-                    print(f"• {config}")
-            else:
-                print(json.dumps(configs, indent=2))
-
-        except Exception as e:
-            print(f"✗ Error listing configs: {e}")
 
     def display_config(self):
         """Display details of a specific configuration."""
@@ -533,26 +512,24 @@ class CIS2CLI:
             self.show_menu()
 
             try:
-                choice = input("Enter your choice (1-7): ").strip()
+                choice = input("Enter your choice (1-6): ").strip()
                 print()
 
                 if choice == "1":
-                    self.list_configs()
-                elif choice == "2":
                     self.display_config()
-                elif choice == "3":
+                elif choice == "2":
                     self.create_config()
-                elif choice == "4":
+                elif choice == "3":
                     self.update_config()
-                elif choice == "5":
+                elif choice == "4":
                     self.re_authenticate()
-                elif choice == "6":
+                elif choice == "5":
                     self.change_team_id()
-                elif choice == "7":
+                elif choice == "6":
                     print("Goodbye!")
                     break
                 else:
-                    print("Invalid choice. Please enter 1-7.")
+                    print("Invalid choice. Please enter 1-6.")
 
                 print()
 
