@@ -7,7 +7,7 @@ dev: # Target the dev environment - make dev <action>
 	$(eval include infrastructure/environments/dev/variables.sh)
 
 pre-prod: # Target the pre-prod environment - make pre-prod <action>
-	$(eval include infrastructure/environments/pre-prodn/variables.sh)
+	$(eval include infrastructure/environments/pre-prod/variables.sh)
 
 review: # Target the review infrastructure, or a review app if PR_NUMBER is used - make review <action> [PR_NUMBER=<pr_number>]
 	$(eval include infrastructure/environments/review/variables.sh)

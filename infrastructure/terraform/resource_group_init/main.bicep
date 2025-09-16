@@ -12,7 +12,7 @@ var hubMap = {
   int:                  'dev'
   review:               'dev'
   nft:                  'dev'
-  'pre-prodn':     'prod'
+  'pre-prod':     'prod'
   prd:                  'prod'
 }
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
@@ -34,20 +34,24 @@ var roleID = {
 }
 
 // Retrieve existing terraform state resource group
-resource storageAccountRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+resource storageAccountRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: storageAccountRGName
+  location: 'UK South'
 }
 // Retrieve existing private endpoint resource group
-resource privateEndpointResourceGroup 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+resource privateEndpointResourceGroup 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: privateEndpointRGName
+  location: 'UK South'
 }
 // Retrieve existing private DNS zone resource group
-resource privateDNSZoneRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+resource privateDNSZoneRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: privateDNSZoneRGName
+  location: 'UK South'
 }
 // Retrieve existing managed identity resource group
-resource managedIdentityRG 'Microsoft.Resources/resourceGroups@2024-11-01' existing = {
+resource managedIdentityRG 'Microsoft.Resources/resourceGroups@2024-11-01' = {
   name: managedIdentityRGName
+  location: 'UK South'
 }
 
 // Create the managed identity assumed by Azure devops to connect to Azure
