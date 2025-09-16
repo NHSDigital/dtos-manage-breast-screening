@@ -206,17 +206,17 @@ When initially creating the terraform; the pipeline will try to create a state f
 Example:
 
 ```
-Failed to get existing workspaces: containers.Client#ListBlobs: Failure sending request: StatusCode=0 -- Original Error: Get "https://samanbrspreprodtfstate.blob.core.windows.net/terraform-state?comp=list&prefix=preprod.tfstateenv%3A&restype=container": dial tcp: lookup samanbrspreprodtfstate.blob.core.windows.net on 168.63.129.16:53: no such host
+Failed to get existing workspaces: containers.Client#ListBlobs: Failure sending request: StatusCode=0 -- Original Error: Get "https://samanbrspreprodtfstate.blob.core.windows.net/terraform-state?comp=list&prefix=preprod.tfstateenv%3A&restype=container": dial tcp: lookup samanbrspreprodtfstate.blob.core.windows.net on *.*.*.*:53: no such host
 ```
 
 
 $ nslookup samanbrspreprodtfstate.blob.core.windows.net
 Server:  UnKnown
-Address:  168.63.129.16
+Address:  *.*.*.*
 
 Non-authoritative answer:
 Name:    samanbrspreprodtfstate.privatelink.blob.core.windows.net
-Address:  10.1.2.25
+Address:  *.*.*.*
 Aliases:  samanbrspreprodtfstate.blob.core.windows.net
 
 
