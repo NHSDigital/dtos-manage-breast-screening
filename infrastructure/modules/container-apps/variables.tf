@@ -129,12 +129,6 @@ variable "region" {
   type        = string
 }
 
-variable "personas_enabled" {
-  description = "To enable personas or not."
-  type        = bool
-  default     = false
-}
-
 variable "seed_demo_data" {
   description = "Whether or not to seed the demo data in the database."
   type        = bool
@@ -164,7 +158,6 @@ locals {
     local.env_vars_from_yaml,
     {
       SSL_MODE         = "require"
-      PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
       DJANGO_ENV       = var.env_config
     }
   )
