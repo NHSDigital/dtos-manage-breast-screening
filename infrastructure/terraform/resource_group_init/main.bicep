@@ -12,7 +12,7 @@ var hubMap = {
   int:                  'dev'
   review:               'dev'
   nft:                  'dev'
-  'pre-prod':     'prod'
+  preprod:              'prod'
   prd:                  'prod'
 }
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
