@@ -32,7 +32,7 @@ This is the initial manual process to create a new environment like review, dev,
 ## Azure devops
 
 - Create ADO group
-  - Name: `Run pipeline - [environment]`
+  - Name: `px prettier --write docs/infrastructure/create-environment.md[environment]`
   - Members: `mi-manbrs-[environment]-ghtoado-uks`. There may be more than 1 in the list. Check client id printed below the name.
   - Permissions:
     - View project-level information
@@ -49,7 +49,7 @@ This is the initial manual process to create a new environment like review, dev,
 - Create service connection (ADO)
   - Connection type: `Azure Resource Manager`
   - Identity type: `Managed identity`
-  - Subscription for managed identity: `Digital Screening DToS - Devops`
+  - Subscription for managed identity: `Digital Screening DToS - Devops` or `Digital Screening DToS - Core Services Prod Hub` for prod.
   - Resource group for managed identity: `rg-mi-[environment]-uks`
   - Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
   - Scope level: `Subscription`
