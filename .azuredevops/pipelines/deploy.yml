@@ -13,15 +13,14 @@ parameters:
     type: string
     default: ''
   - name: pool
-    displayName: pool
+    displayName: ADO management pool
     type: string
-    default: private-pool-dev-uks
 
 stages:
   - stage: ${{ parameters.environment }}
     displayName: Deploy to ${{ parameters.environment }} environment
     pool:
-      name: private-pool-dev-uks
+      name: ${{ parameters.pool }}
     lockBehavior: sequential
     isSkippable: false
 
