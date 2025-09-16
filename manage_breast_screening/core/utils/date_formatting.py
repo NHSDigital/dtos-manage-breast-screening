@@ -71,6 +71,23 @@ def format_date_time(value):
     return f"{date_part}, {time_part}"
 
 
+def format_approximate_date(year, month):
+    """
+    Format an approximate date in the past
+    """
+    current = date.today().replace(day=1)
+    provided = date(year, month, 1)
+
+    if current == provided:
+        relative_part = "this month"
+    elif current < provided:
+        raise ValueError(f"{year=}, {month=} should be in the past")
+    else:
+        relative_part = f"{_format_date_difference(provided, current)} ago"
+
+    return provided.strftime("%B %Y" + f" ({relative_part})")
+
+
 def format_time(value):
     """
     Format a time on a 12-hour clock, with special cases for midday and midnight.
