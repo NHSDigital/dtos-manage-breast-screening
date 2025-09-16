@@ -26,7 +26,9 @@ class RequestValidator:
         if self.headers.get(self.API_KEY_HEADER_NAME) is None:
             return False, "Missing API key header"
 
-        if self.headers.get(self.API_KEY_HEADER_NAME) != os.getenv("NOTIFY_API_KEY"):
+        if self.headers.get(self.API_KEY_HEADER_NAME) != os.getenv(
+            "NHS_NOTIFY_API_KEY"
+        ):
             return False, "Invalid API key"
 
         if self.headers.get(self.SIGNATURE_HEADER_NAME) is None:
@@ -35,7 +37,7 @@ class RequestValidator:
         return True, ""
 
     def verify_signature(self) -> bool:
-        secret = f"{os.getenv('APPLICATION_ID')}.{os.getenv('NOTIFY_API_KEY')}"
+        secret = f"{os.getenv('NHS_NOTIFY_APPLICATION_ID')}.{os.getenv('NHS_NOTIFY_API_KEY')}"
         expected_signature = hmac.new(
             bytes(secret, self.ENCODING),
             msg=bytes(self.body, self.ENCODING),

@@ -19,7 +19,7 @@ class OAuthError(Exception):
 class ApiClient:
     def send_message_batch(self, message_batch: MessageBatch) -> requests.Response:
         response = requests.post(
-            os.getenv("API_MESSAGE_BATCH_URL"),
+            os.getenv("NHS_NOTIFY_API_MESSAGE_BATCH_URL"),
             headers=self.headers(),
             json=self.message_batch_request_body(message_batch),
             timeout=10,
@@ -59,19 +59,19 @@ class ApiClient:
     def bearer_token(self) -> str:
         auth_jwt = jwt.encode(
             {
-                "sub": os.getenv("OAUTH_API_KEY"),
-                "iss": os.getenv("OAUTH_API_KEY"),
+                "sub": os.getenv("API_OAUTH_API_KEY"),
+                "iss": os.getenv("API_OAUTH_API_KEY"),
                 "jti": str(uuid.uuid4()),
-                "aud": os.getenv("OAUTH_TOKEN_URL"),
+                "aud": os.getenv("API_OAUTH_TOKEN_URL"),
                 "exp": int(time.time()) + (EXPIRES_IN_MINUTES * 60),
             },
-            os.getenv("PRIVATE_KEY"),
+            os.getenv("API_OAUTH_PRIVATE_KEY"),
             "RS512",
-            {"alg": "RS512", "typ": "JWT", "kid": os.getenv("OAUTH_API_KID")},
+            {"alg": "RS512", "typ": "JWT", "kid": os.getenv("API_OAUTH_API_KID")},
         )
 
         response = requests.post(
-            os.getenv("OAUTH_TOKEN_URL"),
+            os.getenv("API_OAUTH_TOKEN_URL"),
             data={
                 "grant_type": "client_credentials",
                 "client_assertion_type": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
