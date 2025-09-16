@@ -12,6 +12,10 @@ parameters:
     displayName: Pull request number
     type: string
     default: ''
+  - name: pool
+    displayName: pool
+    type: string
+    default: private-pool-dev-uks
 
 stages:
   - stage: ${{ parameters.environment }}
