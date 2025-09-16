@@ -1,5 +1,5 @@
-ENV_CONFIG=pre-production
-ENVIRONMENT=pre-production
+ENV_CONFIG=pre-prod
+ENVIRONMENT=pre-prod
 AZURE_SUBSCRIPTION="Digital Screening DToS - Core Services PreProd"
 HUB_SUBSCRIPTION="Digital Screening DToS - Core Services Prod Hub"
 HUB=pre
