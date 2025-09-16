@@ -26,6 +26,15 @@ class SymptomAreas(models.TextChoices):
     OTHER = ("OTHER", "Other")
 
 
+class RelativeDateChoices(models.TextChoices):
+    LESS_THAN_THREE_MONTHS = "LESS_THAN_THREE_MONTHS", "Less than 3 months"
+    THREE_MONTHS_TO_A_YEAR = "THREE MONTHS TO A YEAR", "3 months to a year"
+    ONE_TO_THREE_YEARS = "ONE_TO_THREE_YEARS", "1 to 3 years"
+    OVER_THREE_YEARS = "OVER_THREE_YEARS", "Over 3 years"
+    SINCE_A_SPECIFIC_DATE = "SINCE_A_SPECIFIC_DATE", "Since a specific date"
+    NOT_SURE = "NOT_SURE", "Not sure"
+
+
 class Symptom(BaseModel):
     symptom_type = models.ForeignKey(SymptomType, on_delete=models.PROTECT)
     symptom_sub_type = models.ForeignKey(
@@ -42,10 +51,11 @@ class Symptom(BaseModel):
     area_description = models.CharField(blank=True, null=False)
 
     # Has the symptom been investigated already?
-    investigated = models.BooleanField()
+    investigated = models.BooleanField(null=False, default=False)
+    investigation_details = models.CharField(blank=True, null=False)
 
     # Onset information
-    when_started = models.CharField(blank=True, null=False)
+    when_started = models.CharField(blank=True, null=False, choices=RelativeDateChoices)
     year_started = models.IntegerField(null=True, blank=True)
     month_started = models.IntegerField(null=True, blank=True)
     intermittent = models.BooleanField(null=False, default=False)

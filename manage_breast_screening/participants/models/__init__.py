@@ -3,7 +3,7 @@ from .ethnicity import Ethnicity
 from .participant import Participant, ParticipantAddress
 from .reported_mammograms import ParticipantReportedMammogram, SupportReasons
 from .screening_episode import ScreeningEpisode
-from .symptoms import Symptom, SymptomAreas, SymptomSubType, SymptomType
+from .symptom import Symptom, SymptomAreas, SymptomSubType, SymptomType
 
 __all__ = [
     "Appointment",
