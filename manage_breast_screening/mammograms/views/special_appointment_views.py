@@ -7,7 +7,7 @@ from django.views.generic import FormView
 from manage_breast_screening.core.services.auditor import Auditor
 
 from ..forms import MarkReasonsTemporaryForm, ProvideSpecialAppointmentDetailsForm
-from .appointment_flow import AppointmentMixin
+from .mixins import AppointmentMixin
 
 
 class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
