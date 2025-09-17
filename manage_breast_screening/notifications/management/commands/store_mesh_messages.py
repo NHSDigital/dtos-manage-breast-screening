@@ -17,11 +17,11 @@ class Command(BaseCommand):
             today_dirname = datetime.today().strftime("%Y-%m-%d")
             with MeshInbox() as inbox:
                 for message_id in inbox.fetch_message_ids():
-                    appointment = inbox.fetch_message(message_id)
+                    message = inbox.fetch_message(message_id)
 
                     BlobStorage().add(
-                        f"{today_dirname}/{appointment.filename}",
-                        appointment.read().decode("ASCII"),
+                        f"{today_dirname}/{message.filename}",
+                        message.read().decode("ASCII"),
                     )
 
                     inbox.acknowledge(message_id)
