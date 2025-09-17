@@ -56,10 +56,9 @@ class Command(BaseCommand):
                         appt, appt_created = self.update_or_create_appointment(
                             row, clinic
                         )
-                        if appt_created:
-                            self.stdout.write(f"{appt} created")
-                        else:
-                            self.stdout.write(f"{appt} updated")
+                        self.stdout.write(
+                            f"{appt} {'created' if appt_created else 'updated'}"
+                        )
 
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
@@ -108,10 +107,10 @@ class Command(BaseCommand):
                     nbss_id=row["Appointment ID"],
                     nhs_number=row["NHS Num"],
                     number=row["Sequence"],
-                    batch_id=row["BatchID"],
+                    batch_id=row["Batch ID"],
                     clinic=clinic,
                     episode_started_at=datetime.strptime(
-                        row["Episode Start"], "%Y-%m-%d"
+                        row["Episode Start"], "%Y%m%d"
                     ).replace(tzinfo=TZ_INFO),
                     episode_type=row["Episode Type"],
                     starts_at=self.appointment_date_and_time(row),
