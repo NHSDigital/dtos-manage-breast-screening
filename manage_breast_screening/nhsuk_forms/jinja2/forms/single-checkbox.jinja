@@ -3,9 +3,8 @@
 {% if field.errors %}
   {% set error_message = {"text": field.errors | first} %}
 {% endif %}
-{% set conditional_html = field.conditional_html(value) %}
+{% set conditional_html = field.conditional_html("true") %}
 {% set widget = unbound_field.widget %}
-
 {{ checkboxes({
   "name": field.html_name,
   "idPrefix": field.auto_id,

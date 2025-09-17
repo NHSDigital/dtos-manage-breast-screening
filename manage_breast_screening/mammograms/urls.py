@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import appointment_views, special_appointment_views
+from .views import appointment_views, special_appointment_views, symptom_views
 
 app_name = "mammograms"
 
@@ -49,5 +49,10 @@ urlpatterns = [
         "<uuid:pk>/special-appointment/which-reasons/",
         special_appointment_views.MarkReasonsTemporary.as_view(),
         name="mark_reasons_temporary",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/lump/",
+        symptom_views.AddLump.as_view(),
+        name="add_symptom_lump",
     ),
 ]
