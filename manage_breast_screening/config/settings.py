@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "manage_breast_screening.core",
     "manage_breast_screening.auth",
+    "manage_breast_screening.users",
     "manage_breast_screening.clinics",
     "manage_breast_screening.nhsuk_forms",
     "manage_breast_screening.notifications",
@@ -103,6 +104,8 @@ DEBUG_TOOLBAR = DEBUG
 if DEBUG_TOOLBAR:
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+
+AUTH_USER_MODEL = "users.User"
 
 AUTHENTICATION_BACKENDS = (
     "rules.permissions.ObjectPermissionBackend",

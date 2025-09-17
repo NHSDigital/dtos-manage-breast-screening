@@ -11,10 +11,9 @@ def persona_login(request):
     users = _get_users(request.user)
 
     if request.method == "POST":
-        user = get_object_or_404(users, username=request.POST["username"])
+        user = get_object_or_404(users, nhs_uid=request.POST["username"])
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
         return redirect(_next_page(request))
-
     else:
         return render(
             request,
@@ -39,13 +38,13 @@ def _next_page(request):
 
 def _get_users(current_user):
     users = get_user_model().objects.filter(
-        username__in=(persona.username for persona in PERSONAS)
+        nhs_uid__in=(persona.username for persona in PERSONAS)
     )
 
-    if current_user:
+    if current_user.is_authenticated:
         # Stick the current user at the top of the list
         return users.annotate(
-            ordering=Case(When(Q(username=current_user.username), then=0), default=1)
+            ordering=Case(When(Q(nhs_uid=current_user.nhs_uid), then=0), default=1)
         ).order_by("ordering", "first_name")
 
     return users.order_by("first_name")

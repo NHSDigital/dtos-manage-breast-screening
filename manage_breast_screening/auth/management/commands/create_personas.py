@@ -21,7 +21,7 @@ class Command(BaseCommand):
             for persona in PERSONAS:
                 group = Group.objects.get(name=persona.group)
                 user, _ = User.objects.get_or_create(
-                    username=persona.username,
+                    nhs_uid=persona.username,
                     defaults={
                         "first_name": persona.first_name,
                         "last_name": persona.last_name,

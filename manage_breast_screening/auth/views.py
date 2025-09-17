@@ -74,7 +74,7 @@ def cis2_callback(request):
                 f"Missing or empty {userinfo_field} in CIS2 userinfo response"
             )
 
-    user, _ = User.objects.update_or_create(username=sub, defaults=defaults)
+    user, _ = User.objects.update_or_create(nhs_uid=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return redirect(reverse("home"))
 
