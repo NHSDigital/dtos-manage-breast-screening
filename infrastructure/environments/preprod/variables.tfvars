@@ -1,4 +1,5 @@
-dns_zone_name                         = "preprod.manage.breast.screening.nhs.uk"
+# dns_zone_name                         = "preprod.manage.breast.screening.nhs.uk"
+dns_zone_name                         = "preprod.manage-breast-screening.screening.nhs.uk"
 enable_auth                           = false
 fetch_secrets_from_app_key_vault      = false
 front_door_profile                    = "afd-live-hub-manbrs"
