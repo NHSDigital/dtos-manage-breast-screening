@@ -1,2 +1,2 @@
 PERSONAS_ENABLED: 1
-CSRF_TRUSTED_ORIGINS: '*.manage-breast-screening.non-live.screening.nhs.uk'
+CSRF_TRUSTED_ORIGINS: 'https://*.manage-breast-screening.non-live.screening.nhs.uk'
