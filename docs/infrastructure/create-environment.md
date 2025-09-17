@@ -90,4 +90,4 @@ This is the initial manual process to create a new environment like review, dev,
 
 ## Add
 
--
+run the hub repo to deploy front door profile afd-live-hub-manbrs
