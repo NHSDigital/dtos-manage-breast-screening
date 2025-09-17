@@ -74,7 +74,7 @@ module "db_setup" {
 
   container_args = [
     var.seed_demo_data
-    ? "python manage.py migrate && python manage.py seed_demo_data --noinput"
+    ? "python manage.py migrate && python manage.py seed_demo_data --noinput && python manage.py create_personas"
     : "python manage.py migrate"
   ]
   secret_variables = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
