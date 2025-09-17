@@ -143,6 +143,51 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_HOST: localhost
 
+  notifications-end-to-end-test:
+    needs: test
+    if: needs.test.outputs.notifications-changed == 'true'
+    name: 'Notifications End to End Tests'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    services:
+      postgres:
+        image: postgres:17.4-alpine3.21
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      steps:
+      - name: 'Checkout code'
+        uses: actions/checkout@v5
+
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Set up Python
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
+        with:
+          python-version: '${{inputs.python_version}}'
+          cache: poetry
+          cache-dependency-path: ./poetry.lock
+
+      - name: Install dependencies
+        run: make dependencies
+
+      - name: 'Run notifications end to end test suite'
+        run: make test-end-to-end
+        env:
+          DATABASE_NAME: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_USER: postgres
+          DATABASE_HOST: localhost
+
   frontend-integration-test:
     needs: test
     if: needs.test.outputs.frontend-changed == 'true'
