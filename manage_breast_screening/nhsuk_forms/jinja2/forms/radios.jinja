@@ -23,12 +23,12 @@
 {{ radios({
   "name": field.html_name,
   "idPrefix": field.auto_id,
-  "fieldset":  {
+  "fieldset": {
     "legend": {
       "text": field.label,
       "classes": unbound_field.label_classes
     }
-  },
+  } if field.use_fieldset else none,
   "errorMessage": error_message,
   "hint": {
     "html": unbound_field.hint|e

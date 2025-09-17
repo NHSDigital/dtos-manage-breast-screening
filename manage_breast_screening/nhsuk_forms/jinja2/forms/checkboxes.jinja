@@ -28,7 +28,7 @@
       "text": field.label,
       "classes": unbound_field.label_classes
     }
-  } if field.label,
+  } if field.use_fieldset else none,
   "errorMessage": error_message,
   "hint": {
     "html": unbound_field.hint|e

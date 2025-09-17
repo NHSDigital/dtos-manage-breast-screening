@@ -3,6 +3,11 @@ from django.forms import Form
 from django.forms.widgets import CheckboxSelectMultiple, Select
 from pytest_django.asserts import assertHTMLEqual
 
+from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
+    CheckboxSelectMultipleWithoutFieldset,
+    RadioSelectWithoutFieldset,
+)
+
 from ...fields import CharField, ChoiceField, MultipleChoiceField
 
 
@@ -115,6 +120,37 @@ class TestChoiceField:
         bound_field.add_divider_after("a", "or")
         assert bound_field.get_divider_after("a") == "or"
 
+    def test_renders_without_fieldset(self, form_class):
+        class TestForm(Form):
+            field = ChoiceField(
+                label="Abc",
+                label_classes="app-abc",
+                choices=(("a", "A"), ("b", "B")),
+                hint="Pick either one",
+                widget=RadioSelectWithoutFieldset,
+            )
+
+        assertHTMLEqual(
+            TestForm()["field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <div class="nhsuk-hint" id="id_field-hint">
+                    Pick either one
+                </div>
+                <div class="nhsuk-radios" data-module="nhsuk-radios">
+                    <div class="nhsuk-radios__item">
+                        <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
+                        <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
+                    </div>
+                    <div class="nhsuk-radios__item">
+                        <input class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                        <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
+                    </div>
+                </div>
+            </div>
+            """,
+        )
+
 
 class TestMultipleChoiceField:
     @pytest.fixture
@@ -187,6 +223,37 @@ class TestMultipleChoiceField:
                         </div>
                     </div>
                 </fieldset>
+            </div>
+            """,
+        )
+
+    def test_renders_without_fieldset(self, form_class):
+        class TestForm(Form):
+            checkbox_field = MultipleChoiceField(
+                label="Abc",
+                label_classes="app-abc",
+                choices=(("a", "A"), ("b", "B")),
+                hint="Pick multiple",
+                widget=CheckboxSelectMultipleWithoutFieldset,
+            )
+
+        assertHTMLEqual(
+            TestForm()["checkbox_field"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <div class="nhsuk-hint" id="id_checkbox_field-hint">
+                    Pick multiple
+                </div>
+                <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
+                    <div class="nhsuk-checkboxes__item">
+                        <input class="nhsuk-checkboxes__input" id="id_checkbox_field" name="checkbox_field" type="checkbox" value="a">
+                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
+                    </div>
+                    <div class="nhsuk-checkboxes__item">
+                        <input class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
+                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
+                    </div>
+                </div>
             </div>
             """,
         )
