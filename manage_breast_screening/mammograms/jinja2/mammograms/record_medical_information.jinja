@@ -24,7 +24,7 @@
   {% endif %}
 
   <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-    <a href="#" class="nhsuk-link">{{ "Add another symptom" if presenter.symptom_rows else "Add a symptom" }}</a>
+    <a href="{{ presenter.add_lump_link.href }}" class="nhsuk-link">{{ presenter.add_lump_link.text }}</a>
   </p>
 {% endcall %}
 
