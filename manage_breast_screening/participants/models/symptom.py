@@ -20,10 +20,10 @@ class SymptomSubType(ReferenceDataModel):
 
 
 class SymptomAreas(models.TextChoices):
-    RIGHT_BREAST = ("RIGHT_BREAST", "Right")
-    LEFT_BREAST = ("LEFT_BREAST", "Left")
-    BOTH_BREASTS = ("BOTH_BREASTS", "Both")
-    OTHER = ("OTHER", "Other")
+    RIGHT_BREAST = "RIGHT_BREAST", "Right breast"
+    LEFT_BREAST = "LEFT_BREAST", "Left breast"
+    BOTH_BREASTS = "BOTH_BREASTS", "Both breasts"
+    OTHER = "OTHER", "Other"
 
 
 class RelativeDateChoices(models.TextChoices):
