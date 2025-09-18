@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -12,6 +13,8 @@ from manage_breast_screening.notifications.models import (
     MessageStatusChoices,
 )
 from manage_breast_screening.notifications.services.queue import Queue
+
+logger = logging.getLogger(__name__)
 
 TZ_INFO = ZoneInfo("Europe/London")
 RECOVERABLE_STATUS_CODES = [
@@ -51,31 +54,27 @@ class MessageBatchHelpers:
     def mark_batch_as_failed(
         message_batch: MessageBatch, response: Response, retry_count: int = 0
     ):
-        message_batch.nhs_notify_errors = response.json()
+        logger.info(
+            "Marking batch as failed. Reponse code: %s. Response: %s",
+            response.status_code,
+            response.text,
+        )
+
+        try:
+            message_batch.nhs_notify_errors = response.json()
+        except Exception:
+            message_batch.nhs_notify_errors = {"errors": response.text}
+
         if response.status_code in RECOVERABLE_STATUS_CODES:
-            message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
-            Queue.RetryMessageBatches().add(
-                json.dumps(
-                    {
-                        "message_batch_id": str(message_batch.id),
-                        "retry_count": retry_count,
-                    }
-                )
-            )
+            MessageBatchHelpers.process_recoverable_batch(message_batch, retry_count)
         elif response.status_code == VALIDATION_ERROR_STATUS_CODE:
             MessageBatchHelpers.process_validation_errors(message_batch, retry_count)
         else:
-            message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
-        message_batch.save()
-
-        for message in message_batch.messages.all():
-            message.status = MessageStatusChoices.FAILED.value
-            message.sent_at = datetime.now(tz=TZ_INFO)
-            message.save()
+            MessageBatchHelpers.process_unrecoverable_batch(message_batch)
 
     @staticmethod
     def process_validation_errors(message_batch: MessageBatch, retry_count: int = 0):
-        message_batch_errors = json.loads(message_batch.nhs_notify_errors).get("errors")
+        message_batch_errors = message_batch.nhs_notify_errors.get("errors")
 
         messages = list(Message.objects.filter(batch=message_batch).all())
         for error in message_batch_errors:
@@ -86,14 +85,38 @@ class MessageBatchHelpers:
                 message_index = int(message_index_result.group(0))
                 message = messages[message_index]
                 message.batch = None
+                message.status = MessageStatusChoices.FAILED.value
+
                 if message.nhs_notify_errors is None:
-                    message.nhs_notify_errors = json.dumps([error])
+                    message.nhs_notify_errors = [error]
                 else:
-                    message.nhs_notify_errors = json.dumps(
-                        json.loads(message.nhs_notify_errors) + [error]
-                    )
+                    message.nhs_notify_errors = message.nhs_notify_errors + [error]
+
                 message.save()
 
+        message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
+        message_batch.save()
+
+        Queue.RetryMessageBatches().add(
+            json.dumps(
+                {
+                    "message_batch_id": str(message_batch.id),
+                    "retry_count": retry_count,
+                }
+            )
+        )
+
+    @staticmethod
+    def process_unrecoverable_batch(message_batch: MessageBatch):
+        message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
+        message_batch.save()
+        for message in message_batch.messages.all():
+            message.status = MessageStatusChoices.FAILED.value
+            message.sent_at = datetime.now(tz=TZ_INFO)
+            message.save()
+
+    @staticmethod
+    def process_recoverable_batch(message_batch: MessageBatch, retry_count: int):
         message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
         message_batch.save()
         Queue.RetryMessageBatches().add(

@@ -5,6 +5,7 @@ from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MESSAGE_PATH_REGEX,
@@ -14,6 +15,7 @@ from manage_breast_screening.notifications.management.commands.helpers.message_b
 from manage_breast_screening.notifications.models import (
     Message,
     MessageBatch,
+    MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.tests.factories import (
     MessageBatchFactory,
@@ -167,7 +169,7 @@ class TestMessageBatchHelpers:
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             messages=[message_1, message_2, message_3],
-            nhs_notify_errors=json.dumps(notify_errors),
+            nhs_notify_errors=notify_errors,
         )
 
         with patch(
@@ -236,7 +238,7 @@ class TestMessageBatchHelpers:
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             messages=[message_1, message_2, message_3, message_4],
-            nhs_notify_errors=json.dumps(notify_errors),
+            nhs_notify_errors=notify_errors,
         )
 
         with patch(
@@ -251,13 +253,13 @@ class TestMessageBatchHelpers:
         assert message_batch.messages.all().count() == 1
 
         message_1.refresh_from_db()
-        assert message_1.nhs_notify_errors == json.dumps(message_1_errors)
+        assert message_1.nhs_notify_errors == message_1_errors
 
         message_2.refresh_from_db()
-        assert message_2.nhs_notify_errors == json.dumps(message_2_errors)
+        assert message_2.nhs_notify_errors == message_2_errors
 
         message_3.refresh_from_db()
-        assert message_3.nhs_notify_errors == json.dumps(message_3_errors)
+        assert message_3.nhs_notify_errors == message_3_errors
 
         message_4.refresh_from_db()
         assert message_4.batch == message_batch
@@ -280,7 +282,7 @@ class TestMessageBatchHelpers:
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             messages=[message_1, message_2],
-            nhs_notify_errors=json.dumps(notify_errors),
+            nhs_notify_errors=notify_errors,
         )
 
         with patch(
@@ -296,6 +298,33 @@ class TestMessageBatchHelpers:
                     {"message_batch_id": str(message_batch.id), "retry_count": 1}
                 )
             )
+
+    @pytest.mark.django_db
+    def test_mark_batch_as_failed_for_non_json_error(self, routing_plan_id):
+        """Test for non json response when retrying batch"""
+        message = MessageFactory()
+        message_batch = MessageBatchFactory(
+            routing_plan_id=routing_plan_id,
+            messages=[message],
+        )
+        mock_response = MagicMock(spec=requests.Response)
+        mock_response.json.side_effect = Exception("Not JSON")
+        mock_response.status_code = 500
+        mock_response.text = "Internal Server Error"
+
+        with patch(
+            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
+        ) as mock_queue:
+            queue_instance = MagicMock()
+            mock_queue.return_value = queue_instance
+
+            MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response)
+
+        message_batch.refresh_from_db()
+        assert message_batch.nhs_notify_errors == {"errors": "Internal Server Error"}
+        assert (
+            message_batch.status == MessageBatchStatusChoices.FAILED_RECOVERABLE.value
+        )
 
     def test_validation_errors_regex_matches_expected_pointer(self):
         """
