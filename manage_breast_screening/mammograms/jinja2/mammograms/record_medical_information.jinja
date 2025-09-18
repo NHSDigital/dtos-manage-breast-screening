@@ -5,26 +5,28 @@
 
 {% block step_content %}
 
-{% set symptoms_card_html %}
-    {% set has_symptoms = false %}
-
-    {% set inset_html %}
-    <p>No symptoms have been recorded for this participant.</p>
+{% call card({
+  "heading": "Symptoms",
+}) %}
+  <p>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
+  {% if presenter.symptom_rows %}
+     {{ summaryList({
+        "rows": presenter.symptom_rows
+      }) }}
+  {% else %}
+    {% set insetHtml %}
+      <p>No symptoms have been recorded for this participant.</p>
     {% endset %}
     {{ insetText({
-      "html": inset_html,
-      "classes": "nhsuk-u-margin-top-3 nhsuk-u-margin-bottom-4"
+      "html": insetHtml,
+      "classes": "nhsuk-u-margin-top-3 nhsuk-u-margin-bottom-4 app-inset-text"
     }) }}
+  {% endif %}
 
-    <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-      <a href="#" class="nhsuk-link">{{ "Add another symptom" if has_symptoms else "Add a symptom" }}</a>
-    </p>
-{% endset %}
-{{ card({
-  "heading": "Recent breast changes or symptoms",
-  "headingLevel": "2",
-  "descriptionHtml": symptoms_card_html
-}) }}
+  <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
+    <a href="#" class="nhsuk-link">{{ "Add another symptom" if presenter.symptom_rows else "Add a symptom" }}</a>
+  </p>
+{% endcall %}
 
 {% set medical_history_card_html %}
   {% set breast_cancer_history_link %}
@@ -76,7 +78,6 @@
 {% endset %}
 {{ card({
   "heading": "Medical history",
-  "headingLevel": "2",
   "descriptionHtml": medical_history_card_html
 }) }}
 
@@ -88,7 +89,7 @@
     {% endset %}
     {{ insetText({
       "html": insetHtml,
-      "classes": "nhsuk-u-margin-top-3 nhsuk-u-margin-bottom-4"
+      "classes": "nhsuk-u-margin-top-3 nhsuk-u-margin-bottom-4 app-inset-text"
     }) }}
 
     <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
@@ -97,7 +98,6 @@
 {% endset %}
 {{ card({
   "heading": "Breast features",
-  "headingLevel": "2",
   "descriptionHtml": breast_features_card_html
 }) }}
 
@@ -111,7 +111,6 @@
 {% endset %}
 {{ card({
   "heading": "Other information",
-  "headingLevel": "2",
   "descriptionHtml": other_information_card_html
 }) }}
 

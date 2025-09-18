@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import pytest
 import time_machine
 
-from ..date_formatting import format_relative_date
+from ..date_formatting import format_approximate_date, format_relative_date
 
 
 @time_machine.travel(datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")))
@@ -25,3 +25,43 @@ from ..date_formatting import format_relative_date
 )
 def test_relative_dates(dateiso, output):
     assert format_relative_date(datetime.fromisoformat(dateiso)) == output
+
+
+@pytest.mark.parametrize(
+    ("today", "year", "month", "output"),
+    (
+        (
+            datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")),
+            2025,
+            1,
+            "January 2025 (4 months ago)",
+        ),
+        (
+            datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")),
+            2025,
+            5,
+            "May 2025 (this month)",
+        ),
+        (
+            datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")),
+            2024,
+            5,
+            "May 2024 (1 year ago)",
+        ),
+        (
+            datetime(2025, 5, 31, 10, tzinfo=ZoneInfo("Europe/London")),
+            2024,
+            4,
+            "April 2024 (1 year, 1 month ago)",
+        ),
+    ),
+)
+def test_approximate_dates(time_machine, today, year, month, output):
+    time_machine.move_to(today)
+    assert format_approximate_date(year, month) == output
+
+
+@time_machine.travel(datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")))
+def test_approximate_future_date_raises_error():
+    with pytest.raises(ValueError):
+        format_approximate_date(3000, 1)

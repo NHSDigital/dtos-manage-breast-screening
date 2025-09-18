@@ -2,7 +2,7 @@ from django.urls import reverse
 from markupsafe import Markup, escape
 
 
-def no_wrap(value):
+def no_wrap(value: str) -> Markup:
     """
     Wrap a string in a span with class app-no-wrap
 
@@ -14,7 +14,7 @@ def no_wrap(value):
     )
 
 
-def nl2br(value):
+def nl2br(value: str) -> Markup:
     """
     Convert newline characters to html line breaks
 
@@ -28,7 +28,17 @@ def nl2br(value):
     return Markup("<br>".join([escape(line) for line in lines]))
 
 
-def as_hint(value):
+def multiline_content(lines: list[str]) -> Markup:
+    """
+    Convert a list of strings to html line breaks
+
+    >>> multiline_content(["first", "second", "third"])
+    Markup('first<br>second<br>third')
+    """
+    return nl2br("\n".join(lines))
+
+
+def as_hint(value: str) -> Markup:
     """
     Wrap a string in a span with class nhsuk-u-secondary-text-color
 

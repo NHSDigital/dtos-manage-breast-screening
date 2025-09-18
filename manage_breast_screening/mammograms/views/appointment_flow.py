@@ -10,6 +10,9 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
+    MedicalInformationPresenter,
+)
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
@@ -218,6 +221,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "page_title": "Record medical information",
                 "participant": participant,
                 "caption": participant.full_name,
+                "presenter": MedicalInformationPresenter(self.appointment),
             }
         )
         return context
