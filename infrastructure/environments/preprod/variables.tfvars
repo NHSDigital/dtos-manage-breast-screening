@@ -9,3 +9,4 @@ protect_keyvault                      = true
 vnet_address_space                    = "10.10.0.0/16"
 personas_enabled                      = false
 seed_demo_data                        = false
+deploy_database_as_container          = false
