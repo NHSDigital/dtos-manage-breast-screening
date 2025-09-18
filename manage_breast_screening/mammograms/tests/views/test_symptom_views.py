@@ -1,0 +1,70 @@
+import pytest
+from django.urls import reverse
+from pytest_django.asserts import assertInHTML, assertRedirects
+
+from manage_breast_screening.nhsuk_forms.choices import YesNo
+from manage_breast_screening.participants.models.symptom import (
+    RelativeDateChoices,
+    SymptomAreas,
+)
+
+
+@pytest.mark.django_db
+class TestAddLump:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:add_symptom_lump",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:add_symptom_lump",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+    def test_invvalid_post_renders_response_with_errors(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:add_symptom_lump",
+                kwargs={"pk": appointment.pk},
+            ),
+            {},
+        )
+        assert response.status_code == 200
+        assertInHTML(
+            """
+                <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="nhsuk-error-summary">
+                    <h2 class="nhsuk-error-summary__title" id="error-summary-title">There is a problem</h2>
+                      <div class="nhsuk-error-summary__body">
+                        <ul class="nhsuk-list nhsuk-error-summary__list" role="list">
+                            <li><a href="#id_area">Select the location of the lump</a></li>
+                            <li><a href="#id_when_started">Select how long the symptom has existed</a></li>
+                            <li><a href="#id_investigated">Select whether the lump has been investigated or not</a></li>
+                        </ul>
+                    </div>
+                </div>
+            """,
+            response.text,
+        )

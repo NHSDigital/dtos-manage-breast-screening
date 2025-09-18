@@ -12,7 +12,7 @@
       "classes": unbound_field.label_classes if unbound_field.label_classes,
       "isPageHeading": false
     }
-  } if field.label,
+  } if field.use_fieldset else none,
   "errorMessage": error_message,
   "hint": {
     "html": hint|e

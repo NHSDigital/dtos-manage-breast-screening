@@ -146,3 +146,23 @@ class TestRecordMedicalInformationPresenter:
                 },
             },
         ]
+
+    def test_add_lump_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(appointment).add_lump_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/lump/",
+            "text": "Add a lump",
+        }
+
+        SymptomFactory.create(
+            appointment=appointment,
+            skin_change=True,
+            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.BOTH_BREASTS,
+        )
+
+        assert MedicalInformationPresenter(appointment).add_lump_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/lump/",
+            "text": "Add another lump",
+        }

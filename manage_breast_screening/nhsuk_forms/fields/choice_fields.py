@@ -2,6 +2,14 @@ from django import forms
 from django.forms import widgets
 
 
+class RadioSelectWithoutFieldset(widgets.RadioSelect):
+    use_fieldset = False
+
+
+class CheckboxSelectMultipleWithoutFieldset(widgets.CheckboxSelectMultiple):
+    use_fieldset = False
+
+
 class BoundChoiceField(forms.BoundField):
     """
     Specialisation of BoundField that can deal with conditionally shown fields,
@@ -36,6 +44,10 @@ class ChoiceField(forms.ChoiceField):
     """
     A ChoiceField that renders using NHS.UK design system radios/select
     components.
+
+    To render a select instead, pass Select for the `widget` argument.
+    To render radios without the fieldset, pass RadioSelectWithoutFieldset
+    for the `widget` argument.
     """
 
     widget = widgets.RadioSelect
@@ -61,13 +73,13 @@ class ChoiceField(forms.ChoiceField):
 
     @staticmethod
     def _template_name(widget):
-        if (isinstance(widget, type) and widget is widgets.RadioSelect) or isinstance(
-            widget, widgets.RadioSelect
-        ):
+        if (
+            isinstance(widget, type) and issubclass(widget, widgets.RadioSelect)
+        ) or isinstance(widget, widgets.RadioSelect):
             return "forms/radios.jinja"
-        elif (isinstance(widget, type) and widget is widgets.Select) or isinstance(
-            widget, widgets.Select
-        ):
+        elif (
+            isinstance(widget, type) and issubclass(widget, widgets.Select)
+        ) or isinstance(widget, widgets.Select):
             return "forms/select.jinja"
 
 
@@ -75,6 +87,9 @@ class MultipleChoiceField(forms.MultipleChoiceField):
     """
     A MultipleChoiceField that renders using the NHS.UK design system checkboxes
     component.
+
+    To render checkboxes without the fieldset, pass CheckboxSelectMultipleWithoutFieldset
+    for the `widget` argument.
     """
 
     widget = widgets.CheckboxSelectMultiple

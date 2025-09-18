@@ -36,6 +36,23 @@ class TestRecordingAMammogram(SystemTestCase):
         self.when_i_mark_that_the_participant_shared_no_medical_information()
         self.then_the_screen_should_show_that_it_is_awaiting_images_from_the_PACS()
 
+    def test_capturing_medical_information(self):
+        """
+        I can optionally capture medical information as part of the mammogram appointment.
+        """
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_i_am_on_the_appointment_show_page()
+
+        self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
+        self.then_i_should_be_on_the_medical_information_page()
+        self.and_i_should_be_prompted_to_ask_about_relevant_medical_information()
+
+        self.when_i_mark_that_the_participant_shared_medical_information()
+        self.then_i_should_be_on_the_record_medical_information_page()
+        self.when_i_mark_that_imaging_can_go_ahead()
+
+        self.then_the_screen_should_show_that_it_is_awaiting_images_from_the_PACS()
+
     def test_filling_out_forms_incorrectly(self):
         """
         At each step in the flow, when I fill out the forms incorrectly,

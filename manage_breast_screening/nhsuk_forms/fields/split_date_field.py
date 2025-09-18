@@ -67,6 +67,14 @@ class MonthYearWidget(BetterMultiWidget):
         return [None, None]
 
 
+class DayMonthYearWidgetWithoutFieldset(DayMonthYearWidget):
+    use_fieldset = False
+
+
+class MonthYearWidgetWithoutFieldset(MonthYearWidget):
+    use_fieldset = False
+
+
 class SplitDateField(forms.MultiValueField):
     """
     A form field that can be rendered as 2 or 3 inputs using the dateInput component in the design system.
