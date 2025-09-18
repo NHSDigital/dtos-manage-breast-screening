@@ -130,7 +130,7 @@ def cis2_back_channel_logout(request):
     # (a uid in CIS2) before invalidating all of their sessions.
     User = get_user_model()
     try:
-        user = User.objects.get(username=claims["sub"])
+        user = User.objects.get(nhs_uid=claims["sub"])
     except User.DoesNotExist:
         # Nothing to do if the user doesn't exist locally
         return JsonResponse({"status": "ok"})

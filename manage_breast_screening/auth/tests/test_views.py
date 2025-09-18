@@ -15,7 +15,7 @@ def group():
 @pytest.fixture(autouse=True)
 def anna(group):
     user = get_user_model().objects.create(
-        username=ADMINISTRATIVE_PERSONA.username,
+        nhs_uid=ADMINISTRATIVE_PERSONA.username,
         first_name=ADMINISTRATIVE_PERSONA.first_name,
         last_name=ADMINISTRATIVE_PERSONA.last_name,
     )
@@ -26,7 +26,7 @@ def anna(group):
 @pytest.fixture(autouse=True)
 def chloe(group):
     user = get_user_model().objects.create(
-        username=CLINICAL_PERSONA.username,
+        nhs_uid=CLINICAL_PERSONA.username,
         first_name=CLINICAL_PERSONA.first_name,
         last_name=CLINICAL_PERSONA.last_name,
     )
