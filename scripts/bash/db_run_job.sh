@@ -5,13 +5,16 @@ set -euo pipefail
 ENV_CONFIG=$1
 PR_NUMBER=${2:-}
 
-if [ -z "$PR_NUMBER" ]; then
+# if [ -z "$PR_NUMBER" ]; then
+if [[ "$ENV_CONFIG" == "prod" || "$ENV_CONFIG" == "preprod" || "$ENV_CONFIG" == "dev" ]]; then
     # On permanent environments, the environment name is the environment config name, i.e. "production"
     ENV=${ENV_CONFIG}
 else
     # On a review app, the environment name uses the PR number, i.e. "pr-1234"
     ENV=pr-${PR_NUMBER}
 fi
+
+ENV=${ENV_CONFIG}
 
 JOB_NAME=manbrs-dbm-${ENV}
 RG_NAME=rg-manbrs-${ENV}-container-app-uks
