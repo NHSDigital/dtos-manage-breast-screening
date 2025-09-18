@@ -197,3 +197,25 @@ If the private endpoint is deleted, for example if container app environment is 
 All the deployed apps show a blank page and 504 HTTP error.
 
 The solution is to delete all the origins to this particular container app environment. Then when the first origin is readded, the private link will be created. Recreate the other origins and they will use the same link.
+
+### Unable to write state file to blob storage
+
+When initially creating the terraform; the pipeline will try to create a state file on the blob storage. Sometimes you will get an error like this: -
+
+Example:
+
+```
+Failed to get existing workspaces: containers.Client#ListBlobs: Failure sending request: StatusCode=0 -- Original Error: Get "https://samanbrspreprodtfstate.blob.core.windows.net/terraform-state?comp=list&prefix=preprod.tfstateenv%3A&restype=container": dial tcp: lookup samanbrspreprodtfstate.blob.core.windows.net on *.*.*.*:53: no such host
+```
+
+$ nslookup samanbrspreprodtfstate.blob.core.windows.net
+Server: UnKnown
+Address: _._._._
+
+Non-authoritative answer:
+Name: samanbrspreprodtfstate.privatelink.blob.core.windows.net
+Address: _._._._
+Aliases: samanbrspreprodtfstate.blob.core.windows.net
+
+AzureAD+c-AlastairLock@avdlivezbqkp MINGW64 ~
+$

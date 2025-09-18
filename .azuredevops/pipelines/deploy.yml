@@ -12,12 +12,15 @@ parameters:
     displayName: Pull request number
     type: string
     default: ''
+  - name: pool
+    displayName: ADO management pool
+    type: string
 
 stages:
   - stage: ${{ parameters.environment }}
     displayName: Deploy to ${{ parameters.environment }} environment
     pool:
-      name: private-pool-dev-uks
+      name: ${{ parameters.pool }}
     lockBehavior: sequential
     isSkippable: false
 
