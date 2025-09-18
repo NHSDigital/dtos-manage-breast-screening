@@ -69,7 +69,9 @@ class TestCIS2BackChannelLogout(SystemTestCase):
 
     def given_i_am_signed_in(self):
         User = get_user_model()
-        self.user = User.objects.create_user(username="user-123", password="irrelevant")
+        self.user = User.objects.create_user(
+            nhs_uid="user-123", email="user@example.com", password="irrelevant"
+        )
 
         self.login_as_user(self.user)
         self.page.goto(self.live_server_url + reverse("clinics:index"))
@@ -79,11 +81,11 @@ class TestCIS2BackChannelLogout(SystemTestCase):
     def and_someone_else_is_signed_in(self):
         User = get_user_model()
         self.another_user = User.objects.create_user(
-            username="another-user", password="irrelevant"
+            nhs_uid="another-user", email="another@example.com", password="irrelevant"
         )
         # Log in with a different session
         client = TestClient()
-        client.login(username=self.another_user.username, password="irrelevant")
+        client.login(username=self.another_user.nhs_uid, password="irrelevant")
 
     def and_there_is_a_cis2_logout_token(self):
         self.token = self._create_logout_token()
@@ -133,7 +135,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
             "iat": now,
             "exp": now + 300,
             "events": {"http://schemas.openid.net/event/backchannel-logout": {}},
-            "sub": self.user.username,  # We currently key on sub to find the local user
+            "sub": self.user.nhs_uid,  # We currently key on sub to find the local user
             "sid": "not-used",
             "jti": "not-used",
         }

@@ -19,7 +19,7 @@ class TestPersonaLogin(SystemTestCase):
     def given_a_persona_exists(self):
         group, _created = Group.objects.get_or_create(name=CLINICAL_PERSONA.group)
         UserFactory.create(
-            username=CLINICAL_PERSONA.username,
+            nhs_uid=CLINICAL_PERSONA.username,
             first_name="Per",
             last_name="Sona",
             groups=[group],

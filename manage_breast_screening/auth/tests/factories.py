@@ -13,7 +13,7 @@ class UserFactory(DjangoModelFactory):
         django_get_or_create = ("first_name", "last_name")
         skip_postgeneration_save = True
 
-    username = Sequence(lambda n: "alice%d" % n)
+    nhs_uid = Sequence(lambda n: "alice%d" % n)
     first_name = Sequence(lambda n: "alice%d" % n)
     last_name = "Lastname"
 

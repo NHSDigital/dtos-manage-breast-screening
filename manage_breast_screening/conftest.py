@@ -11,22 +11,22 @@ TestCase.maxDiff = None
 
 @pytest.fixture
 def user():
-    return UserFactory.create(username="user1")
+    return UserFactory.create(nhs_uid="user1")
 
 
 @pytest.fixture
 def administrative_user():
-    return UserFactory.create(username="administrative1", groups__administrative=True)
+    return UserFactory.create(nhs_uid="administrative1", groups__administrative=True)
 
 
 @pytest.fixture
 def clinical_user():
-    return UserFactory.create(username="clinical1", groups__clinical=True)
+    return UserFactory.create(nhs_uid="clinical1", groups__clinical=True)
 
 
 @pytest.fixture
 def superuser():
-    return UserFactory.create(username="superuser1", groups__superuser=True)
+    return UserFactory.create(nhs_uid="superuser1", groups__superuser=True)
 
 
 @pytest.fixture
