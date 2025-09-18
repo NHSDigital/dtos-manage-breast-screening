@@ -1,10 +1,9 @@
-import os
 from datetime import datetime
 
 from django.core.management.base import BaseCommand, CommandError
-from mesh_client import MeshClient
 
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
+from manage_breast_screening.notifications.services.mesh_inbox import MeshInbox
 
 
 class Command(BaseCommand):
@@ -15,26 +14,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            with self.mesh_client() as client:
-                today_dirname = datetime.today().strftime("%Y-%m-%d")
-                for message in client.list_messages():
-                    appointment = client.retrieve_message(message)
+            today_dirname = datetime.today().strftime("%Y-%m-%d")
+            with MeshInbox() as inbox:
+                for message_id in inbox.fetch_message_ids():
+                    message = inbox.fetch_message(message_id)
 
                     BlobStorage().add(
-                        f"{today_dirname}/{appointment.filename}",
-                        appointment.read().decode("ASCII"),
+                        f"{today_dirname}/{message.filename}",
+                        message.read().decode("ASCII"),
                     )
 
-                    client.acknowledge_message(message)
+                    inbox.acknowledge(message_id)
 
         except Exception as e:
             raise CommandError(e)
-
-    def mesh_client(self):
-        client = MeshClient(
-            url=os.getenv("MESH_BASE_URL"),
-            mailbox=os.getenv("MESH_INBOX_NAME"),
-            password=os.getenv("MESH_CLIENT_PASSWORD"),
-            shared_key=os.getenv("MESH_CLIENT_SHARED_KEY"),
-        )
-        return client

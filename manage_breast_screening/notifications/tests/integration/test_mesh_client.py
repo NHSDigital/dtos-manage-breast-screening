@@ -10,10 +10,10 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 class TestMeshClient:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
-        monkeypatch.setenv("MESH_BASE_URL", "http://localhost:8700")
-        monkeypatch.setenv("MESH_CLIENT_PASSWORD", "password")
-        monkeypatch.setenv("MESH_CLIENT_SHARED_KEY", "TestKey")
-        monkeypatch.setenv("MESH_INBOX_NAME", "X26ABC1")
+        monkeypatch.setenv("NBSS_MESH_HOST", "http://localhost:8700")
+        monkeypatch.setenv("NBSS_MESH_PASSWORD", "password")
+        monkeypatch.setenv("NBSS_MESH_SHARED_KEY", "TestKey")
+        monkeypatch.setenv("NBSS_MESH_INBOX_NAME", "X26ABC1")
 
     @pytest.fixture
     def helpers(self):
@@ -24,10 +24,10 @@ class TestMeshClient:
         helpers.add_file_to_mesh_mailbox(test_file_path)
 
         with MeshClient(
-            url=os.getenv("MESH_BASE_URL"),
-            mailbox=os.getenv("MESH_INBOX_NAME"),
-            password=os.getenv("MESH_CLIENT_PASSWORD"),
-            shared_key=os.getenv("MESH_CLIENT_SHARED_KEY"),
+            url=os.getenv("NBSS_MESH_HOST"),
+            mailbox=os.getenv("NBSS_MESH_INBOX_NAME"),
+            password=os.getenv("NBSS_MESH_PASSWORD"),
+            shared_key=os.getenv("NBSS_MESH_SHARED_KEY"),
         ) as client:
             message_ids = client.list_messages()
 

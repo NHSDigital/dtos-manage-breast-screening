@@ -12,13 +12,13 @@ class Helpers:
         """Adds a file to MESH sandbox mailbox"""
         with open(filepath) as file:
             with MeshClient(
-                url=os.getenv("MESH_BASE_URL", "http://localhost:8700"),
-                mailbox=os.getenv("MESH_INBOX_NAME", "X26ABC1"),
-                password=os.getenv("MESH_CLIENT_PASSWORD", "password"),
-                shared_key=os.getenv("MESH_CLIENT_SHARED_KEY", "TestKey"),
+                url=os.getenv("NBSS_MESH_HOST", "http://localhost:8700"),
+                mailbox=os.getenv("NBSS_MESH_INBOX_NAME", "X26ABC1"),
+                password=os.getenv("NBSS_MESH_PASSWORD", "password"),
+                shared_key=os.getenv("NBSS_MESH_SHARED_KEY", "TestKey"),
             ) as client:
                 client.send_message(
-                    os.getenv("MESH_INBOX_NAME"),
+                    os.getenv("NBSS_MESH_INBOX_NAME"),
                     file.read().encode("ASCII"),
                     filename=os.path.basename(filepath),
                     workflow_id="TEST_NBSS_WORKFLOW",
