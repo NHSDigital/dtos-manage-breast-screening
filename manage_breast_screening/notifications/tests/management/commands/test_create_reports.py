@@ -39,7 +39,11 @@ class TestCreateReports:
                 with patch(f"{module}.datetime") as mock_datetime:
                     mock_datetime.today.return_value = now
 
-                    yield (mock_blob_storage,)
+                    with patch(f"{module}.NhsMail") as mock_email:
+                        mock_email_service = MagicMock()
+                        mock_email.return_value = mock_email_service
+
+                        yield (mock_blob_storage, mock_email_service)
 
     @pytest.fixture
     def dataframe(self, csv_data):
@@ -51,18 +55,35 @@ class TestCreateReports:
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
             Command().handle()
 
+        aggregate_filename = now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv")
+        failures_filename = now.strftime("%Y-%m-%dT%H:%M:%S-failures-report.csv")
+
         mock_blob_storage = md[0]
+        assert mock_blob_storage.add.call_count == 2
         mock_blob_storage.add.assert_any_call(
-            now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv"),
+            aggregate_filename,
             csv_data,
             content_type="text/csv",
             container_name="reports",
         )
         mock_blob_storage.add.assert_any_call(
-            now.strftime("%Y-%m-%dT%H:%M:%S-failures-report.csv"),
+            failures_filename,
             csv_data,
             content_type="text/csv",
             container_name="reports",
+        )
+
+        mock_email_service = md[1]
+        assert mock_email_service.send_report_email.call_count == 2
+        mock_email_service.send_report_email.assert_any_call(
+            attachment_data=csv_data,
+            attachment_filename=aggregate_filename,
+            report_type="aggregate",
+        )
+        mock_email_service.send_report_email.assert_any_call(
+            attachment_data=csv_data,
+            attachment_filename=failures_filename,
+            report_type="failures",
         )
 
     def test_handle_raises_command_error(self):
