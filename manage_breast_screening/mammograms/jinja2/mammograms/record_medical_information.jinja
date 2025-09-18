@@ -7,7 +7,6 @@
 
 {% call card({
   "heading": "Symptoms",
-  "headingLevel": "2",
 }) %}
   <p>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
   {% if presenter.symptom_rows %}
@@ -79,7 +78,6 @@
 {% endset %}
 {{ card({
   "heading": "Medical history",
-  "headingLevel": "2",
   "descriptionHtml": medical_history_card_html
 }) }}
 
@@ -100,7 +98,6 @@
 {% endset %}
 {{ card({
   "heading": "Breast features",
-  "headingLevel": "2",
   "descriptionHtml": breast_features_card_html
 }) }}
 
@@ -114,7 +111,6 @@
 {% endset %}
 {{ card({
   "heading": "Other information",
-  "headingLevel": "2",
   "descriptionHtml": other_information_card_html
 }) }}
 
