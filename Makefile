@@ -44,7 +44,7 @@ help: # Print help @Others
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	poetry run pytest -m 'not system' --ignore manage_breast_screening/notifications/tests/dependencies --ignore manage_breast_screening/notifications/tests/integration --cov --cov-report term-missing:skip-covered
+	poetry run pytest -m 'not system' --ignore manage_breast_screening/notifications/tests/dependencies --ignore manage_breast_screening/notifications/tests/integration --ignore manage_breast_screening/notifications/tests/end_to_end --cov --cov-report term-missing:skip-covered
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing
@@ -62,6 +62,9 @@ test-ui: # Run UI tests @Testing
 
 test-integration:
 	cd manage_breast_screening/notifications && ./tests/integration/run.sh
+
+test-end-to-end:
+	cd manage_breast_screening/notifications && ./tests/end_to_end/run.sh
 
 run: manage_breast_screening/config/.env # Start the development server @Development
 	poetry run ./manage.py runserver
