@@ -1,17 +1,21 @@
-import uuid
 from datetime import datetime
 from unittest.mock import patch
 
 import pytest
 
 from manage_breast_screening.notifications.management.commands.create_appointments import (
-    Command as CreateAppointmentsCommand,
+    Command as CreateAppointments,
 )
 from manage_breast_screening.notifications.management.commands.send_message_batch import (
-    Command as SendMessageBatchCommand,
+    Command as SendMessageBatch,
 )
 from manage_breast_screening.notifications.management.commands.store_mesh_messages import (
-    Command as StoreMeshMessagesCommand,
+    Command as StoreMeshMessages,
+)
+from manage_breast_screening.notifications.models import (
+    Appointment,
+    MessageBatch,
+    MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
@@ -47,14 +51,20 @@ class TestEndToEnd:
         helpers.add_file_to_mesh_mailbox(test_file_1)
         helpers.add_file_to_mesh_mailbox(test_file_2)
 
-        store_mesh_messages = StoreMeshMessagesCommand()
-        store_mesh_messages.handle()
+        StoreMeshMessages().handle()
 
         today_dirname = datetime.today().strftime("%Y-%m-%d")
-        CreateAppointmentsCommand().handle(**{"date_str": today_dirname})
+        CreateAppointments().handle(**{"date_str": today_dirname})
 
-        routing_plan = str(uuid.uuid4())
-        send_message_batch = SendMessageBatchCommand()
-        send_message_batch.handle(**{"routing_plan_id": routing_plan})
+        assert Appointment.objects.filter(episode_type="F").count() == 1
+        assert Appointment.objects.filter(episode_type="S").count() == 1
 
-        # do we want to perform the failed message batch command here? or save that for another test?
+        send_message_batch = SendMessageBatch()
+        send_message_batch.handle()
+
+        assert (
+            MessageBatch.objects.filter(
+                status=MessageBatchStatusChoices.SENT.value
+            ).count()
+            == 1
+        )
