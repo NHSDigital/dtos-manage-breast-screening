@@ -130,6 +130,9 @@ class Appointment(models.Model):
     starts_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=True, auto_now=True)
+    completed_at = models.DateTimeField(null=True)
+    attended_not_screened = models.CharField(max_length=30, default="")
+    assessment = models.BooleanField(default=False)
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
