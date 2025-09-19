@@ -16,9 +16,9 @@ BASE_URL=http://localhost:8000
 # CIS2 / Authlib
 CIS2_SERVER_METADATA_URL=changeme
 CIS2_CLIENT_ID=changeme
-# Private key in PEM format (escape newlines as \n)
+# Private key in PEM format (paste a multiline string)
 CIS2_CLIENT_PRIVATE_KEY="paste-pem-private-key-here"
-# Public key in PEM format (escape newlines as \n)
+# Public key in PEM format (paste a multiline string)
 CIS2_CLIENT_PUBLIC_KEY="paste-pem-public-key-here"
 
 NOTIFICATIONS_BATCH_RETRY_LIMIT=5
