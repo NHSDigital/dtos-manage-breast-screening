@@ -42,7 +42,8 @@ class ChannelStatusChoices(models.Choices):
 class AppointmentStatusChoices(models.Choices):
     BOOKED = "B"
     CANCELLED = "C"
-    UPDATED = "U"
+    ATTENDED = "A"
+    DNA = "D"
 
 
 class AppointmentEpisodeTypeChoices(models.Choices):
