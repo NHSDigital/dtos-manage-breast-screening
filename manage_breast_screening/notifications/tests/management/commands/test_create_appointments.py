@@ -1,6 +1,6 @@
 import os
-from datetime import datetime
-from unittest.mock import Mock, PropertyMock
+from datetime import datetime, timezone
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
 from azure.storage.blob import BlobProperties, ContainerClient
@@ -19,20 +19,19 @@ from manage_breast_screening.notifications.tests.factories import (
 VALID_DATA_FILE = "ABC_20241202091221_APPT_106.dat"
 UPDATED_APPOINTMENT_FILE = "ABC_20241202091321_APPT_107.dat"
 HOLDING_CLINIC_APPOINTMENT_FILE = "ABC_20241202091421_APPT_108.dat"
+COMPLETED_APPOINTMENT_FILE = "ABC_20241202091521_APPT_109.dat"
 
 
+@pytest.mark.django_db
 class TestCreateAppointments:
     def fixture_file_path(self, filename):
         return (
             f"{os.path.dirname(os.path.realpath(__file__))}/../../fixtures/{filename}"
         )
 
-    @pytest.mark.django_db
     def test_handle_creates_records(self):
         """Test Appointment creation for new booked appointments in NBSS data, stored in Azure storage blob"""
         today_dirname = datetime.today().strftime("%Y-%m-%d")
-
-        subject = Command()
 
         mock_container_client = PropertyMock(spec=ContainerClient)
         mock_blob = Mock(spec=BlobProperties)
@@ -41,6 +40,7 @@ class TestCreateAppointments:
         mock_container_client.get_blob_client().download_blob().readall.return_value = (
             open(self.fixture_file_path(VALID_DATA_FILE)).read()
         )
+        subject = Command()
         subject.container_client = mock_container_client
 
         subject.handle(**{"date_str": today_dirname})
@@ -94,7 +94,8 @@ class TestCreateAppointments:
         assert appointments[0].clinic == clinics[1]
         assert appointments[1].clinic == clinics[1]
 
-    @pytest.mark.django_db
+        assert appointments[1].assessment is True
+
     def test_handles_holding_clinics(self):
         """Test does not create appointments for valid NBSS data marked as a Holding Clinic"""
         today_dirname = datetime.today().strftime("%Y-%m-%d")
@@ -120,7 +121,6 @@ class TestCreateAppointments:
         assert Clinic.objects.count() == 1
         assert Appointment.objects.filter(nhs_number=9449306625).first() is None
 
-    @pytest.mark.django_db
     def test_does_not_save_cancellations_for_new_appointments(self):
         """Test no new Appointment created if the data shows Cancelled status"""
         today = datetime.now()
@@ -144,7 +144,6 @@ class TestCreateAppointments:
 
         assert Appointment.objects.count() == 0
 
-    @pytest.mark.django_db
     def test_handle_updates_records(self):
         """Test Appointment record update from valid NBSS data stored in Azure storage blob"""
         starts_at = datetime.strptime(
@@ -197,7 +196,6 @@ class TestCreateAppointments:
             "20250128-154003", "%Y%m%d-%H%M%S"
         ).replace(tzinfo=TZ_INFO)
 
-    @pytest.mark.django_db
     def test_only_updates_cancelled_appointments(self):
         """We should not update Appointments unless its a Cancellation"""
 
@@ -257,7 +255,54 @@ class TestCreateAppointments:
             Appointment.objects.filter(id=existing_appt_to_cancel.id)[0].status == "C"
         )
 
-    @pytest.mark.django_db
+    def test_creates_completed_appointments(self):
+        today_dirname = datetime.today().strftime("%Y-%m-%d")
+        mock_container_client = PropertyMock(spec=ContainerClient)
+        mock_blob = Mock(spec=BlobProperties)
+        mock_blob.name = PropertyMock(
+            return_value=f"{today_dirname}/{COMPLETED_APPOINTMENT_FILE}"
+        )
+        mock_container_client.list_blobs.return_value = [mock_blob]
+        mock_container_client.get_blob_client().download_blob().readall.return_value = (
+            open(self.fixture_file_path(COMPLETED_APPOINTMENT_FILE)).read()
+        )
+
+        clinic = ClinicFactory(bso_code="KMK", code="BU003")
+        booked_appt1 = AppointmentFactory(
+            nbss_id="BU011-67278-RA1-DN-Y1111-1",
+            nhs_number=9449305552,
+            starts_at=datetime(2025, 3, 14, 13, 45, tzinfo=TZ_INFO),
+            clinic=clinic,
+            status="B",
+        )
+
+        booked_appt2 = AppointmentFactory(
+            nbss_id="BU011-67278-RA1-DN-X0000-1",
+            nhs_number=9449306621,
+            starts_at=datetime(2025, 3, 14, 14, 45, tzinfo=TZ_INFO),
+            clinic=clinic,
+            status="B",
+        )
+
+        subject = Command()
+        subject.container_client = mock_container_client
+        subject.handle(**{"date_str": today_dirname})
+
+        booked_appt1.refresh_from_db()
+        booked_appt2.refresh_from_db()
+
+        assert booked_appt1.status == "A"
+        assert booked_appt1.completed_at == datetime(
+            2025, 1, 28, 15, 40, 3, tzinfo=timezone.utc
+        )
+        assert booked_appt1.attended_not_screened == "N"
+
+        assert booked_appt2.status == "D"
+        assert booked_appt2.completed_at == datetime(
+            2025, 1, 28, 15, 40, 4, tzinfo=timezone.utc
+        )
+        assert booked_appt2.attended_not_screened == ""
+
     def test_handle_accept_date_arg(self):
         """Test Appointment record creation when passed a specific date as argument"""
         subject = Command()
@@ -276,7 +321,6 @@ class TestCreateAppointments:
         assert Clinic.objects.count() == 2
         assert Appointment.objects.count() == 2
 
-    @pytest.mark.django_db
     def test_handle_with_invalid_date_arg(self):
         """Test command execution with an invalid date argument"""
         subject = Command()
@@ -289,7 +333,6 @@ class TestCreateAppointments:
 
         assert Appointment.objects.count() == 0
 
-    @pytest.mark.django_db
     def test_handle_with_no_data(self):
         """Test that no records are created when there is no stored data"""
         subject = Command()
@@ -302,7 +345,6 @@ class TestCreateAppointments:
         assert len(Clinic.objects.all()) == 0
         assert len(Appointment.objects.all()) == 0
 
-    @pytest.mark.django_db
     def test_handle_with_error(self):
         """Test exception handling of the create_appointments command"""
         subject = Command()

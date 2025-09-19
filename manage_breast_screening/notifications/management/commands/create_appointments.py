@@ -74,6 +74,7 @@ class Command(BaseCommand):
             encoding="ASCII",
             engine="python",
             header=1,
+            keep_default_na=False,
             sep="|",
             skipfooter=1,
         )
@@ -106,7 +107,7 @@ class Command(BaseCommand):
                 Appointment.objects.create(
                     nbss_id=row["Appointment ID"],
                     nhs_number=row["NHS Num"],
-                    number=row["Sequence"],
+                    number=row["Screen Appt num"],
                     batch_id=row["Batch ID"],
                     clinic=clinic,
                     episode_started_at=datetime.strptime(
@@ -119,6 +120,7 @@ class Command(BaseCommand):
                     booked_at=self.workflow_action_date_and_time(
                         row["Action Timestamp"]
                     ),
+                    assessment=(row["Screen or Asses"] == "A"),
                 ),
                 True,
             )
@@ -129,14 +131,28 @@ class Command(BaseCommand):
                 row["Action Timestamp"]
             )
             appointment.save()
+        elif self.is_completed_appointment(row, appointment):
+            appointment.status = row["Status"]
+            appointment.attended_not_screened = row["Attended Not Scr"]
+            appointment.completed_at = self.workflow_action_date_and_time(
+                row["Action Timestamp"]
+            )
+            appointment.save()
 
         return (appointment, False)
 
-    def is_cancelling_existing_appointment(self, row, appointment):
+    def is_cancelling_existing_appointment(self, row, appointment: Appointment):
         return appointment is not None and row["Status"] == "C"
 
-    def is_new_booking(self, row, appointment):
+    def is_new_booking(self, row, appointment: Appointment):
         return appointment is None and row["Status"] == "B"
+
+    def is_completed_appointment(self, row, appointment: Appointment):
+        return (
+            appointment is not None
+            and row["Status"] in ["A", "D"]
+            and appointment.starts_at < datetime.now(tz=TZ_INFO)
+        )
 
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
