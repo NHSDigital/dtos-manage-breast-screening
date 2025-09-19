@@ -35,11 +35,6 @@ module "storage" {
   }
   queues              = local.storage_queues
   resource_group_name = azurerm_resource_group.main.name
-
-  depends_on = [
-    module.blob_storage_role_assignment,
-    module.queue_storage_role_assignment
-  ]
 }
 
 module "blob_storage_role_assignment" {
@@ -56,4 +51,12 @@ module "queue_storage_role_assignment" {
   role_definition_name = "Storage Queue Data Contributor"
   scope                = module.storage.storage_account_id
   depends_on           = [module.storage, module.azure_queue_storage_identity]
+}
+
+resource "time_sleep" "rbac_propagation" {
+  depends_on = [
+    module.blob_storage_role_assignment,
+    module.queue_storage_role_assignment
+  ]
+  create_duration = "30s"
 }
