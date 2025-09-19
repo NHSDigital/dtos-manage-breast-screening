@@ -1,0 +1,4 @@
+BASE_URL: https://dev.manage-breast-screening.non-live.screening.nhs.uk
+BASIC_AUTH_ENABLED: True
+CIS2_SERVER_METADATA_URL: https://am.nhsint.auth-ptl.cis2.spineservices.nhs.uk/openam/oauth2/realms/root/realms/NHSIdentity/realms/Healthcare/.well-known/openid-configuration
+PERSONAS_ENABLED: 1
