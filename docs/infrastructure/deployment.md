@@ -51,14 +51,40 @@ When the pull request is closed or merged, and if it has the "deploy" label, the
 
 When a pull request is merged to the main branch, the [CI/CD main branch](https://github.com/NHSDigital/dtos-manage-breast-screening/actions/workflows/cicd-2-main-branch.yaml) is triggered. It runs tests then authenticates to Azure and triggers the [Deploy to Azure](https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build?definitionId=93) Azure devops pipeline. It runs terraform to deploy the entire environment, including both infrastructure and applications. Any manual change is overwritten by terraform.
 
+## Environment variables
+
+The application consumes environment variables so it can be configured differently for each environment, as per the [12 factor app pattern](https://12factor.net/config). This can be used to implement basic feature flags (e.g. `PERSONAS_ENABLED=1`) or configure any _non-secret_ value (e.g. `BACKEND_URL=http://test.backend.gov.uk`). See the [exhaustive list](#environment-variables).
+
+Each environment has a corresponding `variables.yml` file in `infrastructure/environments/[environment]`. Any key-value pair will be provided as-is as a container environment variable. Note any _secret_ must be stored in key vault as per [Application secrets](#application-secrets).
+
+The variables are clearly visible on the public repository and should only be changed via a peer reviewed pull request. When it is merged, the pipeline updates the variables in each environment using terraform and refreshes the containers with the new values.
+
+In case of an emergency, variables can also be [changed manually on the container](https://learn.microsoft.com/en-us/azure/container-apps/environment-variables) via the Azure portal. Azure then creates a new revision to refresh the container with the updated variables. Note this is only temporary as the next terraform run will overwrite the value.
+
 ## Application secrets
 
-The application requires secrets provided as environment variables. Terraform creates an _app_ Azure key vault and all its secrets are mapped directly to the app as environment variables. Developers can access the key vault to create and update the secrets manually.
+The application requires secrets provided as environment variables. Terraform creates an _app_ Azure key vault and all its secrets are mapped directly to the app as environment variables. Developers can access the key vault to create and update the secrets manually. See the [exhaustive list](#environment-variables).
 
-Notes:
+### Notes
 
 - [the process requires multiple steps](https://github.com/NHSDigital/dtos-devops-templates/tree/main/infrastructure/modules/container-app#key-vault-secrets) to set up an environment initially. The process is documented in [create-environment](create-environment.md).
 - The secrets names in key vault are uppercase with hyphen separators. They are mapped to environment variables as uppercase with underscore separator. e.g. `SECRET-KEY` is mapped to `SECRET_KEY`.
+
+### Multi-line secrets
+
+To set multi-line secrets in a key vault, do the following:
+
+1. On your local machine, create a text file containing the multi-line secret.
+1. Raise a PIM request then open an Azure Virtual Desktop session in a web browser.
+1. Click the 'Upload files' button in the desktop session toolbar.
+1. Upload the text file you created.
+1. On the AVD, open Terminal.
+1. Navigate to the upload directory with `cd "\\tsclient\Remote virtual drive\Uploads"` and verify the file is there.
+1. Run `az login`.
+1. Select the Core Services subscription.
+1. Run `az keyvault secret set --vault-name [keyvault name] --name [secret name] --file [file name]` to set the secret.
+1. Check the secret is set by viewing the key vault in Azure Portal.
+1. Delete both the local and uploaded files containing the secret.
 
 ## Manual deployment
 
