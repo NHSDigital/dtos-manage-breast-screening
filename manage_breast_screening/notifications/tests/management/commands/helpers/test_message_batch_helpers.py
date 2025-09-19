@@ -167,7 +167,7 @@ class TestMessageBatchHelpers:
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             messages=[message_1, message_2, message_3],
-            nhs_notify_errors=json.dumps(notify_errors),
+            nhs_notify_errors=notify_errors,
         )
 
         with patch(
@@ -236,7 +236,7 @@ class TestMessageBatchHelpers:
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             messages=[message_1, message_2, message_3, message_4],
-            nhs_notify_errors=json.dumps(notify_errors),
+            nhs_notify_errors=notify_errors,
         )
 
         with patch(
@@ -251,13 +251,13 @@ class TestMessageBatchHelpers:
         assert message_batch.messages.all().count() == 1
 
         message_1.refresh_from_db()
-        assert message_1.nhs_notify_errors == json.dumps(message_1_errors)
+        assert message_1.nhs_notify_errors == message_1_errors
 
         message_2.refresh_from_db()
-        assert message_2.nhs_notify_errors == json.dumps(message_2_errors)
+        assert message_2.nhs_notify_errors == message_2_errors
 
         message_3.refresh_from_db()
-        assert message_3.nhs_notify_errors == json.dumps(message_3_errors)
+        assert message_3.nhs_notify_errors == message_3_errors
 
         message_4.refresh_from_db()
         assert message_4.batch == message_batch
@@ -280,7 +280,7 @@ class TestMessageBatchHelpers:
         message_batch = MessageBatchFactory(
             routing_plan_id=routing_plan_id,
             messages=[message_1, message_2],
-            nhs_notify_errors=json.dumps(notify_errors),
+            nhs_notify_errors=notify_errors,
         )
 
         with patch(

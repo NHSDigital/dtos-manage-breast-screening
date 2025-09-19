@@ -21,7 +21,7 @@ class Queue:
         elif connection_string:
             try:
                 self.client = QueueClient.from_connection_string(
-                    os.getenv("QUEUE_STORAGE_CONNECTION_STRING"), queue_name
+                    connection_string, queue_name
                 )
                 self.client.create_queue()
             except ResourceExistsError:

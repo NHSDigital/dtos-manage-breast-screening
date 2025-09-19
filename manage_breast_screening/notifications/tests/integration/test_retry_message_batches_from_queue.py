@@ -83,9 +83,7 @@ class TestRetryMessageBatchesFromQueue:
         }
 
         mock_send_message_batch.return_value.status_code = 400
-        mock_send_message_batch.return_value.json.return_value = json.dumps(
-            notify_errors
-        )
+        mock_send_message_batch.return_value.json.return_value = notify_errors
 
         invalid_message = MessageFactory(status="failed")
         ok_message_1 = MessageFactory(status="failed")
@@ -106,4 +104,4 @@ class TestRetryMessageBatchesFromQueue:
         invalid_message.refresh_from_db()
         assert invalid_message.status == "failed"
         assert invalid_message.batch is None
-        assert invalid_message.nhs_notify_errors == json.dumps(notify_errors["errors"])
+        assert invalid_message.nhs_notify_errors == notify_errors["errors"]
