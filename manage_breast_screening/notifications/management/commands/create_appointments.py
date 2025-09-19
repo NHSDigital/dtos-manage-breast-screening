@@ -2,6 +2,7 @@ import io
 import os
 from datetime import datetime
 from functools import cached_property
+from logging import getLogger
 from zoneinfo import ZoneInfo
 
 import pandas
@@ -16,6 +17,7 @@ from manage_breast_screening.notifications.models import (
 
 TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
+logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -37,10 +39,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
+            logger.info("Create Appointments Command started")
             for blob in self.container_client.list_blobs(
                 name_starts_with=options["date_str"]
             ):
                 blob_client = self.container_client.get_blob_client(blob.name)
+                logger.debug(f"Processing blob {blob.name}")
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()
@@ -48,6 +52,7 @@ class Command(BaseCommand):
                 data_frame = self.raw_data_to_data_frame(blob_content)
 
                 for idx, row in data_frame.iterrows():
+                    logger.debug(f"Processing row {idx}")
                     if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
                         if clinic_created:
@@ -59,9 +64,13 @@ class Command(BaseCommand):
                         self.stdout.write(
                             f"{appt} {'created' if appt_created else 'updated'}"
                         )
+                        logger.info(
+                            f"{appt} {'created' if appt_created else 'updated'}"
+                        )
 
                 self.stdout.write(f"Processed {len(data_frame)} rows from {blob.name}")
         except Exception as e:
+            logger.error(e)
             raise CommandError(e)
 
     def is_not_holding_clinic(self, row):
