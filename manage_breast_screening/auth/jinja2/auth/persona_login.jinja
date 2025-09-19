@@ -15,7 +15,7 @@
       {% if user != current_user %}
       <form action="{{ request.path }}" method="post" novalidate>
         {{ csrf_input }}
-        <input type="hidden" name="username" value="{{ user.username }}">
+        <input type="hidden" name="username" value="{{ user.nhs_uid }}">
         <input type="hidden" name="next" value="{{ next }}">
 
         {{ button({

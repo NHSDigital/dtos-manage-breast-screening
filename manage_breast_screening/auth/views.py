@@ -74,7 +74,7 @@ def cis2_callback(request):
                 f"Missing or empty {userinfo_field} in CIS2 userinfo response"
             )
 
-    user, _ = User.objects.update_or_create(username=sub, defaults=defaults)
+    user, _ = User.objects.update_or_create(nhs_uid=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
     return redirect(reverse("home"))
 
@@ -130,7 +130,7 @@ def cis2_back_channel_logout(request):
     # (a uid in CIS2) before invalidating all of their sessions.
     User = get_user_model()
     try:
-        user = User.objects.get(username=claims["sub"])
+        user = User.objects.get(nhs_uid=claims["sub"])
     except User.DoesNotExist:
         # Nothing to do if the user doesn't exist locally
         return JsonResponse({"status": "ok"})
