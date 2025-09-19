@@ -24,10 +24,13 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 class TestEndToEnd:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
-        monkeypatch.setenv("MESH_BASE_URL", "http://localhost:8700")
-        monkeypatch.setenv("MESH_CLIENT_PASSWORD", "password")
-        monkeypatch.setenv("MESH_CLIENT_SHARED_KEY", "TestKey")
-        monkeypatch.setenv("MESH_INBOX_NAME", "X26ABC1")
+        monkeypatch.setenv("NBSS_MESH_HOST", "http://localhost:8700")
+        monkeypatch.setenv("NBSS_MESH_PASSWORD", "password")
+        monkeypatch.setenv("NBSS_MESH_SHARED_KEY", "TestKey")
+        monkeypatch.setenv("NBSS_MESH_INBOX_NAME", "X26ABC1")
+        monkeypatch.setenv("NBSS_MESH_CERT", "mesh-cert")
+        monkeypatch.setenv("NBSS_MESH_PRIVATE_KEY", "mesh-private-key")
+        monkeypatch.setenv("NBSS_MESH_CA_CERT", "mesh-ca-cert")
 
         monkeypatch.setenv(
             "BLOB_STORAGE_CONNECTION_STRING", Helpers().azurite_connection_string()
@@ -41,7 +44,7 @@ class TestEndToEnd:
         monkeypatch.setenv("API_OAUTH_API_KEY", "a1b2c3d4")
         monkeypatch.setenv("API_OAUTH_API_KID", "test-1")
 
-        monkeypatch.setenv("PRIVATE_KEY", "test-key")
+        monkeypatch.setenv("API_OAUTH_PRIVATE_KEY", "test-key")
 
     @pytest.mark.django_db
     def test_get_from_mesh_and_send_message_batch(self, mock_jwt_encode):
