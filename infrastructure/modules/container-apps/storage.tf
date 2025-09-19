@@ -35,6 +35,11 @@ module "storage" {
   }
   queues              = local.storage_queues
   resource_group_name = azurerm_resource_group.main.name
+
+  depends_on = [
+    module.blob_storage_role_assignment,
+    module.queue_storage_role_assignment
+  ]
 }
 
 module "blob_storage_role_assignment" {
