@@ -129,12 +129,6 @@ variable "region" {
   type        = string
 }
 
-variable "personas_enabled" {
-  description = "To enable personas or not."
-  type        = bool
-  default     = false
-}
-
 variable "seed_demo_data" {
   description = "Whether or not to seed the demo data in the database."
   type        = bool
@@ -146,6 +140,7 @@ variable "use_apex_domain" {
   type        = bool
 }
 
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
@@ -156,11 +151,16 @@ locals {
   # Here we expect the environment to be in format pr-XXX. For example PR 1234 would have environment pr-1234 and port 2234
   database_port = var.deploy_database_as_container ? tonumber(regex("\\d+", var.environment)) + 1000 : 5432
 
-  common_env = {
-    SSL_MODE         = "require"
-    PERSONAS_ENABLED = var.personas_enabled ? "1" : "0"
-    DJANGO_ENV       = var.env_config
-  }
+  env_vars_from_yaml = yamldecode(
+    file("${path.module}/../../environments/${var.env_config}/variables.yml")
+  )
+  common_env = merge(
+    local.env_vars_from_yaml,
+    {
+      SSL_MODE         = "require"
+      DJANGO_ENV       = var.env_config
+    }
+  )
 
   container_db_env = {
     DATABASE_HOST = var.deploy_database_as_container ? module.database_container[0].container_app_fqdn : null
