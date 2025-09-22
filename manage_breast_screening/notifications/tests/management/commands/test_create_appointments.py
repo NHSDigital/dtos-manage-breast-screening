@@ -1,4 +1,5 @@
 import os
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from unittest.mock import Mock, PropertyMock, patch
 
@@ -22,31 +23,47 @@ HOLDING_CLINIC_APPOINTMENT_FILE = "ABC_20241202091421_APPT_108.dat"
 COMPLETED_APPOINTMENT_FILE = "ABC_20241202091521_APPT_109.dat"
 
 
-@patch(
-    "manage_breast_screening.notifications.management.commands.create_appointments.BlobStorage"
-)
-@pytest.mark.django_db
-class TestCreateAppointments:
-    def fixture_file_path(self, filename):
-        return (
-            f"{os.path.dirname(os.path.realpath(__file__))}/../../fixtures/{filename}"
-        )
+def fixture_file_path(filename):
+    return f"{os.path.dirname(os.path.realpath(__file__))}/../../fixtures/{filename}"
 
-    def test_handle_creates_records(self, mock_blob_storage):
-        """Test Appointment creation for new booked appointments in NBSS data, stored in Azure storage blob"""
-        today_dirname = datetime.today().strftime("%Y-%m-%d")
 
+@contextmanager
+def mocked_blob_storage():
+    with patch(
+        "manage_breast_screening.notifications.management.commands.create_appointments.BlobStorage"
+    ) as mock_blob_storage:
+        yield mock_blob_storage
+
+
+@contextmanager
+def stored_blob_data(prefix_dir: str, filenames: list[str]):
+    with mocked_blob_storage() as mock_blob_storage:
         mock_container_client = (
             mock_blob_storage.return_value.find_or_create_container.return_value
         )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(return_value=f"{today_dirname}/{VALID_DATA_FILE}")
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            open(self.fixture_file_path(VALID_DATA_FILE)).read()
-        )
+        mock_blobs = []
+        mock_blob_contents = []
+        for filename in filenames:
+            mock_blob = Mock(spec=BlobProperties)
+            mock_blob.name = PropertyMock(return_value=f"{prefix_dir}/{filename}")
+            mock_blobs.append(mock_blob)
+            mock_blob_contents.append(open(fixture_file_path(filename)).read())
 
-        Command().handle(**{"date_str": today_dirname})
+        mock_container_client.list_blobs.return_value = mock_blobs
+        mock_container_client.get_blob_client().download_blob().readall.side_effect = (
+            mock_blob_contents
+        )
+        yield
+
+
+@pytest.mark.django_db
+class TestCreateAppointments:
+    def test_handle_creates_records(self):
+        """Test Appointment creation for new booked appointments in NBSS data, stored in Azure storage blob"""
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+
+        with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
+            Command().handle(**{"date_str": today_dirname})
 
         assert Clinic.objects.count() == 2
         clinics = Clinic.objects.all()
@@ -99,23 +116,12 @@ class TestCreateAppointments:
 
         assert appointments[1].assessment is True
 
-    def test_handles_holding_clinics(self, mock_blob_storage):
+    def test_handles_holding_clinics(self):
         """Test does not create appointments for valid NBSS data marked as a Holding Clinic"""
         today_dirname = datetime.today().strftime("%Y-%m-%d")
 
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(
-            return_value=f"{today_dirname}/{HOLDING_CLINIC_APPOINTMENT_FILE}"
-        )
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            open(self.fixture_file_path(HOLDING_CLINIC_APPOINTMENT_FILE)).read()
-        )
-
-        Command().handle(**{"date_str": today_dirname})
+        with stored_blob_data(today_dirname, [HOLDING_CLINIC_APPOINTMENT_FILE]):
+            Command().handle(**{"date_str": today_dirname})
 
         assert Clinic.objects.count() == 1
         assert Clinic.objects.filter(code="BU011").first() is None
@@ -123,29 +129,15 @@ class TestCreateAppointments:
         assert Clinic.objects.count() == 1
         assert Appointment.objects.filter(nhs_number=9449306625).first() is None
 
-    def test_does_not_save_cancellations_for_new_appointments(self, mock_blob_storage):
+    def test_does_not_save_cancellations_for_new_appointments(self):
         """Test no new Appointment created if the data shows Cancelled status"""
-        today = datetime.now()
-        raw_data = open(self.fixture_file_path(UPDATED_APPOINTMENT_FILE)).read()
-        today_dirname = today.strftime("%Y-%m-%d")
-
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(
-            return_value=f"{today_dirname}/{UPDATED_APPOINTMENT_FILE}"
-        )
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            raw_data
-        )
-
-        Command().handle(**{"date_str": today_dirname})
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+        with stored_blob_data(today_dirname, [UPDATED_APPOINTMENT_FILE]):
+            Command().handle(**{"date_str": today_dirname})
 
         assert Appointment.objects.count() == 0
 
-    def test_handle_updates_records(self, mock_blob_storage):
+    def test_handle_updates_records(self):
         """Test Appointment record update from valid NBSS data stored in Azure storage blob"""
         starts_at = datetime.strptime(
             "20250314 1345",
@@ -167,23 +159,9 @@ class TestCreateAppointments:
         assert Appointment.objects.count() == 1
 
         # Receive a cancellation for existing appointment
-        today = datetime.now()
-        raw_data = open(self.fixture_file_path(UPDATED_APPOINTMENT_FILE)).read()
-        today_dirname = today.strftime("%Y-%m-%d")
-
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(
-            return_value=f"{today_dirname}/{UPDATED_APPOINTMENT_FILE}"
-        )
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            raw_data
-        )
-
-        Command().handle(**{"date_str": today_dirname})
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+        with stored_blob_data(today_dirname, [UPDATED_APPOINTMENT_FILE]):
+            Command().handle(**{"date_str": today_dirname})
 
         # check existing appointment updated
         assert Appointment.objects.count() == 1
@@ -196,7 +174,7 @@ class TestCreateAppointments:
             "20250128-154003", "%Y%m%d-%H%M%S"
         ).replace(tzinfo=TZ_INFO)
 
-    def test_only_updates_cancelled_appointments(self, mock_blob_storage):
+    def test_only_updates_cancelled_appointments(self):
         """We should not update Appointments unless its a Cancellation"""
 
         starts_at = datetime.strptime(
@@ -204,9 +182,7 @@ class TestCreateAppointments:
             "%Y%m%d %H%M",
         )
         nbss_id_no_update = "BU011-67278-RA1-DN-Y1111-1"
-        today = datetime.now()
-        today_dirname = today.strftime("%Y-%m-%d")
-        blob_name = f"{today_dirname}/{VALID_DATA_FILE}"
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
 
         existing_appt_no_update = AppointmentFactory(
             nbss_id=nbss_id_no_update,
@@ -231,19 +207,8 @@ class TestCreateAppointments:
             status="B",
         )
 
-        raw_data = open(self.fixture_file_path(VALID_DATA_FILE)).read()
-
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = blob_name
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            raw_data
-        )
-
-        Command().handle(**{"date_str": today_dirname})
+        with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
+            Command().handle(**{"date_str": today_dirname})
 
         # has not been updated with test file data
         assert (
@@ -254,20 +219,8 @@ class TestCreateAppointments:
             Appointment.objects.filter(id=existing_appt_to_cancel.id)[0].status == "C"
         )
 
-    def test_creates_completed_appointments(self, mock_blob_storage):
+    def test_creates_completed_appointments(self):
         today_dirname = datetime.today().strftime("%Y-%m-%d")
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(
-            return_value=f"{today_dirname}/{COMPLETED_APPOINTMENT_FILE}"
-        )
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            open(self.fixture_file_path(COMPLETED_APPOINTMENT_FILE)).read()
-        )
-
         clinic = ClinicFactory(bso_code="KMK", code="BU003")
         booked_appt1 = AppointmentFactory(
             nbss_id="BU011-67278-RA1-DN-Y1111-1",
@@ -285,7 +238,8 @@ class TestCreateAppointments:
             status="B",
         )
 
-        Command().handle(**{"date_str": today_dirname})
+        with stored_blob_data(today_dirname, [COMPLETED_APPOINTMENT_FILE]):
+            Command().handle(**{"date_str": today_dirname})
 
         booked_appt1.refresh_from_db()
         booked_appt2.refresh_from_db()
@@ -302,55 +256,49 @@ class TestCreateAppointments:
         )
         assert booked_appt2.attended_not_screened == ""
 
-    def test_handle_accept_date_arg(self, mock_blob_storage):
+    def test_handle_accept_date_arg(self):
         """Test Appointment record creation when passed a specific date as argument"""
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_blob = Mock(spec=BlobProperties)
-        mock_blob.name = PropertyMock(return_value=f"2025-07-01/{VALID_DATA_FILE}")
-        mock_container_client.list_blobs.return_value = [mock_blob]
-        mock_container_client.get_blob_client().download_blob().readall.return_value = (
-            open(self.fixture_file_path(VALID_DATA_FILE)).read()
-        )
-
-        Command().handle(**{"date_str": "2025-07-01"})
+        with stored_blob_data("2025-07-01", [VALID_DATA_FILE]):
+            Command().handle(**{"date_str": "2025-07-01"})
 
         assert Clinic.objects.count() == 2
         assert Appointment.objects.count() == 2
 
-    def test_handle_with_invalid_date_arg(self, mock_blob_storage):
+    def test_handle_with_invalid_date_arg(self):
         """Test command execution with an invalid date argument"""
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_container_client.list_blobs = Mock(side_effect=Exception("Error!"))
+        with mocked_blob_storage() as mock_blob_storage:
+            mock_container_client = (
+                mock_blob_storage.return_value.find_or_create_container.return_value
+            )
+            mock_container_client.list_blobs = Mock(side_effect=Exception("Error!"))
 
-        with pytest.raises(CommandError):
-            Command().handle(**{"date_str": "Noooo!"})
+            with pytest.raises(CommandError):
+                Command().handle(**{"date_str": "Noooo!"})
 
         assert Appointment.objects.count() == 0
 
-    def test_handle_with_no_data(self, mock_blob_storage):
+    def test_handle_with_no_data(self):
         """Test that no records are created when there is no stored data"""
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_container_client.list_blobs.return_value = []
+        with mocked_blob_storage() as mock_blob_storage:
+            mock_container_client = (
+                mock_blob_storage.return_value.find_or_create_container.return_value
+            )
+            mock_container_client.list_blobs.return_value = []
 
-        Command().handle(**{"date_str": "2000-01-01"})
+            Command().handle(**{"date_str": "2000-01-01"})
 
         assert len(Clinic.objects.all()) == 0
         assert len(Appointment.objects.all()) == 0
 
-    def test_handle_with_error(self, mock_blob_storage):
+    def test_handle_with_error(self):
         """Test exception handling of the create_appointments command"""
-        mock_container_client = (
-            mock_blob_storage.return_value.find_or_create_container.return_value
-        )
-        mock_container_client.list_blobs = Mock(side_effect=Exception("Oops"))
+        with mocked_blob_storage() as mock_blob_storage:
+            mock_container_client = (
+                mock_blob_storage.return_value.find_or_create_container.return_value
+            )
+            mock_container_client.list_blobs = Mock(side_effect=Exception("Oops"))
 
-        with pytest.raises(CommandError):
-            Command().handle(**{"date_str": "2000-01-01"})
+            with pytest.raises(CommandError):
+                Command().handle(**{"date_str": "2000-01-01"})
 
         assert Appointment.objects.count() == 0
