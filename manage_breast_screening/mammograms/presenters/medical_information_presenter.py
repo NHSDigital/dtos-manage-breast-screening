@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
-from manage_breast_screening.participants.models.symptom import SymptomAreas
 
 from .appointment_presenters import AppointmentPresenter
 
@@ -59,21 +58,13 @@ class MedicalInformationPresenter:
         symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
             "symptom_type__name", "reported_at"
         )
-        self.symptoms = [self._map_symptom(symptom) for symptom in symptoms]
+        self.symptoms = [self._present_symptom(symptom) for symptom in symptoms]
 
-    def _map_symptom_area(self, symptom):
-        match symptom.area:
-            case SymptomAreas.RIGHT_BREAST:
-                return "Right breast"
-            case SymptomAreas.LEFT_BREAST:
-                return "Left breast"
-            case SymptomAreas.BOTH_BREASTS:
-                return "Both breasts"
-            case _:
-                return symptom.get_area_display()
+    def _present_symptom_area(self, symptom):
+        return symptom.get_area_display()
 
-    def _map_symptom(self, symptom):
-        location = self._map_symptom_area(symptom)
+    def _present_symptom(self, symptom):
+        location = self._present_symptom_area(symptom)
         started = symptom.get_when_started_display()
         if symptom.year_started is not None and symptom.month_started is not None:
             started = format_approximate_date(
