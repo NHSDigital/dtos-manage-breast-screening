@@ -52,14 +52,3 @@ module "queue_storage_role_assignment" {
   scope                = module.storage.storage_account_id
   depends_on           = [module.storage, module.azure_queue_storage_identity]
 }
-
-resource "time_sleep" "private_endpoint_propagation" {
-  create_duration = "60s"
-
-  # Triggers when private endpoint configuration changes
-  triggers = {
-    subnet_id = var.main_subnet_id
-    blob_dns_zone = data.azurerm_private_dns_zone.storage-account-blob.id
-    queue_dns_zone = data.azurerm_private_dns_zone.storage-account-queue.id
-  }
-}
