@@ -97,7 +97,7 @@ class TestRecordMedicalInformationPresenter:
     def test_formats_for_summary_list(self):
         appointment = AppointmentFactory.create()
 
-        SymptomFactory.create(
+        symptom1 = SymptomFactory.create(
             lump=True,
             appointment=appointment,
             when_started=RelativeDateChoices.NOT_SURE,
@@ -107,7 +107,7 @@ class TestRecordMedicalInformationPresenter:
             additional_information="abc",
         )
 
-        SymptomFactory.create(
+        symptom2 = SymptomFactory.create(
             skin_change=True,
             appointment=appointment,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
@@ -121,7 +121,7 @@ class TestRecordMedicalInformationPresenter:
                 "actions": {
                     "items": [
                         {
-                            "href": "#",
+                            "href": f"/mammograms/{appointment.id}/record-medical-information/lump/{symptom1.id}/",
                             "text": "Change",
                             "visuallyHiddenText": "lump",
                         },
@@ -138,7 +138,7 @@ class TestRecordMedicalInformationPresenter:
                 "actions": {
                     "items": [
                         {
-                            "href": "#",
+                            "href": f"/mammograms/{appointment.id}/record-medical-information/lump/{symptom2.id}/",
                             "text": "Change",
                             "visuallyHiddenText": "skin change",
                         },

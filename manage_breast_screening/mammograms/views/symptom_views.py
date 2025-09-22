@@ -1,15 +1,18 @@
 from functools import cached_property
 
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import FormView
+
+from manage_breast_screening.participants.models.symptom import Symptom
 
 from ..forms.symptom_forms import LumpForm
 from .mixins import InProgressAppointmentMixin
 
 
-class AddLump(InProgressAppointmentMixin, FormView):
+class AddOrChangeLump(InProgressAppointmentMixin, FormView):
     """
-    Add a symptom: lump
+    Add or change a symptom: lump
     """
 
     form_class = LumpForm
@@ -18,6 +21,21 @@ class AddLump(InProgressAppointmentMixin, FormView):
     @cached_property
     def participant(self):
         return self.appointment.participant
+
+    @cached_property
+    def is_update(self):
+        return "lump_pk" in self.kwargs
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        if self.is_update:
+            instance = get_object_or_404(
+                Symptom, pk=self.kwargs["lump_pk"], appointment_id=self.kwargs["pk"]
+            )
+            kwargs["instance"] = instance
+
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -38,7 +56,10 @@ class AddLump(InProgressAppointmentMixin, FormView):
         return context
 
     def form_valid(self, form):
-        form.save(appointment=self.appointment, request=self.request)
+        if self.is_update:
+            form.update(request=self.request)
+        else:
+            form.create(appointment=self.appointment, request=self.request)
 
         return super().form_valid(form)
 

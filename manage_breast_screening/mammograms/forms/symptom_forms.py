@@ -14,7 +14,7 @@ from manage_breast_screening.nhsuk_forms.fields import (
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     RadioSelectWithoutFieldset,
 )
-from manage_breast_screening.nhsuk_forms.utils import YesNo, yes_no_field
+from manage_breast_screening.nhsuk_forms.utils import YesNo, yes_no, yes_no_field
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     SymptomAreas,
@@ -89,6 +89,21 @@ class LumpForm(Form):
 
     def __init__(self, instance=None, **kwargs):
         self.instance = instance
+
+        if instance:
+            kwargs["initial"] = {
+                "area": instance.area,
+                "area_description": instance.area_description,
+                "when_started": instance.when_started,
+                "specific_date": (instance.month_started, instance.year_started),
+                "intermittent": instance.intermittent,
+                "recently_resolved": instance.recently_resolved,
+                "when_resolved": instance.when_resolved,
+                "investigated": yes_no(instance.investigated),
+                "investigation_details": instance.investigation_details,
+                "additional_information": instance.additional_information,
+            }
+
         super().__init__(**kwargs)
 
     def clean(self):
@@ -119,9 +134,44 @@ class LumpForm(Form):
                         ),
                     )
 
-    def save(self, appointment, request):
+    def update(self, request):
         auditor = Auditor.from_request(request)
+        field_values = self._model_values()
+        symptom = self.instance
 
+        if symptom is None:
+            raise ValueError("attempting to update but instance is None")
+
+        for fieldname, value in field_values.items():
+            setattr(symptom, fieldname, value)
+
+        symptom.save(update_fields=field_values.keys())
+
+        auditor.audit_update(symptom)
+
+        return symptom
+
+    def create(self, appointment, request):
+        auditor = Auditor.from_request(request)
+        field_values = self._model_values()
+
+        symptom = appointment.symptom_set.create(
+            appointment=appointment,
+            symptom_type_id=SymptomType.LUMP,
+            reported_at=date.today(),
+            **field_values,
+        )
+
+        auditor.audit_create(symptom)
+
+        return symptom
+
+    def _model_values(self):
+        """
+        Further clean the form data to match the model, including
+        splitting year/month tuples into multiple fields, and blanking
+        conditionally revealed fields that are no longer visible.
+        """
         area = self.cleaned_data["area"]
         area_description = (
             self.cleaned_data.get("area_description", "")
@@ -150,10 +200,7 @@ class LumpForm(Form):
 
         additional_information = self.cleaned_data.get("additional_information", "")
 
-        symptom = appointment.symptom_set.create(
-            appointment=appointment,
-            symptom_type_id=SymptomType.LUMP,
-            reported_at=date.today(),
+        return dict(
             area=area,
             area_description=area_description,
             investigated=investigated,
@@ -166,7 +213,3 @@ class LumpForm(Form):
             when_resolved=when_resolved,
             additional_information=additional_information,
         )
-
-        auditor.audit_create(symptom)
-
-        return symptom

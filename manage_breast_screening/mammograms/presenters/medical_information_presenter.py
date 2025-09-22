@@ -46,7 +46,13 @@ class MedicalInformationPresenter:
                         {
                             "text": "Change",
                             "visuallyHiddenText": self.symptom_type.lower(),
-                            "href": "#",
+                            "href": reverse(
+                                "mammograms:change_symptom_lump",
+                                kwargs={
+                                    "pk": self.appointment_id,
+                                    "lump_pk": self.id,
+                                },
+                            ),
                         }
                     ]
                 },
