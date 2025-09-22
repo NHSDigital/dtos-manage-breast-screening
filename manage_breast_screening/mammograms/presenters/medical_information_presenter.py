@@ -12,6 +12,8 @@ from .appointment_presenters import AppointmentPresenter
 class MedicalInformationPresenter:
     @dataclass
     class PresentedSymptom:
+        id: str
+        appointment_id: str
         symptom_type: str
         location_line: str
         started_line: str
@@ -19,6 +21,37 @@ class MedicalInformationPresenter:
         intermittent_line: str = ""
         stopped_line: str = ""
         additional_information_line: str = ""
+
+        @property
+        def summary_list_row(self):
+            html = multiline_content(
+                [
+                    line
+                    for line in [
+                        self.location_line,
+                        self.started_line,
+                        self.investigated_line,
+                        self.intermittent_line,
+                        self.stopped_line,
+                        self.additional_information_line,
+                    ]
+                    if line
+                ]
+            )
+
+            return {
+                "key": {"text": self.symptom_type},
+                "value": {"html": html},
+                "actions": {
+                    "items": [
+                        {
+                            "text": "Change",
+                            "visuallyHiddenText": self.symptom_type.lower(),
+                            "href": "#",
+                        }
+                    ]
+                },
+            }
 
     def __init__(self, appointment):
         self.appointment = AppointmentPresenter(appointment)
@@ -63,6 +96,8 @@ class MedicalInformationPresenter:
         )
 
         return self.PresentedSymptom(
+            id=symptom.id,
+            appointment_id=symptom.appointment_id,
             symptom_type=symptom.symptom_type.name,
             location_line=location,
             started_line=started,
@@ -74,39 +109,7 @@ class MedicalInformationPresenter:
 
     @property
     def symptom_rows(self):
-        result = []
-        for symptom in self.symptoms:
-            html = multiline_content(
-                [
-                    line
-                    for line in [
-                        symptom.location_line,
-                        symptom.started_line,
-                        symptom.investigated_line,
-                        symptom.intermittent_line,
-                        symptom.stopped_line,
-                        symptom.additional_information_line,
-                    ]
-                    if line
-                ]
-            )
-
-            result.append(
-                {
-                    "key": {"text": symptom.symptom_type},
-                    "value": {"html": html},
-                    "actions": {
-                        "items": [
-                            {
-                                "text": "Change",
-                                "visuallyHiddenText": symptom.symptom_type.lower(),
-                                "href": "#",
-                            }
-                        ]
-                    },
-                }
-            )
-        return result
+        return [symptom.summary_list_row for symptom in self.symptoms]
 
     @property
     def add_lump_link(self):

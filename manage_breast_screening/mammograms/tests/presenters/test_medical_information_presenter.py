@@ -35,6 +35,8 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             MedicalInformationPresenter.PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
                 symptom_type="Lump",
                 location_line=expected_location,
                 started_line="Less than 3 months",
@@ -57,6 +59,8 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             MedicalInformationPresenter.PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
                 symptom_type="Lump",
                 location_line="Right breast",
                 started_line="January 2025 (8 months ago)",
@@ -78,6 +82,8 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             MedicalInformationPresenter.PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
                 symptom_type="Lump",
                 location_line="Left breast",
                 started_line="Not sure",
