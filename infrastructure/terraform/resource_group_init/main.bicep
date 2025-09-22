@@ -8,12 +8,12 @@ param storageAccountName string
 param appShortName string
 
 var hubMap = {
-  dev:      'dev'
-  int:      'dev'
-  review:   'dev'
-  nft:      'dev'
-  pre:      'prod'
-  prd:      'prod'
+  dev:                  'dev'
+  int:                  'dev'
+  review:               'dev'
+  nft:                  'dev'
+  preprod:              'prod'
+  prd:                  'prod'
 }
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
 var privateDNSZoneRGName = 'rg-hub-${hubMap[envConfig]}-uks-private-dns-zones'

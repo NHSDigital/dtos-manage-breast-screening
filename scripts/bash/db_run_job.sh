@@ -13,6 +13,8 @@ else
     ENV=pr-${PR_NUMBER}
 fi
 
+ENV=${ENV_CONFIG}
+
 JOB_NAME=manbrs-dbm-${ENV}
 RG_NAME=rg-manbrs-${ENV}-container-app-uks
 TIMEOUT=300
