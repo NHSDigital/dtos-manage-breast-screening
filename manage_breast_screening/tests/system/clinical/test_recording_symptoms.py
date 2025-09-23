@@ -51,6 +51,16 @@ class TestRecordingSymptoms(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_i_see_three_months_to_a_year()
 
+    def test_removing_a_symptom(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment_with_a_symptom_added_in_the_last_three_months()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.when_i_click_on_change()
+        self.and_i_click_on_delete_this_symptom()
+        self.and_i_confirm_i_want_to_delete_the_symptom()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_lump_is_no_longer_listed()
+
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
@@ -130,3 +140,15 @@ class TestRecordingSymptoms(SystemTestCase):
         )
         row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
         expect(row).to_contain_text("3 months to a year")
+
+    def and_i_click_on_delete_this_symptom(self):
+        self.page.get_by_text("Delete this symptom").click()
+
+    def and_i_confirm_i_want_to_delete_the_symptom(self):
+        self.page.get_by_text("Delete symptom").click()
+
+    def and_the_lump_is_no_longer_listed(self):
+        locator = self.page.locator(
+            ".nhsuk-summary-list__key", has=self.page.get_by_text("Lump", exact=True)
+        )
+        expect(locator).not_to_be_attached()
