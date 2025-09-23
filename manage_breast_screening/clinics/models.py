@@ -2,6 +2,7 @@ import uuid
 from datetime import date
 from enum import StrEnum
 
+from django.conf import settings
 from django.db import models
 
 from ..core.models import BaseModel
@@ -171,3 +172,24 @@ class ClinicStatus(models.Model):
     clinic = models.ForeignKey(
         Clinic, on_delete=models.PROTECT, related_name="statuses"
     )
+
+
+class UserAssignment(BaseModel):
+    """
+    Join table linking users to providers they are assigned to work with.
+    """
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="assignments"
+    )
+    provider = models.ForeignKey(
+        Provider, on_delete=models.PROTECT, related_name="assignments"
+    )
+
+    class Meta:
+        unique_together = ["user", "provider"]
+        verbose_name = "User Provider Assignment"
+        verbose_name_plural = "User Provider Assignments"
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} → {self.provider.name}"
