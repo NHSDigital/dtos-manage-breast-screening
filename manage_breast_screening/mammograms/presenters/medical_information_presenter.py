@@ -9,79 +9,22 @@ from manage_breast_screening.participants.models.symptom import SymptomType
 from .appointment_presenters import AppointmentPresenter
 
 
-class MedicalInformationPresenter:
-    @dataclass
-    class PresentedSymptom:
-        id: str
-        appointment_id: str
-        symptom_type_id: str
-        symptom_type_name: str
-        location_line: str
-        started_line: str
-        investigated_line: str = ""
-        intermittent_line: str = ""
-        stopped_line: str = ""
-        additional_information_line: str = ""
+@dataclass
+class PresentedSymptom:
+    id: str
+    appointment_id: str
+    symptom_type_id: str
+    symptom_type_name: str
+    location_line: str
+    started_line: str
+    investigated_line: str = ""
+    intermittent_line: str = ""
+    stopped_line: str = ""
+    additional_information_line: str = ""
 
-        def change_view(self):
-            match self.symptom_type_id:
-                case SymptomType.LUMP:
-                    return "mammograms:change_symptom_lump"
-                case SymptomType.SWELLING_OR_SHAPE_CHANGE:
-                    return "mammograms:change_symptom_swelling_or_shape_change"
-                case _:
-                    raise ValueError(self.symptom_type_id)
-
-        @property
-        def summary_list_row(self):
-            html = multiline_content(
-                [
-                    line
-                    for line in [
-                        self.location_line,
-                        self.started_line,
-                        self.investigated_line,
-                        self.intermittent_line,
-                        self.stopped_line,
-                        self.additional_information_line,
-                    ]
-                    if line
-                ]
-            )
-
-            return {
-                "key": {"text": self.symptom_type_name},
-                "value": {"html": html},
-                "actions": {
-                    "items": [
-                        {
-                            "text": "Change",
-                            "visuallyHiddenText": self.symptom_type_name.lower(),
-                            "href": reverse(
-                                self.change_view(),
-                                kwargs={
-                                    "pk": self.appointment_id,
-                                    "symptom_pk": self.id,
-                                },
-                            ),
-                        }
-                    ]
-                },
-            }
-
-    def __init__(self, appointment):
-        self.appointment = AppointmentPresenter(appointment)
-
-        symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
-            "symptom_type__name", "reported_at"
-        )
-        self.symptoms = [self._present_symptom(symptom) for symptom in symptoms]
-
-    def _present_symptom_area(self, symptom):
-        return symptom.get_area_display()
-
-    def _present_symptom(self, symptom):
-        location = self._present_symptom_area(symptom)
+    @classmethod
+    def from_symptom(cls, symptom):
+        location = symptom.get_area_display()
         started = symptom.get_when_started_display()
         if symptom.year_started is not None and symptom.month_started is not None:
             started = format_approximate_date(
@@ -103,7 +46,7 @@ class MedicalInformationPresenter:
             else ""
         )
 
-        return self.PresentedSymptom(
+        return cls(
             id=symptom.id,
             appointment_id=symptom.appointment_id,
             symptom_type_id=symptom.symptom_type_id,
@@ -115,6 +58,62 @@ class MedicalInformationPresenter:
             stopped_line=stopped,
             additional_information_line=additional_information,
         )
+
+    def change_view(self):
+        match self.symptom_type_id:
+            case SymptomType.LUMP:
+                return "mammograms:change_symptom_lump"
+            case SymptomType.SWELLING_OR_SHAPE_CHANGE:
+                return "mammograms:change_symptom_swelling_or_shape_change"
+            case _:
+                raise ValueError(self.symptom_type_id)
+
+    @property
+    def summary_list_row(self):
+        html = multiline_content(
+            [
+                line
+                for line in [
+                    self.location_line,
+                    self.started_line,
+                    self.investigated_line,
+                    self.intermittent_line,
+                    self.stopped_line,
+                    self.additional_information_line,
+                ]
+                if line
+            ]
+        )
+
+        return {
+            "key": {"text": self.symptom_type_name},
+            "value": {"html": html},
+            "actions": {
+                "items": [
+                    {
+                        "text": "Change",
+                        "visuallyHiddenText": self.symptom_type_name.lower(),
+                        "href": reverse(
+                            self.change_view(),
+                            kwargs={
+                                "pk": self.appointment_id,
+                                "symptom_pk": self.id,
+                            },
+                        ),
+                    }
+                ]
+            },
+        }
+
+
+class MedicalInformationPresenter:
+    def __init__(self, appointment):
+        self.appointment = AppointmentPresenter(appointment)
+
+        symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
+            "symptom_type__name", "reported_at"
+        )
+        self.symptoms = [PresentedSymptom.from_symptom(symptom) for symptom in symptoms]
 
     @property
     def symptom_rows(self):

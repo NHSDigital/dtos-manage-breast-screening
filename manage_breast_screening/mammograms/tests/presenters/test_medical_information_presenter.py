@@ -2,6 +2,7 @@ import pytest
 
 from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
     MedicalInformationPresenter,
+    PresentedSymptom,
 )
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
@@ -34,7 +35,7 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(symptom.appointment)
 
         assert presenter.symptoms == [
-            MedicalInformationPresenter.PresentedSymptom(
+            PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
                 symptom_type_id="lump",
@@ -59,7 +60,7 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(symptom.appointment)
 
         assert presenter.symptoms == [
-            MedicalInformationPresenter.PresentedSymptom(
+            PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
                 symptom_type_id="lump",
@@ -83,7 +84,7 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(symptom.appointment)
 
         assert presenter.symptoms == [
-            MedicalInformationPresenter.PresentedSymptom(
+            PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
                 symptom_type_id="lump",
