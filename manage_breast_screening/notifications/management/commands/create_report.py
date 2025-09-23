@@ -8,6 +8,7 @@ from django.db import connection
 from manage_breast_screening.notifications.queries.aggregate_query import AggregateQuery
 from manage_breast_screening.notifications.queries.failures_query import FailuresQuery
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
+from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
 
 class Command(BaseCommand):
@@ -45,11 +46,19 @@ class Command(BaseCommand):
                 query.sql(), connection, params=params, columns=query.columns()
             )
 
+            csv = dataframe.to_csv()
+
             BlobStorage().add(
                 self.filename(report_type),
-                dataframe.to_csv(),
+                csv,
                 content_type="text/csv",
                 container_name=os.getenv("REPORTS_CONTAINER_NAME"),
+            )
+
+            NhsMail().send_report_email(
+                attachment_data=csv,
+                attachment_filename=self.filename(report_type),
+                report_type=report_type,
             )
         except Exception as e:
             raise CommandError(e)

@@ -39,7 +39,11 @@ class TestCreateReports:
                 with patch(f"{module}.datetime") as mock_datetime:
                     mock_datetime.today.return_value = now
 
-                    yield (mock_blob_storage,)
+                    with patch(f"{module}.NhsMail") as mock_email:
+                        mock_email_service = MagicMock()
+                        mock_email.return_value = mock_email_service
+
+                        yield (mock_blob_storage, mock_email_service)
 
     @pytest.fixture
     def dataframe(self, csv_data):
@@ -51,12 +55,21 @@ class TestCreateReports:
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
             Command().handle(**{"report_type": "aggregate"})
 
+        filename = now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv")
+
         mock_blob_storage = md[0]
         mock_blob_storage.add.assert_called_once_with(
-            now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv"),
+            filename,
             csv_data,
             content_type="text/csv",
             container_name="reports",
+        )
+
+        mock_email_service = md[1]
+        mock_email_service.send_report_email.assert_called_once_with(
+            attachment_data=csv_data,
+            attachment_filename=filename,
+            report_type="aggregate",
         )
 
     def test_handle_creates_failures_report(self, dataframe, csv_data, now):
@@ -70,6 +83,9 @@ class TestCreateReports:
             content_type="text/csv",
             container_name="reports",
         )
+
+        mock_email_service = md[1]
+        mock_email_service.send_report_email.assert_called_once()
 
     def test_handle_defaults_to_failures_report(self, dataframe, csv_data, now):
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
