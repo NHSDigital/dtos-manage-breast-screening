@@ -1,0 +1,39 @@
+{% extends "layout-app.jinja" %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+
+{% block header %}
+  {{ header({
+    "service": {
+      "name": "Manage breast screening"
+    },
+    "account": {
+      "items": header_account_items(request.user)
+    }
+  }) }}
+{% endblock %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+
+    <h1 class="nhsuk-heading-l">
+      {{ heading | default('Are you sure?') }}
+    </h1>
+
+    {% block details %}
+    {% endblock %}
+
+    <form method="post" action="{{ confirm_action.href | default(request.path) }}">
+      <div class="nhsuk-button-group">
+        {{ button({
+          "text": confirm_action.text,
+          "classes": confirm_action.classes | default("nhsuk-button--warning")
+        }) }}
+        {{ csrf_input }}
+
+        <a class="nhsuk-link--no-visited-state" href="{{ cancel_action.href }}">{{ cancel_action.text | default('Cancel') }}</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
