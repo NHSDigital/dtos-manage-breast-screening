@@ -76,7 +76,8 @@ def cis2_callback(request):
 
     user, _ = User.objects.update_or_create(nhs_uid=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-    return redirect(reverse("home"))
+
+    return redirect(reverse("clinics:select_provider"))
 
 
 @login_not_required
