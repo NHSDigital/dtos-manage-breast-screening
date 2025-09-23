@@ -188,8 +188,8 @@ class UserAssignment(BaseModel):
 
     class Meta:
         unique_together = ["user", "provider"]
-        verbose_name = "User Provider Assignment"
-        verbose_name_plural = "User Provider Assignments"
+        verbose_name = "User provider assignment"
+        verbose_name_plural = "User provider assignments"
 
     def __str__(self):
         return f"{self.user.get_full_name()} → {self.provider.name}"
