@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "qsessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
     "manage_breast_screening.core",
     "manage_breast_screening.auth",
     "manage_breast_screening.users",

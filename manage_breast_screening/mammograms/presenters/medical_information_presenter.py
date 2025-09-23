@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from django.urls import reverse
+
 from manage_breast_screening.core.template_helpers import multiline_content
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
 from manage_breast_screening.participants.models.symptom import SymptomAreas
@@ -105,3 +107,11 @@ class MedicalInformationPresenter:
                 }
             )
         return result
+
+    @property
+    def add_lump_link(self):
+        url = reverse("mammograms:add_symptom_lump", kwargs={"pk": self.appointment.pk})
+        return {
+            "href": url,
+            "text": "Add another lump" if self.symptom_rows else "Add a lump",
+        }
