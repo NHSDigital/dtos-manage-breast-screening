@@ -1,7 +1,13 @@
-from django.shortcuts import get_object_or_404
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views import View
 from django.views.generic import FormView
 
+from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
+    PresentedSymptom,
+)
 from manage_breast_screening.participants.models.symptom import Symptom
 
 from ..forms.symptom_forms import LumpForm, SwellingOrShapeChangeForm
@@ -76,6 +82,21 @@ class ChangeSymptomView(BaseSymptomFormView):
 
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["delete_link"] = {
+            "text": "Delete this symptom",
+            "class": "nhsuk-link app-link--warning",
+            "href": reverse(
+                "mammograms:delete_symptom",
+                kwargs={
+                    "pk": self.kwargs["pk"],
+                    "symptom_pk": self.kwargs["symptom_pk"],
+                },
+            ),
+        }
+        return context
+
 
 class AddLumpView(AddSymptomView):
     """
@@ -115,3 +136,47 @@ class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
     symptom_type_name = "swelling or shape change"
     form_class = SwellingOrShapeChangeForm
     template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+
+
+class DeleteLump(View):
+    def get(self, request, *args, **kwargs):
+        symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
+
+        context = {
+            "heading": "Are you sure you want to delete this symptom?",
+            "confirm_action": {
+                "text": "Delete symptom",
+                "href": reverse(
+                    "mammograms:delete_symptom",
+                    kwargs={
+                        "pk": kwargs["pk"],
+                        "symptom_pk": kwargs["symptom_pk"],
+                    },
+                ),
+            },
+            "cancel_action": {
+                "href": reverse(
+                    "mammograms:record_medical_information",
+                    kwargs={"pk": kwargs["pk"]},
+                )
+            },
+            "summary_list_row": PresentedSymptom.from_symptom(
+                symptom
+            ).build_summary_list_row(include_actions=False),
+        }
+
+        return render(
+            request,
+            "mammograms/medical_information/symptoms/confirm_delete_lump.jinja",
+            context=context,
+        )
+
+    def post(self, request, *args, **kwargs):
+        symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
+        auditor = Auditor.from_request(request)
+
+        auditor.audit_delete(symptom)
+        symptom.delete()
+        messages.add_message(self.request, messages.SUCCESS, "Symptom deleted")
+
+        return redirect("mammograms:record_medical_information", pk=kwargs["pk"])

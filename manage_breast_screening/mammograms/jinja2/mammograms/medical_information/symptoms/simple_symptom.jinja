@@ -42,4 +42,12 @@
       "text": "Save symptom"
     }) }}
   </div>
+
+  {% if delete_link %}
+    <p class="nhsuk-u-margin-top-4">
+      <a href="{{ delete_link.href }}" class="{{ delete_link.class }}">
+        {{ delete_link.text }}
+      </a>
+    </p>
+  {% endif %}
 {% endblock %}

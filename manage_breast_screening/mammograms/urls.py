@@ -70,4 +70,9 @@ urlpatterns = [
         symptom_views.ChangeSwellingOrShapeChangeView.as_view(),
         name="change_symptom_swelling_or_shape_change",
     ),
+    path(
+        "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
+        symptom_views.DeleteLump.as_view(),
+        name="delete_symptom",
+    ),
 ]

@@ -1,12 +1,20 @@
 import pytest
+from django.contrib import messages
 from django.urls import reverse
-from pytest_django.asserts import assertInHTML, assertRedirects
+from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
 from manage_breast_screening.nhsuk_forms.choices import YesNo
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
+    Symptom,
     SymptomAreas,
 )
+from manage_breast_screening.participants.tests.factories import SymptomFactory
+
+
+@pytest.fixture
+def lump(appointment):
+    return SymptomFactory.create(appointment=appointment, lump=True)
 
 
 @pytest.mark.django_db
@@ -68,3 +76,46 @@ class TestAddLump:
             """,
             response.text,
         )
+
+
+@pytest.mark.django_db
+class TestDeleteLump:
+    def test_get_renders_response(self, clinical_user_client, appointment, lump):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:delete_symptom",
+                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_post_redirects_to_record_medical_information(
+        self, clinical_user_client, appointment, lump
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:delete_symptom",
+                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+        assertMessages(
+            response,
+            [messages.Message(level=messages.SUCCESS, message="Symptom deleted")],
+        )
+
+    def test_the_symptom_is_deleted(self, clinical_user_client, appointment, lump):
+        clinical_user_client.post(
+            reverse(
+                "mammograms:delete_symptom",
+                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+            )
+        )
+
+        assert not Symptom.objects.filter(pk=lump.pk).exists()
