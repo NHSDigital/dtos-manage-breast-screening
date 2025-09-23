@@ -20,6 +20,8 @@ CIS2_CLIENT_ID=changeme
 CIS2_CLIENT_PRIVATE_KEY="paste-pem-private-key-here"
 # Public key in PEM format (escape newlines as \n)
 CIS2_CLIENT_PUBLIC_KEY="paste-pem-public-key-here"
+# Toggle debug logging for CIS2
+CIS2_DEBUG=False
 
 NOTIFICATIONS_BATCH_RETRY_LIMIT=5
 NOTIFICATIONS_BATCH_RETRY_DELAY=10
