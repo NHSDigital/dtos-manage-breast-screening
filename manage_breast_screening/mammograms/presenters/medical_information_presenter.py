@@ -70,6 +70,9 @@ class PresentedSymptom:
 
     @property
     def summary_list_row(self):
+        return self.build_summary_list_row()
+
+    def build_summary_list_row(self, include_actions=True):
         html = multiline_content(
             [
                 line
@@ -85,10 +88,13 @@ class PresentedSymptom:
             ]
         )
 
-        return {
+        result = {
             "key": {"text": self.symptom_type_name},
             "value": {"html": html},
-            "actions": {
+        }
+
+        if include_actions:
+            result["actions"] = {
                 "items": [
                     {
                         "text": "Change",
@@ -102,8 +108,9 @@ class PresentedSymptom:
                         ),
                     }
                 ]
-            },
-        }
+            }
+
+        return result
 
 
 class MedicalInformationPresenter:
