@@ -115,7 +115,17 @@ Database server admin user name. When using a managed identity, name of the mana
 
 ## DJANGO_ENV
 
-TBD
+Specifies the Django environment configuration. This variable controls environment-specific behaviour throughout the application. It's primarily for ensuring non-production code is not run or made available in production.
+
+**Example values:**
+
+- `production` (default)
+- `dev`
+
+**Example usage:**
+
+- When not set to "production", enables the `nonprod` Django app which provides development utilities
+- The `seed_demo_data` management command checks this env var to prevent execution in production environments
 
 ## NHS_NOTIFY_API_KEY [Secret]
 
