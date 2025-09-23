@@ -28,3 +28,18 @@ BASIC_AUTH_ENABLED=False
 BASIC_AUTH_USERNAME=changeme
 BASIC_AUTH_PASSWORD=changeme
 
+# Notifications specific env vars
+API_OAUTH_API_KEY=""
+API_OAUTH_API_KID=""
+API_OAUTH_PRIVATE_KEY=""
+API_OAUTH_TOKEN_URL=""
+BLOB_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+BLOB_CONTAINER_NAME="notifications-mesh-data"
+NBSS_MESH_INBOX_NAME="mesh-test-inbox"
+NBSS_MESH_PASSWORD="mesh-test-password"
+NBSS_MESH_SHARED_KEY="mesh-test-shared-key"
+NHS_NOTIFY_API_MESSAGE_BATCH_URL="https://sandbox.api.service.nhs.uk/comms/v1/message-batches"
+QUEUE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
+REPORTS_CONTAINER_NAME="notifications-reports"
+RETRY_QUEUE_NAME="notifications-message-batch-retries"
+STATUS_UPDATES_QUEUE_NAME="notifications-message-status-updates"
