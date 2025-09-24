@@ -1,5 +1,5 @@
 api_oauth_token_url                   = "https://int.api.service.nhs.uk/oauth2/token"
-dns_zone_name                         = "preprod.manage-breast-screening.screening.nhs.uk"
+dns_zone_name                         = "manage-breast-screening.screening.nhs.uk"
 enable_auth                           = false
 fetch_secrets_from_app_key_vault      = true
 front_door_profile                    = "afd-live-hub-manbrs"
