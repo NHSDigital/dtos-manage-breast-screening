@@ -30,8 +30,10 @@ def message_batches():
 
     json_data = request.json
 
-    if not validate_with_schema(json_data):
-        return json.dumps({"error": "Invalid body"}), 422
+    valid, message = validate_with_schema(json_data)
+
+    if not valid:
+        return json.dumps({"error": message}), 422
 
     messages = populate_message_ids(json_data["data"]["attributes"]["messages"])
 
