@@ -8,18 +8,18 @@ from manage_breast_screening.notifications.models import (
 class RoutingPlan:
     # NHS Notify supports integration and production configurations
     # so we only need to support 2 different routing plan sets.
-    # FIX ME: These are not the real IDs
+    # FIX ME: These are not the real production IDs
     PLANS = {
         "dev": (
             (
-                "e7a45ecf-d0fd-46a6-8ba4-dffde8d5c275",
+                "b838b13c-f98c-4def-93f0-515d4e4f4ee1",
                 [
                     EpisodeTypes.ROUTINE_FIRST_CALL.value,
                     EpisodeTypes.SELF_REFERRAL.value,
                 ],
             ),
             (
-                "6faa08a8-3505-40c9-82c1-2be00c59e4fc",
+                "b838b13c-f98c-4def-93f0-515d4e4f4ee1",
                 [EpisodeTypes.ROUTINE_RECALL.value],
             ),
         ),

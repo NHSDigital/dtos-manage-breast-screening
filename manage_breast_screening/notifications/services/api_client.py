@@ -10,6 +10,7 @@ from manage_breast_screening.notifications.models import Message, MessageBatch
 EXPIRES_IN_MINUTES = 5
 
 AUTHORIZATION_HEADER_NAME = "authorization"
+SANDBOX_URL = "https://sandbox.api.service.nhs.uk/comms"
 
 
 class OAuthError(Exception):
@@ -57,6 +58,9 @@ class ApiClient:
         }
 
     def bearer_token(self) -> str:
+        if os.getenv("NHS_NOTIFY_API_MESSAGE_BATCH_URL", "").startswith(SANDBOX_URL):
+            return "token"
+
         auth_jwt = jwt.encode(
             {
                 "sub": os.getenv("API_OAUTH_API_KEY"),
