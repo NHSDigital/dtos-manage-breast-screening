@@ -5,6 +5,8 @@ from . import views
 app_name = "clinics"
 
 urlpatterns = [
+    # Provider selection
+    path("select-provider/", views.select_provider, name="select_provider"),
     # Clinic list
     path("", views.clinic_list, name="index"),
     path("today/", views.clinic_list, name="index_today", kwargs={"filter": "today"}),

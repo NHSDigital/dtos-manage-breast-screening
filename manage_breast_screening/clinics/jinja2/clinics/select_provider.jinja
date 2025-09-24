@@ -1,0 +1,41 @@
+{% extends 'layout-app.jinja' %}
+
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'nhsuk/components/radios/macro.jinja' import radios %}
+
+{% block content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    {% if providers|length == 0 %}
+      <p>You haven't been assigned to any providers.</p>
+    {% else %}
+      <form method="post">
+        {{ csrf_input }}
+        {% set radioItems = [] %}
+        {% for provider in providers %}
+          {% do radioItems.append({
+            "value": provider.pk|string,
+            "text": provider.name
+          }) %}
+        {% endfor %}
+
+        {{ radios({
+          "idPrefix": "provider",
+          "name": "provider",
+          "fieldset": {
+            "legend": {
+              "text": "Select your provider",
+              "classes": "nhsuk-fieldset__legend--m"
+            }
+          },
+          "items": radioItems
+        }) }}
+
+        {{ button({
+          "text": "Continue"
+        }) }}
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

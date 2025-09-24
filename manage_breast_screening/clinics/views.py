@@ -1,8 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from ..participants.models import Appointment, AppointmentStatus
-from .models import Clinic
+from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 
 
@@ -47,3 +48,24 @@ def check_in(_request, pk, appointment_pk):
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)
+
+
+@login_required
+def select_provider(request):
+    user_providers = Provider.objects.filter(assignments__user=request.user)
+
+    if len(user_providers) == 1:
+        request.session["current_provider"] = str(user_providers.first().pk)
+        return redirect("clinics:index")
+
+    if request.method == "POST":
+        provider_id = request.POST.get("provider")
+        if provider_id and user_providers.filter(pk=provider_id).exists():
+            request.session["current_provider"] = provider_id
+            return redirect("clinics:index")
+
+    return render(
+        request,
+        "clinics/select_provider.jinja",
+        context={"providers": user_providers, "page_title": "Select Provider"},
+    )
