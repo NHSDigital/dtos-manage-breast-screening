@@ -13,6 +13,7 @@ module "frontdoor_endpoint" {
     azurerm.dns = azurerm.hub
   }
 
+  allowed_paths = ["${var.environment}-route"]
   cdn_frontdoor_profile_id = data.azurerm_cdn_frontdoor_profile.this.id
   custom_domains = {
     "${var.environment}-domain" = {

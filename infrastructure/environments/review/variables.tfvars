@@ -1,3 +1,4 @@
+allowed_paths                         = 
 api_oauth_token_url                   = "https://int.api.service.nhs.uk/oauth2/token"
 dns_zone_name                         = "manage-breast-screening.non-live.screening.nhs.uk"
 enable_auth                           = true

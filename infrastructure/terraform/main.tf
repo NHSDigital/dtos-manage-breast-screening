@@ -36,6 +36,7 @@ module "container-apps" {
   }
 
   region                                = local.region
+  allowed_paths                         = var.allowed_paths
   app_key_vault_id                      = var.deploy_infra ? module.infra[0].app_key_vault_id : data.azurerm_key_vault.app_key_vault[0].id
   app_short_name                        = var.app_short_name
   container_app_environment_id          = var.deploy_infra ? module.infra[0].container_app_environment_id : data.azurerm_container_app_environment.this[0].id
