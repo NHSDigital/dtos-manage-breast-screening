@@ -26,7 +26,7 @@ class AppointmentFactory(DjangoModelFactory):
         model = models.Appointment
 
     clinic = SubFactory(ClinicFactory)
-    nhs_number = Sequence(lambda n: int("999%06d" % n))
+    nhs_number = Sequence(lambda n: int("999%07d" % n))
     batch_id = Sequence(lambda n: "AAA%06d" % n)
     starts_at = datetime.now(tz=TZ_INFO) + timedelta(weeks=4, days=4)
     status = "B"
