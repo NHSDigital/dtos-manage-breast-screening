@@ -33,6 +33,7 @@ class AppointmentFactory(DjangoModelFactory):
     nbss_id = Sequence(lambda n: int("123%06d" % n))
     episode_type = "S"
     episode_started_at = datetime.now(tz=TZ_INFO) - timedelta(weeks=5, days=5)
+    assessment = False
 
 
 class MessageFactory(DjangoModelFactory):

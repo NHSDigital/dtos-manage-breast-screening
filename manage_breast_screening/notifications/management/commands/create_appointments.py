@@ -1,11 +1,9 @@
 import io
 import os
 from datetime import datetime
-from functools import cached_property
 from zoneinfo import ZoneInfo
 
 import pandas
-from azure.storage.blob import BlobServiceClient, ContainerClient
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.models import (
@@ -13,6 +11,7 @@ from manage_breast_screening.notifications.models import (
     AppointmentStatusChoices,
     Clinic,
 )
+from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
 TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
@@ -22,9 +21,6 @@ class Command(BaseCommand):
     """
     Django Admin command which reads NBSS appointment data from Azure blob storage
     and saves data as Appointment and Clinic records in the database.
-
-    Requires the env vars `BLOB_STORAGE_CONNECTION_STRING` and `BLOB_CONTAINER_NAME`
-    to connect to Azure blob storage.
     """
 
     def add_arguments(self, parser):
@@ -37,10 +33,13 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            for blob in self.container_client.list_blobs(
+            container_client = BlobStorage().find_or_create_container(
+                os.getenv("BLOB_CONTAINER_NAME")
+            )
+            for blob in container_client.list_blobs(
                 name_starts_with=options["date_str"]
             ):
-                blob_client = self.container_client.get_blob_client(blob.name)
+                blob_client = container_client.get_blob_client(blob.name)
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()
@@ -74,6 +73,7 @@ class Command(BaseCommand):
             encoding="ASCII",
             engine="python",
             header=1,
+            keep_default_na=False,
             sep="|",
             skipfooter=1,
         )
@@ -106,7 +106,7 @@ class Command(BaseCommand):
                 Appointment.objects.create(
                     nbss_id=row["Appointment ID"],
                     nhs_number=row["NHS Num"],
-                    number=row["Sequence"],
+                    number=row["Screen Appt num"],
                     batch_id=row["Batch ID"],
                     clinic=clinic,
                     episode_started_at=datetime.strptime(
@@ -119,6 +119,7 @@ class Command(BaseCommand):
                     booked_at=self.workflow_action_date_and_time(
                         row["Action Timestamp"]
                     ),
+                    assessment=(row["Screen or Asses"] == "A"),
                 ),
                 True,
             )
@@ -129,14 +130,28 @@ class Command(BaseCommand):
                 row["Action Timestamp"]
             )
             appointment.save()
+        elif self.is_completed_appointment(row, appointment):
+            appointment.status = row["Status"]
+            appointment.attended_not_screened = row["Attended Not Scr"]
+            appointment.completed_at = self.workflow_action_date_and_time(
+                row["Action Timestamp"]
+            )
+            appointment.save()
 
         return (appointment, False)
 
-    def is_cancelling_existing_appointment(self, row, appointment):
+    def is_cancelling_existing_appointment(self, row, appointment: Appointment):
         return appointment is not None and row["Status"] == "C"
 
-    def is_new_booking(self, row, appointment):
+    def is_new_booking(self, row, appointment: Appointment):
         return appointment is None and row["Status"] == "B"
+
+    def is_completed_appointment(self, row, appointment: Appointment):
+        return (
+            appointment is not None
+            and row["Status"] in ["A", "D"]
+            and appointment.starts_at < datetime.now(tz=TZ_INFO)
+        )
 
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
@@ -148,12 +163,3 @@ class Command(BaseCommand):
             "%Y%m%d %H%M",
         )
         return dt.replace(tzinfo=TZ_INFO)
-
-    @cached_property
-    def container_client(self) -> ContainerClient:
-        connection_string = os.getenv("BLOB_STORAGE_CONNECTION_STRING")
-        container_name = os.getenv("BLOB_CONTAINER_NAME")
-
-        return BlobServiceClient.from_connection_string(
-            connection_string
-        ).get_container_client(container_name)
