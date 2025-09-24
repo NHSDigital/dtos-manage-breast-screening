@@ -12,6 +12,7 @@ from manage_breast_screening.clinics.models import (
     ClinicStatus,
     Provider,
     Setting,
+    UserAssignment,
 )
 from manage_breast_screening.clinics.tests.factories import (
     ClinicFactory,
@@ -202,6 +203,7 @@ class Command(BaseCommand):
             return participant_mammogram
 
     def reset_db(self):
+        UserAssignment.objects.all().delete()
         Symptom.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
