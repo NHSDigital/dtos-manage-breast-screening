@@ -2,7 +2,6 @@ import json
 import time
 import uuid
 
-import requests
 from flask import Flask, request
 from jsonschema import ValidationError, validate
 
@@ -30,8 +29,10 @@ def message_batches():
 
     json_data = request.json
 
-    if not validate_with_schema(json_data):
-        return json.dumps({"error": "Invalid body"}), 422
+    valid, message = validate_with_schema(json_data)
+
+    if not valid:
+        return json.dumps({"error": message}), 400
 
     messages = populate_message_ids(json_data["data"]["attributes"]["messages"])
 
@@ -59,7 +60,8 @@ def message_batches():
 
 def validate_with_schema(data: dict):
     try:
-        schema = requests.get("https://digital.nhs.uk/restapi/oas/540802").json()
+        with open("schema.json") as file:
+            schema = json.loads(file.read())
         subschema = schema["paths"]["/v1/message-batches"]["post"]["requestBody"][
             "content"
         ]["application/vnd.api+json"]["schema"]
