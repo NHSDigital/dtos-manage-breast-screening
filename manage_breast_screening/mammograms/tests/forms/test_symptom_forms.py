@@ -162,3 +162,57 @@ class TestLumpForm:
         assert obj.investigated
         assert obj.investigation_details == "abc"
         assert obj.when_started == RelativeDateChoices.ONE_TO_THREE_YEARS
+
+
+class TestSwellingOrShapeChangeForm:
+    def test_valid_form(self):
+        form = LumpForm(
+            data={
+                "area": RightLeftOtherChoices.LEFT_BREAST,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                "investigated": YesNo.NO,
+            }
+        )
+        assert form.is_valid()
+
+    def test_missing_required_fields(self):
+        form = LumpForm(data={})
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "when_started": ["Select how long the symptom has existed"],
+            "investigated": ["Select whether the lump has been investigated or not"],
+            "area": ["Select the location of the lump"],
+        }
+
+    def test_missing_conditionally_required_fields(self):
+        form = LumpForm(
+            data={
+                "area": RightLeftOtherChoices.OTHER,
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+            }
+        )
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "area_description": [
+                "Describe the specific area where the lump is located"
+            ],
+            "specific_date": ["Enter the date the symptom started"],
+            "investigation_details": ["Enter details of any investigations"],
+        }
+
+    def test_valid_form_with_conditionally_required_fields(self):
+        form = LumpForm(
+            data={
+                "area": RightLeftOtherChoices.OTHER,
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+                "area_description": "abc",
+                "specific_date_0": "2",
+                "specific_date_1": "2025",
+                "investigation_details": "def",
+            }
+        )
+        assert form.is_valid()
