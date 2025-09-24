@@ -37,5 +37,9 @@ module "frontdoor_endpoint" {
   route = {
     https_redirect_enabled = true
     supported_protocols    = ["Http", "Https"]
+    patterns_to_match      = var.allowed_paths
+    cache = {
+      query_string_caching_behavior = "IgnoreQueryString"
+    }
   }
 }
