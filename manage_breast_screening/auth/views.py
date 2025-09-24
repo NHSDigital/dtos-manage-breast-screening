@@ -76,6 +76,7 @@ def cis2_callback(request):
 
     user, _ = User.objects.update_or_create(nhs_uid=sub, defaults=defaults)
     auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    request.session.set_expiry(43200)  # 12 hours
     return redirect(reverse("home"))
 
 
