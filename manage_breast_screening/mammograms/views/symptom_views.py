@@ -26,7 +26,8 @@ class AddLump(InProgressAppointmentMixin, FormView):
             {
                 "back_link_params": {
                     "href": reverse(
-                        "mammograms:start_screening", kwargs={"pk": self.appointment_pk}
+                        "mammograms:record_medical_information",
+                        kwargs={"pk": self.appointment_pk},
                     ),
                     "text": "Back to appointment",
                 },
