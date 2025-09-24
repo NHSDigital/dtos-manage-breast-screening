@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from datetime import date
+from typing import Any
 
 from django.db.models import TextChoices
 from django.forms import Form, ValidationError
@@ -28,21 +30,11 @@ class RightLeftOtherChoices(TextChoices):
     OTHER = SymptomAreas.OTHER.value, SymptomAreas.OTHER.label
 
 
-class LumpForm(Form):
-    area = ChoiceField(
-        choices=RightLeftOtherChoices,
-        label="Where is the lump located?",
-        error_messages={"required": "Select the location of the lump"},
-    )
-    area_description = CharField(
-        required=False,
-        label="Describe the specific area",
-        hint="For example, the left armpit",
-        error_messages={
-            "required": "Describe the specific area where the lump is located"
-        },
-        classes="nhsuk-u-width-two-thirds",
-    )
+class CommonFields:
+    """
+    Fields that can be mixed and matched on the Form classes for specific symptom types
+    """
+
     when_started = ChoiceField(
         choices=RelativeDateChoices,
         label="How long has this symptom existed?",
@@ -87,8 +79,22 @@ class LumpForm(Form):
         widget=Textarea(attrs={"rows": 4}),
     )
 
-    def __init__(self, instance=None, **kwargs):
+
+class SymptomForm(Form):
+    """
+    A base form class for entering symptoms. To be overriden for different symptom types.
+    """
+
+    @dataclass
+    class ConditionalRequirement:
+        conditionally_required_field: str
+        predicate_field: str
+        predicate_field_value: Any
+
+    def __init__(self, symptom_type, instance=None, **kwargs):
         self.instance = instance
+        self.symptom_type = symptom_type
+        self.conditional_requirements = []
 
         if instance:
             kwargs["initial"] = {
@@ -106,33 +112,52 @@ class LumpForm(Form):
 
         super().__init__(**kwargs)
 
-    def clean(self):
-        rules = [
-            ("area", RightLeftOtherChoices.OTHER, "area_description"),
-            (
-                "when_started",
-                RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "specific_date",
-            ),
-            ("investigated", YesNo.YES, "investigation_details"),
-        ]
+    def set_conditionally_required(
+        self, conditionally_required_field, predicate_field, predicate_field_value
+    ):
+        """
+        Mark a field as conditionally required if and only if another field (the predicate field)
+        is set to a specific value.
+        If the predicate field is set to the predicate value, this field will require a value.
+        If the predicate field is set to a different value, this field's value will be ignored.
+        """
+        if conditionally_required_field not in self.fields:
+            raise ValueError(f"{conditionally_required_field} is not a valid field")
+        if predicate_field not in self.fields:
+            raise ValueError(f"{predicate_field} is not a valid field")
 
-        for selected_field, selected_value, required_field in rules:
-            if self.cleaned_data.get(selected_field) == selected_value:
-                cleaned_value = self.cleaned_data.get(required_field)
+        self.conditional_requirements.append(
+            self.ConditionalRequirement(
+                conditionally_required_field=conditionally_required_field,
+                predicate_field=predicate_field,
+                predicate_field_value=predicate_field_value,
+            )
+        )
+
+        self.fields[conditionally_required_field].required = False
+
+    def clean(self):
+        for requirement in self.conditional_requirements:
+            field = requirement.conditionally_required_field
+
+            if (
+                self.cleaned_data.get(requirement.predicate_field)
+                == requirement.predicate_field_value
+            ):
+                cleaned_value = self.cleaned_data.get(field)
                 if isinstance(cleaned_value, str):
                     cleaned_value = cleaned_value.strip()
 
                 if not cleaned_value:
                     self.add_error(
-                        required_field,
+                        field,
                         ValidationError(
-                            message=self.fields[required_field].error_messages[
-                                "required"
-                            ],
+                            message=self.fields[field].error_messages["required"],
                             code="required",
                         ),
                     )
+            else:
+                del self.cleaned_data[field]
 
     def update(self, request):
         auditor = Auditor.from_request(request)
@@ -157,7 +182,7 @@ class LumpForm(Form):
 
         symptom = appointment.symptom_set.create(
             appointment=appointment,
-            symptom_type_id=SymptomType.LUMP,
+            symptom_type_id=self.symptom_type,
             reported_at=date.today(),
             **field_values,
         )
@@ -173,31 +198,14 @@ class LumpForm(Form):
         conditionally revealed fields that are no longer visible.
         """
         area = self.cleaned_data["area"]
-        area_description = (
-            self.cleaned_data.get("area_description", "")
-            if area == SymptomAreas.OTHER
-            else ""
-        )
-
+        area_description = self.cleaned_data.get("area_description", "")
         when_started = self.cleaned_data.get("when_started")
-        specific_date = (
-            self.cleaned_data.get("specific_date")
-            if when_started == RelativeDateChoices.SINCE_A_SPECIFIC_DATE
-            else None
-        )
-
+        specific_date = self.cleaned_data.get("specific_date")
         investigated = self.cleaned_data.get("investigated") == YesNo.YES
-        investigation_details = (
-            self.cleaned_data.get("investigation_details", "") if investigated else ""
-        )
-
+        investigation_details = self.cleaned_data.get("investigation_details", "")
         intermittent = self.cleaned_data.get("intermittent", False)
-
         recently_resolved = self.cleaned_data.get("recently_resolved", False)
-        when_resolved = (
-            self.cleaned_data.get("when_resolved") if recently_resolved else ""
-        )
-
+        when_resolved = self.cleaned_data.get("when_resolved")
         additional_information = self.cleaned_data.get("additional_information", "")
 
         return dict(
@@ -212,4 +220,48 @@ class LumpForm(Form):
             recently_resolved=recently_resolved,
             when_resolved=when_resolved,
             additional_information=additional_information,
+        )
+
+
+class LumpForm(SymptomForm):
+    area = ChoiceField(
+        choices=RightLeftOtherChoices,
+        label="Where is the lump located?",
+        error_messages={"required": "Select the location of the lump"},
+    )
+    area_description = CharField(
+        required=False,
+        label="Describe the specific area",
+        hint="For example, the left armpit",
+        error_messages={
+            "required": "Describe the specific area where the lump is located"
+        },
+        classes="nhsuk-u-width-two-thirds",
+    )
+    when_started = CommonFields.when_started
+    specific_date = CommonFields.specific_date
+    intermittent = CommonFields.intermittent
+    recently_resolved = CommonFields.recently_resolved
+    when_resolved = CommonFields.when_resolved
+    investigated = CommonFields.investigated
+    investigation_details = CommonFields.investigation_details
+    additional_information = CommonFields.additional_information
+
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(symptom_type=SymptomType.LUMP, instance=instance, **kwargs)
+
+        self.set_conditionally_required(
+            conditionally_required_field="area_description",
+            predicate_field="area",
+            predicate_field_value=RightLeftOtherChoices.OTHER,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="specific_date",
+            predicate_field="when_started",
+            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="investigation_details",
+            predicate_field="investigated",
+            predicate_field_value=YesNo.YES,
         )
