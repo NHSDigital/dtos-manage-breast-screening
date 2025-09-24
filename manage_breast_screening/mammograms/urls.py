@@ -56,8 +56,18 @@ urlpatterns = [
         name="add_symptom_lump",
     ),
     path(
-        "<uuid:pk>/record-medical-information/lump/<uuid:lump_pk>/",
+        "<uuid:pk>/record-medical-information/lump/<uuid:symptom_pk>/",
         symptom_views.ChangeLumpView.as_view(),
         name="change_symptom_lump",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/swelling-or-shape-change/",
+        symptom_views.AddSwellingOrShapeChangeView.as_view(),
+        name="add_symptom_swelling_or_shape_change",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/swelling-or-shape-change/<uuid:symptom_pk>/",
+        symptom_views.ChangeSwellingOrShapeChangeView.as_view(),
+        name="change_symptom_swelling_or_shape_change",
     ),
 ]
