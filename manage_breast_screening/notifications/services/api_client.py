@@ -45,7 +45,7 @@ class ApiClient:
     def message_request_body(self, message: Message) -> dict:
         return {
             "messageReference": str(message.id),
-            "recipient": {"nhsNumber": message.appointment.nhs_number},
+            "recipient": {"nhsNumber": str(message.appointment.nhs_number)},
         }
 
     def headers(self) -> dict:

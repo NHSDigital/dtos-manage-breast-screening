@@ -61,14 +61,12 @@ class TestApiClient:
             assert attributes["messageBatchReference"] == str(message_batch.id)
             assert attributes["routingPlanId"] == message_batch.routing_plan_id
             assert attributes["messages"][0]["messageReference"] == str(message_1.id)
-            assert (
-                attributes["messages"][0]["recipient"]["nhsNumber"]
-                == message_1.appointment.nhs_number
+            assert attributes["messages"][0]["recipient"]["nhsNumber"] == str(
+                message_1.appointment.nhs_number
             )
             assert attributes["messages"][1]["messageReference"] == str(message_2.id)
-            assert (
-                attributes["messages"][1]["recipient"]["nhsNumber"]
-                == message_2.appointment.nhs_number
+            assert attributes["messages"][1]["recipient"]["nhsNumber"] == str(
+                message_2.appointment.nhs_number
             )
 
     @pytest.mark.django_db
