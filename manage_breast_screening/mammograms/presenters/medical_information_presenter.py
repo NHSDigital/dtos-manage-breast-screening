@@ -4,7 +4,6 @@ from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
-from manage_breast_screening.participants.models.symptom import SymptomAreas
 
 from .appointment_presenters import AppointmentPresenter
 
@@ -12,6 +11,8 @@ from .appointment_presenters import AppointmentPresenter
 class MedicalInformationPresenter:
     @dataclass
     class PresentedSymptom:
+        id: str
+        appointment_id: str
         symptom_type: str
         location_line: str
         started_line: str
@@ -20,27 +21,56 @@ class MedicalInformationPresenter:
         stopped_line: str = ""
         additional_information_line: str = ""
 
+        @property
+        def summary_list_row(self):
+            html = multiline_content(
+                [
+                    line
+                    for line in [
+                        self.location_line,
+                        self.started_line,
+                        self.investigated_line,
+                        self.intermittent_line,
+                        self.stopped_line,
+                        self.additional_information_line,
+                    ]
+                    if line
+                ]
+            )
+
+            return {
+                "key": {"text": self.symptom_type},
+                "value": {"html": html},
+                "actions": {
+                    "items": [
+                        {
+                            "text": "Change",
+                            "visuallyHiddenText": self.symptom_type.lower(),
+                            "href": reverse(
+                                "mammograms:change_symptom_lump",
+                                kwargs={
+                                    "pk": self.appointment_id,
+                                    "lump_pk": self.id,
+                                },
+                            ),
+                        }
+                    ]
+                },
+            }
+
     def __init__(self, appointment):
         self.appointment = AppointmentPresenter(appointment)
 
         symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
             "symptom_type__name", "reported_at"
         )
-        self.symptoms = [self._map_symptom(symptom) for symptom in symptoms]
+        self.symptoms = [self._present_symptom(symptom) for symptom in symptoms]
 
-    def _map_symptom_area(self, symptom):
-        match symptom.area:
-            case SymptomAreas.RIGHT_BREAST:
-                return "Right breast"
-            case SymptomAreas.LEFT_BREAST:
-                return "Left breast"
-            case SymptomAreas.BOTH_BREASTS:
-                return "Both breasts"
-            case _:
-                return symptom.get_area_display()
+    def _present_symptom_area(self, symptom):
+        return symptom.get_area_display()
 
-    def _map_symptom(self, symptom):
-        location = self._map_symptom_area(symptom)
+    def _present_symptom(self, symptom):
+        location = self._present_symptom_area(symptom)
         started = symptom.get_when_started_display()
         if symptom.year_started is not None and symptom.month_started is not None:
             started = format_approximate_date(
@@ -63,6 +93,8 @@ class MedicalInformationPresenter:
         )
 
         return self.PresentedSymptom(
+            id=symptom.id,
+            appointment_id=symptom.appointment_id,
             symptom_type=symptom.symptom_type.name,
             location_line=location,
             started_line=started,
@@ -74,39 +106,7 @@ class MedicalInformationPresenter:
 
     @property
     def symptom_rows(self):
-        result = []
-        for symptom in self.symptoms:
-            html = multiline_content(
-                [
-                    line
-                    for line in [
-                        symptom.location_line,
-                        symptom.started_line,
-                        symptom.investigated_line,
-                        symptom.intermittent_line,
-                        symptom.stopped_line,
-                        symptom.additional_information_line,
-                    ]
-                    if line
-                ]
-            )
-
-            result.append(
-                {
-                    "key": {"text": symptom.symptom_type},
-                    "value": {"html": html},
-                    "actions": {
-                        "items": [
-                            {
-                                "text": "Change",
-                                "visuallyHiddenText": symptom.symptom_type.lower(),
-                                "href": "#",
-                            }
-                        ]
-                    },
-                }
-            )
-        return result
+        return [symptom.summary_list_row for symptom in self.symptoms]
 
     @property
     def add_lump_link(self):

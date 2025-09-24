@@ -35,6 +35,8 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             MedicalInformationPresenter.PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
                 symptom_type="Lump",
                 location_line=expected_location,
                 started_line="Less than 3 months",
@@ -57,6 +59,8 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             MedicalInformationPresenter.PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
                 symptom_type="Lump",
                 location_line="Right breast",
                 started_line="January 2025 (8 months ago)",
@@ -78,6 +82,8 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             MedicalInformationPresenter.PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
                 symptom_type="Lump",
                 location_line="Left breast",
                 started_line="Not sure",
@@ -91,7 +97,7 @@ class TestRecordMedicalInformationPresenter:
     def test_formats_for_summary_list(self):
         appointment = AppointmentFactory.create()
 
-        SymptomFactory.create(
+        symptom1 = SymptomFactory.create(
             lump=True,
             appointment=appointment,
             when_started=RelativeDateChoices.NOT_SURE,
@@ -101,7 +107,7 @@ class TestRecordMedicalInformationPresenter:
             additional_information="abc",
         )
 
-        SymptomFactory.create(
+        symptom2 = SymptomFactory.create(
             skin_change=True,
             appointment=appointment,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
@@ -115,7 +121,7 @@ class TestRecordMedicalInformationPresenter:
                 "actions": {
                     "items": [
                         {
-                            "href": "#",
+                            "href": f"/mammograms/{appointment.id}/record-medical-information/lump/{symptom1.id}/",
                             "text": "Change",
                             "visuallyHiddenText": "lump",
                         },
@@ -132,7 +138,7 @@ class TestRecordMedicalInformationPresenter:
                 "actions": {
                     "items": [
                         {
-                            "href": "#",
+                            "href": f"/mammograms/{appointment.id}/record-medical-information/lump/{symptom2.id}/",
                             "text": "Change",
                             "visuallyHiddenText": "skin change",
                         },

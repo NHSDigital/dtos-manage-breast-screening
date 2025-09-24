@@ -11,7 +11,10 @@ from manage_breast_screening.participants.models.symptom import (
     SymptomAreas,
     SymptomType,
 )
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    SymptomFactory,
+)
 
 
 class TestLumpForm:
@@ -68,7 +71,7 @@ class TestLumpForm:
         assert form.is_valid()
 
     @pytest.mark.django_db
-    def test_save(self, clinical_user):
+    def test_create(self, clinical_user):
         appointment = AppointmentFactory.create()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
@@ -87,7 +90,7 @@ class TestLumpForm:
 
         assert form.is_valid()
 
-        obj = form.save(appointment=appointment, request=request)
+        obj = form.create(appointment=appointment, request=request)
 
         assert obj.appointment == appointment
         assert obj.symptom_type_id == SymptomType.LUMP
@@ -119,9 +122,43 @@ class TestLumpForm:
 
         assert form.is_valid()
 
-        obj = form.save(appointment=appointment, request=request)
+        obj = form.create(appointment=appointment, request=request)
 
         assert not obj.area_description
         assert not obj.investigation_details
         assert not obj.year_started
         assert not obj.month_started
+
+    @pytest.mark.django_db
+    def test_update(self, clinical_user):
+        appointment = AppointmentFactory.create()
+        symptom = SymptomFactory.create(
+            lump=True,
+            area=RightLeftOtherChoices.LEFT_BREAST,
+            when_started=RelativeDateChoices.ONE_TO_THREE_YEARS,
+            investigated=False,
+            appointment=appointment,
+        )
+        request = RequestFactory().get("/test-form")
+        request.user = clinical_user
+
+        form = LumpForm(
+            data={
+                "area": RightLeftOtherChoices.LEFT_BREAST,
+                "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+                "investigated": YesNo.YES,
+                "investigation_details": "abc",
+            },
+            instance=symptom,
+        )
+
+        assert form.is_valid()
+
+        obj = form.update(request=request)
+
+        assert obj.appointment == appointment
+        assert obj.symptom_type_id == SymptomType.LUMP
+        assert obj.area == SymptomAreas.LEFT_BREAST
+        assert obj.investigated
+        assert obj.investigation_details == "abc"
+        assert obj.when_started == RelativeDateChoices.ONE_TO_THREE_YEARS
