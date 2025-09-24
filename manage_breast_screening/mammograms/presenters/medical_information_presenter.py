@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
+from manage_breast_screening.participants.models.symptom import SymptomType
 
 from .appointment_presenters import AppointmentPresenter
 
@@ -13,7 +14,8 @@ class MedicalInformationPresenter:
     class PresentedSymptom:
         id: str
         appointment_id: str
-        symptom_type: str
+        symptom_type_id: str
+        symptom_type_name: str
         location_line: str
         started_line: str
         investigated_line: str = ""
@@ -39,13 +41,13 @@ class MedicalInformationPresenter:
             )
 
             return {
-                "key": {"text": self.symptom_type},
+                "key": {"text": self.symptom_type_name},
                 "value": {"html": html},
                 "actions": {
                     "items": [
                         {
                             "text": "Change",
-                            "visuallyHiddenText": self.symptom_type.lower(),
+                            "visuallyHiddenText": self.symptom_type_name.lower(),
                             "href": reverse(
                                 "mammograms:change_symptom_lump",
                                 kwargs={
@@ -95,7 +97,8 @@ class MedicalInformationPresenter:
         return self.PresentedSymptom(
             id=symptom.id,
             appointment_id=symptom.appointment_id,
-            symptom_type=symptom.symptom_type.name,
+            symptom_type_id=symptom.symptom_type_id,
+            symptom_type_name=symptom.symptom_type.name,
             location_line=location,
             started_line=started,
             investigated_line=investigated,
@@ -109,9 +112,18 @@ class MedicalInformationPresenter:
         return [symptom.summary_list_row for symptom in self.symptoms]
 
     @property
+    def existing_symptom_type_ids(self):
+        return {symptom.symptom_type_id for symptom in self.symptoms}
+
+    @property
     def add_lump_link(self):
         url = reverse("mammograms:add_symptom_lump", kwargs={"pk": self.appointment.pk})
+
         return {
             "href": url,
-            "text": "Add another lump" if self.symptom_rows else "Add a lump",
+            "text": (
+                "Add another lump"
+                if SymptomType.LUMP in self.existing_symptom_type_ids
+                else "Add a lump"
+            ),
         }
