@@ -24,7 +24,7 @@
   {% endif %}
 
   <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-    <a href="{{ presenter.add_lump_link.href }}" class="nhsuk-link">{{ presenter.add_lump_link.text }}</a>
+    <a href="{{ presenter.add_lump_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_lump_link.text }}</a>
   </p>
 {% endcall %}
 
@@ -93,7 +93,7 @@
     }) }}
 
     <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-      <a href="#" class="nhsuk-link">{{ "Add another feature" if breast_features_recorded else "Add a feature" }}</a>
+      <a href="#" class="nhsuk-link nhsuk-link--no-visited-state">{{ "Add another feature" if breast_features_recorded else "Add a feature" }}</a>
     </p>
 {% endset %}
 {{ card({
