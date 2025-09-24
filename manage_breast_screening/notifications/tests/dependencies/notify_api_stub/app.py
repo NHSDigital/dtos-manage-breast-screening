@@ -32,7 +32,7 @@ def message_batches():
     valid, message = validate_with_schema(json_data)
 
     if not valid:
-        return json.dumps({"error": message}), 422
+        return json.dumps({"error": message}), 400
 
     messages = populate_message_ids(json_data["data"]["attributes"]["messages"])
 
