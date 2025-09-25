@@ -46,6 +46,28 @@ class TestRecordMedicalInformationPresenter:
             ),
         ]
 
+    def test_formats_area(self):
+        symptom = SymptomFactory.create(
+            lump=True,
+            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.OTHER,
+            area_description="abc",
+        )
+
+        presenter = MedicalInformationPresenter(symptom.appointment)
+
+        assert presenter.symptoms == [
+            PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
+                symptom_type_id="lump",
+                symptom_type_name="Lump",
+                location_line="Other: abc",
+                started_line="Less than 3 months",
+                investigated_line="Not investigated",
+            ),
+        ]
+
     def test_formats_investigation_and_specific_date(self):
         symptom = SymptomFactory.create(
             lump=True,
