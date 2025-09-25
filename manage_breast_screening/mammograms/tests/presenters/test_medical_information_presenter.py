@@ -41,7 +41,7 @@ class TestRecordMedicalInformationPresenter:
                 symptom_type_id="lump",
                 symptom_type_name="Lump",
                 location_line=expected_location,
-                started_line="Less than 3 months",
+                started_line="Less than 3 months ago",
                 investigated_line="Not investigated",
             ),
         ]
@@ -63,7 +63,7 @@ class TestRecordMedicalInformationPresenter:
                 symptom_type_id="lump",
                 symptom_type_name="Lump",
                 location_line="Other: abc",
-                started_line="Less than 3 months",
+                started_line="Less than 3 months ago",
                 investigated_line="Not investigated",
             ),
         ]
@@ -174,7 +174,7 @@ class TestRecordMedicalInformationPresenter:
                     "text": "Swelling or shape change",
                 },
                 "value": {
-                    "html": "Both breasts<br>Less than 3 months<br>Not investigated",
+                    "html": "Both breasts<br>Less than 3 months ago<br>Not investigated",
                 },
             },
         ]
