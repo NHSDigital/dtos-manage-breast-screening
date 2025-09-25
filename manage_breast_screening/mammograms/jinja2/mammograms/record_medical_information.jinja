@@ -8,7 +8,7 @@
 {% call card({
   "heading": "Symptoms",
 }) %}
-  <p{% if not presenter.symptom_rows %} class="nhsuk-u-margin-bottom-3"{% endif %}>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
+  <p {%- if not presenter.symptom_rows %} class="nhsuk-u-margin-bottom-3"{% endif %}>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
   {% if presenter.symptom_rows %}
      {{ summaryList({
         "rows": presenter.symptom_rows
