@@ -43,7 +43,3 @@ a[href="#"] {
   right: 0;
   text-align: right;
 }
-
-p:has(+ .app-inset-text) {
-  margin-bottom: 0;
-}
