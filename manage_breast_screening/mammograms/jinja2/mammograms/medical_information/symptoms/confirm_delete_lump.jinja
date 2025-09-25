@@ -1,0 +1,19 @@
+{% extends "layout-confirmation.jinja" %}
+{% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
+{% from 'nhsuk/components/inset-text/macro.jinja' import insetText %}
+
+{% block details %}
+  {{ summaryList({
+    "rows": [summary_list_row],
+    "classes": "nhsuk-summary-list--no-border"
+  }) }}
+
+
+  {% set insetTextHtml %}
+    <p>This action is final and cannot be undone.</p>
+  {% endset %}
+
+  {{ insetText({
+    "html": insetTextHtml
+  }) }}
+{% endblock %}

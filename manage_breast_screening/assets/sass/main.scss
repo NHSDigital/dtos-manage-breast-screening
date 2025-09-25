@@ -43,3 +43,8 @@ a[href="#"] {
   right: 0;
   text-align: right;
 }
+
+.app-link--error,
+.app-link--warning {
+  color: $nhsuk-error-colour;
+}

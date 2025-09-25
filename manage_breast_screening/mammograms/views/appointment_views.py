@@ -182,6 +182,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "presenter": MedicalInformationPresenter(self.appointment),
             }
         )
+
         return context
 
     def form_valid(self, form):
