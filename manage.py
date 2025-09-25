@@ -12,7 +12,8 @@ def main():
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE", "manage_breast_screening.config.settings"
     )
-    DjangoInstrumentor().instrument()
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") is not None:
+        DjangoInstrumentor().instrument()
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
