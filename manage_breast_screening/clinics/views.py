@@ -1,3 +1,7 @@
+import logging
+import os
+
+from azure.monitor.opentelemetry import configure_azure_monitor
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
@@ -8,7 +12,26 @@ from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 
 
+def getLogger():
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") is not None:
+        # Configure OpenTelemetry to use Azure Monitor with the
+        # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
+        configure_azure_monitor(
+            # Set the namespace for the logger in which you would like to collect telemetry for if you are collecting logging telemetry. This is imperative so you do not collect logging telemetry from the SDK itself.
+            logger_name="manbrs",
+        )
+        # Logging telemetry will be collected from logging calls made with this logger and all of it's children loggers.
+        return logging.getLogger("manbrs")
+    else:
+        return logging.getLogger(__name__)
+
+
+logger = getLogger()
+
+
 def clinic_list(request, filter="today"):
+    logger.info("info log in clinics")
+    raise Exception("clinic exception")
     clinics = Clinic.objects.prefetch_related("setting").by_filter(filter)
     counts_by_filter = Clinic.filter_counts()
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
