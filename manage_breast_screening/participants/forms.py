@@ -144,6 +144,7 @@ class ParticipantReportedMammogramForm(forms.Form):
             required=False,
             hint="For example, 15 3 2025",
             label="Date of mammogram",
+            label_classes="nhsuk-u-visually-hidden",
         )
 
         self.fields["approx_date"] = CharField(
