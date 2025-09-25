@@ -64,7 +64,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.provider = self.appointment.provider
         self.symptom = SymptomFactory(
             appointment=self.appointment,
-            lump=True,
+            swelling_or_shape_change=True,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
         )
 
@@ -112,17 +112,21 @@ class TestRecordingSymptoms(SystemTestCase):
 
     def when_i_click_on_change(self):
         key = self.page.locator(
-            ".nhsuk-summary-list__key", has=self.page.get_by_text("Lump", exact=True)
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Swelling or shape change", exact=True),
         )
         row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        row.get_by_text("Change").click()
+        row.locator(".nhsuk-summary-list__actions").get_by_text(
+            "Change swelling or shape change"
+        ).click()
 
     def then_less_than_three_months_should_be_selected(self):
         expect(self.page.get_by_label("Less than 3 months")).to_be_checked()
 
     def and_i_see_three_months_to_a_year(self):
         key = self.page.locator(
-            ".nhsuk-summary-list__key", has=self.page.get_by_text("Lump", exact=True)
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Swelling or shape change", exact=True),
         )
         row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
         expect(row).to_contain_text("3 months to a year")

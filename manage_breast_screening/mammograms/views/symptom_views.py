@@ -1,70 +1,117 @@
-from functools import cached_property
-
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.participants.models.symptom import Symptom
 
-from ..forms.symptom_forms import LumpForm
+from ..forms.symptom_forms import LumpForm, SwellingOrShapeChangeForm
 from .mixins import InProgressAppointmentMixin
 
 
-class AddOrChangeLump(InProgressAppointmentMixin, FormView):
+class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
     """
-    Add or change a symptom: lump
+    Base class for views that add or change symptoms
     """
 
-    form_class = LumpForm
-    template_name = "mammograms/medical_information/symptoms/lump.jinja"
-
-    @cached_property
-    def participant(self):
-        return self.appointment.participant
-
-    @cached_property
-    def is_update(self):
-        return "lump_pk" in self.kwargs
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
-        if self.is_update:
-            instance = get_object_or_404(
-                Symptom, pk=self.kwargs["lump_pk"], appointment_id=self.kwargs["pk"]
-            )
-            kwargs["instance"] = instance
-
-        return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update(
-            {
-                "back_link_params": {
-                    "href": reverse(
-                        "mammograms:record_medical_information",
-                        kwargs={"pk": self.appointment_pk},
-                    ),
-                    "text": "Back to appointment",
-                },
-                "caption": self.participant.full_name,
-                "heading": "Details of the lump",
-            },
-        )
-
-        return context
-
-    def form_valid(self, form):
-        if self.is_update:
-            form.update(request=self.request)
-        else:
-            form.create(appointment=self.appointment, request=self.request)
-
-        return super().form_valid(form)
+    symptom_type_name = "symptom"
 
     def get_success_url(self):
         return reverse(
             "mammograms:record_medical_information", kwargs={"pk": self.appointment.pk}
         )
+
+    def get_back_link_params(self):
+        return {
+            "href": reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment_pk},
+            ),
+            "text": "Back to appointment",
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+
+        participant = self.appointment.participant
+
+        context.update(
+            {
+                "back_link_params": self.get_back_link_params(),
+                "caption": participant.full_name,
+                "heading": f"Details of the {self.symptom_type_name}",
+            },
+        )
+
+        return context
+
+
+class AddSymptomView(BaseSymptomFormView):
+    """
+    Base class for views that add symptoms
+    """
+
+    def form_valid(self, form):
+        form.create(appointment=self.appointment, request=self.request)
+
+        return super().form_valid(form)
+
+
+class ChangeSymptomView(BaseSymptomFormView):
+    """
+    Base class for views that change symptoms
+    """
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        instance = get_object_or_404(
+            Symptom, pk=self.kwargs["symptom_pk"], appointment_id=self.kwargs["pk"]
+        )
+        kwargs["instance"] = instance
+
+        return kwargs
+
+    def form_valid(self, form):
+        form.update(request=self.request)
+
+        return super().form_valid(form)
+
+
+class AddLumpView(AddSymptomView):
+    """
+    Add a symptom: lump
+    """
+
+    symptom_type_name = "lump"
+    form_class = LumpForm
+    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+
+
+class AddSwellingOrShapeChangeView(AddSymptomView):
+    """
+    Add a symptom: swelling or shape change
+    """
+
+    symptom_type_name = "swelling or shape change"
+    form_class = SwellingOrShapeChangeForm
+    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+
+
+class ChangeLumpView(ChangeSymptomView):
+    """
+    Change a symptom: lump
+    """
+
+    symptom_type_name = "lump"
+    form_class = LumpForm
+    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+
+
+class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
+    """
+    Change a symptom: lump
+    """
+
+    symptom_type_name = "swelling or shape change"
+    form_class = SwellingOrShapeChangeForm
+    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"

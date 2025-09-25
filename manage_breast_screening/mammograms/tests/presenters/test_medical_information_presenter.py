@@ -37,7 +37,8 @@ class TestRecordMedicalInformationPresenter:
             MedicalInformationPresenter.PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
-                symptom_type="Lump",
+                symptom_type_id="lump",
+                symptom_type_name="Lump",
                 location_line=expected_location,
                 started_line="Less than 3 months",
                 investigated_line="Not investigated",
@@ -61,7 +62,8 @@ class TestRecordMedicalInformationPresenter:
             MedicalInformationPresenter.PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
-                symptom_type="Lump",
+                symptom_type_id="lump",
+                symptom_type_name="Lump",
                 location_line="Right breast",
                 started_line="January 2025 (8 months ago)",
                 investigated_line="Previously investigated: abc",
@@ -84,7 +86,8 @@ class TestRecordMedicalInformationPresenter:
             MedicalInformationPresenter.PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
-                symptom_type="Lump",
+                symptom_type_id="lump",
+                symptom_type_name="Lump",
                 location_line="Left breast",
                 started_line="Not sure",
                 stopped_line="Stopped: resolved date",
@@ -108,7 +111,7 @@ class TestRecordMedicalInformationPresenter:
         )
 
         symptom2 = SymptomFactory.create(
-            skin_change=True,
+            swelling_or_shape_change=True,
             appointment=appointment,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
             area=SymptomAreas.BOTH_BREASTS,
@@ -138,14 +141,14 @@ class TestRecordMedicalInformationPresenter:
                 "actions": {
                     "items": [
                         {
-                            "href": f"/mammograms/{appointment.id}/record-medical-information/lump/{symptom2.id}/",
+                            "href": f"/mammograms/{appointment.id}/record-medical-information/swelling-or-shape-change/{symptom2.id}/",
                             "text": "Change",
-                            "visuallyHiddenText": "skin change",
+                            "visuallyHiddenText": "swelling or shape change",
                         },
                     ],
                 },
                 "key": {
-                    "text": "Skin change",
+                    "text": "Swelling or shape change",
                 },
                 "value": {
                     "html": "Both breasts<br>Less than 3 months<br>Not investigated",
@@ -163,7 +166,7 @@ class TestRecordMedicalInformationPresenter:
 
         SymptomFactory.create(
             appointment=appointment,
-            skin_change=True,
+            lump=True,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
             area=SymptomAreas.BOTH_BREASTS,
         )
