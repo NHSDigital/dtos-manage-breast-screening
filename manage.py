@@ -4,16 +4,15 @@
 import os
 import sys
 
-from opentelemetry.instrumentation.django import DjangoInstrumentor
-
 
 def main():
     """Run administrative tasks."""
     os.environ.setdefault(
         "DJANGO_SETTINGS_MODULE", "manage_breast_screening.config.settings"
     )
-    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") is not None:
-        DjangoInstrumentor().instrument()
+    # if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") is not None:
+    #     DjangoInstrumentor().instrument()
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
