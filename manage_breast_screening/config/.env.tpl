@@ -45,3 +45,5 @@ QUEUE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devst
 REPORTS_CONTAINER_NAME="notifications-reports"
 RETRY_QUEUE_NAME="notifications-message-batch-retries"
 STATUS_UPDATES_QUEUE_NAME="notifications-message-status-updates"
+
+APPLICATIONINSIGHTS_CONNECTION_STRING=""
