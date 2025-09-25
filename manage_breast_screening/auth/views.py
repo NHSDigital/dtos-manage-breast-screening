@@ -10,7 +10,10 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-from manage_breast_screening.core.decorators import basic_auth_exempt
+from manage_breast_screening.core.decorators import (
+    basic_auth_exempt,
+    current_provider_exempt,
+)
 
 from .oauth import cis2_redirect_uri, get_cis2_client, jwk_from_public_key
 from .services import InvalidLogoutToken, decode_logout_token
@@ -18,6 +21,7 @@ from .services import InvalidLogoutToken, decode_logout_token
 logger = logging.getLogger(__name__)
 
 
+@current_provider_exempt
 @login_not_required
 def login(request):
     """Entry point for authentication with CIS2"""
@@ -30,11 +34,13 @@ def login(request):
     )
 
 
+@current_provider_exempt
 def logout(request):
     auth_logout(request)
     return redirect(reverse("home"))
 
 
+@current_provider_exempt
 @login_not_required
 def cis2_login(request):
     """Start the CIS2 OAuth2/OIDC authorization flow."""
@@ -47,6 +53,7 @@ def cis2_login(request):
     )
 
 
+@current_provider_exempt
 @login_not_required
 def cis2_callback(request):
     """Handle CIS2 OAuth2/OIDC callback, create/login the Django user, then redirect home."""
@@ -80,8 +87,9 @@ def cis2_callback(request):
     return redirect(reverse("clinics:select_provider"))
 
 
-@login_not_required
+@current_provider_exempt
 @basic_auth_exempt
+@login_not_required
 def jwks(request):
     """Publish JSON Web Key Set (JWKS) with the public key used for private_key_jwt."""
     try:
@@ -100,6 +108,7 @@ def jwks(request):
         return JsonResponse({"keys": []})
 
 
+@current_provider_exempt
 @require_http_methods(["POST"])
 @csrf_exempt
 @login_not_required

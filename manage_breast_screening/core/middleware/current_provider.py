@@ -1,46 +1,38 @@
 import logging
-from typing import Callable
+from typing import Callable, Optional
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
-from django.urls import Resolver404, resolve, reverse
+from django.urls import reverse
+
+from manage_breast_screening.core.decorators import is_current_provider_exempt
 
 logger = logging.getLogger(__name__)
 
 
 class CurrentProviderMiddleware:
-    """Redirects users to provider selection when `current_provider` is missing."""
+    """Redirects users to provider selection when `current_provider` is missing.
+
+    Views can be exempted by decorating them with @current_provider_exempt.
+    """
 
     def __init__(self, get_response: Callable[[HttpRequest], HttpResponse]):
         self.get_response = get_response
-        self.select_provider_url = reverse("clinics:select_provider")
-        self.exempt_view_names = {
-            "clinics:select_provider",
-            "auth:logout",
-            "auth:login",
-            "auth:cis2_login",
-            "auth:cis2_callback",
-            "auth:cis2_back_channel_logout",
-            "auth:jwks",
-        }
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
+        return self.get_response(request)
+
+    def process_view(
+        self, request: HttpRequest, view_func, _view_args, _view_kwargs
+    ) -> Optional[HttpResponse]:
         if not request.user.is_authenticated:
-            return self.get_response(request)
+            return None
 
         if request.session.get("current_provider"):
-            return self.get_response(request)
+            return None
 
-        if request.path == self.select_provider_url:
-            return self.get_response(request)
+        # Skip if the view has been marked as exempt
+        if is_current_provider_exempt(view_func):
+            return None
 
-        try:
-            view_name = resolve(request.path_info).view_name
-        except Resolver404:
-            return self.get_response(request)
-
-        if view_name in self.exempt_view_names:
-            return self.get_response(request)
-
-        logger.debug("Redirecting to provider selection for missing current_provider")
-        return redirect(self.select_provider_url)
+        return redirect(reverse("clinics:select_provider"))
