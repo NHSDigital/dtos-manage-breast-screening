@@ -1,21 +1,16 @@
-import json
-import os
-import time
-from logging import getLogger
+import logging
 
+from azure.monitor.opentelemetry import configure_azure_monitor
 from django.core.management.base import BaseCommand, CommandError
 
-from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
-    MessageBatchHelpers,
+# Configure OpenTelemetry to use Azure Monitor with the
+# APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
+configure_azure_monitor(
+    # Set the namespace for the logger in which you would like to collect telemetry for if you are collecting logging telemetry. This is imperative so you do not collect logging telemetry from the SDK itself.
+    logger_name="manbrs",
 )
-from manage_breast_screening.notifications.models import (
-    MessageBatch,
-    MessageBatchStatusChoices,
-)
-from manage_breast_screening.notifications.services.api_client import ApiClient
-from manage_breast_screening.notifications.services.queue import Queue
-
-logger = getLogger(__name__)
+# Logging telemetry will be collected from logging calls made with this logger and all of it's children loggers.
+logger = logging.getLogger("manbrs")
 
 
 class Command(BaseCommand):
@@ -25,51 +20,62 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        queue = Queue.RetryMessageBatches()
-        queue_message = queue.item()
+        # Log a custom event with a custom name and additional attribute
 
-        if queue_message is None:
-            logger.info("No messages on queue")
-            return
+        # The 'microsoft.custom_event.name' value will be used as the name of the customEvent
+        # logger.warning(
+        #     "Hello World!",
+        #     extra={
+        #         "microsoft.custom_event.name": "test-event-name",
+        #         "additional_attrs": "val1"
+        #     }
+        # )
+        logger.info("info log")
+        logger.warning("warning log")
+        logger.error("error log")
+        raise CommandError("test error")
 
-        message_batch_id = json.loads(queue_message.content)["message_batch_id"]
-        message_batch = MessageBatch.objects.filter(
-            id=message_batch_id,
-            status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value,
-        ).first()
+    # logger.info("No messages on queue")
+    #     return
 
-        if message_batch is None:
-            raise CommandError(
-                f"Message Batch with id {message_batch_id} and status of '{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
-            )
+    # message_batch_id = json.loads(queue_message.content)["message_batch_id"]
+    # message_batch = MessageBatch.objects.filter(
+    #     id=message_batch_id,
+    #     status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value,
+    # ).first()
 
-        queue.delete(queue_message)
+    # if message_batch is None:
+    #     raise CommandError(
+    #         f"Message Batch with id {message_batch_id} and status of '{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
+    #     )
 
-        retry_count = int(json.loads(queue_message.content)["retry_count"])
-        if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):
-            time.sleep(
-                int(os.getenv("NOTIFICATIONS_BATCH_RETRY_DELAY", "0")) * retry_count
-            )
+    # queue.delete(queue_message)
 
-            try:
-                response = ApiClient().send_message_batch(message_batch)
+    # retry_count = int(json.loads(queue_message.content)["retry_count"])
+    # if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):
+    #     time.sleep(
+    #         int(os.getenv("NOTIFICATIONS_BATCH_RETRY_DELAY", "0")) * retry_count
+    #     )
 
-                if response.status_code == 201:
-                    MessageBatchHelpers.mark_batch_as_sent(
-                        message_batch=message_batch, response_json=response.json()
-                    )
-                else:
-                    MessageBatchHelpers.mark_batch_as_failed(
-                        message_batch=message_batch,
-                        response=response,
-                        retry_count=(retry_count + 1),
-                    )
+    #     try:
+    #         response = ApiClient().send_message_batch(message_batch)
 
-            except Exception as e:
-                raise CommandError(e)
-        else:
-            message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
-            message_batch.save()
-            raise CommandError(
-                f"Message Batch with id {message_batch_id} not sent: Retry limit exceeded"
-            )
+    #         if response.status_code == 201:
+    #             MessageBatchHelpers.mark_batch_as_sent(
+    #                 message_batch=message_batch, response_json=response.json()
+    #             )
+    #         else:
+    #             MessageBatchHelpers.mark_batch_as_failed(
+    #                 message_batch=message_batch,
+    #                 response=response,
+    #                 retry_count=(retry_count + 1),
+    #             )
+
+    # except Exception as e:
+    #     raise CommandError(e)
+    # else:
+    #     message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
+    #     message_batch.save()
+    #     raise CommandError(
+    #         f"Message Batch with id {message_batch_id} not sent: Retry limit exceeded"
+    #     )
