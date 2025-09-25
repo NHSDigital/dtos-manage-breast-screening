@@ -4,6 +4,7 @@ from playwright.sync_api import expect
 
 from manage_breast_screening.auth.models import CLINICAL_PERSONA
 from manage_breast_screening.auth.tests.factories import UserFactory
+from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 
 from ..system_test_setup import SystemTestCase
 
@@ -18,12 +19,13 @@ class TestPersonaLogin(SystemTestCase):
 
     def given_a_persona_exists(self):
         group, _created = Group.objects.get_or_create(name=CLINICAL_PERSONA.group)
-        UserFactory.create(
+        user = UserFactory.create(
             nhs_uid=CLINICAL_PERSONA.username,
             first_name="Per",
             last_name="Sona",
             groups=[group],
         )
+        UserAssignmentFactory.create(user=user)
 
     def when_i_visit_the_clinics_page(self):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
