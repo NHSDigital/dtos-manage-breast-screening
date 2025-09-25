@@ -1,16 +1,22 @@
 import logging
+import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
 from django.core.management.base import BaseCommand, CommandError
 
-# Configure OpenTelemetry to use Azure Monitor with the
-# APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
-configure_azure_monitor(
-    # Set the namespace for the logger in which you would like to collect telemetry for if you are collecting logging telemetry. This is imperative so you do not collect logging telemetry from the SDK itself.
-    logger_name="manbrs",
-)
-# Logging telemetry will be collected from logging calls made with this logger and all of it's children loggers.
-logger = logging.getLogger("manbrs")
+
+def getLogger():
+    if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") is not None:
+        # Configure OpenTelemetry to use Azure Monitor with the
+        # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
+        configure_azure_monitor(
+            # Set the namespace for the logger in which you would like to collect telemetry for if you are collecting logging telemetry. This is imperative so you do not collect logging telemetry from the SDK itself.
+            logger_name="manbrs",
+        )
+        # Logging telemetry will be collected from logging calls made with this logger and all of it's children loggers.
+        return logging.getLogger("manbrs")
+    else:
+        return logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -30,6 +36,7 @@ class Command(BaseCommand):
         #         "additional_attrs": "val1"
         #     }
         # )
+        logger = getLogger()
         logger.info("info log")
         logger.warning("warning log")
         logger.error("error log")
