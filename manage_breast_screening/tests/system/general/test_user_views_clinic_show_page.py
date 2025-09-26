@@ -21,10 +21,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     @pytest.fixture(autouse=True)
     def before(self):
         today = datetime.now(timezone.utc).replace(hour=9, minute=0)
-        self.clinic = ClinicFactory(starts_at=today, setting__name="West London BSS")
+        self.clinic_start_time = today
 
     def test_user_views_clinic_show_page(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_a_clinic_exists_that_is_run_by_my_provider()
         self.and_there_are_appointments()
         self.and_i_am_on_the_clinic_list()
         self.when_i_click_on_the_clinic()
@@ -44,6 +45,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
     def test_user_views_clinic_show_page_with_special_appointments(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_a_clinic_exists_that_is_run_by_my_provider()
         self.and_an_appointment_has_extra_needs()
         self.and_i_am_on_the_clinic_list()
         self.when_i_click_on_the_clinic()
@@ -53,9 +55,18 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_a_clinic_exists_that_is_run_by_my_provider()
         self.and_there_are_appointments()
         self.and_i_am_on_the_clinic_show_page()
         self.then_the_accessibility_baseline_is_met()
+
+    def and_a_clinic_exists_that_is_run_by_my_provider(self):
+        user_assignment = self.current_user.assignments.first()
+        self.clinic = ClinicFactory(
+            starts_at=self.clinic_start_time,
+            setting__name="West London BSS",
+            setting__provider=user_assignment.provider,
+        )
 
     def and_there_are_appointments(self):
         self.confirmed_appointment = AppointmentFactory(

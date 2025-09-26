@@ -9,8 +9,11 @@ from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresen
 
 
 def clinic_list(request, filter="today"):
-    clinics = Clinic.objects.prefetch_related("setting").by_filter(filter)
-    counts_by_filter = Clinic.filter_counts()
+    current_provider_id = request.session.get("current_provider")
+    clinics = Clinic.objects.prefetch_related("setting").by_filter(
+        filter, current_provider_id
+    )
+    counts_by_filter = Clinic.filter_counts(current_provider_id)
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
