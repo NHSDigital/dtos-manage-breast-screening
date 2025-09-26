@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
+from ..core.decorators import current_provider_exempt
 from ..participants.models import Appointment, AppointmentStatus
 from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
@@ -50,6 +51,7 @@ def check_in(_request, pk, appointment_pk):
     return redirect("clinics:show", pk=pk)
 
 
+@current_provider_exempt
 @login_required
 def select_provider(request):
     user_providers = Provider.objects.filter(assignments__user=request.user)

@@ -12,6 +12,7 @@ from playwright.sync_api import expect, sync_playwright
 
 from manage_breast_screening.auth.models import Role
 from manage_breast_screening.auth.tests.factories import UserFactory
+from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.core.utils.acessibility import AxeAdapter
 
 
@@ -49,6 +50,12 @@ class SystemTestCase(StaticLiveServerTestCase):
         client = Client()
         client.force_login(user)
 
+        assignment = user.assignments.first()
+        if assignment:
+            session = client.session
+            session["current_provider"] = str(assignment.provider_id)
+            session.save()
+
         # Transfer the session cookie to the playwright browser
         sessionid = client.cookies["sessionid"].value
         self.context.add_cookies(
@@ -69,6 +76,8 @@ class SystemTestCase(StaticLiveServerTestCase):
         """
         group, _created = Group.objects.get_or_create(name=role)
         user = UserFactory.create(groups=[group])
+        UserAssignmentFactory.create(user=user)
+
         self.login_as_user(user)
 
     def expect_validation_error(
