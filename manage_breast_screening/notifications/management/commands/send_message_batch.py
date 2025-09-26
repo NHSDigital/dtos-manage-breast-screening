@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from logging import getLogger
 from zoneinfo import ZoneInfo
 
 from business.calendar import Calendar
@@ -19,6 +20,7 @@ from manage_breast_screening.notifications.models import (
 from manage_breast_screening.notifications.services.api_client import ApiClient
 
 TZ_INFO = ZoneInfo("Europe/London")
+logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -29,10 +31,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
+            logger.info("Send Message Batch Command started")
             if not self.bso_working_day():
                 return
 
             for routing_plan in RoutingPlan.all():
+                logger.info(f"Processing Routing Plan {routing_plan.id}")
                 self.stdout.write(
                     f"Finding appointments of episode type {routing_plan.episode_types} to include in batch."
                 )
@@ -45,7 +49,7 @@ class Command(BaseCommand):
                 )
 
                 if not appointments:
-                    self.stdout.write(
+                    logger.info(
                         f"No appointments found to batch for episode types {routing_plan.episode_types}"
                     )
                     continue
@@ -73,8 +77,11 @@ class Command(BaseCommand):
                     MessageBatchHelpers.mark_batch_as_sent(
                         message_batch, response.json()
                     )
-                    self.stdout.write(f"{message_batch} sent")
+                    logger.info(f"{message_batch} sent successfully")
                 else:
+                    logger.error(
+                        f"Failed to send batch. Status: {response.status_code}"
+                    )
                     MessageBatchHelpers.mark_batch_as_failed(
                         message_batch, response, retry_count=0
                     )
