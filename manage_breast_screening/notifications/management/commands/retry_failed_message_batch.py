@@ -2,7 +2,7 @@ import logging
 import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 
 def getLogger():
@@ -26,21 +26,21 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        # Log a custom event with a custom name and additional attribute
-
-        # The 'microsoft.custom_event.name' value will be used as the name of the customEvent
-        # logger.warning(
-        #     "Hello World!",
-        #     extra={
-        #         "microsoft.custom_event.name": "test-event-name",
-        #         "additional_attrs": "val1"
-        #     }
-        # )
         logger = getLogger()
+        # Log a custom event with a custom name and additional attribute
+        # The 'microsoft.custom_event.name' value will be used as the name of the customEvent
+        logger.warning(
+            "Hello World!",
+            extra={
+                "microsoft.custom_event.name": "test-event-name",
+                "additional_attrs": "val1",
+            },
+        )
+
         logger.info("info log")
         logger.warning("warning log")
-        logger.error("error log")
-        raise CommandError("test error")
+        logger.error("error log", stack_info=True, exc_info=True)
+        raise Exception("test error")
 
     # logger.info("No messages on queue")
     #     return
