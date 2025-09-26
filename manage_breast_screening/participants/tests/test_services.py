@@ -5,12 +5,12 @@ import pytest
 
 from manage_breast_screening.clinics.models import Provider
 
-from ..services import fetch_current_provider
+from ..services import fetch_most_recent_provider
 from .factories import AppointmentFactory, ParticipantFactory, ScreeningEpisodeFactory
 
 
 @pytest.mark.django_db
-def test_fetch_current_provider():
+def test_fetch_most_recent_provider():
     participant = ParticipantFactory.create()
     old_appointment = AppointmentFactory.create(
         screening_episode=ScreeningEpisodeFactory.create(participant=participant),
@@ -20,13 +20,14 @@ def test_fetch_current_provider():
         screening_episode=ScreeningEpisodeFactory.create(participant=participant),
         starts_at=datetime(2025, 2, 1, 10, tzinfo=tz.utc),
     )
-    expected_current_provider = new_appointment.clinic_slot.clinic.setting.provider
+    expected_most_recent_provider = new_appointment.clinic_slot.clinic.setting.provider
     assert (
-        expected_current_provider != old_appointment.clinic_slot.clinic.setting.provider
+        expected_most_recent_provider
+        != old_appointment.clinic_slot.clinic.setting.provider
     )
 
-    current_provider = fetch_current_provider(participant.pk)
-    assert current_provider == expected_current_provider
+    most_recent_provider = fetch_most_recent_provider(participant.pk)
+    assert most_recent_provider == expected_most_recent_provider
 
 
 @pytest.mark.django_db
@@ -34,4 +35,4 @@ def test_no_current_provider():
     participant = ParticipantFactory.create()
 
     with pytest.raises(Provider.DoesNotExist):
-        fetch_current_provider(participant.pk)
+        fetch_most_recent_provider(participant.pk)
