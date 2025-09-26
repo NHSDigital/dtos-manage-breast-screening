@@ -81,13 +81,13 @@ class ParticipantReportedMammogramForm(forms.Form):
         YES = "yes"
         NO = "no"
 
-    def __init__(self, participant, current_provider, *args, **kwargs):
+    def __init__(self, participant, most_recent_provider, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.participant = participant
-        self.current_provider = current_provider
+        self.most_recent_provider = most_recent_provider
         self.where_taken_choices = {
-            self.WhereTaken.SAME_UNIT: f"At {current_provider.name}",
+            self.WhereTaken.SAME_UNIT: f"At {most_recent_provider.name}",
             self.WhereTaken.UK: "Somewhere in the UK",
             self.WhereTaken.OUTSIDE_UK: "Outside the UK",
             self.WhereTaken.PREFER_NOT_TO_SAY: "Prefer not to say",
@@ -260,7 +260,7 @@ class ParticipantReportedMammogramForm(forms.Form):
             instance.location_type = where_taken
 
         if where_taken == self.WhereTaken.SAME_UNIT:
-            instance.provider = self.current_provider
+            instance.provider = self.most_recent_provider
         if where_taken == self.WhereTaken.UK:
             instance.location_details = self.cleaned_data["somewhere_in_the_uk_details"]
         elif where_taken == self.WhereTaken.OUTSIDE_UK:
