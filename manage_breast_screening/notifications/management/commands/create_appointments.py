@@ -1,6 +1,7 @@
 import io
 import os
 from datetime import datetime
+from logging import getLogger
 from zoneinfo import ZoneInfo
 
 import pandas
@@ -15,6 +16,7 @@ from manage_breast_screening.notifications.services.blob_storage import BlobStor
 
 TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
+logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -33,6 +35,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
+            logger.info("Create Appointments Command started")
             container_client = BlobStorage().find_or_create_container(
                 os.getenv("BLOB_CONTAINER_NAME")
             )
@@ -40,6 +43,7 @@ class Command(BaseCommand):
                 name_starts_with=options["date_str"]
             ):
                 blob_client = container_client.get_blob_client(blob.name)
+                logger.debug(f"Processing blob {blob.name}")
                 blob_content = blob_client.download_blob(
                     max_concurrency=1, encoding="ASCII"
                 ).readall()
@@ -55,7 +59,7 @@ class Command(BaseCommand):
                         appt, appt_created = self.update_or_create_appointment(
                             row, clinic
                         )
-                        self.stdout.write(
+                        logger.info(
                             f"{appt} {'created' if appt_created else 'updated'}"
                         )
 

@@ -1,4 +1,5 @@
 import json
+from logging import getLogger
 
 from dateutil import parser
 from django.core.exceptions import ValidationError
@@ -11,6 +12,8 @@ from manage_breast_screening.notifications.models import (
 )
 from manage_breast_screening.notifications.services.queue import Queue
 
+logger = getLogger(__name__)
+
 
 class Command(BaseCommand):
     """
@@ -19,9 +22,11 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        logger.info("Save Message Status Command started")
         try:
             queue = Queue.MessageStatusUpdates()
             for item in queue.items():
+                logger.debug(f"Processing message status update {item}")
                 payload = json.loads(item.content)
                 self.data = payload["data"][0]
                 message_id = self.data["attributes"]["messageReference"]
@@ -29,8 +34,10 @@ class Command(BaseCommand):
                 self.idempotency_key = self.data["meta"]["idempotencyKey"]
 
                 if self.save_status_update():
+                    logger.info(f"Message status update {item} saved")
                     queue.delete(item)
         except Exception as e:
+            logger.error(e)
             raise CommandError(e)
 
     def save_status_update(self) -> bool:
