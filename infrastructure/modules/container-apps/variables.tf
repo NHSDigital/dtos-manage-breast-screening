@@ -14,6 +14,11 @@ variable "app_short_name" {
   type        = string
 }
 
+variable "allowed_paths" {
+  description = "List of allowed paths for manbrs service. Empty = allow all."
+  type        = list(string)
+}
+
 variable "container_app_environment_id" {
   description = "The ID of the container app environment where container apps are deployed"
   type        = string

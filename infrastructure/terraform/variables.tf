@@ -4,6 +4,12 @@ variable "deploy_infra" {
   default     = true
 }
 
+variable "allowed_paths" {
+  description = "List of allowed paths for manbrs service. Empty = allow all."
+  type        = list(string)
+  default     = null
+}
+
 variable "deploy_container_apps" {
   description = "Deploy the container app to the foundational infra"
   type        = bool
