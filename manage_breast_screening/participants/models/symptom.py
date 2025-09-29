@@ -46,6 +46,8 @@ class Symptom(BaseModel):
     symptom_sub_type = models.ForeignKey(
         SymptomSubType, on_delete=models.PROTECT, null=True, blank=True
     )
+    symptom_sub_type_details = models.CharField(blank=True, null=False)
+
     appointment = models.ForeignKey(Appointment, on_delete=models.PROTECT)
     reported_at = models.DateField()
 
