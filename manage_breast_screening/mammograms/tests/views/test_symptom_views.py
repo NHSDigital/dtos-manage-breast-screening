@@ -8,6 +8,7 @@ from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     Symptom,
     SymptomAreas,
+    SymptomSubType,
 )
 from manage_breast_screening.participants.tests.factories import SymptomFactory
 
@@ -69,7 +70,7 @@ class TestAddLumpView:
                         <ul class="nhsuk-list nhsuk-error-summary__list" role="list">
                             <li><a href="#id_area">Select the location of the lump</a></li>
                             <li><a href="#id_when_started">Select how long the symptom has existed</a></li>
-                            <li><a href="#id_investigated">Select whether the lump has been investigated or not</a></li>
+                            <li><a href="#id_investigated">Select whether the symptom has been investigated or not</a></li>
                         </ul>
                     </div>
                 </div>
@@ -161,6 +162,80 @@ class TestChangeLumpView:
                 </div>
             """,
             response.text,
+        )
+
+
+@pytest.mark.django_db
+class TestAddSkinChangeView:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:add_symptom_skin_change",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:add_symptom_skin_change",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "symptom_sub_type": SymptomSubType.DIMPLES_OR_INDENTATION,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestChangeSkinChangeView:
+    @pytest.fixture
+    def colour_change(self, appointment):
+        return SymptomFactory.create(colour_change=True, appointment=appointment)
+
+    def test_renders_response(self, clinical_user_client, appointment, colour_change):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:change_symptom_skin_change",
+                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment, colour_change
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:change_symptom_skin_change",
+                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "symptom_sub_type": SymptomSubType.COLOUR_CHANGE,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
         )
 
 

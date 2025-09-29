@@ -16,6 +16,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
 )
+from manage_breast_screening.participants.models.symptom import SymptomSubType
 
 from .. import models
 
@@ -141,8 +142,14 @@ class SymptomFactory(DjangoModelFactory):
             symptom_type_id=models.SymptomType.NIPPLE_CHANGE,
         )
 
-        skin_change = Trait(
+        colour_change = Trait(
             symptom_type_id=models.SymptomType.SKIN_CHANGE,
+            symptom_sub_type_id=SymptomSubType.COLOUR_CHANGE,
+        )
+
+        other_skin_change = Trait(
+            symptom_type_id=models.SymptomType.SKIN_CHANGE,
+            symptom_sub_type_id=SymptomSubType.OTHER,
         )
 
         swelling_or_shape_change = Trait(

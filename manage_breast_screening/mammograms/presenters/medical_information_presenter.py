@@ -17,6 +17,7 @@ class PresentedSymptom:
     symptom_type_name: str
     location_line: str
     started_line: str
+    change_type_line: str = ""
     investigated_line: str = ""
     intermittent_line: str = ""
     stopped_line: str = ""
@@ -46,12 +47,25 @@ class PresentedSymptom:
             else ""
         )
 
+        change_type_line = ""
+        if symptom.symptom_type_id == SymptomType.SKIN_CHANGE:
+            if (
+                symptom.symptom_sub_type_id == "OTHER"
+                and symptom.symptom_sub_type_details
+            ):
+                change_type_line = f"Change type: {symptom.symptom_sub_type_details}"
+            else:
+                change_type_line = (
+                    f"Change type: {symptom.symptom_sub_type.name.lower()}"
+                )
+
         return cls(
             id=symptom.id,
             appointment_id=symptom.appointment_id,
             symptom_type_id=symptom.symptom_type_id,
             symptom_type_name=symptom.symptom_type.name,
             location_line=location,
+            change_type_line=change_type_line,
             started_line=started,
             investigated_line=investigated,
             intermittent_line=intermittent,
@@ -65,6 +79,8 @@ class PresentedSymptom:
                 return "mammograms:change_symptom_lump"
             case SymptomType.SWELLING_OR_SHAPE_CHANGE:
                 return "mammograms:change_symptom_swelling_or_shape_change"
+            case SymptomType.SKIN_CHANGE:
+                return "mammograms:change_symptom_skin_change"
             case _:
                 raise ValueError(self.symptom_type_id)
 
@@ -77,6 +93,7 @@ class PresentedSymptom:
             [
                 line
                 for line in [
+                    self.change_type_line,
                     self.location_line,
                     self.started_line,
                     self.investigated_line,
@@ -154,7 +171,24 @@ class MedicalInformationPresenter:
             "href": url,
             "text": (
                 "Add another swelling or shape change"
-                if SymptomType.LUMP in self.existing_symptom_type_ids
+                if SymptomType.SWELLING_OR_SHAPE_CHANGE
+                in self.existing_symptom_type_ids
                 else "Add a swelling or shape change"
+            ),
+        }
+
+    @property
+    def add_skin_change_link(self):
+        url = reverse(
+            "mammograms:add_symptom_skin_change",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": (
+                "Add another skin change"
+                if SymptomType.SKIN_CHANGE in self.existing_symptom_type_ids
+                else "Add a skin change"
             ),
         }
