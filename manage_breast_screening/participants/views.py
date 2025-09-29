@@ -7,7 +7,7 @@ from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
-from manage_breast_screening.participants.services import fetch_current_provider
+from manage_breast_screening.participants.services import fetch_most_recent_provider
 
 from .forms import EthnicityForm, ParticipantReportedMammogramForm
 from .models import Appointment, Participant, ParticipantReportedMammogram
@@ -113,7 +113,7 @@ def edit_ethnicity(request, pk):
 @permission_required(Permission.VIEW_PARTICIPANT_DATA)
 def add_previous_mammogram(request, pk):
     participant = get_object_or_404(Participant, pk=pk)
-    current_provider = fetch_current_provider(pk)
+    most_recent_provider = fetch_most_recent_provider(pk)
     return_url = parse_return_url(
         request, default=reverse("participants:show", kwargs={"pk": pk})
     )
@@ -122,7 +122,7 @@ def add_previous_mammogram(request, pk):
         form = ParticipantReportedMammogramForm(
             data=request.POST,
             participant=participant,
-            current_provider=current_provider,
+            most_recent_provider=most_recent_provider,
         )
         if form.is_valid():
             form.save()
@@ -130,7 +130,7 @@ def add_previous_mammogram(request, pk):
             return redirect(return_url)
     else:
         form = ParticipantReportedMammogramForm(
-            participant=participant, current_provider=current_provider
+            participant=participant, most_recent_provider=most_recent_provider
         )
 
     return render(

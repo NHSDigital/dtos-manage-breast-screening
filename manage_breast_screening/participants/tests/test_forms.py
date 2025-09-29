@@ -120,11 +120,11 @@ class TestParticipantReportedMammogramForm:
         return ParticipantFactory.create(first_name="Jane", last_name="Oldname")
 
     @pytest.fixture
-    def current_provider(self):
+    def most_recent_provider(self):
         return ProviderFactory.create()
 
-    def test_no_choices_selected(self, participant, current_provider):
-        form = ParticipantReportedMammogramForm(participant, current_provider, {})
+    def test_no_choices_selected(self, participant, most_recent_provider):
+        form = ParticipantReportedMammogramForm(participant, most_recent_provider, {})
         assert not form.is_valid()
         assert form.errors == {
             "where_taken": ["This field is required."],
@@ -132,10 +132,10 @@ class TestParticipantReportedMammogramForm:
             "name_is_the_same": ["This field is required."],
         }
 
-    def test_no_details_provided(self, participant, current_provider):
+    def test_no_details_provided(self, participant, most_recent_provider):
         form = ParticipantReportedMammogramForm(
             participant,
-            current_provider,
+            most_recent_provider,
             {
                 "where_taken": ParticipantReportedMammogramForm.WhereTaken.UK.value,
                 "when_taken": "approx",
@@ -151,7 +151,7 @@ class TestParticipantReportedMammogramForm:
             ],
         }
 
-    def test_mammogram_in_same_provider(self, participant, current_provider):
+    def test_mammogram_in_same_provider(self, participant, most_recent_provider):
         data = {
             "where_taken": ParticipantReportedMammogramForm.WhereTaken.SAME_UNIT.value,
             "when_taken": "approx",
@@ -159,17 +159,17 @@ class TestParticipantReportedMammogramForm:
             "approx_date": "5 years ago",
         }
 
-        form = ParticipantReportedMammogramForm(participant, current_provider, data)
+        form = ParticipantReportedMammogramForm(participant, most_recent_provider, data)
         assert form.is_valid(), form.errors
 
         instance = form.save(commit=False)
 
         assert instance.participant == participant
-        assert instance.provider == current_provider
+        assert instance.provider == most_recent_provider
         assert instance.location_type == "NHS_BREAST_SCREENING_UNIT"
         assert instance.location_details == ""
 
-    def test_mammogram_in_uk(self, participant, current_provider):
+    def test_mammogram_in_uk(self, participant, most_recent_provider):
         data = {
             "where_taken": ParticipantReportedMammogramForm.WhereTaken.UK,
             "somewhere_in_the_uk_details": "XYZ provider",
@@ -178,7 +178,7 @@ class TestParticipantReportedMammogramForm:
             "approx_date": "5 years ago",
         }
 
-        form = ParticipantReportedMammogramForm(participant, current_provider, data)
+        form = ParticipantReportedMammogramForm(participant, most_recent_provider, data)
         assert form.is_valid(), form.errors
 
         instance = form.save(commit=False)
@@ -188,7 +188,7 @@ class TestParticipantReportedMammogramForm:
         assert instance.location_type == "ELSEWHERE_UK"
         assert instance.location_details == "XYZ provider"
 
-    def test_mammogram_prefer_not_to_say(self, participant, current_provider):
+    def test_mammogram_prefer_not_to_say(self, participant, most_recent_provider):
         data = {
             "where_taken": ParticipantReportedMammogramForm.WhereTaken.PREFER_NOT_TO_SAY,
             "when_taken": "approx",
@@ -196,7 +196,7 @@ class TestParticipantReportedMammogramForm:
             "approx_date": "5 years ago",
         }
 
-        form = ParticipantReportedMammogramForm(participant, current_provider, data)
+        form = ParticipantReportedMammogramForm(participant, most_recent_provider, data)
         assert form.is_valid(), form.errors
 
         instance = form.save(commit=False)
@@ -205,7 +205,7 @@ class TestParticipantReportedMammogramForm:
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
 
-    def test_full_details(self, participant, current_provider):
+    def test_full_details(self, participant, most_recent_provider):
         data = {
             "where_taken": ParticipantReportedMammogramForm.WhereTaken.UK,
             "somewhere_in_the_uk_details": "XYZ provider",
@@ -216,7 +216,7 @@ class TestParticipantReportedMammogramForm:
             "additional_information": "abcdef",
         }
 
-        form = ParticipantReportedMammogramForm(participant, current_provider, data)
+        form = ParticipantReportedMammogramForm(participant, most_recent_provider, data)
         assert form.is_valid(), form.errors
 
         instance = form.save(commit=False)
@@ -230,7 +230,7 @@ class TestParticipantReportedMammogramForm:
         assert instance.different_name == "Jane Newname"
         assert instance.additional_information == "abcdef"
 
-    def test_invalid_date(self, participant, current_provider, time_machine):
+    def test_invalid_date(self, participant, most_recent_provider, time_machine):
         time_machine.move_to(date(2025, 5, 1))
         data = {
             "where_taken": ParticipantReportedMammogramForm.WhereTaken.UK,
@@ -241,7 +241,7 @@ class TestParticipantReportedMammogramForm:
             "exact_date_1": "12",
             "exact_date_2": "2025",
         }
-        form = ParticipantReportedMammogramForm(participant, current_provider, data)
+        form = ParticipantReportedMammogramForm(participant, most_recent_provider, data)
 
         assert not form.is_valid()
         assert form.errors == {
