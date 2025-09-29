@@ -44,6 +44,7 @@ class TestLumpForm:
                 "area": RightLeftOtherChoices.OTHER,
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
+                "recently_resolved": True,
             }
         )
 
@@ -54,6 +55,7 @@ class TestLumpForm:
             ],
             "specific_date": ["Enter the date the symptom started"],
             "investigation_details": ["Enter details of any investigations"],
+            "when_resolved": ["Enter when the symptom was resolved"],
         }
 
     def test_valid_form_with_conditionally_required_fields(self):
@@ -66,6 +68,8 @@ class TestLumpForm:
                 "specific_date_0": "2",
                 "specific_date_1": "2025",
                 "investigation_details": "def",
+                "recently_resolved": True,
+                "when_resolved": "3 months ago",
             }
         )
         assert form.is_valid()
@@ -191,6 +195,7 @@ class TestSwellingOrShapeChangeForm:
                 "area": RightLeftOtherChoices.OTHER,
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
+                "recently_resolved": True,
             }
         )
 
@@ -201,6 +206,7 @@ class TestSwellingOrShapeChangeForm:
             ],
             "specific_date": ["Enter the date the symptom started"],
             "investigation_details": ["Enter details of any investigations"],
+            "when_resolved": ["Enter when the symptom was resolved"],
         }
 
     def test_valid_form_with_conditionally_required_fields(self):
@@ -213,6 +219,8 @@ class TestSwellingOrShapeChangeForm:
                 "specific_date_0": "2",
                 "specific_date_1": "2025",
                 "investigation_details": "def",
+                "recently_resolved": True,
+                "when_resolved": "3 months ago",
             }
         )
         assert form.is_valid()
