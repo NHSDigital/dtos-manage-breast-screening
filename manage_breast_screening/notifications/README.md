@@ -24,6 +24,7 @@ make test-end-to-end
 ```
 
 This command will:
+
 - Start the required test dependencies (Azurite, MESH sandbox, and NHS Notify API stub)
 - Run the end-to-end test suite
 - Clean up the test environment afterwards
@@ -31,10 +32,12 @@ This command will:
 The e2e tests are located in `manage_breast_screening/notifications/tests/end_to_end/` and test the complete notification flow from data ingestion through to message sending.
 
 **Prerequisites:**
+
 - Docker must be running
 - PostgreSQL database must be available (run `make db` first if needed)
 
 **Troubleshooting:**
+
 - If you get port conflicts, ensure no other MESH sandbox containers are running
 - If you get database connection errors, ensure PostgreSQL is running with `make db`
 
@@ -55,4 +58,3 @@ poetry run pytest manage_breast_screening/notifications/tests/ --ignore manage_b
 ```
 
 This will run only the unit tests for the notifications app, excluding the integration and end-to-end test directories.
-
