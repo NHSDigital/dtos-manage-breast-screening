@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from logging import getLogger
 
 import pandas
 from django.core.management.base import BaseCommand, CommandError
@@ -8,6 +9,8 @@ from django.db import connection
 from manage_breast_screening.notifications.queries.aggregate_query import AggregateQuery
 from manage_breast_screening.notifications.queries.failures_query import FailuresQuery
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
+
+logger = getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -32,6 +35,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        logger.info("Create Report Command started")
         report_type = options.get("report_type", "failures")
         try:
             if report_type == "aggregate":
@@ -51,6 +55,7 @@ class Command(BaseCommand):
                 content_type="text/csv",
                 container_name=os.getenv("REPORTS_CONTAINER_NAME"),
             )
+            logger.info("Report %s created", report_type)
         except Exception as e:
             raise CommandError(e)
 
