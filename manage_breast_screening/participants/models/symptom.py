@@ -15,6 +15,12 @@ class SymptomType(ReferenceDataModel):
 
 
 class SymptomSubType(ReferenceDataModel):
+    SORES_OR_CYSTS = "sores_or_cysts"
+    DIMPLES_OR_INDENTATION = "dimples_or_indentation"
+    RASH = "rash"
+    COLOUR_CHANGE = "colour_change"
+    OTHER = "other"
+
     symptom_type = models.ForeignKey(SymptomType, on_delete=models.CASCADE)
     name = models.CharField(null=False, blank=False)
 
