@@ -78,6 +78,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         user = UserFactory.create(groups=[group])
         UserAssignmentFactory.create(user=user)
 
+        self.current_user = user
         self.login_as_user(user)
 
     def expect_validation_error(

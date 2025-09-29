@@ -31,16 +31,18 @@ class ClinicFilter(StrEnum):
 
 
 class ClinicQuerySet(models.QuerySet):
-    def by_filter(self, filter: str):
+    def by_filter(self, filter: str, provider_id):
+        queryset = self.filter(setting__provider_id=provider_id)
+
         match filter:
             case ClinicFilter.TODAY:
-                return self.today()
+                return queryset.today()
             case ClinicFilter.UPCOMING:
-                return self.upcoming()
+                return queryset.upcoming()
             case ClinicFilter.COMPLETED:
-                return self.completed()
+                return queryset.completed()
             case ClinicFilter.ALL:
-                return self
+                return queryset
             case _:
                 raise ValueError(filter)
 
@@ -121,12 +123,14 @@ class Clinic(BaseModel):
         return {"start_time": self.starts_at, "end_time": self.ends_at}
 
     @classmethod
-    def filter_counts(cls):
+    def filter_counts(cls, provider_id):
+        queryset = cls.objects.filter(setting__provider_id=provider_id)
+
         return {
-            ClinicFilter.ALL: cls.objects.count(),
-            ClinicFilter.TODAY: cls.objects.today().count(),
-            ClinicFilter.UPCOMING: cls.objects.upcoming().count(),
-            ClinicFilter.COMPLETED: cls.objects.completed().count(),
+            ClinicFilter.ALL: queryset.count(),
+            ClinicFilter.TODAY: queryset.today().count(),
+            ClinicFilter.UPCOMING: queryset.upcoming().count(),
+            ClinicFilter.COMPLETED: queryset.completed().count(),
         }
 
     def __str__(self):
