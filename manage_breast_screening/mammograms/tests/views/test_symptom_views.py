@@ -79,7 +79,7 @@ class TestAddLump:
 
 
 @pytest.mark.django_db
-class TestDeleteLump:
+class TestDeleteSymptomView:
     def test_get_renders_response(self, clinical_user_client, appointment, lump):
         response = clinical_user_client.get(
             reverse(

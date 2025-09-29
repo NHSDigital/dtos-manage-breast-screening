@@ -72,7 +72,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
-        symptom_views.DeleteLump.as_view(),
+        symptom_views.DeleteSymptomView.as_view(),
         name="delete_symptom",
     ),
 ]

@@ -139,7 +139,7 @@ class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
     template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
 
 
-class DeleteLump(View):
+class DeleteSymptomView(View):
     def get(self, request, *args, **kwargs):
         symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
 
