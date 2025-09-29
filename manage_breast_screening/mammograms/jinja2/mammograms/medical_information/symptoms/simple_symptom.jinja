@@ -3,7 +3,7 @@
 {% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
 
 {% block form %}
-  {% do form.area.add_divider_after("LEFT", "or") %}
+  {% do form.area.add_divider_after("LEFT_BREAST", "or") %}
   {% do form.area.add_conditional_html(
     'OTHER',
     form.area_description.as_field_group()
@@ -29,6 +29,7 @@
     }
   }) %}
     {{ form.when_started.as_field_group() }}
+    <br>
     {{ form.intermittent.as_field_group() }}
     {{ form.recently_resolved.as_field_group() }}
   {% endcall %}

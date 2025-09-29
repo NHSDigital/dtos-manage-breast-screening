@@ -58,6 +58,7 @@ class CommonFields:
         label="Describe when",
         hint="For example, 3 days ago",
         classes="nhsuk-u-width-two-thirds",
+        error_messages={"required": "Enter when the symptom was resolved"},
     )
     investigated = yes_no_field(
         label="Has this been investigated?",
@@ -205,7 +206,7 @@ class SymptomForm(Form):
         investigation_details = self.cleaned_data.get("investigation_details", "")
         intermittent = self.cleaned_data.get("intermittent", False)
         recently_resolved = self.cleaned_data.get("recently_resolved", False)
-        when_resolved = self.cleaned_data.get("when_resolved")
+        when_resolved = self.cleaned_data.get("when_resolved", "")
         additional_information = self.cleaned_data.get("additional_information", "")
 
         return dict(
@@ -261,6 +262,11 @@ class LumpForm(SymptomForm):
             predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
         )
         self.set_conditionally_required(
+            conditionally_required_field="when_resolved",
+            predicate_field="recently_resolved",
+            predicate_field_value=True,
+        )
+        self.set_conditionally_required(
             conditionally_required_field="investigation_details",
             predicate_field="investigated",
             predicate_field_value=YesNo.YES,
@@ -309,6 +315,11 @@ class SwellingOrShapeChangeForm(SymptomForm):
             conditionally_required_field="specific_date",
             predicate_field="when_started",
             predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="when_resolved",
+            predicate_field="recently_resolved",
+            predicate_field_value=True,
         )
         self.set_conditionally_required(
             conditionally_required_field="investigation_details",
