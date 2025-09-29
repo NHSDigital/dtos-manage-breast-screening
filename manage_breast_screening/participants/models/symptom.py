@@ -5,21 +5,21 @@ from .appointment import Appointment
 
 
 class SymptomType(ReferenceDataModel):
-    LUMP = "lump"
-    SWELLING_OR_SHAPE_CHANGE = "swelling-or-shape-change"
-    SKIN_CHANGE = "skin-change"
-    NIPPLE_CHANGE = "nipple-change"
-    OTHER = "other"
+    LUMP = "LUMP"
+    SWELLING_OR_SHAPE_CHANGE = "SWELLING_OR_SHAPE_CHANGE"
+    SKIN_CHANGE = "SKIN_CHANGE"
+    NIPPLE_CHANGE = "NIPPLE_CHANGE"
+    OTHER = "OTHER"
 
     name = models.CharField(null=False, blank=False)
 
 
 class SymptomSubType(ReferenceDataModel):
-    SORES_OR_CYSTS = "sores_or_cysts"
-    DIMPLES_OR_INDENTATION = "dimples_or_indentation"
-    RASH = "rash"
-    COLOUR_CHANGE = "colour_change"
-    OTHER = "other"
+    SORES_OR_CYSTS = "SORES_OR_CYSTS"
+    DIMPLES_OR_INDENTATION = "DIMPLES_OR_INDENTATION"
+    RASH = "RASH"
+    COLOUR_CHANGE = "COLOUR_CHANGE"
+    OTHER = "OTHER"
 
     symptom_type = models.ForeignKey(SymptomType, on_delete=models.CASCADE)
     name = models.CharField(null=False, blank=False)
