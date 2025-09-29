@@ -5,6 +5,7 @@ import pytest
 import time_machine
 from pytest_django.asserts import assertQuerySetEqual
 
+from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics import models
 
 from .factories import (
@@ -38,37 +39,72 @@ def test_status_filtering():
     assertQuerySetEqual(models.Clinic.objects.completed(), {past}, ordered=False)
 
 
-@pytest.mark.django_db
-def test_user_assignment_creation():
-    assignment = UserAssignmentFactory()
-    assert assignment.user is not None
-    assert assignment.provider is not None
-    assert assignment.pk is not None
+class TestUserAssignment:
+    def test_str(self):
+        user = UserFactory.build(first_name="John", last_name="Doe")
+        provider = ProviderFactory.build(name="Test Provider")
+        assignment = UserAssignmentFactory.build(user=user, provider=provider)
+        assert str(assignment) == "John Doe → Test Provider"
 
-
-@pytest.mark.django_db
-def test_user_assignment_str():
-    user = UserFactory(first_name="John", last_name="Doe")
-    provider = ProviderFactory(name="Test Provider")
-    assignment = UserAssignmentFactory(user=user, provider=provider)
-    assert str(assignment) == "John Doe → Test Provider"
-
-
-@pytest.mark.django_db
-def test_user_assignment_unique_constraint():
-    user = UserFactory()
-    provider = ProviderFactory()
-    UserAssignmentFactory(user=user, provider=provider)
-
-    with pytest.raises(Exception):
+    @pytest.mark.django_db
+    def test_unique_constraint(self):
+        user = UserFactory()
+        provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider)
 
+        with pytest.raises(Exception):
+            UserAssignmentFactory(user=user, provider=provider)
 
-@pytest.mark.django_db
-def test_user_assignment_related_names():
-    user = UserFactory()
-    provider = ProviderFactory()
-    assignment = UserAssignmentFactory(user=user, provider=provider)
+    @pytest.mark.django_db
+    def test_related_names(self):
+        user = UserFactory()
+        provider = ProviderFactory()
+        assignment = UserAssignmentFactory(user=user, provider=provider)
 
-    assert assignment in user.assignments.all()
-    assert assignment in provider.assignments.all()
+        assert assignment in user.assignments.all()
+        assert assignment in provider.assignments.all()
+
+    @pytest.mark.django_db
+    def test_roles_ordering(self):
+        """Test that roles are sorted alphabetically for consistent ordering."""
+        user = UserFactory()
+        provider = ProviderFactory()
+
+        # Create assignment with roles in reverse alphabetical order
+        assignment = UserAssignmentFactory(
+            user=user,
+            provider=provider,
+            roles=[Role.CLINICAL.value, Role.ADMINISTRATIVE.value],
+        )
+
+        assert assignment.roles == [Role.ADMINISTRATIVE.value, Role.CLINICAL.value]
+
+    @pytest.mark.django_db
+    def test_roles_single_role(self):
+        """Test that single role works correctly."""
+        user = UserFactory()
+        provider = ProviderFactory()
+
+        assignment = UserAssignmentFactory(
+            user=user, provider=provider, roles=[Role.CLINICAL.value]
+        )
+
+        assert assignment.roles == [Role.CLINICAL.value]
+
+    @pytest.mark.django_db
+    def test_roles_duplicate_values(self):
+        """Test that duplicate roles are deduplicated and sorted on save."""
+        user = UserFactory()
+        provider = ProviderFactory()
+
+        assignment = UserAssignmentFactory(
+            user=user,
+            provider=provider,
+            roles=[Role.CLINICAL.value, Role.CLINICAL.value, Role.ADMINISTRATIVE.value],
+        )
+
+        # Should be sorted and deduplicated
+        assert assignment.roles == [
+            Role.ADMINISTRATIVE.value,
+            Role.CLINICAL.value,
+        ]
