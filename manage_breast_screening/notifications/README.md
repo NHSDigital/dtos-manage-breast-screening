@@ -51,7 +51,13 @@ make test-integration
 
 ### Unit Tests
 
-To run the notifications unit tests specifically:
+To run the unit tests for all of Manage:
+
+```bash
+make test-unit
+```
+
+If you would rather not install all of the JS dependencies and only want to run the Notifications unit tests specifically:
 
 ```bash
 poetry run pytest manage_breast_screening/notifications/tests/ --ignore manage_breast_screening/notifications/tests/dependencies --ignore manage_breast_screening/notifications/tests/integration --ignore manage_breast_screening/notifications/tests/end_to_end
