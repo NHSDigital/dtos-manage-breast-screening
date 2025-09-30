@@ -111,6 +111,7 @@ class TestParticipantRecord(SystemTestCase):
             kwargs={"pk": self.participant.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Participant")
 
     def and_i_should_see_the_participant_record(self):
         main = self.page.get_by_role("main")

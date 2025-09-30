@@ -30,7 +30,9 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
-        self.and_i_add_a_reason()
+        self.then_i_am_on_the_special_appointment_form()
+
+        self.when_i_add_a_reason()
         self.and_i_select_no_reasons_are_temporary()
         self.and_i_submit_the_form()
         self.then_i_am_back_on_the_appointment()
@@ -158,10 +160,15 @@ class TestEditingSpecialAppointments(SystemTestCase):
         banner = self.page.locator(".nhsuk-warning-callout")
         banner.get_by_text("Change").click()
 
+    def then_i_am_on_the_special_appointment_form(self):
+        self.assert_page_title_contains("Provide special appointment details")
+
     def and_i_add_a_reason(self):
         self.page.get_by_label("Hearing").click()
         self.page.keyboard.press("Tab")
         self.page.locator("*:focus").fill("Deaf in one ear")
+
+    when_i_add_a_reason = and_i_add_a_reason
 
     def and_i_add_another_reason(self):
         self.page.get_by_label("Gender identity").click()

@@ -107,6 +107,9 @@ class SystemTestCase(StaticLiveServerTestCase):
 
         expect(field).to_be_focused()
 
+        title_components = self.page_title_components()
+        assert title_components[0].startswith("Error: "), title_components
+
     def expect_url(self, url, **kwargs):
         path = reverse(url, kwargs=kwargs)
         url = re.compile(f"^{self.live_server_url}{re.escape(path)}$")
@@ -148,3 +151,13 @@ class SystemTestCase(StaticLiveServerTestCase):
             duplicates = {k: v for k, v in counter.items() if v > 1}
 
             self.assertEqual(len(duplicates), 0, duplicates)
+
+    def page_title_components(self):
+        return self.page.title().split(" – ")
+
+    def assert_page_title_contains(self, component):
+        components = self.page_title_components()
+
+        assert components[-1] == "NHS", components
+        assert components[-2] == "Manage breast screening", components
+        assert components[-3] == component, components

@@ -92,6 +92,7 @@ class TestRecordingSymptoms(SystemTestCase):
 
     def then_i_see_the_add_a_lump_form(self):
         expect(self.page.get_by_text("Details of the lump")).to_be_visible()
+        self.assert_page_title_contains("Details of the lump")
 
     def when_i_select_right_breast(self):
         self.page.get_by_label("Right breast").click()

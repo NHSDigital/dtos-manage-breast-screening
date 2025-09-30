@@ -51,6 +51,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
                 kwargs={"pk": self.appointment.pk},
             )
         )
+        self.assert_page_title_contains("Appointment cannot go ahead")
 
     def when_i_submit_the_form(self):
         self.page.get_by_role("button", name="Continue").click()

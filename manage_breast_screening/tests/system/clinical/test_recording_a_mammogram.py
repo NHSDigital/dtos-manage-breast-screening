@@ -121,6 +121,7 @@ class TestRecordingAMammogram(SystemTestCase):
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Medical information")
 
     def then_i_should_be_on_the_record_medical_information_page(self):
         path = reverse(
@@ -128,6 +129,7 @@ class TestRecordingAMammogram(SystemTestCase):
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Record medical information")
 
     def and_i_should_be_prompted_to_ask_about_relevant_medical_information(self):
         expect(
@@ -156,6 +158,7 @@ class TestRecordingAMammogram(SystemTestCase):
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Awaiting images")
 
     def then_i_am_prompted_to_answer_can_the_screening_go_ahead(self):
         self.expect_validation_error(
