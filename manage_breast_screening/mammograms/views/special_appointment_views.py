@@ -37,6 +37,7 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
                     "text": "Back to appointment",
                 },
                 "caption": self.participant.full_name,
+                "page_title": "Provide special appointment details",
                 "heading": "Provide special appointment details",
             },
         )
@@ -91,6 +92,7 @@ class MarkReasonsTemporary(AppointmentMixin, FormView):
                     "text": "Back",
                 },
                 "caption": self.participant.full_name,
+                "page_title": "Which of these reasons are temporary?",
                 "heading": "Which of these reasons are temporary?",
             },
         )

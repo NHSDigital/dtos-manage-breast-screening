@@ -24,7 +24,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_i_am_viewing_an_appointment()
         self.when_i_click_on_enter_ethnicity_details()
-        self.then_i_should_be_on_the_ethnicity_details_form()
+        self.then_i_am_on_the_ethnicity_details_form()
 
         self.when_i_submit_the_form()
         self.then_i_see_an_error()
@@ -35,7 +35,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.and_the_ethnicity_is_updated_to("Asian or Asian British (Chinese)")
 
         self.when_i_click_the_change_ethnicity_link()
-        self.then_i_should_be_on_the_ethnicity_details_form()
+        self.then_i_am_on_the_ethnicity_details_form()
         self.and_the_saved_ethnicity_is_selected("Chinese")
         self.when_i_select_an_ethnicity("Any other White background")
         self.and_i_submit_the_form()
@@ -52,7 +52,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_i_am_viewing_an_appointment()
         self.when_i_click_on_enter_ethnicity_details()
-        self.then_i_should_be_on_the_ethnicity_details_form()
+        self.then_i_am_on_the_ethnicity_details_form()
 
         self.when_i_select_an_ethnicity("Any other White background")
         self.and_i_enter_an_ethnicity_description_provided_by_the_participant(
@@ -83,7 +83,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
     def when_i_click_on_enter_ethnicity_details(self):
         self.page.get_by_role("link", name="Enter ethnicity details").click()
 
-    def then_i_should_be_on_the_ethnicity_details_form(self):
+    def then_i_am_on_the_ethnicity_details_form(self):
         expect(self.page).to_have_url(
             re.compile(
                 reverse(
@@ -92,6 +92,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
                 )
             )
         )
+        self.assert_page_title_contains("Ethnicity")
 
     def when_i_submit_the_form(self):
         self.page.get_by_role("button", name="Save and continue").click()

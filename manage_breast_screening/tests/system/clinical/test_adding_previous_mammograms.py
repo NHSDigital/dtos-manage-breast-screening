@@ -95,6 +95,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
             kwargs={"pk": self.participant.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Add details of a previous mammogram")
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(

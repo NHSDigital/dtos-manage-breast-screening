@@ -5,6 +5,7 @@ import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.clinics.models import Clinic
 from manage_breast_screening.clinics.tests.factories import ClinicFactory
 from manage_breast_screening.core.utils.date_formatting import format_date, format_time
 from manage_breast_screening.core.utils.string_formatting import (
@@ -66,6 +67,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             starts_at=self.clinic_start_time,
             setting__name="West London BSS",
             setting__provider=user_assignment.provider,
+            risk_type=Clinic.RiskType.ROUTINE_RISK,
         )
 
     def and_there_are_appointments(self):
@@ -100,12 +102,14 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
     def and_i_am_on_the_clinic_list(self):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
+        self.assert_page_title_contains("Today’s clinics")
 
     def and_i_am_on_the_clinic_show_page(self):
         self.page.goto(
             self.live_server_url
             + reverse("clinics:show", kwargs={"pk": self.clinic.pk})
         )
+        self.assert_page_title_contains("Routine risk screening clinic")
 
     def when_i_click_on_the_clinic(self):
         self.page.get_by_role("link", name="West London BSS").click()
