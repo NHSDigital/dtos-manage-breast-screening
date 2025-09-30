@@ -24,6 +24,7 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 class TestEndToEnd:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
+        monkeypatch.setenv("DJANGO_ENV", "test")
         monkeypatch.setenv("NBSS_MESH_HOST", "http://localhost:8700")
         monkeypatch.setenv("NBSS_MESH_PASSWORD", "password")
         monkeypatch.setenv("NBSS_MESH_SHARED_KEY", "TestKey")

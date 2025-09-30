@@ -1,19 +1,17 @@
 import os
 from tempfile import NamedTemporaryFile
 
-from mesh_client import MeshClient, Message
+from mesh_client import INT_ENDPOINT, LIVE_ENDPOINT, Endpoint, MeshClient, Message
 
 
 class MeshInbox:
     def __init__(self):
-        cert_file, private_key_file, ca_cert_file = self.ssl_credentials()
+        cert_file, private_key_file = self.ssl_credentials()
         self.client = MeshClient(
-            url=os.getenv("NBSS_MESH_HOST"),
+            self.endpoint_for_env(),
             mailbox=os.getenv("NBSS_MESH_INBOX_NAME"),
             password=os.getenv("NBSS_MESH_PASSWORD"),
-            shared_key=os.getenv("NBSS_MESH_SHARED_KEY"),
             cert=(cert_file, private_key_file),
-            verify=ca_cert_file,
         )
         self.client.handshake()
 
@@ -26,6 +24,15 @@ class MeshInbox:
     def acknowledge(self, message_id: str):
         self.client.acknowledge_message(message_id)
 
+    def endpoint_for_env(self) -> Endpoint:
+        current_environment = os.getenv("DJANGO_ENV", "dev")
+        if current_environment == "production":
+            return LIVE_ENDPOINT
+        elif current_environment == "test":
+            return Endpoint(os.getenv("NBSS_MESH_HOST"), None, None, False, False)
+        else:
+            return INT_ENDPOINT
+
     def __enter__(self):
         return self
 
@@ -36,12 +43,10 @@ class MeshInbox:
     def ssl_credentials(cls) -> tuple[NamedTemporaryFile]:
         cert = os.getenv("NBSS_MESH_CERT")
         private_key = os.getenv("NBSS_MESH_PRIVATE_KEY")
-        ca_cert = os.getenv("NBSS_MESH_CA_CERT")
 
         return (
             cls.to_file(cert).name,
             cls.to_file(private_key).name,
-            cls.to_file(ca_cert).name,
         )
 
     @staticmethod
