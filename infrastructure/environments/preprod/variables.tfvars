@@ -11,15 +11,5 @@ vnet_address_space                    = "10.10.0.0/16"
 nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"
 seed_demo_data                        = false
 allowed_paths                         = ["/notifications/message-status/create"]
-monitor_action_group = {
-  action_group_1 = {
-    short_name = "group1"
-    email_receiver = {
-      alert_team = {
-        name                    = "email1"
-        email_address           = "alert_team@testing.com"
-        use_common_alert_schema = false
-      }
-    }
-  }
-}
+enable_monitoring                     = true
+monitoring_email_address              = "test@email.com"

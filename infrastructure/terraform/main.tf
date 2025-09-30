@@ -37,7 +37,6 @@ module "container-apps" {
   }
 
   region                                = local.region
-  # action_group_id                       = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
   action_group_id                       = var.deploy_infra ? values(module.infra[0].monitor_action_group_id)[0] : data.azurerm_monitor_action_group.main[0].id
   alert_window_size                     = var.alert_window_size
   enable_monitoring                     = var.enable_monitoring

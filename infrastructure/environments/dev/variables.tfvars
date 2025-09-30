@@ -9,16 +9,4 @@ protect_keyvault                      = false
 vnet_address_space                    = "10.128.0.0/16"
 seed_demo_data                        = true
 nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"
-
-monitor_action_group = {
-  action_group_1 = {
-    short_name = "group1"
-    email_receiver = {
-      alert_team = {
-        name                    = "email1"
-        email_address           = "alert_team@testing.com"
-        use_common_alert_schema = false
-      }
-    }
-  }
-}
+monitoring_email_address              = "test@email.com"
