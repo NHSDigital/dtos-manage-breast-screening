@@ -97,12 +97,47 @@ class CIS2Client:
             else:
                 raise Exception(f"Failed to create config: {e}")
 
+    def update_config(
+        self,
+        team_id: str,
+        config_id: str,
+        client_config: Dict[str, Any],
+        config_hash: str,
+    ) -> Dict[str, Any]:
+        """Update an existing config for the specified team."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}/{config_id}"
+
+        # Add hash as query parameter
+        params = {"hash": config_hash}
+
+        try:
+            response = self.session.put(url, params=params, json=client_config)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            # For HTTP errors, try to get detailed error information from response
+            if hasattr(e, "response") and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    raise Exception(
+                        f"Failed to update config (HTTP {e.response.status_code}): {json.dumps(error_detail, indent=2)}"
+                    )
+                except (ValueError, json.JSONDecodeError):
+                    # If response isn't JSON, show the raw text
+                    raise Exception(
+                        f"Failed to update config (HTTP {e.response.status_code}): {e.response.text}"
+                    )
+            else:
+                raise Exception(f"Failed to update config: {e}")
+
 
 class CIS2CLI:
     """Command-line interface for the CIS2 Connection Manager."""
 
     def __init__(self):
         self.client = CIS2Client()
+        self.last_config_hash: Optional[str] = None
+        self.last_config_id: Optional[str] = None
 
     def setup_credentials(self):
         """Prompt user for secret and team ID, then authenticate."""
@@ -163,7 +198,9 @@ class CIS2CLI:
         print("Available options:")
         print("1. Create new configuration")
         print("2. Display specific configuration")
-        print("3. Quit")
+        print("3. Update existing configuration")
+        print("4. Re-authenticate")
+        print("5. Quit")
         print()
 
     def display_config(self):
@@ -209,6 +246,12 @@ class CIS2CLI:
             # Fetch and display the selected configuration
             print(f"Fetching config '{selected_config_id}'...")
             config = self.client.get_config(self.client.team_id, selected_config_id)
+
+            # Store config hash and ID for future updates
+            if isinstance(config, dict) and "hash" in config:
+                self.last_config_hash = config["hash"]
+                self.last_config_id = selected_config_id
+                print(f"✓ Cached hash for updates: {self.last_config_hash[:8]}...")
 
             print(f"\nConfiguration Details for '{selected_config_id}':")
             print("=" * 40)
@@ -299,6 +342,85 @@ class CIS2CLI:
         except Exception as e:
             print(f"✗ Error creating config: {e}")
 
+    def update_config(self):
+        """Update an existing configuration."""
+        # Check if we have a cached hash from displaying a config
+        if not self.last_config_hash or not self.last_config_id:
+            print("Error: No config hash available for update.")
+            print("Please display a configuration first to cache its hash.")
+            return
+
+        try:
+            print("Update existing configuration")
+            print("-" * 30)
+            print(f"Config: {self.last_config_id}")
+            print(f"Hash: {self.last_config_hash[:8]}...")
+            print()
+
+            print("Enter the new client_config as JSON:")
+            print(
+                "(You can paste a multi-line JSON object. Press Enter on an empty line when done)"
+            )
+
+            json_lines = []
+            while True:
+                line = input()
+                if line.strip() == "":
+                    break
+                json_lines.append(line)
+
+            if not json_lines:
+                print("Error: JSON payload is required")
+                return
+
+            json_text = "\n".join(json_lines)
+
+            # Parse the JSON to validate it
+            try:
+                client_config = json.loads(json_text)
+            except json.JSONDecodeError as e:
+                print(f"Error: Invalid JSON format - {e}")
+                return
+
+            print(
+                f"Updating config '{self.last_config_id}' for team {self.client.team_id}..."
+            )
+            print("Payload:")
+            print(json.dumps(client_config, indent=2))
+            print()
+
+            result = self.client.update_config(
+                self.client.team_id,
+                self.last_config_id,
+                client_config,
+                self.last_config_hash,
+            )
+
+            print("✓ Config updated")
+            print(json.dumps(result, indent=2))
+
+            # Update the cached hash if provided in response
+            if isinstance(result, dict) and "hash" in result:
+                self.last_config_hash = result["hash"]
+                print(f"✓ Cached new hash: {self.last_config_hash[:8]}...")
+
+        except Exception as e:
+            print(f"✗ Error updating config: {e}")
+
+    def re_authenticate(self):
+        """Re-authenticate with a new secret."""
+        secret = getpass.getpass("Enter your API secret: ")
+        if not secret:
+            print("Error: Secret is required")
+            return
+
+        try:
+            print("Re-authenticating with CIS2...")
+            self.client.authenticate(secret)
+            print("✓ Re-authenticated")
+        except Exception as e:
+            print(f"✗ Re-authentication failed: {e}")
+
     def run(self):
         """Run the CLI application."""
         # Initial setup
@@ -309,7 +431,7 @@ class CIS2CLI:
             self.show_menu()
 
             try:
-                choice = input("Enter your choice (1-3): ").strip()
+                choice = input("Enter your choice (1-5): ").strip()
                 print()
 
                 if choice == "1":
@@ -317,10 +439,14 @@ class CIS2CLI:
                 elif choice == "2":
                     self.display_config()
                 elif choice == "3":
+                    self.update_config()
+                elif choice == "4":
+                    self.re_authenticate()
+                elif choice == "5":
                     print("Goodbye!")
                     break
                 else:
-                    print("Invalid choice. Please enter 1-3.")
+                    print("Invalid choice. Please enter 1-5.")
 
                 print()
 
