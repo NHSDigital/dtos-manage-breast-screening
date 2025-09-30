@@ -1,3 +1,4 @@
+alert_window_size                     = "PT15M"
 api_oauth_token_url                   = "https://int.api.service.nhs.uk/oauth2/token"
 dns_zone_name                         = "manage-breast-screening.screening.nhs.uk"
 enable_auth                           = false
@@ -11,3 +12,5 @@ vnet_address_space                    = "10.10.0.0/16"
 nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"
 seed_demo_data                        = false
 allowed_paths                         = ["/notifications/message-status/create"]
+enable_monitoring                     = true
+monitoring_email_address              = "test@email.com"

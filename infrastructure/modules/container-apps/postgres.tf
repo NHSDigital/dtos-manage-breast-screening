@@ -45,6 +45,11 @@ module "postgres" {
     private_service_connection_is_manual = false
   }
 
+  # alerts
+  action_group_id   = var.action_group_id
+  enable_monitoring = var.enable_monitoring
+
+
   databases = {
     db1 = {
       collation   = "en_US.utf8"
