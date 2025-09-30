@@ -134,28 +134,56 @@ class CIS2Client:
 class CIS2CLI:
     """Command-line interface for the CIS2 Connection Manager."""
 
+    # ANSI color codes
+    BLUE = "\033[94m"
+    WHITE = "\033[97m"
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    RESET = "\033[0m"
+
     def __init__(self):
         self.client = CIS2Client()
         self.last_config_hash: Optional[str] = None
         self.last_config_id: Optional[str] = None
+
+    def show_banner(self):
+        """Display the CLI tool banner."""
+        print(
+            f"""
+{self.BLUE}    ╔═══════════════════════════════════════════════════════════════╗
+    ║                                                               ║
+    ║{self.WHITE}    ███    ██ ██   ██ ███████     ██████ ██ ███████ ██████{self.BLUE}     ║
+    ║{self.WHITE}    ████   ██ ██   ██ ██         ██      ██ ██           ██{self.BLUE}    ║
+    ║{self.WHITE}    ██ ██  ██ ███████ ███████    ██      ██ ███████  █████{self.BLUE}     ║
+    ║{self.WHITE}    ██  ██ ██ ██   ██      ██    ██      ██      ██ ██{self.BLUE}         ║
+    ║{self.WHITE}    ██   ████ ██   ██ ███████     ██████ ██ ███████ ███████{self.BLUE}    ║
+    ║                                                               ║
+    ║{self.WHITE}                Connection Manager CLI Tool                    {self.BLUE}║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝{self.RESET}
+        """
+        )
+        print("=" * 40)
 
     def setup_credentials(self):
         """Prompt user for secret and team ID, then authenticate."""
         # Get secret
         secret = getpass.getpass("Enter your API secret: ")
         if not secret:
-            print("Error: Secret is required")
+            print(f"{self.RED}Error: Secret is required{self.RESET}")
             sys.exit(1)
 
         # Authenticate
         try:
-            print("Authenticating with CIS2...")
+            print(f"{self.BLUE}Authenticating with CIS2...{self.RESET}")
             auth_result = self.client.authenticate(secret)
-            print("✓ Authentication successful")
+            print(f"{self.GREEN}✓ Authenticated{self.RESET}")
 
             # Handle team ID selection
             if "team_ids" not in auth_result or not auth_result["team_ids"]:
-                print("✗ Error: No team IDs available for this account")
+                print(
+                    f"{self.RED}✗ Error: No team IDs available for this account{self.RESET}"
+                )
                 print(
                     "Please contact your administrator to ensure your account has team access."
                 )
@@ -175,7 +203,9 @@ class CIS2CLI:
                     if 1 <= choice_num <= len(team_ids):
                         selected_team_id = team_ids[choice_num - 1]
                         self.client.team_id = selected_team_id
-                        print(f"✓ Team ID set to: {selected_team_id}")
+                        print(
+                            f"{self.GREEN}✓ Team ID set to: {selected_team_id}{self.RESET}"
+                        )
                         break
                     else:
                         print(
@@ -188,7 +218,7 @@ class CIS2CLI:
                     sys.exit(1)
 
         except Exception as e:
-            print(f"✗ Authentication failed: {e}")
+            print(f"{self.RED}✗ Authentication failed: {e}{self.RESET}")
             sys.exit(1)
 
         print()
@@ -207,14 +237,18 @@ class CIS2CLI:
         """Display details of a specific configuration."""
         try:
             # First, get the list of available configurations
-            print(f"Fetching configs for team {self.client.team_id}...")
+            print(
+                f"{self.BLUE}Fetching configs for team {self.client.team_id}...{self.RESET}"
+            )
             configs_response = self.client.get_configs(self.client.team_id)
 
             # Extract config IDs from the response
             config_ids = configs_response.get("configs", [])
 
             if not config_ids:
-                print("✗ Error: No configurations available for this team")
+                print(
+                    f"{self.RED}✗ Error: No configurations available for this team{self.RESET}"
+                )
                 return
 
             # Show numbered menu for selection
@@ -244,21 +278,23 @@ class CIS2CLI:
                     return
 
             # Fetch and display the selected configuration
-            print(f"Fetching config '{selected_config_id}'...")
+            print(f"{self.BLUE}Fetching config '{selected_config_id}'...{self.RESET}")
             config = self.client.get_config(self.client.team_id, selected_config_id)
 
             # Store config hash and ID for future updates
             if isinstance(config, dict) and "hash" in config:
                 self.last_config_hash = config["hash"]
                 self.last_config_id = selected_config_id
-                print(f"✓ Cached hash for updates: {self.last_config_hash[:8]}...")
+                print(
+                    f"{self.GREEN}✓ Cached hash for updates: {self.last_config_hash[:8]}...{self.RESET}"
+                )
 
             print(f"\nConfiguration Details for '{selected_config_id}':")
             print("=" * 40)
             print(json.dumps(config, indent=2))
 
         except Exception as e:
-            print(f"✗ Error displaying config: {e}")
+            print(f"{self.RED}✗ Error displaying config: {e}{self.RESET}")
 
     def create_config(self):
         """Create a new configuration."""
@@ -268,14 +304,16 @@ class CIS2CLI:
 
             client_name = input("Enter client name: ").strip()
             if not client_name:
-                print("Error: Client name is required")
+                print(f"{self.RED}Error: Client name is required{self.RESET}")
                 return
 
             redirect_uris_input = input(
                 "Enter redirect URIs (comma-separated): "
             ).strip()
             if not redirect_uris_input:
-                print("Error: At least one redirect URI is required")
+                print(
+                    f"{self.RED}Error: At least one redirect URI is required{self.RESET}"
+                )
                 return
 
             redirect_uris = [uri.strip() for uri in redirect_uris_input.split(",")]
@@ -304,7 +342,9 @@ class CIS2CLI:
                     "Enter JWKS URI (required for private_key_jwt): "
                 ).strip()
                 if not jwks_uri:
-                    print("Error: JWKS URI is required when using private_key_jwt")
+                    print(
+                        f"{self.RED}Error: JWKS URI is required when using private_key_jwt{self.RESET}"
+                    )
                     return
 
                 jwks_uri_signing_algorithm = (
@@ -329,32 +369,34 @@ class CIS2CLI:
                 payload["jwks_uri_signing_algorithm"] = jwks_uri_signing_algorithm
 
             print()
-            print(f"Creating config for team {self.client.team_id}...")
-            print("Payload:")
+            print(
+                f"{self.BLUE}Creating config for team {self.client.team_id}...{self.RESET}"
+            )
+            print(f"{self.BLUE}Payload:{self.RESET}")
             print(json.dumps(payload, indent=2))
             print()
 
             result = self.client.create_config(self.client.team_id, payload)
 
-            print("✓ Config created")
+            print(f"{self.GREEN}✓ Config created{self.RESET}")
             print(json.dumps(result, indent=2))
 
         except Exception as e:
-            print(f"✗ Error creating config: {e}")
+            print(f"{self.RED}✗ Error creating config: {e}{self.RESET}")
 
     def update_config(self):
         """Update an existing configuration."""
         # Check if we have a cached hash from displaying a config
         if not self.last_config_hash or not self.last_config_id:
-            print("Error: No config hash available for update.")
+            print(f"{self.RED}Error: No config hash available for update.{self.RESET}")
             print("Please display a configuration first to cache its hash.")
             return
 
         try:
             print("Update existing configuration")
             print("-" * 30)
-            print(f"Config: {self.last_config_id}")
-            print(f"Hash: {self.last_config_hash[:8]}...")
+            print(f"{self.BLUE}Config: {self.last_config_id}{self.RESET}")
+            print(f"{self.BLUE}Hash: {self.last_config_hash[:8]}...{self.RESET}")
             print()
 
             print("Enter the new client_config as JSON:")
@@ -370,7 +412,7 @@ class CIS2CLI:
                 json_lines.append(line)
 
             if not json_lines:
-                print("Error: JSON payload is required")
+                print(f"{self.RED}Error: JSON payload is required{self.RESET}")
                 return
 
             json_text = "\n".join(json_lines)
@@ -379,13 +421,13 @@ class CIS2CLI:
             try:
                 client_config = json.loads(json_text)
             except json.JSONDecodeError as e:
-                print(f"Error: Invalid JSON format - {e}")
+                print(f"{self.RED}Error: Invalid JSON format - {e}{self.RESET}")
                 return
 
             print(
-                f"Updating config '{self.last_config_id}' for team {self.client.team_id}..."
+                f"{self.BLUE}Updating config '{self.last_config_id}' for team {self.client.team_id}...{self.RESET}"
             )
-            print("Payload:")
+            print(f"{self.BLUE}Payload:{self.RESET}")
             print(json.dumps(client_config, indent=2))
             print()
 
@@ -396,33 +438,36 @@ class CIS2CLI:
                 self.last_config_hash,
             )
 
-            print("✓ Config updated")
+            print(f"{self.GREEN}✓ Config updated{self.RESET}")
             print(json.dumps(result, indent=2))
 
             # Update the cached hash if provided in response
             if isinstance(result, dict) and "hash" in result:
                 self.last_config_hash = result["hash"]
-                print(f"✓ Cached new hash: {self.last_config_hash[:8]}...")
+                print(
+                    f"{self.GREEN}✓ Cached new hash: {self.last_config_hash[:8]}...{self.RESET}"
+                )
 
         except Exception as e:
-            print(f"✗ Error updating config: {e}")
+            print(f"{self.RED}✗ Error updating config: {e}{self.RESET}")
 
     def re_authenticate(self):
         """Re-authenticate with a new secret."""
         secret = getpass.getpass("Enter your API secret: ")
         if not secret:
-            print("Error: Secret is required")
+            print(f"{self.RED}Error: Secret is required{self.RESET}")
             return
 
         try:
-            print("Re-authenticating with CIS2...")
+            print(f"{self.BLUE}Re-authenticating with CIS2...{self.RESET}")
             self.client.authenticate(secret)
-            print("✓ Re-authenticated")
+            print(f"{self.GREEN}✓ Re-authenticated{self.RESET}")
         except Exception as e:
-            print(f"✗ Re-authentication failed: {e}")
+            print(f"{self.RED}✗ Re-authentication failed: {e}{self.RESET}")
 
     def run(self):
         """Run the CLI application."""
+        self.show_banner()
         # Initial setup
         self.setup_credentials()
 
