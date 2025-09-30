@@ -73,6 +73,30 @@ class CIS2Client:
         except requests.exceptions.RequestException as e:
             raise Exception(f"Failed to get config: {e}")
 
+    def create_config(self, team_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new config with full payload support."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}"
+
+        try:
+            response = self.session.post(url, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            # For HTTP errors, try to get detailed error information from response
+            if hasattr(e, "response") and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    raise Exception(
+                        f"Failed to create config (HTTP {e.response.status_code}): {json.dumps(error_detail, indent=2)}"
+                    )
+                except (ValueError, json.JSONDecodeError):
+                    # If response isn't JSON, show the raw text
+                    raise Exception(
+                        f"Failed to create config (HTTP {e.response.status_code}): {e.response.text}"
+                    )
+            else:
+                raise Exception(f"Failed to create config: {e}")
+
 
 class CIS2CLI:
     """Command-line interface for the CIS2 Connection Manager."""
@@ -137,8 +161,9 @@ class CIS2CLI:
     def show_menu(self):
         """Display the main menu options."""
         print("Available options:")
-        print("1. Display specific configuration")
-        print("2. Quit")
+        print("1. Create new configuration")
+        print("2. Display specific configuration")
+        print("3. Quit")
         print()
 
     def display_config(self):
@@ -192,6 +217,88 @@ class CIS2CLI:
         except Exception as e:
             print(f"✗ Error displaying config: {e}")
 
+    def create_config(self):
+        """Create a new configuration."""
+        try:
+            print("Create new configuration")
+            print("-" * 25)
+
+            client_name = input("Enter client name: ").strip()
+            if not client_name:
+                print("Error: Client name is required")
+                return
+
+            redirect_uris_input = input(
+                "Enter redirect URIs (comma-separated): "
+            ).strip()
+            if not redirect_uris_input:
+                print("Error: At least one redirect URI is required")
+                return
+
+            redirect_uris = [uri.strip() for uri in redirect_uris_input.split(",")]
+
+            # Get optional fields
+            description = input("Enter description (optional): ").strip() or None
+
+            backchannel_logout_uri = (
+                input("Enter backchannel logout URI (optional): ").strip() or None
+            )
+
+            print("\nAuthentication method:")
+            print("1. client_secret_post (default)")
+            print("2. private_key_jwt")
+            auth_choice = (
+                input("Choose authentication method (1-2, default 1): ").strip() or "1"
+            )
+
+            token_endpoint_auth_method = "client_secret_post"
+            jwks_uri = None
+            jwks_uri_signing_algorithm = None
+
+            if auth_choice == "2":
+                token_endpoint_auth_method = "private_key_jwt"
+                jwks_uri = input(
+                    "Enter JWKS URI (required for private_key_jwt): "
+                ).strip()
+                if not jwks_uri:
+                    print("Error: JWKS URI is required when using private_key_jwt")
+                    return
+
+                jwks_uri_signing_algorithm = (
+                    input("Enter JWKS URI signing algorithm (e.g., RS512): ").strip()
+                    or None
+                )
+
+            # Build payload with only non-None values
+            payload = {
+                "client_name": client_name,
+                "redirect_uris": redirect_uris,
+                "token_endpoint_auth_method": token_endpoint_auth_method,
+            }
+
+            if description:
+                payload["description"] = description
+            if backchannel_logout_uri:
+                payload["backchannel_logout_uri"] = backchannel_logout_uri
+            if jwks_uri:
+                payload["jwks_uri"] = jwks_uri
+            if jwks_uri_signing_algorithm:
+                payload["jwks_uri_signing_algorithm"] = jwks_uri_signing_algorithm
+
+            print()
+            print(f"Creating config for team {self.client.team_id}...")
+            print("Payload:")
+            print(json.dumps(payload, indent=2))
+            print()
+
+            result = self.client.create_config(self.client.team_id, payload)
+
+            print("✓ Config created")
+            print(json.dumps(result, indent=2))
+
+        except Exception as e:
+            print(f"✗ Error creating config: {e}")
+
     def run(self):
         """Run the CLI application."""
         # Initial setup
@@ -202,16 +309,18 @@ class CIS2CLI:
             self.show_menu()
 
             try:
-                choice = input("Enter your choice (1-2): ").strip()
+                choice = input("Enter your choice (1-3): ").strip()
                 print()
 
                 if choice == "1":
-                    self.display_config()
+                    self.create_config()
                 elif choice == "2":
+                    self.display_config()
+                elif choice == "3":
                     print("Goodbye!")
                     break
                 else:
-                    print("Invalid choice. Please enter 1-2.")
+                    print("Invalid choice. Please enter 1-3.")
 
                 print()
 
