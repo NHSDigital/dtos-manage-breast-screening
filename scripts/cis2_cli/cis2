@@ -7,6 +7,7 @@ Supports authentication and configuration management operations.
 """
 
 import getpass
+import json
 import sys
 from typing import Any, Dict, Optional
 
@@ -49,6 +50,28 @@ class CIS2Client:
             return auth_data
         except requests.exceptions.RequestException as e:
             raise Exception(f"Authentication failed: {e}")
+
+    def get_configs(self, team_id: str) -> Dict[str, Any]:
+        """Get list of configs for the specified team."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}"
+
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Failed to get configs: {e}")
+
+    def get_config(self, team_id: str, config_id: str) -> Dict[str, Any]:
+        """Get a specific config by ID for the specified team."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}/{config_id}"
+
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Failed to get config: {e}")
 
 
 class CIS2CLI:
@@ -114,8 +137,60 @@ class CIS2CLI:
     def show_menu(self):
         """Display the main menu options."""
         print("Available options:")
-        print("1. Quit")
+        print("1. Display specific configuration")
+        print("2. Quit")
         print()
+
+    def display_config(self):
+        """Display details of a specific configuration."""
+        try:
+            # First, get the list of available configurations
+            print(f"Fetching configs for team {self.client.team_id}...")
+            configs_response = self.client.get_configs(self.client.team_id)
+
+            # Extract config IDs from the response
+            config_ids = configs_response.get("configs", [])
+
+            if not config_ids:
+                print("✗ Error: No configurations available for this team")
+                return
+
+            # Show numbered menu for selection
+            print("\nAvailable configurations:")
+            for i, config_id in enumerate(config_ids, 1):
+                print(f"{i}. {config_id}")
+
+            while True:
+                try:
+                    choice = input(
+                        f"Select configuration (1-{len(config_ids)}): "
+                    ).strip()
+                    choice_num = int(choice)
+
+                    if 1 <= choice_num <= len(config_ids):
+                        selected_config_id = config_ids[choice_num - 1]
+                        print()
+                        break
+                    else:
+                        print(
+                            f"Invalid choice. Please enter a number between 1 and {len(config_ids)}."
+                        )
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+                except KeyboardInterrupt:
+                    print("\nOperation cancelled.")
+                    return
+
+            # Fetch and display the selected configuration
+            print(f"Fetching config '{selected_config_id}'...")
+            config = self.client.get_config(self.client.team_id, selected_config_id)
+
+            print(f"\nConfiguration Details for '{selected_config_id}':")
+            print("=" * 40)
+            print(json.dumps(config, indent=2))
+
+        except Exception as e:
+            print(f"✗ Error displaying config: {e}")
 
     def run(self):
         """Run the CLI application."""
@@ -127,14 +202,16 @@ class CIS2CLI:
             self.show_menu()
 
             try:
-                choice = input("Enter your choice (1): ").strip()
+                choice = input("Enter your choice (1-2): ").strip()
                 print()
 
                 if choice == "1":
+                    self.display_config()
+                elif choice == "2":
                     print("Goodbye!")
                     break
                 else:
-                    print("Invalid choice. Please enter 1.")
+                    print("Invalid choice. Please enter 1-2.")
 
                 print()
 
