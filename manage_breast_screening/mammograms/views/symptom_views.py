@@ -45,6 +45,7 @@ class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
                 "back_link_params": self.get_back_link_params(),
                 "caption": participant.full_name,
                 "heading": f"Details of the {self.symptom_type_name}",
+                "page_title": f"Details of the {self.symptom_type_name}",
             },
         )
 
@@ -143,6 +144,7 @@ class DeleteLump(View):
         symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
 
         context = {
+            "page_title": "Are you sure you want to delete this symptom?",
             "heading": "Are you sure you want to delete this symptom?",
             "confirm_action": {
                 "text": "Delete symptom",
