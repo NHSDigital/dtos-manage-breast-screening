@@ -30,6 +30,3 @@ class UserFactory(DjangoModelFactory):
 
         if kwargs.get("clinical"):
             self.groups.add(Group.objects.get(name=Role.CLINICAL))
-
-        if kwargs.get("superuser"):
-            self.groups.add(Group.objects.get(name=Role.SUPERUSER))

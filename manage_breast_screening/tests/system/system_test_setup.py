@@ -121,9 +121,6 @@ class SystemTestCase(StaticLiveServerTestCase):
     def given_i_am_logged_in_as_an_administrative_user(self):
         self.login_as_role(Role.ADMINISTRATIVE)
 
-    def given_i_am_logged_in_as_an_superuser(self):
-        self.login_as_role(Role.SUPERUSER)
-
     def then_the_accessibility_baseline_is_met(self, require_unique_link_text=True):
         """
         Check for certain accessibility issues that can be detected automatically without
