@@ -3,8 +3,11 @@ from datetime import date
 from enum import StrEnum
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MinLengthValidator
 from django.db import models
 
+from ..auth.models import Role
 from ..core.models import BaseModel
 
 
@@ -189,6 +192,24 @@ class UserAssignment(BaseModel):
     provider = models.ForeignKey(
         Provider, on_delete=models.PROTECT, related_name="assignments"
     )
+    roles = ArrayField(
+        base_field=models.CharField(
+            max_length=32,
+            choices=[
+                (Role.CLINICAL.value, Role.CLINICAL.value),
+                (Role.ADMINISTRATIVE.value, Role.ADMINISTRATIVE.value),
+            ],
+        ),
+        default=list,
+        validators=[MinLengthValidator(1)],
+        help_text="Roles granted to the user for this provider.",
+    )
+
+    def save(self, *args, **kwargs):
+        if self.roles:
+            # Remove duplicates and sort
+            self.roles = sorted(list(set(self.roles)))
+        super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ["user", "provider"]
