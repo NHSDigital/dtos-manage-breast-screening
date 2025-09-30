@@ -1,12 +1,12 @@
 locals {
   scheduled_jobs = {
-    store_mesh_data = {
+    store_mesh_messages = {
       cron_expression = "*/15 * * * *"
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-mesh-data"
       }
-      job_short_name     = "smd"
-      job_container_args = "store_mesh_data"
+      job_short_name     = "smm"
+      job_container_args = "store_mesh_messages"
     }
     create_appointments = {
       cron_expression = "*/30 * * * *"
