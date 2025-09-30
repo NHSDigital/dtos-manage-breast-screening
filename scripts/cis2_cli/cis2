@@ -227,7 +227,7 @@ class CIS2CLI:
         """Display the main menu options."""
         print("Available options:")
         print("1. Create new configuration")
-        print("2. Display specific configuration")
+        print("2. Display existing configuration")
         print("3. Update existing configuration")
         print("4. Re-authenticate")
         print("5. Quit")
@@ -399,7 +399,9 @@ class CIS2CLI:
             print(f"{self.BLUE}Hash: {self.last_config_hash[:8]}...{self.RESET}")
             print()
 
-            print("Enter the new client_config as JSON:")
+            print(
+                "Enter the client_config hash with the fields you want to update. Don't include the client_config key, just the config object itself."
+            )
             print(
                 "(You can paste a multi-line JSON object. Press Enter on an empty line when done)"
             )
@@ -476,7 +478,7 @@ class CIS2CLI:
             self.show_menu()
 
             try:
-                choice = input("Enter your choice (1-5): ").strip()
+                choice = input("Enter an option (1-5): ").strip()
                 print()
 
                 if choice == "1":
@@ -491,7 +493,7 @@ class CIS2CLI:
                     print("Goodbye!")
                     break
                 else:
-                    print("Invalid choice. Please enter 1-5.")
+                    print("Invalid option. Please enter 1-5.")
 
                 print()
 
