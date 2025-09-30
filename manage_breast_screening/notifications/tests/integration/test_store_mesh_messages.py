@@ -15,9 +15,9 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 class TestStoreMeshMessages:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
+        monkeypatch.setenv("DJANGO_ENV", "test")
         monkeypatch.setenv("NBSS_MESH_HOST", "http://localhost:8700")
         monkeypatch.setenv("NBSS_MESH_PASSWORD", "password")
-        monkeypatch.setenv("NBSS_MESH_SHARED_KEY", "TestKey")
         monkeypatch.setenv("NBSS_MESH_INBOX_NAME", "X26ABC1")
         monkeypatch.setenv("NBSS_MESH_CERT", "mesh-cert")
         monkeypatch.setenv("NBSS_MESH_PRIVATE_KEY", "mesh-private-key")
@@ -45,7 +45,6 @@ class TestStoreMeshMessages:
             url=os.getenv("NBSS_MESH_HOST"),
             mailbox=os.getenv("NBSS_MESH_INBOX_NAME"),
             password=os.getenv("NBSS_MESH_PASSWORD"),
-            shared_key=os.getenv("NBSS_MESH_SHARED_KEY"),
         ) as client:
             assert len(client.list_messages()) == 2
 
