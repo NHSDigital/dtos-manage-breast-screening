@@ -10,7 +10,7 @@ from .models import Permission, Role
 
 
 def user_has_any_role(role, *other_roles):
-    roles = [role, *other_roles, Role.SUPERUSER]
+    roles = [role, *other_roles]
 
     @rules.predicate
     def check(user):
