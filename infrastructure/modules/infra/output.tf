@@ -25,3 +25,7 @@ output "postgres_subnet_id" {
 output "main_subnet_id" {
   value = module.main_subnet.id
 }
+
+output "monitor_action_group_id" {
+  value = [for m in module.monitor_action_group : m.monitor_action_group.id]
+}

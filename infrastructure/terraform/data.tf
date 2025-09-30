@@ -35,3 +35,10 @@ data "azurerm_subnet" "main" {
   virtual_network_name = module.shared_config.names.virtual-network-lowercase
   resource_group_name  = local.resource_group_name
 }
+
+data "azurerm_monitor_action_group" "main" {
+  count = var.deploy_infra ? 0 : 1
+
+  name                = module.shared_config.names.monitor-action-group
+  resource_group_name = local.resource_group_name
+}
