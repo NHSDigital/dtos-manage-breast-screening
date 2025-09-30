@@ -1,0 +1,150 @@
+#!/usr/bin/env python3
+"""
+NHS CIS2 Connection Manager CLI Tool
+
+A command-line interface for interacting with the NHS CIS2 Connection Manager API.
+Supports authentication and configuration management operations.
+"""
+
+import getpass
+import sys
+from typing import Any, Dict, Optional
+
+import requests
+
+
+class CIS2Client:
+    """Client for interacting with the NHS CIS2 Connection Manager API."""
+
+    BASE_URL = "https://connectionmanager.nhsint.auth-ptl.cis2.spineservices.nhs.uk"
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.access_token: Optional[str] = None
+        self.team_id: Optional[str] = None
+        self.secret: Optional[str] = None
+
+    def authenticate(self, secret: str) -> Dict[str, Any]:
+        """Authenticate with the API using the provided secret."""
+        url = f"{self.BASE_URL}/api/auth"
+        headers = {
+            "Authorization": f"SecretAuth {secret}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            response = self.session.post(url, headers=headers)
+            response.raise_for_status()
+
+            auth_data = response.json()
+            self.access_token = auth_data.get("access_token")
+            self.secret = secret
+
+            # Update session headers with access token
+            if self.access_token:
+                self.session.headers.update(
+                    {"Authorization": f"Bearer {self.access_token}"}
+                )
+
+            return auth_data
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Authentication failed: {e}")
+
+
+class CIS2CLI:
+    """Command-line interface for the CIS2 Connection Manager."""
+
+    def __init__(self):
+        self.client = CIS2Client()
+
+    def setup_credentials(self):
+        """Prompt user for secret and team ID, then authenticate."""
+        # Get secret
+        secret = getpass.getpass("Enter your API secret: ")
+        if not secret:
+            print("Error: Secret is required")
+            sys.exit(1)
+
+        # Authenticate
+        try:
+            print("Authenticating with CIS2...")
+            auth_result = self.client.authenticate(secret)
+            print("✓ Authentication successful")
+
+            # Handle team ID selection
+            if "team_ids" not in auth_result or not auth_result["team_ids"]:
+                print("✗ Error: No team IDs available for this account")
+                print(
+                    "Please contact your administrator to ensure your account has team access."
+                )
+                sys.exit(1)
+
+            team_ids = auth_result["team_ids"]
+
+            print("\nAvailable team IDs:")
+            for i, team_id in enumerate(team_ids, 1):
+                print(f"{i}. {team_id}")
+
+            while True:
+                try:
+                    choice = input(f"Select team ID (1-{len(team_ids)}): ").strip()
+                    choice_num = int(choice)
+
+                    if 1 <= choice_num <= len(team_ids):
+                        selected_team_id = team_ids[choice_num - 1]
+                        self.client.team_id = selected_team_id
+                        print(f"✓ Team ID set to: {selected_team_id}")
+                        break
+                    else:
+                        print(
+                            f"Invalid choice. Please enter a number between 1 and {len(team_ids)}."
+                        )
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+                except KeyboardInterrupt:
+                    print("\nOperation cancelled.")
+                    sys.exit(1)
+
+        except Exception as e:
+            print(f"✗ Authentication failed: {e}")
+            sys.exit(1)
+
+        print()
+
+    def show_menu(self):
+        """Display the main menu options."""
+        print("Available options:")
+        print("1. Quit")
+        print()
+
+    def run(self):
+        """Run the CLI application."""
+        # Initial setup
+        self.setup_credentials()
+
+        # Main loop
+        while True:
+            self.show_menu()
+
+            try:
+                choice = input("Enter your choice (1): ").strip()
+                print()
+
+                if choice == "1":
+                    print("Goodbye!")
+                    break
+                else:
+                    print("Invalid choice. Please enter 1.")
+
+                print()
+
+            except KeyboardInterrupt:
+                print("\n\nGoodbye!")
+                break
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+
+
+if __name__ == "__main__":
+    cli = CIS2CLI()
+    cli.run()
