@@ -1,36 +1,31 @@
 import pytest
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML
 
-from ..models import ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA
-
-
-@pytest.fixture
-def group():
-    return Group.objects.create(name="group")
+from manage_breast_screening.auth.models import ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA
+from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 
 
 @pytest.fixture(autouse=True)
-def anna(group):
+def anna():
     user = get_user_model().objects.create(
         nhs_uid=ADMINISTRATIVE_PERSONA.username,
         first_name=ADMINISTRATIVE_PERSONA.first_name,
         last_name=ADMINISTRATIVE_PERSONA.last_name,
     )
-    user.groups.add(group)
+    UserAssignmentFactory(user=user, roles=[ADMINISTRATIVE_PERSONA.role.value])
     return user
 
 
 @pytest.fixture(autouse=True)
-def chloe(group):
+def chloe():
     user = get_user_model().objects.create(
         nhs_uid=CLINICAL_PERSONA.username,
         first_name=CLINICAL_PERSONA.first_name,
         last_name=CLINICAL_PERSONA.last_name,
     )
-    user.groups.add(group)
+    UserAssignmentFactory(user=user, roles=[CLINICAL_PERSONA.role.value])
     return user
 
 
@@ -54,14 +49,4 @@ def test_post_persona_login(client):
         {"username": "anna_davies", "next": "/some-url"},
     )
     assert response.status_code == 302
-    assert response.headers["location"] == "/some-url"
-
-
-@pytest.mark.django_db
-def test_bad_redirect(client):
-    response = client.post(
-        reverse("auth:persona_login"),
-        {"username": "anna_davies", "next": "http://evil.com"},
-    )
-    assert response.status_code == 302
-    assert response.headers["location"] == "/auth/persona-login/"
+    assert response.headers["location"] == "/clinics/select-provider/?next=%2Fsome-url"

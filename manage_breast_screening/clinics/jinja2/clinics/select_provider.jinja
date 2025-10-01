@@ -11,6 +11,9 @@
     {% else %}
       <form method="post">
         {{ csrf_input }}
+        {% if next %}
+          <input type="hidden" name="next" value="{{ next }}">
+        {% endif %}
         {% set radioItems = [] %}
         {% for provider in providers %}
           {% do radioItems.append({
