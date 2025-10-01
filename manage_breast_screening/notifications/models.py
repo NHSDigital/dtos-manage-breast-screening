@@ -1,4 +1,5 @@
 import uuid
+from zoneinfo import ZoneInfo
 
 from django.db import models
 
@@ -137,8 +138,11 @@ class Appointment(models.Model):
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
+    def localised_starts_at(self):
+        return self.starts_at.replace(tzinfo=ZoneInfo("Europe/London"))
+
     def __str__(self):
-        return f"Appointment for {self.starts_at} at {self.clinic}"
+        return f"Appointment {self.nbss_id} for {self.localised_starts_at()} at {self.clinic}"
 
 
 class Clinic(models.Model):
