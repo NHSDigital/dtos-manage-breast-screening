@@ -40,16 +40,21 @@ class Command(BaseCommand):
 
         if message_batch is None:
             raise CommandError(
-                f"Message Batch with id {message_batch_id} and status of '{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
+                (
+                    f"Message Batch with id {message_batch_id} and status of "
+                    f"'{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
+                )
             )
 
         queue.delete(queue_message)
-        logger.info(f"Message Batch with id {message_batch_id} deleted from queue")
+        logger.info("Message Batch with id %s deleted from queue", message_batch_id)
 
         retry_count = int(json.loads(queue_message.content)["retry_count"])
         if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):
             logger.info(
-                f"Retrying Message Batch with id {message_batch_id} with retry count {retry_count}"
+                "Retrying Message Batch with id %s with retry count %s",
+                message_batch_id,
+                retry_count,
             )
 
             try:
@@ -69,8 +74,9 @@ class Command(BaseCommand):
             except Exception as e:
                 raise CommandError(e)
         else:
-            logger.info(
-                f"Failed Message Batch with id {message_batch_id} not sent: Retry limit exceeded"
+            logger.error(
+                "Failed Message Batch with id %s not sent: Retry limit exceeded",
+                message_batch_id,
             )
             message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
             message_batch.save()
