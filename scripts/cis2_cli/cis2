@@ -1,0 +1,509 @@
+#!/usr/bin/env python3
+"""
+NHS CIS2 Connection Manager CLI Tool
+
+A command-line interface for interacting with the NHS CIS2 Connection Manager API.
+Supports authentication and configuration management operations.
+"""
+
+import getpass
+import json
+import sys
+from typing import Any, Dict, Optional
+
+import requests
+
+
+class CIS2Client:
+    """Client for interacting with the NHS CIS2 Connection Manager API."""
+
+    BASE_URL = "https://connectionmanager.nhsint.auth-ptl.cis2.spineservices.nhs.uk"
+
+    def __init__(self):
+        self.session = requests.Session()
+        self.access_token: Optional[str] = None
+        self.team_id: Optional[str] = None
+        self.secret: Optional[str] = None
+
+    def authenticate(self, secret: str) -> Dict[str, Any]:
+        """Authenticate with the API using the provided secret."""
+        url = f"{self.BASE_URL}/api/auth"
+        headers = {
+            "Authorization": f"SecretAuth {secret}",
+            "Content-Type": "application/json",
+        }
+
+        try:
+            response = self.session.post(url, headers=headers)
+            response.raise_for_status()
+
+            auth_data = response.json()
+            self.access_token = auth_data.get("access_token")
+            self.secret = secret
+
+            # Update session headers with access token
+            if self.access_token:
+                self.session.headers.update(
+                    {"Authorization": f"Bearer {self.access_token}"}
+                )
+
+            return auth_data
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Authentication failed: {e}")
+
+    def get_configs(self, team_id: str) -> Dict[str, Any]:
+        """Get list of configs for the specified team."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}"
+
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Failed to get configs: {e}")
+
+    def get_config(self, team_id: str, config_id: str) -> Dict[str, Any]:
+        """Get a specific config by ID for the specified team."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}/{config_id}"
+
+        try:
+            response = self.session.get(url)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Failed to get config: {e}")
+
+    def create_config(self, team_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new config with full payload support."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}"
+
+        try:
+            response = self.session.post(url, json=payload)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            # For HTTP errors, try to get detailed error information from response
+            if hasattr(e, "response") and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    raise Exception(
+                        f"Failed to create config (HTTP {e.response.status_code}): {json.dumps(error_detail, indent=2)}"
+                    )
+                except (ValueError, json.JSONDecodeError):
+                    # If response isn't JSON, show the raw text
+                    raise Exception(
+                        f"Failed to create config (HTTP {e.response.status_code}): {e.response.text}"
+                    )
+            else:
+                raise Exception(f"Failed to create config: {e}")
+
+    def update_config(
+        self,
+        team_id: str,
+        config_id: str,
+        client_config: Dict[str, Any],
+        config_hash: str,
+    ) -> Dict[str, Any]:
+        """Update an existing config for the specified team."""
+        url = f"{self.BASE_URL}/api/configs/{team_id}/{config_id}"
+
+        # Add hash as query parameter
+        params = {"hash": config_hash}
+
+        try:
+            response = self.session.put(url, params=params, json=client_config)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            # For HTTP errors, try to get detailed error information from response
+            if hasattr(e, "response") and e.response is not None:
+                try:
+                    error_detail = e.response.json()
+                    raise Exception(
+                        f"Failed to update config (HTTP {e.response.status_code}): {json.dumps(error_detail, indent=2)}"
+                    )
+                except (ValueError, json.JSONDecodeError):
+                    # If response isn't JSON, show the raw text
+                    raise Exception(
+                        f"Failed to update config (HTTP {e.response.status_code}): {e.response.text}"
+                    )
+            else:
+                raise Exception(f"Failed to update config: {e}")
+
+
+class CIS2CLI:
+    """Command-line interface for the CIS2 Connection Manager."""
+
+    # ANSI color codes
+    BLUE = "\033[94m"
+    WHITE = "\033[97m"
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    RESET = "\033[0m"
+
+    def __init__(self):
+        self.client = CIS2Client()
+        self.last_config_hash: Optional[str] = None
+        self.last_config_id: Optional[str] = None
+
+    def show_banner(self):
+        """Display the CLI tool banner."""
+        print(
+            f"""
+{self.BLUE}    ╔═══════════════════════════════════════════════════════════════╗
+    ║                                                               ║
+    ║{self.WHITE}    ███    ██ ██   ██ ███████     ██████ ██ ███████ ██████{self.BLUE}     ║
+    ║{self.WHITE}    ████   ██ ██   ██ ██         ██      ██ ██           ██{self.BLUE}    ║
+    ║{self.WHITE}    ██ ██  ██ ███████ ███████    ██      ██ ███████  █████{self.BLUE}     ║
+    ║{self.WHITE}    ██  ██ ██ ██   ██      ██    ██      ██      ██ ██{self.BLUE}         ║
+    ║{self.WHITE}    ██   ████ ██   ██ ███████     ██████ ██ ███████ ███████{self.BLUE}    ║
+    ║                                                               ║
+    ║{self.WHITE}                Connection Manager CLI Tool                    {self.BLUE}║
+    ║                                                               ║
+    ╚═══════════════════════════════════════════════════════════════╝{self.RESET}
+        """
+        )
+        print("=" * 40)
+
+    def setup_credentials(self):
+        """Prompt user for secret and team ID, then authenticate."""
+        # Get secret
+        secret = getpass.getpass("Enter your API secret: ")
+        if not secret:
+            print(f"{self.RED}Error: Secret is required{self.RESET}")
+            sys.exit(1)
+
+        # Authenticate
+        try:
+            print(f"{self.BLUE}Authenticating with CIS2...{self.RESET}")
+            auth_result = self.client.authenticate(secret)
+            print(f"{self.GREEN}✓ Authenticated{self.RESET}")
+
+            # Handle team ID selection
+            if "team_ids" not in auth_result or not auth_result["team_ids"]:
+                print(
+                    f"{self.RED}✗ Error: No team IDs available for this account{self.RESET}"
+                )
+                print(
+                    "Please contact your administrator to ensure your account has team access."
+                )
+                sys.exit(1)
+
+            team_ids = auth_result["team_ids"]
+
+            print("\nAvailable team IDs:")
+            for i, team_id in enumerate(team_ids, 1):
+                print(f"{i}. {team_id}")
+
+            while True:
+                try:
+                    choice = input(f"Select team ID (1-{len(team_ids)}): ").strip()
+                    choice_num = int(choice)
+
+                    if 1 <= choice_num <= len(team_ids):
+                        selected_team_id = team_ids[choice_num - 1]
+                        self.client.team_id = selected_team_id
+                        print(
+                            f"{self.GREEN}✓ Team ID set to: {selected_team_id}{self.RESET}"
+                        )
+                        break
+                    else:
+                        print(
+                            f"Invalid choice. Please enter a number between 1 and {len(team_ids)}."
+                        )
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+                except KeyboardInterrupt:
+                    print("\nOperation cancelled.")
+                    sys.exit(1)
+
+        except Exception as e:
+            print(f"{self.RED}✗ Authentication failed: {e}{self.RESET}")
+            sys.exit(1)
+
+        print()
+
+    def show_menu(self):
+        """Display the main menu options."""
+        print("Available options:")
+        print("1. Create new configuration")
+        print("2. Display existing configuration")
+        print("3. Update existing configuration")
+        print("4. Re-authenticate")
+        print("5. Quit")
+        print()
+
+    def display_config(self):
+        """Display details of a specific configuration."""
+        try:
+            # First, get the list of available configurations
+            print(
+                f"{self.BLUE}Fetching configs for team {self.client.team_id}...{self.RESET}"
+            )
+            configs_response = self.client.get_configs(self.client.team_id)
+
+            # Extract config IDs from the response
+            config_ids = configs_response.get("configs", [])
+
+            if not config_ids:
+                print(
+                    f"{self.RED}✗ Error: No configurations available for this team{self.RESET}"
+                )
+                return
+
+            # Show numbered menu for selection
+            print("\nAvailable configurations:")
+            for i, config_id in enumerate(config_ids, 1):
+                print(f"{i}. {config_id}")
+
+            while True:
+                try:
+                    choice = input(
+                        f"Select configuration (1-{len(config_ids)}): "
+                    ).strip()
+                    choice_num = int(choice)
+
+                    if 1 <= choice_num <= len(config_ids):
+                        selected_config_id = config_ids[choice_num - 1]
+                        print()
+                        break
+                    else:
+                        print(
+                            f"Invalid choice. Please enter a number between 1 and {len(config_ids)}."
+                        )
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+                except KeyboardInterrupt:
+                    print("\nOperation cancelled.")
+                    return
+
+            # Fetch and display the selected configuration
+            print(f"{self.BLUE}Fetching config '{selected_config_id}'...{self.RESET}")
+            config = self.client.get_config(self.client.team_id, selected_config_id)
+
+            # Store config hash and ID for future updates
+            if isinstance(config, dict) and "hash" in config:
+                self.last_config_hash = config["hash"]
+                self.last_config_id = selected_config_id
+                print(
+                    f"{self.GREEN}✓ Cached hash for updates: {self.last_config_hash[:8]}...{self.RESET}"
+                )
+
+            print(f"\nConfiguration Details for '{selected_config_id}':")
+            print("=" * 40)
+            print(json.dumps(config, indent=2))
+
+        except Exception as e:
+            print(f"{self.RED}✗ Error displaying config: {e}{self.RESET}")
+
+    def create_config(self):
+        """Create a new configuration."""
+        try:
+            print("Create new configuration")
+            print("-" * 25)
+
+            client_name = input("Enter client name: ").strip()
+            if not client_name:
+                print(f"{self.RED}Error: Client name is required{self.RESET}")
+                return
+
+            redirect_uris_input = input(
+                "Enter redirect URIs (comma-separated): "
+            ).strip()
+            if not redirect_uris_input:
+                print(
+                    f"{self.RED}Error: At least one redirect URI is required{self.RESET}"
+                )
+                return
+
+            redirect_uris = [uri.strip() for uri in redirect_uris_input.split(",")]
+
+            # Get optional fields
+            description = input("Enter description (optional): ").strip() or None
+
+            backchannel_logout_uri = (
+                input("Enter backchannel logout URI (optional): ").strip() or None
+            )
+
+            print("\nAuthentication method:")
+            print("1. client_secret_post (default)")
+            print("2. private_key_jwt")
+            auth_choice = (
+                input("Choose authentication method (1-2, default 1): ").strip() or "1"
+            )
+
+            token_endpoint_auth_method = "client_secret_post"
+            jwks_uri = None
+            jwks_uri_signing_algorithm = None
+
+            if auth_choice == "2":
+                token_endpoint_auth_method = "private_key_jwt"
+                jwks_uri = input(
+                    "Enter JWKS URI (required for private_key_jwt): "
+                ).strip()
+                if not jwks_uri:
+                    print(
+                        f"{self.RED}Error: JWKS URI is required when using private_key_jwt{self.RESET}"
+                    )
+                    return
+
+                jwks_uri_signing_algorithm = (
+                    input("Enter JWKS URI signing algorithm (e.g., RS512): ").strip()
+                    or None
+                )
+
+            # Build payload with only non-None values
+            payload = {
+                "client_name": client_name,
+                "redirect_uris": redirect_uris,
+                "token_endpoint_auth_method": token_endpoint_auth_method,
+            }
+
+            if description:
+                payload["description"] = description
+            if backchannel_logout_uri:
+                payload["backchannel_logout_uri"] = backchannel_logout_uri
+            if jwks_uri:
+                payload["jwks_uri"] = jwks_uri
+            if jwks_uri_signing_algorithm:
+                payload["jwks_uri_signing_algorithm"] = jwks_uri_signing_algorithm
+
+            print()
+            print(
+                f"{self.BLUE}Creating config for team {self.client.team_id}...{self.RESET}"
+            )
+            print(f"{self.BLUE}Payload:{self.RESET}")
+            print(json.dumps(payload, indent=2))
+            print()
+
+            result = self.client.create_config(self.client.team_id, payload)
+
+            print(f"{self.GREEN}✓ Config created{self.RESET}")
+            print(json.dumps(result, indent=2))
+
+        except Exception as e:
+            print(f"{self.RED}✗ Error creating config: {e}{self.RESET}")
+
+    def update_config(self):
+        """Update an existing configuration."""
+        # Check if we have a cached hash from displaying a config
+        if not self.last_config_hash or not self.last_config_id:
+            print(f"{self.RED}Error: No config hash available for update.{self.RESET}")
+            print("Please display a configuration first to cache its hash.")
+            return
+
+        try:
+            print("Update existing configuration")
+            print("-" * 30)
+            print(f"{self.BLUE}Config: {self.last_config_id}{self.RESET}")
+            print(f"{self.BLUE}Hash: {self.last_config_hash[:8]}...{self.RESET}")
+            print()
+
+            print(
+                "Enter the client_config hash with the fields you want to update. Don't include the client_config key, just the config object itself."
+            )
+            print(
+                "(You can paste a multi-line JSON object. Press Enter on an empty line when done)"
+            )
+
+            json_lines = []
+            while True:
+                line = input()
+                if line.strip() == "":
+                    break
+                json_lines.append(line)
+
+            if not json_lines:
+                print(f"{self.RED}Error: JSON payload is required{self.RESET}")
+                return
+
+            json_text = "\n".join(json_lines)
+
+            # Parse the JSON to validate it
+            try:
+                client_config = json.loads(json_text)
+            except json.JSONDecodeError as e:
+                print(f"{self.RED}Error: Invalid JSON format - {e}{self.RESET}")
+                return
+
+            print(
+                f"{self.BLUE}Updating config '{self.last_config_id}' for team {self.client.team_id}...{self.RESET}"
+            )
+            print(f"{self.BLUE}Payload:{self.RESET}")
+            print(json.dumps(client_config, indent=2))
+            print()
+
+            result = self.client.update_config(
+                self.client.team_id,
+                self.last_config_id,
+                client_config,
+                self.last_config_hash,
+            )
+
+            print(f"{self.GREEN}✓ Config updated{self.RESET}")
+            print(json.dumps(result, indent=2))
+
+            # Update the cached hash if provided in response
+            if isinstance(result, dict) and "hash" in result:
+                self.last_config_hash = result["hash"]
+                print(
+                    f"{self.GREEN}✓ Cached new hash: {self.last_config_hash[:8]}...{self.RESET}"
+                )
+
+        except Exception as e:
+            print(f"{self.RED}✗ Error updating config: {e}{self.RESET}")
+
+    def re_authenticate(self):
+        """Re-authenticate with a new secret."""
+        secret = getpass.getpass("Enter your API secret: ")
+        if not secret:
+            print(f"{self.RED}Error: Secret is required{self.RESET}")
+            return
+
+        try:
+            print(f"{self.BLUE}Re-authenticating with CIS2...{self.RESET}")
+            self.client.authenticate(secret)
+            print(f"{self.GREEN}✓ Re-authenticated{self.RESET}")
+        except Exception as e:
+            print(f"{self.RED}✗ Re-authentication failed: {e}{self.RESET}")
+
+    def run(self):
+        """Run the CLI application."""
+        self.show_banner()
+        # Initial setup
+        self.setup_credentials()
+
+        # Main loop
+        while True:
+            self.show_menu()
+
+            try:
+                choice = input("Enter an option (1-5): ").strip()
+                print()
+
+                if choice == "1":
+                    self.create_config()
+                elif choice == "2":
+                    self.display_config()
+                elif choice == "3":
+                    self.update_config()
+                elif choice == "4":
+                    self.re_authenticate()
+                elif choice == "5":
+                    print("Goodbye!")
+                    break
+                else:
+                    print("Invalid option. Please enter 1-5.")
+
+                print()
+
+            except KeyboardInterrupt:
+                print("\n\nGoodbye!")
+                break
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+
+
+if __name__ == "__main__":
+    cli = CIS2CLI()
+    cli.run()
