@@ -137,7 +137,6 @@ variable "region" {
 variable "seed_demo_data" {
   description = "Whether or not to seed the demo data in the database."
   type        = bool
-  default     = false
 }
 
 variable "use_apex_domain" {
