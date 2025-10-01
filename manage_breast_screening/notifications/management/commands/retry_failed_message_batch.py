@@ -1,6 +1,5 @@
 import json
 import os
-import time
 from logging import getLogger
 
 from django.core.management.base import BaseCommand, CommandError
@@ -51,9 +50,6 @@ class Command(BaseCommand):
         if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):
             logger.info(
                 f"Retrying Message Batch with id {message_batch_id} with retry count {retry_count}"
-            )
-            time.sleep(
-                int(os.getenv("NOTIFICATIONS_BATCH_RETRY_DELAY", "0")) * retry_count
             )
 
             try:
