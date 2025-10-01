@@ -149,7 +149,6 @@ variable "enable_alerting" {
   type        = bool
 }
 
-
 variable "alert_window_size" {
   type     = string
   nullable = false

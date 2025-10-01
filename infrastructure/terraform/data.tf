@@ -39,6 +39,6 @@ data "azurerm_subnet" "main" {
 data "azurerm_monitor_action_group" "main" {
   count = var.deploy_infra ? 0 : 1
 
-  name                = module.shared_config.names.monitor-action-group
+  name                = "${module.shared_config.names.monitor-action-group}-${var.env_config}"
   resource_group_name = local.resource_group_name
 }

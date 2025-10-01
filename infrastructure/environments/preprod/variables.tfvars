@@ -1,4 +1,3 @@
-alert_window_size                     = "PT15M"
 api_oauth_token_url                   = "https://int.api.service.nhs.uk/oauth2/token"
 dns_zone_name                         = "manage-breast-screening.screening.nhs.uk"
 enable_auth                           = false

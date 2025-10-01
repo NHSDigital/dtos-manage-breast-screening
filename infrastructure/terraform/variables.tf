@@ -133,7 +133,7 @@ variable "seed_demo_data" {
 variable "alert_window_size" {
   type     = string
   nullable = false
-  default  = "PT5M"
+  default  = "PT15M"
   validation {
     condition     = contains(["PT1M", "PT5M", "PT15M", "PT30M", "PT1H", "PT6H", "PT12H"], var.alert_window_size)
     error_message = "The alert_window_size must be one of: PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H"
