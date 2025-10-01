@@ -111,12 +111,12 @@ class Command(BaseCommand):
                     nbss_id=row["Appointment ID"],
                     nhs_number=row["NHS Num"],
                     number=row["Screen Appt num"],
-                    batch_id=row["Batch ID"],
+                    batch_id=row.get("Batch ID", row.get("BatchID")),
                     clinic=clinic,
                     episode_started_at=datetime.strptime(
                         row["Episode Start"], "%Y%m%d"
                     ).replace(tzinfo=TZ_INFO),
-                    episode_type=row["Episode Type"],
+                    episode_type=row.get("Episode Type", row.get("Epsiode Type")),
                     starts_at=self.appointment_date_and_time(row),
                     status=row["Status"],
                     booked_by=row["Booked By"],
