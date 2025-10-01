@@ -20,6 +20,11 @@ module "webapp" {
   source                           = "../dtos-devops-templates/infrastructure/modules/container-app"
   name                             = "${var.app_short_name}-web-${var.environment}"
   container_app_environment_id     = var.container_app_environment_id
+
+  # alerts
+  action_group_id   = var.action_group_id
+  enable_monitoring = var.enable_monitoring
+
   resource_group_name              = azurerm_resource_group.main.name
   fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
   infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
