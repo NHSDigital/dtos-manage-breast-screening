@@ -127,6 +127,30 @@ Specifies the Django environment configuration. This variable controls environme
 - When not set to "production", enables the `nonprod` Django app which provides development utilities
 - The `seed_demo_data` management command checks this env var to prevent execution in production environments
 
+## NBSS_MESH_INBOX_NAME [Secret]
+
+Description: Inbox identifier for NBSS MESH data. Used in conjunction with other `NBSS_MESH_*` variables to connect.
+
+To rotate: Contact NHS service desk to make request for new MESH inbox.
+
+## NBSS_MESH_PASSWORD [Secret]
+
+Description: Inbox password for NBSS MESH data. Used in conjunction with other `NBSS_MESH_*` variables to connect.
+
+To rotate: Contact NHS service desk to make request for password change.
+
+## NBSS_MESH_CERT [Secret]
+
+Description: SSL Cert in PEM format used to connect to MESH inbox. Used in conjunction with `NBSS_MESH_PRIVATE_KEY` for SSL connections to MESH.
+
+To rotate: Contact NHS service desk to make request for new MESH inbox keystore.
+
+## NBSS_MESH_PRIVATE_KEY [Secret]
+
+Description: SSL private key in PEM format used to connect to MESH inbox. Used in conjunction with `NBSS_MESH_CERT` for SSL connections to MESH.
+
+To rotate: Contact NHS service desk to make request for new MESH inbox keystore.
+
 ## NHS_NOTIFY_API_KEY [Secret]
 
 Description: API Key used in HMAC signature verification when processing callback HTTP requests from NHS Notify API.
