@@ -46,8 +46,8 @@ module "postgres" {
   }
 
   # alerts
-  action_group_id   = var.action_group_id
-  enable_monitoring = var.enable_monitoring
+  action_group_id = var.action_group_id
+  enable_monitoring = var.enable_alerting
 
 
   databases = {

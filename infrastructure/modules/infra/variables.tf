@@ -33,8 +33,13 @@ variable "protect_keyvault" {
   type        = bool
 }
 
-variable "monitoring_email_address" {
-  description = "monitoring email address"
+variable "infra_key_vault_name" {
+  description = "Name of the infra key vault"
+  type        = string
+}
+
+variable "infra_key_vault_rg" {
+  description = "Name of the infra key vault resource group"
   type        = string
 }
 

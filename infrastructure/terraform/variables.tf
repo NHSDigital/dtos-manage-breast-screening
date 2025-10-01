@@ -141,20 +141,17 @@ variable "alert_window_size" {
   description = "The period of time that is used to monitor alert activity e.g. PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H. The interval between checks is adjusted accordingly."
 }
 
-variable "enable_monitoring" {
+variable "enable_alerting" {
   description = "Whether monitoring and alerting is enabled for the PostgreSQL Flexible Server."
   type        = bool
   default     = false
 }
 
-variable "monitoring_email_address" {
-  description = "monitoring email address"
-  type        = string
-  default     = null
-}
 
 locals {
   region = "uksouth"
 
-  resource_group_name = "rg-${var.app_short_name}-${var.env_config}-uks"
+  resource_group_name  = "rg-${var.app_short_name}-${var.env_config}-uks"
+  infra_key_vault_name = "kv-${var.app_short_name}-${var.env_config}-inf"
+  infra_key_vault_rg   = "rg-${var.app_short_name}-${var.env_config}-infra"
 }

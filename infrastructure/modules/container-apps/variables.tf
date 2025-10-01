@@ -144,7 +144,7 @@ variable "use_apex_domain" {
   type        = bool
 }
 
-variable "enable_monitoring" {
+variable "enable_alerting" {
   description = "Whether monitoring and alerting is enabled for the PostgreSQL Flexible Server."
   type        = bool
 }
@@ -165,6 +165,15 @@ variable "action_group_id" {
   description = "ID of the action group to notify."
 }
 
+variable "infra_key_vault_name" {
+  description = "Name of the infra key vault"
+  type        = string
+}
+
+variable "infra_key_vault_rg" {
+  description = "Name of the infra key vault resource group"
+  type        = string
+}
 
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"

@@ -8,7 +8,7 @@ module "monitor_action_group" {
   email_receiver = {
     email = {
       name          = "email"
-      email_address = var.monitoring_email_address
+      email_address = data.azurerm_key_vault_secret.infra.value
     }
   }
 }
