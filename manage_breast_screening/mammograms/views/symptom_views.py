@@ -44,8 +44,8 @@ class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
             {
                 "back_link_params": self.get_back_link_params(),
                 "caption": participant.full_name,
-                "heading": f"Details of the {self.symptom_type_name}",
-                "page_title": f"Details of the {self.symptom_type_name}",
+                "heading": f"Details of the {self.symptom_type_name.lower()}",
+                "page_title": f"Details of the {self.symptom_type_name.lower()}",
             },
         )
 
