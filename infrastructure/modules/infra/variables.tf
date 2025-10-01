@@ -31,7 +31,6 @@ variable "vnet_address_space" {
 variable "protect_keyvault" {
   description = "Ability to recover the key vault or its secrets after deletion"
   type        = bool
-  default     = true
 }
 
 variable "monitoring_email_address" {
