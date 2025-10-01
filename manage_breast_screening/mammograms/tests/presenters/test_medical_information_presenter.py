@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 
 from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
@@ -46,7 +48,9 @@ class TestRecordMedicalInformationPresenter:
             ),
         ]
 
-    def test_formats_investigation_and_specific_date(self):
+    def test_formats_investigation_and_specific_date(self, time_machine):
+        time_machine.move_to(date(2025, 9, 1))
+
         symptom = SymptomFactory.create(
             lump=True,
             when_started=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
