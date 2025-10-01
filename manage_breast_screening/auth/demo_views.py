@@ -1,7 +1,12 @@
+from urllib.parse import urlencode
+
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Case, Q, When
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+
+from manage_breast_screening.core.utils.urls import safe_next_url
 
 from .models import PERSONAS
 
@@ -9,11 +14,17 @@ from .models import PERSONAS
 @login_not_required
 def persona_login(request):
     users = _get_users(request.user)
+    next_url = safe_next_url(request)
 
     if request.method == "POST":
         user = get_object_or_404(users, nhs_uid=request.POST["username"])
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        return redirect(_next_page(request))
+
+        redirect_url = reverse("clinics:select_provider")
+        if next_url:
+            redirect_url = f"{redirect_url}?{urlencode({'next': next_url})}"
+
+        return redirect(redirect_url)
     else:
         return render(
             request,
@@ -22,18 +33,9 @@ def persona_login(request):
                 "users": users,
                 "page_title": "Personas",
                 "current_user": request.user,
-                "next": request.GET.get("next", request.path),
+                "next": next_url,
             },
         )
-
-
-def _next_page(request):
-    url = request.POST.get("next", "/")
-
-    if not url.startswith("/"):
-        return request.path
-
-    return url
 
 
 def _get_users(current_user):
