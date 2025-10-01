@@ -111,7 +111,8 @@ module "scheduled_jobs" {
     "python manage.py ${each.value.job_container_args}"
   ]
 
-  docker_image = var.docker_image
+  docker_image        = var.docker_image
+  replica_retry_limit = 0
   user_assigned_identity_ids = flatten([
     [module.azure_blob_storage_identity.id],
     [module.azure_queue_storage_identity.id],
