@@ -5,6 +5,7 @@ import pytest
 from django.http import HttpResponse
 from django.test import RequestFactory
 
+from manage_breast_screening.clinics.tests.factories import ProviderFactory
 from manage_breast_screening.core.decorators import current_provider_exempt
 from manage_breast_screening.core.middleware.current_provider import (
     CurrentProviderMiddleware,
@@ -58,3 +59,23 @@ class TestCurrentProviderMiddleware:
         assert response is not None
         assert response.status_code == 302
         assert response.url == "/clinics/select-provider/"
+
+    def test_adds_current_provider_to_request_when_in_session(self):
+        provider = ProviderFactory(name="Test Provider")
+        request = RequestFactory().get("/")
+        request.session = {"current_provider": str(provider.pk)}
+
+        mw = _make_middleware()
+        mw(request)
+
+        assert request.current_provider == provider
+        assert request.current_provider.name == "Test Provider"
+
+    def test_sets_current_provider_to_none_when_not_in_session(self):
+        request = RequestFactory().get("/")
+        request.session = {}
+
+        mw = _make_middleware()
+        mw(request)
+
+        assert request.current_provider is None
