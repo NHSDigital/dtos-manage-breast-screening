@@ -47,7 +47,7 @@ module "postgres" {
 
   # alerts
   action_group_id   = var.action_group_id
-  enable_monitoring = var.enable_alerting
+  enable_alerting   = var.enable_alerting
 
   databases = {
     db1 = {
@@ -94,6 +94,11 @@ module "database_container" {
     POSTGRES_USER = local.database_user
     POSTGRES_DB   = local.database_name
   }
+
+  # alerts
+  action_group_id   = var.action_group_id
+  enable_alerting   = var.enable_alerting
+
   resource_group_name = azurerm_resource_group.main.name
   is_tcp_app          = true
   # postgres has a port of 5432
