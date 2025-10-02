@@ -6,6 +6,9 @@ import pytest
 import requests
 from dateutil import relativedelta
 
+from manage_breast_screening.notifications.management.commands.helpers.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )

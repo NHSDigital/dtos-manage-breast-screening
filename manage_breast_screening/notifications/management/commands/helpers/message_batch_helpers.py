@@ -5,6 +5,9 @@ from datetime import datetime
 
 from requests import Response
 
+from manage_breast_screening.notifications.management.commands.helpers.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.models import (
     ZONE_INFO,
     Message,
@@ -56,8 +59,17 @@ class MessageBatchHelpers:
     def mark_batch_as_failed(
         message_batch: MessageBatch, response: Response, retry_count: int = 0
     ):
+<<<<<<< HEAD
         log_msg = "Marking batch %s as failed. Response code: %s. Response: %s" % (
             message_batch.id,
+=======
+        ApplicationInsightsLogging().trigger_an_event(
+            "batch_marked_as_failed", str(message_batch.id)
+        )
+
+        logger.info(
+            "Marking batch as failed. Reponse code: %s. Response: %s",
+>>>>>>> 7ee4f0eb (wip trigger an event when message batch marked as failed)
             response.status_code,
             response.text,
         )
