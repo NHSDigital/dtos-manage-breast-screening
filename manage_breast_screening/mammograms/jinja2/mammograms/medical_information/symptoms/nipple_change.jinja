@@ -1,0 +1,52 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+  {% do form.symptom_sub_type.add_conditional_html('NIPPLE_CHANGE_OTHER', form.symptom_sub_type_details.as_field_group()) %}
+
+  {% do form.when_started.add_divider_after("OVER_THREE_YEARS", "or") %}
+  {% do form.when_started.add_divider_after("SINCE_A_SPECIFIC_DATE", "or") %}
+  {% do form.when_started.add_conditional_html(
+    'SINCE_A_SPECIFIC_DATE',
+    form.specific_date.as_field_group()
+  ) %}
+
+  {% do form.recently_resolved.add_conditional_html('true', form.when_resolved.as_field_group()) %}
+
+  {% do form.investigated.add_conditional_html('YES', form.investigation_details.as_field_group()) %}
+
+  {{ form.area.as_field_group() }}
+
+  {{ form.symptom_sub_type.as_field_group() }}
+
+  {% call fieldset({
+    "legend": {
+      "text": form.when_started.label,
+      "classes": "nhsuk-fieldset__legend--m"
+    }
+  }) %}
+    {{ form.when_started.as_field_group() }}
+    <br>
+    {{ form.intermittent.as_field_group() }}
+    {{ form.recently_resolved.as_field_group() }}
+  {% endcall %}
+
+  {{ form.investigated.as_field_group() }}
+
+  {{ form.additional_information.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save symptom"
+    }) }}
+  </div>
+
+  {% if delete_link %}
+    <p class="nhsuk-u-margin-top-4">
+      <a href="{{ delete_link.href }}" class="{{ delete_link.class }}">
+        {{ delete_link.text }}
+      </a>
+    </p>
+  {% endif %}
+{% endblock %}
