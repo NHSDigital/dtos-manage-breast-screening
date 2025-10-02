@@ -10,7 +10,12 @@ from manage_breast_screening.mammograms.presenters.medical_information_presenter
 )
 from manage_breast_screening.participants.models.symptom import Symptom
 
-from ..forms.symptom_forms import LumpForm, SkinChangeForm, SwellingOrShapeChangeForm
+from ..forms.symptom_forms import (
+    LumpForm,
+    NippleChangeForm,
+    SkinChangeForm,
+    SwellingOrShapeChangeForm,
+)
 from .mixins import InProgressAppointmentMixin
 
 
@@ -129,6 +134,16 @@ class AddSkinChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
 
 
+class AddNippleChangeView(AddSymptomView):
+    """
+    Add a symptom: nipple change
+    """
+
+    symptom_type_name = "Nipple change"
+    form_class = NippleChangeForm
+    template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+
+
 class ChangeLumpView(ChangeSymptomView):
     """
     Change a symptom: lump
@@ -157,6 +172,16 @@ class ChangeSkinChangeView(ChangeSymptomView):
     symptom_type_name = "Skin change"
     form_class = SkinChangeForm
     template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
+
+
+class ChangeNippleChangeView(ChangeSymptomView):
+    """
+    Change a symptom: nipple change
+    """
+
+    symptom_type_name = "Nipple change"
+    form_class = NippleChangeForm
+    template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
 
 
 class DeleteSymptomView(View):

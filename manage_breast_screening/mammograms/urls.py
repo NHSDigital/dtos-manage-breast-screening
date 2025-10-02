@@ -81,6 +81,16 @@ urlpatterns = [
         name="change_symptom_skin_change",
     ),
     path(
+        "<uuid:pk>/record-medical-information/nipple-change/",
+        symptom_views.AddNippleChangeView.as_view(),
+        name="add_symptom_nipple_change",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/nipple-change/<uuid:symptom_pk>/",
+        symptom_views.ChangeNippleChangeView.as_view(),
+        name="change_symptom_nipple_change",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
         symptom_views.DeleteSymptomView.as_view(),
         name="delete_symptom",

@@ -255,7 +255,7 @@ class SymptomForm(Form):
                 RightLeftNippleChoices.LEFT_BREAST.value,
             ]
         else:
-            return [area.value]
+            return [area]
 
 
 class LumpForm(SymptomForm):
