@@ -9,7 +9,7 @@
     form.area_description.as_field_group()
   ) %}
 
-  {% do form.symptom_sub_type.add_conditional_html('OTHER', form.symptom_sub_type_details.as_field_group()) %}
+  {% do form.symptom_sub_type.add_conditional_html('SKIN_CHANGE_OTHER', form.symptom_sub_type_details.as_field_group()) %}
 
 
   {% do form.when_started.add_divider_after("OVER_THREE_YEARS", "or") %}
