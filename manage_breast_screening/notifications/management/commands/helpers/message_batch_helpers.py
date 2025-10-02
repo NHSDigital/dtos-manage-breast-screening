@@ -6,6 +6,9 @@ from zoneinfo import ZoneInfo
 
 from requests import Response
 
+from manage_breast_screening.notifications.management.commands.helpers.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.models import (
     Message,
     MessageBatch,
@@ -54,6 +57,10 @@ class MessageBatchHelpers:
     def mark_batch_as_failed(
         message_batch: MessageBatch, response: Response, retry_count: int = 0
     ):
+        ApplicationInsightsLogging().trigger_an_event(
+            "batch_marked_as_failed", str(message_batch.id)
+        )
+
         logger.info(
             "Marking batch as failed. Reponse code: %s. Response: %s",
             response.status_code,
