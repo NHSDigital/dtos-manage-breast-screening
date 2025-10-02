@@ -30,6 +30,7 @@
     }
   } if field.use_fieldset else none,
   "errorMessage": error_message,
+  "classes": unbound_field.classes if unbound_field.classes,
   "hint": {
     "html": unbound_field.hint|e
   } if unbound_field.hint,

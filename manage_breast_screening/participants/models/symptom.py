@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import TextChoices
 
 from ...core.models import BaseModel, ReferenceDataModel
 from .appointment import Appointment
@@ -15,14 +16,29 @@ class SymptomType(ReferenceDataModel):
 
 
 class SymptomSubType(ReferenceDataModel):
-    SORES_OR_CYSTS = "SORES_OR_CYSTS"
-    DIMPLES_OR_INDENTATION = "DIMPLES_OR_INDENTATION"
-    RASH = "RASH"
-    COLOUR_CHANGE = "COLOUR_CHANGE"
-    OTHER = "OTHER"
-
     symptom_type = models.ForeignKey(SymptomType, on_delete=models.CASCADE)
     name = models.CharField(null=False, blank=False)
+
+
+class SkinChangeChoices(TextChoices):
+    SORES_OR_CYSTS = "SORES_OR_CYSTS", "Sores or cysts"
+    DIMPLES_OR_INDENTATION = (
+        "DIMPLES_OR_INDENTATION",
+        "Dimples or indentation",
+    )
+    RASH = "RASH", "Rash"
+    COLOUR_CHANGE = "COLOUR_CHANGE", "Colour change"
+    OTHER = "SKIN_CHANGE_OTHER", "Other"
+
+
+class NippleChangeChoices(TextChoices):
+    BLOODY_DISCHARGE = "NIPPLE_CHANGE_BLOODY_DISCHARGE", "Bloody discharge"
+    OTHER_DISCHARGE = "NIPPLE_CHANGE_OTHER_DISCHARGE", "Other discharge"
+    INVERSION = "NIPPLE_CHANGE_INVERSION", "Inversion"
+    RASH_OR_ECZEMA = "NIPPLE_CHANGE_RASH_OR_ECZEMA", "Rash or eczema"
+    SHAPE_CHANGE = "NIPPLE_CHANGE_SHAPE_CHANGE", "Shape change"
+    COLOUR_CHANGE = "NIPPLE_CHANGE_COLOUR_CHANGE", "Colour change"
+    OTHER = "NIPPLE_CHANGE_OTHER", "Other"
 
 
 class SymptomAreas(models.TextChoices):
