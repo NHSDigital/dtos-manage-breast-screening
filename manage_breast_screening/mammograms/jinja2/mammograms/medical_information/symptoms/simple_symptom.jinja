@@ -5,8 +5,16 @@
 {% block form %}
   {% do form.area.add_divider_after("LEFT_BREAST", "or") %}
   {% do form.area.add_conditional_html(
+    'RIGHT_BREAST',
+    form.area_description_right_breast.as_field_group()
+  ) %}
+  {% do form.area.add_conditional_html(
+    'LEFT_BREAST',
+    form.area_description_left_breast.as_field_group()
+  ) %}
+  {% do form.area.add_conditional_html(
     'OTHER',
-    form.area_description.as_field_group()
+    form.area_description_other.as_field_group()
   ) %}
 
   {% do form.when_started.add_divider_after("OVER_THREE_YEARS", "or") %}

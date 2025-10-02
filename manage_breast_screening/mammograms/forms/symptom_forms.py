@@ -80,6 +80,26 @@ class CommonFields:
         widget=Textarea(attrs={"rows": 4}),
     )
 
+    @staticmethod
+    def area(symptom_type):
+        return ChoiceField(
+            choices=RightLeftOtherChoices,
+            label=f"Where is the {symptom_type} located?",
+            error_messages={"required": f"Select the location of the {symptom_type}"},
+        )
+
+    @staticmethod
+    def area_description(symptom_type):
+        return CharField(
+            required=False,
+            label="Describe the specific area",
+            hint="For example, the left armpit",
+            error_messages={
+                "required": f"Describe the specific area where the {symptom_type} is located"
+            },
+            classes="nhsuk-u-width-two-thirds",
+        )
+
 
 class SymptomForm(Form):
     """
@@ -100,7 +120,7 @@ class SymptomForm(Form):
         if instance:
             kwargs["initial"] = {
                 "area": instance.area,
-                "area_description": instance.area_description,
+                f"area_description_{instance.area.lower()}": instance.area_description,
                 "when_started": instance.when_started,
                 "specific_date": (instance.month_started, instance.year_started),
                 "intermittent": instance.intermittent,
@@ -194,12 +214,16 @@ class SymptomForm(Form):
 
     def _model_values(self):
         """
-        Further clean the form data to match the model, including
-        splitting year/month tuples into multiple fields, and blanking
-        conditionally revealed fields that are no longer visible.
+        Further clean the form data to match the model
         """
         area = self.cleaned_data["area"]
-        area_description = self.cleaned_data.get("area_description", "")
+
+        if area in SymptomAreas:
+            area_description_field_name = f"area_description_{area.lower()}"
+            area_description = self.cleaned_data.get(area_description_field_name, "")
+        else:
+            area_description = ""
+
         when_started = self.cleaned_data.get("when_started")
         specific_date = self.cleaned_data.get("specific_date")
         investigated = self.cleaned_data.get("investigated") == YesNo.YES
@@ -225,20 +249,10 @@ class SymptomForm(Form):
 
 
 class LumpForm(SymptomForm):
-    area = ChoiceField(
-        choices=RightLeftOtherChoices,
-        label="Where is the lump located?",
-        error_messages={"required": "Select the location of the lump"},
-    )
-    area_description = CharField(
-        required=False,
-        label="Describe the specific area",
-        hint="For example, the left armpit",
-        error_messages={
-            "required": "Describe the specific area where the lump is located"
-        },
-        classes="nhsuk-u-width-two-thirds",
-    )
+    area = CommonFields.area("lump")
+    area_description_right_breast = CommonFields.area_description("lump")
+    area_description_left_breast = CommonFields.area_description("lump")
+    area_description_other = CommonFields.area_description("lump")
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
     intermittent = CommonFields.intermittent
@@ -252,7 +266,18 @@ class LumpForm(SymptomForm):
         super().__init__(symptom_type=SymptomType.LUMP, instance=instance, **kwargs)
 
         self.set_conditionally_required(
-            conditionally_required_field="area_description",
+            conditionally_required_field="area_description_right_breast",
+            predicate_field="area",
+            predicate_field_value=RightLeftOtherChoices.RIGHT_BREAST,
+        )
+
+        self.set_conditionally_required(
+            conditionally_required_field="area_description_left_breast",
+            predicate_field="area",
+            predicate_field_value=RightLeftOtherChoices.LEFT_BREAST,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="area_description_other",
             predicate_field="area",
             predicate_field_value=RightLeftOtherChoices.OTHER,
         )
@@ -274,22 +299,14 @@ class LumpForm(SymptomForm):
 
 
 class SwellingOrShapeChangeForm(SymptomForm):
-    area = ChoiceField(
-        choices=RightLeftOtherChoices,
-        label="Where is the swelling or shape change located?",
-        error_messages={
-            "required": "Select the location of the swelling or shape change"
-        },
+    area = CommonFields.area("swelling or shape change")
+    area_description_right_breast = CommonFields.area_description(
+        "swelling or shape change"
     )
-    area_description = CharField(
-        required=False,
-        label="Describe the specific area",
-        hint="For example, the left armpit",
-        error_messages={
-            "required": "Describe the specific area where the swelling or shape change is located"
-        },
-        classes="nhsuk-u-width-two-thirds",
+    area_description_left_breast = CommonFields.area_description(
+        "swelling or shape change"
     )
+    area_description_other = CommonFields.area_description("swelling or shape change")
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
     intermittent = CommonFields.intermittent
