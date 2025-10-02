@@ -128,7 +128,7 @@ class Appointment(models.Model):
     booked_at = models.DateTimeField(null=True)
     cancelled_by = models.CharField(max_length=50)
     cancelled_at = models.DateTimeField(null=True)
-    number = models.IntegerField(null=True, default=1)
+    number = models.CharField(max_length=30, null=True)
     starts_at = models.DateTimeField(null=False)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=True, auto_now=True)
