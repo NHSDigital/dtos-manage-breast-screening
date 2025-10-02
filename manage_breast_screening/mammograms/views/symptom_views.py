@@ -5,8 +5,8 @@ from django.views import View
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
-from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
-    PresentedSymptom,
+from manage_breast_screening.mammograms.presenters.symptom_presenter import (
+    SymptomPresenter,
 )
 from manage_breast_screening.participants.models.symptom import Symptom
 
@@ -207,9 +207,9 @@ class DeleteSymptomView(View):
                     kwargs={"pk": kwargs["pk"]},
                 )
             },
-            "summary_list_row": PresentedSymptom.from_symptom(
-                symptom
-            ).build_summary_list_row(include_actions=False),
+            "summary_list_row": SymptomPresenter(symptom).build_summary_list_row(
+                include_actions=False
+            ),
         }
 
         return render(
