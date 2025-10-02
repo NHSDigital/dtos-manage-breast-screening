@@ -30,10 +30,19 @@ class TestAggregateQuery:
             starts_at=date,
             episode_type=episode_type,
         )
-        message = MessageFactory(appointment=appt, status=message_status)
-        MessageStatusFactory(message=message, status=message_status)
+        message = MessageFactory(
+            appointment=appt, status=message_status, sent_at=datetime.now()
+        )
+        MessageStatusFactory(
+            message=message, status=message_status, status_updated_at=datetime.now()
+        )
         for channel, status in channel_statuses.items():
-            ChannelStatusFactory(message=message, channel=channel, status=status)
+            ChannelStatusFactory(
+                message=message,
+                channel=channel,
+                status=status,
+                status_updated_at=datetime.now(),
+            )
         return appt
 
     def test_query_aggregates_appointments_and_cascade_counts(self):
@@ -126,6 +135,74 @@ class TestAggregateQuery:
             results = cursor.fetchall()
 
         assert len(results) == 1
+
+    def test_aggregate_cascade_overlaps_are_counted_once(self):
+        appt_date = datetime.now() - timedelta(days=20)
+        message_sent_at = datetime.now() - timedelta(days=6)
+        appt = AppointmentFactory(
+            clinic=ClinicFactory(code="BU006", bso_code="BSO6", name="BSU 6"),
+            starts_at=appt_date,
+            episode_type="S",
+        )
+        message = MessageFactory(
+            appointment=appt, status="delivered", sent_at=message_sent_at
+        )
+        MessageStatusFactory(message=message, status="delivered")
+        ChannelStatusFactory(
+            message=message,
+            channel="nhsapp",
+            status="read",
+            status_updated_at=(message_sent_at + timedelta(days=2)),
+        )
+        sms_status = ChannelStatusFactory(
+            message=message,
+            channel="sms",
+            status="delivered",
+            status_updated_at=(message_sent_at + timedelta(days=4)),
+        )
+
+        with connection.cursor() as cursor:
+            cursor.execute(AggregateQuery.sql(), ("1 month",))
+            results = cursor.fetchall()
+
+        assert list(results[0]) == [
+            appt_date.strftime("%Y-%m-%d"),
+            "BSO6",
+            "BU006",
+            "BSU 6",
+            "Self referral",
+            1,
+            0,
+            1,
+            0,
+            0,
+        ]
+
+        sms_status.status_updated_at = message_sent_at + timedelta(days=5)
+        sms_status.save()
+        ChannelStatusFactory(
+            message=message,
+            channel="letter",
+            status="received",
+            status_updated_at=(message_sent_at + timedelta(days=5)),
+        )
+
+        with connection.cursor() as cursor:
+            cursor.execute(AggregateQuery.sql(), ("1 month",))
+            results = cursor.fetchall()
+
+        assert list(results[0]) == [
+            appt_date.strftime("%Y-%m-%d"),
+            "BSO6",
+            "BU006",
+            "BSU 6",
+            "Self referral",
+            1,
+            0,
+            0,
+            1,
+            0,
+        ]
 
     def test_aggregate_columns(self):
         assert AggregateQuery.columns() == [
