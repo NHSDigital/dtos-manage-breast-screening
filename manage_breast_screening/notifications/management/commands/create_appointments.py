@@ -113,19 +113,26 @@ class Command(BaseCommand):
                     nbss_id=row["Appointment ID"],
                     nhs_number=row["NHS Num"],
                     number=row["Screen Appt num"],
-                    batch_id=row.get("Batch ID", row.get("BatchID")),
+                    batch_id=self.handle_aliased_column("Batch ID", "BatchID", row),
                     clinic=clinic,
                     episode_started_at=datetime.strptime(
                         row["Episode Start"], "%Y%m%d"
                     ).replace(tzinfo=TZ_INFO),
-                    episode_type=row.get("Episode Type", row.get("Epsiode Type")),
+                    episode_type=self.handle_aliased_column(
+                        "Episode Type", "Epsiode Type", row
+                    ),
                     starts_at=self.appointment_date_and_time(row),
                     status=row["Status"],
                     booked_by=row["Booked By"],
                     booked_at=self.workflow_action_date_and_time(
                         row["Action Timestamp"]
                     ),
-                    assessment=(row["Screen or Asses"] == "A"),
+                    assessment=(
+                        self.handle_aliased_column(
+                            "Screen or Assess", "Screen or Asses", row
+                        )
+                        == "A"
+                    ),
                 ),
                 True,
             )
@@ -162,6 +169,11 @@ class Command(BaseCommand):
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
         return dt.replace(tzinfo=TZ_INFO)
+
+    def handle_aliased_column(
+        self, expected_name: str, fallback_name: str, row: pandas.Series
+    ) -> object:
+        return row.get(expected_name, row.get(fallback_name))
 
     def appointment_date_and_time(self, row: pandas.Series) -> datetime:
         dt = datetime.strptime(
