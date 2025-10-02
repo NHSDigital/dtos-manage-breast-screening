@@ -125,7 +125,7 @@ class Command(BaseCommand):
                     booked_at=self.workflow_action_date_and_time(
                         row["Action Timestamp"]
                     ),
-                    assessment=(row["Screen or Asses"] == "A"),
+                    assessment=self.is_assessment(row),
                 ),
                 True,
             )
@@ -162,6 +162,16 @@ class Command(BaseCommand):
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
         return dt.replace(tzinfo=TZ_INFO)
+
+    def is_assessment(self, row: pandas.Series) -> bool:
+        """
+        There was an error in the data where the column was initially misspelled as 'Screen or Asses'. To ensure backwards compatibility, we check for both spellings.
+        """
+        if "Screen or Assess" in row:
+            return row["Screen or Assess"] == "A"
+        elif "Screen or Asses" in row:
+            return row["Screen or Asses"] == "A"
+        return False
 
     def appointment_date_and_time(self, row: pandas.Series) -> datetime:
         dt = datetime.strptime(
