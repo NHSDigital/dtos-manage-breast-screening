@@ -114,8 +114,8 @@ class TestCreateAppointments:
         assert appointments[0].clinic == clinics[1]
         assert appointments[1].clinic == clinics[1]
 
-        assert appointments[0].number == 1
-        assert appointments[1].number == 3
+        assert appointments[0].number == "1"
+        assert appointments[1].number == ""
 
         assert appointments[1].assessment is True
 
