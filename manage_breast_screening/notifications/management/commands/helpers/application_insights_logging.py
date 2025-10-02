@@ -28,5 +28,14 @@ class ApplicationInsightsLogging:
             default_logger.info("Failed to configure Application Insights %s", e)
             return default_logger
 
-    def raise_an_exception(self, exceptionName: str):
-        self.logger.exception(exceptionName, stack_info=True)
+    def raise_an_exception(self, exception_name: str):
+        self.logger.exception(exception_name, stack_info=True)
+
+    def trigger_an_event(self, event_name: str, additional_attrs: str):
+        self.logger.warning(
+            event_name,
+            extra={
+                "microsoft.custom_event.name": event_name,
+                "additional_attrs": additional_attrs,
+            },
+        )
