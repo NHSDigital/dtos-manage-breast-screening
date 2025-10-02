@@ -48,3 +48,15 @@ a[href="#"] {
 .app-link--warning {
   color: $nhsuk-error-colour;
 }
+
+.app-checkboxes--inline {
+  @include nhsuk-media-query($from: tablet) {
+    @include nhsuk-clearfix;
+
+    .nhsuk-checkboxes__item {
+      clear: none;
+      float: left;
+      margin-right: nhsuk-spacing(4);
+    }
+  }
+}
