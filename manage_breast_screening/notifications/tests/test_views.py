@@ -7,6 +7,9 @@ import pytest
 from django.http import JsonResponse
 from django.test import RequestFactory
 
+from manage_breast_screening.notifications.management.commands.helpers.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.views import create_message_status
 
 
@@ -14,6 +17,12 @@ from manage_breast_screening.notifications.views import create_message_status
 def setup(monkeypatch):
     monkeypatch.setenv("NHS_NOTIFY_APPLICATION_ID", "application_id")
     monkeypatch.setenv("NHS_NOTIFY_API_KEY", "api_key")
+
+
+@pytest.fixture(autouse=True)
+def mock_insights_logger(monkeypatch):
+    mock_insights_logger = MagicMock()
+    monkeypatch.setattr(ApplicationInsightsLogging, "getLogger", mock_insights_logger)
 
 
 def test_create_message_status_with_valid_request():
