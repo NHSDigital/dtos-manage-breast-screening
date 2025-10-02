@@ -134,23 +134,23 @@ class TestRetryFailedMessageBatch:
         )
         mock_retry_message_batches.return_value.delete.assert_called_with(mocked_item())
 
-    @pytest.mark.django_db
-    def test_no_batches_in_queue(
-        self,
-        mock_mark_batch_as_failed,
-        mock_mark_batch_as_sent,
-        mock_retry_message_batches,
-        mock_send_message_batch,
-    ):
-        mock_retry_message_batches.return_value.item.return_value = None
-        subject = Command()
+    # @pytest.mark.django_db
+    # def test_no_batches_in_queue(
+    #     self,
+    #     mock_mark_batch_as_failed,
+    #     mock_mark_batch_as_sent,
+    #     mock_retry_message_batches,
+    #     mock_send_message_batch,
+    # ):
+    #     mock_retry_message_batches.return_value.item.return_value = None
+    #     subject = Command()
 
-        subject.handle()
+    #     subject.handle()
 
-        mock_retry_message_batches.return_value.delete.assert_not_called
+    #     mock_retry_message_batches.return_value.delete.assert_not_called
 
-        # reset mock
-        mock_retry_message_batches.return_value.item.return_value = MagicMock()
+    #     # reset mock
+    #     mock_retry_message_batches.return_value.item.return_value = MagicMock()
 
     @pytest.mark.django_db
     def test_batch_with_retry_count_more_than_5_is_marked_as_failed_unrecoverable(

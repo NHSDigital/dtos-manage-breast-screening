@@ -35,6 +35,10 @@ class Command(BaseCommand):
             queue_message = queue.item()
 
             if queue_message is None:
+                ApplicationInsightsLogging().trigger_an_event(
+                    "batch_marked_as_failed", "some attribute"
+                )
+                raise Exception("no messages in queue")
                 logger.info("No messages on queue")
                 return
 
