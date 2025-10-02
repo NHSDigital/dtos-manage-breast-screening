@@ -28,10 +28,10 @@ class TestRoutingPlan:
     def test_routing_plan_episode_types(self):
         plans = RoutingPlan.all()
 
-        assert plans[0].episode_types == ["F", "S"]
+        assert plans[0].episode_types == ["F", "G", "S"]
         assert plans[1].episode_types == ["R"]
 
-    @pytest.mark.parametrize("episode_type", ["F", "R", "S"])
+    @pytest.mark.parametrize("episode_type", ["F", "G", "R", "S"])
     def test_routing_plan_for_episode_type(self, episode_type):
         plan = RoutingPlan.for_episode_type(episode_type)
 

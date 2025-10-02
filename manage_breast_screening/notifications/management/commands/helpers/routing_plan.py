@@ -15,6 +15,7 @@ class RoutingPlan:
                 "b838b13c-f98c-4def-93f0-515d4e4f4ee1",
                 [
                     EpisodeTypes.ROUTINE_FIRST_CALL.value,
+                    EpisodeTypes.GP_REFERRAL.value,
                     EpisodeTypes.SELF_REFERRAL.value,
                 ],
             ),
@@ -28,6 +29,7 @@ class RoutingPlan:
                 "e82809da-0e58-4915-9774-cc781332d893",
                 [
                     EpisodeTypes.ROUTINE_FIRST_CALL.value,
+                    EpisodeTypes.GP_REFERRAL.value,
                     EpisodeTypes.SELF_REFERRAL.value,
                 ],
             ),
