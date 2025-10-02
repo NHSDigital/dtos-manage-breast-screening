@@ -172,12 +172,8 @@ class Command(BaseCommand):
 
     def handle_aliased_column(
         self, expected_name: str, fallback_name: str, row: pandas.Series
-    ) -> str | None:
-        if expected_name in row:
-            return row[expected_name]
-        elif fallback_name in row:
-            return row[fallback_name]
-        return None
+    ) -> object:
+        return row.get(expected_name, row.get(fallback_name))
 
     def appointment_date_and_time(self, row: pandas.Series) -> datetime:
         dt = datetime.strptime(
