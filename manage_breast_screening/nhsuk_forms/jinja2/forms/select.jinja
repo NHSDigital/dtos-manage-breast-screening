@@ -18,6 +18,7 @@
   "id": field.auto_id,
   "label": {"text": field.label, "classes": unbound_field.label_classes},
   "errorMessage": error_message,
+  "classes": unbound_field.classes if unbound_field.classes,
   "hint": {
     "html": unbound_field.hint|e
   } if unbound_field.hint,
