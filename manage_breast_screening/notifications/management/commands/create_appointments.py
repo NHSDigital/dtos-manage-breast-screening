@@ -113,15 +113,13 @@ class Command(BaseCommand):
                     nbss_id=row["Appointment ID"],
                     nhs_number=row["NHS Num"],
                     number=row["Screen Appt num"],
-                    batch_id=row.get(
-                        self.handle_aliased_column("Batch ID", "BatchID", row)
-                    ),
+                    batch_id=self.handle_aliased_column("Batch ID", "BatchID", row),
                     clinic=clinic,
                     episode_started_at=datetime.strptime(
                         row["Episode Start"], "%Y%m%d"
                     ).replace(tzinfo=TZ_INFO),
-                    episode_type=row.get(
-                        self.handle_aliased_column("Episode Type", "Epsiode Type", row)
+                    episode_type=self.handle_aliased_column(
+                        "Episode Type", "Epsiode Type", row
                     ),
                     starts_at=self.appointment_date_and_time(row),
                     status=row["Status"],
@@ -129,12 +127,12 @@ class Command(BaseCommand):
                     booked_at=self.workflow_action_date_and_time(
                         row["Action Timestamp"]
                     ),
-                    assessment=row.get(
+                    assessment=(
                         self.handle_aliased_column(
                             "Screen or Assess", "Screen or Asses", row
                         )
-                    )
-                    == "A",
+                        == "A"
+                    ),
                 ),
                 True,
             )
@@ -174,10 +172,12 @@ class Command(BaseCommand):
 
     def handle_aliased_column(
         self, expected_name: str, fallback_name: str, row: pandas.Series
-    ) -> str:
+    ) -> str | None:
         if expected_name in row:
             return row[expected_name]
-        return row[fallback_name]
+        elif fallback_name in row:
+            return row[fallback_name]
+        return None
 
     def appointment_date_and_time(self, row: pandas.Series) -> datetime:
         dt = datetime.strptime(
