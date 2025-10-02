@@ -19,8 +19,8 @@ from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
 from manage_breast_screening.nhsuk_forms.utils import YesNo, yes_no, yes_no_field
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
+    SkinChangeChoices,
     SymptomAreas,
-    SymptomSubType,
     SymptomType,
 )
 
@@ -336,16 +336,6 @@ class SwellingOrShapeChangeForm(SymptomForm):
 
 
 class SkinChangeForm(SymptomForm):
-    class SymptomSubTypeChoices(TextChoices):
-        SORES_OR_CYSTS = SymptomSubType.SORES_OR_CYSTS, "Sores or cysts"
-        DIMPLES_OR_INDENTATION = (
-            SymptomSubType.DIMPLES_OR_INDENTATION,
-            "Dimples or indentation",
-        )
-        RASH = SymptomSubType.RASH, "Rash"
-        COLOUR_CHANGE = SymptomSubType.COLOUR_CHANGE, "Colour change"
-        OTHER = SymptomSubType.OTHER, "Other"
-
     area = ChoiceField(
         choices=RightLeftOtherChoices,
         label="Where is the skin change located?",
@@ -361,7 +351,7 @@ class SkinChangeForm(SymptomForm):
         classes="nhsuk-u-width-two-thirds",
     )
     symptom_sub_type = ChoiceField(
-        choices=SymptomSubTypeChoices,
+        choices=SkinChangeChoices,
         label="How has the skin changed?",
         error_messages={"required": "Select how the skin has changed"},
     )
@@ -395,7 +385,7 @@ class SkinChangeForm(SymptomForm):
         self.set_conditionally_required(
             conditionally_required_field="symptom_sub_type_details",
             predicate_field="symptom_sub_type",
-            predicate_field_value=self.SymptomSubTypeChoices.OTHER,
+            predicate_field_value=SkinChangeChoices.OTHER,
         )
         self.set_conditionally_required(
             conditionally_required_field="specific_date",
