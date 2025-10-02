@@ -9,8 +9,9 @@ class ApplicationInsightsLogging:
         self.logger = self.getLogger()
 
     @staticmethod
-    def getLogger():
-        try:
+    def configure_azure_monitor():
+        # This could be an env var boolean instead of checking for the string
+        if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING") is not None:
             logger_name = os.getenv(
                 "APPLICATIONINSIGHTS_LOGGER_NAME", "manbrs-notifications-local"
             )
@@ -19,6 +20,13 @@ class ApplicationInsightsLogging:
             configure_azure_monitor(
                 # Set the namespace for the logger in which you would like to collect telemetry for if you are collecting logging telemetry. This is imperative so you do not collect logging telemetry from the SDK itself.
                 logger_name=logger_name,
+            )
+
+    @staticmethod
+    def getLogger():
+        try:
+            logger_name = os.getenv(
+                "APPLICATIONINSIGHTS_LOGGER_NAME", "manbrs-notifications-local"
             )
             # Logging telemetry will be collected from logging calls made with this logger and all of it's children loggers.
             return logging.getLogger(logger_name)
