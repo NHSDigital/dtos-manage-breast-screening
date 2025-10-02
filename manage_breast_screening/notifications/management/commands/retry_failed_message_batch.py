@@ -4,6 +4,9 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand, CommandError
 
+from manage_breast_screening.notifications.management.commands.helpers.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )
@@ -24,40 +27,40 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        logger.info("Retry Failed Message Batch Command started")
-        queue = Queue.RetryMessageBatches()
-        queue_message = queue.item()
+        try:
+            logger.info("Retry Failed Message Batch Command started")
+            queue = Queue.RetryMessageBatches()
+            queue_message = queue.item()
 
-        if queue_message is None:
-            logger.info("No messages on queue")
-            return
+            if queue_message is None:
+                logger.info("No messages on queue")
+                return
 
-        message_batch_id = json.loads(queue_message.content)["message_batch_id"]
-        message_batch = MessageBatch.objects.filter(
-            id=message_batch_id,
-            status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value,
-        ).first()
+            message_batch_id = json.loads(queue_message.content)["message_batch_id"]
+            message_batch = MessageBatch.objects.filter(
+                id=message_batch_id,
+                status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value,
+            ).first()
 
-        if message_batch is None:
-            raise CommandError(
-                (
-                    f"Message Batch with id {message_batch_id} and status of "
-                    f"'{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
+            if message_batch is None:
+                raise CommandError(
+                    (
+                        f"Message Batch with id {message_batch_id} and status of "
+                        f"'{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
+                    )
                 )
-            )
 
-        queue.delete(queue_message)
-        logger.info("Message Batch with id %s deleted from queue", message_batch_id)
+            queue.delete(queue_message)
+            logger.info("Message Batch with id %s deleted from queue", message_batch_id)
 
-        retry_count = int(json.loads(queue_message.content)["retry_count"])
-        if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):
-            logger.info(
-                "Retrying Message Batch with id %s with retry count %s",
-                message_batch_id,
-                retry_count,
-            )
+            retry_count = int(json.loads(queue_message.content)["retry_count"])
+            if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):
+                logger.info(
+                    "Retrying Message Batch with id %s with retry count %s",
+                    message_batch_id,
+                    retry_count,
+                )
 
-            try:
                 response = ApiClient().send_message_batch(message_batch)
 
                 if response.status_code == 201:
@@ -70,16 +73,20 @@ class Command(BaseCommand):
                         response=response,
                         retry_count=(retry_count + 1),
                     )
-
-            except Exception as e:
-                raise CommandError(e)
-        else:
-            logger.error(
-                "Failed Message Batch with id %s not sent: Retry limit exceeded",
-                message_batch_id,
+            else:
+                logger.error(
+                    "Failed Message Batch with id %s not sent: Retry limit exceeded",
+                    message_batch_id,
+                )
+                message_batch.status = (
+                    MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
+                )
+                message_batch.save()
+                raise Exception(
+                    f"Message Batch with id {message_batch_id} not sent: Retry limit exceeded"
+                )
+        except Exception as e:
+            ApplicationInsightsLogging().raise_an_exception(
+                f"RetryFailedMessageBatchError: {e}"
             )
-            message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
-            message_batch.save()
-            raise CommandError(
-                f"Message Batch with id {message_batch_id} not sent: Retry limit exceeded"
-            )
+            raise CommandError(e)
