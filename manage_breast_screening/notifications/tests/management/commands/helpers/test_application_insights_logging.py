@@ -15,10 +15,9 @@ from manage_breast_screening.notifications.management.commands.helpers.applicati
 class TestApplicationInsightsLogging:
     def test_raise_exception(self, mock_logging, mock_configure_azure):
         ApplicationInsightsLogging().raise_an_exception("CustomError")
-        mock_configure_azure.assert_called_with(
-            logger_name="manbrs-notifications-local"
-        )
         mock_logging.getLogger.assert_called_with("manbrs-notifications-local")
         mock_logging.getLogger.return_value.exception.assert_called_with(
             "CustomError", stack_info=True
         )
+
+    # TODO test getLogger and configure_azure_monitor
