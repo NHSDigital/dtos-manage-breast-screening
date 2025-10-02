@@ -17,11 +17,11 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            logger.info("Store MESH Messages Command started")
+            logger.info("Store MESH Messages command started")
             today_dirname = datetime.today().strftime("%Y-%m-%d")
             with MeshInbox() as inbox:
                 for message_id in inbox.fetch_message_ids():
-                    logger.debug(f"Processing message {message_id}")
+                    logger.debug("Processing message %s", message_id)
                     message = inbox.fetch_message(message_id)
 
                     BlobStorage().add(
@@ -29,12 +29,14 @@ class Command(BaseCommand):
                         message.read().decode("ASCII"),
                     )
 
-                    logger.info(f"Message {message.id} stored in blob storage")
+                    logger.info("Message %s stored in blob storage", message_id)
 
                     inbox.acknowledge(message_id)
 
-                    logger.info(f"Message {message.id} acknowledged")
+                    logger.info("Message %s acknowledged", message_id)
+
+            logger.info("Store MESH Messages command completed successfully")
 
         except Exception as e:
-            logger.error(e)
+            logger.error(e, exc_info=True)
             raise CommandError(e)
