@@ -3,7 +3,7 @@ from datetime import date
 from typing import Any
 
 from django.db.models import TextChoices
-from django.forms import Form, ValidationError
+from django.forms import CheckboxSelectMultiple, Form, ValidationError
 from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
@@ -14,10 +14,12 @@ from manage_breast_screening.nhsuk_forms.fields import (
     SplitDateField,
 )
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
+    MultipleChoiceField,
     RadioSelectWithoutFieldset,
 )
 from manage_breast_screening.nhsuk_forms.utils import YesNo, yes_no, yes_no_field
 from manage_breast_screening.participants.models.symptom import (
+    NippleChangeChoices,
     RelativeDateChoices,
     SkinChangeChoices,
     SymptomAreas,
@@ -29,6 +31,11 @@ class RightLeftOtherChoices(TextChoices):
     RIGHT_BREAST = SymptomAreas.RIGHT_BREAST.value, SymptomAreas.RIGHT_BREAST.label
     LEFT_BREAST = SymptomAreas.LEFT_BREAST.value, SymptomAreas.LEFT_BREAST.label
     OTHER = SymptomAreas.OTHER.value, SymptomAreas.OTHER.label
+
+
+class RightLeftNippleChoices(TextChoices):
+    RIGHT_BREAST = SymptomAreas.RIGHT_BREAST.value, "Right nipple"
+    LEFT_BREAST = SymptomAreas.LEFT_BREAST.value, "Left nipple"
 
 
 class CommonFields:
@@ -100,7 +107,11 @@ class SymptomForm(Form):
 
         if instance:
             kwargs["initial"] = {
-                "area": instance.area,
+                "area": (
+                    self._area_checkboxes(instance.area)
+                    if self.symptom_type == SymptomType.NIPPLE_CHANGE
+                    else instance.area
+                ),
                 "area_description": instance.area_description,
                 "symptom_sub_type": instance.symptom_sub_type_id,
                 "symptom_sub_type_details": instance.symptom_sub_type_details,
@@ -201,7 +212,14 @@ class SymptomForm(Form):
         splitting year/month tuples into multiple fields, and blanking
         conditionally revealed fields that are no longer visible.
         """
-        area = self.cleaned_data["area"]
+        match self.cleaned_data["area"]:
+            case [SymptomAreas.RIGHT_BREAST, SymptomAreas.LEFT_BREAST]:
+                area = SymptomAreas.BOTH_BREASTS
+            case [one]:
+                area = one
+            case _:
+                area = self.cleaned_data["area"]
+
         area_description = self.cleaned_data.get("area_description", "")
         symptom_sub_type = self.cleaned_data.get("symptom_sub_type")
         symptom_sub_type_details = self.cleaned_data.get("symptom_sub_type_details", "")
@@ -229,6 +247,15 @@ class SymptomForm(Form):
             when_resolved=when_resolved,
             additional_information=additional_information,
         )
+
+    def _area_checkboxes(self, area):
+        if area == SymptomAreas.BOTH_BREASTS:
+            return [
+                RightLeftNippleChoices.RIGHT_BREAST.value,
+                RightLeftNippleChoices.LEFT_BREAST.value,
+            ]
+        else:
+            return [area.value]
 
 
 class LumpForm(SymptomForm):
@@ -386,6 +413,58 @@ class SkinChangeForm(SymptomForm):
             conditionally_required_field="symptom_sub_type_details",
             predicate_field="symptom_sub_type",
             predicate_field_value=SkinChangeChoices.OTHER,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="specific_date",
+            predicate_field="when_started",
+            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="investigation_details",
+            predicate_field="investigated",
+            predicate_field_value=YesNo.YES,
+        )
+
+
+class NippleChangeForm(SymptomForm):
+    area = MultipleChoiceField(
+        choices=RightLeftNippleChoices,
+        widget=CheckboxSelectMultiple,
+        label="Which nipple has changed?",
+        error_messages={"required": "Select which nipples have changed"},
+        classes="app-checkboxes--inline",
+    )
+    symptom_sub_type = ChoiceField(
+        choices=NippleChangeChoices,
+        label="Describe the change",
+        error_messages={"required": "Describe the change"},
+    )
+    symptom_sub_type_details = CharField(
+        required=False,
+        label="Provide details",
+        error_messages={"required": "Enter details of the change"},
+        classes="nhsuk-u-width-two-thirds",
+    )
+    when_started = CommonFields.when_started
+    specific_date = CommonFields.specific_date
+    intermittent = CommonFields.intermittent
+    recently_resolved = CommonFields.recently_resolved
+    when_resolved = CommonFields.when_resolved
+    investigated = CommonFields.investigated
+    investigation_details = CommonFields.investigation_details
+    additional_information = CommonFields.additional_information
+
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(
+            symptom_type=SymptomType.NIPPLE_CHANGE,
+            instance=instance,
+            **kwargs,
+        )
+
+        self.set_conditionally_required(
+            conditionally_required_field="symptom_sub_type_details",
+            predicate_field="symptom_sub_type",
+            predicate_field_value=NippleChangeChoices.OTHER,
         )
         self.set_conditionally_required(
             conditionally_required_field="specific_date",
