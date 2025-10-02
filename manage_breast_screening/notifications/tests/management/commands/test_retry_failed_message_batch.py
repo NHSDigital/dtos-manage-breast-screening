@@ -5,6 +5,9 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 import requests
 
+from manage_breast_screening.notifications.management.commands.helpers.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )
