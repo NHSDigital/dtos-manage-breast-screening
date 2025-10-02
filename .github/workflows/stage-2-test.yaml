@@ -100,7 +100,7 @@ jobs:
 
   notifications-integration-test:
     needs: test
-    if: needs.test.outputs.notifications-changed == 'true'
+    if: github.ref == 'refs/heads/main' || needs.test.outputs.notifications-changed == 'true'
     name: 'Notifications Integration Tests'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -145,7 +145,7 @@ jobs:
 
   notifications-end-to-end-test:
     needs: test
-    if: needs.test.outputs.notifications-changed == 'true'
+    if: github.ref == 'refs/heads/main' || needs.test.outputs.notifications-changed == 'true'
     name: 'Notifications End to End Tests'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -190,7 +190,7 @@ jobs:
 
   frontend-integration-test:
     needs: test
-    if: needs.test.outputs.frontend-changed == 'true'
+    if: github.ref == 'refs/heads/main' || needs.test.outputs.frontend-changed == 'true'
     name: 'Frontend Tests'
     runs-on: ubuntu-latest
     timeout-minutes: 5
