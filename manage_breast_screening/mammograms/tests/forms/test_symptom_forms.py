@@ -22,6 +22,7 @@ class TestLumpForm:
         form = LumpForm(
             data={
                 "area": RightLeftOtherChoices.LEFT_BREAST,
+                "area_description_left_breast": "abc",
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
                 "investigated": YesNo.NO,
             }
@@ -50,7 +51,7 @@ class TestLumpForm:
 
         assert not form.is_valid()
         assert form.errors == {
-            "area_description": [
+            "area_description_other": [
                 "Describe the specific area where the lump is located"
             ],
             "specific_date": ["Enter the date the symptom started"],
@@ -64,7 +65,7 @@ class TestLumpForm:
                 "area": RightLeftOtherChoices.OTHER,
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
-                "area_description": "abc",
+                "area_description_other": "abc",
                 "specific_date_0": "2",
                 "specific_date_1": "2025",
                 "investigation_details": "def",
@@ -82,10 +83,10 @@ class TestLumpForm:
 
         form = LumpForm(
             data={
-                "area": RightLeftOtherChoices.OTHER,
+                "area": RightLeftOtherChoices.LEFT_BREAST,
+                "area_description_left_breast": "abc",
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
-                "area_description": "abc",
                 "specific_date_0": "2",
                 "specific_date_1": "2025",
                 "investigation_details": "def",
@@ -98,7 +99,7 @@ class TestLumpForm:
 
         assert obj.appointment == appointment
         assert obj.symptom_type_id == SymptomType.LUMP
-        assert obj.area == SymptomAreas.OTHER
+        assert obj.area == SymptomAreas.LEFT_BREAST
         assert obj.area_description == "abc"
         assert obj.investigated
         assert obj.investigation_details == "def"
@@ -115,9 +116,10 @@ class TestLumpForm:
         form = LumpForm(
             data={
                 "area": RightLeftOtherChoices.RIGHT_BREAST,
+                "area_description_right_breast": "abc",
                 "when_started": RelativeDateChoices.NOT_SURE,
                 "investigated": YesNo.NO,
-                "area_description": "abc",
+                "area_description_other": "def",
                 "specific_date_0": "2",
                 "specific_date_1": "2025",
                 "investigation_details": "def",
@@ -128,7 +130,7 @@ class TestLumpForm:
 
         obj = form.create(appointment=appointment, request=request)
 
-        assert not obj.area_description
+        assert obj.area_description == "abc"
         assert not obj.investigation_details
         assert not obj.year_started
         assert not obj.month_started
@@ -149,6 +151,7 @@ class TestLumpForm:
         form = LumpForm(
             data={
                 "area": RightLeftOtherChoices.LEFT_BREAST,
+                "area_description_left_breast": "abc",
                 "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
                 "investigated": YesNo.YES,
                 "investigation_details": "abc",
@@ -173,6 +176,7 @@ class TestSwellingOrShapeChangeForm:
         form = LumpForm(
             data={
                 "area": RightLeftOtherChoices.LEFT_BREAST,
+                "area_description_left_breast": "abc",
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
                 "investigated": YesNo.NO,
             }
@@ -201,7 +205,7 @@ class TestSwellingOrShapeChangeForm:
 
         assert not form.is_valid()
         assert form.errors == {
-            "area_description": [
+            "area_description_other": [
                 "Describe the specific area where the lump is located"
             ],
             "specific_date": ["Enter the date the symptom started"],
@@ -215,7 +219,7 @@ class TestSwellingOrShapeChangeForm:
                 "area": RightLeftOtherChoices.OTHER,
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
-                "area_description": "abc",
+                "area_description_other": "abc",
                 "specific_date_0": "2",
                 "specific_date_1": "2025",
                 "investigation_details": "def",
