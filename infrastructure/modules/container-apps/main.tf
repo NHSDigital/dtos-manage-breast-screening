@@ -22,8 +22,8 @@ module "webapp" {
   container_app_environment_id     = var.container_app_environment_id
   resource_group_name              = azurerm_resource_group.main.name
   fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
-  infra_key_vault_name             = "kv-${var.app_short_name}-${var.env_config}-inf"
-  infra_key_vault_rg               = "rg-${var.app_short_name}-${var.env_config}-infra"
+  infra_key_vault_name             = var.infra_key_vault_name
+  infra_key_vault_rg               = var.infra_key_vault_rg
   enable_auth                      = var.enable_auth
   app_key_vault_id                 = var.app_key_vault_id
   docker_image                     = var.docker_image

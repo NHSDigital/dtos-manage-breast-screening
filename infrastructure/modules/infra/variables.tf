@@ -31,7 +31,16 @@ variable "vnet_address_space" {
 variable "protect_keyvault" {
   description = "Ability to recover the key vault or its secrets after deletion"
   type        = bool
-  default     = true
+}
+
+variable "infra_key_vault_name" {
+  description = "Name of the infra key vault"
+  type        = string
+}
+
+variable "infra_key_vault_rg" {
+  description = "Name of the infra key vault resource group"
+  type        = string
 }
 
 locals {

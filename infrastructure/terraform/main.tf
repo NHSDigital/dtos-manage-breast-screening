@@ -8,13 +8,15 @@ module "infra" {
     azurerm.hub = azurerm.hub
   }
 
-  region              = local.region
-  resource_group_name = local.resource_group_name
-  app_short_name      = var.app_short_name
-  environment         = var.env_config
-  hub                 = var.hub
-  protect_keyvault    = var.protect_keyvault
-  vnet_address_space  = var.vnet_address_space
+  region               = local.region
+  resource_group_name  = local.resource_group_name
+  infra_key_vault_name = local.infra_key_vault_name
+  infra_key_vault_rg   = local.infra_key_vault_rg
+  app_short_name       = var.app_short_name
+  environment          = var.env_config
+  hub                  = var.hub
+  protect_keyvault     = var.protect_keyvault
+  vnet_address_space   = var.vnet_address_space
 }
 
 module "shared_config" {
@@ -36,6 +38,9 @@ module "container-apps" {
   }
 
   region                                = local.region
+  action_group_id                       = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
+  alert_window_size                     = var.alert_window_size
+  enable_alerting                       = var.enable_alerting
   app_key_vault_id                      = var.deploy_infra ? module.infra[0].app_key_vault_id : data.azurerm_key_vault.app_key_vault[0].id
   app_short_name                        = var.app_short_name
   allowed_paths                         = var.allowed_paths
@@ -61,4 +66,6 @@ module "container-apps" {
   main_subnet_id                        = var.deploy_infra ? module.infra[0].main_subnet_id : data.azurerm_subnet.main[0].id
   seed_demo_data                        = var.seed_demo_data
   use_apex_domain                       = var.use_apex_domain
+  infra_key_vault_name                  = local.infra_key_vault_name
+  infra_key_vault_rg                    = local.infra_key_vault_rg
 }
