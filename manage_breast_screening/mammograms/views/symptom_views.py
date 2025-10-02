@@ -10,7 +10,7 @@ from manage_breast_screening.mammograms.presenters.medical_information_presenter
 )
 from manage_breast_screening.participants.models.symptom import Symptom
 
-from ..forms.symptom_forms import LumpForm, SwellingOrShapeChangeForm
+from ..forms.symptom_forms import LumpForm, SkinChangeForm, SwellingOrShapeChangeForm
 from .mixins import InProgressAppointmentMixin
 
 
@@ -44,8 +44,8 @@ class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
             {
                 "back_link_params": self.get_back_link_params(),
                 "caption": participant.full_name,
-                "heading": f"Details of the {self.symptom_type_name}",
-                "page_title": f"Details of the {self.symptom_type_name}",
+                "heading": f"Details of the {self.symptom_type_name.lower()}",
+                "page_title": f"Details of the {self.symptom_type_name.lower()}",
             },
         )
 
@@ -119,6 +119,16 @@ class AddSwellingOrShapeChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
 
 
+class AddSkinChangeView(AddSymptomView):
+    """
+    Add a symptom: skin change
+    """
+
+    symptom_type_name = "Skin change"
+    form_class = SkinChangeForm
+    template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
+
+
 class ChangeLumpView(ChangeSymptomView):
     """
     Change a symptom: lump
@@ -131,7 +141,7 @@ class ChangeLumpView(ChangeSymptomView):
 
 class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
     """
-    Change a symptom: lump
+    Change a symptom: swelling or shape change
     """
 
     symptom_type_name = "swelling or shape change"
@@ -139,7 +149,17 @@ class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
     template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
 
 
-class DeleteLump(View):
+class ChangeSkinChangeView(ChangeSymptomView):
+    """
+    Change a symtom: skin change
+    """
+
+    symptom_type_name = "Skin change"
+    form_class = SkinChangeForm
+    template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
+
+
+class DeleteSymptomView(View):
     def get(self, request, *args, **kwargs):
         symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
 

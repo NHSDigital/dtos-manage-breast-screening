@@ -26,24 +26,69 @@ class TestRecordMedicalInformationPresenter:
             (SymptomAreas.OTHER, "Other"),
         ],
     )
-    def test_returns_symptoms(self, area, expected_location):
-        symptom = SymptomFactory.create(
+    def test_presents_symptoms_with_area(self, area, expected_location):
+        lump = SymptomFactory.create(
             lump=True,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
             area=area,
             investigated=False,
         )
 
-        presenter = MedicalInformationPresenter(symptom.appointment)
+        presenter = MedicalInformationPresenter(lump.appointment)
 
         assert presenter.symptoms == [
             PresentedSymptom(
-                id=symptom.id,
-                appointment_id=symptom.appointment_id,
-                symptom_type_id="lump",
+                id=lump.id,
+                appointment_id=lump.appointment.id,
+                symptom_type_id="LUMP",
                 symptom_type_name="Lump",
                 location_line=expected_location,
                 started_line="Less than 3 months",
+                investigated_line="Not investigated",
+            )
+        ]
+
+    def test_presents_symptoms_with_subtypes(self):
+        appointment = AppointmentFactory.create()
+
+        colour_change = SymptomFactory.create(
+            colour_change=True,
+            appointment=appointment,
+            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.RIGHT_BREAST,
+            investigated=False,
+        )
+
+        other_change = SymptomFactory.create(
+            other_skin_change=True,
+            appointment=appointment,
+            when_started=RelativeDateChoices.NOT_SURE,
+            area=SymptomAreas.OTHER,
+            investigated=False,
+            symptom_sub_type_details="abc",
+        )
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.symptoms == [
+            PresentedSymptom(
+                id=colour_change.id,
+                appointment_id=appointment.id,
+                symptom_type_id="SKIN_CHANGE",
+                symptom_type_name="Skin change",
+                location_line="Right breast",
+                started_line="Less than 3 months",
+                change_type_line="Change type: colour change",
+                investigated_line="Not investigated",
+            ),
+            PresentedSymptom(
+                id=other_change.id,
+                appointment_id=appointment.id,
+                symptom_type_id="SKIN_CHANGE",
+                symptom_type_name="Skin change",
+                location_line="Other",
+                started_line="Not sure",
+                change_type_line="Change type: abc",
                 investigated_line="Not investigated",
             ),
         ]
@@ -67,7 +112,7 @@ class TestRecordMedicalInformationPresenter:
             PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
-                symptom_type_id="lump",
+                symptom_type_id="LUMP",
                 symptom_type_name="Lump",
                 location_line="Right breast",
                 started_line="January 2025 (8 months ago)",
@@ -91,7 +136,7 @@ class TestRecordMedicalInformationPresenter:
             PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
-                symptom_type_id="lump",
+                symptom_type_id="LUMP",
                 symptom_type_name="Lump",
                 location_line="Left breast",
                 started_line="Not sure",

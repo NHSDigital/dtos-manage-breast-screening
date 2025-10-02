@@ -20,6 +20,7 @@ from manage_breast_screening.nhsuk_forms.utils import YesNo, yes_no, yes_no_fiel
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     SymptomAreas,
+    SymptomSubType,
     SymptomType,
 )
 
@@ -63,7 +64,7 @@ class CommonFields:
     investigated = yes_no_field(
         label="Has this been investigated?",
         error_messages={
-            "required": "Select whether the lump has been investigated or not"
+            "required": "Select whether the symptom has been investigated or not"
         },
     )
     investigation_details = CharField(
@@ -101,6 +102,8 @@ class SymptomForm(Form):
             kwargs["initial"] = {
                 "area": instance.area,
                 "area_description": instance.area_description,
+                "symptom_sub_type": instance.symptom_sub_type_id,
+                "symptom_sub_type_details": instance.symptom_sub_type_details,
                 "when_started": instance.when_started,
                 "specific_date": (instance.month_started, instance.year_started),
                 "intermittent": instance.intermittent,
@@ -200,6 +203,8 @@ class SymptomForm(Form):
         """
         area = self.cleaned_data["area"]
         area_description = self.cleaned_data.get("area_description", "")
+        symptom_sub_type = self.cleaned_data.get("symptom_sub_type")
+        symptom_sub_type_details = self.cleaned_data.get("symptom_sub_type_details", "")
         when_started = self.cleaned_data.get("when_started")
         specific_date = self.cleaned_data.get("specific_date")
         investigated = self.cleaned_data.get("investigated") == YesNo.YES
@@ -212,6 +217,8 @@ class SymptomForm(Form):
         return dict(
             area=area,
             area_description=area_description,
+            symptom_sub_type_id=symptom_sub_type,
+            symptom_sub_type_details=symptom_sub_type_details,
             investigated=investigated,
             investigation_details=investigation_details,
             when_started=when_started,
@@ -320,6 +327,80 @@ class SwellingOrShapeChangeForm(SymptomForm):
             conditionally_required_field="when_resolved",
             predicate_field="recently_resolved",
             predicate_field_value=True,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="investigation_details",
+            predicate_field="investigated",
+            predicate_field_value=YesNo.YES,
+        )
+
+
+class SkinChangeForm(SymptomForm):
+    class SymptomSubTypeChoices(TextChoices):
+        SORES_OR_CYSTS = SymptomSubType.SORES_OR_CYSTS, "Sores or cysts"
+        DIMPLES_OR_INDENTATION = (
+            SymptomSubType.DIMPLES_OR_INDENTATION,
+            "Dimples or indentation",
+        )
+        RASH = SymptomSubType.RASH, "Rash"
+        COLOUR_CHANGE = SymptomSubType.COLOUR_CHANGE, "Colour change"
+        OTHER = SymptomSubType.OTHER, "Other"
+
+    area = ChoiceField(
+        choices=RightLeftOtherChoices,
+        label="Where is the skin change located?",
+        error_messages={"required": "Select the location of the skin change"},
+    )
+    area_description = CharField(
+        required=False,
+        label="Describe the specific area",
+        hint="For example, the left armpit",
+        error_messages={
+            "required": "Describe the specific area where the skin change is located"
+        },
+        classes="nhsuk-u-width-two-thirds",
+    )
+    symptom_sub_type = ChoiceField(
+        choices=SymptomSubTypeChoices,
+        label="How has the skin changed?",
+        error_messages={"required": "Select how the skin has changed"},
+    )
+    symptom_sub_type_details = CharField(
+        required=False,
+        label="Describe the change",
+        error_messages={"required": "Enter a description of the change"},
+        classes="nhsuk-u-width-two-thirds",
+    )
+    when_started = CommonFields.when_started
+    specific_date = CommonFields.specific_date
+    intermittent = CommonFields.intermittent
+    recently_resolved = CommonFields.recently_resolved
+    when_resolved = CommonFields.when_resolved
+    investigated = CommonFields.investigated
+    investigation_details = CommonFields.investigation_details
+    additional_information = CommonFields.additional_information
+
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(
+            symptom_type=SymptomType.SKIN_CHANGE,
+            instance=instance,
+            **kwargs,
+        )
+
+        self.set_conditionally_required(
+            conditionally_required_field="area_description",
+            predicate_field="area",
+            predicate_field_value=RightLeftOtherChoices.OTHER,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="symptom_sub_type_details",
+            predicate_field="symptom_sub_type",
+            predicate_field_value=self.SymptomSubTypeChoices.OTHER,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="specific_date",
+            predicate_field="when_started",
+            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
         )
         self.set_conditionally_required(
             conditionally_required_field="investigation_details",

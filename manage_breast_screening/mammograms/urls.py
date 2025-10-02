@@ -71,8 +71,18 @@ urlpatterns = [
         name="change_symptom_swelling_or_shape_change",
     ),
     path(
+        "<uuid:pk>/record-medical-information/skin-change/",
+        symptom_views.AddSkinChangeView.as_view(),
+        name="add_symptom_skin_change",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/skin-change/<uuid:symptom_pk>/",
+        symptom_views.ChangeSkinChangeView.as_view(),
+        name="change_symptom_skin_change",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
-        symptom_views.DeleteLump.as_view(),
+        symptom_views.DeleteSymptomView.as_view(),
         name="delete_symptom",
     ),
 ]
