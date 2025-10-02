@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
-from random import randrange
 from zoneinfo import ZoneInfo
 
 import pytest
+from django.db import connection
 
 from manage_breast_screening.notifications.queries.failures_query import FailuresQuery
 from manage_breast_screening.notifications.tests.factories import (
@@ -15,125 +15,172 @@ from manage_breast_screening.notifications.tests.factories import (
 class TestFailuresQuery:
     def create_message_set(
         self,
-        date: datetime,
-        nhs_number: str,
-        episode_type: str,
-        status: str,
-        description: str,
+        appt_params: dict,
+        message_params: dict,
+        message_status_params: dict = None,
     ):
-        appt = AppointmentFactory(
-            starts_at=date, nhs_number=nhs_number, episode_type=episode_type
-        )
-        message = MessageFactory(appointment=appt)
-        MessageStatusFactory(message=message, status=status, description=description)
+        appt = AppointmentFactory(**appt_params)
+        message_params["sent_at"] = datetime.now() - timedelta(minutes=5)
+        message = MessageFactory(appointment=appt, **message_params)
+        if message_status_params:
+            message_status_params["status_updated_at"] = datetime.now() - timedelta(
+                minutes=7
+            )
+            MessageStatusFactory(message=message, **message_status_params)
+
         return appt
 
     @pytest.mark.django_db
     def test_failures_query_data_today(self):
-        def is_today(date_and_time: datetime) -> bool:
-            return date_and_time.strftime("%Y-%m-%d") == datetime.today().strftime(
-                "%Y-%m-%d"
-            )
-
-        def sometime_today():
-            now = datetime.today()
-            today = now.replace(hour=0, minute=0, tzinfo=ZoneInfo("Europe/London"))
-            return today + timedelta(hours=randrange(24), minutes=randrange(60))
-
+        appt_time = datetime.now(tz=ZoneInfo("Europe/London"))
         appt1 = self.create_message_set(
-            sometime_today(),
-            "9990001111",
-            "S",
-            "failed",
-            "No reachable communication channel",
+            {"starts_at": appt_time, "nhs_number": "9990001111", "episode_type": "S"},
+            {"status": "failed"},
+            {"status": "failed", "description": "No reachable communication channel"},
         )
         appt2 = self.create_message_set(
-            sometime_today(), "9990001112", "F", "failed", "Patient has an exit code"
+            {"starts_at": appt_time, "nhs_number": "9990001112", "episode_type": "F"},
+            {"status": "failed"},
+            {"status": "failed", "description": "Patient has an exit code"},
         )
         appt3 = self.create_message_set(
-            sometime_today(), "9990001113", "R", "failed", "Patient is formally dead"
+            {"starts_at": appt_time, "nhs_number": "9990001113", "episode_type": "R"},
+            {"status": "failed"},
+            {"status": "failed", "description": "Patient is formally dead"},
         )
         appt4 = self.create_message_set(
-            sometime_today(), "9990001114", "R", "failed", "Patient is informally dead"
+            {"starts_at": appt_time, "nhs_number": "9990001114", "episode_type": "R"},
+            {"status": "failed"},
+            {"status": "failed", "description": "Patient is informally dead"},
         )
         appt5 = self.create_message_set(
-            sometime_today(),
-            "9990001115",
-            "S",
-            "failed",
-            "No reachable communication channel",
+            {"starts_at": appt_time, "nhs_number": "9990001115", "episode_type": "S"},
+            {"status": "failed"},
+            {"status": "failed", "description": "No reachable communication channel"},
         )
-
-        self.create_message_set(
-            sometime_today(), "9990001116", "S", "delivered", "Delivered"
+        appt6 = self.create_message_set(
+            {"starts_at": appt_time, "nhs_number": "9990001116", "episode_type": "S"},
+            {
+                "status": "failed",
+                "nhs_notify_errors": {
+                    "errors": [
+                        {"code": "CM_INVALID_NHS_NUMBER", "title": "Invalid NHS number"}
+                    ]
+                },
+            },
+        )
+        appt7 = self.create_message_set(
+            {"starts_at": appt_time, "nhs_number": "9990001117", "episode_type": "S"},
+            {
+                "status": "failed",
+                "nhs_notify_errors": {
+                    "errors": [{"code": "CM_INVALID_VALUE", "title": "Invalid value"}]
+                },
+            },
         )
         self.create_message_set(
-            sometime_today() - timedelta(days=2),
-            "9990001117",
-            "S",
-            "failed",
-            "No reachable communication channel",
+            {
+                "starts_at": appt_time - timedelta(days=2),
+                "nhs_number": "9990001118",
+                "episode_type": "S",
+            },
+            {"status": "failed"},
+            {"status": "failed", "description": "No reachable communication channel"},
         )
         today_formatted = datetime.today().strftime("%Y-%m-%d")
 
-        results = FailuresQuery.query()
+        with connection.cursor() as cursor:
+            cursor.execute(FailuresQuery.sql(), (datetime.now().date(),))
+            results = cursor.fetchall()
 
-        assert len(results) == 5
+        assert len(results) == 7
 
-        assert results[0]["nhs_number"] == 9990001111
-        assert results[0]["appointment_date"] == appt1.starts_at
-        assert results[0]["episode_type"] == "Self referral"
-        assert results[0]["clinic_code"] == appt1.clinic.code
-        assert results[0]["failure_date"] == today_formatted
-        assert results[0]["failure_reason"] == "No reachable communication channel"
+        expectations = [
+            [
+                9990001111,
+                appt1.starts_at.strftime("%Y-%m-%d"),
+                appt1.clinic.code,
+                "Self referral",
+                today_formatted,
+                "No reachable communication channel",
+            ],
+            [
+                9990001112,
+                appt2.starts_at.strftime("%Y-%m-%d"),
+                appt2.clinic.code,
+                "Routine first call",
+                today_formatted,
+                "Patient has an exit code",
+            ],
+            [
+                9990001113,
+                appt3.starts_at.strftime("%Y-%m-%d"),
+                appt3.clinic.code,
+                "Routine recall",
+                today_formatted,
+                "Patient is formally dead",
+            ],
+            [
+                9990001114,
+                appt4.starts_at.strftime("%Y-%m-%d"),
+                appt4.clinic.code,
+                "Routine recall",
+                today_formatted,
+                "Patient is informally dead",
+            ],
+            [
+                9990001115,
+                appt5.starts_at.strftime("%Y-%m-%d"),
+                appt5.clinic.code,
+                "Self referral",
+                today_formatted,
+                "No reachable communication channel",
+            ],
+            [
+                9990001116,
+                appt6.starts_at.strftime("%Y-%m-%d"),
+                appt6.clinic.code,
+                "Self referral",
+                today_formatted,
+                "Invalid NHS number",
+            ],
+            [
+                9990001117,
+                appt7.starts_at.strftime("%Y-%m-%d"),
+                appt7.clinic.code,
+                "Self referral",
+                today_formatted,
+                "Invalid value",
+            ],
+        ]
 
-        assert results[1]["nhs_number"] == 9990001112
-        assert results[1]["appointment_date"] == appt2.starts_at
-        assert results[1]["episode_type"] == "Routine first call"
-        assert results[1]["clinic_code"] == appt2.clinic.code
-        assert results[1]["failure_date"] == today_formatted
-        assert results[1]["failure_reason"] == "Patient has an exit code"
-
-        assert results[2]["nhs_number"] == 9990001113
-        assert results[2]["appointment_date"] == appt3.starts_at
-        assert results[2]["episode_type"] == "Routine recall"
-        assert results[2]["clinic_code"] == appt3.clinic.code
-        assert results[2]["failure_date"] == today_formatted
-        assert results[2]["failure_reason"] == "Patient is formally dead"
-
-        assert results[3]["nhs_number"] == 9990001114
-        assert results[3]["appointment_date"] == appt4.starts_at
-        assert results[3]["episode_type"] == "Routine recall"
-        assert results[3]["clinic_code"] == appt4.clinic.code
-        assert results[3]["failure_date"] == today_formatted
-        assert results[3]["failure_reason"] == "Patient is informally dead"
-
-        assert results[4]["nhs_number"] == 9990001115
-        assert results[4]["appointment_date"] == appt5.starts_at
-        assert results[4]["episode_type"] == "Self referral"
-        assert results[4]["clinic_code"] == appt5.clinic.code
-        assert results[4]["failure_date"] == today_formatted
-        assert results[4]["failure_reason"] == "No reachable communication channel"
+        for idx, res in enumerate(results):
+            assert expectations[idx] == list(res)
 
     @pytest.mark.django_db
     def test_failures_query_for_given_date(self):
         the_date = datetime.today() - timedelta(days=2)
-
         self.create_message_set(
-            the_date, "9990001111", "S", "failed", "No reachable communication channel"
+            {"starts_at": the_date, "nhs_number": "9990001111", "episode_type": "S"},
+            {"status": "failed"},
+            {"status": "failed", "description": "No reachable communication channel"},
         )
         self.create_message_set(
-            the_date - timedelta(days=1),
-            "9990001112",
-            "R",
-            "failed",
-            "No reachable communication channel",
+            {
+                "starts_at": the_date - timedelta(days=1),
+                "nhs_number": "9990001112",
+                "episode_type": "F",
+            },
+            {"status": "failed"},
+            {"status": "failed", "description": "Patient has an exit code"},
         )
 
-        results = FailuresQuery.query(the_date)
+        with connection.cursor() as cursor:
+            cursor.execute(FailuresQuery.sql(), (the_date.date(),))
+            results = cursor.fetchall()
 
         assert len(results) == 1
-        assert results[0]["nhs_number"] == 9990001111
+        assert list(results[0])[0] == 9990001111
 
     def test_failures_query_columns(self):
         assert FailuresQuery.columns() == [
@@ -144,6 +191,3 @@ class TestFailuresQuery:
             "Failure date",
             "Failure reason",
         ]
-
-    def test_failures_query_sql(self):
-        assert 'SELECT "notifications_appointment"."nhs_number"' in FailuresQuery.sql()

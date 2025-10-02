@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 params = ("3 months",)
             else:
                 query = FailuresQuery
-                params = None
+                params = (datetime.now().date(),)
 
             dataframe = pandas.read_sql(
                 query.sql(), connection, params=params, columns=query.columns()
