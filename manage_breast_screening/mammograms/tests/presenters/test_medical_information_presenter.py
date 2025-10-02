@@ -62,7 +62,7 @@ class TestRecordMedicalInformationPresenter:
             PresentedSymptom(
                 id=symptom.id,
                 appointment_id=symptom.appointment_id,
-                symptom_type_id="lump",
+                symptom_type_id="LUMP",
                 symptom_type_name="Lump",
                 location_line="Other: abc",
                 started_line="Less than 3 months ago",
@@ -73,11 +73,11 @@ class TestRecordMedicalInformationPresenter:
     def test_presents_symptoms_with_subtypes(self):
         appointment = AppointmentFactory.create()
 
-        colour_change = SymptomFactory.create(
-            colour_change=True,
+        inversion = SymptomFactory.create(
+            inversion=True,
             appointment=appointment,
             when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-            area=SymptomAreas.RIGHT_BREAST,
+            area=SymptomAreas.BOTH_BREASTS,
             investigated=False,
         )
 
@@ -94,13 +94,13 @@ class TestRecordMedicalInformationPresenter:
 
         assert presenter.symptoms == [
             PresentedSymptom(
-                id=colour_change.id,
+                id=inversion.id,
                 appointment_id=appointment.id,
-                symptom_type_id="SKIN_CHANGE",
-                symptom_type_name="Skin change",
-                location_line="Right breast",
-                started_line="Less than 3 months",
-                change_type_line="Change type: colour change",
+                symptom_type_id="NIPPLE_CHANGE",
+                symptom_type_name="Nipple change",
+                location_line="Both breasts",
+                started_line="Less than 3 months ago",
+                change_type_line="Change type: inversion",
                 investigated_line="Not investigated",
             ),
             PresentedSymptom(
@@ -246,4 +246,24 @@ class TestRecordMedicalInformationPresenter:
         assert MedicalInformationPresenter(appointment).add_lump_link == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/lump/",
             "text": "Add another lump",
+        }
+
+    def test_add_nipple_change_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(appointment).add_nipple_change_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/nipple-change/",
+            "text": "Add a nipple change",
+        }
+
+        SymptomFactory.create(
+            appointment=appointment,
+            inversion=True,
+            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.BOTH_BREASTS,
+        )
+
+        assert MedicalInformationPresenter(appointment).add_nipple_change_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/nipple-change/",
+            "text": "Add another nipple change",
         }

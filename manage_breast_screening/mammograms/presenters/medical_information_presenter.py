@@ -5,7 +5,9 @@ from django.urls import reverse
 from manage_breast_screening.core.template_helpers import multiline_content
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
 from manage_breast_screening.participants.models.symptom import (
+    NippleChangeChoices,
     RelativeDateChoices,
+    SkinChangeChoices,
     SymptomAreas,
     SymptomType,
 )
@@ -76,9 +78,13 @@ class PresentedSymptom:
         )
 
         change_type_line = ""
-        if symptom.symptom_type_id == SymptomType.SKIN_CHANGE:
+        if symptom.symptom_type_id in [
+            SymptomType.SKIN_CHANGE,
+            SymptomType.NIPPLE_CHANGE,
+        ]:
             if (
-                symptom.symptom_sub_type_id == "OTHER"
+                symptom.symptom_sub_type_id
+                in [SkinChangeChoices.OTHER, NippleChangeChoices.OTHER]
                 and symptom.symptom_sub_type_details
             ):
                 change_type_line = f"Change type: {symptom.symptom_sub_type_details}"
@@ -109,6 +115,8 @@ class PresentedSymptom:
                 return "mammograms:change_symptom_swelling_or_shape_change"
             case SymptomType.SKIN_CHANGE:
                 return "mammograms:change_symptom_skin_change"
+            case SymptomType.NIPPLE_CHANGE:
+                return "mammograms:change_symptom_nipple_change"
             case _:
                 raise ValueError(self.symptom_type_id)
 
@@ -218,5 +226,21 @@ class MedicalInformationPresenter:
                 "Add another skin change"
                 if SymptomType.SKIN_CHANGE in self.existing_symptom_type_ids
                 else "Add a skin change"
+            ),
+        }
+
+    @property
+    def add_nipple_change_link(self):
+        url = reverse(
+            "mammograms:add_symptom_nipple_change",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": (
+                "Add another nipple change"
+                if SymptomType.NIPPLE_CHANGE in self.existing_symptom_type_ids
+                else "Add a nipple change"
             ),
         }
