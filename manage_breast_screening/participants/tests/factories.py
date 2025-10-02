@@ -17,6 +17,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
 )
 from manage_breast_screening.participants.models.symptom import (
+    NippleChangeChoices,
     SkinChangeChoices,
 )
 
@@ -156,6 +157,11 @@ class SymptomFactory(DjangoModelFactory):
 
         swelling_or_shape_change = Trait(
             symptom_type_id=models.SymptomType.SWELLING_OR_SHAPE_CHANGE,
+        )
+
+        inversion = Trait(
+            symptom_type_id=models.SymptomType.NIPPLE_CHANGE,
+            symptom_sub_type_id=NippleChangeChoices.INVERSION,
         )
 
         other = Trait(

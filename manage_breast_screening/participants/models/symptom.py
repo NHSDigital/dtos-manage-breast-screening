@@ -28,7 +28,17 @@ class SkinChangeChoices(TextChoices):
     )
     RASH = "RASH", "Rash"
     COLOUR_CHANGE = "COLOUR_CHANGE", "Colour change"
-    OTHER = "OTHER", "Other"
+    OTHER = "SKIN_CHANGE_OTHER", "Other"
+
+
+class NippleChangeChoices(TextChoices):
+    BLOODY_DISCHARGE = "NIPPLE_CHANGE_BLOODY_DISCHARGE", "Bloody discharge"
+    OTHER_DISCHARGE = "NIPPLE_CHANGE_OTHER_DISCHARGE", "Other discharge"
+    INVERSION = "NIPPLE_CHANGE_INVERSION", "Inversion"
+    RASH_OR_ECZEMA = "NIPPLE_CHANGE_RASH_OR_ECZEMA", "Rash or eczema"
+    SHAPE_CHANGE = "NIPPLE_CHANGE_SHAPE_CHANGE", "Shape change"
+    COLOUR_CHANGE = "NIPPLE_CHANGE_COLOUR_CHANGE", "Colour change"
+    OTHER = "NIPPLE_CHANGE_OTHER", "Other"
 
 
 class SymptomAreas(models.TextChoices):
