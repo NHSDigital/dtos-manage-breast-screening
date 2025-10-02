@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import TextChoices
 
 from ...core.models import BaseModel, ReferenceDataModel
 from .appointment import Appointment
@@ -15,14 +16,19 @@ class SymptomType(ReferenceDataModel):
 
 
 class SymptomSubType(ReferenceDataModel):
-    SORES_OR_CYSTS = "SORES_OR_CYSTS"
-    DIMPLES_OR_INDENTATION = "DIMPLES_OR_INDENTATION"
-    RASH = "RASH"
-    COLOUR_CHANGE = "COLOUR_CHANGE"
-    OTHER = "OTHER"
-
     symptom_type = models.ForeignKey(SymptomType, on_delete=models.CASCADE)
     name = models.CharField(null=False, blank=False)
+
+
+class SkinChangeChoices(TextChoices):
+    SORES_OR_CYSTS = "SORES_OR_CYSTS", "Sores or cysts"
+    DIMPLES_OR_INDENTATION = (
+        "DIMPLES_OR_INDENTATION",
+        "Dimples or indentation",
+    )
+    RASH = "RASH", "Rash"
+    COLOUR_CHANGE = "COLOUR_CHANGE", "Colour change"
+    OTHER = "OTHER", "Other"
 
 
 class SymptomAreas(models.TextChoices):

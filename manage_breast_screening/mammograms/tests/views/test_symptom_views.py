@@ -6,9 +6,9 @@ from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 from manage_breast_screening.nhsuk_forms.choices import YesNo
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
+    SkinChangeChoices,
     Symptom,
     SymptomAreas,
-    SymptomSubType,
 )
 from manage_breast_screening.participants.tests.factories import SymptomFactory
 
@@ -186,7 +186,7 @@ class TestAddSkinChangeView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
-                "symptom_sub_type": SymptomSubType.DIMPLES_OR_INDENTATION,
+                "symptom_sub_type": SkinChangeChoices.DIMPLES_OR_INDENTATION,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },
@@ -225,7 +225,7 @@ class TestChangeSkinChangeView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
-                "symptom_sub_type": SymptomSubType.COLOUR_CHANGE,
+                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },

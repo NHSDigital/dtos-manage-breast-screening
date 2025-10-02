@@ -10,8 +10,8 @@ from manage_breast_screening.mammograms.forms.symptom_forms import (
 )
 from manage_breast_screening.nhsuk_forms.choices import YesNo
 from manage_breast_screening.participants.models.symptom import (
+    SkinChangeChoices,
     SymptomAreas,
-    SymptomSubType,
     SymptomType,
 )
 from manage_breast_screening.participants.tests.factories import (
@@ -235,7 +235,7 @@ class TestSkinChangeForm:
         form = SkinChangeForm(
             data={
                 "area": RightLeftOtherChoices.LEFT_BREAST,
-                "symptom_sub_type": SymptomSubType.COLOUR_CHANGE,
+                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
                 "investigated": YesNo.NO,
             }
@@ -259,7 +259,7 @@ class TestSkinChangeForm:
                 "area": RightLeftOtherChoices.OTHER,
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
-                "symptom_sub_type": SkinChangeForm.SymptomSubTypeChoices.OTHER,
+                "symptom_sub_type": SkinChangeChoices.OTHER,
             }
         )
 
@@ -277,7 +277,7 @@ class TestSkinChangeForm:
         form = SkinChangeForm(
             data={
                 "area": RightLeftOtherChoices.OTHER,
-                "symptom_sub_type": SkinChangeForm.SymptomSubTypeChoices.OTHER,
+                "symptom_sub_type": SkinChangeChoices.OTHER,
                 "symptom_sub_type_details": "abc",
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
