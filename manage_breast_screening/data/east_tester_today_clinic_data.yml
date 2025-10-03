@@ -88,7 +88,7 @@ clinic:
               postcode: B2 7E9
         symptoms:
           - id: e9cc27f6-8e6f-4b83-890c-d73590c40f81
-            symptom_type_id: lump
+            symptom_type_id: LUMP
             area: RIGHT_BREAST
             when_started: LESS_THAN_THREE_MONTHS
 
