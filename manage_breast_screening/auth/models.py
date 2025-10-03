@@ -16,7 +16,7 @@ class Permission(StrEnum):
 class Persona:
     first_name: str
     last_name: str
-    group: str
+    role: str
 
     @property
     def username(self):
