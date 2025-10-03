@@ -1,7 +1,7 @@
 from functools import cached_property
 
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.shortcuts import get_object_or_404, redirect
+from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.participants.models import Appointment
@@ -35,6 +35,9 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     """
 
     permission_required = Permission.PERFORM_MAMMOGRAM_APPOINTMENT
+
+    def get_permission_object(self):
+        return self.request.current_provider
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore

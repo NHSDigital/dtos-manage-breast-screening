@@ -45,7 +45,10 @@ class ShowAppointment(AppointmentMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         if (
-            request.user.has_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT)
+            request.user.has_perm(
+                Permission.PERFORM_MAMMOGRAM_APPOINTMENT,
+                request.current_provider,
+            )
             and appointment.current_status.in_progress
         ):
             return redirect("mammograms:start_screening", pk=self.appointment.pk)
