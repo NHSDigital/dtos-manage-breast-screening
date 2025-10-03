@@ -4,7 +4,11 @@ from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
-from manage_breast_screening.participants.models.symptom import SymptomType
+from manage_breast_screening.participants.models.symptom import (
+    RelativeDateChoices,
+    SymptomAreas,
+    SymptomType,
+)
 
 from .appointment_presenters import AppointmentPresenter
 
@@ -23,10 +27,34 @@ class PresentedSymptom:
     stopped_line: str = ""
     additional_information_line: str = ""
 
+    @staticmethod
+    def _present_symptom_area(symptom):
+        if symptom.area == SymptomAreas.OTHER and symptom.area_description:
+            location = f"Other: {symptom.area_description}"
+        else:
+            location = symptom.get_area_display()
+        return location
+
+    @staticmethod
+    def _present_started(symptom):
+        match symptom.when_started:
+            case RelativeDateChoices.SINCE_A_SPECIFIC_DATE:
+                if symptom.year_started is None or symptom.month_started is None:
+                    # Shouldn't happen unless there is a bug in data entry
+                    return "Since a specific date"
+
+                return format_approximate_date(
+                    symptom.year_started, symptom.month_started
+                )
+            case RelativeDateChoices.NOT_SURE:
+                return "Not sure"
+            case _:
+                return symptom.get_when_started_display() + " ago"
+
     @classmethod
     def from_symptom(cls, symptom):
-        location = symptom.get_area_display()
-        started = symptom.get_when_started_display()
+        location = cls._present_symptom_area(symptom)
+        started = cls._present_started(symptom)
         if symptom.year_started is not None and symptom.month_started is not None:
             started = format_approximate_date(
                 symptom.year_started, symptom.month_started
