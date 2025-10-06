@@ -57,9 +57,11 @@ def raise_helper(msg):
 def _user_name_and_role_item(user):
     if user.is_authenticated:
         name_and_role_text = f"{user.last_name.upper()}, {user.first_name}"
-        roles = list(user.groups.all())
+        roles = set()
+        for assignment in user.assignments.all():
+            roles.update(assignment.roles)
         if roles:
-            name_and_role_text += f" ({', '.join(role.name for role in roles)})"
+            name_and_role_text += f" ({', '.join(sorted(roles))})"
 
         return {"text": name_and_role_text, "icon": True}
 

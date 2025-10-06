@@ -22,7 +22,7 @@ class TestPersonaLogin(SystemTestCase):
             first_name="Per",
             last_name="Sona",
         )
-        UserAssignmentFactory.create(user=user, roles=[CLINICAL_PERSONA.role.value])
+        UserAssignmentFactory.create(user=user, clinical=True)
 
     def when_i_visit_the_clinics_page(self):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
