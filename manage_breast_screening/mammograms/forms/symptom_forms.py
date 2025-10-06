@@ -493,3 +493,57 @@ class NippleChangeForm(SymptomForm):
             ]
         else:
             return [area]
+
+
+class OtherSymptomForm(SymptomForm):
+    area = ChoiceField(
+        choices=RightLeftOtherChoices,
+        label="Where is the symptom located?",
+        error_messages={"required": "Select the location of the symptom"},
+    )
+    area_description = CharField(
+        required=False,
+        label="Describe the specific area",
+        hint="For example, the left armpit",
+        error_messages={
+            "required": "Describe the specific area where the symptom is located"
+        },
+        classes="nhsuk-u-width-two-thirds",
+    )
+    symptom_sub_type_details = CharField(
+        label="Describe the symptom",
+        label_classes="nhsuk-label--m",
+        error_messages={"required": "Enter a description of the symptom"},
+        classes="nhsuk-u-width-two-thirds",
+    )
+    when_started = CommonFields.when_started
+    specific_date = CommonFields.specific_date
+    intermittent = CommonFields.intermittent
+    recently_resolved = CommonFields.recently_resolved
+    when_resolved = CommonFields.when_resolved
+    investigated = CommonFields.investigated
+    investigation_details = CommonFields.investigation_details
+    additional_information = CommonFields.additional_information
+
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(
+            symptom_type=SymptomType.OTHER,
+            instance=instance,
+            **kwargs,
+        )
+
+        self.set_conditionally_required(
+            conditionally_required_field="area_description",
+            predicate_field="area",
+            predicate_field_value=RightLeftOtherChoices.OTHER,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="specific_date",
+            predicate_field="when_started",
+            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="investigation_details",
+            predicate_field="investigated",
+            predicate_field_value=YesNo.YES,
+        )
