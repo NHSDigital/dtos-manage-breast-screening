@@ -278,29 +278,29 @@ class TestAddNippleChangeView:
 @pytest.mark.django_db
 class TestChangeNippleChangeView:
     @pytest.fixture
-    def colour_change(self, appointment):
-        return SymptomFactory.create(colour_change=True, appointment=appointment)
+    def inversion(self, appointment):
+        return SymptomFactory.create(inversion=True, appointment=appointment)
 
-    def test_renders_response(self, clinical_user_client, appointment, colour_change):
+    def test_renders_response(self, clinical_user_client, appointment, inversion):
         response = clinical_user_client.get(
             reverse(
                 "mammograms:change_symptom_nipple_change",
-                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+                kwargs={"pk": appointment.pk, "symptom_pk": inversion.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, colour_change
+        self, clinical_user_client, appointment, inversion
     ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:change_symptom_nipple_change",
-                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+                kwargs={"pk": appointment.pk, "symptom_pk": inversion.pk},
             ),
             {
                 "area": [SymptomAreas.RIGHT_BREAST.value],
-                "symptom_sub_type": NippleChangeChoices.COLOUR_CHANGE,
+                "symptom_sub_type": NippleChangeChoices.INVERSION,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },
