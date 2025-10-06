@@ -49,7 +49,7 @@ module "container-apps" {
   dns_zone_name                         = var.dns_zone_name
   docker_image                          = var.docker_image
   deploy_database_as_container          = var.deploy_database_as_container
-  enable_auth                           = var.enable_auth
+  enable_entra_id_authentication        = var.enable_entra_id_authentication
   environment                           = var.environment
   env_config                            = var.env_config
   fetch_secrets_from_app_key_vault      = var.fetch_secrets_from_app_key_vault

@@ -1,6 +1,6 @@
 api_oauth_token_url                   = "https://int.api.service.nhs.uk/oauth2/token"
 dns_zone_name                         = "manage-breast-screening.non-live.screening.nhs.uk"
-enable_auth                           = true
+enable_entra_id_authentication        = true
 fetch_secrets_from_app_key_vault      = true
 front_door_profile                    = "afd-nonlive-hub-manbrs"
 postgres_backup_retention_days        = 7
