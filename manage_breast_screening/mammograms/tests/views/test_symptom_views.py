@@ -116,6 +116,23 @@ class TestChangeLumpView:
 
         assert response.status_code == 404
 
+    def test_different_type_of_symptom_is_a_404(
+        self, clinical_user_client, appointment
+    ):
+        SymptomFactory.create(colour_change=True, appointment=appointment)
+
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:change_symptom_lump",
+                kwargs={
+                    "pk": appointment.pk,
+                    "symptom_pk": "beefbeef-beef-beef-beef-beefbeefbeef",
+                },
+            )
+        )
+
+        assert response.status_code == 404
+
     def test_valid_post_redirects_to_appointment(
         self, clinical_user_client, appointment, lump
     ):
