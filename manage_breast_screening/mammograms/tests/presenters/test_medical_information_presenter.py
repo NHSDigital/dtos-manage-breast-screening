@@ -43,7 +43,29 @@ class TestRecordMedicalInformationPresenter:
                 symptom_type_id="LUMP",
                 symptom_type_name="Lump",
                 location_line=expected_location,
-                started_line="Less than 3 months",
+                started_line="Less than 3 months ago",
+                investigated_line="Not investigated",
+            ),
+        ]
+
+    def test_formats_area(self):
+        symptom = SymptomFactory.create(
+            lump=True,
+            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.OTHER,
+            area_description="abc",
+        )
+
+        presenter = MedicalInformationPresenter(symptom.appointment)
+
+        assert presenter.symptoms == [
+            PresentedSymptom(
+                id=symptom.id,
+                appointment_id=symptom.appointment_id,
+                symptom_type_id="lump",
+                symptom_type_name="Lump",
+                location_line="Other: abc",
+                started_line="Less than 3 months ago",
                 investigated_line="Not investigated",
             )
         ]
@@ -201,7 +223,7 @@ class TestRecordMedicalInformationPresenter:
                     "text": "Swelling or shape change",
                 },
                 "value": {
-                    "html": "Both breasts<br>Less than 3 months<br>Not investigated",
+                    "html": "Both breasts<br>Less than 3 months ago<br>Not investigated",
                 },
             },
         ]
