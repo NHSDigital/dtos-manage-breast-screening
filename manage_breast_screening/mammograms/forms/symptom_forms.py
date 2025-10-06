@@ -106,26 +106,70 @@ class SymptomForm(Form):
         self.conditional_requirements = []
 
         if instance:
-            kwargs["initial"] = {
-                "area": (
-                    self._area_checkboxes(instance.area)
-                    if self.symptom_type == SymptomType.NIPPLE_CHANGE
-                    else instance.area
-                ),
-                "area_description": instance.area_description,
-                "symptom_sub_type": instance.symptom_sub_type_id,
-                "symptom_sub_type_details": instance.symptom_sub_type_details,
-                "when_started": instance.when_started,
-                "specific_date": (instance.month_started, instance.year_started),
-                "intermittent": instance.intermittent,
-                "recently_resolved": instance.recently_resolved,
-                "when_resolved": instance.when_resolved,
-                "investigated": yes_no(instance.investigated),
-                "investigation_details": instance.investigation_details,
-                "additional_information": instance.additional_information,
-            }
+            kwargs["initial"] = self.initial_values(instance)
 
         super().__init__(**kwargs)
+
+    def initial_values(self, instance):
+        """
+        Map a Symptom record to initial values for the form
+        """
+        return {
+            "area": instance.area,
+            "area_description": instance.area_description,
+            "symptom_sub_type": instance.symptom_sub_type_id,
+            "symptom_sub_type_details": instance.symptom_sub_type_details,
+            "when_started": instance.when_started,
+            "specific_date": (instance.month_started, instance.year_started),
+            "intermittent": instance.intermittent,
+            "recently_resolved": instance.recently_resolved,
+            "when_resolved": instance.when_resolved,
+            "investigated": yes_no(instance.investigated),
+            "investigation_details": instance.investigation_details,
+            "additional_information": instance.additional_information,
+        }
+
+    def model_values(self):
+        """
+        Further clean the form data to match the model, including
+        splitting year/month tuples into multiple fields, and blanking
+        conditionally revealed fields that are no longer visible.
+        """
+        match self.cleaned_data["area"]:
+            case [SymptomAreas.RIGHT_BREAST, SymptomAreas.LEFT_BREAST]:
+                area = SymptomAreas.BOTH_BREASTS
+            case [one]:
+                area = one
+            case _:
+                area = self.cleaned_data["area"]
+
+        area_description = self.cleaned_data.get("area_description", "")
+        symptom_sub_type = self.cleaned_data.get("symptom_sub_type")
+        symptom_sub_type_details = self.cleaned_data.get("symptom_sub_type_details", "")
+        when_started = self.cleaned_data.get("when_started")
+        specific_date = self.cleaned_data.get("specific_date")
+        investigated = self.cleaned_data.get("investigated") == YesNo.YES
+        investigation_details = self.cleaned_data.get("investigation_details", "")
+        intermittent = self.cleaned_data.get("intermittent", False)
+        recently_resolved = self.cleaned_data.get("recently_resolved", False)
+        when_resolved = self.cleaned_data.get("when_resolved", "")
+        additional_information = self.cleaned_data.get("additional_information", "")
+
+        return dict(
+            area=area,
+            area_description=area_description,
+            symptom_sub_type_id=symptom_sub_type,
+            symptom_sub_type_details=symptom_sub_type_details,
+            investigated=investigated,
+            investigation_details=investigation_details,
+            when_started=when_started,
+            year_started=specific_date.year if specific_date else None,
+            month_started=specific_date.month if specific_date else None,
+            intermittent=intermittent,
+            recently_resolved=recently_resolved,
+            when_resolved=when_resolved,
+            additional_information=additional_information,
+        )
 
     def set_conditionally_required(
         self, conditionally_required_field, predicate_field, predicate_field_value
@@ -176,7 +220,7 @@ class SymptomForm(Form):
 
     def update(self, request):
         auditor = Auditor.from_request(request)
-        field_values = self._model_values()
+        field_values = self.model_values()
         symptom = self.instance
 
         if symptom is None:
@@ -193,7 +237,7 @@ class SymptomForm(Form):
 
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
-        field_values = self._model_values()
+        field_values = self.model_values()
 
         symptom = appointment.symptom_set.create(
             appointment=appointment,
@@ -205,57 +249,6 @@ class SymptomForm(Form):
         auditor.audit_create(symptom)
 
         return symptom
-
-    def _model_values(self):
-        """
-        Further clean the form data to match the model, including
-        splitting year/month tuples into multiple fields, and blanking
-        conditionally revealed fields that are no longer visible.
-        """
-        match self.cleaned_data["area"]:
-            case [SymptomAreas.RIGHT_BREAST, SymptomAreas.LEFT_BREAST]:
-                area = SymptomAreas.BOTH_BREASTS
-            case [one]:
-                area = one
-            case _:
-                area = self.cleaned_data["area"]
-
-        area_description = self.cleaned_data.get("area_description", "")
-        symptom_sub_type = self.cleaned_data.get("symptom_sub_type")
-        symptom_sub_type_details = self.cleaned_data.get("symptom_sub_type_details", "")
-        when_started = self.cleaned_data.get("when_started")
-        specific_date = self.cleaned_data.get("specific_date")
-        investigated = self.cleaned_data.get("investigated") == YesNo.YES
-        investigation_details = self.cleaned_data.get("investigation_details", "")
-        intermittent = self.cleaned_data.get("intermittent", False)
-        recently_resolved = self.cleaned_data.get("recently_resolved", False)
-        when_resolved = self.cleaned_data.get("when_resolved", "")
-        additional_information = self.cleaned_data.get("additional_information", "")
-
-        return dict(
-            area=area,
-            area_description=area_description,
-            symptom_sub_type_id=symptom_sub_type,
-            symptom_sub_type_details=symptom_sub_type_details,
-            investigated=investigated,
-            investigation_details=investigation_details,
-            when_started=when_started,
-            year_started=specific_date.year if specific_date else None,
-            month_started=specific_date.month if specific_date else None,
-            intermittent=intermittent,
-            recently_resolved=recently_resolved,
-            when_resolved=when_resolved,
-            additional_information=additional_information,
-        )
-
-    def _area_checkboxes(self, area):
-        if area == SymptomAreas.BOTH_BREASTS:
-            return [
-                RightLeftNippleChoices.RIGHT_BREAST.value,
-                RightLeftNippleChoices.LEFT_BREAST.value,
-            ]
-        else:
-            return [area]
 
 
 class LumpForm(SymptomForm):
@@ -476,3 +469,27 @@ class NippleChangeForm(SymptomForm):
             predicate_field="investigated",
             predicate_field_value=YesNo.YES,
         )
+
+    def initial_values(self, instance):
+        return {
+            "area": self.area_initial(instance.area),
+            "symptom_sub_type": instance.symptom_sub_type_id,
+            "symptom_sub_type_details": instance.symptom_sub_type_details,
+            "when_started": instance.when_started,
+            "specific_date": (instance.month_started, instance.year_started),
+            "intermittent": instance.intermittent,
+            "recently_resolved": instance.recently_resolved,
+            "when_resolved": instance.when_resolved,
+            "investigated": yes_no(instance.investigated),
+            "investigation_details": instance.investigation_details,
+            "additional_information": instance.additional_information,
+        }
+
+    def area_initial(self, area):
+        if area == SymptomAreas.BOTH_BREASTS:
+            return [
+                RightLeftNippleChoices.RIGHT_BREAST.value,
+                RightLeftNippleChoices.LEFT_BREAST.value,
+            ]
+        else:
+            return [area]
