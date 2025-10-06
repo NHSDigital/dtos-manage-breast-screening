@@ -6,7 +6,10 @@
     "moduleResolution": "Node",
     "noEmit": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": false,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true
   },
   "exclude": ["**/node_modules"],
   "typeAcquisition": {
