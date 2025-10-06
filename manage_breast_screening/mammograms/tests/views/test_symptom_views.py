@@ -5,10 +5,11 @@ from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
 from manage_breast_screening.nhsuk_forms.choices import YesNo
 from manage_breast_screening.participants.models.symptom import (
+    NippleChangeChoices,
     RelativeDateChoices,
+    SkinChangeChoices,
     Symptom,
     SymptomAreas,
-    SymptomSubType,
 )
 from manage_breast_screening.participants.tests.factories import SymptomFactory
 
@@ -186,7 +187,7 @@ class TestAddSkinChangeView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
-                "symptom_sub_type": SymptomSubType.DIMPLES_OR_INDENTATION,
+                "symptom_sub_type": SkinChangeChoices.DIMPLES_OR_INDENTATION,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },
@@ -225,7 +226,81 @@ class TestChangeSkinChangeView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
-                "symptom_sub_type": SymptomSubType.COLOUR_CHANGE,
+                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestAddNippleChangeView:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:add_symptom_nipple_change",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:add_symptom_nipple_change",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "area": [SymptomAreas.RIGHT_BREAST.value],
+                "symptom_sub_type": NippleChangeChoices.BLOODY_DISCHARGE,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestChangeNippleChangeView:
+    @pytest.fixture
+    def colour_change(self, appointment):
+        return SymptomFactory.create(colour_change=True, appointment=appointment)
+
+    def test_renders_response(self, clinical_user_client, appointment, colour_change):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:change_symptom_nipple_change",
+                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment, colour_change
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:change_symptom_nipple_change",
+                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+            ),
+            {
+                "area": [SymptomAreas.RIGHT_BREAST.value],
+                "symptom_sub_type": NippleChangeChoices.COLOUR_CHANGE,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },

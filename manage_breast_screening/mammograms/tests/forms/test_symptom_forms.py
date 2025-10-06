@@ -3,13 +3,17 @@ from django.test import RequestFactory
 
 from manage_breast_screening.mammograms.forms.symptom_forms import (
     LumpForm,
+    NippleChangeForm,
     RelativeDateChoices,
+    RightLeftNippleChoices,
     RightLeftOtherChoices,
     SkinChangeForm,
     SwellingOrShapeChangeForm,
 )
 from manage_breast_screening.nhsuk_forms.choices import YesNo
 from manage_breast_screening.participants.models.symptom import (
+    NippleChangeChoices,
+    SkinChangeChoices,
     SymptomAreas,
     SymptomSubType,
     SymptomType,
@@ -229,13 +233,12 @@ class TestSwellingOrShapeChangeForm:
         assert form.is_valid()
 
 
-@pytest.mark.django_db
 class TestSkinChangeForm:
     def test_valid_form(self):
         form = SkinChangeForm(
             data={
                 "area": RightLeftOtherChoices.LEFT_BREAST,
-                "symptom_sub_type": SymptomSubType.COLOUR_CHANGE,
+                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
                 "investigated": YesNo.NO,
             }
@@ -259,7 +262,7 @@ class TestSkinChangeForm:
                 "area": RightLeftOtherChoices.OTHER,
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
-                "symptom_sub_type": SkinChangeForm.SymptomSubTypeChoices.OTHER,
+                "symptom_sub_type": SkinChangeChoices.OTHER,
             }
         )
 
@@ -277,7 +280,7 @@ class TestSkinChangeForm:
         form = SkinChangeForm(
             data={
                 "area": RightLeftOtherChoices.OTHER,
-                "symptom_sub_type": SkinChangeForm.SymptomSubTypeChoices.OTHER,
+                "symptom_sub_type": SkinChangeChoices.OTHER,
                 "symptom_sub_type_details": "abc",
                 "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
                 "investigated": YesNo.YES,
@@ -288,3 +291,190 @@ class TestSkinChangeForm:
             }
         )
         assert form.is_valid()
+
+
+class TestNippleChangeForm:
+    def test_valid_form(self):
+        form = NippleChangeForm(
+            data={
+                "area": [
+                    RightLeftNippleChoices.LEFT_BREAST,
+                    RightLeftNippleChoices.RIGHT_BREAST,
+                ],
+                "symptom_sub_type": NippleChangeChoices.COLOUR_CHANGE,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                "investigated": YesNo.NO,
+            }
+        )
+        assert form.is_valid()
+
+    def test_missing_required_fields(self):
+        form = NippleChangeForm(data={})
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "when_started": ["Select how long the symptom has existed"],
+            "investigated": ["Select whether the symptom has been investigated or not"],
+            "area": ["Select which nipples have changed"],
+            "symptom_sub_type": ["Describe the change"],
+        }
+
+    def test_missing_conditionally_required_fields(self):
+        form = NippleChangeForm(
+            data={
+                "area": [RightLeftNippleChoices.RIGHT_BREAST],
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+                "symptom_sub_type": NippleChangeChoices.OTHER,
+            }
+        )
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "specific_date": ["Enter the date the symptom started"],
+            "investigation_details": ["Enter details of any investigations"],
+            "symptom_sub_type_details": ["Enter details of the change"],
+        }
+
+    def test_valid_form_with_conditionally_required_fields(self):
+        form = NippleChangeForm(
+            data={
+                "area": [RightLeftNippleChoices.RIGHT_BREAST],
+                "symptom_sub_type": NippleChangeChoices.OTHER,
+                "symptom_sub_type_details": "abc",
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+                "specific_date_0": "2",
+                "specific_date_1": "2025",
+                "investigation_details": "def",
+            }
+        )
+        assert form.is_valid()
+
+    @pytest.fixture
+    def other_discharge_sub_type(self):
+        return SymptomSubType.objects.get_or_create(
+            id=NippleChangeChoices.OTHER_DISCHARGE,
+            name="Other discharge",
+            symptom_type_id=SymptomType.NIPPLE_CHANGE,
+        )
+
+    @pytest.fixture
+    def inversion_sub_type(self):
+        return SymptomSubType.objects.get_or_create(
+            id=NippleChangeChoices.INVERSION,
+            name="Inversion",
+            symptom_type_id=SymptomType.NIPPLE_CHANGE,
+        )
+
+    @pytest.mark.django_db
+    def test_create(self, clinical_user, other_discharge_sub_type):
+        appointment = AppointmentFactory.create()
+        request = RequestFactory().get("/test-form")
+        request.user = clinical_user
+
+        form = NippleChangeForm(
+            data={
+                "area": [
+                    RightLeftNippleChoices.RIGHT_BREAST,
+                    RightLeftNippleChoices.LEFT_BREAST,
+                ],
+                "symptom_sub_type": NippleChangeChoices.OTHER_DISCHARGE,
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+                "specific_date_0": "2",
+                "specific_date_1": "2025",
+                "investigation_details": "def",
+            }
+        )
+
+        assert form.is_valid()
+
+        obj = form.create(appointment=appointment, request=request)
+
+        assert obj.appointment == appointment
+        assert obj.symptom_type_id == SymptomType.NIPPLE_CHANGE
+        assert obj.symptom_sub_type_id == NippleChangeChoices.OTHER_DISCHARGE
+        assert obj.area == SymptomAreas.BOTH_BREASTS
+        assert obj.investigated
+        assert obj.investigation_details == "def"
+        assert obj.when_started == RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        assert obj.year_started == 2025
+        assert obj.month_started == 2
+
+    @pytest.mark.django_db
+    def test_update(self, clinical_user, inversion_sub_type):
+        appointment = AppointmentFactory.create()
+        symptom = SymptomFactory.create(
+            inversion=True,
+            area=SymptomAreas.BOTH_BREASTS,
+            when_started=RelativeDateChoices.ONE_TO_THREE_YEARS,
+            investigated=False,
+            appointment=appointment,
+        )
+        request = RequestFactory().get("/test-form")
+        request.user = clinical_user
+
+        form = NippleChangeForm(
+            data={
+                "area": [RightLeftNippleChoices.LEFT_BREAST],
+                "symptom_sub_type": NippleChangeChoices.INVERSION,
+                "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+                "investigated": YesNo.YES,
+                "investigation_details": "abc",
+            },
+            instance=symptom,
+        )
+
+        assert form.is_valid()
+
+        obj = form.update(request=request)
+
+        assert obj.appointment == appointment
+        assert obj.symptom_type_id == SymptomType.NIPPLE_CHANGE
+        assert obj.symptom_sub_type_id == NippleChangeChoices.INVERSION
+        assert obj.area == SymptomAreas.LEFT_BREAST
+        assert obj.investigated
+        assert obj.investigation_details == "abc"
+        assert obj.when_started == RelativeDateChoices.ONE_TO_THREE_YEARS
+
+    @pytest.mark.django_db
+    def test_initial(self, clinical_user, inversion_sub_type):
+        appointment = AppointmentFactory.create()
+        symptom = SymptomFactory.create(
+            inversion=True,
+            area=SymptomAreas.BOTH_BREASTS,
+            when_started=RelativeDateChoices.ONE_TO_THREE_YEARS,
+            investigated=False,
+            appointment=appointment,
+        )
+        request = RequestFactory().get("/test-form")
+        request.user = clinical_user
+
+        form = NippleChangeForm(
+            data={
+                "area": [RightLeftNippleChoices.LEFT_BREAST],
+                "symptom_sub_type": NippleChangeChoices.INVERSION,
+                "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+                "investigated": YesNo.YES,
+                "investigation_details": "abc",
+            },
+            instance=symptom,
+        )
+
+        assert form.initial == {
+            "additional_information": "",
+            "area": [
+                RightLeftNippleChoices.RIGHT_BREAST,
+                RightLeftNippleChoices.LEFT_BREAST,
+            ],
+            "intermittent": False,
+            "investigated": YesNo.NO,
+            "investigation_details": "",
+            "recently_resolved": False,
+            "specific_date": (None, None),
+            "symptom_sub_type": NippleChangeChoices.INVERSION,
+            "symptom_sub_type_details": "",
+            "when_resolved": "",
+            "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+        }

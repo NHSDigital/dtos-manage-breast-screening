@@ -5,12 +5,17 @@ from django.views import View
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
-from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
-    PresentedSymptom,
+from manage_breast_screening.mammograms.presenters.symptom_presenter import (
+    SymptomPresenter,
 )
 from manage_breast_screening.participants.models.symptom import Symptom
 
-from ..forms.symptom_forms import LumpForm, SkinChangeForm, SwellingOrShapeChangeForm
+from ..forms.symptom_forms import (
+    LumpForm,
+    NippleChangeForm,
+    SkinChangeForm,
+    SwellingOrShapeChangeForm,
+)
 from .mixins import InProgressAppointmentMixin
 
 
@@ -129,6 +134,16 @@ class AddSkinChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
 
 
+class AddNippleChangeView(AddSymptomView):
+    """
+    Add a symptom: nipple change
+    """
+
+    symptom_type_name = "Nipple change"
+    form_class = NippleChangeForm
+    template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+
+
 class ChangeLumpView(ChangeSymptomView):
     """
     Change a symptom: lump
@@ -159,6 +174,16 @@ class ChangeSkinChangeView(ChangeSymptomView):
     template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
 
 
+class ChangeNippleChangeView(ChangeSymptomView):
+    """
+    Change a symptom: nipple change
+    """
+
+    symptom_type_name = "Nipple change"
+    form_class = NippleChangeForm
+    template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+
+
 class DeleteSymptomView(View):
     def get(self, request, *args, **kwargs):
         symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
@@ -182,9 +207,9 @@ class DeleteSymptomView(View):
                     kwargs={"pk": kwargs["pk"]},
                 )
             },
-            "summary_list_row": PresentedSymptom.from_symptom(
-                symptom
-            ).build_summary_list_row(include_actions=False),
+            "summary_list_row": SymptomPresenter(symptom).build_summary_list_row(
+                include_actions=False
+            ),
         }
 
         return render(
