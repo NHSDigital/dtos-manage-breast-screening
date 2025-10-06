@@ -14,7 +14,14 @@ SELECT  appt.nhs_number,
           ELSE TO_CHAR(msg_sts.status_updated_at, 'yyyy-mm-dd')
         END AS failure_date,
         CASE
-          WHEN msg_fld.nhs_notify_errors IS NOT NULL THEN msg_fld.nhs_notify_errors->'errors'->0->>'title'
+          WHEN msg_fld.nhs_notify_errors IS NOT NULL THEN (
+            array_to_string(
+              ARRAY(
+                SELECT errs ->> 'title'
+                FROM jsonb_array_elements(msg_fld.nhs_notify_errors) AS errs
+              ), ', '
+            )
+          )
           ELSE msg_sts.description
         END AS failure_reason
 FROM    notifications_appointment appt
@@ -27,7 +34,7 @@ LEFT OUTER JOIN notifications_messagestatus msg_sts ON msg_sts.message_id = msg.
 AND     msg_sts.status = 'failed'
 WHERE   appt.starts_at::date = %s
 AND   (
-  msg_fld.nhs_notify_errors->'errors' @> '[{"code":"CM_INVALID_NHS_NUMBER"}]' OR
-  msg_fld.nhs_notify_errors->'errors' @> '[{"code":"CM_INVALID_VALUE"}]' OR
+  msg_fld.nhs_notify_errors @> '[{"code":"CM_INVALID_NHS_NUMBER"}]' OR
+  msg_fld.nhs_notify_errors @> '[{"code":"CM_INVALID_VALUE"}]' OR
   msg_sts.description IS NOT NULL
 )

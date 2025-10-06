@@ -62,20 +62,19 @@ class TestFailuresQuery:
             {"starts_at": appt_time, "nhs_number": "9990001116", "episode_type": "S"},
             {
                 "status": "failed",
-                "nhs_notify_errors": {
-                    "errors": [
-                        {"code": "CM_INVALID_NHS_NUMBER", "title": "Invalid NHS number"}
-                    ]
-                },
+                "nhs_notify_errors": [
+                    {"code": "CM_INVALID_NHS_NUMBER", "title": "Invalid NHS number"}
+                ],
             },
         )
         appt7 = self.create_message_set(
             {"starts_at": appt_time, "nhs_number": "9990001117", "episode_type": "S"},
             {
                 "status": "failed",
-                "nhs_notify_errors": {
-                    "errors": [{"code": "CM_INVALID_VALUE", "title": "Invalid value"}]
-                },
+                "nhs_notify_errors": [
+                    {"code": "CM_INVALID_VALUE", "title": "Invalid value"},
+                    {"code": "CM_INVALID_NHS_NUMBER", "title": "Invalid NHS number"},
+                ],
             },
         )
         self.create_message_set(
@@ -150,7 +149,7 @@ class TestFailuresQuery:
                 appt7.clinic.code,
                 "Self referral",
                 today_formatted,
-                "Invalid value",
+                "Invalid value, Invalid NHS number",
             ],
         ]
 
