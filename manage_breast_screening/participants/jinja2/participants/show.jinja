@@ -8,12 +8,6 @@
 {% from 'components/participant-details/personal_details.jinja' import personal_details %}
 {% from 'components/participant-details/screening_details.jinja' import screening_details %}
 
-{% block beforeContent %}
-  {{ backLink({
-    "href": back_link.href,
-    "text": back_link.text
-  }) }}
-{% endblock beforeContent %}
 
 {% block page_content %}
   <div class="nhsuk-grid-row">

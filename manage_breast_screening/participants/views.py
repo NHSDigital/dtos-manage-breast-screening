@@ -65,10 +65,6 @@ def show(request, pk):
             "presented_mammograms": presented_mammograms,
             "heading": participant.full_name,
             "page_title": "Participant",
-            "back_link": {
-                "text": "Back to participants",
-                "href": reverse("participants:index"),
-            },
         },
     )
 

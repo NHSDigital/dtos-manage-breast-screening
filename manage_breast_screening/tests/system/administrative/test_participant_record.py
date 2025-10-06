@@ -23,7 +23,6 @@ class TestParticipantRecord(SystemTestCase):
 
         time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 
-    @pytest.mark.skip("not implemented yet")
     def test_viewing_participant_record_from_an_appointment(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
@@ -49,7 +48,7 @@ class TestParticipantRecord(SystemTestCase):
 
     def test_viewing_past_appointments(self):
         self.given_i_am_logged_in_as_an_administrative_user()
-        self.and_i_have_past_appointments()
+        self.and_the_participant_has_past_appointments()
         self.and_i_am_on_the_participant_record_page()
         self.then_i_should_see_the_past_appointments()
         self.when_i_click_on_a_past_appointment()
@@ -64,7 +63,7 @@ class TestParticipantRecord(SystemTestCase):
             clinic_slot=clinic_slot, screening_episode=screening_episode
         )
 
-    def and_i_have_past_appointments(self):
+    def and_the_participant_has_past_appointments(self):
         clinic_slot_2022 = ClinicSlotFactory(
             starts_at=datetime(2022, 1, 2, 11, tzinfo=tz.utc)
         )
@@ -119,7 +118,7 @@ class TestParticipantRecord(SystemTestCase):
         expect(main).to_contain_text("Personal details")
 
     def when_i_click_on_the_back_link(self):
-        self.page.get_by_text("Back to appointment").click()
+        self.page.go_back()
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(
