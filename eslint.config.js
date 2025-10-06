@@ -40,6 +40,21 @@ export default defineConfig([
       }
     },
     rules: {
+      // Turn off rules that are handled by TypeScript
+      // https://typescript-eslint.io/troubleshooting/typed-linting/performance/#eslint-plugin-import
+      'import/default': 'off',
+      'import/named': 'off',
+      'import/namespace': 'off',
+      'import/no-cycle': 'off',
+      'import/no-deprecated': 'off',
+      'import/no-named-as-default': 'off',
+      'import/no-named-as-default-member': 'off',
+      'import/no-unresolved': 'off',
+      'import/no-unused-modules': 'off',
+
+      // Always import Node.js packages from `node:*`
+      'import/enforce-node-protocol-usage': ['error', 'always'],
+
       // Check import or require statements are A-Z ordered
       'import/order': [
         'error',

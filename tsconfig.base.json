@@ -5,6 +5,7 @@
     "module": "Preserve",
     "moduleResolution": "Node",
     "noEmit": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": false,
     "strictBindCallApply": true,
