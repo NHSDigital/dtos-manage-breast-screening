@@ -5,8 +5,12 @@
     "module": "Preserve",
     "moduleResolution": "Node",
     "noEmit": true,
+    "noUnusedLocals": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": false,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true
   },
   "exclude": ["**/node_modules"],
   "typeAcquisition": {

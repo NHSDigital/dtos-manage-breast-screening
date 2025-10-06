@@ -14,7 +14,7 @@ const TIMEOUT = 2000
  * @param {(this: HTMLFormElement, error: Error) => void} [options.onError] - Callback on error
  */
 export default ($form, options = {}) => {
-  if (!$form || !($form instanceof HTMLFormElement)) {
+  if (!($form instanceof HTMLFormElement)) {
     throw new ElementError({
       element: $form,
       identifier: 'setSubmit: Form element (`$form`)',
