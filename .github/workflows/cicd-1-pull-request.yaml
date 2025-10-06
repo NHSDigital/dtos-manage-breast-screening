@@ -61,7 +61,7 @@ jobs:
     secrets: inherit
   build-stage:
     name: 'Build stage'
-    needs: [metadata, test-stage]
+    needs: [metadata]
     uses: ./.github/workflows/stage-3-build.yaml
     with:
       build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
