@@ -30,6 +30,8 @@ class SymptomPresenter:
                 return f"Change type: {self._symptom.symptom_sub_type_details}"
             case [SymptomType.SKIN_CHANGE, _] | [SymptomType.NIPPLE_CHANGE, _]:
                 return f"Change type: {self._symptom.symptom_sub_type.name.lower()}"
+            case [SymptomType.OTHER, _]:
+                return f"Description: {self._symptom.symptom_sub_type_details}"
             case _:
                 return ""
         # fmt: on
@@ -137,4 +139,4 @@ class SymptomPresenter:
             case SymptomType.NIPPLE_CHANGE:
                 return "mammograms:change_symptom_nipple_change"
             case _:
-                raise ValueError(self._symptom.symptom_type_id)
+                return "mammograms:change_symptom_other"

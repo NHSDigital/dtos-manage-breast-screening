@@ -85,3 +85,19 @@ class MedicalInformationPresenter:
                 else "Add a nipple change"
             ),
         }
+
+    @property
+    def add_other_symptom_link(self):
+        url = reverse(
+            "mammograms:add_symptom_other",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": (
+                "Add another symptom (other symptom)"
+                if SymptomType.NIPPLE_CHANGE in self.existing_symptom_type_ids
+                else "Add a symptom (other symptom)"
+            ),
+        }

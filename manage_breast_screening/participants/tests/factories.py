@@ -165,5 +165,5 @@ class SymptomFactory(DjangoModelFactory):
         )
 
         other = Trait(
-            symptom_type_id=models.SymptomType.OTHER,
+            symptom_type_id=models.SymptomType.OTHER, symptom_sub_type_details="abc"
         )

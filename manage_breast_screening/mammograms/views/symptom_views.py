@@ -13,6 +13,7 @@ from manage_breast_screening.participants.models.symptom import Symptom
 from ..forms.symptom_forms import (
     LumpForm,
     NippleChangeForm,
+    OtherSymptomForm,
     SkinChangeForm,
     SwellingOrShapeChangeForm,
 )
@@ -144,6 +145,21 @@ class AddNippleChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
 
 
+class AddOtherSymptomView(AddSymptomView):
+    """
+    Add a symptom: other
+    """
+
+    symptom_type_name = "Other"
+    form_class = OtherSymptomForm
+    template_name = "mammograms/medical_information/symptoms/other.jinja"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["heading"] = "Symptom details"
+        return context
+
+
 class ChangeLumpView(ChangeSymptomView):
     """
     Change a symptom: lump
@@ -182,6 +198,21 @@ class ChangeNippleChangeView(ChangeSymptomView):
     symptom_type_name = "Nipple change"
     form_class = NippleChangeForm
     template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+
+
+class ChangeOtherSymptomView(ChangeSymptomView):
+    """
+    Change a symptom: other
+    """
+
+    symptom_type_name = "Other"
+    form_class = OtherSymptomForm
+    template_name = "mammograms/medical_information/symptoms/other.jinja"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["heading"] = "Symptom details"
+        return context
 
 
 class DeleteSymptomView(View):

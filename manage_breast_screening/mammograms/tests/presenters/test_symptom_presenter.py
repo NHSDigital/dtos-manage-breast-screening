@@ -8,6 +8,7 @@ from manage_breast_screening.mammograms.presenters.symptom_presenter import (
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     SymptomAreas,
+    SymptomType,
 )
 from manage_breast_screening.participants.tests.factories import SymptomFactory
 
@@ -65,6 +66,17 @@ class TestSymptomPresenter:
         )
 
         assert SymptomPresenter(inversion).change_type_line == "Change type: inversion"
+
+    def test_present_description(self):
+        inversion = SymptomFactory.create(
+            symptom_type_id=SymptomType.OTHER,
+            symptom_sub_type_details="symptom x",
+            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+            area=SymptomAreas.BOTH_BREASTS,
+            investigated=False,
+        )
+
+        assert SymptomPresenter(inversion).change_type_line == "Description: symptom x"
 
     def test_present_change_type_other(self):
         other_change = SymptomFactory.create(

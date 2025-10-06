@@ -315,6 +315,80 @@ class TestChangeNippleChangeView:
 
 
 @pytest.mark.django_db
+class TestAddOtherSymptomView:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:add_symptom_other",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:add_symptom_other",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "symptom_sub_type_details": "abc",
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestChangeOtherSymptomView:
+    @pytest.fixture
+    def other_symptom(self, appointment):
+        return SymptomFactory.create(other=True, appointment=appointment)
+
+    def test_renders_response(self, clinical_user_client, appointment, other_symptom):
+        response = clinical_user_client.get(
+            reverse(
+                "mammograms:change_symptom_other",
+                kwargs={"pk": appointment.pk, "symptom_pk": other_symptom.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment, other_symptom
+    ):
+        response = clinical_user_client.post(
+            reverse(
+                "mammograms:change_symptom_other",
+                kwargs={"pk": appointment.pk, "symptom_pk": other_symptom.pk},
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "symptom_sub_type_details": "abc",
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
 class TestDeleteSymptomView:
     def test_get_renders_response(self, clinical_user_client, appointment, lump):
         response = clinical_user_client.get(
