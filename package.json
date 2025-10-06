@@ -1,4 +1,5 @@
 {
+  "name": "dtos-manage-breast-screening",
   "type": "module",
   "files": [
     "manage_breast_screening",
