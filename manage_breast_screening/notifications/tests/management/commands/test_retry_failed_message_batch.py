@@ -13,6 +13,9 @@ from manage_breast_screening.notifications.management.commands.retry_failed_mess
     CommandError,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.queue import Queue
 from manage_breast_screening.notifications.tests.factories import MessageBatchFactory
 
@@ -30,6 +33,14 @@ def setup(monkeypatch):
 @patch.object(MessageBatchHelpers, "mark_batch_as_sent")
 @patch.object(MessageBatchHelpers, "mark_batch_as_failed")
 class TestRetryFailedMessageBatch:
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "exception", mock_insights_logger
+        )
+        return mock_insights_logger
+
     @pytest.mark.django_db
     def test_handle_batch_not_found(
         self,
@@ -169,4 +180,28 @@ class TestRetryFailedMessageBatch:
         assert (
             str(error.value)
             == f"Message Batch with id {batch_id} not sent: Retry limit exceeded"
+        )
+
+    @pytest.mark.django_db
+    def test_calls_insights_logger_if_exception_raised(
+        self,
+        mock_mark_batch_as_failed,
+        mock_mark_batch_as_sent,
+        mock_retry_message_batches,
+        mock_send_message_batch,
+        mock_insights_logger,
+    ):
+        subject = Command()
+        batch_id = uuid.uuid4()
+        _failed_batch = MessageBatchFactory(id=batch_id, status="failed_recoverable")
+
+        mock_retry_message_batches.return_value.item.return_value.content = json.dumps(
+            {"message_batch_id": str(batch_id), "retry_count": 5}
+        )
+
+        with pytest.raises(CommandError):
+            subject.handle()
+
+        mock_insights_logger.assert_called_with(
+            f"RetryFailedMessageBatchError: Message Batch with id {str(batch_id)} not sent: Retry limit exceeded"
         )
