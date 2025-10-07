@@ -1,8 +1,6 @@
 import pytest
 from django.urls import reverse
 
-from manage_breast_screening.auth.models import Role
-
 from .factories import ProviderFactory, UserAssignmentFactory, UserFactory
 
 
@@ -11,7 +9,7 @@ class TestSelectProvider:
     def test_single_assignment_redirects_to_next(self, client):
         user = UserFactory()
         provider = ProviderFactory()
-        UserAssignmentFactory(user=user, provider=provider, roles=[Role.CLINICAL.value])
+        UserAssignmentFactory(user=user, provider=provider, clinical=True)
 
         client.force_login(user)
 
@@ -28,12 +26,8 @@ class TestSelectProvider:
         user = UserFactory()
         provider1 = ProviderFactory()
         provider2 = ProviderFactory()
-        UserAssignmentFactory(
-            user=user, provider=provider1, roles=[Role.CLINICAL.value]
-        )
-        UserAssignmentFactory(
-            user=user, provider=provider2, roles=[Role.CLINICAL.value]
-        )
+        UserAssignmentFactory(user=user, provider=provider1, clinical=True)
+        UserAssignmentFactory(user=user, provider=provider2, clinical=True)
 
         client.force_login(user)
 
@@ -50,7 +44,7 @@ class TestSelectProvider:
     def test_safely_handles_bad_redirect(self, client):
         user = UserFactory()
         provider = ProviderFactory()
-        UserAssignmentFactory(user=user, provider=provider, roles=[Role.CLINICAL.value])
+        UserAssignmentFactory(user=user, provider=provider, clinical=True)
 
         client.force_login(user)
 
@@ -66,7 +60,7 @@ class TestSelectProvider:
     def test_excludes_providers_with_no_roles(self, client):
         user = UserFactory()
         provider = ProviderFactory()
-        UserAssignmentFactory(user=user, provider=provider, roles=[])
+        UserAssignmentFactory(user=user, provider=provider)
 
         client.force_login(user)
 
