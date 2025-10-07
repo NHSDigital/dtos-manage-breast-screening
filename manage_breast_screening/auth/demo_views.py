@@ -6,7 +6,7 @@ from django.db.models import Case, Q, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
-from manage_breast_screening.core.utils.urls import safe_next_url
+from manage_breast_screening.core.utils.urls import extract_next_path_from_params
 
 from .models import PERSONAS
 
@@ -14,15 +14,15 @@ from .models import PERSONAS
 @login_not_required
 def persona_login(request):
     users = _get_users(request.user)
-    next_url = safe_next_url(request)
+    next_path = extract_next_path_from_params(request)
 
     if request.method == "POST":
         user = get_object_or_404(users, nhs_uid=request.POST["username"])
         login(request, user, backend="django.contrib.auth.backends.ModelBackend")
 
         redirect_url = reverse("clinics:select_provider")
-        if next_url:
-            redirect_url = f"{redirect_url}?{urlencode({'next': next_url})}"
+        if next_path:
+            redirect_url = f"{redirect_url}?{urlencode({'next': next_path})}"
 
         return redirect(redirect_url)
     else:
@@ -33,7 +33,7 @@ def persona_login(request):
                 "users": users,
                 "page_title": "Personas",
                 "current_user": request.user,
-                "next": next_url,
+                "next": next_path,
             },
         )
 

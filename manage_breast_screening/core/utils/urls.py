@@ -1,4 +1,4 @@
-def safe_next_url(request):
+def extract_next_path_from_params(request):
     """Extract and validate a 'next' URL from request GET or POST parameters.
 
     Only returns the URL if it's a safe relative URL (starts with '/').
