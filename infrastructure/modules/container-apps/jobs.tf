@@ -9,7 +9,7 @@ locals {
       job_container_args = "store_mesh_messages"
     }
     create_appointments = {
-      cron_expression = "*/30 * * * *"
+      cron_expression = local.NO_OP_DATE
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-mesh-data"
       }
@@ -17,7 +17,7 @@ locals {
       job_container_args = "create_appointments"
     }
     send_message_batch = {
-      cron_expression = "0 11,13,15 * * *"
+      cron_expression = local.NO_OP_DATE
       environment_variables = {
         API_OAUTH_TOKEN_URL              = var.api_oauth_token_url
         NHS_NOTIFY_API_MESSAGE_BATCH_URL = var.nhs_notify_api_message_batch_url
@@ -27,7 +27,7 @@ locals {
       job_container_args = "send_message_batch"
     }
     retry_failed_message_batch = {
-      cron_expression = "*/30 * * * *"
+      cron_expression = local.NO_OP_DATE
       environment_variables = {
         API_OAUTH_TOKEN_URL              = var.api_oauth_token_url
         NHS_NOTIFY_API_MESSAGE_BATCH_URL = var.nhs_notify_api_message_batch_url
@@ -37,7 +37,7 @@ locals {
       job_container_args = "retry_failed_message_batch"
     }
     save_message_status = {
-      cron_expression = "*/30 * * * *"
+      cron_expression = local.NO_OP_DATE
       environment_variables = {
         STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
       }
@@ -45,7 +45,7 @@ locals {
       job_container_args = "save_message_status"
     }
     create_failures_report = {
-      cron_expression = "30 23 * * *"
+      cron_expression = local.NO_OP_DATE
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-reports"
       }
@@ -53,7 +53,7 @@ locals {
       job_container_args = "create_report"
     }
     create_aggregate_report = {
-      cron_expression = "45 23 * * *"
+      cron_expression = local.NO_OP_DATE
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-reports"
       }
@@ -136,9 +136,5 @@ module "scheduled_jobs" {
     module.queue_storage_role_assignment
   ]
 
-  # schedule_trigger_config {
-  #  cron_expression          = each.value.cron_expression
-  #  parallelism              = 1
-  #  replica_completion_count = 1
-  #}
+  cron_expression          = each.value.cron_expression
 }
