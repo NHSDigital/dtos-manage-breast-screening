@@ -74,6 +74,8 @@ class TestFailuresQuery:
                 "nhs_notify_errors": [
                     {"code": "CM_INVALID_VALUE", "title": "Invalid value"},
                     {"code": "CM_INVALID_NHS_NUMBER", "title": "Invalid NHS number"},
+                    {"code": "CM_MISSING_VALUE", "title": "Address inline is missing"},
+                    {"code": "CM_NULL_VALUE", "title": "Clinic location is null"},
                 ],
             },
         )
@@ -149,7 +151,7 @@ class TestFailuresQuery:
                 appt7.clinic.code,
                 "Self referral",
                 today_formatted,
-                "Invalid value, Invalid NHS number",
+                "Invalid value, Invalid NHS number, Address inline is missing, Clinic location is null",
             ],
         ]
 

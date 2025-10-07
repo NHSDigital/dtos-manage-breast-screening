@@ -34,7 +34,11 @@ LEFT OUTER JOIN notifications_messagestatus msg_sts ON msg_sts.message_id = msg.
 AND     msg_sts.status = 'failed'
 WHERE   appt.starts_at::date = %s
 AND   (
-  msg_fld.nhs_notify_errors @> '[{"code":"CM_INVALID_NHS_NUMBER"}]' OR
-  msg_fld.nhs_notify_errors @> '[{"code":"CM_INVALID_VALUE"}]' OR
+  msg_fld.nhs_notify_errors @> ANY(ARRAY[
+    '[{"code":"CM_INVALID_NHS_NUMBER"}]',
+    '[{"code":"CM_INVALID_VALUE"}]',
+    '[{"code":"CM_MISSING_VALUE"}]',
+    '[{"code":"CM_NULL_VALUE"}]'
+  ]::jsonb[]) OR
   msg_sts.description IS NOT NULL
 )
