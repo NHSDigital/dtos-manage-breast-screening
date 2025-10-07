@@ -78,6 +78,7 @@ variable "log_analytics_workspace_audit_id" {
   type        = string
 }
 
+
 variable "deploy_database_as_container" {
   description = "Whether to deploy the database as a container or as an Azure postgres flexible server."
   type        = bool
