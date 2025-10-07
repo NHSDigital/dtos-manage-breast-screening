@@ -69,12 +69,12 @@ module "container-app-environment" {
 }
 
 module "app_insights_audit" {
-  source = "../dtos-devops-templates/infrastructure/modules/application-insights"
+  source = "../dtos-devops-templates/infrastructure/modules/app-insights"
 
   name                = module.shared_config.names.app-insights
   location            = var.region
   resource_group_name = azurerm_resource_group.main.name
-  application_type    = "web"
+  appinsights_type    = "web"
 
   log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 }
