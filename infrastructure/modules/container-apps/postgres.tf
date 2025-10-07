@@ -46,8 +46,11 @@ module "postgres" {
   }
 
   # alerts
-  action_group_id   = var.action_group_id
-  enable_alerting   = var.enable_alerting
+  action_group_id         = var.action_group_id
+  enable_alerting         = var.enable_alerting
+  alert_memory_threshold  = 60
+  alert_cpu_threshold     = 90
+  alert_storage_threshold = 60
 
   databases = {
     db1 = {
@@ -96,8 +99,10 @@ module "database_container" {
   }
 
   # alerts
-  action_group_id   = var.action_group_id
-  enable_alerting   = var.enable_alerting
+  action_group_id         = var.action_group_id
+  enable_alerting         = var.enable_alerting
+  alert_memory_threshold  = 60
+  alert_cpu_threshold     = 90
 
   resource_group_name = azurerm_resource_group.main.name
   is_tcp_app          = true
