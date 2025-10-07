@@ -22,8 +22,10 @@ module "webapp" {
   container_app_environment_id     = var.container_app_environment_id
 
   # alerts
-  action_group_id   = var.action_group_id
-  enable_alerting   = var.enable_alerting
+  action_group_id        = var.action_group_id
+  enable_alerting        = var.enable_alerting
+  alert_memory_threshold = 60
+  alert_cpu_threshold    = 90
 
   resource_group_name              = azurerm_resource_group.main.name
   fetch_secrets_from_app_key_vault = var.fetch_secrets_from_app_key_vault
