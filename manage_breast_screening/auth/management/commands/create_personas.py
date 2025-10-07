@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.clinics.models import Provider, UserAssignment
@@ -24,7 +23,6 @@ class Command(BaseCommand):
             if not provider:
                 raise CommandError("No providers found. Refusing to create.")
             for persona in PERSONAS:
-                group = Group.objects.get(name=persona.group)
                 user, _ = User.objects.get_or_create(
                     nhs_uid=persona.username,
                     defaults={
@@ -32,7 +30,8 @@ class Command(BaseCommand):
                         "last_name": persona.last_name,
                     },
                 )
-                UserAssignment.objects.create(user=user, provider=provider)
-                user.groups.add(group)
+                UserAssignment.objects.create(
+                    user=user, provider=provider, roles=[persona.role.value]
+                )
         except Exception as e:
             raise CommandError(e)

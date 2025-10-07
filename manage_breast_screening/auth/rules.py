@@ -9,20 +9,25 @@ import rules
 from .models import Permission, Role
 
 
-def user_has_any_role(role, *other_roles):
-    roles = [role, *other_roles, Role.SUPERUSER]
+@rules.predicate
+def is_clinical(user, provider):
+    if not provider:
+        return False
 
-    @rules.predicate
-    def check(user):
-        # TODO: customise user model to add a cachable role attribute
-        return any(group.name in roles for group in user.groups.all())
-
-    return check
+    return user.assignments.filter(
+        provider=provider, roles__contains=[Role.CLINICAL.value]
+    ).exists()
 
 
-# fmt: off
+@rules.predicate
+def is_administrative(user, provider):
+    if not provider:
+        return False
 
-rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, user_has_any_role(Role.CLINICAL, Role.ADMINISTRATIVE))
-rules.add_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT, user_has_any_role(Role.CLINICAL))
+    return user.assignments.filter(
+        provider=provider, roles__contains=[Role.ADMINISTRATIVE.value]
+    ).exists()
 
-# fmt: on
+
+rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, is_clinical | is_administrative)
+rules.add_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT, is_clinical)

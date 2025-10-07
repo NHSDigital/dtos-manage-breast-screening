@@ -4,7 +4,7 @@ from collections import Counter
 
 import pytest
 from django.conf import settings
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.client import Client
 from django.urls import reverse
@@ -74,9 +74,8 @@ class SystemTestCase(StaticLiveServerTestCase):
         Emulate logging in as a user having a particular role,
         without needing to visit a login page.
         """
-        group, _created = Group.objects.get_or_create(name=role)
-        user = UserFactory.create(groups=[group])
-        UserAssignmentFactory.create(user=user)
+        user = UserFactory.create()
+        UserAssignmentFactory.create(user=user, roles=[role.value])
 
         self.current_user = user
         self.login_as_user(user)
@@ -120,9 +119,6 @@ class SystemTestCase(StaticLiveServerTestCase):
 
     def given_i_am_logged_in_as_an_administrative_user(self):
         self.login_as_role(Role.ADMINISTRATIVE)
-
-    def given_i_am_logged_in_as_an_superuser(self):
-        self.login_as_role(Role.SUPERUSER)
 
     def then_the_accessibility_baseline_is_met(self, require_unique_link_text=True):
         """

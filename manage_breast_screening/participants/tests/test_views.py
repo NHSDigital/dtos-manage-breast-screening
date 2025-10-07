@@ -12,7 +12,6 @@ def participant():
 @pytest.mark.django_db
 class TestShowParticipant:
     def test_renders_response(self, clinical_user_client, participant):
-        clinical_user_client.login()
         response = clinical_user_client.get(
             reverse("participants:show", kwargs={"pk": participant.pk}),
         )

@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import IntegrityError
 
+from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics.models import Provider, UserAssignment
 
 logger = logging.getLogger(__name__)
@@ -70,9 +71,31 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.ERROR("\nOperation cancelled."))
                     return
 
+            roles = list(Role)
+            self.stdout.write("\nAvailable roles:")
+            for i, role in enumerate(roles, 1):
+                self.stdout.write(f"{i}. {role.value}")
+
+            while True:
+                try:
+                    role_choice = input("\nSelect a role (enter number): ").strip()
+                    role_index = int(role_choice) - 1
+                    if 0 <= role_index < len(roles):
+                        selected_role = roles[role_index]
+                        break
+                    else:
+                        self.stdout.write(
+                            self.style.ERROR("Invalid selection. Please try again.")
+                        )
+                except (ValueError, KeyboardInterrupt):
+                    self.stdout.write(self.style.ERROR("\nOperation cancelled."))
+                    return
+
             try:
                 assignment = UserAssignment.objects.create(
-                    user=selected_user, provider=selected_provider
+                    user=selected_user,
+                    provider=selected_provider,
+                    roles=[selected_role.value],
                 )
 
                 self.stdout.write(

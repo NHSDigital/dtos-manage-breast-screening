@@ -5,7 +5,6 @@ from enum import StrEnum
 class Role(StrEnum):
     ADMINISTRATIVE = "Administrative"
     CLINICAL = "Clinical"
-    SUPERUSER = "Superuser"
 
 
 class Permission(StrEnum):
@@ -17,7 +16,7 @@ class Permission(StrEnum):
 class Persona:
     first_name: str
     last_name: str
-    group: str
+    role: str
 
     @property
     def username(self):
@@ -26,5 +25,4 @@ class Persona:
 
 ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
 CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
-SUPERUSER_PERSONA = Persona("Simon", "O'Brien", Role.SUPERUSER)
-PERSONAS = [ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA, SUPERUSER_PERSONA]
+PERSONAS = [ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA]

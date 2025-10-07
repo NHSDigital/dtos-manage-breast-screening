@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_http_methods
 
 from ..core.decorators import current_provider_exempt
+from ..core.utils.urls import extract_next_path_from_params
 from ..participants.models import Appointment, AppointmentStatus
 from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
@@ -57,20 +58,29 @@ def check_in(_request, pk, appointment_pk):
 @current_provider_exempt
 @login_required
 def select_provider(request):
+    next_path = extract_next_path_from_params(request)
     user_providers = Provider.objects.filter(assignments__user=request.user)
 
     if len(user_providers) == 1:
         request.session["current_provider"] = str(user_providers.first().pk)
+        if next_path:
+            return redirect(next_path)
         return redirect("clinics:index")
 
     if request.method == "POST":
         provider_id = request.POST.get("provider")
         if provider_id and user_providers.filter(pk=provider_id).exists():
             request.session["current_provider"] = provider_id
+            if next_path:
+                return redirect(next_path)
             return redirect("clinics:index")
 
     return render(
         request,
         "clinics/select_provider.jinja",
-        context={"providers": user_providers, "page_title": "Select Provider"},
+        context={
+            "providers": user_providers,
+            "page_title": "Select Provider",
+            "next": next_path,
+        },
     )
