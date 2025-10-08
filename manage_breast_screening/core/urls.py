@@ -16,7 +16,6 @@ Including another URLconf
 """
 
 from django.conf import settings
-from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
 from django.urls import include, path
@@ -32,7 +31,6 @@ def sha_view(requests):
 
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
     path(
         "auth/",
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
