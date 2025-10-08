@@ -59,7 +59,6 @@ PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.forms",

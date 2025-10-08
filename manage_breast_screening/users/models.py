@@ -1,8 +1,5 @@
-from django.contrib.auth.models import (
-    AbstractBaseUser,
-    BaseUserManager,
-    PermissionsMixin,
-)
+import rules
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
 
@@ -11,17 +8,11 @@ class UserManager(BaseUserManager):
         if not nhs_uid:
             raise ValueError("The NHS UID must be set")
         user = self.model(nhs_uid=nhs_uid, email=email, **extra_fields)
-        user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, nhs_uid, email=None, password=None, **extra_fields):
-        extra_fields.setdefault("is_staff", True)
-        extra_fields.setdefault("is_superuser", True)
-        return self.create_user(nhs_uid, email, password, **extra_fields)
 
-
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser):
     nhs_uid = models.CharField(max_length=150, unique=True)
     email = models.EmailField()
     first_name = models.CharField(max_length=150, blank=True)
@@ -38,3 +29,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
+
+    def has_perm(self, perm, obj=None):
+        if not self.is_active:
+            return False
+        return rules.has_perm(perm, self, obj)
+
+    def has_perms(self, perm_list, obj=None):
+        return all(self.has_perm(perm, obj=obj) for perm in perm_list)
