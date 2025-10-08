@@ -17,9 +17,9 @@ module "webapp" {
     azurerm     = azurerm
     azurerm.hub = azurerm.hub
   }
-  source                           = "../dtos-devops-templates/infrastructure/modules/container-app"
-  name                             = "${var.app_short_name}-web-${var.environment}"
-  container_app_environment_id     = var.container_app_environment_id
+  source                       = "../dtos-devops-templates/infrastructure/modules/container-app"
+  name                         = "${var.app_short_name}-web-${var.environment}"
+  container_app_environment_id = var.container_app_environment_id
 
   # alerts
   action_group_id        = var.action_group_id
