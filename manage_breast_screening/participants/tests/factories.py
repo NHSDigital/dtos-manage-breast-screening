@@ -3,6 +3,7 @@ from datetime import date
 from factory import post_generation
 from factory.declarations import (
     Iterator,
+    LazyAttribute,
     LazyFunction,
     RelatedFactory,
     Sequence,
@@ -135,6 +136,9 @@ class SymptomFactory(DjangoModelFactory):
     investigated = False
     recently_resolved = False
     appointment = SubFactory(AppointmentFactory)
+    area_description = LazyAttribute(
+        lambda o: "" if o.area == models.SymptomAreas.BOTH_BREASTS else "abc"
+    )
 
     class Params:
         lump = Trait(

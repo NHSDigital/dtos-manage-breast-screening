@@ -1,9 +1,7 @@
-from dataclasses import dataclass
 from datetime import date
-from typing import Any
 
 from django.db.models import TextChoices
-from django.forms import CheckboxSelectMultiple, Form, ValidationError
+from django.forms import CheckboxSelectMultiple
 from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
@@ -17,6 +15,7 @@ from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     MultipleChoiceField,
     RadioSelectWithoutFieldset,
 )
+from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.nhsuk_forms.utils import YesNo, yes_no, yes_no_field
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
@@ -109,21 +108,14 @@ class CommonFields:
         )
 
 
-class SymptomForm(Form):
+class SymptomForm(FormWithConditionalFields):
     """
     A base form class for entering symptoms. To be overriden for different symptom types.
     """
 
-    @dataclass
-    class ConditionalRequirement:
-        conditionally_required_field: str
-        predicate_field: str
-        predicate_field_value: Any
-
     def __init__(self, symptom_type, instance=None, **kwargs):
         self.instance = instance
         self.symptom_type = symptom_type
-        self.conditional_requirements = []
 
         if instance:
             kwargs["initial"] = self.initial_values(instance)
@@ -136,7 +128,7 @@ class SymptomForm(Form):
         """
         return {
             "area": instance.area,
-            "area_description": instance.area_description,
+            f"area_description_{instance.area.lower()}": instance.area_description,
             "symptom_sub_type": instance.symptom_sub_type_id,
             "symptom_sub_type_details": instance.symptom_sub_type_details,
             "when_started": instance.when_started,
@@ -162,8 +154,14 @@ class SymptomForm(Form):
                 area = one
             case _:
                 area = self.cleaned_data["area"]
+                area_description_field_name = f"area_description_{area.lower()}"
+                area_description = self.cleaned_data.get(
+                    area_description_field_name, ""
+                )
 
-        area_description = self.cleaned_data.get("area_description", "")
+        area_description_field_name = f"area_description_{area.lower()}"
+        area_description = self.cleaned_data.get(area_description_field_name, "")
+
         symptom_sub_type = self.cleaned_data.get("symptom_sub_type")
         symptom_sub_type_details = self.cleaned_data.get("symptom_sub_type_details", "")
         when_started = self.cleaned_data.get("when_started")
@@ -190,53 +188,6 @@ class SymptomForm(Form):
             when_resolved=when_resolved,
             additional_information=additional_information,
         )
-
-    def set_conditionally_required(
-        self, conditionally_required_field, predicate_field, predicate_field_value
-    ):
-        """
-        Mark a field as conditionally required if and only if another field (the predicate field)
-        is set to a specific value.
-        If the predicate field is set to the predicate value, this field will require a value.
-        If the predicate field is set to a different value, this field's value will be ignored.
-        """
-        if conditionally_required_field not in self.fields:
-            raise ValueError(f"{conditionally_required_field} is not a valid field")
-        if predicate_field not in self.fields:
-            raise ValueError(f"{predicate_field} is not a valid field")
-
-        self.conditional_requirements.append(
-            self.ConditionalRequirement(
-                conditionally_required_field=conditionally_required_field,
-                predicate_field=predicate_field,
-                predicate_field_value=predicate_field_value,
-            )
-        )
-
-        self.fields[conditionally_required_field].required = False
-
-    def clean(self):
-        for requirement in self.conditional_requirements:
-            field = requirement.conditionally_required_field
-
-            if (
-                self.cleaned_data.get(requirement.predicate_field)
-                == requirement.predicate_field_value
-            ):
-                cleaned_value = self.cleaned_data.get(field)
-                if isinstance(cleaned_value, str):
-                    cleaned_value = cleaned_value.strip()
-
-                if not cleaned_value:
-                    self.add_error(
-                        field,
-                        ValidationError(
-                            message=self.fields[field].error_messages["required"],
-                            code="required",
-                        ),
-                    )
-            else:
-                del self.cleaned_data[field]
 
     def update(self, request):
         auditor = Auditor.from_request(request)
@@ -273,7 +224,9 @@ class SymptomForm(Form):
 
 class LumpForm(SymptomForm):
     area = CommonFields.area_radios(symptom_name="lump")
-    area_description = CommonFields.area_description(symptom_name="lump")
+    area_description_right_breast = CommonFields.area_description("lump")
+    area_description_left_breast = CommonFields.area_description("lump")
+    area_description_other = CommonFields.area_description("lump")
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
     intermittent = CommonFields.intermittent
@@ -286,33 +239,28 @@ class LumpForm(SymptomForm):
     def __init__(self, instance=None, **kwargs):
         super().__init__(symptom_type=SymptomType.LUMP, instance=instance, **kwargs)
 
-        self.set_conditionally_required(
-            conditionally_required_field="area_description",
-            predicate_field="area",
-            predicate_field_value=RightLeftOtherChoices.OTHER,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="specific_date",
-            predicate_field="when_started",
-            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="when_resolved",
-            predicate_field="recently_resolved",
-            predicate_field_value=True,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="investigation_details",
-            predicate_field="investigated",
-            predicate_field_value=YesNo.YES,
+        self.given_field("area").require_field_with_prefix("area_description")
+
+        self.given_field_value(
+            "when_started", RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        ).require_field("specific_date")
+
+        self.given_field_value("recently_resolved", True).require_field("when_resolved")
+
+        self.given_field_value("investigated", YesNo.YES).require_field(
+            "investigation_details"
         )
 
 
 class SwellingOrShapeChangeForm(SymptomForm):
     area = CommonFields.area_radios(symptom_name="swelling or shape change")
-    area_description = CommonFields.area_description(
-        symptom_name="swelling or shape change"
+    area_description_right_breast = CommonFields.area_description(
+        "swelling or shape change"
     )
+    area_description_left_breast = CommonFields.area_description(
+        "swelling or shape change"
+    )
+    area_description_other = CommonFields.area_description("swelling or shape change")
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
     intermittent = CommonFields.intermittent
@@ -329,31 +277,24 @@ class SwellingOrShapeChangeForm(SymptomForm):
             **kwargs,
         )
 
-        self.set_conditionally_required(
-            conditionally_required_field="area_description",
-            predicate_field="area",
-            predicate_field_value=RightLeftOtherChoices.OTHER,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="specific_date",
-            predicate_field="when_started",
-            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="when_resolved",
-            predicate_field="recently_resolved",
-            predicate_field_value=True,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="investigation_details",
-            predicate_field="investigated",
-            predicate_field_value=YesNo.YES,
+        self.given_field("area").require_field_with_prefix("area_description")
+
+        self.given_field_value(
+            "when_started", RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        ).require_field("specific_date")
+
+        self.given_field_value("recently_resolved", True).require_field("when_resolved")
+
+        self.given_field_value("investigated", YesNo.YES).require_field(
+            "investigation_details"
         )
 
 
 class SkinChangeForm(SymptomForm):
     area = CommonFields.area_radios(symptom_name="skin change")
-    area_description = CommonFields.area_description(symptom_name="skin change")
+    area_description_right_breast = CommonFields.area_description("skin change")
+    area_description_left_breast = CommonFields.area_description("skin change")
+    area_description_other = CommonFields.area_description("skin change")
     symptom_sub_type = ChoiceField(
         choices=SkinChangeChoices,
         label="How has the skin changed?",
@@ -381,26 +322,21 @@ class SkinChangeForm(SymptomForm):
             **kwargs,
         )
 
-        self.set_conditionally_required(
-            conditionally_required_field="area_description",
-            predicate_field="area",
-            predicate_field_value=RightLeftOtherChoices.OTHER,
+        self.given_field("area").require_field_with_prefix("area_description")
+
+        self.given_field_value(
+            "when_started", RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        ).require_field("specific_date")
+
+        self.given_field_value("recently_resolved", True).require_field("when_resolved")
+
+        self.given_field_value("investigated", YesNo.YES).require_field(
+            "investigation_details"
         )
-        self.set_conditionally_required(
-            conditionally_required_field="symptom_sub_type_details",
-            predicate_field="symptom_sub_type",
-            predicate_field_value=SkinChangeChoices.OTHER,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="specific_date",
-            predicate_field="when_started",
-            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="investigation_details",
-            predicate_field="investigated",
-            predicate_field_value=YesNo.YES,
-        )
+
+        self.given_field_value(
+            "symptom_sub_type", SkinChangeChoices.OTHER
+        ).require_field("symptom_sub_type_details")
 
 
 class NippleChangeForm(SymptomForm):
@@ -438,21 +374,19 @@ class NippleChangeForm(SymptomForm):
             **kwargs,
         )
 
-        self.set_conditionally_required(
-            conditionally_required_field="symptom_sub_type_details",
-            predicate_field="symptom_sub_type",
-            predicate_field_value=NippleChangeChoices.OTHER,
+        self.given_field_value(
+            "when_started", RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        ).require_field("specific_date")
+
+        self.given_field_value("recently_resolved", True).require_field("when_resolved")
+
+        self.given_field_value("investigated", YesNo.YES).require_field(
+            "investigation_details"
         )
-        self.set_conditionally_required(
-            conditionally_required_field="specific_date",
-            predicate_field="when_started",
-            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="investigation_details",
-            predicate_field="investigated",
-            predicate_field_value=YesNo.YES,
-        )
+
+        self.given_field_value(
+            "symptom_sub_type", NippleChangeChoices.OTHER
+        ).require_field("symptom_sub_type_details")
 
     def initial_values(self, instance):
         return {
@@ -481,7 +415,9 @@ class NippleChangeForm(SymptomForm):
 
 class OtherSymptomForm(SymptomForm):
     area = CommonFields.area_radios()
-    area_description = CommonFields.area_description()
+    area_description_right_breast = CommonFields.area_description()
+    area_description_left_breast = CommonFields.area_description()
+    area_description_other = CommonFields.area_description()
     symptom_sub_type_details = CharField(
         label="Describe the symptom",
         label_classes="nhsuk-label--m",
@@ -504,18 +440,14 @@ class OtherSymptomForm(SymptomForm):
             **kwargs,
         )
 
-        self.set_conditionally_required(
-            conditionally_required_field="area_description",
-            predicate_field="area",
-            predicate_field_value=RightLeftOtherChoices.OTHER,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="specific_date",
-            predicate_field="when_started",
-            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-        )
-        self.set_conditionally_required(
-            conditionally_required_field="investigation_details",
-            predicate_field="investigated",
-            predicate_field_value=YesNo.YES,
+        self.given_field("area").require_field_with_prefix("area_description")
+
+        self.given_field_value(
+            "when_started", RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        ).require_field("specific_date")
+
+        self.given_field_value("recently_resolved", True).require_field("when_resolved")
+
+        self.given_field_value("investigated", YesNo.YES).require_field(
+            "investigation_details"
         )

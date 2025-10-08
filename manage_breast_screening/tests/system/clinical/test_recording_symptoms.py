@@ -32,6 +32,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.then_i_see_the_add_a_lump_form()
 
         self.when_i_select_right_breast()
+        self.and_i_enter_the_area()
         self.and_i_select_less_than_three_months()
         self.and_i_select_no_the_symptom_has_not_been_investigated()
         self.and_i_click_save_symptom()
@@ -96,6 +97,11 @@ class TestRecordingSymptoms(SystemTestCase):
 
     def when_i_select_right_breast(self):
         self.page.get_by_label("Right breast").click()
+
+    def and_i_enter_the_area(self):
+        self.page.get_by_label("Describe the specific area").filter(visible=True).fill(
+            "ldq"
+        )
 
     def and_i_select_less_than_three_months(self):
         self.page.get_by_label("Less than 3 months").click()
