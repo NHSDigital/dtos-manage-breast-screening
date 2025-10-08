@@ -58,6 +58,50 @@ def message_batches():
     ), 201
 
 
+@app.route("/message/batch/recoverable-error", methods=["POST"])
+def message_batch_with_error_response():
+    return json.dumps(
+        {
+            "errors": [
+                {
+                    "id": "rrt-1931948104716186917-c-geu2-10664-3111479-3.0",
+                    "code": "CM_TIMEOUT",
+                    "links": {
+                        "about": "https://digital.nhs.uk/developer/api-catalogue/nhs-notify"
+                    },
+                    "status": "408",
+                    "title": "Request timeout",
+                    "detail": "The service was unable to receive your request within the timeout period.",
+                }
+            ]
+        }
+    ), 408
+
+
+@app.route("/message/batch/validation-error", methods=["POST"])
+def message_batch_with_validation_error_response():
+    return json.dumps(
+        {
+            "errors": [
+                {
+                    "id": "rrt-1931948104716186917-c-geu2-10664-3111479-3.0",
+                    "code": "CM_INVALID_NHS_NUMBER",
+                    "links": {
+                        "about": "https://digital.nhs.uk/developer/api-catalogue/nhs-notify",
+                        "nhsNumbers": "https://www.datadictionary.nhs.uk/attributes/nhs_number.html",
+                    },
+                    "status": "400",
+                    "title": "Invalid nhs number",
+                    "detail": "The value provided in this nhsNumber field is not a valid NHS number.",
+                    "source": {
+                        "pointer": "/data/attributes/messages/0/recipient/nhsNumber"
+                    },
+                }
+            ]
+        }
+    ), 400
+
+
 def validate_with_schema(data: dict):
     try:
         with open("schema.json") as file:
