@@ -24,12 +24,21 @@ class SymptomPresenter:
 
     @property
     def change_type_line(self):
+        type_id = self._symptom.symptom_type_id
+        sub_type_id = self._symptom.symptom_sub_type_id
+        sub_type_details = self._symptom.symptom_sub_type_details
+
         # fmt: off
-        match [self._symptom.symptom_type_id, self._symptom.symptom_sub_type_id]:
-            case [SymptomType.SKIN_CHANGE, SkinChangeChoices.OTHER] | [SymptomType.NIPPLE_CHANGE, NippleChangeChoices.OTHER]:
-                return f"Change type: {self._symptom.symptom_sub_type_details}"
-            case [SymptomType.SKIN_CHANGE, _] | [SymptomType.NIPPLE_CHANGE, _]:
+        match (type_id, sub_type_id, sub_type_details):
+            case (
+                [SymptomType.SKIN_CHANGE, SkinChangeChoices.OTHER, details] |
+                [SymptomType.NIPPLE_CHANGE, NippleChangeChoices.OTHER, details]
+            ) if details:
+                return f"Change type: {details}"
+            case [SymptomType.SKIN_CHANGE, _, _] | [SymptomType.NIPPLE_CHANGE, _, _]:
                 return f"Change type: {self._symptom.symptom_sub_type.name.lower()}"
+            case [SymptomType.OTHER, _, description] if description:
+                return f"Description: {description}"
             case _:
                 return ""
         # fmt: on
@@ -137,4 +146,4 @@ class SymptomPresenter:
             case SymptomType.NIPPLE_CHANGE:
                 return "mammograms:change_symptom_nipple_change"
             case _:
-                raise ValueError(self._symptom.symptom_type_id)
+                return "mammograms:change_symptom_other"

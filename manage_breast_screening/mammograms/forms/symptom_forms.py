@@ -88,6 +88,26 @@ class CommonFields:
         widget=Textarea(attrs={"rows": 4}),
     )
 
+    @staticmethod
+    def area_radios(symptom_name="symptom"):
+        return ChoiceField(
+            choices=RightLeftOtherChoices,
+            label=f"Where is the {symptom_name} located?",
+            error_messages={"required": f"Select the location of the {symptom_name}"},
+        )
+
+    @staticmethod
+    def area_description(symptom_name="symptom", hint="For example, the left armpit"):
+        return CharField(
+            required=False,
+            label="Describe the specific area",
+            hint=hint,
+            error_messages={
+                "required": f"Describe the specific area where the {symptom_name} is located"
+            },
+            classes="nhsuk-u-width-two-thirds",
+        )
+
 
 class SymptomForm(Form):
     """
@@ -252,20 +272,8 @@ class SymptomForm(Form):
 
 
 class LumpForm(SymptomForm):
-    area = ChoiceField(
-        choices=RightLeftOtherChoices,
-        label="Where is the lump located?",
-        error_messages={"required": "Select the location of the lump"},
-    )
-    area_description = CharField(
-        required=False,
-        label="Describe the specific area",
-        hint="For example, the left armpit",
-        error_messages={
-            "required": "Describe the specific area where the lump is located"
-        },
-        classes="nhsuk-u-width-two-thirds",
-    )
+    area = CommonFields.area_radios(symptom_name="lump")
+    area_description = CommonFields.area_description(symptom_name="lump")
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
     intermittent = CommonFields.intermittent
@@ -301,21 +309,9 @@ class LumpForm(SymptomForm):
 
 
 class SwellingOrShapeChangeForm(SymptomForm):
-    area = ChoiceField(
-        choices=RightLeftOtherChoices,
-        label="Where is the swelling or shape change located?",
-        error_messages={
-            "required": "Select the location of the swelling or shape change"
-        },
-    )
-    area_description = CharField(
-        required=False,
-        label="Describe the specific area",
-        hint="For example, the left armpit",
-        error_messages={
-            "required": "Describe the specific area where the swelling or shape change is located"
-        },
-        classes="nhsuk-u-width-two-thirds",
+    area = CommonFields.area_radios(symptom_name="swelling or shape change")
+    area_description = CommonFields.area_description(
+        symptom_name="swelling or shape change"
     )
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
@@ -356,20 +352,8 @@ class SwellingOrShapeChangeForm(SymptomForm):
 
 
 class SkinChangeForm(SymptomForm):
-    area = ChoiceField(
-        choices=RightLeftOtherChoices,
-        label="Where is the skin change located?",
-        error_messages={"required": "Select the location of the skin change"},
-    )
-    area_description = CharField(
-        required=False,
-        label="Describe the specific area",
-        hint="For example, the left armpit",
-        error_messages={
-            "required": "Describe the specific area where the skin change is located"
-        },
-        classes="nhsuk-u-width-two-thirds",
-    )
+    area = CommonFields.area_radios(symptom_name="skin change")
+    area_description = CommonFields.area_description(symptom_name="skin change")
     symptom_sub_type = ChoiceField(
         choices=SkinChangeChoices,
         label="How has the skin changed?",
@@ -493,3 +477,45 @@ class NippleChangeForm(SymptomForm):
             ]
         else:
             return [area]
+
+
+class OtherSymptomForm(SymptomForm):
+    area = CommonFields.area_radios()
+    area_description = CommonFields.area_description()
+    symptom_sub_type_details = CharField(
+        label="Describe the symptom",
+        label_classes="nhsuk-label--m",
+        error_messages={"required": "Enter a description of the symptom"},
+        classes="nhsuk-u-width-two-thirds",
+    )
+    when_started = CommonFields.when_started
+    specific_date = CommonFields.specific_date
+    intermittent = CommonFields.intermittent
+    recently_resolved = CommonFields.recently_resolved
+    when_resolved = CommonFields.when_resolved
+    investigated = CommonFields.investigated
+    investigation_details = CommonFields.investigation_details
+    additional_information = CommonFields.additional_information
+
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(
+            symptom_type=SymptomType.OTHER,
+            instance=instance,
+            **kwargs,
+        )
+
+        self.set_conditionally_required(
+            conditionally_required_field="area_description",
+            predicate_field="area",
+            predicate_field_value=RightLeftOtherChoices.OTHER,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="specific_date",
+            predicate_field="when_started",
+            predicate_field_value=RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+        )
+        self.set_conditionally_required(
+            conditionally_required_field="investigation_details",
+            predicate_field="investigated",
+            predicate_field_value=YesNo.YES,
+        )

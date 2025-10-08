@@ -8,11 +8,12 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
-from manage_breast_screening.participants.models.symptom import Symptom
+from manage_breast_screening.participants.models.symptom import Symptom, SymptomType
 
 from ..forms.symptom_forms import (
     LumpForm,
     NippleChangeForm,
+    OtherSymptomForm,
     SkinChangeForm,
     SwellingOrShapeChangeForm,
 )
@@ -77,7 +78,10 @@ class ChangeSymptomView(BaseSymptomFormView):
         kwargs = super().get_form_kwargs()
 
         instance = get_object_or_404(
-            Symptom, pk=self.kwargs["symptom_pk"], appointment_id=self.kwargs["pk"]
+            Symptom,
+            pk=self.kwargs["symptom_pk"],
+            appointment_id=self.kwargs["pk"],
+            **self.extra_filters(),
         )
         kwargs["instance"] = instance
 
@@ -102,6 +106,12 @@ class ChangeSymptomView(BaseSymptomFormView):
             ),
         }
         return context
+
+    def extra_filters(self):
+        """
+        Override this method to filter objects editable by this form
+        """
+        raise NotImplementedError
 
 
 class AddLumpView(AddSymptomView):
@@ -144,6 +154,21 @@ class AddNippleChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
 
 
+class AddOtherSymptomView(AddSymptomView):
+    """
+    Add a symptom: other
+    """
+
+    symptom_type_name = "Other"
+    form_class = OtherSymptomForm
+    template_name = "mammograms/medical_information/symptoms/other.jinja"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["heading"] = "Symptom details"
+        return context
+
+
 class ChangeLumpView(ChangeSymptomView):
     """
     Change a symptom: lump
@@ -152,6 +177,9 @@ class ChangeLumpView(ChangeSymptomView):
     symptom_type_name = "lump"
     form_class = LumpForm
     template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+
+    def extra_filters(self):
+        return {"symptom_type_id": SymptomType.LUMP}
 
 
 class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
@@ -163,6 +191,9 @@ class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
     form_class = SwellingOrShapeChangeForm
     template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
 
+    def extra_filters(self):
+        return {"symptom_type_id": SymptomType.SWELLING_OR_SHAPE_CHANGE}
+
 
 class ChangeSkinChangeView(ChangeSymptomView):
     """
@@ -173,6 +204,9 @@ class ChangeSkinChangeView(ChangeSymptomView):
     form_class = SkinChangeForm
     template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
 
+    def extra_filters(self):
+        return {"symptom_type_id": SymptomType.SKIN_CHANGE}
+
 
 class ChangeNippleChangeView(ChangeSymptomView):
     """
@@ -182,6 +216,27 @@ class ChangeNippleChangeView(ChangeSymptomView):
     symptom_type_name = "Nipple change"
     form_class = NippleChangeForm
     template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+
+    def extra_filters(self):
+        return {"symptom_type_id": SymptomType.NIPPLE_CHANGE}
+
+
+class ChangeOtherSymptomView(ChangeSymptomView):
+    """
+    Change a symptom: other
+    """
+
+    symptom_type_name = "Other"
+    form_class = OtherSymptomForm
+    template_name = "mammograms/medical_information/symptoms/other.jinja"
+
+    def extra_filters(self):
+        return {"symptom_type_id": SymptomType.OTHER}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["heading"] = "Symptom details"
+        return context
 
 
 class DeleteSymptomView(View):

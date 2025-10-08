@@ -4,6 +4,7 @@ from django.test import RequestFactory
 from manage_breast_screening.mammograms.forms.symptom_forms import (
     LumpForm,
     NippleChangeForm,
+    OtherSymptomForm,
     RelativeDateChoices,
     RightLeftNippleChoices,
     RightLeftOtherChoices,
@@ -478,3 +479,62 @@ class TestNippleChangeForm:
             "when_resolved": "",
             "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
         }
+
+
+class TestOtherSymptomForm:
+    def test_valid_form(self):
+        form = OtherSymptomForm(
+            data={
+                "area": RightLeftOtherChoices.LEFT_BREAST,
+                "symptom_sub_type_details": "abc symptom",
+                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                "investigated": YesNo.NO,
+            }
+        )
+        assert form.is_valid()
+
+    def test_missing_required_fields(self):
+        form = OtherSymptomForm(data={})
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "when_started": ["Select how long the symptom has existed"],
+            "symptom_sub_type_details": ["Enter a description of the symptom"],
+            "investigated": ["Select whether the symptom has been investigated or not"],
+            "area": ["Select the location of the symptom"],
+        }
+
+    def test_missing_conditionally_required_fields(self):
+        form = OtherSymptomForm(
+            data={
+                "area": RightLeftOtherChoices.OTHER,
+                "symptom_sub_type_details": "abc symptom",
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+            }
+        )
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "area_description": [
+                "Describe the specific area where the symptom is located"
+            ],
+            "specific_date": ["Enter the date the symptom started"],
+            "investigation_details": ["Enter details of any investigations"],
+        }
+
+    def test_valid_form_with_conditionally_required_fields(self):
+        form = OtherSymptomForm(
+            data={
+                "area": RightLeftOtherChoices.OTHER,
+                "area_description": "abc",
+                "symptom_sub_type_details": "abc",
+                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                "investigated": YesNo.YES,
+                "specific_date_0": "2",
+                "specific_date_1": "2025",
+                "investigation_details": "def",
+            }
+        )
+        assert form.is_valid()
