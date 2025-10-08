@@ -28,6 +28,7 @@ var miGHtoADOname = 'mi-${appShortName}-${envConfig}-ghtoado-uks'
 var roleID = {
   CDNContributor: 'ec156ff8-a8d1-4d15-830c-5b80698ca432'
   kvSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
+  monitoringContributor: '749f88d5-cbae-40b8-bcfc-e573ddc772fa'
   networkContributor: '4d97b98b-1d4f-4787-a291-c67834d212e7'
   rbacAdmin: 'f58310d9-a9f6-439a-9e8d-f62e7b41a168'
   reader: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
@@ -121,6 +122,16 @@ module storageAccountPrivateEndpoint 'privateEndpoint.bicep' = {
     resourceServiceType: 'storage'
     resourceID: terraformStateStorageAccount.outputs.storageAccountID
     privateDNSZoneID: storagePrivateDNSZone.outputs.privateDNSZoneID
+  }
+}
+
+// Let the managed identity manage monitoring resources (Application Insights, Log Analytics)
+resource monitoringContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, envConfig, 'monitoringContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.monitoringContributor)
+    principalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
+    description: '${miADOtoAZname} Monitoring Contributor access to subscription'
   }
 }
 
