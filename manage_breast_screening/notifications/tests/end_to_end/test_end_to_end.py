@@ -29,13 +29,15 @@ from manage_breast_screening.notifications.tests.integration.helpers import Help
 
 @patch("manage_breast_screening.notifications.services.api_client.jwt.encode")
 class TestEndToEnd:
-    @pytest.mark.django_db
-    def test_get_from_mesh_and_send_message_batch(self, mock_jwt_encode, monkeypatch):
+    @pytest.fixture(autouse=True)
+    def before(self):
         Helpers().add_file_to_mesh_mailbox(
             f"{os.path.dirname(os.path.realpath(__file__))}/ABC_20250302091221_APPT_100.dat"
         )
         Queue.RetryMessageBatches().client.clear_messages()
 
+    @pytest.mark.django_db
+    def test_get_from_mesh_and_send_message_batch(self, mock_jwt_encode, monkeypatch):
         StoreMeshMessages().handle()
 
         today_dirname = datetime.today().strftime("%Y-%m-%d")
@@ -44,13 +46,13 @@ class TestEndToEnd:
         appointments = Appointment.objects.filter(
             episode_type__in=["F", "G", "R", "S"],
             starts_at__lte=datetime.now() + timedelta(weeks=4),
-            message__isnull=True,
             status="B",
         )
-        assert len(appointments) == 3
 
         appointment_date = datetime.now() + timedelta(days=2)
         appointments.update(starts_at=appointment_date)
+
+        assert appointments.count() == 3
 
         # Respond with a 408 recoverable error
         monkeypatch.setenv(
@@ -107,6 +109,11 @@ class TestEndToEnd:
         ).all()
 
         assert sent_batches.count() == 1
-        assert sent_batches.first().messages.count() == 2
+        sent_batch = sent_batches.first()
+        assert sent_batch.messages.count() == 2
+        appointments_from_sent_messages = [
+            m.appointment for m in sent_batch.messages.all()
+        ]
 
+        assert appointments_from_sent_messages == [appointments[1], appointments[2]]
         assert len(Queue.RetryMessageBatches().peek()) == 0
