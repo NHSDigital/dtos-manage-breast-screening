@@ -14,7 +14,7 @@ def anna():
         first_name=ADMINISTRATIVE_PERSONA.first_name,
         last_name=ADMINISTRATIVE_PERSONA.last_name,
     )
-    UserAssignmentFactory(user=user, roles=[ADMINISTRATIVE_PERSONA.role.value])
+    UserAssignmentFactory(user=user, administrative=True)
     return user
 
 
@@ -25,7 +25,7 @@ def chloe():
         first_name=CLINICAL_PERSONA.first_name,
         last_name=CLINICAL_PERSONA.last_name,
     )
-    UserAssignmentFactory(user=user, roles=[CLINICAL_PERSONA.role.value])
+    UserAssignmentFactory(user=user, clinical=True)
     return user
 
 

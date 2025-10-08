@@ -59,7 +59,9 @@ def check_in(_request, pk, appointment_pk):
 @login_required
 def select_provider(request):
     next_path = extract_next_path_from_params(request)
-    user_providers = Provider.objects.filter(assignments__user=request.user)
+    user_providers = Provider.objects.filter(
+        assignments__user=request.user, assignments__roles__len__gt=0
+    )
 
     if len(user_providers) == 1:
         request.session["current_provider"] = str(user_providers.first().pk)

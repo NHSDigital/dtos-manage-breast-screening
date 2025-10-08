@@ -3,7 +3,6 @@ from unittest import TestCase
 import pytest
 from django.test.client import Client
 
-from manage_breast_screening.auth.models import Role
 from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 
@@ -19,14 +18,14 @@ def user():
 @pytest.fixture
 def administrative_user():
     user = UserFactory.create(nhs_uid="administrative1")
-    UserAssignmentFactory.create(user=user, roles=[Role.ADMINISTRATIVE])
+    UserAssignmentFactory.create(user=user, administrative=True)
     return user
 
 
 @pytest.fixture
 def clinical_user():
     user = UserFactory.create(nhs_uid="clinical1")
-    UserAssignmentFactory.create(user=user, roles=[Role.CLINICAL])
+    UserAssignmentFactory.create(user=user, clinical=True)
     return user
 
 

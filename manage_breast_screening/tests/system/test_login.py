@@ -83,7 +83,9 @@ class TestLogin(SystemTestCase):
 
     def then_i_see_no_providers_message(self):
         expect(
-            self.page.get_by_text("You haven't been assigned to any providers.")
+            self.page.get_by_text(
+                "No providers found. Check that you've been assigned a role with at least one provider."
+            )
         ).to_be_visible()
 
     def given_a_user_with_single_provider(self):
@@ -96,8 +98,10 @@ class TestLogin(SystemTestCase):
         self.provider1 = ProviderFactory(name="Provider One")
         self.provider2 = ProviderFactory(name="Provider Two")
 
-        UserAssignmentFactory(user=self.user, provider=self.provider1)
-        UserAssignmentFactory(user=self.user, provider=self.provider2)
+        UserAssignmentFactory(user=self.user, provider=self.provider1, clinical=True)
+        UserAssignmentFactory(
+            user=self.user, provider=self.provider2, administrative=True
+        )
 
     def given_i_am_on_the_login_page(self):
         self.page.goto(self.live_server_url + reverse("auth:login"))

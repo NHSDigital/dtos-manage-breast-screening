@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta, timezone
 
 from django.contrib.auth import get_user_model
-from factory import LazyAttribute, post_generation
+from factory import LazyAttribute, Trait, post_generation
 from factory.declarations import RelatedFactoryList, Sequence, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
+from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics import models
 
 User = get_user_model()
@@ -93,3 +94,7 @@ class UserAssignmentFactory(DjangoModelFactory):
 
     user = SubFactory(UserFactory)
     provider = SubFactory(ProviderFactory)
+
+    class Params:
+        clinical = Trait(roles=[Role.CLINICAL])
+        administrative = Trait(roles=[Role.ADMINISTRATIVE])

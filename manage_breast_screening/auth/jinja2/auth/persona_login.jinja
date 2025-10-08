@@ -10,7 +10,7 @@
 
     {% for user in users %}
       <h2>{{ user.first_name }} {{ user.last_name }}{% if user == current_user %} (logged in){% endif %}</h2>
-      <p>{{ user.first_name }} has <b>{{ user.groups.all() | map(attribute='name') | join(', ') }}</b> access.</p>
+      <p>{{ user.first_name }} has <b>{{ user.assignments.all() | map(attribute='roles') | sum(start=[]) | unique | join(', ') }}</b> access.</p>
 
       {% if user != current_user %}
       <form action="{{ request.path }}" method="post" novalidate>
