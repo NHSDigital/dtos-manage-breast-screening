@@ -4,7 +4,7 @@ from django.db import models
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, nhs_uid, email=None, password=None, **extra_fields):
+    def create_user(self, nhs_uid, email=None, **extra_fields):
         if not nhs_uid:
             raise ValueError("The NHS UID must be set")
         user = self.model(nhs_uid=nhs_uid, email=email, **extra_fields)
