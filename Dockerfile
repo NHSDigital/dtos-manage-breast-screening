@@ -20,7 +20,7 @@ ARG poetry_version
 
 WORKDIR /app
 
-RUN apk add --no-cache libgcc libstdc++ build-base
+RUN apk add --no-cache libgcc libstdc++ build-base linux-headers
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
