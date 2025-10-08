@@ -54,15 +54,11 @@ class Command(BaseCommand):
                     if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
                         if clinic_created:
-                            self.stdout.write(f"{clinic} created")
+                            logger.info("%s created", clinic)
 
                         appt, appt_created = self.update_or_create_appointment(
                             row, clinic
                         )
-                        logger.info(
-                            "%s %s", appt, ("created" if appt_created else "updated")
-                        )
-
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
             logger.info("Create Appointments command finished successfully")
         except Exception as e:
@@ -108,34 +104,31 @@ class Command(BaseCommand):
         appointment = Appointment.objects.filter(nbss_id=row["Appointment ID"]).first()
 
         if self.is_new_booking(row, appointment):
-            return (
-                Appointment.objects.create(
-                    nbss_id=row["Appointment ID"],
-                    nhs_number=row["NHS Num"],
-                    number=row["Screen Appt num"],
-                    batch_id=self.handle_aliased_column("Batch ID", "BatchID", row),
-                    clinic=clinic,
-                    episode_started_at=datetime.strptime(
-                        row["Episode Start"], "%Y%m%d"
-                    ).replace(tzinfo=TZ_INFO),
-                    episode_type=self.handle_aliased_column(
-                        "Episode Type", "Epsiode Type", row
-                    ),
-                    starts_at=self.appointment_date_and_time(row),
-                    status=row["Status"],
-                    booked_by=row["Booked By"],
-                    booked_at=self.workflow_action_date_and_time(
-                        row["Action Timestamp"]
-                    ),
-                    assessment=(
-                        self.handle_aliased_column(
-                            "Screen or Assess", "Screen or Asses", row
-                        )
-                        == "A"
-                    ),
+            new_appointment = Appointment.objects.create(
+                nbss_id=row["Appointment ID"],
+                nhs_number=row["NHS Num"],
+                number=row["Screen Appt num"],
+                batch_id=self.handle_aliased_column("Batch ID", "BatchID", row),
+                clinic=clinic,
+                episode_started_at=datetime.strptime(
+                    row["Episode Start"], "%Y%m%d"
+                ).replace(tzinfo=TZ_INFO),
+                episode_type=self.handle_aliased_column(
+                    "Episode Type", "Epsiode Type", row
                 ),
-                True,
+                starts_at=self.appointment_date_and_time(row),
+                status=row["Status"],
+                booked_by=row["Booked By"],
+                booked_at=self.workflow_action_date_and_time(row["Action Timestamp"]),
+                assessment=(
+                    self.handle_aliased_column(
+                        "Screen or Assess", "Screen or Asses", row
+                    )
+                    == "A"
+                ),
             )
+            logger.info("%s created", new_appointment)
+            return (new_appointment, True)
         elif self.is_cancelling_existing_appointment(row, appointment):
             appointment.status = AppointmentStatusChoices.CANCELLED.value
             appointment.cancelled_by = row["Cancelled By"]
@@ -143,6 +136,7 @@ class Command(BaseCommand):
                 row["Action Timestamp"]
             )
             appointment.save()
+            logger.info("%s cancelled", appointment)
         elif self.is_completed_appointment(row, appointment):
             appointment.status = row["Status"]
             appointment.attended_not_screened = row["Attended Not Scr"]
@@ -150,6 +144,11 @@ class Command(BaseCommand):
                 row["Action Timestamp"]
             )
             appointment.save()
+            logger.info("%s marked completed (%s)", appointment, row.get("Status"))
+        elif appointment is None:
+            logger.info(
+                "No Appointment record found for NBSS ID: %s", row.get("Appointment ID")
+            )
 
         return (appointment, False)
 
