@@ -92,7 +92,7 @@ module "db_setup" {
   # alerts
   action_group_id            = var.action_group_id
   enable_alerting            = var.enable_alerting
-  log_analytics_workspace_id = var.log_analytics_workspace_audit_id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 
   depends_on = [
     module.queue_storage_role_assignment,
@@ -138,9 +138,9 @@ module "scheduled_jobs" {
 
 
   # alerts
-  action_group_id                  = var.action_group_id
-  enable_alerting                  = var.enable_alerting
-  log_analytics_workspace_audit_id = var.log_analytics_workspace_audit_id
+  action_group_id            = var.action_group_id
+  enable_alerting            = var.enable_alerting
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 
   # Ensure RBAC role assignments are created before the job definition finalizes
   depends_on = [

@@ -73,7 +73,7 @@ variable "hub" {
   type        = string
 }
 
-variable "log_analytics_workspace_audit_id" {
+variable "log_analytics_workspace_id" {
   description = "Log analytics workspace audit ID"
   type        = string
 }
