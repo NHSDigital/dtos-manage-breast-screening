@@ -9,6 +9,7 @@ class CharField(forms.CharField):
         hint=None,
         label_classes=None,
         classes=None,
+        visually_hidden_label_suffix=None,
         **kwargs,
     ):
         widget = kwargs.get("widget")
@@ -22,6 +23,7 @@ class CharField(forms.CharField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
+        self.visually_hidden_label_suffix = visually_hidden_label_suffix
 
         super().__init__(*args, **kwargs)
 
