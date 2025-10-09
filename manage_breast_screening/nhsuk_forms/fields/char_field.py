@@ -17,7 +17,7 @@ class CharField(forms.CharField):
         self,
         *args,
         max_length=None,
-        max_words=None,
+        max_words=250,
         hint=None,
         label_classes=None,
         classes=None,

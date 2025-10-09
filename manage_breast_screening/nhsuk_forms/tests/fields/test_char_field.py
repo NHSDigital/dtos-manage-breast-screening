@@ -10,7 +10,9 @@ class TestCharField:
     @pytest.fixture
     def form_class(self):
         class TestForm(Form):
-            field = CharField(label="Abc", initial="somevalue", max_length=10)
+            field = CharField(
+                label="Abc", initial="somevalue", max_length=10, max_words=None
+            )
             field_with_visually_hidden_label = CharField(
                 label="Abc",
                 initial="somevalue",
@@ -49,9 +51,15 @@ class TestCharField:
                         "spellcheck": "true",
                     }
                 ),
+                max_words=None,
             )
-            textfield_simple = CharField(label="Text", widget=Textarea)
-            char_count = CharField(label="Text", widget=Textarea, max_length=10)
+            textfield_simple = CharField(label="Text", widget=Textarea, max_words=None)
+            char_count = CharField(
+                label="Text",
+                widget=Textarea,
+                max_length=10,
+                max_words=None,
+            )
             char_count_max_words = CharField(label="Text", widget=Textarea, max_words=5)
 
         return TestForm
