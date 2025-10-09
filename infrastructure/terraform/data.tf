@@ -42,3 +42,10 @@ data "azurerm_monitor_action_group" "main" {
   name                = "${module.shared_config.names.monitor-action-group}-${var.env_config}"
   resource_group_name = local.resource_group_name
 }
+
+data "azurerm_application_insights" "app_insights" {
+  count = var.deploy_infra ? 0 : 1
+
+  name                = module.shared_config.names.app-insights
+  resource_group_name = local.resource_group_name
+}

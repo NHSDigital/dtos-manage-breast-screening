@@ -42,7 +42,10 @@ module "webapp" {
     },
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
-  secret_variables = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
-  is_web_app       = true
-  port             = 8000
+  secret_variables = merge(
+    { APPLICATIONINSIGHTS_CONNECTION_STRING = var.app_insights_connection_string },
+    var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
+  )
+  is_web_app = true
+  port       = 8000
 }
