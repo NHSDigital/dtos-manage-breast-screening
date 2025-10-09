@@ -121,7 +121,7 @@ class AddLumpView(AddSymptomView):
 
     symptom_type_name = "lump"
     form_class = LumpForm
-    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/simple_symptom.jinja"
 
 
 class AddSwellingOrShapeChangeView(AddSymptomView):
@@ -131,7 +131,7 @@ class AddSwellingOrShapeChangeView(AddSymptomView):
 
     symptom_type_name = "swelling or shape change"
     form_class = SwellingOrShapeChangeForm
-    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/simple_symptom.jinja"
 
 
 class AddSkinChangeView(AddSymptomView):
@@ -141,7 +141,7 @@ class AddSkinChangeView(AddSymptomView):
 
     symptom_type_name = "Skin change"
     form_class = SkinChangeForm
-    template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/skin_change.jinja"
 
 
 class AddNippleChangeView(AddSymptomView):
@@ -151,7 +151,7 @@ class AddNippleChangeView(AddSymptomView):
 
     symptom_type_name = "Nipple change"
     form_class = NippleChangeForm
-    template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/nipple_change.jinja"
 
 
 class AddOtherSymptomView(AddSymptomView):
@@ -161,7 +161,7 @@ class AddOtherSymptomView(AddSymptomView):
 
     symptom_type_name = "Other"
     form_class = OtherSymptomForm
-    template_name = "mammograms/medical_information/symptoms/other.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/other.jinja"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -176,7 +176,7 @@ class ChangeLumpView(ChangeSymptomView):
 
     symptom_type_name = "lump"
     form_class = LumpForm
-    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/simple_symptom.jinja"
 
     def extra_filters(self):
         return {"symptom_type_id": SymptomType.LUMP}
@@ -189,7 +189,7 @@ class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
 
     symptom_type_name = "swelling or shape change"
     form_class = SwellingOrShapeChangeForm
-    template_name = "mammograms/medical_information/symptoms/simple_symptom.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/simple_symptom.jinja"
 
     def extra_filters(self):
         return {"symptom_type_id": SymptomType.SWELLING_OR_SHAPE_CHANGE}
@@ -202,7 +202,7 @@ class ChangeSkinChangeView(ChangeSymptomView):
 
     symptom_type_name = "Skin change"
     form_class = SkinChangeForm
-    template_name = "mammograms/medical_information/symptoms/skin_change.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/skin_change.jinja"
 
     def extra_filters(self):
         return {"symptom_type_id": SymptomType.SKIN_CHANGE}
@@ -215,7 +215,7 @@ class ChangeNippleChangeView(ChangeSymptomView):
 
     symptom_type_name = "Nipple change"
     form_class = NippleChangeForm
-    template_name = "mammograms/medical_information/symptoms/nipple_change.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/nipple_change.jinja"
 
     def extra_filters(self):
         return {"symptom_type_id": SymptomType.NIPPLE_CHANGE}
@@ -228,7 +228,7 @@ class ChangeOtherSymptomView(ChangeSymptomView):
 
     symptom_type_name = "Other"
     form_class = OtherSymptomForm
-    template_name = "mammograms/medical_information/symptoms/other.jinja"
+    template_name = "mammograms/medical_information/symptoms/forms/other.jinja"
 
     def extra_filters(self):
         return {"symptom_type_id": SymptomType.OTHER}

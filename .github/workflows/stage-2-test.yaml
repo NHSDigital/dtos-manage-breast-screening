@@ -226,7 +226,7 @@ jobs:
         run: make dependencies
 
       - name: Install Playwright browsers
-        run: poetry run playwright install chromium --with-deps
+        run: poetry run playwright install chromium --with-deps --only-shell
 
       - name: 'Run Playwright system tests'
         run: make test-ui

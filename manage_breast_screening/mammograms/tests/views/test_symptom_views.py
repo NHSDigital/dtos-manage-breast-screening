@@ -40,6 +40,7 @@ class TestAddLumpView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },
@@ -52,7 +53,7 @@ class TestAddLumpView:
             ),
         )
 
-    def test_invvalid_post_renders_response_with_errors(
+    def test_invalid_post_renders_response_with_errors(
         self, clinical_user_client, appointment
     ):
         response = clinical_user_client.post(
@@ -143,6 +144,7 @@ class TestChangeLumpView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
             },
@@ -204,6 +206,7 @@ class TestAddSkinChangeView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
                 "symptom_sub_type": SkinChangeChoices.DIMPLES_OR_INDENTATION,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
@@ -243,6 +246,7 @@ class TestChangeSkinChangeView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
                 "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
@@ -352,6 +356,7 @@ class TestAddOtherSymptomView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
                 "symptom_sub_type_details": "abc",
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
@@ -391,6 +396,7 @@ class TestChangeOtherSymptomView:
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
                 "symptom_sub_type_details": "abc",
                 "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
                 "investigated": YesNo.NO.value,
