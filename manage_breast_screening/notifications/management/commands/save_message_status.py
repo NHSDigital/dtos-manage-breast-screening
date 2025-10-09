@@ -28,6 +28,7 @@ class Command(BaseCommand):
             for item in queue.items():
                 logger.debug(f"Processing message status update {item}")
                 payload = json.loads(item.content)
+                queue.delete(item)
                 self.data = payload["data"][0]
                 message_id = self.data["attributes"]["messageReference"]
                 self.message = Message.objects.get(pk=message_id)
@@ -35,7 +36,6 @@ class Command(BaseCommand):
 
                 if self.save_status_update():
                     logger.info(f"Message status update {item} saved")
-                    queue.delete(item)
         except Exception as e:
             logger.error(e)
             raise CommandError(e)
@@ -67,7 +67,8 @@ class Command(BaseCommand):
         try:
             status_record.full_clean()
             status_record.save()
-        except ValidationError:
+        except ValidationError as e:
+            logger.error(e, exc_info=True)
             pass
 
     def save_channel_status(self):
@@ -85,5 +86,6 @@ class Command(BaseCommand):
         try:
             status_record.full_clean()
             status_record.save()
-        except ValidationError:
+        except ValidationError as e:
+            logger.error(e, exc_info=True)
             pass
