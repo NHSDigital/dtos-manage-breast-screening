@@ -1,0 +1,16 @@
+from django.core.exceptions import ValidationError
+
+
+class MaxWordValidator:
+    def __init__(self, max_words):
+        self.max_words = max_words
+
+    def __call__(self, value):
+        if not value:
+            return
+
+        if len(str(value).strip().split(" ")) > self.max_words:
+            raise ValidationError(
+                f"Enter at most {self.max_words} words",
+                params={"value": value},
+            )

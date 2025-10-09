@@ -1,0 +1,32 @@
+{% from "character-count/macro.jinja" import characterCount %}
+{% set unbound_field = field.field %}
+{% set widget = unbound_field.widget %}
+{% set character_count_params = {
+    "label": {
+      "text": field.label,
+      "classes": unbound_field.label_classes if unbound_field.label_classes
+    },
+    "hint": {
+      "text": unbound_field.hint
+    } if unbound_field.hint,
+    "maxlength": unbound_field.max_length,
+    "maxwords": unbound_field.max_words,
+    "id": field.auto_id,
+    "name": field.html_name,
+    "value": field.value() or "",
+    "classes": unbound_field.classes if unbound_field.classes,
+    "rows": widget.attrs.pop("rows", none),
+    "cols": widget.attrs.pop("cols", none),
+    "attributes": widget.attrs
+  } %}
+  {% if field.errors %}
+    {% set error_params = {
+      "errorMessage": {
+        "text": field.errors | first
+      }
+    } %}
+    {% set character_count_params = dict(character_count_params, **error_params) %}
+  {% endif %}
+
+{{ characterCount(character_count_params) }}
+

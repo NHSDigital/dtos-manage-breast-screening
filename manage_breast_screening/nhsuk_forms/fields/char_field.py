@@ -1,31 +1,45 @@
 from django import forms
 from django.forms import Textarea
 
+from manage_breast_screening.nhsuk_forms import validators
+
 
 class CharField(forms.CharField):
+    """
+    CharField subclass that renders using an input or textarea component in the
+    NHS design system, depending on the widget argument.
+
+    If max_words or max_length are passed in, a character count component will
+    be used.
+    """
+
     def __init__(
         self,
         *args,
+        max_length=None,
+        max_words=None,
         hint=None,
         label_classes=None,
         classes=None,
         visually_hidden_label_suffix=None,
         **kwargs,
     ):
-        widget = kwargs.get("widget")
-        if (isinstance(widget, type) and widget is Textarea) or isinstance(
-            widget, Textarea
-        ):
-            kwargs["template_name"] = "forms/textarea.jinja"
-        else:
-            kwargs["template_name"] = "forms/input.jinja"
-
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
         self.visually_hidden_label_suffix = visually_hidden_label_suffix
+        self.max_length = max_length
+        self.max_words = max_words
 
-        super().__init__(*args, **kwargs)
+        if max_length and max_words:
+            raise ValueError("Cannot set both max_length and max_words")
+
+        kwargs["template_name"] = self.template_name(widget=kwargs.get("widget"))
+
+        super().__init__(*args, max_length=max_length, **kwargs)
+
+        if max_words:
+            self.validators.append(validators.MaxWordValidator(int(max_words)))
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
@@ -35,3 +49,13 @@ class CharField(forms.CharField):
         attrs.pop("maxlength", None)
 
         return attrs
+
+    def template_name(self, widget):
+        is_textarea = widget is Textarea or isinstance(widget, Textarea)
+
+        if is_textarea and (self.max_length is not None or self.max_words is not None):
+            return "forms/character-count.jinja"
+        elif is_textarea:
+            return "forms/textarea.jinja"
+        else:
+            return "forms/input.jinja"
