@@ -73,6 +73,9 @@ class MessageBatch(BaseModel):
     )
     nhs_notify_errors = models.JSONField(blank=True, null=True)
 
+    class Meta:
+        indexes = [models.Index(fields=["notify_id"])]
+
     def __str__(self):
         return f"MessageBatch {self.id} - Status: {self.status}"
 
@@ -102,6 +105,9 @@ class Message(models.Model):
     appointment = models.ForeignKey(
         "notifications.Appointment", on_delete=models.PROTECT
     )
+
+    class Meta:
+        indexes = [models.Index(fields=["notify_id"])]
 
     def __str__(self):
         return f"Message about {self.appointment} - Sent at: {self.sent_at}"
@@ -151,7 +157,7 @@ class Clinic(models.Model):
     """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    code = models.CharField(max_length=50, unique=True)
+    code = models.CharField(max_length=50)
     bso_code = models.CharField(max_length=50, null=True)
     name = models.CharField(max_length=50)
     alt_name = models.CharField(max_length=50)
@@ -166,6 +172,14 @@ class Clinic(models.Model):
     postcode = models.CharField(max_length=50)
     created_at = models.DateTimeField(null=False, auto_now_add=True)
     updated_at = models.DateTimeField(null=False, auto_now_add=True)
+
+    class Meta:
+        indexes = [models.Index(fields=["code", "bso_code"])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["code", "bso_code"], name="unique_code_bso_code"
+            )
+        ]
 
     def __str__(self):
         return f"Clinic {self.name} ({self.code})"
