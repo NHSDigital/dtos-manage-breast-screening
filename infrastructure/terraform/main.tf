@@ -55,7 +55,7 @@ module "container-apps" {
   fetch_secrets_from_app_key_vault      = var.fetch_secrets_from_app_key_vault
   front_door_profile                    = var.front_door_profile
   hub                                   = var.hub
-  log_analytics_workspace_audit_id      = var.deploy_infra ? module.infra[0].log_analytics_workspace_audit_id : data.azurerm_log_analytics_workspace.audit[0].id
+  log_analytics_workspace_id            = var.deploy_infra ? module.infra[0].log_analytics_workspace_id : data.azurerm_log_analytics_workspace.audit[0].id
   postgres_backup_retention_days        = var.postgres_backup_retention_days
   postgres_geo_redundant_backup_enabled = var.postgres_geo_redundant_backup_enabled
   postgres_sku_name                     = var.postgres_sku_name

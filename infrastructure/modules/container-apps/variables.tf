@@ -73,10 +73,11 @@ variable "hub" {
   type        = string
 }
 
-variable "log_analytics_workspace_audit_id" {
+variable "log_analytics_workspace_id" {
   description = "Log analytics workspace audit ID"
   type        = string
 }
+
 
 variable "deploy_database_as_container" {
   description = "Whether to deploy the database as a container or as an Azure postgres flexible server."

@@ -88,6 +88,12 @@ module "db_setup" {
     local.common_env,
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
+
+  # alerts
+  action_group_id            = var.action_group_id
+  enable_alerting            = var.enable_alerting
+  log_analytics_workspace_id = var.log_analytics_workspace_id
+
   depends_on = [
     module.queue_storage_role_assignment,
     module.blob_storage_role_assignment
@@ -129,6 +135,12 @@ module "scheduled_jobs" {
     each.value.environment_variables,
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
+
+
+  # alerts
+  action_group_id            = var.action_group_id
+  enable_alerting            = var.enable_alerting
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 
   # Ensure RBAC role assignments are created before the job definition finalizes
   depends_on = [

@@ -17,7 +17,7 @@ module "storage" {
 
   containers                 = local.storage_containers
   location                   = var.region
-  log_analytics_workspace_id = var.log_analytics_workspace_audit_id
+  log_analytics_workspace_id = var.log_analytics_workspace_id
   # log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 
   monitor_diagnostic_setting_storage_account_enabled_logs = ["StorageWrite", "StorageRead", "StorageDelete"]
