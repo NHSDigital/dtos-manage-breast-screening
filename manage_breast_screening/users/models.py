@@ -1,6 +1,7 @@
 import rules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.utils.crypto import salted_hmac
 
 
 class UserManager(BaseUserManager):
@@ -8,6 +9,7 @@ class UserManager(BaseUserManager):
         if not nhs_uid:
             raise ValueError("The NHS UID must be set")
         user = self.model(nhs_uid=nhs_uid, email=email, **extra_fields)
+        user.set_unusable_password()
         user.save(using=self._db)
         return user
 
@@ -26,6 +28,17 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "nhs_uid"
     REQUIRED_FIELDS = []
+
+    def get_session_auth_hash(self):
+        """
+        Override this method in AbstractBaseUser. It's purpose is to invalidate
+        the session hash on password changes. Given we don't use locally stored
+        passwords for authentication, here we simply hash the is_active field.
+        """
+        key_salt = "manage_breast_screening.users.models.User.get_session_auth_hash"
+        return salted_hmac(
+            key_salt, str(self.is_active), algorithm="sha256"
+        ).hexdigest()
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
