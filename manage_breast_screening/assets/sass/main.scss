@@ -60,3 +60,19 @@ a[href="#"] {
     }
   }
 }
+
+/*
+  The design system has an inline variant for radios, but it's overriden when conditionals are used,
+  and it uses floats
+*/
+.app-radios-inline {
+  @include nhsuk-media-query($from: tablet) {
+    @include nhsuk-clearfix;
+
+    .nhsuk-radios__item {
+      clear: none;
+      float: left !important; /* higher specificity to override the design system style */
+      margin-right: nhsuk-spacing(4);
+    }
+  }
+}
