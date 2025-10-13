@@ -71,6 +71,7 @@ jobs:
               - 'manage_breast_screening/config/**'
               - 'manage_breast_screening/data/**'
               - 'manage_breast_screening/mammograms/**'
+              - 'manage_breast_screening/nhsuk_forms/**'
               - 'manage_breast_screening/nonprod/**'
               - 'manage_breast_screening/participants/**'
               - 'manage_breast_screening/static/**'
