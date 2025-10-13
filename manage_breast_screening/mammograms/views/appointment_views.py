@@ -1,6 +1,6 @@
 import logging
 
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_http_methods
@@ -9,11 +9,10 @@ from django.views.generic import FormView, TemplateView
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
-    Appointment,
     AppointmentStatus,
-    Participant,
     ParticipantReportedMammogram,
 )
+from manage_breast_screening.participants.repositories import AppointmentRepository
 
 from ..forms import (
     AppointmentCannotGoAheadForm,
@@ -135,7 +134,7 @@ class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
-        participant = Participant.objects.get(screeningepisode__appointment__pk=pk)
+        participant = self.appointment.screening_episode.participant
 
         context.update(
             {
@@ -172,10 +171,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pk = self.kwargs["pk"]
-        participant = get_object_or_404(
-            Participant, screeningepisode__appointment__pk=pk
-        )
+        participant = self.appointment.screening_episode.participant
         context.update(
             {
                 "heading": "Record medical information",
@@ -237,7 +233,10 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 @require_http_methods(["POST"])
 def check_in(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
+    from django.shortcuts import get_object_or_404
+
+    appointment_repo = AppointmentRepository(request.current_provider)
+    appointment = get_object_or_404(appointment_repo.get_queryset(), pk=pk)
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)
