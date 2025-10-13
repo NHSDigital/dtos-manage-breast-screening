@@ -244,5 +244,5 @@ class TestCharField:
     def test_max_word_validation(self):
         field = CharField(label="Text", widget=Textarea, max_words=5)
 
-        with pytest.raises(ValidationError, match="Enter at most 5 words"):
+        with pytest.raises(ValidationError, match="Enter 5 words or less"):
             field.clean("one two three four five six")
