@@ -5,7 +5,10 @@ import uuid
 import jwt
 import requests
 
-from manage_breast_screening.notifications.models import Message, MessageBatch
+from manage_breast_screening.notifications.models import MessageBatch
+from manage_breast_screening.notifications.presenters.message_batch_presenter import (
+    MessageBatchPresenter,
+)
 
 EXPIRES_IN_MINUTES = 5
 
@@ -22,32 +25,11 @@ class ApiClient:
         response = requests.post(
             os.getenv("NHS_NOTIFY_API_MESSAGE_BATCH_URL"),
             headers=self.headers(),
-            json=self.message_batch_request_body(message_batch),
+            json=MessageBatchPresenter(message_batch).present(),
             timeout=10,
         )
 
         return response
-
-    def message_batch_request_body(self, message_batch: MessageBatch) -> dict:
-        return {
-            "data": {
-                "type": "MessageBatch",
-                "attributes": {
-                    "routingPlanId": str(message_batch.routing_plan_id),
-                    "messageBatchReference": str(message_batch.id),
-                    "messages": [
-                        self.message_request_body(m)
-                        for m in message_batch.messages.all()
-                    ],
-                },
-            }
-        }
-
-    def message_request_body(self, message: Message) -> dict:
-        return {
-            "messageReference": str(message.id),
-            "recipient": {"nhsNumber": str(message.appointment.nhs_number)},
-        }
 
     def headers(self) -> dict:
         return {
