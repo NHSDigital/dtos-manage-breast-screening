@@ -18,6 +18,7 @@ class CharField(forms.CharField):
         *args,
         max_length=None,
         max_words=250,
+        threshold=25,
         hint=None,
         label_classes=None,
         classes=None,
@@ -30,6 +31,7 @@ class CharField(forms.CharField):
         self.visually_hidden_label_suffix = visually_hidden_label_suffix
         self.max_length = max_length
         self.max_words = max_words
+        self.threshold = threshold
 
         if max_length and max_words:
             raise ValueError("Cannot set both max_length and max_words")

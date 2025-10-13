@@ -209,7 +209,7 @@ class TestCharField:
         assertHTMLEqual(
             form_class()["char_count"].as_field_group(),
             """
-            <div class="nhsuk-character-count" data-maxlength="10" data-module="nhsuk-character-count">
+            <div class="nhsuk-character-count" data-maxlength="10" data-threshold="25" data-module="nhsuk-character-count">
                 <div class="nhsuk-form-group">
                     <label class="nhsuk-label" for="id_char_count">
                         Text
@@ -227,7 +227,7 @@ class TestCharField:
         assertHTMLEqual(
             form_class()["char_count_max_words"].as_field_group(),
             """
-            <div class="nhsuk-character-count" data-maxwords="5" data-module="nhsuk-character-count">
+            <div class="nhsuk-character-count" data-maxwords="5" data-threshold="25" data-module="nhsuk-character-count">
                 <div class="nhsuk-form-group">
                     <label class="nhsuk-label" for="id_char_count_max_words">
                         Text
