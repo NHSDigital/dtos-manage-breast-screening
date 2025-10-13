@@ -9,6 +9,7 @@ from django.db import models
 
 from ..auth.models import Role
 from ..core.models import BaseModel
+from ..core.querysets import ProviderScopedQuerySet
 
 
 class Provider(BaseModel):
@@ -33,19 +34,20 @@ class ClinicFilter(StrEnum):
     ALL = "all"
 
 
-class ClinicQuerySet(models.QuerySet):
-    def by_filter(self, filter: str, provider_id):
-        queryset = self.filter(setting__provider_id=provider_id)
+class ClinicQuerySet(ProviderScopedQuerySet):
+    def _provider_filter_kwargs(self, provider_id):
+        return {"setting__provider_id": provider_id}
 
+    def by_filter(self, filter: str):
         match filter:
             case ClinicFilter.TODAY:
-                return queryset.today()
+                return self.today()
             case ClinicFilter.UPCOMING:
-                return queryset.upcoming()
+                return self.upcoming()
             case ClinicFilter.COMPLETED:
-                return queryset.completed()
+                return self.completed()
             case ClinicFilter.ALL:
-                return queryset
+                return self
             case _:
                 raise ValueError(filter)
 
@@ -127,8 +129,7 @@ class Clinic(BaseModel):
 
     @classmethod
     def filter_counts(cls, provider_id):
-        queryset = cls.objects.filter(setting__provider_id=provider_id)
-
+        queryset = cls.objects.for_provider(provider_id)
         return {
             ClinicFilter.ALL: queryset.count(),
             ClinicFilter.TODAY: queryset.today().count(),

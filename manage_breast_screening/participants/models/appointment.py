@@ -6,12 +6,16 @@ from django.db import models
 from django.db.models import OuterRef, Subquery
 
 from ...core.models import BaseModel
+from ...core.querysets import ProviderScopedQuerySet
 from .screening_episode import ScreeningEpisode
 
 logger = getLogger(__name__)
 
 
-class AppointmentQuerySet(models.QuerySet):
+class AppointmentQuerySet(ProviderScopedQuerySet):
+    def _provider_filter_kwargs(self, provider_id):
+        return {"clinic_slot__clinic__setting__provider_id": provider_id}
+
     def in_status(self, *statuses):
         return self.filter(
             statuses=Subquery(
@@ -49,15 +53,16 @@ class AppointmentQuerySet(models.QuerySet):
         return self.filter(clinic_slot__starts_at__date__lt=date.today())
 
     def for_clinic_and_filter(self, clinic, filter):
+        queryset = self.filter(clinic_slot__clinic=clinic)
         match filter:
             case "remaining":
-                return self.remaining().filter(clinic_slot__clinic=clinic)
+                return queryset.remaining()
             case "checked_in":
-                return self.checked_in().filter(clinic_slot__clinic=clinic)
+                return queryset.checked_in()
             case "complete":
-                return self.complete().filter(clinic_slot__clinic=clinic)
+                return queryset.complete()
             case "all":
-                return self.filter(clinic_slot__clinic=clinic)
+                return queryset
             case _:
                 raise ValueError(filter)
 

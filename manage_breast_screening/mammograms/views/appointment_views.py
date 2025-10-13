@@ -237,7 +237,9 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 @require_http_methods(["POST"])
 def check_in(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
+    appointment = get_object_or_404(
+        Appointment.objects.for_provider(request.current_provider), pk=pk
+    )
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)

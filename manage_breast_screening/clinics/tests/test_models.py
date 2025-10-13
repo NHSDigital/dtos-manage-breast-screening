@@ -11,6 +11,7 @@ from manage_breast_screening.clinics import models
 from .factories import (
     ClinicFactory,
     ProviderFactory,
+    SettingFactory,
     UserAssignmentFactory,
     UserFactory,
 )
@@ -27,16 +28,25 @@ def test_clinic_current_status():
 @pytest.mark.django_db
 @time_machine.travel(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 def test_status_filtering():
-    current = ClinicFactory.create(starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc))
-    future = ClinicFactory.create(starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc))
-    past = ClinicFactory.create(starts_at=datetime(2024, 1, 1, 9, tzinfo=tz.utc))
-
-    assertQuerySetEqual(
-        models.Clinic.objects.all(), {current, future, past}, ordered=False
+    provider = ProviderFactory.create()
+    setting = SettingFactory.create(provider=provider)
+    current = ClinicFactory.create(
+        setting=setting, starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc)
     )
-    assertQuerySetEqual(models.Clinic.objects.today(), {current}, ordered=False)
-    assertQuerySetEqual(models.Clinic.objects.upcoming(), {future}, ordered=False)
-    assertQuerySetEqual(models.Clinic.objects.completed(), {past}, ordered=False)
+    future = ClinicFactory.create(
+        setting=setting, starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc)
+    )
+    past = ClinicFactory.create(
+        setting=setting, starts_at=datetime(2024, 1, 1, 9, tzinfo=tz.utc)
+    )
+    ClinicFactory.create()  # Different provider
+
+    provider_scoped = models.Clinic.objects.for_provider(provider)
+
+    assertQuerySetEqual(provider_scoped.all(), {current, future, past}, ordered=False)
+    assertQuerySetEqual(provider_scoped.today(), {current}, ordered=False)
+    assertQuerySetEqual(provider_scoped.upcoming(), {future}, ordered=False)
+    assertQuerySetEqual(provider_scoped.completed(), {past}, ordered=False)
 
 
 class TestUserAssignment:

@@ -75,39 +75,44 @@ class TestScreeningEvent:
 @pytest.mark.django_db
 class TestAppointment:
     def test_state_filtering(self):
+        clinic = ClinicFactory.create()
+        provider = clinic.provider
+        slot = ClinicSlotFactory.create(clinic=clinic)
+
         confirmed = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=slot, current_status=models.AppointmentStatus.CONFIRMED
         )
         checked_in = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CHECKED_IN
+            clinic_slot=slot, current_status=models.AppointmentStatus.CHECKED_IN
         )
         screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.SCREENED
+            clinic_slot=slot, current_status=models.AppointmentStatus.SCREENED
         )
         cancelled = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CANCELLED
+            clinic_slot=slot, current_status=models.AppointmentStatus.CANCELLED
         )
         did_not_attend = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.DID_NOT_ATTEND
+            clinic_slot=slot, current_status=models.AppointmentStatus.DID_NOT_ATTEND
         )
         partially_screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.PARTIALLY_SCREENED
+            clinic_slot=slot, current_status=models.AppointmentStatus.PARTIALLY_SCREENED
         )
         attended_not_screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.ATTENDED_NOT_SCREENED
+            clinic_slot=slot,
+            current_status=models.AppointmentStatus.ATTENDED_NOT_SCREENED,
         )
 
+        provider_scoped = models.Appointment.objects.for_provider(provider)
+
         assertQuerySetEqual(
-            models.Appointment.objects.remaining(),
+            provider_scoped.remaining(),
             {confirmed, checked_in},
             ordered=False,
         )
 
+        assertQuerySetEqual(provider_scoped.checked_in(), {checked_in}, ordered=False)
         assertQuerySetEqual(
-            models.Appointment.objects.checked_in(), {checked_in}, ordered=False
-        )
-        assertQuerySetEqual(
-            models.Appointment.objects.complete(),
+            provider_scoped.complete(),
             {
                 screened,
                 cancelled,
@@ -121,26 +126,31 @@ class TestAppointment:
     def test_upcoming_past_filters(self, time_machine):
         time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 
-        # > 00:00 so counts as upcoming still
+        clinic = ClinicFactory.create()
+        provider = clinic.provider
+
         earlier_today = AppointmentFactory.create(
-            starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc)
+            clinic_slot=ClinicSlotFactory.create(clinic=clinic),
+            starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
         )
 
         # past
         yesterday = AppointmentFactory.create(
-            starts_at=datetime(2024, 12, 31, 9, tzinfo=tz.utc)
+            clinic_slot=ClinicSlotFactory.create(clinic=clinic),
+            starts_at=datetime(2024, 12, 31, 9, tzinfo=tz.utc),
         )
 
         # upcoming
         tomorrow = AppointmentFactory.create(
-            starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc)
+            clinic_slot=ClinicSlotFactory.create(clinic=clinic),
+            starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc),
         )
 
+        provider_scoped = models.Appointment.objects.for_provider(provider)
+
+        assertQuerySetEqual(provider_scoped.past(), [yesterday], ordered=False)
         assertQuerySetEqual(
-            models.Appointment.objects.past(), [yesterday], ordered=False
-        )
-        assertQuerySetEqual(
-            models.Appointment.objects.upcoming(),
+            provider_scoped.upcoming(),
             [earlier_today, tomorrow],
             ordered=False,
         )
@@ -148,6 +158,7 @@ class TestAppointment:
     def test_by_clinic_and_filter(self):
         # Create a clinic and clinic slots
         clinic = ClinicFactory.create()
+        provider = clinic.provider
         clinic_slot1 = ClinicSlotFactory.create(clinic=clinic)
         clinic_slot2 = ClinicSlotFactory.create(clinic=clinic)
 
@@ -171,23 +182,25 @@ class TestAppointment:
             clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
         )
 
+        provider_scoped = models.Appointment.objects.for_provider(provider)
+
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "remaining"),
+            provider_scoped.for_clinic_and_filter(clinic, "remaining"),
             {confirmed, checked_in},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "checked_in"),
+            provider_scoped.for_clinic_and_filter(clinic, "checked_in"),
             {checked_in},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "complete"),
+            provider_scoped.for_clinic_and_filter(clinic, "complete"),
             {screened},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "all"),
+            provider_scoped.for_clinic_and_filter(clinic, "all"),
             {confirmed, checked_in, screened},
             ordered=False,
         )
@@ -195,6 +208,7 @@ class TestAppointment:
     def test_filter_counts_for_clinic(self):
         # Create a clinic and clinic slots
         clinic = ClinicFactory.create()
+        provider = clinic.provider
         clinic_slot1 = ClinicSlotFactory.create(clinic=clinic)
         clinic_slot2 = ClinicSlotFactory.create(clinic=clinic)
 
@@ -222,7 +236,8 @@ class TestAppointment:
             clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
         )
 
-        counts = models.Appointment.objects.filter_counts_for_clinic(clinic)
+        provider_scoped = models.Appointment.objects.for_provider(provider)
+        counts = provider_scoped.filter_counts_for_clinic(clinic)
 
         assert counts["remaining"] == 3
         assert counts["checked_in"] == 1

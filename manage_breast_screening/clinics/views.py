@@ -10,11 +10,12 @@ from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresen
 
 
 def clinic_list(request, filter="today"):
-    current_provider_id = request.session.get("current_provider")
-    clinics = Clinic.objects.prefetch_related("setting").by_filter(
-        filter, current_provider_id
+    current_provider = request.current_provider
+    clinics_qs = Clinic.objects.for_provider(current_provider).prefetch_related(
+        "setting"
     )
-    counts_by_filter = Clinic.filter_counts(current_provider_id)
+    clinics = clinics_qs.by_filter(filter)
+    counts_by_filter = Clinic.filter_counts(provider_id=current_provider)
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
@@ -24,15 +25,20 @@ def clinic_list(request, filter="today"):
 
 
 def clinic(request, pk, filter="remaining"):
-    clinic = Clinic.objects.select_related("setting").get(pk=pk)
+    clinic = (
+        Clinic.objects.for_provider(request.current_provider)
+        .select_related("setting")
+        .get(pk=pk)
+    )
     presented_clinic = ClinicPresenter(clinic)
+    appointments_qs = Appointment.objects.for_provider(request.current_provider)
     appointments = (
-        Appointment.objects.for_clinic_and_filter(clinic, filter)
+        appointments_qs.for_clinic_and_filter(clinic, filter)
         .prefetch_related("statuses")
         .select_related("clinic_slot__clinic", "screening_episode__participant")
         .order_by("clinic_slot__starts_at")
     )
-    counts_by_filter = Appointment.objects.filter_counts_for_clinic(clinic)
+    counts_by_filter = appointments_qs.filter_counts_for_clinic(clinic)
     presented_appointment_list = AppointmentListPresenter(
         pk, appointments, filter, counts_by_filter
     )
