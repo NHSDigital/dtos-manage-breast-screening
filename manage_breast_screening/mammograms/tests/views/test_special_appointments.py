@@ -11,22 +11,24 @@ from manage_breast_screening.mammograms.tests.forms.test_special_appointment_for
 
 @pytest.mark.django_db
 class TestProvideDetails:
-    def test_get_renders_a_response(self, clinical_user_client, appointment):
+    def test_get_renders_a_response(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.get(
             reverse(
                 "mammograms:provide_special_appointment_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment_if_no_temporary_reasons(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, appointment_viewed_by_clinical_user
     ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {
                 "support_reasons": [SupportReasons.MEDICAL_DEVICES],
@@ -38,17 +40,17 @@ class TestProvideDetails:
             response,
             reverse(
                 "mammograms:start_screening",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
     def test_valid_post_redirects_to_appointment_if_one_temporary_reason(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, appointment_viewed_by_clinical_user
     ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {
                 "support_reasons": [SupportReasons.LANGUAGE],
@@ -60,17 +62,17 @@ class TestProvideDetails:
             response,
             reverse(
                 "mammograms:start_screening",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
     def test_valid_post_creates_an_audit_record(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, appointment_viewed_by_clinical_user
     ):
         clinical_user_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {
                 "support_reasons": [SupportReasons.LANGUAGE],
@@ -80,19 +82,19 @@ class TestProvideDetails:
         )
         assert (
             AuditLog.objects.filter(
-                object_id=appointment.participant.pk,
+                object_id=appointment_viewed_by_clinical_user.participant.pk,
                 operation=AuditLog.Operations.UPDATE,
             ).count()
             == 1
         )
 
     def test_valid_post_redirects_to_next_step_if_some_temporary_reasons(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, appointment_viewed_by_clinical_user
     ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {
                 "support_reasons": [
@@ -108,17 +110,17 @@ class TestProvideDetails:
             response,
             reverse(
                 "mammograms:mark_reasons_temporary",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
     def test_invalid_post_to_provide_details_page_renders_response(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, appointment_viewed_by_clinical_user
     ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {},
         )
@@ -127,27 +129,29 @@ class TestProvideDetails:
 
 @pytest.mark.django_db
 class TestMarkTemporary:
-    def test_get_renders_a_response(self, clinical_user_client, appointment):
+    def test_get_renders_a_response(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.get(
             reverse(
                 "mammograms:mark_reasons_temporary",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             )
         )
         assert response.status_code == 200
 
     @pytest.fixture
-    def appointment_with_selected_reasons(self, appointment):
+    def appointment_with_selected_reasons(self, appointment_viewed_by_clinical_user):
         """
         Emulate the state of the appointment after the first form has been completed
         """
-        participant = appointment.participant
+        participant = appointment_viewed_by_clinical_user.participant
         participant.extra_needs = {
             SupportReasons.MEDICAL_DEVICES: {"details": "abc"},
             SupportReasons.HEARING: {"details": "abc"},
         }
         participant.save()
-        return appointment
+        return appointment_viewed_by_clinical_user
 
     def test_valid_post_redirects_to_appointment(
         self, clinical_user_client, appointment_with_selected_reasons
@@ -190,11 +194,13 @@ class TestMarkTemporary:
             == 1
         )
 
-    def test_invalid_post_renders_response(self, clinical_user_client, appointment):
+    def test_invalid_post_renders_response(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:mark_reasons_temporary",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {"which_are_temporary": []},
         )

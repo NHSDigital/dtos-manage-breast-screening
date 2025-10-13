@@ -10,31 +10,40 @@ from manage_breast_screening.participants.models import AppointmentStatus
 @pytest.mark.django_db
 class TestShowAppointment:
     def test_redirects_to_show_screening_if_in_progress(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, appointment_viewed_by_clinical_user
     ):
         response = clinical_user_client.get(
-            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk})
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:start_screening",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
     def test_doesnt_redirect_if_not_permitted(
-        self, administrative_user_client, appointment
+        self, administrative_user_client, appointment_viewed_by_administrative_user
     ):
         response = administrative_user_client.get(
-            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk})
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": appointment_viewed_by_administrative_user.pk},
+            )
         )
         assert response.status_code == 200
 
-    def test_renders_response(self, clinical_user_client, completed_appointment):
+    def test_renders_response(
+        self, clinical_user_client, completed_appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.get(
             reverse(
-                "mammograms:show_appointment", kwargs={"pk": completed_appointment.pk}
+                "mammograms:show_appointment",
+                kwargs={"pk": completed_appointment_viewed_by_clinical_user.pk},
             )
         )
         assert response.status_code == 200
@@ -42,51 +51,67 @@ class TestShowAppointment:
 
 @pytest.mark.django_db
 class TestStartScreening:
-    def test_appointment_continued(self, clinical_user_client, appointment):
+    def test_appointment_continued(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:start_screening",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            ),
             {"decision": "continue"},
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
-    def test_appointment_stopped(self, clinical_user_client, appointment):
+    def test_appointment_stopped(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:start_screening",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            ),
             {"decision": "dropout"},
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:appointment_cannot_go_ahead",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
     def test_already_completed_appointment_redirects(
-        self, clinical_user_client, completed_appointment
+        self, clinical_user_client, completed_appointment_viewed_by_clinical_user
     ):
         response = clinical_user_client.get(
             reverse(
-                "mammograms:start_screening", kwargs={"pk": completed_appointment.pk}
+                "mammograms:start_screening",
+                kwargs={"pk": completed_appointment_viewed_by_clinical_user.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:show_appointment",
-                kwargs={"pk": completed_appointment.pk},
+                kwargs={"pk": completed_appointment_viewed_by_clinical_user.pk},
             ),
         )
 
-    def test_renders_invalid_form(self, clinical_user_client, appointment):
+    def test_renders_invalid_form(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:start_screening",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            ),
             {},
         )
         assertContains(response, "There is a problem")
@@ -94,11 +119,13 @@ class TestStartScreening:
 
 @pytest.mark.django_db
 class TestAskForMedicalInformation:
-    def test_continue_to_record(self, clinical_user_client, appointment):
+    def test_continue_to_record(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {"decision": "yes"},
         )
@@ -106,15 +133,17 @@ class TestAskForMedicalInformation:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
-    def test_continue_to_imaging(self, clinical_user_client, appointment):
+    def test_continue_to_imaging(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {"decision": "no"},
         )
@@ -122,15 +151,17 @@ class TestAskForMedicalInformation:
             response,
             reverse(
                 "mammograms:awaiting_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
         )
 
-    def test_renders_invalid_form(self, clinical_user_client, appointment):
+    def test_renders_invalid_form(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
             reverse(
                 "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {},
         )
@@ -139,11 +170,13 @@ class TestAskForMedicalInformation:
 
 @pytest.mark.django_db
 class TestRecordMedicalInformation:
-    def test_renders_response(self, clinical_user_client, appointment):
+    def test_renders_response(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.get(
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             )
         )
         assert response.status_code == 200
@@ -151,18 +184,29 @@ class TestRecordMedicalInformation:
 
 @pytest.mark.django_db
 class TestCheckIn:
-    def test_known_redirect(self, clinical_user_client, appointment):
+    def test_known_redirect(
+        self, clinical_user_client, appointment_viewed_by_clinical_user
+    ):
         response = clinical_user_client.post(
-            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
+            reverse(
+                "mammograms:check_in",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            )
         )
         assertRedirects(
             response,
-            reverse("mammograms:start_screening", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:start_screening",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            ),
         )
 
-    def test_audit(self, clinical_user_client, appointment):
+    def test_audit(self, clinical_user_client, appointment_viewed_by_clinical_user):
         clinical_user_client.post(
-            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
+            reverse(
+                "mammograms:check_in",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
+            )
         )
         assert (
             AuditLog.objects.filter(
@@ -175,10 +219,11 @@ class TestCheckIn:
 
 @pytest.mark.django_db
 class TestAppointmentCannotGoAhead:
-    def test_audit(self, clinical_user_client, appointment):
+    def test_audit(self, clinical_user_client, appointment_viewed_by_clinical_user):
         clinical_user_client.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+                "mammograms:appointment_cannot_go_ahead",
+                kwargs={"pk": appointment_viewed_by_clinical_user.pk},
             ),
             {
                 "stopped_reasons": ["failed_identity_check"],
@@ -187,7 +232,7 @@ class TestAppointmentCannotGoAhead:
         )
         assert (
             AuditLog.objects.filter(
-                object_id=appointment.pk,
+                object_id=appointment_viewed_by_clinical_user.pk,
                 operation=AuditLog.Operations.UPDATE,
             ).count()
             == 1
