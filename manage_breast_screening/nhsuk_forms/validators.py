@@ -15,7 +15,7 @@ class MaxWordValidator:
 
         if len(words) > self.max_words:
             raise ValidationError(
-                f"Enter at most {self.max_words} words",
+                f"Enter {self.max_words} words or less",
                 params={"value": value},
                 code="max_words",
             )
