@@ -1,7 +1,10 @@
+import json
+import os
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pytest
+from jsonschema import ValidationError, validate
 
 from manage_breast_screening.notifications.presenters.message_batch_presenter import (
     MessageBatchPresenter,
@@ -72,3 +75,40 @@ class TestMessageBatchPresenter:
             second_message["personalisation"]
             == PersonalisationPresenter(appointment2).present()
         )
+
+    def test_present_is_valid_for_notify_schema(self):
+        appointment = AppointmentFactory(
+            starts_at=datetime(2025, 9, 9, 9, 30, tzinfo=ZoneInfo("Europe/London")),
+            clinic=ClinicFactory(
+                code="MDSSH",
+                bso_code="MBD",
+                address_line_1="Birmingham Treatment Centre",
+                address_line_2="Floor 1",
+                address_line_3="City Health Campus",
+                address_line_4="Dudley Road",
+                postcode="B71 4HJ",
+            ),
+        )
+        message_batch = MessageBatchFactory(
+            messages=[MessageFactory(appointment=appointment)]
+        )
+        path = (
+            os.path.dirname(os.path.realpath(__file__))
+            + "/../dependencies/notify_api_stub/schema.json"
+        )
+        with open(path) as file:
+            schema = json.loads(file.read())
+            subschema = schema["paths"]["/v1/message-batches"]["post"]["requestBody"][
+                "content"
+            ]["application/vnd.api+json"]["schema"]
+
+        try:
+            validate(
+                instance=MessageBatchPresenter(message_batch).present(),
+                schema=subschema,
+            )
+            assert True
+        except ValidationError:
+            self.fail(
+                "MessageBatchPresenter#present() does not conform to Notify schema"
+            )

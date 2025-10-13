@@ -46,6 +46,7 @@ django-debug-toolbar = "^6.0.0"
 requests-mock = "^1.12.1"
 pytest-cov = "^7.0.0"
 djlint = "^1.36.4"
+jsonschema = "^4.25.1"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
