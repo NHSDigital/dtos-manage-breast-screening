@@ -149,6 +149,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "manage_breast_screening.config.wsgi.application"
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 SESSION_ENGINE = "qsessions.backends.db"
+SESSION_COOKIE_AGE = 43200  # 12 hours
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
