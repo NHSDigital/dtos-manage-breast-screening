@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('notifications', '0019_alter_appointment_number'),
+        ('notifications', '0020_alter_channelstatus_description_and_more'),
     ]
 
     operations = [
