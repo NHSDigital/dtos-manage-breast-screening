@@ -12,9 +12,13 @@ from manage_breast_screening.notifications.models import (
     MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.queue import Queue
 
 logger = getLogger(__name__)
+INSIGHTS_ERROR_NAME = "RetryFailedMessageBatchError"
 
 
 class Command(BaseCommand):
@@ -24,6 +28,13 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
+        try:
+            self.retry_failed_message_batch()
+        except Exception as e:
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
+            raise CommandError(e)
+
+    def retry_failed_message_batch(self):
         logger.info("Retry Failed Message Batch Command started")
         queue = Queue.RetryMessageBatches()
         queue_message = queue.item()
@@ -57,22 +68,18 @@ class Command(BaseCommand):
                 retry_count,
             )
 
-            try:
-                response = ApiClient().send_message_batch(message_batch)
+            response = ApiClient().send_message_batch(message_batch)
 
-                if response.status_code == 201:
-                    MessageBatchHelpers.mark_batch_as_sent(
-                        message_batch=message_batch, response_json=response.json()
-                    )
-                else:
-                    MessageBatchHelpers.mark_batch_as_failed(
-                        message_batch=message_batch,
-                        response=response,
-                        retry_count=(retry_count + 1),
-                    )
-
-            except Exception as e:
-                raise CommandError(e)
+            if response.status_code == 201:
+                MessageBatchHelpers.mark_batch_as_sent(
+                    message_batch=message_batch, response_json=response.json()
+                )
+            else:
+                MessageBatchHelpers.mark_batch_as_failed(
+                    message_batch=message_batch,
+                    response=response,
+                    retry_count=(retry_count + 1),
+                )
         else:
             logger.error(
                 "Failed Message Batch with id %s not sent: Retry limit exceeded",
