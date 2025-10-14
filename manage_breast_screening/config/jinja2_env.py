@@ -6,9 +6,11 @@ from jinja2 import ChoiceLoader, Environment, PackageLoader
 from manage_breast_screening.core.template_helpers import (
     as_hint,
     header_account_items,
+    info_banner,
     nl2br,
     no_wrap,
     raise_helper,
+    success_banner,
 )
 
 
@@ -50,6 +52,8 @@ def environment(**options):
         {
             "STATIC_URL": settings.STATIC_URL,
             "header_account_items": header_account_items,
+            "info_banner": info_banner,
+            "success_banner": success_banner,
             "raise": raise_helper,
             "static": static,
             "url": reverse,

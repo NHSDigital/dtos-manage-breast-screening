@@ -1,4 +1,6 @@
 {% from 'nhsuk/components/header/macro.jinja' import header %}
+{% from "notification-banner/macro.jinja" import notificationBanner %}
+
 {% set assetPath = STATIC_URL ~ "/assets" %}
 {% extends "nhsuk/template.jinja" %}
 
@@ -34,13 +36,31 @@
 {% endblock %}
 
 {% block content %}
-  <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-two-thirds">
-      {% block messages %}
-        {#- TODO: show messages from django.contrib.messages -#}
-      {% endblock messages %}
-    </div>
-  </div>
+  {% block flash_messages %}
+    {#- TODO: show messages from django.contrib.messages -#}
+    {% set html %}
+      <h3 class="nhsuk-notification-banner__heading">
+        Patient record updated
+      </h3>
+      <p>Contact <a class="nhsuk-notification-banner__link" href="#">example@department.nhs.uk</a> if you think there's a problem.</p>
+    {% endset %}
+
+    {% set info_notification = info_banner(request) %}
+    {% set success_notification = success_banner(request) %}
+
+    {# Don't show a notification banner and an error summary component on the same page.
+       We'll just show the error summary (in layout-form.jinja). #}
+    {% if not form.errors %}
+      {% if success_notification %}
+        {{ notificationBanner(success_notification) }}
+      {% endif %}
+
+      {% if info_notification %}
+        {{ notificationBanner(info_notification) }}
+      {% endif %}
+    {% endif %}
+
+  {% endblock flash_messages %}
 
   {% block page_content %}
   {% endblock page_content %}

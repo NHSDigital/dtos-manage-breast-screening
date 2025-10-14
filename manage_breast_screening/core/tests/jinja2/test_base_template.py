@@ -1,7 +1,12 @@
 from unittest.mock import MagicMock
 
 import pytest
+from django.contrib.messages import SUCCESS
+from django.contrib.messages.storage.base import Message
 from django.forms import Form
+from django.test import RequestFactory
+from django.utils.safestring import mark_safe
+from pytest_django.asserts import assertInHTML
 
 form = MagicMock(autospec=Form)
 form.errors = {}
@@ -26,3 +31,63 @@ def test_page_title(jinja_env, page_title, form, expected_title):
     )
     html = template.render({"page_title": page_title, "form": form})
     assert f"<title>{expected_title}</title>" in html
+
+
+def test_success_banner(jinja_env):
+    template = jinja_env.from_string(
+        """
+        {% extends "layout-app.jinja" %}
+        """
+    )
+    request = RequestFactory().get("/")
+    request._messages = [Message(level=SUCCESS, message="Did a thing")]
+
+    html = template.render(
+        {
+            "request": request,
+        }
+    )
+
+    assertInHTML(
+        """
+        <div class="nhsuk-notification-banner nhsuk-notification-banner--success" role="alert" aria-labelledby="nhsuk-notification-banner-title" data-module="nhsuk-notification-banner">
+            <div class="nhsuk-notification-banner__header">
+                <h2 class="nhsuk-notification-banner__title" id="nhsuk-notification-banner-title">Success</h2>
+            </div>
+            <div class="nhsuk-notification-banner__content">
+                <p class="nhsuk-notification-banner__heading">Did a thing</p>
+            </div>
+        </div>
+        """,
+        html,
+    )
+
+
+def test_success_banner_with_html_message(jinja_env):
+    template = jinja_env.from_string(
+        """
+        {% extends "layout-app.jinja" %}
+        """
+    )
+    request = RequestFactory().get("/")
+    request._messages = [
+        Message(
+            level=SUCCESS, message=mark_safe("<p>Did an <em>important</em> thing</p>")
+        )
+    ]
+
+    html = template.render({"request": request})
+
+    assertInHTML(
+        """
+        <div class="nhsuk-notification-banner nhsuk-notification-banner--success" role="alert" aria-labelledby="nhsuk-notification-banner-title" data-module="nhsuk-notification-banner">
+            <div class="nhsuk-notification-banner__header">
+                <h2 class="nhsuk-notification-banner__title" id="nhsuk-notification-banner-title">Success</h2>
+            </div>
+            <div class="nhsuk-notification-banner__content">
+                <p>Did an <em>important</em> thing</p>
+            </div>
+        </div>
+        """,
+        html,
+    )

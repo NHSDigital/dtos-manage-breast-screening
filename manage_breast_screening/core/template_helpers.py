@@ -1,4 +1,7 @@
+from django.contrib.messages import INFO, SUCCESS, get_messages
 from django.urls import reverse
+from django.utils.html import conditional_escape as django_html_escape
+from django.utils.safestring import SafeData, SafeString, mark_safe
 from markupsafe import Markup, escape
 
 
@@ -50,8 +53,65 @@ def as_hint(value: str) -> Markup:
     )
 
 
+def _is_safe_message(value) -> bool:
+    """
+    Return true if a string is marked safe for embedding in HTML
+
+    >>> _is_safe_message("<script>alert('boo')</script>")
+    False
+
+    >>> _is_safe_message(mark_safe("<p>Hello</p>"))
+    True
+    """
+    return isinstance(value, SafeData)
+
+
 def raise_helper(msg):
     raise Exception(msg)
+
+
+def notification_with_heading(heading: str, html=None) -> SafeString:
+    """
+    Create the HTML for a notification banner presented as a heading
+    followed by some extra HTML.
+    """
+
+    heading_tag = mark_safe(
+        f'<h3 class="nhsuk-notification-banner__heading">{django_html_escape(heading)}</h3>'
+    )
+    if html:
+        return heading_tag + django_html_escape(html)
+    else:
+        return heading_tag
+
+
+def info_banner(request):
+    info_messages = [
+        message for message in get_messages(request) if message.level == INFO
+    ]
+    if not info_messages:
+        return None
+
+    info_message = info_messages[0].message
+    if _is_safe_message(info_message):
+        return {"html": Markup(info_message)}
+    else:
+        return {"text": info_message}
+
+
+def success_banner(request):
+    success_messages = [
+        message for message in get_messages(request) if message.level == SUCCESS
+    ]
+    if not success_messages:
+        return None
+
+    success_message = success_messages[0].message
+
+    if _is_safe_message(success_message):
+        return {"html": Markup(success_message), "type": "success"}
+    else:
+        return {"text": success_message, "type": "success"}
 
 
 def _user_name_and_role_item(user):
