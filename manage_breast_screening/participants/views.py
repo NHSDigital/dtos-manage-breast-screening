@@ -93,7 +93,7 @@ def edit_ethnicity(request, pk):
             "participant": participant,
             "form": form,
             "heading": "Ethnicity",
-            "back_link": {
+            "back_link_params": {
                 "text": "Go back",
                 "href": return_url,
             },
