@@ -1,13 +1,9 @@
-from django.http import HttpResponse
 from django.conf import settings
 from django.urls import path
 
 from . import demo_views, views
 
 app_name = "auth"
-
-# def sha_view(reviews):
-#   return HttpResponse(settings.COMMIT_SHA)
 
 urlpatterns = [
     path("log-in/", views.login, name="login"),
@@ -20,7 +16,6 @@ urlpatterns = [
         views.cis2_back_channel_logout,
         name="cis2_back_channel_logout",
     ),
-    # path("sha/", sha_view),
     # JWKS endpoint for private_key_jwt
     path("cis2/jwks_uri", views.jwks, name="jwks"),
 ]

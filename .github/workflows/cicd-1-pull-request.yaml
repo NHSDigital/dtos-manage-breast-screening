@@ -33,32 +33,32 @@ jobs:
           echo "python_version=$(grep "^python" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "version=${GITHUB_REF}" >> $GITHUB_OUTPUT
-  # commit-stage:
-  #   name: 'Commit stage'
-  #   needs: [metadata]
-  #   uses: ./.github/workflows/stage-1-commit.yaml
-  #   with:
-  #     build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
-  #     build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
-  #     build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
-  #     nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
-  #     python_version: '${{ needs.metadata.outputs.python_version }}'
-  #     terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
-  #     version: '${{ needs.metadata.outputs.version }}'
-  #   secrets: inherit
-  # test-stage:
-  #   name: 'Test stage'
-  #   needs: [metadata]
-  #   uses: ./.github/workflows/stage-2-test.yaml
-  #   with:
-  #     build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
-  #     build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
-  #     build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
-  #     nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
-  #     python_version: '${{ needs.metadata.outputs.python_version }}'
-  #     terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
-  #     version: '${{ needs.metadata.outputs.version }}'
-  #   secrets: inherit
+  commit-stage:
+    name: 'Commit stage'
+    needs: [metadata]
+    uses: ./.github/workflows/stage-1-commit.yaml
+    with:
+      build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
+      build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
+      build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
+      nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
+      python_version: '${{ needs.metadata.outputs.python_version }}'
+      terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
+      version: '${{ needs.metadata.outputs.version }}'
+    secrets: inherit
+  test-stage:
+    name: 'Test stage'
+    needs: [metadata]
+    uses: ./.github/workflows/stage-2-test.yaml
+    with:
+      build_datetime: '${{ needs.metadata.outputs.build_datetime }}'
+      build_timestamp: '${{ needs.metadata.outputs.build_timestamp }}'
+      build_epoch: '${{ needs.metadata.outputs.build_epoch }}'
+      nodejs_version: '${{ needs.metadata.outputs.nodejs_version }}'
+      python_version: '${{ needs.metadata.outputs.python_version }}'
+      terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
+      version: '${{ needs.metadata.outputs.version }}'
+    secrets: inherit
   build-stage:
     name: 'Build stage'
     needs: [metadata]

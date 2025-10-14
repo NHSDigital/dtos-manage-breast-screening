@@ -17,10 +17,11 @@ Including another URLconf
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
 from django.urls import include, path
 from django.views.generic.base import RedirectView
-from django.contrib.auth.decorators import login_not_required
+
 
 @login_not_required
 def sha_view(reviews):
