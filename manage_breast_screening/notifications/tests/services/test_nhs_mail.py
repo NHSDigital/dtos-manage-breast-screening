@@ -17,7 +17,7 @@ from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 class TestNhsMail:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):
-        monkeypatch.setenv("NOTIFICATIONS_SMTP_RECIPIENT", "recipient@nhsmail.net")
+        monkeypatch.setenv("NOTIFICATIONS_SMTP_RECIPIENTS", "recipient@nhsmail.net")
         monkeypatch.setenv("NOTIFICATIONS_SMTP_USERNAME", "sender@nhsmail.net")
         monkeypatch.setenv("NOTIFICATIONS_SMTP_PASSWORD", "password")
 
@@ -34,13 +34,25 @@ class TestNhsMail:
     def csv_data(self):
         return "this,that,1,8,1,2,1"
 
+    def test_sends_to_multiple_emails(self, mock_smtp_server, csv_data, monkeypatch):
+        monkeypatch.setenv(
+            "NOTIFICATIONS_SMTP_RECIPIENTS", "recipient@nhsmail.net,another@nhs.net"
+        )
+        subject = NhsMail()
+        subject.send_report_email(csv_data, "filename.csv", "failures")
+
+        mock_smtp_server.login.assert_called_once_with("sender@nhsmail.net", "password")
+        mock_smtp_server.sendmail.assert_called_once_with(
+            "sender@nhsmail.net", ["recipient@nhsmail.net", "another@nhs.net"], ANY
+        )
+
     def test_sends_a_failure_report_email(self, mock_smtp_server, csv_data):
         subject = NhsMail()
         subject.send_report_email(csv_data, "filename.csv", "failures")
 
         mock_smtp_server.login.assert_called_once_with("sender@nhsmail.net", "password")
         mock_smtp_server.sendmail.assert_called_once_with(
-            "sender@nhsmail.net", "recipient@nhsmail.net", ANY
+            "sender@nhsmail.net", ["recipient@nhsmail.net"], ANY
         )
         email_content = mock_smtp_server.sendmail.call_args[0][2]
 
@@ -65,7 +77,7 @@ class TestNhsMail:
 
         mock_smtp_server.login.assert_called_once_with("sender@nhsmail.net", "password")
         mock_smtp_server.sendmail.assert_called_once_with(
-            "sender@nhsmail.net", "recipient@nhsmail.net", ANY
+            "sender@nhsmail.net", ["recipient@nhsmail.net"], ANY
         )
         email_content = mock_smtp_server.sendmail.call_args[0][2]
 

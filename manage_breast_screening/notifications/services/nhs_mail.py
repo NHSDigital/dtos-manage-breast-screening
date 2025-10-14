@@ -14,7 +14,9 @@ SMTP_PORT = 587
 
 class NhsMail:
     def __init__(self) -> None:
-        self._receiver_email = os.getenv("NOTIFICATIONS_SMTP_RECIPIENT", "")
+        self._recipient_emails = os.getenv("NOTIFICATIONS_SMTP_RECIPIENTS", "").split(
+            ","
+        )
         self._sender_email = os.getenv("NOTIFICATIONS_SMTP_USERNAME", "")
         self._sender_password = os.getenv("NOTIFICATIONS_SMTP_PASSWORD", "")
 
@@ -36,7 +38,9 @@ class NhsMail:
                     self._sender_password,
                 )
 
-                server.sendmail(email["from"], email["to"], email.as_string())
+                server.sendmail(
+                    email["from"], self._recipient_emails, email.as_string()
+                )
         except Exception as e:
             logger.warning(
                 f"Error sending email: {e}",
@@ -59,7 +63,7 @@ class NhsMail:
 
         message["Subject"] = content["subject"]
         message["From"] = self._sender_email
-        message["To"] = self._receiver_email
+        message["To"] = ",".join(self._recipient_emails)
 
         attachment = MIMEApplication(attachment_data, Name=attachment_filename)
         attachment["Content-Disposition"] = (
