@@ -175,6 +175,11 @@ variable "infra_key_vault_rg" {
   type        = string
 }
 
+variable "app_insights_connection_string" {
+  description = "The Application Insights connection string."
+  type        = string
+}
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
@@ -195,7 +200,6 @@ locals {
       DJANGO_ENV = var.env_config
     }
   )
-
   container_db_env = {
     DATABASE_HOST = var.deploy_database_as_container ? module.database_container[0].container_app_fqdn : null
     DATABASE_NAME = local.database_name

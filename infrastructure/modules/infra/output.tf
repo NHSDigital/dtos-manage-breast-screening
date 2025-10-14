@@ -29,3 +29,7 @@ output "main_subnet_id" {
 output "monitor_action_group_id" {
   value = module.monitor_action_group.monitor_action_group.id
 }
+
+output "app_insights_connection_string" {
+  value = module.app_insights_audit.connection_string
+}
