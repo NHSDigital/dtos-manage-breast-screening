@@ -17,6 +17,9 @@ review: # Target the review infrastructure, or a review app if PR_NUMBER is used
 db-setup:
 	$(if ${TF_VAR_deploy_container_apps},, scripts/bash/db_run_job.sh ${ENVIRONMENT} ${PR_NUMBER})
 
+# smoke-test:
+# 	$(if ${TF_VAR_deploy_container_apps},, scripts/bash/container_app_smoke_test.sh ${ENVIRONMENT} ${EXPECTED_SHA} ${PR_NUMBER})
+
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)
 	$(eval SKIP_AZURE_LOGIN=true)
