@@ -6,6 +6,11 @@ updates:
     schedule:
       interval: 'daily'
 
+    ignore:
+      # Manually track LTS release versions (see .tool-versions, package.json
+      # and .browserslistrc)
+      - dependency-name: 'node'
+
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
