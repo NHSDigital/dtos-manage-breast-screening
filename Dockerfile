@@ -39,7 +39,6 @@ RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
 
 FROM python:3.13.7-alpine3.21@sha256:0c3d4f28025c9adc2c03326aa160dde8f53faaa8684134a0e146e4edca28a946
 
-
 # Workaround for CVE-2024-6345 upgrade the installed version of setuptools to the latest version
 RUN pip install -U setuptools
 
