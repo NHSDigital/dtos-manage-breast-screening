@@ -46,6 +46,7 @@ class Command(BaseCommand):
                     starts_at__lte=self.schedule_date(),
                     message__isnull=True,
                     status="B",
+                    number="1",
                 )
 
                 if not appointments:
