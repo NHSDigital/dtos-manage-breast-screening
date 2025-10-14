@@ -55,7 +55,8 @@ class MessageBatchHelpers:
         message_batch: MessageBatch, response: Response, retry_count: int = 0
     ):
         logger.info(
-            "Marking batch as failed. Reponse code: %s. Response: %s",
+            "Marking batch %s as failed. Response code: %s. Response: %s",
+            message_batch.id,
             response.status_code,
             response.text,
         )
@@ -97,6 +98,11 @@ class MessageBatchHelpers:
         message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
         message_batch.save()
 
+        logger.info(
+            "Adding MessageBatch %s to retry queue after validation failure",
+            message_batch.id,
+        )
+
         Queue.RetryMessageBatches().add(
             json.dumps(
                 {
@@ -115,10 +121,20 @@ class MessageBatchHelpers:
             message.sent_at = datetime.now(tz=TZ_INFO)
             message.save()
 
+        logger.error(
+            "MessageBatch %s failed to send. Unrecoverable failure.", message_batch.id
+        )
+
     @staticmethod
     def process_recoverable_batch(message_batch: MessageBatch, retry_count: int):
         message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
         message_batch.save()
+
+        logger.info(
+            "Adding MessageBatch %s to retry queue after recoverable failure",
+            message_batch.id,
+        )
+
         Queue.RetryMessageBatches().add(
             json.dumps(
                 {

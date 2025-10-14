@@ -37,6 +37,7 @@ class Command(BaseCommand):
     def retry_failed_message_batch(self):
         logger.info("Retry Failed Message Batch Command started")
         queue = Queue.RetryMessageBatches()
+        logger.debug("Retry queue items: %s", queue.peek())
         queue_message = queue.item()
 
         if queue_message is None:
@@ -49,6 +50,13 @@ class Command(BaseCommand):
             status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value,
         ).first()
 
+        queue.delete(queue_message)
+        logger.info(
+            "Queue message %s for MessageBatch with id %s deleted from queue",
+            queue_message.id,
+            message_batch_id,
+        )
+
         if message_batch is None:
             raise CommandError(
                 (
@@ -56,9 +64,6 @@ class Command(BaseCommand):
                     f"'{MessageBatchStatusChoices.FAILED_RECOVERABLE.value}' not found"
                 )
             )
-
-        queue.delete(queue_message)
-        logger.info("Message Batch with id %s deleted from queue", message_batch_id)
 
         retry_count = int(json.loads(queue_message.content)["retry_count"])
         if retry_count < int(os.getenv("NOTIFICATIONS_BATCH_RETRY_LIMIT", "5")):

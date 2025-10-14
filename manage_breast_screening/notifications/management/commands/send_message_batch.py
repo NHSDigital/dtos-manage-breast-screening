@@ -54,9 +54,7 @@ class Command(BaseCommand):
                     )
                     continue
 
-                self.stdout.write(
-                    f"Found {appointments.count()} appointments to batch."
-                )
+                logger.info(f"Found {appointments.count()} appointments to batch.")
 
                 message_batch = MessageBatch.objects.create(
                     routing_plan_id=routing_plan.id,
@@ -67,7 +65,7 @@ class Command(BaseCommand):
                 for appointment in appointments:
                     Message.objects.create(appointment=appointment, batch=message_batch)
 
-                self.stdout.write(
+                logger.info(
                     f"Created MessageBatch with ID {message_batch.id} containing {appointments.count()} messages."
                 )
 
@@ -85,10 +83,8 @@ class Command(BaseCommand):
                     MessageBatchHelpers.mark_batch_as_failed(
                         message_batch, response, retry_count=0
                     )
-                    self.stdout.write(
-                        f"Failed to send batch. Status: {response.status_code}"
-                    )
         except Exception as e:
+            logger.error(e, exc_info=True)
             raise CommandError(e)
 
     def bso_working_day(self):
