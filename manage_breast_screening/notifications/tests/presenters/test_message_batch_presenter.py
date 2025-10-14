@@ -43,7 +43,7 @@ class TestMessageBatchPresenter:
                 bso_code="MBD",
                 address_line_1="Victoria Health Centre",
                 address_line_2="5 Suffrage Street",
-                address_line_3="off Windmill Lane",
+                address_line_3="Off Windmill Lane",
                 address_line_4="Smethwick",
                 address_line_5="",
                 postcode="B66 3PZ",

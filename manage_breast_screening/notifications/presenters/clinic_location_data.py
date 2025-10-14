@@ -32,7 +32,7 @@ CLINIC_LOCATION_DATA = [
     {
         "code": "MDSCH",
         "bso_code": "MBD",
-        "location_description": "beside the Treatment Centre",
+        "location_description": "Beside the Treatment Centre",
         "location_url": "https://www.google.com/maps/search/B18+7QH",
     },
     {
@@ -50,7 +50,7 @@ CLINIC_LOCATION_DATA = [
     {
         "code": "MDSDD",
         "bso_code": "MBD",
-        "location_description": "off Perry Common Road",
+        "location_description": "Off Perry Common Road",
         "location_url": "https://www.google.com/maps/search/B23+5DD",
     },
     {
@@ -62,7 +62,7 @@ CLINIC_LOCATION_DATA = [
     {
         "code": "MDSMG",
         "bso_code": "MBD",
-        "location_description": "past store entrance to the end of the car park on the left",
+        "location_description": "Past store entrance to the end of the car park on the left",
         "location_url": "https://www.google.com/maps/search/B75+5BT",
     },
     {
@@ -74,7 +74,7 @@ CLINIC_LOCATION_DATA = [
     {
         "code": "MDSQU",
         "bso_code": "MBD",
-        "location_description": "off Queslett Road",
+        "location_description": "Off Queslett Road",
         "location_url": "https://www.google.com/maps/search/B43+7HA",
     },
     {
@@ -92,7 +92,7 @@ CLINIC_LOCATION_DATA = [
     {
         "code": "MDSVH",
         "bso_code": "MBD",
-        "location_description": "off Windmill Lane",
+        "location_description": "Off Windmill Lane",
         "location_url": "https://www.google.com/maps/search/B66+3PZ",
     },
     {
@@ -116,7 +116,7 @@ CLINIC_LOCATION_DATA = [
     {
         "code": "MDSSH",
         "bso_code": "MBD",
-        "location_description": "parked close to the Ante-Natal Clinic",
+        "location_description": "Parked close to the Ante-Natal Clinic",
         "location_url": "https://www.google.com/maps/search/B71+4HJ",
     },
     {
