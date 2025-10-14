@@ -8,12 +8,16 @@ SELECT  appt.nhs_number,
           WHEN appt.episode_type = 'N' THEN 'Early recall'
           WHEN appt.episode_type = 'R' THEN 'Routine recall'
           WHEN appt.episode_type = 'S' THEN 'Self referral'
+          WHEN appt.episode_type = 'T' THEN 'VHR short-term recall'
         END as episode_type,
         CASE
           WHEN msg_sts.id IS NULL THEN TO_CHAR(msg.sent_at, 'yyyy-mm-dd')
-          ELSE TO_CHAR(msg_sts.status_updated_at, 'yyyy-mm-dd')
+          WHEN msg_sts.id IS NOT NULL THEN TO_CHAR(msg_sts.status_updated_at, 'yyyy-mm-dd')
+          ELSE TO_CHAR(appt.created_at, 'yyyy-mm-dd')
         END AS failure_date,
         CASE
+          WHEN CAST(appt.number AS INTEGER) > 1 THEN 'invitation not sent as not a 1st time appointment'
+          WHEN appt.episode_type IN ('H', 'T', 'N') THEN 'invitation not sent as episode type is not supported'
           WHEN msg_fld.nhs_notify_errors IS NOT NULL THEN (
             array_to_string(
               ARRAY(
@@ -22,7 +26,7 @@ SELECT  appt.nhs_number,
               ), ', '
             )
           )
-          ELSE msg_sts.description
+          WHEN msg_sts.description IS NOT NULL THEN msg_sts.description
         END AS failure_reason
 FROM    notifications_appointment appt
 JOIN    notifications_clinic cl ON appt.clinic_id = cl.id
@@ -40,5 +44,7 @@ AND   (
     '[{"code":"CM_MISSING_VALUE"}]',
     '[{"code":"CM_NULL_VALUE"}]'
   ]::jsonb[]) OR
-  msg_sts.description IS NOT NULL
+  msg_sts.description IS NOT NULL OR
+  CAST(appt.number AS INTEGER) > 1 OR
+  appt.episode_type IN ('H', 'N', 'T')
 )
