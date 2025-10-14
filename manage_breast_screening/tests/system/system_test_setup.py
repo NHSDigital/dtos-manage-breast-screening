@@ -98,11 +98,11 @@ class SystemTestCase(StaticLiveServerTestCase):
         expect(error_span).to_contain_text(error_text)
 
         if field_name:
-            field = fieldset.get_by_label(field_label).and_(
+            field = fieldset.get_by_label(field_label, exact=True).and_(
                 fieldset.locator(f"[name='{field_name}']")
             )
         else:
-            field = fieldset.get_by_label(field_label)
+            field = fieldset.get_by_label(field_label, exact=True)
 
         expect(field).to_be_focused()
 

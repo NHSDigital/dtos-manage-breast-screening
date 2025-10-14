@@ -62,6 +62,32 @@ class TestRecordingSymptoms(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_lump_is_no_longer_listed()
 
+    def test_adding_a_symptom_with_errors(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.when_i_click_on_add_a_lump()
+        self.and_i_select_less_than_three_months()
+        self.and_i_select_no_the_symptom_has_not_been_investigated()
+        self.and_i_click_save_symptom()
+        self.then_i_am_prompted_to_enter_the_location_of_the_lump()
+
+        self.when_i_select_right_breast()
+        self.and_i_click_save_symptom()
+        self.then_i_am_prompted_to_enter_the_specific_area()
+
+        self.when_i_enter_the_area()
+        self.and_i_click_save_symptom()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_lump_on_the_right_breast_is_listed()
+
+    def test_accessibility(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.when_i_click_on_add_a_lump()
+        self.then_the_accessibility_baseline_is_met()
+
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
@@ -102,6 +128,8 @@ class TestRecordingSymptoms(SystemTestCase):
         self.page.get_by_label("Describe the specific area: right breast").filter(
             visible=True
         ).fill("ldq")
+
+    when_i_enter_the_area = and_i_enter_the_area
 
     def and_i_select_less_than_three_months(self):
         self.page.get_by_label("Less than 3 months").click()
@@ -159,3 +187,18 @@ class TestRecordingSymptoms(SystemTestCase):
             ".nhsuk-summary-list__key", has=self.page.get_by_text("Lump", exact=True)
         )
         expect(locator).not_to_be_attached()
+
+    def then_i_am_prompted_to_enter_the_location_of_the_lump(self):
+        self.expect_validation_error(
+            error_text="Select the location of the lump",
+            fieldset_legend="Where is the lump located?",
+            field_label="Right breast",
+        )
+
+    def then_i_am_prompted_to_enter_the_specific_area(self):
+        self.expect_validation_error(
+            error_text="Describe the specific area where the lump is located",
+            fieldset_legend="Where is the lump located?",
+            field_label="Describe the specific area: right breast",
+            field_name="area_description_right_breast",
+        )
