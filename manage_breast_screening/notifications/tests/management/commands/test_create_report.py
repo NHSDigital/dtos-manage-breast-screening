@@ -47,36 +47,18 @@ class TestCreateReports:
         df.to_csv.return_value = csv_data
         return df
 
-    def test_handle_creates_aggregate_report(self, dataframe, csv_data, now):
+    def test_handle_creates_all_reports(self, dataframe, csv_data, now):
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
-            Command().handle(**{"report_type": "aggregate"})
+            Command().handle()
 
         mock_blob_storage = md[0]
-        mock_blob_storage.add.assert_called_once_with(
+        mock_blob_storage.add.assert_any_call(
             now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv"),
             csv_data,
             content_type="text/csv",
             container_name="reports",
         )
-
-    def test_handle_creates_failures_report(self, dataframe, csv_data, now):
-        with self.mocked_dependencies(dataframe, csv_data, now) as md:
-            Command().handle(**{"report_type": "failures"})
-
-        mock_blob_storage = md[0]
-        mock_blob_storage.add.assert_called_once_with(
-            now.strftime("%Y-%m-%dT%H:%M:%S-failures-report.csv"),
-            csv_data,
-            content_type="text/csv",
-            container_name="reports",
-        )
-
-    def test_handle_defaults_to_failures_report(self, dataframe, csv_data, now):
-        with self.mocked_dependencies(dataframe, csv_data, now) as md:
-            Command().handle()
-
-        mock_blob_storage = md[0]
-        mock_blob_storage.add.assert_called_once_with(
+        mock_blob_storage.add.assert_any_call(
             now.strftime("%Y-%m-%dT%H:%M:%S-failures-report.csv"),
             csv_data,
             content_type="text/csv",

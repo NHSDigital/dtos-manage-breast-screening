@@ -22,40 +22,31 @@ class Command(BaseCommand):
     a 3 month time period and can be resource intensive.
     'failures' covers all failed status updates from NHS Notify and contains
     NHS numbers, Clinic and BSO code and failure dates and reasons for one day.
-    If no report_type argument is specified the default behaviour is to
-    generate the failures report.
+    Reports are generated sequentially.
     Reports are stored in Azure Blob storage.
     """
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "report_type",
-            default="failures",
-            help="type of report. Can be 'aggregate' or 'failures'. Default: failures",
-        )
+    REPORTS = [
+        [AggregateQuery, ("3 months",)],
+        [FailuresQuery, (datetime.now(),)],
+    ]
 
     def handle(self, *args, **options):
         logger.info("Create Report Command started")
-        report_type = options.get("report_type", "failures")
         try:
-            if report_type == "aggregate":
-                query = AggregateQuery
-                params = ("3 months",)
-            else:
-                query = FailuresQuery
-                params = (datetime.now().date(),)
+            for query, params in self.REPORTS:
+                report_type = query.__name__.replace("Query", "").lower()
+                dataframe = pandas.read_sql(
+                    query.sql(), connection, params=params, columns=query.columns()
+                )
 
-            dataframe = pandas.read_sql(
-                query.sql(), connection, params=params, columns=query.columns()
-            )
-
-            BlobStorage().add(
-                self.filename(report_type),
-                dataframe.to_csv(),
-                content_type="text/csv",
-                container_name=os.getenv("REPORTS_CONTAINER_NAME"),
-            )
-            logger.info("Report %s created", report_type)
+                BlobStorage().add(
+                    self.filename(report_type),
+                    dataframe.to_csv(),
+                    content_type="text/csv",
+                    container_name=os.getenv("REPORTS_CONTAINER_NAME"),
+                )
+                logger.info("Report %s created", report_type)
         except Exception as e:
             raise CommandError(e)
 
