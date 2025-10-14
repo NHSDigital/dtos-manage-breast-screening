@@ -49,9 +49,6 @@ ENV CONTAINER_USER=appuser \
     CONTAINER_UID=31337 \
     CONTAINER_GID=31337
 
-ARG COMMIT_SHA
-ENV COMMIT_SHA=$COMMIT_SHA
-
 RUN addgroup --gid ${CONTAINER_GID} --system ${CONTAINER_GROUP} \
     && adduser --uid ${CONTAINER_UID} --system ${CONTAINER_USER} --ingroup ${CONTAINER_GROUP}
 
@@ -66,12 +63,13 @@ COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ./manage_breast_screening /app
 COPY --from=node_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} /app/manage_breast_screening/assets/compiled /app/manage_breast_screening/assets/compiled
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} manage.py ./
 
-
-
 # Run django commands
 ENV DEBUG=0
 RUN python ./manage.py collectstatic --noinput
 
 EXPOSE 8000
+
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
 
 ENTRYPOINT ["/app/.venv/bin/gunicorn", "--bind", "0.0.0.0:8000", "manage_breast_screening.config.wsgi"]
