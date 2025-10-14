@@ -100,6 +100,7 @@ class CommonFields:
         symptom_name="symptom",
         hint="For example, the left armpit",
         visually_hidden_label_suffix=None,
+        classes="",
     ):
         return CharField(
             required=False,
@@ -108,7 +109,7 @@ class CommonFields:
             error_messages={
                 "required": f"Describe the specific area where the {symptom_name} is located"
             },
-            classes="nhsuk-u-width-two-thirds",
+            classes=classes,
             visually_hidden_label_suffix=visually_hidden_label_suffix,
         )
 
@@ -236,7 +237,7 @@ class LumpForm(SymptomForm):
         "lump", visually_hidden_label_suffix="left breast"
     )
     area_description_other = CommonFields.area_description(
-        "lump", visually_hidden_label_suffix="other"
+        "lump", visually_hidden_label_suffix="other", classes="nhsuk-u-width-two-thirds"
     )
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
@@ -272,7 +273,9 @@ class SwellingOrShapeChangeForm(SymptomForm):
         "swelling or shape change", visually_hidden_label_suffix="left breast"
     )
     area_description_other = CommonFields.area_description(
-        "swelling or shape change", visually_hidden_label_suffix="other"
+        "swelling or shape change",
+        visually_hidden_label_suffix="other",
+        classes="nhsuk-u-width-two-thirds",
     )
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
@@ -312,7 +315,9 @@ class SkinChangeForm(SymptomForm):
         "skin change", visually_hidden_label_suffix="left breast"
     )
     area_description_other = CommonFields.area_description(
-        "skin change", visually_hidden_label_suffix="other"
+        "skin change",
+        visually_hidden_label_suffix="other",
+        classes="nhsuk-u-width-two-thirds",
     )
     symptom_sub_type = ChoiceField(
         choices=SkinChangeChoices,
@@ -441,7 +446,7 @@ class OtherSymptomForm(SymptomForm):
         visually_hidden_label_suffix="left breast"
     )
     area_description_other = CommonFields.area_description(
-        visually_hidden_label_suffix="other"
+        visually_hidden_label_suffix="other", classes="nhsuk-u-width-two-thirds"
     )
     symptom_sub_type_details = CharField(
         label="Describe the symptom",

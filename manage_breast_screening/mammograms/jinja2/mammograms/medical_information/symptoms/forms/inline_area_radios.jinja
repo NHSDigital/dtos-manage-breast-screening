@@ -1,0 +1,82 @@
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+{% from "nhsuk/components/input/macro.jinja" import input %}
+{% from "nhsuk/components/radios/macro.jinja" import radios %}
+{% from "nhsuk/components/error-message/macro.jinja" import errorMessage %}
+
+<div class="nhsuk-form-group {%- if form.area.errors %} nhsuk-form-group--error{% endif %}">
+  {% call fieldset({
+      "legend": {
+        "text": form.area.label,
+        "classes": "nhsuk-fieldset__legend--m",
+        "aria-describedby": "area-error" if form.area.errors else ""
+      }
+  }) %}
+    {% set unbound_area_field = form.area.field %}
+
+    {% if form.area.errors %}
+      <span class="nhsuk-error-message" id="area-error">
+        <span class="nhsuk-u-visually-hidden">Error:</span> {{ form.area.errors | first }}
+      </span>
+    {% endif %}
+
+    <div class="nhsuk-grid-row">
+      <div class="nhsuk-grid-column-one-half">
+        {{ radios({
+          "name": form.area.html_name,
+          "value": form.area.value(),
+          "formGroup": {
+            "classes": "nhsuk-u-margin-bottom-2"
+          },
+          "items": [
+            {
+              "id": form.area.auto_id,
+              "value": "RIGHT_BREAST",
+              "text": "Right breast",
+              "conditional": {
+                "html":  form.area_description_right_breast.as_field_group()
+              }
+            }
+          ]
+        }) }}
+      </div>
+      <div class="nhsuk-grid-column-one-half">
+        {{ radios({
+          "name": form.area.html_name,
+          "value": form.area.value(),
+          "formGroup": {
+            "classes": "nhsuk-u-margin-bottom-2"
+          },
+          "items": [
+            {
+              "value": "LEFT_BREAST",
+              "text": "Left breast",
+              "conditional": {
+                "html":  form.area_description_left_breast.as_field_group()
+              }
+            }
+          ]
+        }) }}
+      </div>
+    </div>
+
+    {{ radios({
+      "name": form.area.name,
+      "value": form.area.value(),
+      "items": [
+        {
+          "divider": "or"
+        },
+        {
+          "value": "OTHER",
+          "text": "Other",
+          "hint": {
+            "text": "For example, the armpit"
+          },
+          "conditional": {
+            "html":  form.area_description_other.as_field_group()
+          }
+        }
+      ]
+    }) }}
+  {% endcall %}
+</div>
