@@ -44,21 +44,13 @@ locals {
       job_short_name     = "sms"
       job_container_args = "save_message_status"
     }
-    create_failures_report = {
-      cron_expression = local.NO_OP_DATE
+    create_reports = {
+      cron_expression = "0 21 * * *"
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-reports"
       }
-      job_short_name     = "crf"
-      job_container_args = "create_report"
-    }
-    create_aggregate_report = {
-      cron_expression = local.NO_OP_DATE
-      environment_variables = {
-        BLOB_CONTAINER_NAME = "notifications-reports"
-      }
-      job_short_name     = "cra"
-      job_container_args = "create_report aggregate"
+      job_short_name     = "crp"
+      job_container_args = "create_reports"
     }
   }
 }
