@@ -69,4 +69,6 @@ module "container-apps" {
   use_apex_domain                       = var.use_apex_domain
   infra_key_vault_name                  = local.infra_key_vault_name
   infra_key_vault_rg                    = local.infra_key_vault_rg
+  api_oauth_token_url                   = var.api_oauth_token_url
+  nhs_notify_api_message_batch_url      = var.nhs_notify_api_message_batch_url
 }
