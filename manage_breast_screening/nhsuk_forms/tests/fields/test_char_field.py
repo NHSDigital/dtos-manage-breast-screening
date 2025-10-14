@@ -1,5 +1,5 @@
 import pytest
-from django.forms import Form
+from django.forms import Form, ValidationError
 from django.forms.widgets import TelInput, Textarea, TextInput
 from pytest_django.asserts import assertHTMLEqual
 
@@ -10,7 +10,9 @@ class TestCharField:
     @pytest.fixture
     def form_class(self):
         class TestForm(Form):
-            field = CharField(label="Abc", initial="somevalue", max_length=10)
+            field = CharField(
+                label="Abc", initial="somevalue", max_length=10, max_words=None
+            )
             field_with_visually_hidden_label = CharField(
                 label="Abc",
                 initial="somevalue",
@@ -49,8 +51,16 @@ class TestCharField:
                         "spellcheck": "true",
                     }
                 ),
+                max_words=None,
             )
-            textfield_simple = CharField(label="Text", widget=Textarea)
+            textfield_simple = CharField(label="Text", widget=Textarea, max_words=None)
+            char_count = CharField(
+                label="Text",
+                widget=Textarea,
+                max_length=10,
+                max_words=None,
+            )
+            char_count_max_words = CharField(label="Text", widget=Textarea, max_words=5)
 
         return TestForm
 
@@ -194,3 +204,45 @@ class TestCharField:
                 </div>
                 """,
         )
+
+    def test_textarea_with_max_length_renders_character_count(self, form_class):
+        assertHTMLEqual(
+            form_class()["char_count"].as_field_group(),
+            """
+            <div class="nhsuk-character-count" data-maxlength="10" data-threshold="25" data-module="nhsuk-character-count">
+                <div class="nhsuk-form-group">
+                    <label class="nhsuk-label" for="id_char_count">
+                        Text
+                    </label>
+                    <textarea aria-describedby="id_char_count-info" class="nhsuk-js-character-count nhsuk-textarea" id="id_char_count" name="char_count" rows="10"></textarea>
+                </div>
+                <div class="nhsuk-character-count__message nhsuk-hint" id="id_char_count-info">
+                    You can enter up to 10 characters
+                </div>
+            </div>
+            """,
+        )
+
+    def test_textarea_with_maxwords_renders_character_count(self, form_class):
+        assertHTMLEqual(
+            form_class()["char_count_max_words"].as_field_group(),
+            """
+            <div class="nhsuk-character-count" data-maxwords="5" data-threshold="25" data-module="nhsuk-character-count">
+                <div class="nhsuk-form-group">
+                    <label class="nhsuk-label" for="id_char_count_max_words">
+                        Text
+                    </label>
+                    <textarea aria-describedby="id_char_count_max_words-info" class="nhsuk-js-character-count nhsuk-textarea" id="id_char_count_max_words" name="char_count_max_words" rows="10"></textarea>
+                </div>
+                <div class="nhsuk-character-count__message nhsuk-hint" id="id_char_count_max_words-info">
+                    You can enter up to 5 words
+                </div>
+            </div>
+            """,
+        )
+
+    def test_max_word_validation(self):
+        field = CharField(label="Text", widget=Textarea, max_words=5)
+
+        with pytest.raises(ValidationError, match="Enter 5 words or less"):
+            field.clean("one two three four five six")

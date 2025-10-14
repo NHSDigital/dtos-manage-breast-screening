@@ -85,6 +85,8 @@ class CommonFields:
         label="Additional info (optional)",
         label_classes="nhsuk-label--m",
         widget=Textarea(attrs={"rows": 4}),
+        max_words=500,
+        error_messages={"max_words": "Additional details must be 500 words or less"},
     )
 
     @staticmethod
