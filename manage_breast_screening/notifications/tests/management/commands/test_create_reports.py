@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from django.core.management.base import CommandError
 
-from manage_breast_screening.notifications.management.commands.create_report import (
+from manage_breast_screening.notifications.management.commands.create_reports import (
     Command,
 )
 
@@ -26,7 +26,7 @@ class TestCreateReports:
     @contextmanager
     def mocked_dependencies(self, dataframe, csv_data, now):
         module = (
-            "manage_breast_screening.notifications.management.commands.create_report"
+            "manage_breast_screening.notifications.management.commands.create_reports"
         )
 
         with patch(f"{module}.BlobStorage") as mock_storage:
