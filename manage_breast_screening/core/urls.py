@@ -17,8 +17,15 @@ Including another URLconf
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.auth.decorators import login_not_required
+from django.http import HttpResponse
 from django.urls import include, path
 from django.views.generic.base import RedirectView
+
+
+@login_not_required
+def sha_view(reviews):
+  return HttpResponse(settings.COMMIT_SHA)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -46,6 +53,10 @@ urlpatterns = [
     path(
         "participants/",
         include("manage_breast_screening.participants.urls", namespace="participants"),
+    ),
+    path(
+        "sha/",
+        sha_view,
     ),
     path("", RedirectView.as_view(pattern_name="clinics:index"), name="home"),
 ]

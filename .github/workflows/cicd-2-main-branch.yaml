@@ -76,6 +76,7 @@ jobs:
       python_version: '${{ needs.metadata.outputs.python_version }}'
       terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
       version: '${{ needs.metadata.outputs.version }}'
+      commit_sha: '${{ github.sha }}'
     secrets: inherit
 
   deploy-stage:

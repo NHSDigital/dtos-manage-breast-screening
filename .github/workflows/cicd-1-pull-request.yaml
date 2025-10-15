@@ -71,6 +71,7 @@ jobs:
       python_version: '${{ needs.metadata.outputs.python_version }}'
       terraform_version: '${{ needs.metadata.outputs.terraform_version }}'
       version: '${{ needs.metadata.outputs.version }}'
+      commit_sha: '${{ github.event.pull_request.head.sha }}'
     secrets: inherit
   deploy-stage:
     if: contains(github.event.pull_request.labels.*.name, 'deploy')
