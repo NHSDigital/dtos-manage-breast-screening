@@ -12,7 +12,7 @@ from manage_breast_screening.clinics.tests.factories import UserAssignmentFactor
 from manage_breast_screening.core.template_helpers import (
     header_account_items,
     info_banner,
-    notification_with_heading,
+    message_with_heading,
     success_banner,
 )
 
@@ -41,9 +41,9 @@ class TestHeaderAccountItems:
         ]
 
 
-class TestNotificationWithHeading:
-    def test_notification_with_heading(self):
-        result = notification_with_heading("Heading", Markup("<p>Content</p>"))
+class TestMessageWithHeading:
+    def test_message_with_heading(self):
+        result = message_with_heading("Heading", Markup("<p>Content</p>"))
 
         assertHTMLEqual(
             result,
@@ -53,8 +53,8 @@ class TestNotificationWithHeading:
             """,
         )
 
-    def test_notification_with_heading_and_unsafe_content(self):
-        result = notification_with_heading(
+    def test_message_with_heading_and_unsafe_content(self):
+        result = message_with_heading(
             "Created widget", "Created <script>alert(1)</script>"
         )
 

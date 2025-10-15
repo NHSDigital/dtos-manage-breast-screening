@@ -70,7 +70,7 @@ def raise_helper(msg):
     raise Exception(msg)
 
 
-def notification_with_heading(heading: str, html=None) -> SafeString:
+def message_with_heading(heading: str, html=None) -> SafeString:
     """
     Create the HTML for a notification banner presented as a heading
     followed by some extra HTML.
