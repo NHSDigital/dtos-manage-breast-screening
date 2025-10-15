@@ -39,7 +39,7 @@ class TestNhsMail:
             "NOTIFICATIONS_SMTP_RECIPIENTS", "recipient@nhsmail.net,another@nhs.net"
         )
         subject = NhsMail()
-        subject.send_report_email(csv_data, "filename.csv", "failures")
+        subject.send_report_email(csv_data, "filename.csv", "invites_not_sent")
 
         mock_smtp_server.login.assert_called_once_with("sender@nhsmail.net", "password")
         mock_smtp_server.sendmail.assert_called_once_with(
@@ -48,7 +48,7 @@ class TestNhsMail:
 
     def test_sends_a_failure_report_email(self, mock_smtp_server, csv_data):
         subject = NhsMail()
-        subject.send_report_email(csv_data, "filename.csv", "failures")
+        subject.send_report_email(csv_data, "filename.csv", "invites_not_sent")
 
         mock_smtp_server.login.assert_called_once_with("sender@nhsmail.net", "password")
         mock_smtp_server.sendmail.assert_called_once_with(
@@ -61,10 +61,10 @@ class TestNhsMail:
             "utf-8"
         )
         assert (
-            "Breast screening digital comms failure report – 11-10-2025 – Birmingham (MCR)"
+            "Breast screening digital comms invites not sent report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
-        assert "Please find failure report attached." in email_content
+        assert "Please find invites not sent report attached." in email_content
         assert "filename.csv" in email_content
         decoded_attachment_data = base64.b64encode(csv_data.encode("utf-8")).decode(
             "utf-8"
@@ -90,7 +90,7 @@ class TestNhsMail:
             "Breast screening digital comms daily aggregate report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
-        assert "Please find failure report attached." not in email_content
+        assert "Please find invites not sent report attached." not in email_content
         assert "Please find daily report attached." in email_content
         assert "filename.csv" in email_content
         decoded_attachment_data = base64.b64encode(csv_data.encode("utf-8")).decode(

@@ -21,7 +21,10 @@ class NhsMail:
         self._sender_password = os.getenv("NOTIFICATIONS_SMTP_PASSWORD", "")
 
     def send_report_email(
-        self, attachment_data: str, attachment_filename: str, report_type="failures"
+        self,
+        attachment_data: str,
+        attachment_filename: str,
+        report_type="invites_not_sent",
     ):
         email = self._get_email_content(
             attachment_data, attachment_filename, report_type
@@ -53,7 +56,7 @@ class NhsMail:
         todays_date = datetime.today().strftime("%d-%m-%Y")
         content = (
             self.failure_report_content(todays_date)
-            if report_type == "failures"
+            if report_type == "invites_not_sent"
             else self.aggregate_report_content(todays_date)
         )
 
@@ -80,13 +83,11 @@ class NhsMail:
         }
 
     def _failure_report_subject_text(self, date) -> str:
-        return (
-            f"Breast screening digital comms failure report – {date} – Birmingham (MCR)"
-        )
+        return f"Breast screening digital comms invites not sent report – {date} – Birmingham (MCR)"
 
     def _failure_report_body_text(self) -> str:
         return f"""Hello \n
-                Please find failure report attached. \n
+                Please find invites not sent report attached. \n
                 For any questions please email {self._sender_email}"""
 
     def aggregate_report_content(self, date) -> dict[str, str]:
