@@ -28,15 +28,14 @@ class Command(BaseCommand):
     """
 
     REPORTS = [
-        [AggregateQuery, ("3 months",)],
-        [FailuresQuery, (datetime.now(),)],
+        [AggregateQuery, ("3 months",), "aggregate"],
+        [FailuresQuery, (datetime.now(),), "invites_not_sent"],
     ]
 
     def handle(self, *args, **options):
         logger.info("Create Report Command started")
         try:
-            for query, params in self.REPORTS:
-                report_type = query.__name__.replace("Query", "").lower()
+            for query, params, report_type in self.REPORTS:
                 dataframe = pandas.read_sql(
                     query.sql(), connection, params=params, columns=query.columns()
                 )
@@ -62,4 +61,4 @@ class Command(BaseCommand):
 
     def filename(self, report_type: str) -> str:
         formatted_time = datetime.today().strftime("%Y-%m-%dT%H:%M:%S")
-        return f"{formatted_time}-{report_type}-report.csv"
+        return f"{formatted_time}-{report_type.replace('_', '-')}-report.csv"
