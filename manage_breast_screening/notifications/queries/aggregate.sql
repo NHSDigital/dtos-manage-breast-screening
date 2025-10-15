@@ -9,6 +9,7 @@ SELECT  TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS appointment_date,
           WHEN appt.episode_type = 'N' THEN 'Early recall'
           WHEN appt.episode_type = 'R' THEN 'Routine recall'
           WHEN appt.episode_type = 'S' THEN 'Self referral'
+          WHEN appt.episode_type = 'T' THEN 'VHR short-term recall'
         END,
         COUNT(msg_snt.id)     AS notifications_sent,
         COUNT(nhsapp_read.id) AS nhs_app_messages_read,

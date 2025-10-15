@@ -88,6 +88,13 @@ class TestFailuresQuery:
             {"status": "failed"},
             {"status": "failed", "description": "No reachable communication channel"},
         )
+
+        appt8 = AppointmentFactory(
+            starts_at=appt_time, nhs_number="9990001119", episode_type="T"
+        )
+        appt9 = AppointmentFactory(
+            starts_at=appt_time, nhs_number="9990001120", number="2"
+        )
         today_formatted = datetime.today().strftime("%Y-%m-%d")
 
         with connection.cursor() as cursor:
@@ -152,6 +159,22 @@ class TestFailuresQuery:
                 "Self referral",
                 today_formatted,
                 "Invalid value, Invalid NHS number, Address inline is missing, Clinic location is null",
+            ],
+            [
+                9990001119,
+                appt8.starts_at.strftime("%Y-%m-%d"),
+                appt8.clinic.code,
+                "VHR early recall",
+                today_formatted,
+                "Invitation not sent as episode type is not supported",
+            ],
+            [
+                9990001120,
+                appt9.starts_at.strftime("%Y-%m-%d"),
+                appt9.clinic.code,
+                "Self referral",
+                today_formatted,
+                "Invitation not sent as not a 1st time appointment",
             ],
         ]
 
