@@ -4,17 +4,17 @@ from django.views.decorators.http import require_http_methods
 
 from ..core.decorators import current_provider_exempt
 from ..core.utils.urls import extract_next_path_from_params
-from ..participants.models import Appointment, AppointmentStatus
-from .models import Clinic, Provider
+from ..participants.models import AppointmentStatus
+from ..participants.repositories import AppointmentRepository
+from .models import Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
+from .repositories import ClinicRepository
 
 
 def clinic_list(request, filter="today"):
-    current_provider_id = request.session.get("current_provider")
-    clinics = Clinic.objects.prefetch_related("setting").by_filter(
-        filter, current_provider_id
-    )
-    counts_by_filter = Clinic.filter_counts(current_provider_id)
+    clinic_repo = ClinicRepository(request.current_provider)
+    clinics = clinic_repo.by_filter(filter).with_settings().all()
+    counts_by_filter = clinic_repo.filter_counts()
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
@@ -24,15 +24,17 @@ def clinic_list(request, filter="today"):
 
 
 def clinic(request, pk, filter="remaining"):
-    clinic = Clinic.objects.select_related("setting").get(pk=pk)
+    clinic_repo = ClinicRepository(request.current_provider)
+    clinic = get_object_or_404(clinic_repo.with_settings().all(), pk=pk)
     presented_clinic = ClinicPresenter(clinic)
+
+    appointment_repo = AppointmentRepository(request.current_provider)
     appointments = (
-        Appointment.objects.for_clinic_and_filter(clinic, filter)
-        .prefetch_related("statuses")
-        .select_related("clinic_slot__clinic", "screening_episode__participant")
-        .order_by("clinic_slot__starts_at")
+        appointment_repo.for_clinic_and_filter(clinic, filter)
+        .ordered_by_clinic_slot_starts_at()
+        .all()
     )
-    counts_by_filter = Appointment.objects.filter_counts_for_clinic(clinic)
+    counts_by_filter = appointment_repo.filter_counts_for_clinic(clinic)
     presented_appointment_list = AppointmentListPresenter(
         pk, appointments, filter, counts_by_filter
     )
@@ -48,8 +50,9 @@ def clinic(request, pk, filter="remaining"):
 
 
 @require_http_methods(["POST"])
-def check_in(_request, pk, appointment_pk):
-    appointment = get_object_or_404(Appointment, pk=appointment_pk)
+def check_in(request, pk, appointment_pk):
+    appointment_repo = AppointmentRepository(request.current_provider)
+    appointment = get_object_or_404(appointment_repo.all(), pk=appointment_pk)
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)

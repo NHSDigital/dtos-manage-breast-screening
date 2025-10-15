@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, redirect
 from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
-from manage_breast_screening.participants.models import Appointment
+from manage_breast_screening.participants.repositories import AppointmentRepository
 
 
 class AppointmentMixin:
@@ -18,14 +18,8 @@ class AppointmentMixin:
 
     @cached_property
     def appointment(self):
-        return get_object_or_404(
-            Appointment.objects.select_related(
-                "clinic_slot__clinic",
-                "screening_episode__participant",
-                "screening_episode__participant__address",
-            ),
-            pk=self.appointment_pk,
-        )
+        appointment_repo = AppointmentRepository(self.request.current_provider)
+        return get_object_or_404(appointment_repo.all(), pk=self.appointment_pk)
 
 
 class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
