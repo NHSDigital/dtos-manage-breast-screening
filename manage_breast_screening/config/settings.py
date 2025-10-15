@@ -59,7 +59,6 @@ PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 # Application definition
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.forms",
@@ -114,10 +113,7 @@ if DEBUG_TOOLBAR:
 
 AUTH_USER_MODEL = "users.User"
 
-AUTHENTICATION_BACKENDS = (
-    "rules.permissions.ObjectPermissionBackend",
-    "django.contrib.auth.backends.ModelBackend",
-)
+AUTHENTICATION_BACKENDS = ("manage_breast_screening.auth.backends.CIS2Backend",)
 
 ROOT_URLCONF = "manage_breast_screening.core.urls"
 
