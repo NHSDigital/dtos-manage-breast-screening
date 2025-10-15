@@ -19,7 +19,7 @@ def autoescape(template_name):
     Going forwards, we want to use Django's default behaviour for autoescape.
     """
     if template_name is None:
-        return False
+        return True
     elif template_name.endswith("attributes.jinja"):
         return False
     else:
