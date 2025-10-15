@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.template_helpers import notification_with_heading
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
@@ -277,8 +279,17 @@ class DeleteSymptomView(View):
         symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
         auditor = Auditor.from_request(request)
 
+        name = SymptomPresenter(symptom).name
+
         auditor.audit_delete(symptom)
         symptom.delete()
-        messages.add_message(self.request, messages.SUCCESS, "Symptom deleted")
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            notification_with_heading(
+                heading="Symptom deleted", html=mark_safe(f"<p>Deleted {name}.</p>")
+            ),
+        )
 
         return redirect("mammograms:record_medical_information", pk=kwargs["pk"])
