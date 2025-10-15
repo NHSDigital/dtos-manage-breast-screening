@@ -1,5 +1,5 @@
-ENV_CONFIG=prod
-ENVIRONMENT=prod
+ENV_CONFIG=production
+ENVIRONMENT=production
 AZURE_SUBSCRIPTION="Breast Screening - Manage Breast Screening - Prod"
 HUB_SUBSCRIPTION="Digital Screening DToS - Core Services Prod Hub"
 HUB=prod
