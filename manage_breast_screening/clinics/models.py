@@ -34,18 +34,16 @@ class ClinicFilter(StrEnum):
 
 
 class ClinicQuerySet(models.QuerySet):
-    def by_filter(self, filter: str, provider_id):
-        queryset = self.filter(setting__provider_id=provider_id)
-
+    def by_filter(self, filter: str):
         match filter:
             case ClinicFilter.TODAY:
-                return queryset.today()
+                return self.today()
             case ClinicFilter.UPCOMING:
-                return queryset.upcoming()
+                return self.upcoming()
             case ClinicFilter.COMPLETED:
-                return queryset.completed()
+                return self.completed()
             case ClinicFilter.ALL:
-                return queryset
+                return self
             case _:
                 raise ValueError(filter)
 
