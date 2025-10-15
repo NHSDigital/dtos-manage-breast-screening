@@ -60,6 +60,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.and_i_click_on_delete_this_symptom()
         self.and_i_confirm_i_want_to_delete_the_symptom()
         self.then_i_am_back_on_the_medical_information_page()
+        self.and_i_see_a_success_message()
         self.and_the_lump_is_no_longer_listed()
 
     def test_adding_a_symptom_with_errors(self):
@@ -202,3 +203,10 @@ class TestRecordingSymptoms(SystemTestCase):
             field_label="Describe the specific area: right breast",
             field_name="area_description_right_breast",
         )
+
+    def and_i_see_a_success_message(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Symptom deleted")
+        expect(alert).to_contain_text("Deleted swelling or shape change.")
