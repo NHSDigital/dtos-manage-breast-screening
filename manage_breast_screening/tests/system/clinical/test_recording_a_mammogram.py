@@ -1,6 +1,5 @@
 import re
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -14,17 +13,12 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestRecordingAMammogram(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
-        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
-
     def test_recording_a_mammogram_without_capturing_medical_information(self):
         """
         I can record a mammogram without entering any relevant medical information.
         """
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_the_demographic_banner()
         self.and_i_should_see_the_participant_details()
@@ -41,6 +35,7 @@ class TestRecordingAMammogram(SystemTestCase):
         I can optionally capture medical information as part of the mammogram appointment.
         """
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
 
         self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
@@ -59,6 +54,7 @@ class TestRecordingAMammogram(SystemTestCase):
         then I should see the errors so I can fix them.
         """
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_submit_the_form()
         self.then_i_am_prompted_to_answer_can_the_screening_go_ahead()
@@ -77,6 +73,7 @@ class TestRecordingAMammogram(SystemTestCase):
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
 
@@ -88,6 +85,14 @@ class TestRecordingAMammogram(SystemTestCase):
 
         self.when_i_mark_that_imaging_can_go_ahead()
         self.then_the_accessibility_baseline_is_met()
+
+    def and_there_is_an_appointment(self):
+        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+        )
 
     def and_i_am_on_the_appointment_show_page(self):
         self.page.goto(
