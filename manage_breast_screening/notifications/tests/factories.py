@@ -34,6 +34,7 @@ class AppointmentFactory(DjangoModelFactory):
     episode_type = "S"
     episode_started_at = datetime.now(tz=TZ_INFO) - timedelta(weeks=5, days=5)
     assessment = False
+    number = "1"
 
 
 class MessageFactory(DjangoModelFactory):

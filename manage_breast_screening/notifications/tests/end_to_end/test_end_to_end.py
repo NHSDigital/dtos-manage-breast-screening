@@ -80,6 +80,7 @@ class TestEndToEnd(TestCase):
             episode_type__in=["F", "G", "R", "S"],
             starts_at__lte=datetime.now() + timedelta(weeks=4),
             status="B",
+            number="1",
         )
 
         appointment_date = datetime.now() + timedelta(days=2)

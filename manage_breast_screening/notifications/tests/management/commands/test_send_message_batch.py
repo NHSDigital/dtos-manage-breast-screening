@@ -228,6 +228,24 @@ class TestSendMessageBatch:
 
         mock_send_message_batch.assert_not_called()
 
+    def test_handle_with_non_first_time_appointment(
+        self,
+        mock_mark_batch_as_sent,
+        mock_send_message_batch,
+        monkeypatch,
+    ):
+        """Test that appointments with date inside the schedule period are notified"""
+        AppointmentFactory(
+            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4),
+            number="2",
+        )
+
+        Command().handle()
+
+        assert MessageBatch.objects.count() == 0
+        assert Message.objects.count() == 0
+        mock_mark_batch_as_sent.assert_not_called()
+
     def test_handle_with_error(self, mock_mark_batch_as_sent, mock_send_message_batch):
         """Test that errors are caught and raised as CommandErrors"""
         with patch.object(RoutingPlan, "all", side_effect=Exception("Nooooo!")):
