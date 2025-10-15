@@ -49,6 +49,9 @@ ENV CONTAINER_USER=appuser \
     CONTAINER_UID=31337 \
     CONTAINER_GID=31337
 
+ARG COMMIT_SHA
+ENV COMMIT_SHA=$COMMIT_SHA
+
 RUN addgroup --gid ${CONTAINER_GID} --system ${CONTAINER_GROUP} \
     && adduser --uid ${CONTAINER_UID} --system ${CONTAINER_USER} --ingroup ${CONTAINER_GROUP}
 
@@ -62,6 +65,8 @@ COPY --from=python_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ${VIRTUA
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ./manage_breast_screening /app/manage_breast_screening
 COPY --from=node_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} /app/manage_breast_screening/assets/compiled /app/manage_breast_screening/assets/compiled
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} manage.py ./
+
+
 
 # Run django commands
 ENV DEBUG=0

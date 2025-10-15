@@ -31,6 +31,11 @@ on:
         description: 'Version of the software, set by the CI/CD pipeline workflow'
         required: true
         type: string
+      commit_sha:
+        description: 'commit sha of the docker image'
+        required: true
+        type: string
+
 
 env:
   REGISTRY: ghcr.io
@@ -70,6 +75,8 @@ jobs:
             type=raw,value=${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || '' }}
             type=sha,format=long,prefix=git-sha-
 
+      - name: Print commit SHA
+        run: echo "Commit SHA is ${{ inputs.commit_sha }}"
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
@@ -78,6 +85,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            COMMIT_SHA=${{ inputs.commit_sha }}
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3
