@@ -1,6 +1,5 @@
 import re
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -14,14 +13,9 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestEthnicityDetailsForm(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        self.participant = ParticipantFactory(ethnic_background_id="")
-        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
-
     def test_entering_ethnicity_details_for_a_participant(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_viewing_an_appointment()
         self.when_i_click_on_enter_ethnicity_details()
         self.then_i_am_on_the_ethnicity_details_form()
@@ -50,6 +44,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
 
     def test_entering_ethnicity_description_provided_by_the_participant(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_viewing_an_appointment()
         self.when_i_click_on_enter_ethnicity_details()
         self.then_i_am_on_the_ethnicity_details_form()
@@ -69,6 +64,14 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
         self.and_the_ethnicity_is_updated_to(
             "Asian or Asian British (any other Asian background)"
+        )
+
+    def and_there_is_an_appointment(self):
+        self.participant = ParticipantFactory(ethnic_background_id="")
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
         )
 
     def and_i_am_viewing_an_appointment(self):
