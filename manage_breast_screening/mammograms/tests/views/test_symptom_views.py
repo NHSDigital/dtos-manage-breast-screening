@@ -11,18 +11,27 @@ from manage_breast_screening.participants.models.symptom import (
     Symptom,
     SymptomAreas,
 )
-from manage_breast_screening.participants.tests.factories import SymptomFactory
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    SymptomFactory,
+)
 
 
 @pytest.fixture
-def lump(appointment):
+def lump(clinical_user_client):
+    appointment = AppointmentFactory.create(
+        clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    )
     return SymptomFactory.create(appointment=appointment, lump=True)
 
 
 @pytest.mark.django_db
 class TestAddLumpView:
-    def test_renders_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_lump",
                 kwargs={"pk": appointment.pk},
@@ -30,10 +39,11 @@ class TestAddLumpView:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment
-    ):
-        response = clinical_user_client.post(
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_lump",
                 kwargs={"pk": appointment.pk},
@@ -53,10 +63,11 @@ class TestAddLumpView:
             ),
         )
 
-    def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, appointment
-    ):
-        response = clinical_user_client.post(
+    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_lump",
                 kwargs={"pk": appointment.pk},
@@ -84,28 +95,32 @@ class TestAddLumpView:
 @pytest.mark.django_db
 class TestChangeLumpView:
     @pytest.fixture
-    def lump(self, appointment):
+    def lump(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
         return SymptomFactory.create(lump=True, appointment=appointment)
 
-    def test_renders_response(self, clinical_user_client, appointment, lump):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client, lump):
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_lump",
-                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+                kwargs={"pk": lump.appointment.pk, "symptom_pk": lump.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_non_existant_or_deleted_symptom_id_is_a_404(
-        self, clinical_user_client, appointment
-    ):
+    def test_non_existant_or_deleted_symptom_id_is_a_404(self, clinical_user_client):
         """
         Note: the behaviour we probably want here is to redirect back to
         the "parent page" when a child entity is not found, and use flash
         messages to explain the error. However, none of this is
         implemented yet.
         """
-        response = clinical_user_client.get(
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_lump",
                 kwargs={
@@ -117,12 +132,13 @@ class TestChangeLumpView:
 
         assert response.status_code == 404
 
-    def test_different_type_of_symptom_is_a_404(
-        self, clinical_user_client, appointment
-    ):
+    def test_different_type_of_symptom_is_a_404(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
         SymptomFactory.create(colour_change=True, appointment=appointment)
 
-        response = clinical_user_client.get(
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_lump",
                 kwargs={
@@ -134,13 +150,11 @@ class TestChangeLumpView:
 
         assert response.status_code == 404
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, lump
-    ):
-        response = clinical_user_client.post(
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client, lump):
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_symptom_lump",
-                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+                kwargs={"pk": lump.appointment.pk, "symptom_pk": lump.pk},
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -153,17 +167,17 @@ class TestChangeLumpView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": lump.appointment.pk},
             ),
         )
 
     def test_invvalid_post_renders_response_with_errors(
-        self, clinical_user_client, appointment, lump
+        self, clinical_user_client, lump
     ):
-        response = clinical_user_client.post(
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_symptom_lump",
-                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+                kwargs={"pk": lump.appointment.pk, "symptom_pk": lump.pk},
             ),
             {},
         )
@@ -187,8 +201,11 @@ class TestChangeLumpView:
 
 @pytest.mark.django_db
 class TestAddSkinChangeView:
-    def test_renders_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_skin_change",
                 kwargs={"pk": appointment.pk},
@@ -196,10 +213,11 @@ class TestAddSkinChangeView:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment
-    ):
-        response = clinical_user_client.post(
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_skin_change",
                 kwargs={"pk": appointment.pk},
@@ -224,25 +242,34 @@ class TestAddSkinChangeView:
 @pytest.mark.django_db
 class TestChangeSkinChangeView:
     @pytest.fixture
-    def colour_change(self, appointment):
+    def colour_change(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
         return SymptomFactory.create(colour_change=True, appointment=appointment)
 
-    def test_renders_response(self, clinical_user_client, appointment, colour_change):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client, colour_change):
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_skin_change",
-                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+                kwargs={
+                    "pk": colour_change.appointment.pk,
+                    "symptom_pk": colour_change.pk,
+                },
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, colour_change
+        self, clinical_user_client, colour_change
     ):
-        response = clinical_user_client.post(
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_symptom_skin_change",
-                kwargs={"pk": appointment.pk, "symptom_pk": colour_change.pk},
+                kwargs={
+                    "pk": colour_change.appointment.pk,
+                    "symptom_pk": colour_change.pk,
+                },
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -256,15 +283,18 @@ class TestChangeSkinChangeView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": colour_change.appointment.pk},
             ),
         )
 
 
 @pytest.mark.django_db
 class TestAddNippleChangeView:
-    def test_renders_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_nipple_change",
                 kwargs={"pk": appointment.pk},
@@ -272,10 +302,11 @@ class TestAddNippleChangeView:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment
-    ):
-        response = clinical_user_client.post(
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_nipple_change",
                 kwargs={"pk": appointment.pk},
@@ -299,25 +330,26 @@ class TestAddNippleChangeView:
 @pytest.mark.django_db
 class TestChangeNippleChangeView:
     @pytest.fixture
-    def inversion(self, appointment):
+    def inversion(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
         return SymptomFactory.create(inversion=True, appointment=appointment)
 
-    def test_renders_response(self, clinical_user_client, appointment, inversion):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client, inversion):
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_nipple_change",
-                kwargs={"pk": appointment.pk, "symptom_pk": inversion.pk},
+                kwargs={"pk": inversion.appointment.pk, "symptom_pk": inversion.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, inversion
-    ):
-        response = clinical_user_client.post(
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client, inversion):
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_symptom_nipple_change",
-                kwargs={"pk": appointment.pk, "symptom_pk": inversion.pk},
+                kwargs={"pk": inversion.appointment.pk, "symptom_pk": inversion.pk},
             ),
             {
                 "area": [SymptomAreas.RIGHT_BREAST.value],
@@ -330,15 +362,18 @@ class TestChangeNippleChangeView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": inversion.appointment.pk},
             ),
         )
 
 
 @pytest.mark.django_db
 class TestAddOtherSymptomView:
-    def test_renders_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_other",
                 kwargs={"pk": appointment.pk},
@@ -346,10 +381,11 @@ class TestAddOtherSymptomView:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment
-    ):
-        response = clinical_user_client.post(
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_other",
                 kwargs={"pk": appointment.pk},
@@ -374,25 +410,34 @@ class TestAddOtherSymptomView:
 @pytest.mark.django_db
 class TestChangeOtherSymptomView:
     @pytest.fixture
-    def other_symptom(self, appointment):
+    def other_symptom(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
         return SymptomFactory.create(other=True, appointment=appointment)
 
-    def test_renders_response(self, clinical_user_client, appointment, other_symptom):
-        response = clinical_user_client.get(
+    def test_renders_response(self, clinical_user_client, other_symptom):
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_other",
-                kwargs={"pk": appointment.pk, "symptom_pk": other_symptom.pk},
+                kwargs={
+                    "pk": other_symptom.appointment.pk,
+                    "symptom_pk": other_symptom.pk,
+                },
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, other_symptom
+        self, clinical_user_client, other_symptom
     ):
-        response = clinical_user_client.post(
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_symptom_other",
-                kwargs={"pk": appointment.pk, "symptom_pk": other_symptom.pk},
+                kwargs={
+                    "pk": other_symptom.appointment.pk,
+                    "symptom_pk": other_symptom.pk,
+                },
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -406,36 +451,36 @@ class TestChangeOtherSymptomView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": other_symptom.appointment.pk},
             ),
         )
 
 
 @pytest.mark.django_db
 class TestDeleteSymptomView:
-    def test_get_renders_response(self, clinical_user_client, appointment, lump):
-        response = clinical_user_client.get(
+    def test_get_renders_response(self, clinical_user_client, lump):
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:delete_symptom",
-                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+                kwargs={"pk": lump.appointment.pk, "symptom_pk": lump.pk},
             )
         )
         assert response.status_code == 200
 
     def test_post_redirects_to_record_medical_information(
-        self, clinical_user_client, appointment, lump
+        self, clinical_user_client, lump
     ):
-        response = clinical_user_client.post(
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:delete_symptom",
-                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+                kwargs={"pk": lump.appointment.pk, "symptom_pk": lump.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": lump.appointment.pk},
             ),
         )
         assertMessages(
@@ -443,11 +488,11 @@ class TestDeleteSymptomView:
             [messages.Message(level=messages.SUCCESS, message="Symptom deleted")],
         )
 
-    def test_the_symptom_is_deleted(self, clinical_user_client, appointment, lump):
-        clinical_user_client.post(
+    def test_the_symptom_is_deleted(self, clinical_user_client, lump):
+        clinical_user_client.http.post(
             reverse(
                 "mammograms:delete_symptom",
-                kwargs={"pk": appointment.pk, "symptom_pk": lump.pk},
+                kwargs={"pk": lump.appointment.pk, "symptom_pk": lump.pk},
             )
         )
 

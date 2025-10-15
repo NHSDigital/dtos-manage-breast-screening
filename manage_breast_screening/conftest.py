@@ -1,3 +1,4 @@
+from types import SimpleNamespace
 from unittest import TestCase
 
 import pytest
@@ -37,7 +38,7 @@ def clinical_user_client(clinical_user):
     session = client.session
     session["current_provider"] = str(provider.pk)
     session.save()
-    return client
+    return SimpleNamespace(http=client, current_provider=provider, user=clinical_user)
 
 
 @pytest.fixture
@@ -48,4 +49,6 @@ def administrative_user_client(administrative_user):
     session = client.session
     session["current_provider"] = str(provider.pk)
     session.save()
-    return client
+    return SimpleNamespace(
+        http=client, current_provider=provider, user=administrative_user
+    )
