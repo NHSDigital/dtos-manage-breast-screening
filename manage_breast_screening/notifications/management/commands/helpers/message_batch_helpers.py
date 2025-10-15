@@ -12,6 +12,9 @@ from manage_breast_screening.notifications.models import (
     MessageBatchStatusChoices,
     MessageStatusChoices,
 )
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.queue import Queue
 
 logger = logging.getLogger(__name__)
@@ -54,11 +57,14 @@ class MessageBatchHelpers:
     def mark_batch_as_failed(
         message_batch: MessageBatch, response: Response, retry_count: int = 0
     ):
-        logger.info(
-            "Marking batch %s as failed. Response code: %s. Response: %s",
+        log_msg = "Marking batch %s as failed. Response code: %s. Response: %s" % (
             message_batch.id,
             response.status_code,
             response.text,
+        )
+        ApplicationInsightsLogging().custom_event(
+            message=log_msg,
+            event_name="batch_marked_as_failed",
         )
 
         try:
