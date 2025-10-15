@@ -150,6 +150,15 @@ variable "enable_alerting" {
   default     = false
 }
 
+variable "api_oauth_token_url" {
+  description = "API OAuth provider endpoint URL used to obtain bearer token for NHS Notify API requests"
+  type        = string
+}
+
+variable "nhs_notify_api_message_batch_url" {
+  description = "NHS Notify API endpoint URL for making message batch requests"
+  type        = string
+}
 
 locals {
   region = "uksouth"
