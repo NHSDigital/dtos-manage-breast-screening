@@ -101,5 +101,5 @@ class NhsMail:
 
     def _aggregate_report_body_text(self) -> str:
         return f"""Hello \n
-                Please find daily report attached. \n
+                Please find daily aggregate report attached. \n
                 For any questions please email {self._sender_email}"""

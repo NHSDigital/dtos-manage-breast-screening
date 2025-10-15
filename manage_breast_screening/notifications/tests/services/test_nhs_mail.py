@@ -91,7 +91,7 @@ class TestNhsMail:
             in decoded_subject_line
         )
         assert "Please find invites not sent report attached." not in email_content
-        assert "Please find daily report attached." in email_content
+        assert "Please find daily aggregate report attached." in email_content
         assert "filename.csv" in email_content
         decoded_attachment_data = base64.b64encode(csv_data.encode("utf-8")).decode(
             "utf-8"
