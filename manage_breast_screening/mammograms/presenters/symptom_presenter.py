@@ -44,6 +44,29 @@ class SymptomPresenter:
         # fmt: on
 
     @property
+    def type_name(self):
+        """
+        A way of refering to the specific symptom type
+        """
+        if self._symptom.symptom_type_id == SymptomType.OTHER:
+            return "other symptom"
+        else:
+            return self._symptom.symptom_type.name.lower()
+
+    @property
+    def name(self):
+        """
+        A way of referring to a symptom within a sentence
+        """
+        result = self.type_name
+
+        if self.change_type_line:
+            details = self.change_type_line[0].lower() + self.change_type_line[1:]
+            result += f" ({details})"
+
+        return result
+
+    @property
     def started_line(self):
         match self._symptom.when_started:
             case RelativeDateChoices.SINCE_A_SPECIFIC_DATE:
