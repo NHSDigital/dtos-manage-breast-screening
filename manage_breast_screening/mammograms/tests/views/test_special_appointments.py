@@ -7,12 +7,16 @@ from manage_breast_screening.mammograms.tests.forms.test_special_appointment_for
     SupportReasons,
     TemporaryChoices,
 )
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 @pytest.mark.django_db
 class TestProvideDetails:
-    def test_get_renders_a_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.get(
+    def test_get_renders_a_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -21,9 +25,12 @@ class TestProvideDetails:
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment_if_no_temporary_reasons(
-        self, clinical_user_client, appointment
+        self, clinical_user_client
     ):
-        response = clinical_user_client.post(
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -43,9 +50,12 @@ class TestProvideDetails:
         )
 
     def test_valid_post_redirects_to_appointment_if_one_temporary_reason(
-        self, clinical_user_client, appointment
+        self, clinical_user_client
     ):
-        response = clinical_user_client.post(
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -64,10 +74,11 @@ class TestProvideDetails:
             ),
         )
 
-    def test_valid_post_creates_an_audit_record(
-        self, clinical_user_client, appointment
-    ):
-        clinical_user_client.post(
+    def test_valid_post_creates_an_audit_record(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        clinical_user_client.http.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -87,9 +98,12 @@ class TestProvideDetails:
         )
 
     def test_valid_post_redirects_to_next_step_if_some_temporary_reasons(
-        self, clinical_user_client, appointment
+        self, clinical_user_client
     ):
-        response = clinical_user_client.post(
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -113,9 +127,12 @@ class TestProvideDetails:
         )
 
     def test_invalid_post_to_provide_details_page_renders_response(
-        self, clinical_user_client, appointment
+        self, clinical_user_client
     ):
-        response = clinical_user_client.post(
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:provide_special_appointment_details",
                 kwargs={"pk": appointment.pk},
@@ -127,8 +144,11 @@ class TestProvideDetails:
 
 @pytest.mark.django_db
 class TestMarkTemporary:
-    def test_get_renders_a_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.get(
+    def test_get_renders_a_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
             reverse(
                 "mammograms:mark_reasons_temporary",
                 kwargs={"pk": appointment.pk},
@@ -137,10 +157,13 @@ class TestMarkTemporary:
         assert response.status_code == 200
 
     @pytest.fixture
-    def appointment_with_selected_reasons(self, appointment):
+    def appointment_with_selected_reasons(self, clinical_user_client):
         """
         Emulate the state of the appointment after the first form has been completed
         """
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
         participant = appointment.participant
         participant.extra_needs = {
             SupportReasons.MEDICAL_DEVICES: {"details": "abc"},
@@ -152,7 +175,7 @@ class TestMarkTemporary:
     def test_valid_post_redirects_to_appointment(
         self, clinical_user_client, appointment_with_selected_reasons
     ):
-        response = clinical_user_client.post(
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_reasons_temporary",
                 kwargs={"pk": appointment_with_selected_reasons.pk},
@@ -172,7 +195,7 @@ class TestMarkTemporary:
     def test_valid_post_creates_an_audit_record(
         self, clinical_user_client, appointment_with_selected_reasons
     ):
-        clinical_user_client.post(
+        clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_reasons_temporary",
                 kwargs={"pk": appointment_with_selected_reasons.pk},
@@ -190,8 +213,11 @@ class TestMarkTemporary:
             == 1
         )
 
-    def test_invalid_post_renders_response(self, clinical_user_client, appointment):
-        response = clinical_user_client.post(
+    def test_invalid_post_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_reasons_temporary",
                 kwargs={"pk": appointment.pk},
