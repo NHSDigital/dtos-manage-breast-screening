@@ -78,6 +78,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         UserAssignmentFactory.create(user=user, roles=[role.value])
 
         self.current_user = user
+        self.current_provider = user.assignments.first().provider
         self.login_as_user(user)
 
     def expect_validation_error(

@@ -1,6 +1,5 @@
 import re
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -15,14 +14,9 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        self.participant = ParticipantFactory()
-        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
-
     def test_user_submits_cannot_go_ahead_form(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_cannot_go_ahead_form()
         self.when_i_submit_the_form()
         self.then_i_should_see_validation_errors()
@@ -40,8 +34,17 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_cannot_go_ahead_form()
         self.then_the_accessibility_baseline_is_met()
+
+    def and_there_is_an_appointment(self):
+        self.participant = ParticipantFactory()
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+        )
 
     def and_i_am_on_the_cannot_go_ahead_form(self):
         self.page.goto(
