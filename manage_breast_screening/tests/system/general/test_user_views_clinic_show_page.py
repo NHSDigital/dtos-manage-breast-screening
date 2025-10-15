@@ -1,5 +1,6 @@
 import re
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 import pytest
 from django.urls import reverse
@@ -71,31 +72,36 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         )
 
     def and_there_are_appointments(self):
+        tzinfo = ZoneInfo("Europe/London")
         self.confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now(timezone.utc).replace(hour=9, minute=0),
+            clinic_slot__starts_at=datetime.now().replace(
+                hour=9, minute=0, tzinfo=tzinfo
+            ),
             current_status=AppointmentStatus.CONFIRMED,
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Confirmed",
         )
         self.another_confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now(timezone.utc).replace(hour=9, minute=0),
+            clinic_slot__starts_at=datetime.now(timezone.utc).replace(
+                hour=9, minute=0, tzinfo=tzinfo
+            ),
             screening_episode__participant__first_name="Also",
             screening_episode__participant__last_name="Confirmed",
             current_status=AppointmentStatus.CONFIRMED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now(timezone.utc).replace(
-                hour=9, minute=30
+            clinic_slot__starts_at=datetime.now().replace(
+                hour=9, minute=30, tzinfo=tzinfo
             ),
             current_status=AppointmentStatus.CHECKED_IN,
         )
         self.screened_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now(timezone.utc).replace(
-                hour=10, minute=45
+            clinic_slot__starts_at=datetime.now().replace(
+                hour=10, minute=45, tzinfo=tzinfo
             ),
             current_status=AppointmentStatus.SCREENED,
         )

@@ -163,6 +163,7 @@ DATABASES = {
         "HOST": environ.get("DATABASE_HOST", ""),
         "PORT": environ.get("DATABASE_PORT", "5432"),
         "OPTIONS": {"sslmode": environ.get("DATABASE_SSLMODE", "prefer")},
+        "TIME_ZONE": "Europe/London",
     }
 }
 
