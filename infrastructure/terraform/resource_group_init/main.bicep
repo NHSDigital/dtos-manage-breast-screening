@@ -13,7 +13,7 @@ var hubMap = {
   review:               'dev'
   nft:                  'dev'
   preprod:              'prod'
-  prd:                  'prod'
+  production:           'prod'
 }
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
 var privateDNSZoneRGName = 'rg-hub-${hubMap[envConfig]}-uks-private-dns-zones'
