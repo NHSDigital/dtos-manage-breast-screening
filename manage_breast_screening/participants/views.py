@@ -38,11 +38,10 @@ def show(request, pk):
     presented_participant = ParticipantPresenter(participant)
 
     appointment_repo = AppointmentRepository(request.current_provider)
-    # TODO: review if these queries should be encapsulated in the repository
     appointments = (
-        appointment_repo.select_related("clinic_slot__clinic__setting")
-        .filter(screening_episode__participant=participant)
-        .order_by("-clinic_slot__starts_at")
+        appointment_repo.for_participant(participant)
+        .with_setting()
+        .ordered_by_clinic_slot_starts_at(descending=True)
         .all()
     )
 

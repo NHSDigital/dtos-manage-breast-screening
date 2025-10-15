@@ -35,6 +35,7 @@ class TestParticipantRecord(SystemTestCase):
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_an_administrative_user()
+        self.and_the_participant_has_an_upcoming_appointment()
         self.and_i_am_on_the_participant_record_page()
         self.then_the_accessibility_baseline_is_met()
 
@@ -56,19 +57,23 @@ class TestParticipantRecord(SystemTestCase):
 
     def and_the_participant_has_an_upcoming_appointment(self):
         clinic_slot = ClinicSlotFactory(
-            starts_at=datetime(2025, 1, 2, 11, tzinfo=tz.utc)
+            starts_at=datetime(2025, 1, 2, 11, tzinfo=tz.utc),
+            clinic__setting__provider=self.current_provider,
         )
         screening_episode = ScreeningEpisodeFactory(participant=self.participant)
         self.upcoming_appointment = AppointmentFactory(
-            clinic_slot=clinic_slot, screening_episode=screening_episode
+            clinic_slot=clinic_slot,
+            screening_episode=screening_episode,
         )
 
     def and_the_participant_has_past_appointments(self):
         clinic_slot_2022 = ClinicSlotFactory(
-            starts_at=datetime(2022, 1, 2, 11, tzinfo=tz.utc)
+            starts_at=datetime(2022, 1, 2, 11, tzinfo=tz.utc),
+            clinic__setting__provider=self.current_provider,
         )
         clinic_slot_2019 = ClinicSlotFactory(
-            starts_at=datetime(2019, 1, 2, 11, tzinfo=tz.utc)
+            starts_at=datetime(2019, 1, 2, 11, tzinfo=tz.utc),
+            clinic__setting__provider=self.current_provider,
         )
         self.past_appointments = [
             AppointmentFactory(

@@ -91,14 +91,18 @@ class TestRecordingSymptoms(SystemTestCase):
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
-        self.provider = self.appointment.provider
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+        )
 
     def and_there_is_an_appointment_with_a_symptom_added_in_the_last_three_months(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(screening_episode=self.screening_episode)
-        self.provider = self.appointment.provider
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+        )
         self.symptom = SymptomFactory(
             appointment=self.appointment,
             swelling_or_shape_change=True,
