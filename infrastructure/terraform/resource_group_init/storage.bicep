@@ -3,6 +3,8 @@ param storageName string
 param enableSoftDelete bool
 param miPrincipalID string
 param miName string
+param userGroupPrincipalID string
+param userGroupName string
 
 // Create storage account without public access
 resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' = {
@@ -64,6 +66,17 @@ resource blobContributorAssignment 'Microsoft.Authorization/roleAssignments@2022
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.blobContributor)
     principalId: miPrincipalID
     description: '${miName} Network Contributor access to subscription'
+  }
+}
+
+// Let the Entra ID group edit the terraform state
+resource groupBlobContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(userGroupPrincipalID)) {
+  name: guid(subscription().subscriptionId, userGroupPrincipalID, 'blobContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.blobContributor)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} Blob Contributor access to subscription'
   }
 }
 

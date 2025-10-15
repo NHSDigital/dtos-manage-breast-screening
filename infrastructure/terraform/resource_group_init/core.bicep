@@ -4,11 +4,16 @@ targetScope='subscription'
 param miPrincipalId string
 @minLength(1)
 param miName string
+@minLength(1)
+param userGroupPrincipalID string
+@minLength(1)
+param userGroupName string
 
 // See: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 var roleID = {
   contributor: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
   kvSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
+  kvSecretsOfficer: 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
   rbacAdmin: 'f58310d9-a9f6-439a-9e8d-f62e7b41a168'
   storageBlobDataContributor: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
   storageQueueDataContributor: '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
@@ -43,5 +48,28 @@ resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01
     condition: '((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/write\'})) OR (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}, ${roleID.storageBlobDataContributor}, ${roleID.storageQueueDataContributor}})) AND ((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/delete\'})) OR (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}, ${roleID.storageBlobDataContributor}, ${roleID.storageQueueDataContributor}}))'
     conditionVersion: '2.0'
     description: '${miName} Role Based Access Control Administrator access to subscription. Can assign Key Vault Secrets User, Storage Blob Data Contributor, and Storage Queue Data Contributor roles.'
+  }
+}
+
+// Entra ID Group RBAC assignments - mirroring the managed identity permissions (excluding RBAC Admin)
+// Let the Entra ID group configure resources in the subscription
+resource groupContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, userGroupPrincipalID, 'contributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.contributor)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} Contributor access to subscription'
+  }
+}
+
+// Let the Entra ID group manage key vault secrets
+resource groupKvSecretsOfficerAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, userGroupPrincipalID, 'kvSecretsOfficer')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.kvSecretsOfficer)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} Key Vault Secrets Officer access to subscription'
   }
 }

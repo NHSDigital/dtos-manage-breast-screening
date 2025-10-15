@@ -87,6 +87,7 @@ variable "log_analytics_workspace_id" {
 variable "deploy_database_as_container" {
   description = "Whether to deploy the database as a container or as an Azure postgres flexible server."
   type        = bool
+  default     = false
 }
 
 variable "nhs_notify_api_message_batch_url" {
@@ -241,7 +242,7 @@ locals {
   }
   storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
 
-  always_allowed_paths = ["/sha"]
+  always_allowed_paths = ["/sha", "/healthcheck"]
   # If allowed_paths is not set, use the module default which allows any pattern
   # If it is set, include the default paths
   patterns_to_match = (var.allowed_paths == null ? null :
