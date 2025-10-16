@@ -1,4 +1,4 @@
-from django.contrib.messages import INFO, SUCCESS, get_messages
+from django.contrib.messages import INFO, SUCCESS, WARNING, get_messages
 from django.urls import reverse
 from django.utils.html import conditional_escape as django_html_escape
 from django.utils.safestring import SafeData, SafeString, mark_safe
@@ -85,39 +85,33 @@ def message_with_heading(heading: str, html=None) -> SafeString:
         return heading_tag
 
 
-def info_banner(request, disable_auto_focus=True):
-    info_messages = [
-        message for message in get_messages(request) if message.level == INFO
-    ]
-    if not info_messages:
+def get_notification_banner_params(
+    request, message_type="info", disable_auto_focus=True
+):
+    levels = {"info": INFO, "warning": WARNING, "success": SUCCESS}
+    try:
+        level = levels[message_type]
+    except KeyError:
+        raise ValueError(
+            f"message_type must be one of {{info, warning, success}}; got {message_type}"
+        )
+
+    messages = [message for message in get_messages(request) if message.level == level]
+    if not messages:
         return None
 
-    info_message = info_messages[0].message
-    if _is_safe_message(info_message):
-        return {"html": Markup(info_message), "disableAutoFocus": disable_auto_focus}
-    else:
-        return {"text": info_message, "disableAutoFocus": disable_auto_focus}
+    message = messages[0].message
 
-
-def success_banner(request, disable_auto_focus=True):
-    success_messages = [
-        message for message in get_messages(request) if message.level == SUCCESS
-    ]
-    if not success_messages:
-        return None
-
-    success_message = success_messages[0].message
-
-    if _is_safe_message(success_message):
+    if _is_safe_message(message):
         return {
-            "html": Markup(success_message),
-            "type": "success",
+            "html": Markup(message),
+            "type": message_type,
             "disableAutoFocus": disable_auto_focus,
         }
     else:
         return {
-            "text": success_message,
-            "type": "success",
+            "text": message,
+            "type": message_type,
             "disableAutoFocus": disable_auto_focus,
         }
 

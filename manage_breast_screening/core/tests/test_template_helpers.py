@@ -1,6 +1,6 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.messages import INFO, SUCCESS
+from django.contrib.messages import ERROR, INFO, SUCCESS, WARNING
 from django.contrib.messages.storage.base import Message
 from django.test import RequestFactory
 from django.utils.safestring import mark_safe
@@ -10,10 +10,9 @@ from pytest_django.asserts import assertHTMLEqual
 from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.core.template_helpers import (
+    get_notification_banner_params,
     header_account_items,
-    info_banner,
     message_with_heading,
-    success_banner,
 )
 
 
@@ -74,16 +73,39 @@ class TestNotificationBannerParamsForStringMessages:
         request._messages = [
             Message(message="abc", level=INFO),
             Message(message="def", level=SUCCESS),
+            Message(message="warning!", level=WARNING),
+            Message(message="error!!!", level=ERROR),
         ]
         return request
 
     def test_info_banner_with_text_message(self, dummy_request):
-        result = info_banner(dummy_request)
-        assert result == {"text": "abc", "disableAutoFocus": True}
+        result = get_notification_banner_params(dummy_request, "info")
+        assert result == {"text": "abc", "type": "info", "disableAutoFocus": True}
 
     def test_success_banner_with_text_message(self, dummy_request):
-        result = success_banner(dummy_request)
+        result = get_notification_banner_params(dummy_request, "success")
         assert result == {"text": "def", "type": "success", "disableAutoFocus": True}
+
+    def test_warning_banner_with_text_message(self, dummy_request):
+        result = get_notification_banner_params(dummy_request, "warning")
+        assert result == {
+            "text": "warning!",
+            "type": "warning",
+            "disableAutoFocus": True,
+        }
+
+    def test_invalid_message_type(self, dummy_request):
+        with pytest.raises(
+            ValueError,
+            match="message_type must be one of {info, warning, success}; got error",
+        ):
+            get_notification_banner_params(dummy_request, "error")
+
+    def test_autofocus_param(self, dummy_request):
+        result = get_notification_banner_params(
+            dummy_request, "info", disable_auto_focus=False
+        )
+        assert result == {"text": "abc", "type": "info", "disableAutoFocus": False}
 
 
 class TestNotificationBannerParamsForHTMLMessages:
@@ -97,11 +119,15 @@ class TestNotificationBannerParamsForHTMLMessages:
         return request
 
     def test_info_banner_with_html_message(self, dummy_request):
-        result = info_banner(dummy_request)
-        assert result == {"html": mark_safe("abc"), "disableAutoFocus": True}
+        result = get_notification_banner_params(dummy_request, "info")
+        assert result == {
+            "html": mark_safe("abc"),
+            "type": "info",
+            "disableAutoFocus": True,
+        }
 
     def test_success_banner_with_html_message(self, dummy_request):
-        result = success_banner(dummy_request)
+        result = get_notification_banner_params(dummy_request, "success")
         assert result == {
             "html": mark_safe("def"),
             "type": "success",
