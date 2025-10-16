@@ -2,6 +2,6 @@ ENV_CONFIG=review
 AZURE_SUBSCRIPTION="Digital Screening DToS - Core Services Dev"
 HUB_SUBSCRIPTION="Digital Screening DToS - DevOps"
 HUB=dev
-TERRAFORM_MODULES_REF=main
+TERRAFORM_MODULES_REF=DTOSS-11302-Manage-invite-application-insights-application-health-check
 ENABLE_SOFT_DELETE=false
 ADO_MANAGEMENT_POOL=private-pool-dev-uks
