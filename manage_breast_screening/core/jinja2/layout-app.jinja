@@ -45,18 +45,18 @@
       <p>Contact <a class="nhsuk-notification-banner__link" href="#">example@department.nhs.uk</a> if you think there's a problem.</p>
     {% endset %}
 
-    {% set info_notification = info_banner(request) %}
-    {% set success_notification = success_banner(request) %}
+    {% set info_notification_params = info_banner(request, disable_auto_focus=disable_auto_focus|default(true)) %}
+    {% set success_notification_params = success_banner(request, disable_auto_focus=disable_auto_focus|default(true)) %}
 
     {# Don't show a notification banner and an error summary component on the same page.
        We'll just show the error summary (in layout-form.jinja). #}
     {% if not form.errors %}
-      {% if success_notification %}
-        {{ notificationBanner(success_notification) }}
+      {% if success_notification_params %}
+        {{ notificationBanner(success_notification_params) }}
       {% endif %}
 
-      {% if info_notification %}
-        {{ notificationBanner(info_notification) }}
+      {% if info_notification_params %}
+        {{ notificationBanner(info_notification_params) }}
       {% endif %}
     {% endif %}
 

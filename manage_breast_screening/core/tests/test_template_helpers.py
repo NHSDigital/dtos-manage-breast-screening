@@ -79,11 +79,11 @@ class TestNotificationBannerParamsForStringMessages:
 
     def test_info_banner_with_text_message(self, dummy_request):
         result = info_banner(dummy_request)
-        assert result == {"text": "abc"}
+        assert result == {"text": "abc", "disableAutoFocus": True}
 
     def test_success_banner_with_text_message(self, dummy_request):
         result = success_banner(dummy_request)
-        assert result == {"text": "def", "type": "success"}
+        assert result == {"text": "def", "type": "success", "disableAutoFocus": True}
 
 
 class TestNotificationBannerParamsForHTMLMessages:
@@ -98,8 +98,12 @@ class TestNotificationBannerParamsForHTMLMessages:
 
     def test_info_banner_with_html_message(self, dummy_request):
         result = info_banner(dummy_request)
-        assert result == {"html": mark_safe("abc")}
+        assert result == {"html": mark_safe("abc"), "disableAutoFocus": True}
 
     def test_success_banner_with_html_message(self, dummy_request):
         result = success_banner(dummy_request)
-        assert result == {"html": mark_safe("def"), "type": "success"}
+        assert result == {
+            "html": mark_safe("def"),
+            "type": "success",
+            "disableAutoFocus": True,
+        }

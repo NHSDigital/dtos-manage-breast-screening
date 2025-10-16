@@ -50,7 +50,7 @@ def test_success_banner(jinja_env):
 
     assertInHTML(
         """
-        <div class="nhsuk-notification-banner nhsuk-notification-banner--success" role="alert" aria-labelledby="nhsuk-notification-banner-title" data-module="nhsuk-notification-banner">
+        <div class="nhsuk-notification-banner nhsuk-notification-banner--success" role="alert" aria-labelledby="nhsuk-notification-banner-title" data-module="nhsuk-notification-banner" data-disable-auto-focus="true">
             <div class="nhsuk-notification-banner__header">
                 <h2 class="nhsuk-notification-banner__title" id="nhsuk-notification-banner-title">Success</h2>
             </div>
@@ -80,7 +80,7 @@ def test_success_banner_with_html_message(jinja_env):
 
     assertInHTML(
         """
-        <div class="nhsuk-notification-banner nhsuk-notification-banner--success" role="alert" aria-labelledby="nhsuk-notification-banner-title" data-module="nhsuk-notification-banner">
+        <div class="nhsuk-notification-banner nhsuk-notification-banner--success" role="alert" aria-labelledby="nhsuk-notification-banner-title" data-module="nhsuk-notification-banner" data-disable-auto-focus="true">
             <div class="nhsuk-notification-banner__header">
                 <h2 class="nhsuk-notification-banner__title" id="nhsuk-notification-banner-title">Success</h2>
             </div>

@@ -85,7 +85,7 @@ def message_with_heading(heading: str, html=None) -> SafeString:
         return heading_tag
 
 
-def info_banner(request):
+def info_banner(request, disable_auto_focus=True):
     info_messages = [
         message for message in get_messages(request) if message.level == INFO
     ]
@@ -94,12 +94,12 @@ def info_banner(request):
 
     info_message = info_messages[0].message
     if _is_safe_message(info_message):
-        return {"html": Markup(info_message)}
+        return {"html": Markup(info_message), "disableAutoFocus": disable_auto_focus}
     else:
-        return {"text": info_message}
+        return {"text": info_message, "disableAutoFocus": disable_auto_focus}
 
 
-def success_banner(request):
+def success_banner(request, disable_auto_focus=True):
     success_messages = [
         message for message in get_messages(request) if message.level == SUCCESS
     ]
@@ -109,9 +109,17 @@ def success_banner(request):
     success_message = success_messages[0].message
 
     if _is_safe_message(success_message):
-        return {"html": Markup(success_message), "type": "success"}
+        return {
+            "html": Markup(success_message),
+            "type": "success",
+            "disableAutoFocus": disable_auto_focus,
+        }
     else:
-        return {"text": success_message, "type": "success"}
+        return {
+            "text": success_message,
+            "type": "success",
+            "disableAutoFocus": disable_auto_focus,
+        }
 
 
 def _user_name_and_role_item(user):
