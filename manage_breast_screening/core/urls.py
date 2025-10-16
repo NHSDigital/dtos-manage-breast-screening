@@ -22,9 +22,12 @@ from django.http import HttpResponse
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
+from manage_breast_screening.core.decorators import basic_auth_exempt
 
+
+@basic_auth_exempt
 @login_not_required
-def sha_view(reviews):
+def sha_view(requests):
   return HttpResponse(settings.COMMIT_SHA)
 
 urlpatterns = [
