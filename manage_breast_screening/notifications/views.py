@@ -14,10 +14,11 @@ from manage_breast_screening.notifications.validators.request_validator import (
 )
 
 
-@require_http_methods(["POST"])
+# The order of these decorators affects basic auth exemption
 @login_not_required
 @basic_auth_exempt
 @csrf_exempt
+@require_http_methods(["POST"])
 def create_message_status(request):
     valid, message = RequestValidator(request).valid()
 
