@@ -52,22 +52,17 @@
         disable_auto_focus=disable_auto_focus|default(true)
       ) %}
 
-    {# Don't show a notification banner and an error summary component on the same page.
-       We'll just show the error summary (in layout-form.jinja). #}
-    {% if not form.errors %}
-      {% if success_notification_params %}
-        {{ notificationBanner(success_notification_params) }}
-      {% endif %}
-
-      {% if info_notification_params %}
-        {{ notificationBanner(info_notification_params) }}
-      {% endif %}
-
-      {% if warning_notification_params %}
-        {{ notificationBanner(warning_notification_params) }}
-      {% endif %}
+    {% if success_notification_params %}
+      {{ notificationBanner(success_notification_params) }}
     {% endif %}
 
+    {% if info_notification_params %}
+      {{ notificationBanner(info_notification_params) }}
+    {% endif %}
+
+    {% if warning_notification_params %}
+      {{ notificationBanner(warning_notification_params) }}
+    {% endif %}
   {% endblock flash_messages %}
 
   {% block page_content %}
