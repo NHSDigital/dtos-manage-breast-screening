@@ -1,80 +1,56 @@
-{% extends 'layout-app.jinja' %}
+{% extends 'layout-form.jinja' %}
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'nhsuk/components/radios/macro.jinja' import radios %}
 {% from 'nhsuk/components/button/macro.jinja' import button %}
 {% from 'nhsuk/components/fieldset/macro.jinja' import fieldset %}
 
-{% from 'django_form_helpers.jinja' import form_error_summary %}
+{% block form %}
+  <input type="hidden" name="return_url" value="{{ back_link_params.href }}">
 
-{% block beforeContent %}
-  {{ backLink({
-    "href": back_link.href,
-    "text": back_link.text
-  }) }}
-{% endblock beforeContent %}
+  {% set hasErrors = form.errors %}
 
-{% block messages %}
-  {{ form_error_summary(form) }}
-{% endblock %}
-
-{% block page_content %}
-  <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-two-thirds">
-      <h1 class="nhsuk-heading-l">
-        {{ heading }}
-      </h1>
-
-      <form action="{{ request.path }}" method="POST">
-        {{ csrf_input }}
-        <input type="hidden" name="return_url" value="{{ back_link.href }}">
-
-        {% set hasErrors = form.errors %}
-
-        <div class="nhsuk-form-group {{"nhsuk-form-group--error" if hasErrors}}">
-          {% call fieldset({
-            "legend": {
-              "text": "How does " ~ participant.full_name ~ " describe their ethnicity?",
-              "classes": "nhsuk-fieldset__legend--m",
-              "isPageHeading": false
-            },
-            "attributes": {
-              "aria-describedby": form.ethnic_background_choice.auto_id
-            } if hasErrors else ""
-          }) %}
-            {% if hasErrors %}
-              <span class="nhsuk-error-message" id={{ form.ethnic_background_choice.auto_id }}>
-                <span class="nhsuk-u-visually-hidden">Error:</span> {{ form.ethnic_background_choice.errors.0 }}
-              </span>
-            {% endif %}
-            {% for ethnic_category, ethnic_backgrounds in form.ethnic_backgrounds_by_category() %}
-              <h2 class="nhsuk-fieldset__legend--s">{{ ethnic_category }}</h2>
-                {% set radio_items = [] %}
-                {% for ethnic_background in ethnic_backgrounds %}
-                  {% set conditional = {
-                      "html": form[ethnic_background.id + "_details"].as_field_group()
-                    } if ethnic_background.id in form.non_specific_ethnic_backgrounds() else {} %}
-                  {% do radio_items.append({
-                    "value": ethnic_background.id,
-                    "text": ethnic_background.display_name,
-                    "checked": form.ethnic_background_choice.value() == ethnic_background.id,
-                    "conditional": conditional,
-                  }) %}
-                {% endfor %}
-                {{ radios({
-                  "name": form.ethnic_background_choice.html_name,
-                  "items": radio_items,
-                  "idPrefix": ethnic_category | lower | replace(' ', '_'),
-                }) }}
-            {% endfor %}
-          {% endcall %}
-        </div>
-
-        <div class="nhsuk-form-group">
-          {{ button({
-            "text": "Save and continue"
+  <div class="nhsuk-form-group {{"nhsuk-form-group--error" if hasErrors}}">
+    {% call fieldset({
+      "legend": {
+        "text": "How does " ~ participant.full_name ~ " describe their ethnicity?",
+        "classes": "nhsuk-fieldset__legend--m",
+        "isPageHeading": false
+      },
+      "attributes": {
+        "aria-describedby": form.ethnic_background_choice.auto_id
+      } if hasErrors else ""
+    }) %}
+      {% if hasErrors %}
+        <span class="nhsuk-error-message" id={{ form.ethnic_background_choice.auto_id }}>
+          <span class="nhsuk-u-visually-hidden">Error:</span> {{ form.ethnic_background_choice.errors.0 }}
+        </span>
+      {% endif %}
+      {% for ethnic_category, ethnic_backgrounds in form.ethnic_backgrounds_by_category() %}
+        <h2 class="nhsuk-fieldset__legend--s">{{ ethnic_category }}</h2>
+          {% set radio_items = [] %}
+          {% for ethnic_background in ethnic_backgrounds %}
+            {% set conditional = {
+                "html": form[ethnic_background.id + "_details"].as_field_group()
+              } if ethnic_background.id in form.non_specific_ethnic_backgrounds() else {} %}
+            {% do radio_items.append({
+              "value": ethnic_background.id,
+              "text": ethnic_background.display_name,
+              "checked": form.ethnic_background_choice.value() == ethnic_background.id,
+              "conditional": conditional,
+            }) %}
+          {% endfor %}
+          {{ radios({
+            "name": form.ethnic_background_choice.html_name,
+            "items": radio_items,
+            "idPrefix": ethnic_category | lower | replace(' ', '_'),
           }) }}
-        </div>
-      </form>
-    </div>
+      {% endfor %}
+    {% endcall %}
   </div>
-{% endblock page_content %}
+
+  <div class="nhsuk-form-group">
+    {{ button({
+      "text": "Save and continue"
+    }) }}
+  </div>
+{% endblock form %}

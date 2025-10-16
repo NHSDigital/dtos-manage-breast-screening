@@ -5,6 +5,7 @@ from jinja2 import ChoiceLoader, Environment, PackageLoader
 
 from manage_breast_screening.core.template_helpers import (
     as_hint,
+    get_notification_banner_params,
     header_account_items,
     nl2br,
     no_wrap,
@@ -19,7 +20,7 @@ def autoescape(template_name):
     Going forwards, we want to use Django's default behaviour for autoescape.
     """
     if template_name is None:
-        return False
+        return True
     elif template_name.endswith("attributes.jinja"):
         return False
     else:
@@ -50,6 +51,7 @@ def environment(**options):
         {
             "STATIC_URL": settings.STATIC_URL,
             "header_account_items": header_account_items,
+            "get_notification_banner_params": get_notification_banner_params,
             "raise": raise_helper,
             "static": static,
             "url": reverse,

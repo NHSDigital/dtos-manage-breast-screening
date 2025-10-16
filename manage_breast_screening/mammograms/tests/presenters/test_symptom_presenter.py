@@ -89,6 +89,18 @@ class TestSymptomPresenter:
 
         assert SymptomPresenter(other_change).change_type_line == "Change type: abc"
 
+    def test_name(self):
+        lump = SymptomFactory.create(lump=True)
+        other_skin_change = SymptomFactory.create(
+            other_skin_change=True, symptom_sub_type_details="abc"
+        )
+        other = SymptomFactory.create(other=True, symptom_sub_type_details="abc")
+        assert SymptomPresenter(lump).name == "lump"
+        assert (
+            SymptomPresenter(other_skin_change).name == "skin change (change type: abc)"
+        )
+        assert SymptomPresenter(other).name == "other symptom (description: abc)"
+
     def test_formats_investigation_and_specific_date(self, time_machine):
         time_machine.move_to(date(2025, 9, 1))
 

@@ -440,7 +440,12 @@ class TestDeleteSymptomView:
         )
         assertMessages(
             response,
-            [messages.Message(level=messages.SUCCESS, message="Symptom deleted")],
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message='<h3 class="nhsuk-notification-banner__heading">Symptom deleted</h3><p>Deleted lump.</p>',
+                )
+            ],
         )
 
     def test_the_symptom_is_deleted(self, clinical_user_client, appointment, lump):
