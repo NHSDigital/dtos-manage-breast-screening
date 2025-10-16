@@ -17,6 +17,9 @@ from manage_breast_screening.notifications.models import (
     MessageBatch,
     MessageBatchStatusChoices,
 )
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.tests.factories import (
     MessageBatchFactory,
     MessageFactory,
@@ -27,6 +30,14 @@ class TestMessageBatchHelpers:
     @pytest.fixture
     def routing_plan_id(self):
         return str(uuid.uuid4())
+
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "custom_event", mock_insights_logger
+        )
+        return mock_insights_logger
 
     @pytest.mark.django_db
     def test_mark_messages_as_sent(self):
@@ -149,6 +160,30 @@ class TestMessageBatchHelpers:
             MessageBatchHelpers.mark_batch_as_failed(message_batch, mock_response, 1)
 
             mock_validation_method.assert_called_once_with(message_batch, 1)
+
+    @pytest.mark.django_db
+    def test_mark_batch_as_failed_calls_insights_logging(
+        self, mock_insights_logger, routing_plan_id
+    ):
+        mock_response = MagicMock()
+        mock_response.status_code = "401"
+        notify_errors = {"errors": [{"some-error": "details"}]}
+        mock_response.json.return_value = notify_errors
+        mock_response.text = "response text"
+        message_batch = MessageBatchFactory(routing_plan_id=routing_plan_id)
+
+        MessageBatchHelpers.mark_batch_as_failed(
+            message_batch, mock_response, retry_count=1
+        )
+
+        log_msg = "Marking batch %s as failed. Response code: %s. Response: %s" % (
+            message_batch.id,
+            "401",
+            "response text",
+        )
+        mock_insights_logger.assert_called_with(
+            message=log_msg, event_name="batch_marked_as_failed"
+        )
 
     @pytest.mark.django_db
     def test_remove_validation_errors(self, routing_plan_id):
