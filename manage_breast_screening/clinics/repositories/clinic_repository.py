@@ -15,25 +15,10 @@ class ClinicRepository(ProviderScopedRepository):
         return Clinic.objects.filter(setting__provider=self.provider)
 
     def by_filter(self, filter):
-        """
-        Get clinics filtered by status (today, upcoming, completed, all).
-
-        Args:
-            filter: One of the ClinicFilter enum values
-
-        Returns:
-            self: For method chaining
-        """
         self._queryset = self._queryset.by_filter(filter)
         return self
 
     def with_settings(self):
-        """
-        Apply prefetching for related settings.
-
-        Returns:
-            self: For method chaining
-        """
         self._queryset = self._queryset.prefetch_related("setting")
         return self
 

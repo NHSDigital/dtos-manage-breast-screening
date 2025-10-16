@@ -15,7 +15,6 @@ class ParticipantRepository(ProviderScopedRepository):
     model_class = Participant
 
     def _scoped_queryset(self):
-        """Return participants who have appointments with the current provider."""
         return Participant.objects.filter(
             screeningepisode__appointment__clinic_slot__clinic__setting__provider=self.provider
         ).distinct()
