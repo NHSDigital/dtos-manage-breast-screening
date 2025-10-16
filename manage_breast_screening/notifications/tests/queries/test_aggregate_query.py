@@ -5,7 +5,7 @@ import pytest
 from django.db import connection
 
 from manage_breast_screening.notifications.models import Clinic
-from manage_breast_screening.notifications.queries.aggregate_query import AggregateQuery
+from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     ChannelStatusFactory,
@@ -110,7 +110,7 @@ class TestAggregateQuery:
             self.create_appointment_set(*d)
 
         with connection.cursor() as cursor:
-            cursor.execute(AggregateQuery.sql(), ("1 month",))
+            cursor.execute(Helper.sql("aggregate"), ("1 month",))
             results = cursor.fetchall()
 
         for idx, res in enumerate(results):
@@ -131,7 +131,7 @@ class TestAggregateQuery:
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(AggregateQuery.sql(), ("1 week",))
+            cursor.execute(Helper.sql("aggregate"), ("1 week",))
             results = cursor.fetchall()
 
         assert len(results) == 1
@@ -162,7 +162,7 @@ class TestAggregateQuery:
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(AggregateQuery.sql(), ("1 month",))
+            cursor.execute(Helper.sql("aggregate"), ("1 month",))
             results = cursor.fetchall()
 
         assert list(results[0]) == [
@@ -188,7 +188,7 @@ class TestAggregateQuery:
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(AggregateQuery.sql(), ("1 month",))
+            cursor.execute(Helper.sql("aggregate"), ("1 month",))
             results = cursor.fetchall()
 
         assert list(results[0]) == [
@@ -204,8 +204,13 @@ class TestAggregateQuery:
             0,
         ]
 
+    @pytest.mark.django_db
     def test_aggregate_columns(self):
-        assert AggregateQuery.columns() == [
+        with connection.cursor() as cursor:
+            cursor.execute(Helper.sql("aggregate") + "\nLIMIT 0", ("1 month",))
+            columns = [col[0] for col in cursor.description]
+
+        assert columns == [
             "Appointment date",
             "BSO code",
             "Clinic code",

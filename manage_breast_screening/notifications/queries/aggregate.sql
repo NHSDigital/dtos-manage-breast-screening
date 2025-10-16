@@ -1,7 +1,7 @@
-SELECT  TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS appointment_date,
-        cl.bso_code AS bso_code,
-        cl.code AS clinic_code,
-        cl.name AS clinic_name,
+SELECT  TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS "Appointment date",
+        cl.bso_code AS "BSO code",
+        cl.code AS "Clinic code",
+        cl.name AS "Clinic name",
         CASE
           WHEN appt.episode_type = 'F' THEN 'Routine first call'
           WHEN appt.episode_type = 'G' THEN 'GP Referral'
@@ -10,12 +10,12 @@ SELECT  TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS appointment_date,
           WHEN appt.episode_type = 'R' THEN 'Routine recall'
           WHEN appt.episode_type = 'S' THEN 'Self referral'
           WHEN appt.episode_type = 'T' THEN 'VHR short-term recall'
-        END,
-        COUNT(msg_snt.id)     AS notifications_sent,
-        COUNT(nhsapp_read.id) AS nhs_app_messages_read,
-        COUNT(sms_dlv.id)     AS sms_messages_delivered,
-        COUNT(ltr_sent.id)    AS letters_sent,
-        COUNT(msg_fld.id)     AS notifications_failed
+        END AS "Episode type",
+        COUNT(msg_snt.id)     AS "Notifications sent",
+        COUNT(nhsapp_read.id) AS "NHS app messages read",
+        COUNT(sms_dlv.id)     AS "SMS messages delivered",
+        COUNT(ltr_sent.id)    AS "Letters sent",
+        COUNT(msg_fld.id)     AS "Notifications failed"
 FROM   notifications_appointment appt
 JOIN   notifications_clinic cl ON appt.clinic_id = cl.id
 LEFT OUTER JOIN notifications_message msg_snt ON msg_snt.appointment_id = appt.id
@@ -35,5 +35,5 @@ LEFT OUTER JOIN notifications_channelstatus ltr_sent ON ltr_sent.message_id = ms
 AND    ltr_sent.channel = 'letter'
 AND    ltr_sent.status = 'received'
 WHERE  appt.starts_at > CURRENT_DATE - INTERVAL %s
-GROUP BY appointment_date, cl.bso_code, cl.code, cl.name, appt.episode_type
-ORDER BY appointment_date DESC
+GROUP BY appt.starts_at, cl.bso_code, cl.code, cl.name, appt.episode_type
+ORDER BY appt.starts_at DESC

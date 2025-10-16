@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 import pytest
 from django.db import connection
 
-from manage_breast_screening.notifications.queries.failures_query import FailuresQuery
+from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     MessageFactory,
@@ -98,7 +98,7 @@ class TestFailuresQuery:
         today_formatted = datetime.today().strftime("%Y-%m-%d")
 
         with connection.cursor() as cursor:
-            cursor.execute(FailuresQuery.sql(), (datetime.now().date(),))
+            cursor.execute(Helper.sql("failures"), (datetime.now().date(),))
             results = cursor.fetchall()
 
         assert len(results) == 7
@@ -200,18 +200,25 @@ class TestFailuresQuery:
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(FailuresQuery.sql(), (the_date.date(),))
+            cursor.execute(Helper.sql("failures"), (the_date.date(),))
             results = cursor.fetchall()
 
         assert len(results) == 1
         assert list(results[0])[0] == 9990001111
 
+    @pytest.mark.django_db
     def test_failures_query_columns(self):
-        assert FailuresQuery.columns() == [
+        with connection.cursor() as cursor:
+            cursor.execute(
+                Helper.sql("failures") + "\nLIMIT 0", (datetime.now().date(),)
+            )
+            columns = [col[0] for col in cursor.description]
+
+        assert columns == [
             "NHS number",
             "Appointment date",
             "Clinic code",
             "Episode type",
-            "Failure date",
-            "Failure reason",
+            "Failed date",
+            "Reason",
         ]
