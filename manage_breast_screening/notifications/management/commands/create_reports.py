@@ -39,7 +39,7 @@ class Command(BaseCommand):
                     Helper.sql(sqlfile), connection, params=params
                 )
 
-                csv = dataframe.to_csv()
+                csv = dataframe.to_csv(index=False)
 
                 BlobStorage().add(
                     self.filename(report_type),
