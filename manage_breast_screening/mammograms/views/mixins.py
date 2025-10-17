@@ -1,9 +1,10 @@
 from functools import cached_property
 
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.participants.models import Appointment
 from manage_breast_screening.participants.repositories import AppointmentRepository
 
 
@@ -19,7 +20,10 @@ class AppointmentMixin:
     @cached_property
     def appointment(self):
         appointment_repo = AppointmentRepository(self.request.current_provider)
-        return get_object_or_404(appointment_repo.all(), pk=self.appointment_pk)
+        try:
+            return appointment_repo.show(pk=self.appointment_pk)
+        except Appointment.DoesNotExist:
+            return None
 
 
 class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):

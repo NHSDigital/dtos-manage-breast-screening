@@ -123,17 +123,6 @@ class Clinic(BaseModel):
     def time_range(self):
         return {"start_time": self.starts_at, "end_time": self.ends_at}
 
-    @classmethod
-    def filter_counts(cls, provider_id):
-        queryset = cls.objects.filter(setting__provider_id=provider_id)
-
-        return {
-            ClinicFilter.ALL: queryset.count(),
-            ClinicFilter.TODAY: queryset.today().count(),
-            ClinicFilter.UPCOMING: queryset.upcoming().count(),
-            ClinicFilter.COMPLETED: queryset.completed().count(),
-        }
-
     def __str__(self):
         return self.setting.name + " " + self.starts_at.strftime("%Y-%m-%d %H:%M")
 
