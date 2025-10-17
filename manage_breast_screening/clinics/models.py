@@ -9,6 +9,7 @@ from django.db import models
 
 from ..auth.models import Role
 from ..core.models import BaseModel
+from ..participants.models import Appointment
 
 
 class Provider(BaseModel):
@@ -16,6 +17,14 @@ class Provider(BaseModel):
 
     def __str__(self):
         return self.name
+
+    @property
+    def appointments(self):
+        return Appointment.objects.filter(clinic_slot__clinic__setting__provider=self)
+
+    @property
+    def clinics(self):
+        return Clinic.objects.filter(setting__provider=self)
 
 
 class Setting(BaseModel):
@@ -34,18 +43,16 @@ class ClinicFilter(StrEnum):
 
 
 class ClinicQuerySet(models.QuerySet):
-    def by_filter(self, filter: str, provider_id):
-        queryset = self.filter(setting__provider_id=provider_id)
-
+    def by_filter(self, filter: str):
         match filter:
             case ClinicFilter.TODAY:
-                return queryset.today()
+                return self.today()
             case ClinicFilter.UPCOMING:
-                return queryset.upcoming()
+                return self.upcoming()
             case ClinicFilter.COMPLETED:
-                return queryset.completed()
+                return self.completed()
             case ClinicFilter.ALL:
-                return queryset
+                return self
             case _:
                 raise ValueError(filter)
 

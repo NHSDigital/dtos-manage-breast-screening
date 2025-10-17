@@ -222,7 +222,7 @@ class TestAppointment:
             clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
         )
 
-        counts = models.Appointment.objects.filter_counts_for_clinic(clinic)
+        counts = models.Appointment.filter_counts_for_clinic(clinic)
 
         assert counts["remaining"] == 3
         assert counts["checked_in"] == 1

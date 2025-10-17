@@ -9,7 +9,6 @@ from django.views.generic import FormView, TemplateView
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
-    Appointment,
     AppointmentStatus,
     Participant,
     ParticipantReportedMammogram,
@@ -237,7 +236,7 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 @require_http_methods(["POST"])
 def check_in(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
+    appointment = get_object_or_404(request.current_provider.appointments, pk=pk)
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)
