@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -18,62 +17,57 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 @pytest.mark.django_db
-class TestAppointmentRepositoryScopedQueryset:
-    """Test that the repository correctly scopes appointments to the provider."""
-
-    def test_all_returns_appointments_for_provider(self):
+class TestList:
+    def test_list_returns_appointments_for_clinic(self):
         provider = ProviderFactory.create()
         other_provider = ProviderFactory.create()
-
-        # Create appointments for different providers
-        appointment_for_provider = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=provider
-        )
-        appointment_for_other_provider = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=other_provider
-        )
-
-        repository = AppointmentRepository(provider=provider)
-        appointments = repository.all()
-
-        assert appointment_for_provider in appointments
-        assert appointment_for_other_provider not in appointments
-
-
-@pytest.mark.django_db
-class TestOrderedByClinicSlotStartsAt:
-    """Test ordering appointments by clinic slot start time."""
-
-    def test_orders_appointments(self):
-        provider = ProviderFactory.create()
+        clinic1 = ClinicFactory.create(setting__provider=provider)
+        clinic2 = ClinicFactory.create(setting__provider=provider)
+        clinic3 = ClinicFactory.create(setting__provider=other_provider)
 
         appointment1 = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=provider,
+            clinic_slot__clinic=clinic1,
             clinic_slot__starts_at=datetime(2025, 1, 3, 10, 0, tzinfo=timezone.utc),
         )
-        appointment2 = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=provider,
+        _appointment2 = AppointmentFactory.create(
+            clinic_slot__clinic=clinic2,
             clinic_slot__starts_at=datetime(2025, 1, 1, 10, 0, tzinfo=timezone.utc),
         )
-        appointment3 = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=provider,
+        _appointment3 = AppointmentFactory.create(
+            clinic_slot__clinic=clinic3,
             clinic_slot__starts_at=datetime(2025, 1, 2, 10, 0, tzinfo=timezone.utc),
         )
 
         repository = AppointmentRepository(provider=provider)
-        appointments = list(repository.ordered_by_clinic_slot_starts_at().all())
-        appointments_descending = list(
-            repository.ordered_by_clinic_slot_starts_at(descending=True).all()
+        appointments = list(repository.list(clinic=clinic1))
+
+        assert appointments == [appointment1]
+
+    def test_orders_appointments(self):
+        provider = ProviderFactory.create()
+        clinic = ClinicFactory.create(setting__provider=provider)
+
+        appointment1 = AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            clinic_slot__starts_at=datetime(2025, 1, 3, 10, 0, tzinfo=timezone.utc),
+        )
+        appointment2 = AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            clinic_slot__starts_at=datetime(2025, 1, 1, 10, 0, tzinfo=timezone.utc),
+        )
+        appointment3 = AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            clinic_slot__starts_at=datetime(2025, 1, 2, 10, 0, tzinfo=timezone.utc),
         )
 
+        repository = AppointmentRepository(provider=provider)
+        appointments = list(repository.list(clinic=clinic))
+
         assert appointments == [appointment2, appointment3, appointment1]
-        assert appointments_descending == [appointment1, appointment3, appointment2]
 
 
 @pytest.mark.django_db
-class TestForParticipant:
-    """Test filtering appointments by participant."""
-
+class TestListForParticipant:
     def test_filters_appointments_for_specific_participant(self):
         provider = ProviderFactory.create()
         participant1 = ParticipantFactory.create()
@@ -89,7 +83,7 @@ class TestForParticipant:
         )
 
         repository = AppointmentRepository(provider=provider)
-        appointments = list(repository.for_participant(participant1).all())
+        appointments = list(repository.list_for_participant(participant1))
 
         assert appointment1 in appointments
         assert appointment2 not in appointments
@@ -99,115 +93,122 @@ class TestForParticipant:
         participant = ParticipantFactory.create()
 
         repository = AppointmentRepository(provider=provider)
-        appointments = list(repository.for_participant(participant).all())
+        appointments = list(repository.list_for_participant(participant))
 
         assert len(appointments) == 0
 
-
-@pytest.mark.django_db
-class TestForClinicAndFilter:
-    """Test filtering appointments by clinic and status filter."""
-
-    def test_filters_appointments(self):
+    def test_orders_appointments_by_clinic_slot_starts_at_descending(self):
         provider = ProviderFactory.create()
-        clinic = ClinicFactory.create(setting__provider=provider)
+        participant1 = ParticipantFactory.create()
 
-        confirmed_appointment = AppointmentFactory.create(
-            clinic_slot__clinic=clinic,
-            current_status=AppointmentStatus.CONFIRMED,
+        appointment1 = AppointmentFactory.create(
+            screening_episode__participant=participant1,
+            clinic_slot__clinic__setting__provider=provider,
+            clinic_slot__starts_at=datetime(2025, 1, 3, 10, 0, tzinfo=timezone.utc),
         )
-        checked_in_appointment = AppointmentFactory.create(
-            clinic_slot__clinic=clinic,
-            current_status=AppointmentStatus.CHECKED_IN,
+        appointment2 = AppointmentFactory.create(
+            screening_episode__participant=participant1,
+            clinic_slot__clinic__setting__provider=provider,
+            clinic_slot__starts_at=datetime(2025, 1, 1, 10, 0, tzinfo=timezone.utc),
         )
-        screened_appointment = AppointmentFactory.create(
-            clinic_slot__clinic=clinic,
-            current_status=AppointmentStatus.SCREENED,
+        appointment3 = AppointmentFactory.create(
+            screening_episode__participant=participant1,
+            clinic_slot__clinic__setting__provider=provider,
+            clinic_slot__starts_at=datetime(2025, 1, 2, 10, 0, tzinfo=timezone.utc),
         )
 
         repository = AppointmentRepository(provider=provider)
-        appointments = list(repository.for_clinic_and_filter(clinic, "remaining").all())
+        appointments = list(repository.list_for_participant(participant1))
 
-        assert confirmed_appointment in appointments
-        assert checked_in_appointment in appointments
-        assert screened_appointment not in appointments
+        assert appointments == [appointment1, appointment3, appointment2]
 
 
 @pytest.mark.django_db
-class TestWithSetting:
-    """Test select_related optimization for clinic settings."""
-
-    def test_select_related_includes_setting(self, django_assert_num_queries):
-        provider = ProviderFactory.create()
-        AppointmentFactory.create(clinic_slot__clinic__setting__provider=provider)
-
-        repository = AppointmentRepository(provider=provider)
-
-        # Execute query with select_related
-        with django_assert_num_queries(1):
-            appointment = repository.with_setting().all().first()
-            # Accessing setting should not trigger additional query
-            _ = appointment.clinic_slot.clinic.setting
-
-
-@pytest.mark.django_db
-class TestWithFullDetails:
-    """Test select_related optimization for full appointment details."""
-
-    def test_select_related_includes_full_details(self, django_assert_num_queries):
-        provider = ProviderFactory.create()
-        AppointmentFactory.create(clinic_slot__clinic__setting__provider=provider)
-
-        repository = AppointmentRepository(provider=provider)
-
-        # Execute query with full details
-        with django_assert_num_queries(1):
-            appointment = repository.with_full_details().all().first()
-            # Accessing related objects should not trigger additional queries
-            _ = appointment.clinic_slot.clinic
-            _ = appointment.screening_episode.participant
-            _ = appointment.screening_episode.participant.address
-
-
-@pytest.mark.django_db
-class TestWithListDetails:
-    """Test prefetch and select_related optimization for list views."""
-
-    def test_prefetch_and_select_related_includes_list_details(
-        self, django_assert_num_queries
-    ):
+class TestShow:
+    def test_returns_appointment(self):
         provider = ProviderFactory.create()
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=provider
         )
-        # Create multiple statuses to test prefetch
-        AppointmentStatus.objects.create(
-            appointment=appointment, state=AppointmentStatus.CHECKED_IN
+
+        repository = AppointmentRepository(provider=provider)
+        result = repository.show(appointment.pk)
+
+        assert result == appointment
+
+    def test_raises_appointment_not_found_if_appointment_belongs_to_other_provider(
+        self,
+    ):
+        provider = ProviderFactory.create()
+        other_provider = ProviderFactory.create()
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=other_provider
         )
 
         repository = AppointmentRepository(provider=provider)
-
-        # Execute query with list details
-        with django_assert_num_queries(2):  # 1 for appointment, 1 for prefetch statuses
-            appointment = repository.with_list_details().all().first()
-            # Accessing related objects should not trigger additional queries
-            _ = appointment.clinic_slot.clinic
-            _ = appointment.screening_episode.participant
-            _ = list(appointment.statuses.all())
+        with pytest.raises(Appointment.DoesNotExist):
+            repository.show(appointment.pk)
 
 
 @pytest.mark.django_db
 class TestFilterCountsForClinic:
     """Test getting filter counts for a clinic."""
 
-    def test_delegates_to_model_manager(self):
-        provider = ProviderFactory.build()
-        clinic = MagicMock()
+    def test_returns_counts_for_each_filter_type(self):
+        provider = ProviderFactory.create()
+        other_provider = ProviderFactory.create()
 
-        with patch.object(
-            Appointment.objects, "filter_counts_for_clinic"
-        ) as mock_filter_counts:
-            repository = AppointmentRepository(provider=provider)
-            repository.filter_counts_for_clinic(clinic)
+        clinic = ClinicFactory.create(setting__provider=provider)
+        other_clinic = ClinicFactory.create(setting__provider=other_provider)
 
-            mock_filter_counts.assert_called_once_with(clinic)
+        # Create 2 CONFIRMED appointments (count as "remaining")
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.CONFIRMED,
+        )
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.CONFIRMED,
+        )
+
+        # Create 2 CHECKED_IN appointments (count as both "remaining" and "checked_in")
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.CHECKED_IN,
+        )
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.CHECKED_IN,
+        )
+
+        # Create 3 complete appointments
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.CANCELLED,
+        )
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.SCREENED,
+        )
+        AppointmentFactory.create(
+            clinic_slot__clinic=clinic,
+            current_status=AppointmentStatus.DID_NOT_ATTEND,
+        )
+
+        # Create appointments for other clinic (should not be counted)
+        AppointmentFactory.create(
+            clinic_slot__clinic=other_clinic,
+            current_status=AppointmentStatus.CONFIRMED,
+        )
+        AppointmentFactory.create(
+            clinic_slot__clinic=other_clinic,
+            current_status=AppointmentStatus.CHECKED_IN,
+        )
+
+        repository = AppointmentRepository(provider=provider)
+        counts = repository.filter_counts_for_clinic(clinic)
+
+        assert counts["all"] == 7
+        assert counts["remaining"] == 4  # 2 confirmed + 2 checked_in
+        assert counts["checked_in"] == 2
+        assert counts["complete"] == 3  # cancelled + screened + did_not_attend

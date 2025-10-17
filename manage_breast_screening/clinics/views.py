@@ -13,7 +13,7 @@ from .repositories import ClinicRepository
 
 def clinic_list(request, filter="today"):
     clinic_repo = ClinicRepository(request.current_provider)
-    clinics = clinic_repo.by_filter(filter).with_settings().all()
+    clinics = clinic_repo.list(filter)
     counts_by_filter = clinic_repo.filter_counts()
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
@@ -25,15 +25,11 @@ def clinic_list(request, filter="today"):
 
 def clinic(request, pk, filter="remaining"):
     clinic_repo = ClinicRepository(request.current_provider)
-    clinic = get_object_or_404(clinic_repo.with_settings().all(), pk=pk)
+    clinic = clinic_repo.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
 
     appointment_repo = AppointmentRepository(request.current_provider)
-    appointments = (
-        appointment_repo.for_clinic_and_filter(clinic, filter)
-        .ordered_by_clinic_slot_starts_at()
-        .all()
-    )
+    appointments = appointment_repo.list(clinic, filter)
     counts_by_filter = appointment_repo.filter_counts_for_clinic(clinic)
     presented_appointment_list = AppointmentListPresenter(
         pk, appointments, filter, counts_by_filter
@@ -52,7 +48,11 @@ def clinic(request, pk, filter="remaining"):
 @require_http_methods(["POST"])
 def check_in(request, pk, appointment_pk):
     appointment_repo = AppointmentRepository(request.current_provider)
-    appointment = get_object_or_404(appointment_repo.all(), pk=appointment_pk)
+    clinic_repo = ClinicRepository(request.current_provider)
+    clinic = clinic_repo.get(pk=pk)
+    appointment = get_object_or_404(
+        appointment_repo.list(clinic=clinic), pk=appointment_pk
+    )
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)

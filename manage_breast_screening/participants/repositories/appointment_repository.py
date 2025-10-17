@@ -16,43 +16,35 @@ class AppointmentRepository(ProviderScopedRepository):
             clinic_slot__clinic__setting__provider=self.provider
         )
 
-    def ordered_by_clinic_slot_starts_at(self, descending=False):
-        order_field = (
-            "-clinic_slot__starts_at" if descending else "clinic_slot__starts_at"
+    def list(self, clinic, filter="all"):
+        return (
+            self._queryset.for_clinic_and_filter(clinic, filter)
+            .ordered_by_clinic_slot_starts_at()
+            .prefetch_related("statuses")
+            .select_related("clinic_slot__clinic", "screening_episode__participant")
         )
-        self._queryset = self._queryset.order_by(order_field)
-        return self
 
-    def for_participant(self, participant):
-        self._queryset = self._queryset.filter(
-            screening_episode__participant=participant
+    def list_for_participant(self, participant):
+        return (
+            self._queryset.filter(screening_episode__participant=participant)
+            .select_related("clinic_slot__clinic__setting")
+            .ordered_by_clinic_slot_starts_at(descending=True)
         )
-        return self
 
-    def for_clinic_and_filter(self, clinic, filter):
-        self._queryset = self._queryset.for_clinic_and_filter(clinic, filter)
-        return self
-
-    def with_setting(self):
-        self._queryset = self._queryset.select_related("clinic_slot__clinic__setting")
-        return self
-
-    def with_full_details(self):
-        self._queryset = self._queryset.select_related(
+    def show(self, pk):
+        return self._queryset.select_related(
             "clinic_slot__clinic",
             "screening_episode__participant",
             "screening_episode__participant__address",
-        )
-        return self
-
-    def with_list_details(self):
-        self._queryset = self._queryset.prefetch_related("statuses").select_related(
-            "clinic_slot__clinic", "screening_episode__participant"
-        )
-        return self
+        ).get(pk=pk)
 
     def filter_counts_for_clinic(self, clinic):
         """
-        Get counts of appointments by each filter type for a clinic. Terminal method.
+        Get counts of appointments by each filter type for a clinic.
         """
-        return Appointment.objects.filter_counts_for_clinic(clinic)
+        counts = {}
+        for filter in ["remaining", "checked_in", "complete", "all"]:
+            counts[filter] = self._queryset.for_clinic_and_filter(
+                clinic, filter
+            ).count()
+        return counts

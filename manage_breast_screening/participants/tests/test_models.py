@@ -192,43 +192,6 @@ class TestAppointment:
             ordered=False,
         )
 
-    def test_filter_counts_for_clinic(self):
-        # Create a clinic and clinic slots
-        clinic = ClinicFactory.create()
-        clinic_slot1 = ClinicSlotFactory.create(clinic=clinic)
-        clinic_slot2 = ClinicSlotFactory.create(clinic=clinic)
-
-        # Create appointments with different statuses
-        AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CONFIRMED
-        )
-        AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.CONFIRMED
-        )
-        AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CHECKED_IN
-        )
-        AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.SCREENED
-        )
-        AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CANCELLED
-        )
-
-        # Create another clinic with appointments that shouldn't be counted
-        other_clinic = ClinicFactory.create()
-        other_slot = ClinicSlotFactory.create(clinic=other_clinic)
-        AppointmentFactory.create(
-            clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
-        )
-
-        counts = models.Appointment.objects.filter_counts_for_clinic(clinic)
-
-        assert counts["remaining"] == 3
-        assert counts["checked_in"] == 1
-        assert counts["complete"] == 2
-        assert counts["all"] == 5
-
 
 @pytest.mark.django_db
 def test_appointment_current_status():

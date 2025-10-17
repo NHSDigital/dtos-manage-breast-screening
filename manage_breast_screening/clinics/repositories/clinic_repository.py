@@ -1,4 +1,4 @@
-from manage_breast_screening.clinics.models import Clinic
+from manage_breast_screening.clinics.models import Clinic, ClinicFilter
 from manage_breast_screening.core.repositories.provider_scoped_repository import (
     ProviderScopedRepository,
 )
@@ -14,13 +14,11 @@ class ClinicRepository(ProviderScopedRepository):
     def _scoped_queryset(self):
         return Clinic.objects.filter(setting__provider=self.provider)
 
-    def by_filter(self, filter):
-        self._queryset = self._queryset.by_filter(filter)
-        return self
+    def list(self, filter="all"):
+        return self._queryset.by_filter(filter).prefetch_related("setting")
 
-    def with_settings(self):
-        self._queryset = self._queryset.prefetch_related("setting")
-        return self
+    def get(self, pk):
+        return self._queryset.get(pk=pk)
 
     def filter_counts(self):
         """
@@ -29,4 +27,9 @@ class ClinicRepository(ProviderScopedRepository):
         Returns:
             dict: Mapping of filter names to counts
         """
-        return Clinic.filter_counts(self.provider.pk)
+        return {
+            ClinicFilter.ALL: self._queryset.count(),
+            ClinicFilter.TODAY: self._queryset.today().count(),
+            ClinicFilter.UPCOMING: self._queryset.upcoming().count(),
+            ClinicFilter.COMPLETED: self._queryset.completed().count(),
+        }

@@ -38,12 +38,7 @@ def show(request, pk):
     presented_participant = ParticipantPresenter(participant)
 
     appointment_repo = AppointmentRepository(request.current_provider)
-    appointments = (
-        appointment_repo.for_participant(participant)
-        .with_setting()
-        .ordered_by_clinic_slot_starts_at(descending=True)
-        .all()
-    )
+    appointments = appointment_repo.list_for_participant(participant)
 
     presented_appointments = ParticipantAppointmentsPresenter(
         past_appointments=list(appointments.past()),

@@ -61,11 +61,11 @@ class AppointmentQuerySet(models.QuerySet):
             case _:
                 raise ValueError(filter)
 
-    def filter_counts_for_clinic(self, clinic):
-        counts = {}
-        for filter in ["remaining", "checked_in", "complete", "all"]:
-            counts[filter] = self.for_clinic_and_filter(clinic, filter).count()
-        return counts
+    def ordered_by_clinic_slot_starts_at(self, descending=False):
+        order_field = (
+            "-clinic_slot__starts_at" if descending else "clinic_slot__starts_at"
+        )
+        return self.order_by(order_field)
 
 
 class Appointment(BaseModel):
@@ -86,6 +86,10 @@ class Appointment(BaseModel):
     @property
     def participant(self):
         return self.screening_episode.participant
+
+    @property
+    def clinic(self):
+        return self.clinic_slot.clinic
 
     @property
     def current_status(self) -> "AppointmentStatus":
