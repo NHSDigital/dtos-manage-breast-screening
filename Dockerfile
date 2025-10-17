@@ -1,5 +1,3 @@
-ARG poetry_version=2.1.2
-
 #### NODE.JS BUILD
 
 FROM node:22.20-alpine3.21@sha256:f40aebdd0c1959821ab6d72daecafb2cd1d4c9a958e9952c1d71b84d4458f875 AS node_builder
@@ -16,7 +14,6 @@ RUN npm ci
 RUN npm run compile
 
 FROM python:3.13.7-alpine3.21@sha256:0c3d4f28025c9adc2c03326aa160dde8f53faaa8684134a0e146e4edca28a946 AS python_builder
-ARG poetry_version
 
 WORKDIR /app
 
@@ -25,15 +22,13 @@ RUN apk add --no-cache libgcc libstdc++ build-base linux-headers
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_IN_PROJECT=1 \
-    POETRY_VIRTUALENVS_CREATE=1 \
-    POETRY_CACHE_DIR=/tmp/poetry_cache
+ENV UV_PROJECT_ENVIRONMENT=/app/.venv \
+    UV_CACHE_DIR=/tmp/uv_cache
 
 # Install python dependencies to a virtualenv
-COPY pyproject.toml poetry.lock ./
-RUN pip install poetry=="${poetry_version}"
-RUN poetry install --without dev --no-root && rm -rf $POETRY_CACHE_DIR
+COPY pyproject.toml uv.lock ./
+RUN pip install uv
+RUN uv sync --frozen --no-dev && rm -rf $UV_CACHE_DIR
 
 #### FINAL RUNTIME IMAGE
 
