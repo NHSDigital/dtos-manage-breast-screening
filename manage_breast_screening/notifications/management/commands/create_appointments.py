@@ -35,35 +35,34 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            logger.info("Create Appointments command started")
-            container_client = BlobStorage().find_or_create_container(
-                os.getenv("BLOB_CONTAINER_NAME")
-            )
-            for blob in container_client.list_blobs(
-                name_starts_with=options["date_str"]
-            ):
-                blob_client = container_client.get_blob_client(blob.name)
-                logger.debug("Processing blob %s", blob.name)
-                blob_content = blob_client.download_blob(
-                    max_concurrency=1, encoding="ASCII"
-                ).readall()
-
-                data_frame = self.raw_data_to_data_frame(blob_content)
-
-                for idx, row in data_frame.iterrows():
-                    if self.is_not_holding_clinic(row):
-                        clinic, clinic_created = self.find_or_create_clinic(row)
-                        if clinic_created:
-                            logger.info("%s created", clinic)
-
-                        appt, appt_created = self.update_or_create_appointment(
-                            row, clinic
-                        )
-                logger.info("Processed %s rows from %s", len(data_frame), blob.name)
-            logger.info("Create Appointments command finished successfully")
+            self.create_appointments(options)
         except Exception as e:
             logger.error(e, exc_info=True)
             raise CommandError(e)
+
+    def create_appointments(self, options):
+        logger.info("Create Appointments command started")
+        container_client = BlobStorage().find_or_create_container(
+            os.getenv("BLOB_CONTAINER_NAME", "")
+        )
+        for blob in container_client.list_blobs(name_starts_with=options["date_str"]):
+            blob_client = container_client.get_blob_client(blob.name)
+            logger.debug("Processing blob %s", blob.name)
+            blob_content = blob_client.download_blob(
+                max_concurrency=1, encoding="ASCII"
+            ).readall()
+
+            data_frame = self.raw_data_to_data_frame(blob_content)
+
+            for idx, row in data_frame.iterrows():
+                if self.is_not_holding_clinic(row):
+                    clinic, clinic_created = self.find_or_create_clinic(row)
+                    if clinic_created:
+                        logger.info("%s created", clinic)
+
+                    appt, appt_created = self.update_or_create_appointment(row, clinic)
+            logger.info("Processed %s rows from %s", len(data_frame), blob.name)
+        logger.info("Create Appointments command finished successfully")
 
     def is_not_holding_clinic(self, row):
         return row.get("Holding Clinic") != "Y"
