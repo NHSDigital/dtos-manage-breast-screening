@@ -36,32 +36,35 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-        logger.info("Create Report Command started")
         try:
-            for sqlfile, params, report_type in self.REPORTS:
-                dataframe = pandas.read_sql(
-                    Helper.sql(sqlfile), connection, params=params
-                )
-
-                csv = dataframe.to_csv(index=False)
-
-                BlobStorage().add(
-                    self.filename(report_type),
-                    csv,
-                    content_type="text/csv",
-                    container_name=os.getenv("REPORTS_CONTAINER_NAME"),
-                )
-
-                NhsMail().send_report_email(
-                    attachment_data=csv,
-                    attachment_filename=self.filename(report_type),
-                    report_type=report_type,
-                )
-
-                logger.info("Report %s created", report_type)
+            self.create_reports()
         except Exception as e:
             ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
+
+    def create_reports(self):
+        logger.info("Create Report Command started")
+        for sqlfile, params, report_type in self.REPORTS:
+            dataframe = pandas.read_sql(
+                Helper.sql(sqlfile), connection, params=params
+            )
+
+            csv = dataframe.to_csv(index=False)
+
+            BlobStorage().add(
+                self.filename(report_type),
+                csv,
+                content_type="text/csv",
+                container_name=os.getenv("REPORTS_CONTAINER_NAME"),
+            )
+
+            NhsMail().send_report_email(
+                attachment_data=csv,
+                attachment_filename=self.filename(report_type),
+                report_type=report_type,
+            )
+
+            logger.info("Report %s created", report_type)
 
     def filename(self, report_type: str) -> str:
         formatted_time = datetime.today().strftime("%Y-%m-%dT%H:%M:%S")
