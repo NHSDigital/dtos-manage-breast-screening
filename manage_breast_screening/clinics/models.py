@@ -9,7 +9,7 @@ from django.db import models
 
 from ..auth.models import Role
 from ..core.models import BaseModel
-from ..participants.models import Appointment
+from ..participants.models import Appointment, Participant
 
 
 class Provider(BaseModel):
@@ -25,6 +25,12 @@ class Provider(BaseModel):
     @property
     def clinics(self):
         return Clinic.objects.filter(setting__provider=self)
+
+    @property
+    def participants(self):
+        return Participant.objects.filter(
+            screeningepisode__appointment__clinic_slot__clinic__setting__provider=self
+        ).distinct()
 
 
 class Setting(BaseModel):

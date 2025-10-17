@@ -8,7 +8,7 @@ from manage_breast_screening.mammograms.presenters import LastKnownMammogramPres
 from manage_breast_screening.participants.services import fetch_most_recent_provider
 
 from .forms import EthnicityForm, ParticipantReportedMammogramForm
-from .models import Appointment, Participant, ParticipantReportedMammogram
+from .models import ParticipantReportedMammogram
 from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
 
 logger = getLogger(__name__)
@@ -32,11 +32,12 @@ def parse_return_url(request, default: str) -> str:
 
 
 def show(request, pk):
-    participant = get_object_or_404(Participant, pk=pk)
+    provider = request.current_provider
+    participant = get_object_or_404(provider.participants, pk=pk)
     presented_participant = ParticipantPresenter(participant)
 
     appointments = (
-        Appointment.objects.select_related("clinic_slot__clinic__setting")
+        provider.appointments.select_related("clinic_slot__clinic__setting")
         .filter(screening_episode__participant=participant)
         .order_by("-clinic_slot__starts_at")
     )
@@ -70,7 +71,7 @@ def show(request, pk):
 
 
 def edit_ethnicity(request, pk):
-    participant = get_object_or_404(Participant, pk=pk)
+    participant = get_object_or_404(request.current_provider.participants, pk=pk)
 
     if request.method == "POST":
         return_url = request.POST.get("return_url")
@@ -103,7 +104,7 @@ def edit_ethnicity(request, pk):
 
 
 def add_previous_mammogram(request, pk):
-    participant = get_object_or_404(Participant, pk=pk)
+    participant = get_object_or_404(request.current_provider.participants, pk=pk)
     most_recent_provider = fetch_most_recent_provider(pk)
     return_url = parse_return_url(
         request, default=reverse("participants:show", kwargs={"pk": pk})
