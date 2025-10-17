@@ -7,10 +7,14 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
 from manage_breast_screening.notifications.queries.helper import Helper
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
 logger = getLogger(__name__)
+INSIGHTS_ERROR_NAME = "CreateReportsError"
 
 
 class Command(BaseCommand):
@@ -56,6 +60,7 @@ class Command(BaseCommand):
 
                 logger.info("Report %s created", report_type)
         except Exception as e:
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
 
     def filename(self, report_type: str) -> str:
