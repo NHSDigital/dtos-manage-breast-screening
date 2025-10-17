@@ -12,10 +12,14 @@ from manage_breast_screening.notifications.models import (
     AppointmentStatusChoices,
     Clinic,
 )
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
 TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
+INSIGHTS_ERROR_NAME = "CreateAppointmentsError"
 logger = getLogger(__name__)
 
 
@@ -37,7 +41,7 @@ class Command(BaseCommand):
         try:
             self.create_appointments(options)
         except Exception as e:
-            logger.error(e, exc_info=True)
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
 
     def create_appointments(self, options):

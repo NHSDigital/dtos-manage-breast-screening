@@ -1,7 +1,7 @@
 import os
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import MagicMock, Mock, PropertyMock, patch
 
 import pytest
 from azure.storage.blob import BlobProperties
@@ -12,6 +12,9 @@ from manage_breast_screening.notifications.management.commands.create_appointmen
     Command,
 )
 from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     ClinicFactory,
@@ -58,6 +61,14 @@ def stored_blob_data(prefix_dir: str, filenames: list[str]):
 
 @pytest.mark.django_db
 class TestCreateAppointments:
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "exception", mock_insights_logger
+        )
+        return mock_insights_logger
+
     def test_handle_creates_records(self):
         """Test Appointment creation for new booked appointments in NBSS data, stored in Azure storage blob"""
         today_dirname = datetime.now().strftime("%Y-%m-%d")
@@ -305,3 +316,19 @@ class TestCreateAppointments:
                 Command().handle(**{"date_str": "2000-01-01"})
 
         assert Appointment.objects.count() == 0
+
+    @pytest.mark.django_db
+    def test_calls_insights_logger_if_exception_raised(
+        self,
+        mock_insights_logger,
+    ):
+        with mocked_blob_storage() as mock_blob_storage:
+            mock_container_client = (
+                mock_blob_storage.return_value.find_or_create_container.return_value
+            )
+            mock_container_client.list_blobs = Mock(side_effect=Exception("Error!"))
+
+            with pytest.raises(CommandError):
+                Command().handle(**{"date_str": "Noooo!"})
+
+        mock_insights_logger.assert_called_with("CreateAppointmentsError: Error!")
