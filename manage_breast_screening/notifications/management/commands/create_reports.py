@@ -37,32 +37,35 @@ class Command(BaseCommand):
     ]
 
     def handle(self, *args, **options):
-        logger.info("Create Report Command started")
         try:
-            for query, params, report_type in self.REPORTS:
-                dataframe = pandas.read_sql(
-                    query.sql(), connection, params=params, columns=query.columns()
-                )
-
-                csv = dataframe.to_csv()
-
-                BlobStorage().add(
-                    self.filename(report_type),
-                    csv,
-                    content_type="text/csv",
-                    container_name=os.getenv("REPORTS_CONTAINER_NAME"),
-                )
-
-                NhsMail().send_report_email(
-                    attachment_data=csv,
-                    attachment_filename=self.filename(report_type),
-                    report_type=report_type,
-                )
-
-                logger.info("Report %s created", report_type)
+            self.create_reports(options)
         except Exception as e:
             ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
+
+    def create_reports(self, options):
+        logger.info("Create Report Command started")
+        for query, params, report_type in self.REPORTS:
+            dataframe = pandas.read_sql(
+                query.sql(), connection, params=params, columns=query.columns()
+            )
+
+            csv = dataframe.to_csv()
+
+            BlobStorage().add(
+                self.filename(report_type),
+                csv,
+                content_type="text/csv",
+                container_name=os.getenv("REPORTS_CONTAINER_NAME"),
+            )
+
+            NhsMail().send_report_email(
+                attachment_data=csv,
+                attachment_filename=self.filename(report_type),
+                report_type=report_type,
+            )
+
+            logger.info("Report %s created", report_type)
 
     def filename(self, report_type: str) -> str:
         formatted_time = datetime.today().strftime("%Y-%m-%dT%H:%M:%S")
