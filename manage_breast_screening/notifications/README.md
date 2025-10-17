@@ -60,7 +60,7 @@ make test-unit
 If you would rather not install all of the JS dependencies and only want to run the Notifications unit tests specifically:
 
 ```bash
-poetry run pytest manage_breast_screening/notifications/tests/ --ignore manage_breast_screening/notifications/tests/dependencies --ignore manage_breast_screening/notifications/tests/integration --ignore manage_breast_screening/notifications/tests/end_to_end
+uv run pytest manage_breast_screening/notifications/tests/ --ignore manage_breast_screening/notifications/tests/dependencies --ignore manage_breast_screening/notifications/tests/integration --ignore manage_breast_screening/notifications/tests/end_to_end
 ```
 
 This will run only the unit tests for the notifications app, excluding the integration and end-to-end test directories.
