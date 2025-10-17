@@ -61,12 +61,6 @@ class AppointmentQuerySet(models.QuerySet):
             case _:
                 raise ValueError(filter)
 
-    def filter_counts_for_clinic(self, clinic):
-        counts = {}
-        for filter in ["remaining", "checked_in", "complete", "all"]:
-            counts[filter] = self.for_clinic_and_filter(clinic, filter).count()
-        return counts
-
 
 class Appointment(BaseModel):
     objects = AppointmentQuerySet.as_manager()
@@ -78,6 +72,13 @@ class Appointment(BaseModel):
     )
     reinvite = models.BooleanField(default=False)
     stopped_reasons = models.JSONField(null=True, blank=True)
+
+    @classmethod
+    def filter_counts_for_clinic(cls, clinic):
+        counts = {}
+        for filter in ["remaining", "checked_in", "complete", "all"]:
+            counts[filter] = cls.objects.for_clinic_and_filter(clinic, filter).count()
+        return counts
 
     @property
     def provider(self):
