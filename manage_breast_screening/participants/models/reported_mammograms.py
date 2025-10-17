@@ -1,9 +1,7 @@
 from django.db import models
 from django.db.models import TextChoices
 
-from ...clinics.models import Provider
 from ...core.models import BaseModel
-from .participant import Participant
 
 
 class SupportReasons(TextChoices):
@@ -32,11 +30,13 @@ class ParticipantReportedMammogram(BaseModel):
         PREFER_NOT_TO_SAY = "PREFER_NOT_TO_SAY", "Prefer not to say"
 
     participant = models.ForeignKey(
-        Participant, on_delete=models.PROTECT, related_name="reported_mammograms"
+        "participants.Participant",
+        on_delete=models.PROTECT,
+        related_name="reported_mammograms",
     )
     location_type = models.CharField(choices=LocationType)
     provider = models.ForeignKey(
-        Provider, on_delete=models.PROTECT, null=True, blank=True
+        "clinics.Provider", on_delete=models.PROTECT, null=True, blank=True
     )
     location_details = models.TextField(null=False, default="", blank=True)
     exact_date = models.DateField(null=True, blank=True)

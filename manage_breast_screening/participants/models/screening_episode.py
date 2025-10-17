@@ -1,7 +1,6 @@
 from django.db import models
 
 from ...core.models import BaseModel
-from .participant import Participant
 
 
 class ScreeningEpisode(BaseModel):
@@ -12,7 +11,9 @@ class ScreeningEpisode(BaseModel):
         Protocol.FAMILY_HISTORY: "Family history",
     }
 
-    participant = models.ForeignKey(Participant, on_delete=models.PROTECT)
+    participant = models.ForeignKey(
+        "participants.Participant", on_delete=models.PROTECT
+    )
     protocol = models.CharField(
         choices=PROTOCOL_CHOICES, default=Protocol.FAMILY_HISTORY, max_length=50
     )

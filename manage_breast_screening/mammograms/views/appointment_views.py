@@ -9,9 +9,7 @@ from django.views.generic import FormView, TemplateView
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
-    Appointment,
     AppointmentStatus,
-    Participant,
     ParticipantReportedMammogram,
 )
 
@@ -135,7 +133,9 @@ class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
-        participant = Participant.objects.get(screeningepisode__appointment__pk=pk)
+        participant = self.request.current_provider.participants.get(
+            screeningepisode__appointment__pk=pk
+        )
 
         context.update(
             {
@@ -174,7 +174,8 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
         participant = get_object_or_404(
-            Participant, screeningepisode__appointment__pk=pk
+            self.request.current_provider.participants,
+            screeningepisode__appointment__pk=pk,
         )
         context.update(
             {
@@ -207,7 +208,9 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        participant = self.appointment.screening_episode.participant
+        participant = self.request.current_provider.participants.get(
+            screeningepisode__appointment__pk=self.appointment.pk
+        )
         context.update(
             {
                 "heading": "Appointment cannot go ahead",
@@ -237,7 +240,7 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 @require_http_methods(["POST"])
 def check_in(request, pk):
-    appointment = get_object_or_404(Appointment, pk=pk)
+    appointment = get_object_or_404(request.current_provider.appointments, pk=pk)
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)

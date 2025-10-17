@@ -1,4 +1,3 @@
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -14,22 +13,13 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestViewingACompletedAppointment(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
-        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(
-            clinic_slot__clinic__type=Clinic.Type.SCREENING,
-            screening_episode=self.screening_episode,
-            current_status=AppointmentStatus.SCREENED,
-        )
-
     def test_viewing_a_completed_appointment(self):
         """
         The appointment page includes appointment details, medical information, and images tabs.
         Only the first one is implemented yet.
         """
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_the_demographic_banner()
         self.and_i_should_see_the_participant_details()
@@ -37,8 +27,19 @@ class TestViewingACompletedAppointment(SystemTestCase):
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
+
+    def and_there_is_an_appointment(self):
+        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            clinic_slot__clinic__type=Clinic.Type.SCREENING,
+            screening_episode=self.screening_episode,
+            current_status=AppointmentStatus.SCREENED,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+        )
 
     def and_i_am_on_the_appointment_show_page(self):
         self.page.goto(
