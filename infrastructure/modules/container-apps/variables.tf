@@ -180,6 +180,11 @@ variable "app_insights_connection_string" {
   type        = string
 }
 
+variable "app_insights_id" {
+  description = "The Application Insights id."
+  type        = string
+}
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 

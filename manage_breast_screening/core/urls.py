@@ -31,6 +31,10 @@ def sha_view(requests):
     return HttpResponse(settings.COMMIT_SHA)
 
 
+@login_not_required
+def health_check(reviews):
+  return HttpResponse("OK")
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
@@ -39,6 +43,10 @@ urlpatterns = [
     ),
     path(
         "clinics/", include("manage_breast_screening.clinics.urls", namespace="clinics")
+    ),
+    path(
+        "healthcheck/",
+        health_check,
     ),
     path(
         "mammograms/",
