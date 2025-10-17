@@ -5,6 +5,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from ...core.models import BaseModel
+from .appointment import Appointment
 from .ethnicity import Ethnicity
 
 
@@ -25,6 +26,10 @@ class Participant(BaseModel):
     any_other_background_details = models.TextField(blank=True, null=True)
     risk_level = models.TextField()
     extra_needs = models.JSONField(null=False, default=list, blank=True)
+
+    @property
+    def appointments(self):
+        return Appointment.objects.filter(screening_episode__participant=self)
 
     @property
     def full_name(self):
@@ -58,7 +63,7 @@ class Participant(BaseModel):
 class ParticipantAddress(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     participant = models.OneToOneField(
-        Participant, on_delete=models.PROTECT, related_name="address"
+        "participants.Participant", on_delete=models.PROTECT, related_name="address"
     )
     lines = ArrayField(models.CharField(), size=5, blank=True)
     postcode = models.CharField(blank=True, null=True)

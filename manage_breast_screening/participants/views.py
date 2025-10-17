@@ -36,11 +36,9 @@ def show(request, pk):
     participant = get_object_or_404(provider.participants, pk=pk)
     presented_participant = ParticipantPresenter(participant)
 
-    appointments = (
-        provider.appointments.select_related("clinic_slot__clinic__setting")
-        .filter(screening_episode__participant=participant)
-        .order_by("-clinic_slot__starts_at")
-    )
+    appointments = participant.appointments.order_by(
+        "-clinic_slot__starts_at"
+    ).select_related("clinic_slot__clinic__setting")
 
     presented_appointments = ParticipantAppointmentsPresenter(
         past_appointments=list(appointments.past()),
