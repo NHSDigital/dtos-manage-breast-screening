@@ -135,7 +135,7 @@ class AppointmentStatus(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     appointment = models.ForeignKey(
-        Appointment, on_delete=models.PROTECT, related_name="statuses"
+        "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
     )
 
     class Meta:
