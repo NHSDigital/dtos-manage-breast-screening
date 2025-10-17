@@ -172,22 +172,22 @@ class TestAppointment:
         )
 
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "remaining"),
+            clinic.appointments.for_filter("remaining"),
             {confirmed, checked_in},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "checked_in"),
+            clinic.appointments.for_filter("checked_in"),
             {checked_in},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "complete"),
+            clinic.appointments.for_filter("complete"),
             {screened},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "all"),
+            clinic.appointments.for_filter("all"),
             {confirmed, checked_in, screened},
             ordered=False,
         )

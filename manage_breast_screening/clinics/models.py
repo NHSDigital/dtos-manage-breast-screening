@@ -117,6 +117,10 @@ class Clinic(BaseModel):
     objects = ClinicQuerySet.as_manager()
 
     @property
+    def appointments(self):
+        return Appointment.objects.filter(clinic_slot__clinic=self)
+
+    @property
     def provider(self):
         return self.setting.provider
 
