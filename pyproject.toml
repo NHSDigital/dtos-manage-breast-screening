@@ -3,9 +3,9 @@ name = "manage-breast-screening"
 version = "0.1.0"
 description = ""
 authors = [{ name = "Your Name", email = "you@example.com" }]
-license = { text = "MIT" }
-readme = "README.md"
 requires-python = ">=3.13,<4.0.0"
+readme = "README.md"
+license = { text = "MIT" }
 dependencies = [
   "django (>=5.1.7,<6.0.0)",
   "dotenv (>=0.9.9,<0.10.0)",
@@ -30,27 +30,28 @@ dependencies = [
   "azure-monitor-opentelemetry (>=1.8.1,<2.0.0)",
 ]
 
-[tool.poetry]
-package-mode = false
+[dependency-groups]
+dev = [
+  "pytest>=8.4.1,<9",
+  "pytest-django>=4.11.1,<5",
+  "time-machine>=2.17.0,<3",
+  "pytest-playwright>=0.7.0,<0.8",
+  "ipdb>=0.13.13,<0.14",
+  "axe-playwright-python>=0.1.5,<0.2",
+  "ruff>=0.14.1,<0.15",
+  "django-debug-toolbar>=6.0.0,<7",
+  "requests-mock>=1.12.1,<2",
+  "pytest-cov>=7.0.0,<8",
+  "djlint>=1.36.4,<2",
+  "jsonschema>=4.25.1,<5",
+]
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.4.1"
-pytest-django = "^4.11.1"
-time-machine = "^2.17.0"
-pytest-playwright = "^0.7.0"
-ipdb = "^0.13.13"
-axe-playwright-python = "^0.1.6"
-ruff = "^0.14.3"
-django-debug-toolbar = "^6.1.0"
-requests-mock = "^1.12.1"
-pytest-cov = "^7.0.0"
-djlint = "^1.36.4"
-jsonschema = "^4.25.1"
+[tool.uv]
+package = false
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "manage_breast_screening.config.settings_test"
