@@ -28,7 +28,8 @@ from manage_breast_screening.core.decorators import basic_auth_exempt
 @basic_auth_exempt
 @login_not_required
 def sha_view(requests):
-  return HttpResponse(settings.COMMIT_SHA)
+    return HttpResponse(settings.COMMIT_SHA)
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -58,7 +59,7 @@ urlpatterns = [
         include("manage_breast_screening.participants.urls", namespace="participants"),
     ),
     path(
-        "sha/",
+        "sha",
         sha_view,
     ),
     path("", RedirectView.as_view(pattern_name="clinics:index"), name="home"),
