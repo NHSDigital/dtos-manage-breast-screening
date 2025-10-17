@@ -34,18 +34,16 @@ class ClinicFilter(StrEnum):
 
 
 class ClinicQuerySet(models.QuerySet):
-    def by_filter(self, filter: str, provider_id):
-        queryset = self.filter(setting__provider_id=provider_id)
-
+    def by_filter(self, filter: str):
         match filter:
             case ClinicFilter.TODAY:
-                return queryset.today()
+                return self.today()
             case ClinicFilter.UPCOMING:
-                return queryset.upcoming()
+                return self.upcoming()
             case ClinicFilter.COMPLETED:
-                return queryset.completed()
+                return self.completed()
             case ClinicFilter.ALL:
-                return queryset
+                return self
             case _:
                 raise ValueError(filter)
 
@@ -124,17 +122,6 @@ class Clinic(BaseModel):
 
     def time_range(self):
         return {"start_time": self.starts_at, "end_time": self.ends_at}
-
-    @classmethod
-    def filter_counts(cls, provider_id):
-        queryset = cls.objects.filter(setting__provider_id=provider_id)
-
-        return {
-            ClinicFilter.ALL: queryset.count(),
-            ClinicFilter.TODAY: queryset.today().count(),
-            ClinicFilter.UPCOMING: queryset.upcoming().count(),
-            ClinicFilter.COMPLETED: queryset.completed().count(),
-        }
 
     def __str__(self):
         return self.setting.name + " " + self.starts_at.strftime("%Y-%m-%d %H:%M")
