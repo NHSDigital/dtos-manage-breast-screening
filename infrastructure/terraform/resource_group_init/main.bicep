@@ -6,6 +6,7 @@ param region string
 param storageAccountRGName string
 param storageAccountName string
 param appShortName string
+param entraIdGroupObjectId string
 
 var hubMap = {
   dev:                  'dev'
@@ -74,6 +75,17 @@ module managedIdentiyGHtoADO 'managedIdentity.bicep' = {
   }
 }
 
+// Reference the Entra ID group for RBAC assignments
+module entraIdGroup 'entraIdGroupRbac.bicep' = {
+  name: 'entraIdGroupRbac'
+  scope: subscription()
+  params: {
+    groupObjectId: entraIdGroupObjectId
+    appShortName: appShortName
+    envConfig: envConfig
+  }
+}
+
 // Let the GHtoADO managed identity access a subscription
 resource readerAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, envConfig, 'reader')
@@ -93,6 +105,8 @@ module terraformStateStorageAccount 'storage.bicep' = {
     enableSoftDelete: enableSoftDelete
     miPrincipalID: managedIdentiyADOtoAZ.outputs.miPrincipalID
     miName: miADOtoAZname
+    groupPrincipalId: entraIdGroup.outputs.groupPrincipalId
+    groupName: entraIdGroup.outputs.expectedGroupName
   }
 }
 
@@ -174,6 +188,8 @@ module keyVaultModule 'keyVault.bicep' = {
     miName: miADOtoAZname
     miPrincipalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
     region: region
+    groupPrincipalId: entraIdGroup.outputs.groupPrincipalId
+    groupName: entraIdGroup.outputs.expectedGroupName
   }
 }
 
@@ -196,6 +212,40 @@ resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01
     condition: '((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/write\'})) OR (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}})) AND ((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/delete\'})) OR (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}}))'
     conditionVersion: '2.0'
     description: '${miADOtoAZname} Role Based Access Control Administrator access to subscription. Only allows assigning the Key Vault Secrets User role.'
+  }
+}
+
+// Entra ID Group RBAC assignments - mirroring the managed identity permissions (excluding RBAC Admin)
+// Let the Entra ID group manage monitoring resources (Application Insights, Log Analytics)
+resource groupMonitoringContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, entraIdGroupObjectId, 'monitoringContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.monitoringContributor)
+    principalId: entraIdGroup.outputs.groupPrincipalId
+    principalType: 'Group'
+    description: '${entraIdGroup.outputs.expectedGroupName} Monitoring Contributor access to subscription'
+  }
+}
+
+// Let the Entra ID group configure vnet peering and DNS records
+resource groupNetworkContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, entraIdGroupObjectId, 'networkContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.networkContributor)
+    principalId: entraIdGroup.outputs.groupPrincipalId
+    principalType: 'Group'
+    description: '${entraIdGroup.outputs.expectedGroupName} Network Contributor access to subscription'
+  }
+}
+
+// Let the Entra ID group configure Front door and its resources
+resource groupCDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, entraIdGroupObjectId, 'CDNContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.CDNContributor)
+    principalId: entraIdGroup.outputs.groupPrincipalId
+    principalType: 'Group'
+    description: '${entraIdGroup.outputs.expectedGroupName} CDN Contributor access to subscription'
   }
 }
 
