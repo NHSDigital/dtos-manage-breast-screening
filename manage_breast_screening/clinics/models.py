@@ -35,7 +35,7 @@ class Provider(BaseModel):
 
 class Setting(BaseModel):
     name = models.TextField()
-    provider = models.ForeignKey(Provider, on_delete=models.PROTECT)
+    provider = models.ForeignKey("clinics.Provider", on_delete=models.PROTECT)
 
     def __str__(self):
         return self.name
@@ -108,7 +108,7 @@ class Clinic(BaseModel):
 
     TYPE_CHOICES = {Type.ASSESSMENT: "Assessment", Type.SCREENING: "Screening"}
 
-    setting = models.ForeignKey(Setting, on_delete=models.PROTECT)
+    setting = models.ForeignKey("clinics.Setting", on_delete=models.PROTECT)
     starts_at = models.DateTimeField()
     ends_at = models.DateTimeField()
     type = models.CharField(choices=TYPE_CHOICES, max_length=50)
@@ -155,7 +155,7 @@ class Clinic(BaseModel):
 
 class ClinicSlot(BaseModel):
     clinic = models.ForeignKey(
-        Clinic, on_delete=models.PROTECT, related_name="clinic_slots"
+        "clinics.Clinic", on_delete=models.PROTECT, related_name="clinic_slots"
     )
     starts_at = models.DateTimeField()
     duration_in_minutes = models.IntegerField()
@@ -190,7 +190,7 @@ class ClinicStatus(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     state = models.CharField(choices=STATE_CHOICES, max_length=50)
     clinic = models.ForeignKey(
-        Clinic, on_delete=models.PROTECT, related_name="statuses"
+        "clinics.Clinic", on_delete=models.PROTECT, related_name="statuses"
     )
 
 
@@ -203,7 +203,7 @@ class UserAssignment(BaseModel):
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="assignments"
     )
     provider = models.ForeignKey(
-        Provider, on_delete=models.PROTECT, related_name="assignments"
+        "clinics.Provider", on_delete=models.PROTECT, related_name="assignments"
     )
     roles = ArrayField(
         base_field=models.CharField(
