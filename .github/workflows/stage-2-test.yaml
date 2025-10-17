@@ -78,15 +78,16 @@ jobs:
             notifications:
               - 'manage_breast_screening/notifications/**'
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: '**/uv.lock'
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
         with:
           python-version: '${{inputs.python_version}}'
-          cache: poetry
-          cache-dependency-path: ./poetry.lock
 
       - name: Install dependencies
         run: make dependencies
@@ -123,15 +124,16 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v5
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: '**/uv.lock'
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
         with:
           python-version: '${{inputs.python_version}}'
-          cache: poetry
-          cache-dependency-path: ./poetry.lock
 
       - name: Install dependencies
         run: make dependencies
@@ -168,15 +170,16 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v5
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: '**/uv.lock'
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
         with:
           python-version: '${{inputs.python_version}}'
-          cache: poetry
-          cache-dependency-path: ./poetry.lock
 
       - name: Install dependencies
         run: make dependencies
@@ -213,15 +216,16 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v5
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: '**/uv.lock'
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
         with:
           python-version: '${{inputs.python_version}}'
-          cache: poetry
-          cache-dependency-path: ./poetry.lock
 
       - name: Install dependencies
         run: make dependencies
@@ -230,7 +234,7 @@ jobs:
         run: npm run compile
 
       - name: Install Playwright browsers
-        run: poetry run playwright install chromium --with-deps --only-shell
+        run: uv run playwright install chromium --with-deps --only-shell
 
       - name: 'Run Playwright system tests'
         run: make test-ui
@@ -249,15 +253,16 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v5
 
-      - name: Install poetry
-        run: pipx install poetry
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: '**/uv.lock'
 
       - name: Set up Python
         uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c
         with:
           python-version: '${{inputs.python_version}}'
-          cache: poetry
-          cache-dependency-path: ./poetry.lock
 
       - name: Install dependencies
         run: make dependencies
