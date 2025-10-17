@@ -48,18 +48,21 @@ class AppointmentQuerySet(models.QuerySet):
     def past(self):
         return self.filter(clinic_slot__starts_at__date__lt=date.today())
 
-    def for_clinic_and_filter(self, clinic, filter):
+    def for_filter(self, filter):
         match filter:
             case "remaining":
-                return self.remaining().filter(clinic_slot__clinic=clinic)
+                return self.remaining()
             case "checked_in":
-                return self.checked_in().filter(clinic_slot__clinic=clinic)
+                return self.checked_in()
             case "complete":
-                return self.complete().filter(clinic_slot__clinic=clinic)
+                return self.complete()
             case "all":
-                return self.filter(clinic_slot__clinic=clinic)
+                return self
             case _:
                 raise ValueError(filter)
+
+    def order_by_starts_at(self):
+        return self.order_by("clinic_slot__starts_at")
 
 
 class Appointment(BaseModel):
@@ -77,7 +80,7 @@ class Appointment(BaseModel):
     def filter_counts_for_clinic(cls, clinic):
         counts = {}
         for filter in ["remaining", "checked_in", "complete", "all"]:
-            counts[filter] = cls.objects.for_clinic_and_filter(clinic, filter).count()
+            counts[filter] = clinic.appointments.for_filter(filter).count()
         return counts
 
     @property
