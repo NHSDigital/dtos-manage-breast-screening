@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 from logging import getLogger
 from smtplib import SMTP
 
+from django.template.loader import render_to_string
+
 logger = getLogger(__name__)
 
 SMTP_SERVER = "smtp.office365.com"
@@ -55,7 +57,7 @@ class NhsMail:
     def _get_email_content(self, attachment_data, attachment_filename, report_type):
         todays_date = datetime.today().strftime("%d-%m-%Y")
         content = (
-            self.failure_report_content(todays_date)
+            self.invites_not_sent_content(todays_date)
             if report_type == "invites_not_sent"
             else self.aggregate_report_content(todays_date)
         )
@@ -76,19 +78,17 @@ class NhsMail:
 
         return message
 
-    def failure_report_content(self, date) -> dict[str, str]:
+    def invites_not_sent_content(self, date) -> dict[str, str]:
         return {
-            "subject": self._failure_report_subject_text(date),
-            "body": self._failure_report_body_text(),
+            "subject": self._invites_not_sent_subject_text(date),
+            "body": self._invites_not_sent_body_text(),
         }
 
-    def _failure_report_subject_text(self, date) -> str:
+    def _invites_not_sent_subject_text(self, date) -> str:
         return f"Breast screening digital comms invites not sent report – {date} – Birmingham (MCR)"
 
-    def _failure_report_body_text(self) -> str:
-        return f"""Hello \n
-                Please find invites not sent report attached. \n
-                For any questions please email {self._sender_email}"""
+    def _invites_not_sent_body_text(self) -> str:
+        return render_to_string("report_emails/invites_not_sent.html")
 
     def aggregate_report_content(self, date) -> dict[str, str]:
         return {
@@ -100,6 +100,4 @@ class NhsMail:
         return f"Breast screening digital comms daily aggregate report – {date} – Birmingham (MCR)"
 
     def _aggregate_report_body_text(self) -> str:
-        return f"""Hello \n
-                Please find daily aggregate report attached. \n
-                For any questions please email {self._sender_email}"""
+        return render_to_string("report_emails/aggregate.html")

@@ -1,8 +1,7 @@
-import base64
 import email
 import smtplib
 from datetime import datetime
-from email.header import decode_header
+from email.header import decode_header, make_header
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
@@ -54,22 +53,29 @@ class TestNhsMail:
         mock_smtp_server.sendmail.assert_called_once_with(
             "sender@nhsmail.net", ["recipient@nhsmail.net"], ANY
         )
-        email_content = mock_smtp_server.sendmail.call_args[0][2]
 
-        decoded_email = email.message_from_string(email_content)
-        decoded_subject_line = decode_header(decoded_email["Subject"])[0][0].decode(
-            "utf-8"
-        )
+        email_content = mock_smtp_server.sendmail.call_args[0][2]
+        mime_message = email.message_from_string(email_content)
+
+        decoded_subject_line = str(make_header(decode_header(mime_message["Subject"])))
         assert (
             "Breast screening digital comms invites not sent report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
-        assert "Please find invites not sent report attached." in email_content
-        assert "filename.csv" in email_content
-        decoded_attachment_data = base64.b64encode(csv_data.encode("utf-8")).decode(
-            "utf-8"
+        assert (
+            "It's important that you take action when you receive this email"
+            in email_content
         )
-        assert decoded_attachment_data in email_content
+
+        assert "filename.csv" in email_content
+        decoded_attachment_data = (
+            mime_message.get_payload()[1]  # type: ignore
+            .get_payload(  # type: ignore
+                None, True
+            )
+            .decode("utf-8")  # type: ignore
+        )
+        assert csv_data in decoded_attachment_data
 
     def test_sends_an_aggregate_report_email(self, mock_smtp_server, csv_data):
         subject = NhsMail()
@@ -80,23 +86,27 @@ class TestNhsMail:
             "sender@nhsmail.net", ["recipient@nhsmail.net"], ANY
         )
         email_content = mock_smtp_server.sendmail.call_args[0][2]
+        mime_message = email.message_from_string(email_content)
 
-        decoded_email = email.message_from_string(email_content)
-        decoded_subject_line = decode_header(decoded_email["Subject"])[0][0].decode(
-            "utf-8"
-        )
+        decoded_subject_line = str(make_header(decode_header(mime_message["Subject"])))
 
         assert (
             "Breast screening digital comms daily aggregate report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
-        assert "Please find invites not sent report attached." not in email_content
-        assert "Please find daily aggregate report attached." in email_content
-        assert "filename.csv" in email_content
-        decoded_attachment_data = base64.b64encode(csv_data.encode("utf-8")).decode(
-            "utf-8"
+        assert (
+            "Attached to the email is the daily report for breast screening digital"
+            in email_content
         )
-        assert decoded_attachment_data in email_content
+        assert "filename.csv" in email_content
+        decoded_attachment_data = (
+            mime_message.get_payload()[1]  # type: ignore
+            .get_payload(  # type: ignore
+                None, True
+            )
+            .decode("utf-8")  # type: ignore
+        )
+        assert csv_data in decoded_attachment_data
 
     def test_raises_exception_if_email_fails(self, mock_smtp_server, csv_data):
         mock_smtp_server.sendmail.side_effect = smtplib.SMTPException
