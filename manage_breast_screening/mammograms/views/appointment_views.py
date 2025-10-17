@@ -1,6 +1,7 @@
 import logging
 
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_http_methods
@@ -9,7 +10,9 @@ from django.views.generic import FormView, TemplateView
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
+    Appointment,
     AppointmentStatus,
+    Participant,
     ParticipantReportedMammogram,
 )
 
@@ -173,10 +176,12 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
-        participant = get_object_or_404(
-            self.request.current_provider.participants,
-            screeningepisode__appointment__pk=pk,
-        )
+        try:
+            participant = self.request.current_provider.participants.get(
+                screeningepisode__appointment__pk=pk,
+            )
+        except Participant.DoesNotExist:
+            raise Http404("Participant not found")
         context.update(
             {
                 "heading": "Record medical information",
@@ -240,7 +245,10 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 
 @require_http_methods(["POST"])
 def check_in(request, pk):
-    appointment = get_object_or_404(request.current_provider.appointments, pk=pk)
+    try:
+        appointment = request.current_provider.appointments.get(pk=pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)

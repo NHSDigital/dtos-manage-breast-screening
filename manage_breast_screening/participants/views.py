@@ -1,14 +1,15 @@
 from logging import getLogger
 from urllib.parse import urlparse
 
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
 from manage_breast_screening.participants.services import fetch_most_recent_provider
 
 from .forms import EthnicityForm, ParticipantReportedMammogramForm
-from .models import ParticipantReportedMammogram
+from .models import Participant, ParticipantReportedMammogram
 from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
 
 logger = getLogger(__name__)
@@ -33,7 +34,10 @@ def parse_return_url(request, default: str) -> str:
 
 def show(request, pk):
     provider = request.current_provider
-    participant = get_object_or_404(provider.participants, pk=pk)
+    try:
+        participant = provider.participants.get(pk=pk)
+    except Participant.DoesNotExist:
+        raise Http404("Participant not found")
     presented_participant = ParticipantPresenter(participant)
 
     appointments = (
@@ -71,7 +75,10 @@ def show(request, pk):
 
 
 def edit_ethnicity(request, pk):
-    participant = get_object_or_404(request.current_provider.participants, pk=pk)
+    try:
+        participant = request.current_provider.participants.get(pk=pk)
+    except Participant.DoesNotExist:
+        raise Http404("Participant not found")
 
     if request.method == "POST":
         return_url = request.POST.get("return_url")
@@ -104,7 +111,10 @@ def edit_ethnicity(request, pk):
 
 
 def add_previous_mammogram(request, pk):
-    participant = get_object_or_404(request.current_provider.participants, pk=pk)
+    try:
+        participant = request.current_provider.participants.get(pk=pk)
+    except Participant.DoesNotExist:
+        raise Http404("Participant not found")
     most_recent_provider = fetch_most_recent_provider(pk)
     return_url = parse_return_url(
         request, default=reverse("participants:show", kwargs={"pk": pk})

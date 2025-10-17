@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from ..core.decorators import current_provider_exempt
@@ -49,9 +50,10 @@ def clinic(request, pk, filter="remaining"):
 
 @require_http_methods(["POST"])
 def check_in(request, pk, appointment_pk):
-    appointment = get_object_or_404(
-        request.current_provider.appointments, pk=appointment_pk
-    )
+    try:
+        appointment = request.current_provider.appointments.get(pk=appointment_pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)

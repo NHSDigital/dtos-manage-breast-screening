@@ -3,7 +3,8 @@ from urllib.parse import urlencode
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_not_required
 from django.db.models import Case, Q, When
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 from django.urls import reverse
 
 from manage_breast_screening.core.utils.urls import extract_next_path_from_params
@@ -17,7 +18,10 @@ def persona_login(request):
     next_path = extract_next_path_from_params(request)
 
     if request.method == "POST":
-        user = get_object_or_404(users, nhs_uid=request.POST["username"])
+        try:
+            user = get_user_model().objects.get(nhs_uid=request.POST["username"])
+        except get_user_model().DoesNotExist:
+            raise Http404("User not found")
         login(
             request, user, backend="manage_breast_screening.auth.backends.CIS2Backend"
         )
