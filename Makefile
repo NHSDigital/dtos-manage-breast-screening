@@ -106,6 +106,8 @@ _clean-docker:
 manage_breast_screening/config/.env:
 	cp manage_breast_screening/config/.env.tpl manage_breast_screening/config/.env
 
+diagrams:
+	docker run -it --rm -p 8080:8080 -v ${PWD}/docs/diagrams:/usr/local/structurizr structurizr/lite
 
 .DEFAULT_GOAL := help
 .PHONY: clean config dependencies build deploy githooks-config githooks-run help test test-unit test-lint test-ui run _install-poetry _clean-docker rebuild-db db migrate seed shell

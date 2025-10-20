@@ -104,7 +104,15 @@ Then run the app and navigate to `http://localhost:8000/admin`
 
 The service will be deployed as a web application, backed by a postgres database with authentication provided by NHS CIS2. In addtion to these elements we will deploy a gateway application to each breast screening unit that uses the service that will be responsible for interop with local hospital systems. The gateway will be developed in a future phase of this project and is not currently under active development.
 
-![](docs/diagrams/container-diagram.png)
+![](docs/diagrams/svg/structurizr-1-SystemContext-001.svg)
+
+Display diagrams interactively:
+- Run `make diagrams`
+- Open `http://localhost:8080/` in a browser
+- Select views from the sidebar or double click on diagram elements
+
+Alternatively, [view all static diagrams](docs/diagrams/README.md).
+
 
 ### Structure
 

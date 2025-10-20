@@ -33,3 +33,7 @@ coverage
 
 # MacOS Finder hidden files
 .DS_Store
+
+# Structurizr
+.structurizr
+workspace.json
