@@ -1,6 +1,6 @@
-SELECT  appt.nhs_number,
-        TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS appointment_date,
-        cl.code AS clinic_code,
+SELECT  appt.nhs_number AS "NHS number",
+        TO_CHAR(appt.starts_at, 'yyyy-mm-dd') AS "Appointment date",
+        cl.code AS "Clinic code",
         CASE
           WHEN appt.episode_type = 'F' THEN 'Routine first call'
           WHEN appt.episode_type = 'G' THEN 'GP Referral'
@@ -9,12 +9,12 @@ SELECT  appt.nhs_number,
           WHEN appt.episode_type = 'R' THEN 'Routine recall'
           WHEN appt.episode_type = 'S' THEN 'Self referral'
           WHEN appt.episode_type = 'T' THEN 'VHR short-term recall'
-        END as episode_type,
+        END AS "Episode type",
         CASE
           WHEN msg_sts.id IS NULL THEN TO_CHAR(msg.sent_at, 'yyyy-mm-dd')
           WHEN msg_sts.id IS NOT NULL THEN TO_CHAR(msg_sts.status_updated_at, 'yyyy-mm-dd')
           ELSE TO_CHAR(appt.created_at, 'yyyy-mm-dd')
-        END AS failure_date,
+        END AS "Failed date",
         CASE
           WHEN CAST(appt.number AS INTEGER) > 1 THEN 'invitation not sent as not a 1st time appointment'
           WHEN appt.episode_type IN ('H', 'T', 'N') THEN 'invitation not sent as episode type is not supported'
@@ -27,7 +27,7 @@ SELECT  appt.nhs_number,
             )
           )
           WHEN msg_sts.description IS NOT NULL THEN msg_sts.description
-        END AS failure_reason
+        END AS "Reason"
 FROM    notifications_appointment appt
 JOIN    notifications_clinic cl ON appt.clinic_id = cl.id
 JOIN    notifications_message msg ON msg.appointment_id = appt.id

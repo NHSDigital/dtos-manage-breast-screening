@@ -90,7 +90,7 @@ class TestCreateReports:
 
     def test_handle_raises_command_error(self):
         with patch(
-            "manage_breast_screening.notifications.queries.failures_query.FailuresQuery"
+            "manage_breast_screening.notifications.queries.helper.Helper"
         ) as mock_query:
             mock_query.sql.side_effect = Exception("err")
 
