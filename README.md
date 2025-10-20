@@ -107,12 +107,12 @@ The service will be deployed as a web application, backed by a postgres database
 ![](docs/diagrams/svg/structurizr-1-SystemContext-001.svg)
 
 Display diagrams interactively:
+
 - Run `make diagrams`
 - Open `http://localhost:8080/` in a browser
 - Select views from the sidebar or double click on diagram elements
 
 Alternatively, [view all static diagrams](docs/diagrams/README.md).
-
 
 ### Structure
 
