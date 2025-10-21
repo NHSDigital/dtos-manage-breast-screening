@@ -78,7 +78,7 @@ run: manage_breast_screening/config/.env # Start the development server @Develop
 db: manage_breast_screening/config/.env # Start the development database @Development
 	docker compose --env-file manage_breast_screening/config/.env up -d --wait
 
-local: db seed-demo-data personas run
+local: config seed-demo-data personas run
 
 rebuild-db: _clean-docker db migrate seed  # Create a fresh development database @Development
 
