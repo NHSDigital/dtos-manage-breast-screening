@@ -3,7 +3,10 @@ include scripts/terraform/terraform.mk
 
 .DEFAULT_GOAL := help
 
-.PHONY: assets build clean config db deploy diagrams githooks-config githooks-run help local migrate models rebuild-db run seed seed-demo-data shell test test-end-to-end test-integration test-lint test-lint-templates test-ui test-unit dependencies _clean-docker _install-poetry
+.PHONY: _clean-docker _install-poetry assets build clean config db dependencies deploy \
+	diagrams githooks-config githooks-run help local migrate models personas rebuild-db run \
+	seed seed-demo-data shell test test-end-to-end test-integration test-lint \
+	test-lint-templates test-ui test-unit
 .SILENT: help run
 
 # ---------------------------------------------------------------------------
@@ -75,12 +78,15 @@ run: manage_breast_screening/config/.env # Start the development server @Develop
 db: manage_breast_screening/config/.env # Start the development database @Development
 	docker compose --env-file manage_breast_screening/config/.env up -d --wait
 
-local: db run
+local: db seed-demo-data personas run
 
 rebuild-db: _clean-docker db migrate seed  # Create a fresh development database @Development
 
 migrate:  # Run migrations
 	poetry run ./manage.py migrate
+
+personas: # Add personas to the database @Development
+	poetry run ./manage.py create_personas
 
 seed:  # Load seed data
 	#noop for now we'll use this to load lookup tables etc rather than test data
