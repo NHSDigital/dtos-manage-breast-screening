@@ -70,7 +70,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
     def given_i_am_signed_in(self):
         User = get_user_model()
         self.user = User.objects.create_user(
-            nhs_uid="user-123", email="user@example.com", password="irrelevant"
+            nhs_uid="user-123", email="user@example.com"
         )
 
         self.login_as_user(self.user)
@@ -81,11 +81,11 @@ class TestCIS2BackChannelLogout(SystemTestCase):
     def and_someone_else_is_signed_in(self):
         User = get_user_model()
         self.another_user = User.objects.create_user(
-            nhs_uid="another-user", email="another@example.com", password="irrelevant"
+            nhs_uid="another-user", email="another@example.com"
         )
         # Log in with a different session
         client = TestClient()
-        client.login(username=self.another_user.nhs_uid, password="irrelevant")
+        client.force_login(self.another_user)
 
     def and_there_is_a_cis2_logout_token(self):
         self.token = self._create_logout_token()
