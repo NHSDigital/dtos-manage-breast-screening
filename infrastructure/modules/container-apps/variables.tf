@@ -188,8 +188,7 @@ locals {
   database_user = "admin"
   database_name = "manage_breast_screening"
   # Here we expect the environment to be in format pr-XXX. For example PR 1234 would have environment pr-1234 and port 2234
-  database_port = var.deploy_database_as_container ? tonumber(regex("\\d+", var.environment)) + 1000 : 5432
-
+  database_port = var.deploy_database_as_container ? try(tonumber(regex("\\d+", var.environment)), 24) + 1000 : 5432
   env_vars_from_yaml = yamldecode(
     file("${path.module}/../../environments/${var.env_config}/variables.yml")
   )
@@ -226,4 +225,11 @@ locals {
     }
   }
   storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
+
+  always_allowed_paths = ["/sha"]
+  # If allowed_paths is not set, use the module default which allows any pattern
+  # If it is set, include the default paths
+  patterns_to_match = (var.allowed_paths == null ? null :
+    concat(local.always_allowed_paths, var.allowed_paths)
+  )
 }

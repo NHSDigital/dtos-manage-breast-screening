@@ -37,13 +37,15 @@ class TestApplicationInsightsLogging:
             "CustomError", stack_info=True
         )
 
-    def test_trigger_an_event(self, mock_logging, mock_configure_azure):
-        ApplicationInsightsLogging().custom_event("CustomEvent", "something went wrong")
+    def test_custom_event(self, mock_logging, mock_configure_azure):
+        ApplicationInsightsLogging().custom_event(
+            "something went wrong", "custom-event"
+        )
         mock_logging.getLogger.assert_called_with("insights-logger")
         mock_logging.getLogger.return_value.warning.assert_called_with(
-            "CustomEvent",
+            "something went wrong",
             extra={
-                "microsoft.custom_event.name": "CustomEvent",
+                "microsoft.custom_event.name": "custom-event",
                 "additional_attrs": "something went wrong",
             },
         )

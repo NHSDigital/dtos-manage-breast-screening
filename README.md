@@ -88,23 +88,19 @@ There is a make task to seed a non-production instance of the service with examp
 
 This command wipes the database entirely before populating it with fictitious data. The data is contained in yaml files in the [data directory](/data) and can be amended etc there as required.
 
-### Django admin
-
-We'll probably remove it before deploying to production, but currently Django admin is enabled.
-
-To use it, first create a superuser
-
-```sh
-poetry run ./manage.py createsuperuser
-```
-
-Then run the app and navigate to `http://localhost:8000/admin`
-
 ## Design
 
 The service will be deployed as a web application, backed by a postgres database with authentication provided by NHS CIS2. In addtion to these elements we will deploy a gateway application to each breast screening unit that uses the service that will be responsible for interop with local hospital systems. The gateway will be developed in a future phase of this project and is not currently under active development.
 
-![](docs/diagrams/container-diagram.png)
+![](docs/diagrams/svg/structurizr-1-SystemContext-001.svg)
+
+Display diagrams interactively:
+
+- Run `make diagrams`
+- Open `http://localhost:8080/` in a browser
+- Select views from the sidebar or double click on diagram elements
+
+Alternatively, [view all static diagrams](docs/diagrams/README.md).
 
 ### Structure
 

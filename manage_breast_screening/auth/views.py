@@ -1,6 +1,6 @@
 import logging
 
-from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_not_required
@@ -65,24 +65,11 @@ def cis2_callback(request):
     if not sub:
         return HttpResponseBadRequest("Missing subject in CIS2 response")
 
-    User = get_user_model()
-    defaults = {}
+    user = authenticate(request, cis2_sub=sub, cis2_userinfo=userinfo)
+    if not user:
+        return HttpResponseBadRequest("Failed to create/update authenticated CIS2 user")
 
-    for db_field, userinfo_field in [
-        ("email", "email"),
-        ("first_name", "given_name"),
-        ("last_name", "family_name"),
-    ]:
-        value = userinfo.get(userinfo_field, "")
-        if value:
-            defaults[db_field] = value
-        else:
-            logger.warning(
-                f"Missing or empty {userinfo_field} in CIS2 userinfo response"
-            )
-
-    user, _ = User.objects.update_or_create(nhs_uid=sub, defaults=defaults)
-    auth_login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+    auth_login(request, user)
 
     return redirect(reverse("clinics:select_provider"))
 

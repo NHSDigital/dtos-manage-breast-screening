@@ -6,8 +6,7 @@ import pandas
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
-from manage_breast_screening.notifications.queries.aggregate_query import AggregateQuery
-from manage_breast_screening.notifications.queries.failures_query import FailuresQuery
+from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
@@ -28,20 +27,19 @@ class Command(BaseCommand):
     """
 
     REPORTS = [
-        [AggregateQuery, ("3 months",)],
-        [FailuresQuery, (datetime.now(),)],
+        ["aggregate", ("3 months",), "aggregate"],
+        ["failures", (datetime.now(),), "invites_not_sent"],
     ]
 
     def handle(self, *args, **options):
         logger.info("Create Report Command started")
         try:
-            for query, params in self.REPORTS:
-                report_type = query.__name__.replace("Query", "").lower()
+            for sqlfile, params, report_type in self.REPORTS:
                 dataframe = pandas.read_sql(
-                    query.sql(), connection, params=params, columns=query.columns()
+                    Helper.sql(sqlfile), connection, params=params
                 )
 
-                csv = dataframe.to_csv()
+                csv = dataframe.to_csv(index=False)
 
                 BlobStorage().add(
                     self.filename(report_type),
@@ -62,4 +60,4 @@ class Command(BaseCommand):
 
     def filename(self, report_type: str) -> str:
         formatted_time = datetime.today().strftime("%Y-%m-%dT%H:%M:%S")
-        return f"{formatted_time}-{report_type}-report.csv"
+        return f"{formatted_time}-{report_type.replace('_', '-')}-report.csv"

@@ -109,6 +109,7 @@ module "scheduled_jobs" {
     "python manage.py ${each.value.job_container_args}"
   ]
 
+  secret_variables    = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   docker_image        = var.docker_image
   replica_retry_limit = 0
   user_assigned_identity_ids = flatten([
@@ -127,7 +128,6 @@ module "scheduled_jobs" {
     each.value.environment_variables,
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
-
 
   # alerts
   action_group_id            = var.action_group_id

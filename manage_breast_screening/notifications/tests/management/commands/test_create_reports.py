@@ -56,7 +56,9 @@ class TestCreateReports:
             Command().handle()
 
         aggregate_filename = now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv")
-        failures_filename = now.strftime("%Y-%m-%dT%H:%M:%S-failures-report.csv")
+        failures_filename = now.strftime(
+            "%Y-%m-%dT%H:%M:%S-invites-not-sent-report.csv"
+        )
 
         mock_blob_storage = md[0]
         assert mock_blob_storage.add.call_count == 2
@@ -83,12 +85,12 @@ class TestCreateReports:
         mock_email_service.send_report_email.assert_any_call(
             attachment_data=csv_data,
             attachment_filename=failures_filename,
-            report_type="failures",
+            report_type="invites_not_sent",
         )
 
     def test_handle_raises_command_error(self):
         with patch(
-            "manage_breast_screening.notifications.queries.failures_query.FailuresQuery"
+            "manage_breast_screening.notifications.queries.helper.Helper"
         ) as mock_query:
             mock_query.sql.side_effect = Exception("err")
 

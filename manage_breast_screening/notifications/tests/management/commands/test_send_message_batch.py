@@ -19,6 +19,9 @@ from manage_breast_screening.notifications.management.commands.send_message_batc
 )
 from manage_breast_screening.notifications.models import Message, MessageBatch
 from manage_breast_screening.notifications.services.api_client import ApiClient
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.tests.factories import AppointmentFactory
 
 
@@ -29,6 +32,13 @@ from manage_breast_screening.notifications.tests.factories import AppointmentFac
 @pytest.mark.time_machine(datetime.today() + relativedelta.relativedelta(weekday=0))
 @pytest.mark.django_db
 class TestSendMessageBatch:
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "getLogger", mock_insights_logger
+        )
+
     def test_handle_with_a_batch_to_send(
         self, mock_mark_batch_as_sent, mock_send_message_batch
     ):

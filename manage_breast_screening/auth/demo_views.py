@@ -18,7 +18,9 @@ def persona_login(request):
 
     if request.method == "POST":
         user = get_object_or_404(users, nhs_uid=request.POST["username"])
-        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+        login(
+            request, user, backend="manage_breast_screening.auth.backends.CIS2Backend"
+        )
 
         redirect_url = reverse("clinics:select_provider")
         if next_path:
