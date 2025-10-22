@@ -14,6 +14,11 @@ variable "app_short_name" {
   type        = string
 }
 
+variable "resource_group_name_infra" {
+  description = "resource group name infra"
+  type        = string
+}
+
 variable "allowed_paths" {
   description = "List of allowed paths for manbrs service. Empty = allow all."
   type        = list(string)
@@ -150,6 +155,11 @@ variable "enable_alerting" {
   type        = bool
 }
 
+variable "target_url" {
+  description = "The external url"
+  type        = string
+}
+
 variable "alert_window_size" {
   type     = string
   nullable = false
@@ -177,6 +187,11 @@ variable "infra_key_vault_rg" {
 
 variable "app_insights_connection_string" {
   description = "The Application Insights connection string."
+  type        = string
+}
+
+variable "app_insights_id" {
+  description = "The Application Insights id."
   type        = string
 }
 

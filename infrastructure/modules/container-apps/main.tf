@@ -49,3 +49,14 @@ module "webapp" {
   is_web_app = true
   port       = 8000
 }
+
+module "azurerm_application_insights_standard_web_test" {
+  count = var.enable_alerting ? 1 : 0
+
+  source                  = "../dtos-devops-templates/infrastructure/modules/application-insights-availability-test"
+  name                    = "${var.app_short_name}-web-${var.environment}"
+  resource_group_name     = var.resource_group_name_infra
+  location                = var.region
+  application_insights_id = var.app_insights_id
+  target_url              = var.target_url
+}
