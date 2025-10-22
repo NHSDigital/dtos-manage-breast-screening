@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import pytest
+import time_machine
 from django.db import connection
 
 from manage_breast_screening.notifications.queries.helper import Helper
@@ -205,6 +206,44 @@ class TestFailuresQuery:
 
         assert len(results) == 1
         assert list(results[0])[0] == 9990001111
+
+    @time_machine.travel("2025-03-30 10:00:00", tick=False)
+    @pytest.mark.django_db
+    def test_appointments_around_bst_start(self):
+        """
+        Test appointments near the BST start boundary (March 30, 2025).
+        """
+
+        # Before bst (should be excluded)
+        before_bst = datetime(2025, 3, 30, 00, 30)  # 30 mins before boundary
+        # After bst (should be included)
+        after_bst = datetime(2025, 3, 30, 1, 30)  # 30 mins after boundary
+
+        self.create_message_set(
+            {
+                "starts_at": before_bst,
+                "nhs_number": "9990001111",
+                "episode_type": "S",
+            },
+            {"status": "failed"},
+            {"status": "failed", "description": "No reachable communication channel"},
+        )
+
+        self.create_message_set(
+            {
+                "starts_at": after_bst,
+                "nhs_number": "9990001111",
+                "episode_type": "S",
+            },
+            {"status": "failed"},
+            {"status": "failed", "description": "No reachable communication channel"},
+        )
+
+        with connection.cursor() as cursor:
+            cursor.execute(Helper.sql("failures"), (datetime.now().date(),))
+            results = cursor.fetchall()
+
+        assert len(results) == 2
 
     @pytest.mark.django_db
     def test_failures_query_columns(self):
