@@ -1,6 +1,5 @@
 import re
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -15,19 +14,9 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestEditingSpecialAppointments(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        self.participant = ParticipantFactory(
-            first_name="Janet", last_name="Williams", extra_needs={}
-        )
-        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(
-            screening_episode=self.screening_episode,
-            current_status=AppointmentStatus.CONFIRMED,
-        )
-
     def test_setting_up_a_special_appointment(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
         self.then_i_am_on_the_special_appointment_form()
@@ -40,6 +29,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def test_setting_up_a_special_appointment_with_a_temporary_reason(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
         self.and_i_add_a_reason()
@@ -50,6 +40,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def test_setting_up_a_special_appointment_with_multiple_reasons(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_make_special_appointment()
         self.and_i_add_a_reason()
@@ -63,6 +54,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def test_adding_reasons_to_a_special_appointment(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_the_participant_already_has_reasons_set()
         self.and_i_am_on_the_appointment_show_page()
         self.then_i_see_the_special_appointment_banner()
@@ -75,6 +67,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def test_removing_all_reasons_removes_the_banner(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_the_participant_already_has_reasons_set()
         self.and_i_am_on_the_appointment_show_page()
         self.when_i_click_on_the_change_link()
@@ -85,9 +78,21 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def test_form_error_when_required_fields_are_missing(self):
         self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
         self.and_i_am_on_the_form()
         self.when_i_submit_the_form()
         self.then_i_should_see_an_error_for_the_required_fields()
+
+    def and_there_is_an_appointment(self):
+        self.participant = ParticipantFactory(
+            first_name="Janet", last_name="Williams", extra_needs={}
+        )
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            current_status=AppointmentStatus.CONFIRMED,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+        )
 
     def and_the_participant_already_has_reasons_set(self):
         self.participant.extra_needs = {

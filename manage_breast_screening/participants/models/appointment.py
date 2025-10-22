@@ -48,24 +48,23 @@ class AppointmentQuerySet(models.QuerySet):
     def past(self):
         return self.filter(clinic_slot__starts_at__date__lt=date.today())
 
-    def for_clinic_and_filter(self, clinic, filter):
+    def for_filter(self, filter):
         match filter:
             case "remaining":
-                return self.remaining().filter(clinic_slot__clinic=clinic)
+                return self.remaining()
             case "checked_in":
-                return self.checked_in().filter(clinic_slot__clinic=clinic)
+                return self.checked_in()
             case "complete":
-                return self.complete().filter(clinic_slot__clinic=clinic)
+                return self.complete()
             case "all":
-                return self.filter(clinic_slot__clinic=clinic)
+                return self
             case _:
                 raise ValueError(filter)
 
-    def filter_counts_for_clinic(self, clinic):
-        counts = {}
-        for filter in ["remaining", "checked_in", "complete", "all"]:
-            counts[filter] = self.for_clinic_and_filter(clinic, filter).count()
-        return counts
+    def order_by_starts_at(self, desc=False):
+        return self.order_by(
+            "-clinic_slot__starts_at" if desc else "clinic_slot__starts_at"
+        )
 
 
 class Appointment(BaseModel):
@@ -78,6 +77,13 @@ class Appointment(BaseModel):
     )
     reinvite = models.BooleanField(default=False)
     stopped_reasons = models.JSONField(null=True, blank=True)
+
+    @classmethod
+    def filter_counts_for_clinic(cls, clinic):
+        counts = {}
+        for filter in ["remaining", "checked_in", "complete", "all"]:
+            counts[filter] = clinic.appointments.for_filter(filter).count()
+        return counts
 
     @property
     def provider(self):
@@ -134,7 +140,7 @@ class AppointmentStatus(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     appointment = models.ForeignKey(
-        Appointment, on_delete=models.PROTECT, related_name="statuses"
+        "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
     )
 
     class Meta:

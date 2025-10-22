@@ -1,5 +1,6 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
 from django.views.generic import FormView
@@ -77,12 +78,14 @@ class ChangeSymptomView(BaseSymptomFormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        instance = get_object_or_404(
-            Symptom,
-            pk=self.kwargs["symptom_pk"],
-            appointment_id=self.kwargs["pk"],
-            **self.extra_filters(),
-        )
+        try:
+            instance = Symptom.objects.get(
+                pk=self.kwargs["symptom_pk"],
+                appointment_id=self.kwargs["pk"],
+                **self.extra_filters(),
+            )
+        except Symptom.DoesNotExist:
+            raise Http404("Symptom not found")
         kwargs["instance"] = instance
 
         return kwargs
@@ -241,7 +244,10 @@ class ChangeOtherSymptomView(ChangeSymptomView):
 
 class DeleteSymptomView(View):
     def get(self, request, *args, **kwargs):
-        symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
+        try:
+            symptom = Symptom.objects.get(pk=kwargs["symptom_pk"])
+        except Symptom.DoesNotExist:
+            raise Http404("Symptom not found")
 
         context = {
             "page_title": "Are you sure you want to delete this symptom?",
@@ -274,7 +280,10 @@ class DeleteSymptomView(View):
         )
 
     def post(self, request, *args, **kwargs):
-        symptom = get_object_or_404(Symptom, pk=kwargs["symptom_pk"])
+        try:
+            symptom = Symptom.objects.get(pk=kwargs["symptom_pk"])
+        except Symptom.DoesNotExist:
+            raise Http404("Symptom not found")
         auditor = Auditor.from_request(request)
 
         auditor.audit_delete(symptom)

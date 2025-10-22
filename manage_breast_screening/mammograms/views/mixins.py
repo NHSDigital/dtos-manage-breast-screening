@@ -1,6 +1,7 @@
 from functools import cached_property
 
-from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404
+from django.shortcuts import redirect
 from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
@@ -18,14 +19,14 @@ class AppointmentMixin:
 
     @cached_property
     def appointment(self):
-        return get_object_or_404(
-            Appointment.objects.select_related(
+        try:
+            return self.request.current_provider.appointments.select_related(
                 "clinic_slot__clinic",
                 "screening_episode__participant",
                 "screening_episode__participant__address",
-            ),
-            pk=self.appointment_pk,
-        )
+            ).get(pk=self.appointment_pk)
+        except Appointment.DoesNotExist:
+            raise Http404
 
 
 class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):

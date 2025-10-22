@@ -145,49 +145,34 @@ class TestAppointment:
             ordered=False,
         )
 
-    def test_by_clinic_and_filter(self):
-        # Create a clinic and clinic slots
-        clinic = ClinicFactory.create()
-        clinic_slot1 = ClinicSlotFactory.create(clinic=clinic)
-        clinic_slot2 = ClinicSlotFactory.create(clinic=clinic)
-
-        # Create another clinic to verify filtering works correctly
-        other_clinic = ClinicFactory.create()
-        other_slot = ClinicSlotFactory.create(clinic=other_clinic)
-
-        # Create appointments with different statuses for our target clinic
+    def test_for_filter(self):
         confirmed = AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CONFIRMED
+            current_status=models.AppointmentStatus.CONFIRMED
         )
         checked_in = AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.CHECKED_IN
+            current_status=models.AppointmentStatus.CHECKED_IN
         )
         screened = AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.SCREENED
-        )
-
-        # Create an appointment for the other clinic that should not appear in results
-        AppointmentFactory.create(
-            clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
+            current_status=models.AppointmentStatus.SCREENED
         )
 
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "remaining"),
+            models.Appointment.objects.for_filter("remaining"),
             {confirmed, checked_in},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "checked_in"),
+            models.Appointment.objects.for_filter("checked_in"),
             {checked_in},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "complete"),
+            models.Appointment.objects.for_filter("complete"),
             {screened},
             ordered=False,
         )
         assertQuerySetEqual(
-            models.Appointment.objects.for_clinic_and_filter(clinic, "all"),
+            models.Appointment.objects.for_filter("all"),
             {confirmed, checked_in, screened},
             ordered=False,
         )
@@ -222,12 +207,33 @@ class TestAppointment:
             clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
         )
 
-        counts = models.Appointment.objects.filter_counts_for_clinic(clinic)
+        counts = models.Appointment.filter_counts_for_clinic(clinic)
 
         assert counts["remaining"] == 3
         assert counts["checked_in"] == 1
         assert counts["complete"] == 2
         assert counts["all"] == 5
+
+    def test_order_by_starts_at(self):
+        early = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc)
+        )
+        middle = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 2, 10, tzinfo=tz.utc)
+        )
+        late = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 3, 14, tzinfo=tz.utc)
+        )
+
+        assertQuerySetEqual(
+            models.Appointment.objects.order_by_starts_at(),
+            [early, middle, late],
+        )
+
+        assertQuerySetEqual(
+            models.Appointment.objects.order_by_starts_at(desc=True),
+            [late, middle, early],
+        )
 
 
 @pytest.mark.django_db

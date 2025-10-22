@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
+from django.http import Http404
+from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from ..core.decorators import current_provider_exempt
@@ -10,11 +11,10 @@ from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresen
 
 
 def clinic_list(request, filter="today"):
-    current_provider_id = request.session.get("current_provider")
-    clinics = Clinic.objects.prefetch_related("setting").by_filter(
-        filter, current_provider_id
+    clinics = request.current_provider.clinics.by_filter(filter).prefetch_related(
+        "setting"
     )
-    counts_by_filter = Clinic.filter_counts(current_provider_id)
+    counts_by_filter = Clinic.filter_counts(request.current_provider.pk)
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
@@ -24,15 +24,16 @@ def clinic_list(request, filter="today"):
 
 
 def clinic(request, pk, filter="remaining"):
-    clinic = Clinic.objects.select_related("setting").get(pk=pk)
+    provider = request.current_provider
+    clinic = provider.clinics.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
     appointments = (
-        Appointment.objects.for_clinic_and_filter(clinic, filter)
+        clinic.appointments.for_filter(filter)
         .prefetch_related("statuses")
         .select_related("clinic_slot__clinic", "screening_episode__participant")
-        .order_by("clinic_slot__starts_at")
+        .order_by_starts_at()
     )
-    counts_by_filter = Appointment.objects.filter_counts_for_clinic(clinic)
+    counts_by_filter = Appointment.filter_counts_for_clinic(clinic)
     presented_appointment_list = AppointmentListPresenter(
         pk, appointments, filter, counts_by_filter
     )
@@ -48,8 +49,11 @@ def clinic(request, pk, filter="remaining"):
 
 
 @require_http_methods(["POST"])
-def check_in(_request, pk, appointment_pk):
-    appointment = get_object_or_404(Appointment, pk=appointment_pk)
+def check_in(request, pk, appointment_pk):
+    try:
+        appointment = request.current_provider.appointments.get(pk=appointment_pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)
