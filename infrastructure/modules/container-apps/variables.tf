@@ -226,8 +226,6 @@ locals {
   }
   storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
 
-  NO_OP_DATE = "0 0 31 2 *"
-
   always_allowed_paths = ["/sha"]
   # If allowed_paths is not set, use the module default which allows any pattern
   # If it is set, include the default paths
