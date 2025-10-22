@@ -110,6 +110,7 @@ test-unit: # Run unit tests @Testing
 test-lint: # Lint files @Testing
 	npm run lint
 	poetry run ruff check manage_breast_screening
+	poetry run python scripts/lint_model_usage_in_views.py
 
 	# Enable this once we have fixed all the issues
 	# make test-lint-templates
