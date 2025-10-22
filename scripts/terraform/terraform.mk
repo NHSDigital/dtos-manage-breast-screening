@@ -70,3 +70,6 @@ terraform-destroy: terraform-init # Destroy Terraform resources - make <env> ter
 
 terraform-validate: terraform-init-no-backend # Validate Terraform changes - make <env> terraform-validate
 	terraform -chdir=infrastructure/terraform validate
+
+smoke-test-ca-jobs:
+	$(if ${TF_VAR_deploy_container_apps},, pytest scripts/python/test_ca_jobs.py --environment $ENVIRONMENT)
