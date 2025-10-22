@@ -12,27 +12,38 @@ The new service is a system for managing breast screening clinics, including:
 
 ## Setup
 
-To install the toolchain dependencies and setup the project, run
+You will need to manually install a few prerequisites to bootstrap everything:
+
+- [Docker](https://www.docker.com/) container runtime or a compatible tool, e.g. [Podman](https://podman.io/)
+- [asdf](https://asdf-vm.com/) version manager
+- [GNU make](https://www.gnu.org/software/make/) 3.82 or later
+- [The suggested build environment for pyenv](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+
+Then to install the rest of the toolchain, run:
 
 ```shell
 make config
 ```
 
-This command assumes you have a few things already installed:
+If you run into `command not found: pip` errors, make sure you have correctly configured your shell for asdf, i.e. updated the relevant dotfile, and reloaded it or opened a new shell.
 
-- [Docker](https://www.docker.com/) container runtime or a compatible tool, e.g. [Podman](https://podman.io/)
-- [asdf](https://asdf-vm.com/) version manager
-- [GNU make](https://www.gnu.org/software/make/) 3.82 or later
-
-## Usage
+## Running the app for the first time
 
 ```sh
 make local
 ```
 
-This will start the development instance of postgres (via docker) and serve the app at http://localhost:8000
+This will install dependencies, start the development instance of postgres (via docker), seed the database, and serve the app at http://localhost:8000
 
-## Local development
+## Commands for local development
+
+### Dev server
+
+```
+make run
+```
+
+This will run the dev server without reloading seed data. This is a shortcut for `poetry run ./manage.py server`.
 
 ### Tests
 
