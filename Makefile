@@ -80,16 +80,13 @@ db: manage_breast_screening/config/.env # Start the development database @Develo
 
 local: config seed-demo-data personas run
 
-rebuild-db: _clean-docker db migrate seed  # Create a fresh development database @Development
+rebuild-db: _clean-docker db migrate seed-demo-data personas  # Create a fresh development database @Development
 
 migrate:  # Run migrations
 	poetry run ./manage.py migrate
 
 personas: # Add personas to the database @Development
 	poetry run ./manage.py create_personas
-
-seed:  # Load seed data
-	#noop for now we'll use this to load lookup tables etc rather than test data
 
 # run with ARGS="--noinput" to bypass confirmation prompt in CI etc
 seed-demo-data:
