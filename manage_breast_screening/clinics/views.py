@@ -25,13 +25,13 @@ def clinic_list(request, filter="today"):
 
 def clinic(request, pk, filter="remaining"):
     provider = request.current_provider
-    clinic = provider.clinics.select_related("setting").get(pk=pk)
+    clinic = provider.clinics.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
     appointments = (
-        provider.appointments.for_clinic_and_filter(clinic, filter)
+        clinic.appointments.for_filter(filter)
         .prefetch_related("statuses")
         .select_related("clinic_slot__clinic", "screening_episode__participant")
-        .order_by("clinic_slot__starts_at")
+        .order_by_starts_at()
     )
     counts_by_filter = Appointment.filter_counts_for_clinic(clinic)
     presented_appointment_list = AppointmentListPresenter(
