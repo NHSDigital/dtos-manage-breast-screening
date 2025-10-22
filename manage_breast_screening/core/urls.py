@@ -26,9 +26,14 @@ from manage_breast_screening.core.decorators import basic_auth_exempt
 
 @basic_auth_exempt
 @login_not_required
-def sha_view(requests):
+def sha_view(request):
     return HttpResponse(settings.COMMIT_SHA)
 
+
+@basic_auth_exempt
+@login_not_required
+def health_check(request):
+  return HttpResponse("OK")
 
 urlpatterns = [
     path(
@@ -37,6 +42,10 @@ urlpatterns = [
     ),
     path(
         "clinics/", include("manage_breast_screening.clinics.urls", namespace="clinics")
+    ),
+    path(
+        "healthcheck/",
+        health_check,
     ),
     path(
         "mammograms/",
