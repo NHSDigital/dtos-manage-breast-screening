@@ -33,3 +33,7 @@ output "monitor_action_group_id" {
 output "app_insights_connection_string" {
   value = module.app_insights_audit.connection_string
 }
+
+output "app_insights_id" {
+  value = module.app_insights_audit.id
+}

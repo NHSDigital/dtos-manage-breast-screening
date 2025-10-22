@@ -44,6 +44,7 @@ module "container-apps" {
   app_key_vault_id                      = var.deploy_infra ? module.infra[0].app_key_vault_id : data.azurerm_key_vault.app_key_vault[0].id
   app_short_name                        = var.app_short_name
   app_insights_connection_string        = var.deploy_infra ? module.infra[0].app_insights_connection_string : data.azurerm_application_insights.app_insights[0].connection_string
+  app_insights_id                       = var.deploy_infra ? module.infra[0].app_insights_id : data.azurerm_application_insights.app_insights[0].id
   allowed_paths                         = var.allowed_paths
   container_app_environment_id          = var.deploy_infra ? module.infra[0].container_app_environment_id : data.azurerm_container_app_environment.this[0].id
   default_domain                        = var.deploy_infra ? module.infra[0].default_domain : data.azurerm_container_app_environment.this[0].default_domain
@@ -71,4 +72,6 @@ module "container-apps" {
   infra_key_vault_rg                    = local.infra_key_vault_rg
   api_oauth_token_url                   = var.api_oauth_token_url
   nhs_notify_api_message_batch_url      = var.nhs_notify_api_message_batch_url
+  target_url                            = var.deploy_container_apps ? "${module.container-apps[0].external_url}healthcheck/" : null
+  resource_group_name_infra             = local.resource_group_name
 }
