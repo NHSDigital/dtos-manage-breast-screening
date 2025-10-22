@@ -214,6 +214,27 @@ class TestAppointment:
         assert counts["complete"] == 2
         assert counts["all"] == 5
 
+    def test_order_by_starts_at(self):
+        early = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc)
+        )
+        middle = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 2, 10, tzinfo=tz.utc)
+        )
+        late = AppointmentFactory.create(
+            starts_at=datetime(2025, 1, 3, 14, tzinfo=tz.utc)
+        )
+
+        assertQuerySetEqual(
+            models.Appointment.objects.order_by_starts_at(),
+            [early, middle, late],
+        )
+
+        assertQuerySetEqual(
+            models.Appointment.objects.order_by_starts_at(desc=True),
+            [late, middle, early],
+        )
+
 
 @pytest.mark.django_db
 def test_appointment_current_status():

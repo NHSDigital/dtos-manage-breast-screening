@@ -40,8 +40,8 @@ def show(request, pk):
         raise Http404("Participant not found")
     presented_participant = ParticipantPresenter(participant)
 
-    appointments = participant.appointments.order_by(
-        "-clinic_slot__starts_at"
+    appointments = participant.appointments.order_by_starts_at(
+        desc=True
     ).select_related("clinic_slot__clinic__setting")
 
     presented_appointments = ParticipantAppointmentsPresenter(

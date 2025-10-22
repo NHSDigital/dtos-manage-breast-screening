@@ -61,6 +61,11 @@ class AppointmentQuerySet(models.QuerySet):
             case _:
                 raise ValueError(filter)
 
+    def order_by_starts_at(self, desc=False):
+        return self.order_by(
+            "-clinic_slot__starts_at" if desc else "clinic_slot__starts_at"
+        )
+
 
 class Appointment(BaseModel):
     objects = AppointmentQuerySet.as_manager()
