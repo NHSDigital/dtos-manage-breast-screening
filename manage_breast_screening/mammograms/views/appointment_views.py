@@ -47,7 +47,7 @@ class ShowAppointment(AppointmentMixin, View):
         appointment = self.appointment
         if (
             request.user.has_perm(
-                Permission.PERFORM_MAMMOGRAM_APPOINTMENT,
+                Permission.VIEW_MAMMOGRAM_APPOINTMENT,
                 request.user.current_provider,
             )
             and appointment.current_status.in_progress

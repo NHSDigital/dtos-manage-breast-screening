@@ -89,27 +89,21 @@ class TestPerformMammogramAppointmentPermission:
         user_assignment = UserAssignmentFactory.create(clinical=True)
         user_assignment.make_current()
 
-        assert user_assignment.user.has_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT)
+        assert user_assignment.user.has_perm(Permission.VIEW_MAMMOGRAM_APPOINTMENT)
 
     def test_returns_false_for_administrative_user(self):
         user_assignment = UserAssignmentFactory.create(administrative=True)
         user_assignment.make_current()
 
-        assert not user_assignment.user.has_perm(
-            Permission.PERFORM_MAMMOGRAM_APPOINTMENT
-        )
+        assert not user_assignment.user.has_perm(Permission.VIEW_MAMMOGRAM_APPOINTMENT)
 
     def test_returns_false_for_user_without_roles(self):
         user_assignment = UserAssignmentFactory.create()
         user_assignment.make_current()
 
-        assert not user_assignment.user.has_perm(
-            Permission.PERFORM_MAMMOGRAM_APPOINTMENT
-        )
+        assert not user_assignment.user.has_perm(Permission.VIEW_MAMMOGRAM_APPOINTMENT)
 
     def test_returns_false_if_no_provider_given(self):
         user_assignment = UserAssignmentFactory.create()
 
-        assert not user_assignment.user.has_perm(
-            Permission.PERFORM_MAMMOGRAM_APPOINTMENT
-        )
+        assert not user_assignment.user.has_perm(Permission.VIEW_MAMMOGRAM_APPOINTMENT)

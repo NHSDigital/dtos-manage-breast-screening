@@ -30,4 +30,4 @@ def is_administrative(user):
 
 
 rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, is_clinical | is_administrative)
-rules.add_perm(Permission.PERFORM_MAMMOGRAM_APPOINTMENT, is_clinical)
+rules.add_perm(Permission.VIEW_MAMMOGRAM_APPOINTMENT, is_clinical)

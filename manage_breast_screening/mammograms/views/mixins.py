@@ -36,7 +36,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     If the appointment is not in progress, redirect to the appointment show page.
     """
 
-    permission_required = Permission.PERFORM_MAMMOGRAM_APPOINTMENT
+    permission_required = Permission.VIEW_MAMMOGRAM_APPOINTMENT
 
     def get_permission_object(self):
         return self.appointment
