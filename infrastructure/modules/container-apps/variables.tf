@@ -87,7 +87,6 @@ variable "log_analytics_workspace_id" {
 variable "deploy_database_as_container" {
   description = "Whether to deploy the database as a container or as an Azure postgres flexible server."
   type        = bool
-  default     = false
 }
 
 variable "nhs_notify_api_message_batch_url" {
