@@ -81,11 +81,23 @@ jobs:
       - name: Print commit SHA
         run: echo "Commit SHA is ${{ inputs.commit_sha }}"
 
+      - name: Set branch environment variable (push)
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          GIT_BRANCH=${GITHUB_REF##*/}
+          echo "BRANCH_TAG=$GIT_BRANCH" >> $GITHUB_ENV # GIT_BRANCH will be main for refs/heads/main
+
+      - name: Set branch environment variable (pull_request)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          GIT_BRANCH=${GITHUB_HEAD_REF##*/}
+          echo "BRANCH_TAG=$GIT_BRANCH" >> $GITHUB_ENV
+
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83
-        env:
-          CACHE_FROM_BRANCH: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY_LOWERCASE }}:${{ github.head_ref }}
         with:
           context: .
           push: true
@@ -94,9 +106,9 @@ jobs:
           build-args: |
             COMMIT_SHA=${{ inputs.commit_sha }}
           cache-from: |
-            ${{ github.head_ref && env.CACHE_FROM_BRANCH || '' }}
+            type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY_LOWERCASE }}:${{ env.BRANCH_TAG }}
             type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY_LOWERCASE }}:main
-          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY_LOWERCASE }}:${{ github.head_ref || github.ref_name }},mode=max
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY_LOWERCASE }}:${{ env.BRANCH_TAG }},mode=max
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v3
