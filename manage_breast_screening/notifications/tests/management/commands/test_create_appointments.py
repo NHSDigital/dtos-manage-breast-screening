@@ -185,7 +185,7 @@ class TestCreateAppointments:
         assert appointments[0].status == "C"
         assert appointments[0].cancelled_by == "C"
         assert appointments[0].cancelled_at == datetime.strptime(
-            "20250128-154003", "%Y%m%d-%H%M%S"
+            "20250128-175555", "%Y%m%d-%H%M%S"
         ).replace(tzinfo=TZ_INFO)
 
     def test_only_updates_cancelled_appointments(self):
