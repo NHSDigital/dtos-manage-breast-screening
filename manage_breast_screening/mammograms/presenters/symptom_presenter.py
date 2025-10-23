@@ -1,4 +1,5 @@
 from django.urls import reverse
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from manage_breast_screening.core.template_helpers import (
@@ -178,11 +179,13 @@ class SymptomPresenter:
     @property
     def delete_message_html(self):
         return message_with_heading(
-            heading="Symptom deleted", html=mark_safe(f"<p>Deleted {self.name}.</p>")
+            heading="Symptom deleted",
+            html=mark_safe(f"<p>Deleted {escape(self.name)}.</p>"),
         )
 
     @property
     def add_message_html(self):
         return message_with_heading(
-            heading="Symptom added", html=mark_safe(f"<p>Added {self.name}.</p>")
+            heading="Symptom added",
+            html=mark_safe(f"<p>Added {escape(self.name)}.</p>"),
         )
