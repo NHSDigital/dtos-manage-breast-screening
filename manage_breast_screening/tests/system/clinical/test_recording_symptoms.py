@@ -38,6 +38,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.and_i_click_save_symptom()
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_lump_on_the_right_breast_is_listed()
+        self.and_the_message_says_symptom_added()
 
     def test_changing_a_symptom(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -60,7 +61,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.and_i_click_on_delete_this_symptom()
         self.and_i_confirm_i_want_to_delete_the_symptom()
         self.then_i_am_back_on_the_medical_information_page()
-        self.and_i_see_a_success_message()
+        self.and_the_message_says_symptom_deleted()
         self.and_the_lump_is_no_longer_listed()
 
     def test_adding_a_symptom_with_errors(self):
@@ -208,9 +209,16 @@ class TestRecordingSymptoms(SystemTestCase):
             field_name="area_description_right_breast",
         )
 
-    def and_i_see_a_success_message(self):
+    def and_the_message_says_symptom_deleted(self):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
         expect(alert).to_contain_text("Symptom deleted")
         expect(alert).to_contain_text("Deleted swelling or shape change.")
+
+    def and_the_message_says_symptom_added(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Symptom added")
+        expect(alert).to_contain_text("Added lump.")
