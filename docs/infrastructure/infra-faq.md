@@ -4,6 +4,7 @@
 - [Github action triggering Azure devops pipeline](#github-action-triggering-azure-devops-pipeline)
 - [Bicep errors](#bicep-errors)
 - [Front door](#front-door)
+- [Smoke Testing](#smoke-testing)
 
 ## Terraform
 
@@ -222,3 +223,29 @@ Aliases: samanbrspreprodtfstate.blob.core.windows.net
 ```
 
 In the above example it was discoverd that the pipeline pool was on the wrong ADO management pool, i.e on the private-pool-dev-uks instead of the private-pool-prod-uks.
+
+## Smoke Testing
+
+### Smoke test failing with 404 or timeout
+
+The smoke test verifies the deployed application is accessible and serving the correct version.
+
+**Common causes:**
+
+1. **Apex domain misconfiguration**
+   - Production uses apex domain (`manage-breast-screening.nhs.uk`)
+   - Other environments use subdomain (`{env}.manage-breast-screening.nhs.uk`)
+   - Ensure `use_apex_domain = true` is set in `infrastructure/environments/prod/variables.tfvars`
+
+2. **Front Door not approved**
+   - See [Error 504](#error-504) for private link approval steps
+
+3. **Container app not ready**
+   - The test waits up to 5 minutes for the app to become available
+   - Check container app logs in Azure Portal
+
+4. **Wrong SHA deployed**
+   - Verify the correct docker image tag was used in deployment
+   - Check the `/sha` endpoint manually from AVD
+
+**Script location:** `scripts/bash/container_app_smoke_test.sh`
