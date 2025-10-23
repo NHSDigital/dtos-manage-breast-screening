@@ -35,7 +35,7 @@
     </div>
   </div>
 
-  {{ appointment_header(presented_appointment) }}
+  {{ appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
 
   {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=False) }}
 

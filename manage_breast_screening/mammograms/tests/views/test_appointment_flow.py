@@ -199,6 +199,38 @@ class TestCheckIn:
 
 
 @pytest.mark.django_db
+class TestStartAppointment:
+    def test_known_redirect(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:ask_for_medical_information", kwargs={"pk": appointment.pk}
+            ),
+        )
+
+    def test_audit(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        clinical_user_client.http.post(
+            reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
+        )
+        assert (
+            AuditLog.objects.filter(
+                content_type=ContentType.objects.get_for_model(AppointmentStatus),
+                operation=AuditLog.Operations.CREATE,
+            ).count()
+            == 1
+        )
+
+
+@pytest.mark.django_db
 class TestAppointmentCannotGoAhead:
     def test_audit(self, clinical_user_client):
         appointment = AppointmentFactory.create(

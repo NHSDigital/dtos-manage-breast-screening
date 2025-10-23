@@ -250,8 +250,26 @@ def check_in(request, pk):
         appointment = provider.appointments.get(pk=pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
+
+    # TODO: this transition should depend on the current state
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)
 
     return redirect("mammograms:start_screening", pk=pk)
+
+
+@require_http_methods(["POST"])
+def start_appointment(request, pk):
+    try:
+        provider = request.user.current_provider
+        appointment = provider.appointments.get(pk=pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
+
+    # TODO: this transition should depend on the current state
+    status = appointment.statuses.create(state=AppointmentStatus.IN_PROGRESS)
+
+    Auditor.from_request(request).audit_create(status)
+
+    return redirect("mammograms:ask_for_medical_information", pk=pk)

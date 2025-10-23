@@ -6,6 +6,7 @@ from uuid import UUID, uuid4
 import pytest
 import time_machine
 
+from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.clinics.models import ClinicSlot
 from manage_breast_screening.mammograms.presenters import (
     AppointmentPresenter,
@@ -13,6 +14,7 @@ from manage_breast_screening.mammograms.presenters import (
     SpecialAppointmentPresenter,
 )
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
+from manage_breast_screening.users.models import User
 
 
 class TestAppointmentPresenter:
@@ -22,6 +24,10 @@ class TestAppointmentPresenter:
         mock.screening_episode.participant.nhs_number = "99900900829"
         mock.screening_episode.participant.pk = uuid4()
         return mock
+
+    @pytest.fixture
+    def mock_user(self):
+        return MagicMock(spec=User)
 
     @pytest.mark.parametrize(
         "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
@@ -99,6 +105,19 @@ class TestAppointmentPresenter:
         mock_appointment.screening_episode.participant.extra_needs = extra_needs
         assert (
             AppointmentPresenter(mock_appointment).can_be_made_special == expected_value
+        )
+
+    @pytest.mark.parametrize("has_permission", [True, False])
+    def test_can_be_started_by(self, mock_appointment, mock_user, has_permission):
+        mock_user.has_perm.return_value = has_permission
+
+        assert (
+            AppointmentPresenter(mock_appointment).can_be_started_by(mock_user)
+            == has_permission
+        )
+
+        mock_user.has_perm.assert_called_once_with(
+            Permission.START_MAMMOGRAM_APPOINTMENT, mock_appointment
         )
 
     def test_clinic_url(self, mock_appointment):

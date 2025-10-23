@@ -11,6 +11,11 @@ urlpatterns = [
         name="check_in",
     ),
     path(
+        "<uuid:pk>/start-appointment/",
+        appointment_views.start_appointment,
+        name="start_appointment",
+    ),
+    path(
         "<uuid:pk>/",
         appointment_views.ShowAppointment.as_view(),
         name="show_appointment",
