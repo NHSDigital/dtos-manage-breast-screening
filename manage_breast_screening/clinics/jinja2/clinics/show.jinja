@@ -6,6 +6,7 @@
 {% from 'components/count/macro.jinja' import appCount %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
+{% from 'components/check-in/macro.jinja' import check_in %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -65,17 +66,7 @@
     {% endset %}
     {% set appointment_html %}
       {{
-        appointment_status(
-          appointment=presented_appointment,
-          check_in_url=url(
-            'clinics:check_in',
-             kwargs={
-              'pk': presented_clinic.pk,
-              'appointment_pk': presented_appointment.pk,
-              }
-          ),
-          csrf_input=csrf_input
-        )
+        appointment_status(presented_appointment)
       }}
       <p class="nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0 app-nowrap">
         <a href="{{ url('mammograms:show_appointment', kwargs={"pk": presented_appointment.pk}) }}" class="nhsuk-link">
@@ -84,6 +75,17 @@
       </p>
     {% endset %}
     {% set actions_html %}
+      {{ check_in(
+        presented_appointment,
+        check_in_url=url(
+          'clinics:check_in',
+           kwargs={
+            'pk': presented_clinic.pk,
+            'appointment_pk': presented_appointment.pk,
+            }
+        ),
+        csrf_input=csrf_input
+      ) }}
     {% endset %}
 
     {% do table_rows.append([

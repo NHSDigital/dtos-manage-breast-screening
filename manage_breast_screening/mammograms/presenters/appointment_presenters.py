@@ -59,6 +59,10 @@ class AppointmentPresenter:
         return not self.is_special_appointment and self._appointment.active
 
     @cached_property
+    def can_be_checked_in(self):
+        return self._appointment.current_status.state == AppointmentStatus.CONFIRMED
+
+    @cached_property
     def active(self):
         return self._appointment.active
 

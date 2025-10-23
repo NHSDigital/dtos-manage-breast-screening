@@ -1,0 +1,16 @@
+{% if check_in_url is undefined %}
+  {{ raise('check_in_url is required') }}
+{% endif %}
+
+{% if presented_appointment.can_be_checked_in %}
+
+  <div data-module="app-check-in" data-appointment-id="{{ presented_appointment.pk }}">
+    <form action="{{ check_in_url }}" method="post" novalidate>
+      <p class="nhsuk-u-margin-bottom-2">
+        <button class="app-button--link">Check in<span class="nhsuk-u-visually-hidden"> {{ presented_appointment.participant.full_name }}</span></button>
+      </p>
+      {{ csrf_input }}
+    </form>
+  </div>
+
+{% endif %}

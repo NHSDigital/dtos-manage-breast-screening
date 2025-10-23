@@ -4,6 +4,7 @@
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
 {% from 'components/appointment-header/macro.jinja' import appointment_header %}
+{% from 'components/check-in/macro.jinja' import check_in %}
 {% from 'components/participant-details/macro.jinja' import participant_details %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
@@ -28,11 +29,21 @@
     </h1>
 
     <div class="app-header__status-tag">
-      {{ appointment_status(
-        appointment=presented_appointment,
-        csrf_input=csrf_input
-      ) }}
+      {{ appointment_status(presented_appointment) }}
+      <p class="nhsuk-u-margin-bottom-2">
+        {{ check_in(
+          presented_appointment,
+          check_in_url=url(
+            'mammograms:check_in',
+             kwargs={
+              'pk': presented_appointment.pk,
+              }
+          ),
+          csrf_input=csrf_input
+        ) }}
+      </p>
     </div>
+
   </div>
 
   {{ appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
