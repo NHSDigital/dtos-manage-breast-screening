@@ -1,21 +1,15 @@
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
-{% set show_check_in = appointment.current_status.is_confirmed %}
-<div data-event-status-container="{{ appointment.id }}"
-     {% if show_check_in %}data-module="app-check-in"{% endif %}>
-  <span data-hide-on-submit>{{ tag({
+
+{% set can_be_checked_in = appointment.current_status.is_confirmed %}
+
+<div data-event-status-container="{{ appointment.pk }}" >
+  <span {% if can_be_checked_in %}data-hide-on-check-in{% endif %}>
+    {{ tag({
     "text": appointment.current_status.text,
     "classes": appointment.current_status.classes
-  }) }}</span>
-  {% if show_check_in %}
-    <span data-show-on-submit hidden>{{ tag({"text": "Checked in", "classes": "app-nowrap"}) }}</span>
-  {% endif %}
-  {% if show_check_in %}
-    {% set action_url = check_in_url or url('mammograms:check_in', kwargs={'pk': appointment.pk}) %}
-    <form action="{{ action_url }}" method="post" novalidate>
-      <p class="nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0">
-        <button class="app-button--link">Check in<span class="nhsuk-u-visually-hidden"> {{ appointment.participant.full_name }}</span></button>
-      </p>
-      {{ csrf_input }}
-    </form>
+    }) }}
+  </span>
+  {% if can_be_checked_in %}
+    <span data-show-on-check-in hidden>{{ tag({"text": "Checked in", "classes": "app-nowrap"}) }}</span>
   {% endif %}
 </div>

@@ -14,33 +14,54 @@ describe('Check in', () => {
   let button
 
   /** @type {HTMLDivElement} */
-  let oldMessage
+  let checkInContainer
 
   /** @type {HTMLDivElement} */
-  let message
+  let statusContainer
+
+  /** @type {HTMLSpanElement} */
+  let currentStatus
+
+  /** @type {HTMLSpanElement} */
+  let checkedInStatus
 
   beforeEach(() => {
     document.body.innerHTML = `
-      <div data-module="${CheckIn.moduleName}">
-        <div data-hide-on-submit>Not submitted</div>
-        <div data-show-on-submit hidden>Submitted</div>
-        <form method="post" action="/example" novalidate>
-          <button>Submit</button>
-        </form>
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <div data-event-status-container="123">
+                <span data-hide-on-check-in>Confirmed</span>
+                <span data-show-on-check-in hidden>Checked in</span>
+              </div>
+            </td>
+            <td>
+              <div data-module="${CheckIn.moduleName}" data-appointment-id="123">
+                <form method="post" action="/example" novalidate>
+                  <button>Check in</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     `
 
-    const $container = document.querySelector('[data-module="app-check-in"]')
-
-    form = $container.querySelector('form')
-    button = getByRole(form, 'button', { name: 'Submit' })
-    oldMessage = $container.querySelector('[data-hide-on-submit]')
-    message = $container.querySelector('[data-show-on-submit]')
+    checkInContainer = document.querySelector('[data-module="app-check-in"]')
+    statusContainer = document.querySelector(
+      '[data-event-status-container="123"]'
+    )
+    form = checkInContainer.querySelector('form')
+    button = getByRole(form, 'button', { name: 'Check in' })
+    currentStatus = statusContainer.querySelector('[data-hide-on-check-in]')
+    checkedInStatus = statusContainer.querySelector('[data-show-on-check-in]')
 
     jest.spyOn(console, 'error').mockImplementation(() => {})
+    jest.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
-  it('swaps the form for a success message', async () => {
+  it('updates the status and hides the form on successful check-in', async () => {
     jest.mocked(fetch).mockResolvedValue(
       /** @type {Response} */ ({
         ok: true,
@@ -52,9 +73,9 @@ describe('Check in', () => {
 
     await user.click(button)
 
-    expect(form).toHaveAttribute('hidden')
-    expect(oldMessage).toHaveAttribute('hidden')
-    expect(message).not.toHaveAttribute('hidden')
+    expect(checkInContainer).toHaveAttribute('hidden')
+    expect(currentStatus).toHaveAttribute('hidden')
+    expect(checkedInStatus).not.toHaveAttribute('hidden')
     expect(console.error).not.toHaveBeenCalled()
   })
 
@@ -70,11 +91,72 @@ describe('Check in', () => {
 
     await user.click(button)
 
-    expect(message).toHaveAttribute('hidden')
-    expect(oldMessage).not.toHaveAttribute('hidden')
+    expect(checkInContainer).not.toHaveAttribute('hidden')
+    expect(currentStatus).not.toHaveAttribute('hidden')
+    expect(checkedInStatus).toHaveAttribute('hidden')
 
     expect(console.error).toHaveBeenCalledWith(
       new Error('Response status: 500')
+    )
+  })
+
+  it('warns if the parent table cannot be found', async () => {
+    // Remove the table wrapper
+    document.body.innerHTML = `
+      <div data-module="${CheckIn.moduleName}" data-appointment-id="123">
+        <form method="post" action="/example" novalidate>
+          <button>Check in</button>
+        </form>
+      </div>
+    `
+
+    jest.mocked(fetch).mockResolvedValue(
+      /** @type {Response} */ ({
+        ok: true,
+        status: 200
+      })
+    )
+
+    createAll(CheckIn)
+
+    const newButton = getByRole(document.body, 'button', { name: 'Check in' })
+    await user.click(newButton)
+
+    expect(console.warn).toHaveBeenCalledWith('Could not find parent table')
+  })
+
+  it('warns if the status container cannot be found', async () => {
+    // Create table but without matching status container
+    document.body.innerHTML = `
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <div data-module="${CheckIn.moduleName}" data-appointment-id="999">
+                <form method="post" action="/example" novalidate>
+                  <button>Check in</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    `
+
+    jest.mocked(fetch).mockResolvedValue(
+      /** @type {Response} */ ({
+        ok: true,
+        status: 200
+      })
+    )
+
+    createAll(CheckIn)
+
+    const newButton = getByRole(document.body, 'button', { name: 'Check in' })
+    await user.click(newButton)
+
+    expect(console.warn).toHaveBeenCalledWith(
+      'Could not find status container for appointment 999'
     )
   })
 })

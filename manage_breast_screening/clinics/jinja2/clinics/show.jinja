@@ -6,6 +6,7 @@
 {% from 'components/count/macro.jinja' import appCount %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
+{% from 'components/check-in/macro.jinja' import check_in %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -84,6 +85,9 @@
       </p>
     {% endset %}
     {% set actions_html %}
+    {% if presented_appointment.current_status.is_confirmed %}
+      {{ check_in(appointment=presented_appointment, csrf_input=csrf_input) }}
+    {% endif %}
     {% endset %}
 
     {% do table_rows.append([
