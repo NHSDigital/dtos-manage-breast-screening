@@ -38,9 +38,6 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
 
     permission_required = Permission.VIEW_MAMMOGRAM_APPOINTMENT
 
-    def get_permission_object(self):
-        return self.appointment
-
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
         if not appointment.current_status.in_progress:
