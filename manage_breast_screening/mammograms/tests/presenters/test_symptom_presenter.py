@@ -172,3 +172,11 @@ class TestSymptomPresenter:
             presenter.delete_message_html
             == '<h3 class="nhsuk-notification-banner__heading">Symptom deleted</h3><p>Deleted lump.</p>'
         )
+
+    def test_add_message_html(self):
+        lump = SymptomFactory.create(lump=True)
+        presenter = SymptomPresenter(lump)
+        assert (
+            presenter.add_message_html
+            == '<h3 class="nhsuk-notification-banner__heading">Symptom added</h3><p>Added lump.</p>'
+        )

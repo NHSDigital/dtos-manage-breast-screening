@@ -65,7 +65,13 @@ class AddSymptomView(BaseSymptomFormView):
     """
 
     def form_valid(self, form):
-        form.create(appointment=self.appointment, request=self.request)
+        symptom = form.create(appointment=self.appointment, request=self.request)
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            SymptomPresenter(symptom).add_message_html,
+        )
 
         return super().form_valid(form)
 

@@ -180,3 +180,9 @@ class SymptomPresenter:
         return message_with_heading(
             heading="Symptom deleted", html=mark_safe(f"<p>Deleted {self.name}.</p>")
         )
+
+    @property
+    def add_message_html(self):
+        return message_with_heading(
+            heading="Symptom added", html=mark_safe(f"<p>Added {self.name}.</p>")
+        )
