@@ -1,4 +1,7 @@
+from django.contrib.messages import INFO, SUCCESS, WARNING, get_messages
 from django.urls import reverse
+from django.utils.html import conditional_escape as django_html_escape
+from django.utils.safestring import SafeData, SafeString, mark_safe
 from markupsafe import Markup, escape
 
 
@@ -50,8 +53,67 @@ def as_hint(value: str) -> Markup:
     )
 
 
+def _is_safe_message(value) -> bool:
+    """
+    Return true if a string is marked safe for embedding in HTML
+
+    >>> _is_safe_message("<script>alert('boo')</script>")
+    False
+
+    >>> _is_safe_message(mark_safe("<p>Hello</p>"))
+    True
+    """
+    return isinstance(value, SafeData)
+
+
 def raise_helper(msg):
     raise Exception(msg)
+
+
+def message_with_heading(heading: str, html=None) -> SafeString:
+    """
+    Create the HTML for a notification banner presented as a heading
+    followed by some extra HTML.
+    """
+
+    heading_tag = mark_safe(
+        f'<h3 class="nhsuk-notification-banner__heading">{django_html_escape(heading)}</h3>'
+    )
+    if html:
+        return heading_tag + django_html_escape(html)
+    else:
+        return heading_tag
+
+
+def get_notification_banner_params(
+    request, message_type="info", disable_auto_focus=True
+):
+    levels = {"info": INFO, "warning": WARNING, "success": SUCCESS}
+    try:
+        level = levels[message_type]
+    except KeyError:
+        raise ValueError(
+            f"message_type must be one of {{info, warning, success}}; got {message_type}"
+        )
+
+    messages = [message for message in get_messages(request) if message.level == level]
+    if not messages:
+        return None
+
+    message = messages[0].message
+
+    if _is_safe_message(message):
+        return {
+            "html": Markup(message),
+            "type": message_type,
+            "disableAutoFocus": disable_auto_focus,
+        }
+    else:
+        return {
+            "text": message,
+            "type": message_type,
+            "disableAutoFocus": disable_auto_focus,
+        }
 
 
 def _user_name_and_role_item(user):

@@ -1,4 +1,6 @@
 {% from 'nhsuk/components/header/macro.jinja' import header %}
+{% from "notification-banner/macro.jinja" import notificationBanner %}
+
 {% set assetPath = STATIC_URL ~ "/assets" %}
 {% extends "nhsuk/template.jinja" %}
 
@@ -34,13 +36,34 @@
 {% endblock %}
 
 {% block content %}
-  <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-two-thirds">
-      {% block messages %}
-        {#- TODO: show messages from django.contrib.messages -#}
-      {% endblock messages %}
-    </div>
-  </div>
+  {% block flash_messages %}
+    {% set info_notification_params = get_notification_banner_params(
+        request, message_type='info',
+        disable_auto_focus=disable_auto_focus|default(true)
+      ) %}
+
+    {% set success_notification_params = get_notification_banner_params(
+        request, message_type='success',
+        disable_auto_focus=disable_auto_focus|default(true)
+      ) %}
+
+    {% set warning_notification_params = get_notification_banner_params(
+        request, message_type='warning',
+        disable_auto_focus=disable_auto_focus|default(true)
+      ) %}
+
+    {% if success_notification_params %}
+      {{ notificationBanner(success_notification_params) }}
+    {% endif %}
+
+    {% if info_notification_params %}
+      {{ notificationBanner(info_notification_params) }}
+    {% endif %}
+
+    {% if warning_notification_params %}
+      {{ notificationBanner(warning_notification_params) }}
+    {% endif %}
+  {% endblock flash_messages %}
 
   {% block page_content %}
   {% endblock page_content %}

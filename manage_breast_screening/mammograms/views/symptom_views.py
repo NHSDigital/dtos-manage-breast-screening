@@ -2,10 +2,12 @@ from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.views import View
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.template_helpers import message_with_heading
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
@@ -286,8 +288,17 @@ class DeleteSymptomView(View):
             raise Http404("Symptom not found")
         auditor = Auditor.from_request(request)
 
+        name = SymptomPresenter(symptom).name
+
         auditor.audit_delete(symptom)
         symptom.delete()
-        messages.add_message(self.request, messages.SUCCESS, "Symptom deleted")
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            message_with_heading(
+                heading="Symptom deleted", html=mark_safe(f"<p>Deleted {name}.</p>")
+            ),
+        )
 
         return redirect("mammograms:record_medical_information", pk=kwargs["pk"])
