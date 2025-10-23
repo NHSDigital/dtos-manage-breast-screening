@@ -241,7 +241,7 @@ locals {
   }
   storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
 
-  always_allowed_paths = ["/sha"]
+  always_allowed_paths = ["/sha", "/healthcheck"]
   # If allowed_paths is not set, use the module default which allows any pattern
   # If it is set, include the default paths
   patterns_to_match = (var.allowed_paths == null ? null :

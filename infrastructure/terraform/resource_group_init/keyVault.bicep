@@ -4,6 +4,8 @@ param keyVaultName string
 param miPrincipalId string
 param miName string
 param region string
+param userGroupPrincipalID string
+param userGroupName string
 
 // See: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 var roleID = {
@@ -35,6 +37,17 @@ resource kvSecretsUserAssignment 'Microsoft.Authorization/roleAssignments@2022-0
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.kvSecretsUser)
     principalId: miPrincipalId
     description: '${miName} kvSecretsUser access to resource group'
+  }
+}
+
+// Let the Entra ID group read key vault secrets during terraform plan
+resource groupKvSecretsUserAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(userGroupPrincipalID)) {
+  name: guid(subscription().subscriptionId, userGroupPrincipalID, 'kvSecretsUser')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.kvSecretsUser)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} kvSecretsUser access to resource group'
   }
 }
 

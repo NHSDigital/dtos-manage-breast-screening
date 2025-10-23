@@ -6,6 +6,7 @@ param region string
 param storageAccountRGName string
 param storageAccountName string
 param appShortName string
+param userGroupPrincipalID string
 
 var hubMap = {
   dev:                  'dev'
@@ -13,7 +14,7 @@ var hubMap = {
   review:               'dev'
   nft:                  'dev'
   preprod:              'prod'
-  prd:                  'prod'
+  prod:                 'prod'
 }
 var privateEndpointRGName = 'rg-hub-${envConfig}-uks-hub-private-endpoints'
 var privateDNSZoneRGName = 'rg-hub-${hubMap[envConfig]}-uks-private-dns-zones'
@@ -23,6 +24,7 @@ var keyVaultName = 'kv-manbrs-${envConfig}-inf'
 
 var miADOtoAZname = 'mi-${appShortName}-${envConfig}-adotoaz-uks'
 var miGHtoADOname = 'mi-${appShortName}-${envConfig}-ghtoado-uks'
+var userGroupName = 'screening_${appShortName}_${envConfig}'
 
 // See: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 var roleID = {
@@ -74,6 +76,7 @@ module managedIdentiyGHtoADO 'managedIdentity.bicep' = {
   }
 }
 
+
 // Let the GHtoADO managed identity access a subscription
 resource readerAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, envConfig, 'reader')
@@ -93,6 +96,8 @@ module terraformStateStorageAccount 'storage.bicep' = {
     enableSoftDelete: enableSoftDelete
     miPrincipalID: managedIdentiyADOtoAZ.outputs.miPrincipalID
     miName: miADOtoAZname
+    userGroupPrincipalID: userGroupPrincipalID
+    userGroupName: userGroupName
   }
 }
 
@@ -174,6 +179,8 @@ module keyVaultModule 'keyVault.bicep' = {
     miName: miADOtoAZname
     miPrincipalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
     region: region
+    userGroupPrincipalID: userGroupPrincipalID
+    userGroupName: userGroupName
   }
 }
 
@@ -196,6 +203,40 @@ resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01
     condition: '((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/write\'})) OR (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}})) AND ((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/delete\'})) OR (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}}))'
     conditionVersion: '2.0'
     description: '${miADOtoAZname} Role Based Access Control Administrator access to subscription. Only allows assigning the Key Vault Secrets User role.'
+  }
+}
+
+// Entra ID Group RBAC assignments - mirroring the managed identity permissions (excluding RBAC Admin)
+// Let the Entra ID group manage monitoring resources (Application Insights, Log Analytics)
+resource groupMonitoringContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, userGroupName, 'monitoringContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.monitoringContributor)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} Monitoring Contributor access to subscription'
+  }
+}
+
+// Let the Entra ID group configure vnet peering and DNS records
+resource groupNetworkContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, userGroupName, 'networkContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.networkContributor)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} Network Contributor access to subscription'
+  }
+}
+
+// Let the Entra ID group configure Front door and its resources
+resource groupCDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(subscription().subscriptionId, userGroupName, 'CDNContributor')
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.CDNContributor)
+    principalId: userGroupPrincipalID
+    principalType: 'Group'
+    description: '${userGroupName} CDN Contributor access to subscription'
   }
 }
 
