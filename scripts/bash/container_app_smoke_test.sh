@@ -6,10 +6,17 @@ ENV_CONFIG=$1
 EXPECTED_SHA=$2
 DNS_ZONE_NAME=$3
 PR_NUMBER=${4:-}
+USE_APEX_DOMAIN=${5:-false}
 
 if [ -z "$PR_NUMBER" ]; then
     # Permanent environments
-    ENDPOINT="https://${ENV_CONFIG}.${DNS_ZONE_NAME}/sha"
+    if [ "$USE_APEX_DOMAIN" = "true" ]; then
+        # For production with apex domain
+        ENDPOINT="https://${DNS_ZONE_NAME}/sha"
+    else
+        # For other environments (dev, test, etc.)
+        ENDPOINT="https://${ENV_CONFIG}.${DNS_ZONE_NAME}/sha"
+    fi
 else
     # On a review app, the environment name uses the PR number, i.e. "pr-1234"
     ENDPOINT="https://pr-${PR_NUMBER}.${DNS_ZONE_NAME}/sha"

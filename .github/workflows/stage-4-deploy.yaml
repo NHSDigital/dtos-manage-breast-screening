@@ -63,4 +63,5 @@ jobs:
       - name: Basic application smoke test
         run: |
           dns_zone_name=$( grep dns_zone_name infrastructure/environments/${{ matrix.environment }}/variables.tfvars | awk -F'"' '{print $2}' )
-          scripts/bash/container_app_smoke_test.sh "${{ matrix.environment }}" "${{ inputs.commit_sha }}" "${dns_zone_name}" "${{inputs.pr_number}}"
+          use_apex_domain=$( grep use_apex_domain infrastructure/environments/${{ matrix.environment }}/variables.tfvars | awk '{print $3}' || echo "false" )
+          scripts/bash/container_app_smoke_test.sh "${{ matrix.environment }}" "${{ inputs.commit_sha }}" "${dns_zone_name}" "${{inputs.pr_number}}" "${use_apex_domain}"
