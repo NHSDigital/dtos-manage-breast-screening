@@ -11,10 +11,9 @@ from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresen
 
 
 def clinic_list(request, filter="today"):
-    clinics = request.current_provider.clinics.by_filter(filter).prefetch_related(
-        "setting"
-    )
-    counts_by_filter = Clinic.filter_counts(request.current_provider.pk)
+    provider = request.user.current_provider
+    clinics = provider.clinics.by_filter(filter).prefetch_related("setting")
+    counts_by_filter = Clinic.filter_counts(provider.pk)
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
@@ -24,7 +23,7 @@ def clinic_list(request, filter="today"):
 
 
 def clinic(request, pk, filter="remaining"):
-    provider = request.current_provider
+    provider = request.user.current_provider
     clinic = provider.clinics.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
     appointments = (
@@ -50,8 +49,9 @@ def clinic(request, pk, filter="remaining"):
 
 @require_http_methods(["POST"])
 def check_in(request, pk, appointment_pk):
+    provider = request.user.current_provider
     try:
-        appointment = request.current_provider.appointments.get(pk=appointment_pk)
+        appointment = provider.appointments.get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
     appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
