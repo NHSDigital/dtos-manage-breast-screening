@@ -1,9 +1,12 @@
 import os
+import logging
 
 from azure.core.exceptions import ResourceExistsError
 from azure.identity import ManagedIdentityCredential
 from azure.storage.queue import QueueClient, QueueMessage
+from opentelemetry.metrics import Meter, get_meter_provider
 
+logger = logging.getLogger(__name__)
 
 class Queue:
     def __init__(self, queue_name):
@@ -41,6 +44,33 @@ class Queue:
 
     def item(self):
         return self.client.receive_message()
+
+    def properties(self):
+        """Fetch queue properties and record message count as a metric."""
+        try:
+            properties = self.client.get_queue_properties()
+            self.message_count = properties.approximate_message_count
+        except Exception as e:
+            logger.exception(e)
+            self.message_count = None
+            return None
+
+        try:
+            meter = get_meter_provider().get_meter("queue_metrics")
+
+            gauge = meter.create_gauge(
+                name="queue_message_count",
+                description="Approximate number of messages in the queue",
+                unit="messages"
+            )
+
+            # Record the latest value
+            if self.message_count is not None:
+                gauge.record(self.message_count)
+        except Exception as e:
+            logger.exception(e)
+
+        return self.message_count
 
     @classmethod
     def MessageStatusUpdates(cls):
