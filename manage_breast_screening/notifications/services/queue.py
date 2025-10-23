@@ -13,6 +13,7 @@ class Queue:
         storage_account_name = os.getenv("STORAGE_ACCOUNT_NAME")
         queue_mi_client_id = os.getenv("QUEUE_MI_CLIENT_ID")
         connection_string = os.getenv("QUEUE_STORAGE_CONNECTION_STRING")
+        self.queue_name = queue_name
 
         if storage_account_name and queue_mi_client_id:
             self.client = QueueClient(
@@ -59,7 +60,7 @@ class Queue:
             meter = get_meter_provider().get_meter("queue_metrics")
 
             gauge = meter.create_gauge(
-                name="queue_message_count",
+                name=queue_name,
                 description="Approximate number of messages in the queue",
                 unit="messages"
             )
