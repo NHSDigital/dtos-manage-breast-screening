@@ -33,7 +33,8 @@ def sha_view(request):
 @basic_auth_exempt
 @login_not_required
 def health_check(request):
-  return HttpResponse("OK")
+    return HttpResponse("OK")
+
 
 urlpatterns = [
     path(
@@ -44,7 +45,7 @@ urlpatterns = [
         "clinics/", include("manage_breast_screening.clinics.urls", namespace="clinics")
     ),
     path(
-        "healthcheck/",
+        "healthcheck",
         health_check,
     ),
     path(
