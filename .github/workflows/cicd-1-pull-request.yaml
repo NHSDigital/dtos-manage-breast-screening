@@ -99,4 +99,4 @@ jobs:
           message: |
             The review app is available at this URL:
             https://pr-${{ github.event.pull_request.number }}.manage-breast-screening.non-live.screening.nhs.uk
-            You must authenticate with Entra ID
+            You must authenticate with HTTP basic authentication. Ask the team for credentials.
