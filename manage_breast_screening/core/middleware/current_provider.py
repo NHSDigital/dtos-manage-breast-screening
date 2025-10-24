@@ -43,13 +43,13 @@ class CurrentProviderMiddleware:
         return redirect(reverse("clinics:select_provider"))
 
     def _add_current_provider_property(self, request: HttpRequest) -> None:
-        """Add current_provider attribute to request.
+        """Add current_provider attribute to request.user.
 
         Loads the Provider instance from the database based on the
         current_provider session value.
         """
         provider_id = request.session.get("current_provider")
         if provider_id:
-            request.current_provider = Provider.objects.get(pk=provider_id)
+            request.user.current_provider = Provider.objects.get(pk=provider_id)
         else:
-            request.current_provider = None
+            request.user.current_provider = None

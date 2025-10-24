@@ -19,14 +19,16 @@ def user():
 @pytest.fixture
 def administrative_user():
     user = UserFactory.create(nhs_uid="administrative1")
-    UserAssignmentFactory.create(user=user, administrative=True)
+    assignment = UserAssignmentFactory.create(user=user, administrative=True)
+    assignment.make_current()
     return user
 
 
 @pytest.fixture
 def clinical_user():
     user = UserFactory.create(nhs_uid="clinical1")
-    UserAssignmentFactory.create(user=user, clinical=True)
+    assignment = UserAssignmentFactory.create(user=user, clinical=True)
+    assignment.make_current()
     return user
 
 
