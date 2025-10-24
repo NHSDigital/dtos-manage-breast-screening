@@ -21,26 +21,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            logger.info("Store MESH Messages command started")
-            today_dirname = datetime.today().strftime("%Y-%m-%d")
-            with MeshInbox() as inbox:
-                for message_id in inbox.fetch_message_ids():
-                    logger.debug("Processing message %s", message_id)
-                    message = inbox.fetch_message(message_id)
-
-                    BlobStorage().add(
-                        f"{today_dirname}/{message.filename}",
-                        message.read().decode("ASCII"),
-                    )
-
-                    logger.info("Message %s stored in blob storage", message_id)
-
-                    inbox.acknowledge(message_id)
-
-                    logger.info("Message %s acknowledged", message_id)
-
-            logger.info("Store MESH Messages command completed successfully")
-
+            self.store_mesh_messages()
         except Exception as e:
             ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
+
+    def store_mesh_messages(self):
+        logger.info("Store MESH Messages command started")
+        today_dirname = datetime.today().strftime("%Y-%m-%d")
+        with MeshInbox() as inbox:
+            for message_id in inbox.fetch_message_ids():
+                logger.debug("Processing message %s", message_id)
+                message = inbox.fetch_message(message_id)
+
+                BlobStorage().add(
+                    f"{today_dirname}/{message.filename}",
+                    message.read().decode("ASCII"),
+                )
+
+                logger.info("Message %s stored in blob storage", message_id)
+
+                inbox.acknowledge(message_id)
+
+                logger.info("Message %s acknowledged", message_id)
+
+        logger.info("Store MESH Messages command completed successfully")
