@@ -18,8 +18,12 @@ from manage_breast_screening.notifications.models import (
     MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 
 TZ_INFO = ZoneInfo("Europe/London")
+INSIGHTS_ERROR_NAME = "SendMessageBatchError"
 logger = getLogger(__name__)
 
 
@@ -31,62 +35,61 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            logger.info("Send Message Batch Command started")
-            if not self.bso_working_day():
-                return
-
-            for routing_plan in RoutingPlan.all():
-                logger.info(f"Processing Routing Plan {routing_plan.id}")
-                self.stdout.write(
-                    f"Finding appointments of episode type {routing_plan.episode_types} to include in batch."
-                )
-
-                appointments = Appointment.objects.filter(
-                    episode_type__in=routing_plan.episode_types,
-                    starts_at__lte=self.schedule_date(),
-                    message__isnull=True,
-                    status="B",
-                    number="1",
-                )
-
-                if not appointments:
-                    logger.info(
-                        f"No appointments found to batch for episode types {routing_plan.episode_types}"
-                    )
-                    continue
-
-                logger.info(f"Found {appointments.count()} appointments to batch.")
-
-                message_batch = MessageBatch.objects.create(
-                    routing_plan_id=routing_plan.id,
-                    scheduled_at=datetime.now(tz=TZ_INFO),
-                    status=MessageBatchStatusChoices.SCHEDULED.value,
-                )
-
-                for appointment in appointments:
-                    Message.objects.create(appointment=appointment, batch=message_batch)
-
-                logger.info(
-                    f"Created MessageBatch with ID {message_batch.id} containing {appointments.count()} messages."
-                )
-
-                response = ApiClient().send_message_batch(message_batch)
-
-                if response.status_code == 201:
-                    MessageBatchHelpers.mark_batch_as_sent(
-                        message_batch, response.json()
-                    )
-                    logger.info(f"{message_batch} sent successfully")
-                else:
-                    logger.error(
-                        f"Failed to send batch. Status: {response.status_code}"
-                    )
-                    MessageBatchHelpers.mark_batch_as_failed(
-                        message_batch, response, retry_count=0
-                    )
+            return self.send_message_batch()
         except Exception as e:
-            logger.error(e, exc_info=True)
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
+
+    def send_message_batch(self):
+        logger.info("Send Message Batch Command started")
+        if not self.bso_working_day():
+            return
+
+        for routing_plan in RoutingPlan.all():
+            logger.info(f"Processing Routing Plan {routing_plan.id}")
+            self.stdout.write(
+                f"Finding appointments of episode type {routing_plan.episode_types} to include in batch."
+            )
+
+            appointments = Appointment.objects.filter(
+                episode_type__in=routing_plan.episode_types,
+                starts_at__lte=self.schedule_date(),
+                message__isnull=True,
+                status="B",
+                number="1",
+            )
+
+            if not appointments:
+                logger.info(
+                    f"No appointments found to batch for episode types {routing_plan.episode_types}"
+                )
+                continue
+
+            logger.info(f"Found {appointments.count()} appointments to batch.")
+
+            message_batch = MessageBatch.objects.create(
+                routing_plan_id=routing_plan.id,
+                scheduled_at=datetime.now(tz=TZ_INFO),
+                status=MessageBatchStatusChoices.SCHEDULED.value,
+            )
+
+            for appointment in appointments:
+                Message.objects.create(appointment=appointment, batch=message_batch)
+
+            logger.info(
+                f"Created MessageBatch with ID {message_batch.id} containing {appointments.count()} messages."
+            )
+
+            response = ApiClient().send_message_batch(message_batch)
+
+            if response.status_code == 201:
+                MessageBatchHelpers.mark_batch_as_sent(message_batch, response.json())
+                logger.info(f"{message_batch} sent successfully")
+            else:
+                logger.error(f"Failed to send batch. Status: {response.status_code}")
+                MessageBatchHelpers.mark_batch_as_failed(
+                    message_batch, response, retry_count=0
+                )
 
     def bso_working_day(self):
         return Calendar().is_business_day(datetime.now(tz=TZ_INFO))
