@@ -69,6 +69,7 @@ class Queue:
 
             if self.message_count is not None:
                 gauge.record(self.message_count)
+
         except Exception as e:
             logger.exception(e)
 
