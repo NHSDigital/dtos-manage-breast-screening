@@ -18,8 +18,12 @@ from manage_breast_screening.notifications.models import (
     MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 
 TZ_INFO = ZoneInfo("Europe/London")
+INSIGHTS_ERROR_NAME = "SendMessageBatchError"
 logger = getLogger(__name__)
 
 
@@ -85,7 +89,7 @@ class Command(BaseCommand):
                         message_batch, response, retry_count=0
                     )
         except Exception as e:
-            logger.error(e, exc_info=True)
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
 
     def bso_working_day(self):
