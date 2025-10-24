@@ -87,8 +87,7 @@ module "db_setup" {
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
   depends_on = [
-    module.queue_storage_role_assignment,
-    module.blob_storage_role_assignment
+    module.storage,
   ]
 
 }
@@ -136,8 +135,7 @@ module "scheduled_jobs" {
 
   # Ensure RBAC role assignments are created before the job definition finalizes
   depends_on = [
-    module.blob_storage_role_assignment,
-    module.queue_storage_role_assignment
+    module.storage,
   ]
 
   cron_expression = each.value.cron_expression
