@@ -242,7 +242,8 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         ).to_be_visible()
 
     def when_i_click_on_the_special_appointment(self):
-        self.page.get_by_role("link", name="Janet Special Appointment").click()
+        row = self.page.locator("tr").filter(has_text="Janet Special Appointment")
+        row.locator("a", has_text="View appointment").click()
 
     def then_i_can_see_the_special_appointment_banner(self):
         banner = self.page.locator(".nhsuk-warning-callout")
