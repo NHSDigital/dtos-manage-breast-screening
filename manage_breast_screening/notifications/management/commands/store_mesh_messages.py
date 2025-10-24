@@ -3,10 +3,14 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand, CommandError
 
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.services.mesh_inbox import MeshInbox
 
 logger = getLogger(__name__)
+INSIGHTS_ERROR_NAME = "StoreMeshMessagesError"
 
 
 class Command(BaseCommand):
@@ -38,5 +42,5 @@ class Command(BaseCommand):
             logger.info("Store MESH Messages command completed successfully")
 
         except Exception as e:
-            logger.error(e, exc_info=True)
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)

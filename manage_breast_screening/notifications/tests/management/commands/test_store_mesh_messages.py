@@ -1,11 +1,14 @@
 import datetime
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 from django.core.management.base import CommandError
 
 from manage_breast_screening.notifications.management.commands.store_mesh_messages import (
     Command,
+)
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
 )
 
 
@@ -16,6 +19,14 @@ from manage_breast_screening.notifications.management.commands.store_mesh_messag
     "manage_breast_screening.notifications.management.commands.store_mesh_messages.MeshInbox"
 )
 class TestStoreMeshMessages:
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "exception", mock_insights_logger
+        )
+        return mock_insights_logger
+
     def test_handle_stores_blobs(self, mock_mesh_inbox, mock_blob_storage, monkeypatch):
         dirname = datetime.datetime.now().strftime("%Y-%m-%d")
         message1 = Mock()
@@ -55,3 +66,16 @@ class TestStoreMeshMessages:
 
         with pytest.raises(CommandError):
             Command().handle()
+
+    def test_calls_insights_logger_if_exception_raised(
+        self,
+        mock_mesh_inbox,
+        _y,
+        mock_insights_logger,
+    ):
+        mock_mesh_inbox.side_effect = Exception("inbox wrong")
+
+        with pytest.raises(CommandError):
+            Command().handle()
+
+        mock_insights_logger.assert_called_with("StoreMeshMessagesError: inbox wrong")
