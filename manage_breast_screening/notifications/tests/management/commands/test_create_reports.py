@@ -8,6 +8,9 @@ from django.core.management.base import CommandError
 from manage_breast_screening.notifications.management.commands.create_reports import (
     Command,
 )
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 
 
 class TestCreateReports:
@@ -22,6 +25,14 @@ class TestCreateReports:
     @pytest.fixture
     def now(self):
         return datetime.today()
+
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "exception", mock_insights_logger
+        )
+        return mock_insights_logger
 
     @contextmanager
     def mocked_dependencies(self, dataframe, csv_data, now):
@@ -96,3 +107,15 @@ class TestCreateReports:
 
             with pytest.raises(CommandError):
                 Command().handle()
+
+    @pytest.mark.django_db
+    def test_calls_insights_logger_if_exception_raised(
+        self,
+        mock_insights_logger,
+    ):
+        with pytest.raises(CommandError):
+            Command().handle()
+
+        mock_insights_logger.assert_called_with(
+            "CreateReportsError: 'BlobStorage' object has no attribute 'client'"
+        )
