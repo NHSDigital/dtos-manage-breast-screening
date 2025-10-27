@@ -1,4 +1,4 @@
 "NBSSAPPT_HDR"|"00000013"|"20250128"|"170922"|"000003"
 "NBSSAPPT_FLDS"|"Sequence"|"BSO"|"Action"|"Clinic Code"|"Holding Clinic"|"Status"|"Attended Not Scr"|"Appointment ID"|"NHS Num"|"Episode Type"|"Episode Start"|"Batch ID"|"Screen or Asses"|"Screen Appt num"|"Booked By"|"Cancelled By"|"Appt Date"|"Appt Time"|"Location"|"Clinic Name"|"Clinic Name (Let)"|"Clinic Address 1"|"Clinic Address 2"|"Clinic Address 3"|"Clinic Address 4"|"Clinic Address 5"|"Postcode"|"Action Timestamp"
-"NBSSAPPT_DATA"|"000001"|"KMK"|"C"|"BU011"|"N"|"C"|"N"|"BU011-67278-RA1-DN-Y1111-1"|"9449305552"|"F"|"20250128"|"KMK001326"|"S"|"1"|"H"|"C"|"20250314"|"1345"|"MKGH"|"BREAST CARE UNIT"|"BREAST CARE UNIT"|"BREAST CARE UNIT"|"MILTON KEYNES HOSPITAL"|"STANDING WAY"|"MILTON KEYNES"|"MK6 5LD"|"MK6 5LD"|"20250128-154003"
+"NBSSAPPT_DATA"|"000001"|"KMK"|"C"|"BU011"|"N"|"C"|"N"|"BU011-67278-RA1-DN-Y1111-1"|"9449305552"|"F"|"20250128"|"KMK001326"|"S"|"1"|"H"|"C"|"20250314"|"1345"|"MKGH"|"BREAST CARE UNIT"|"BREAST CARE UNIT"|"BREAST CARE UNIT"|"MILTON KEYNES HOSPITAL"|"STANDING WAY"|"MILTON KEYNES"|"MK6 5LD"|"MK6 5LD"|"20250128-175555"
 "NBSSAPPT_END"|"00000013"|"20250128"|"17:09:22"|"000003"
