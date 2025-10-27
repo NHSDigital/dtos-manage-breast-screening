@@ -113,9 +113,17 @@ class TestCreateReports:
         self,
         mock_insights_logger,
     ):
-        with pytest.raises(CommandError):
-            Command().handle()
+        an_exception = Exception("'BlobStorage' object has no attribute 'client'")
+        with patch(
+            (
+                "manage_breast_screening.notifications.management."
+                "commands.create_reports.BlobStorage"
+            )
+        ) as mock_blob_storage:
+            mock_blob_storage.client.side_effect = an_exception
+            with pytest.raises(CommandError):
+                Command().handle()
 
-        mock_insights_logger.assert_called_with(
-            "CreateReportsError: 'BlobStorage' object has no attribute 'client'"
-        )
+                mock_insights_logger.assert_called_with(
+                    f"CreateReportsError: {an_exception}"
+                )
