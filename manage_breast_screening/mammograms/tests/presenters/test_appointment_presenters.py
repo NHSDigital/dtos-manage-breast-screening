@@ -81,7 +81,7 @@ class TestAppointmentPresenter:
         assert result["is_screened"] == expected_is_screened
 
     @pytest.mark.parametrize(
-        "extra_needs, in_progress, expected_value",
+        "extra_needs, active, expected_value",
         [
             ({}, True, True),
             ({}, False, False),
@@ -93,9 +93,9 @@ class TestAppointmentPresenter:
         ],
     )
     def test_can_be_made_special(
-        self, mock_appointment, extra_needs, in_progress, expected_value
+        self, mock_appointment, extra_needs, active, expected_value
     ):
-        mock_appointment.in_progress = in_progress
+        mock_appointment.active = active
         mock_appointment.screening_episode.participant.extra_needs = extra_needs
         assert (
             AppointmentPresenter(mock_appointment).can_be_made_special == expected_value

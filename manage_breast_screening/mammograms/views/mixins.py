@@ -40,7 +40,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
-        if not appointment.current_status.in_progress:
+        if not appointment.active:
             return redirect(
                 "mammograms:show_appointment",
                 pk=appointment.pk,

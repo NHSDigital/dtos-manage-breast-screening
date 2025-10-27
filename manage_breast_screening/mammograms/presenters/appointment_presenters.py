@@ -54,7 +54,7 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_made_special(self):
-        return not self.is_special_appointment and self._appointment.in_progress
+        return not self.is_special_appointment and self._appointment.active
 
     @cached_property
     def special_appointment_tag_properties(self):

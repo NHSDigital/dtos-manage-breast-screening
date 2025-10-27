@@ -10,7 +10,7 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 
 @pytest.mark.django_db
 class TestShowAppointment:
-    def test_redirects_to_show_screening_if_in_progress(self, clinical_user_client):
+    def test_redirects_to_show_screening_if_active(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )

@@ -147,8 +147,8 @@ class AppointmentStatus(models.Model):
         ordering = ["-created_at"]
 
     @property
-    def in_progress(self):
+    def active(self):
         """
-        Is this state one of the in-progress states?
+        Is this state one of the active, non-final states?
         """
-        return self.state in [self.CONFIRMED, self.CHECKED_IN]
+        return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]

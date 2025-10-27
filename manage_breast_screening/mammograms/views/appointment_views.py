@@ -50,7 +50,7 @@ class ShowAppointment(AppointmentMixin, View):
                 Permission.VIEW_MAMMOGRAM_APPOINTMENT,
                 request.user.current_provider,
             )
-            and appointment.current_status.in_progress
+            and appointment.active
         ):
             return redirect("mammograms:start_screening", pk=self.appointment.pk)
 
