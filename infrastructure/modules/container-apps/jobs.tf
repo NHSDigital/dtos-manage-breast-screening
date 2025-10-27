@@ -1,8 +1,7 @@
 locals {
   scheduled_jobs = {
     store_mesh_messages = {
-      # cron_expression = "0 9-18 * * *"
-      cron_expression = null
+      cron_expression = "0 6-20 * * *"
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-mesh-data"
       }
@@ -10,8 +9,7 @@ locals {
       job_container_args = "store_mesh_messages"
     }
     create_appointments = {
-      # cron_expression = "30 9-18 * * *"
-      cron_expression = null
+      cron_expression = "30 6-20 * * *"
       environment_variables = {
         BLOB_CONTAINER_NAME = "notifications-mesh-data"
       }
@@ -146,5 +144,5 @@ module "scheduled_jobs" {
     module.queue_storage_role_assignment
   ]
 
-  cron_expression = each.value.cron_expression
+  cron_expression = var.enable_notifications_jobs_schedule ? each.value.cron_expression : null
 }

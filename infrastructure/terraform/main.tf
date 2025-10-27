@@ -74,4 +74,5 @@ module "container-apps" {
   nhs_notify_api_message_batch_url      = var.nhs_notify_api_message_batch_url
   target_url                            = var.deploy_container_apps ? "${module.container-apps[0].external_url}healthcheck" : null
   resource_group_name_infra             = local.resource_group_name
+  enable_notifications_jobs_schedule    = var.enable_notifications_jobs_schedule
 }
