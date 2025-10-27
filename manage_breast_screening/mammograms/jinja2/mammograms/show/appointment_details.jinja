@@ -31,13 +31,13 @@
       {{ appointment_status(
         appointment=presented_appointment,
         csrf_input=csrf_input
-      )}}
+      ) }}
     </div>
   </div>
 
   {{ appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
 
-  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=False) }}
+  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
 
   {{ app_secondary_navigation({
     "visuallyHiddenTitle": "Secondary menu",

@@ -56,8 +56,6 @@ class TestRecordingAMammogram(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
-        self.when_i_submit_the_form()
-        self.then_i_am_prompted_to_answer_can_the_screening_go_ahead()
 
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_medical_information_page()

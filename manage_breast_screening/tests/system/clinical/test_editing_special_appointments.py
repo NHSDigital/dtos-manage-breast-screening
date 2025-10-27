@@ -157,9 +157,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
         expect(banner).not_to_be_attached()
 
     def then_i_am_back_on_the_appointment(self):
-        expect(self.page).to_have_url(
-            re.compile(f"/mammograms/{self.appointment.pk}/start-screening/")
-        )
+        expect(self.page).to_have_url(re.compile(f"/mammograms/{self.appointment.pk}/"))
 
     def when_i_click_on_the_change_link(self):
         banner = self.page.locator(".nhsuk-warning-callout")

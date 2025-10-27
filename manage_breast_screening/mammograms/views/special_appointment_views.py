@@ -32,7 +32,8 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
             {
                 "back_link_params": {
                     "href": reverse(
-                        "mammograms:start_screening", kwargs={"pk": self.appointment_pk}
+                        "mammograms:show_appointment",
+                        kwargs={"pk": self.appointment_pk},
                     ),
                     "text": "Back to appointment",
                 },
@@ -62,7 +63,7 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
         ):
             return redirect("mammograms:mark_reasons_temporary", pk=self.appointment_pk)
         else:
-            return redirect("mammograms:start_screening", pk=self.appointment_pk)
+            return redirect("mammograms:show_appointment", pk=self.appointment_pk)
 
 
 class MarkReasonsTemporary(AppointmentMixin, FormView):
@@ -109,4 +110,4 @@ class MarkReasonsTemporary(AppointmentMixin, FormView):
         self.participant.save()
         Auditor.from_request(self.request).audit_update(self.participant)
 
-        return redirect("mammograms:start_screening", pk=self.appointment_pk)
+        return redirect("mammograms:show_appointment", pk=self.appointment_pk)

@@ -58,6 +58,10 @@ class AppointmentPresenter:
     def can_be_made_special(self):
         return not self.is_special_appointment and self._appointment.active
 
+    @cached_property
+    def active(self):
+        return self._appointment.active
+
     def can_be_started_by(self, user):
         return user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment)
 
