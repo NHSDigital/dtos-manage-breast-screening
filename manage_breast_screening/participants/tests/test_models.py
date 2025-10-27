@@ -250,6 +250,7 @@ def test_appointment_current_status():
 def test_appointment_status_active():
     assert AppointmentStatus(state=AppointmentStatus.CONFIRMED).active
     assert AppointmentStatus(state=AppointmentStatus.CHECKED_IN).active
+    assert AppointmentStatus(state=AppointmentStatus.IN_PROGRESS).active
     assert not AppointmentStatus(state=AppointmentStatus.CANCELLED).active
     assert not AppointmentStatus(state=AppointmentStatus.DID_NOT_ATTEND).active
     assert not AppointmentStatus(state=AppointmentStatus.ATTENDED_NOT_SCREENED).active
