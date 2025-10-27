@@ -146,5 +146,5 @@ module "scheduled_jobs" {
     module.queue_storage_role_assignment
   ]
 
-  cron_expression = each.value.cron_expression
+  cron_expression = var.enable_notifications_jobs_schedule ? each.value.cron_expression : null
 }

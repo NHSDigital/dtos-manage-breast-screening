@@ -195,6 +195,12 @@ variable "app_insights_id" {
   type        = string
 }
 
+variable "enable_notifications_jobs_schedule" {
+  description = "Whether we apply the cron schedules for the notifications container app jobs"
+  type        = bool
+  default     = false
+}
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
