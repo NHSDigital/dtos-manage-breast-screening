@@ -1,7 +1,7 @@
 import os
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from unittest.mock import MagicMock, Mock, PropertyMock, patch
+from unittest.mock import Mock, PropertyMock, patch
 
 import pytest
 from azure.storage.blob import BlobProperties
@@ -11,9 +11,6 @@ from manage_breast_screening.notifications.management.commands.create_appointmen
     Command,
 )
 from manage_breast_screening.notifications.models import ZONE_INFO, Appointment, Clinic
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
-)
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     ClinicFactory,
@@ -60,14 +57,6 @@ def stored_blob_data(prefix_dir: str, filenames: list[str]):
 
 @pytest.mark.django_db
 class TestCreateAppointments:
-    @pytest.fixture(autouse=True)
-    def mock_insights_logger(self, monkeypatch):
-        mock_insights_logger = MagicMock()
-        monkeypatch.setattr(
-            ApplicationInsightsLogging, "exception", mock_insights_logger
-        )
-        return mock_insights_logger
-
     def test_handle_creates_records(self):
         """Test Appointment creation for new booked appointments in NBSS data, stored in Azure storage blob"""
         today_dirname = datetime.now().strftime("%Y-%m-%d")
@@ -277,13 +266,13 @@ class TestCreateAppointments:
         assert Clinic.objects.count() == 2
         assert Appointment.objects.count() == 2
 
-    def test_handle_with_invalid_date_arg(self):
+    def test_handle_with_invalid_date_arg(self, mock_insights_logger):
         """Test command execution with an invalid date argument"""
         with mocked_blob_storage() as mock_blob_storage:
             mock_container_client = (
                 mock_blob_storage.return_value.find_or_create_container.return_value
             )
-            mock_container_client.list_blobs = Mock(side_effect=Exception("Error!"))
+            mock_container_client.list_blobs.side_effect = Exception("Error!")
 
             with pytest.raises(CommandError):
                 Command().handle(**{"date_str": "Noooo!"})
@@ -303,7 +292,7 @@ class TestCreateAppointments:
         assert len(Clinic.objects.all()) == 0
         assert len(Appointment.objects.all()) == 0
 
-    def test_handle_with_error(self):
+    def test_handle_with_error(self, mock_insights_logger):
         """Test exception handling of the create_appointments command"""
         with mocked_blob_storage() as mock_blob_storage:
             mock_container_client = (
