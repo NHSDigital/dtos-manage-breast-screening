@@ -1,6 +1,11 @@
 from django.urls import reverse
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
-from manage_breast_screening.core.template_helpers import multiline_content
+from manage_breast_screening.core.template_helpers import (
+    message_with_heading,
+    multiline_content,
+)
 from manage_breast_screening.core.utils.date_formatting import format_approximate_date
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
@@ -170,3 +175,17 @@ class SymptomPresenter:
                 return "mammograms:change_symptom_nipple_change"
             case _:
                 return "mammograms:change_symptom_other"
+
+    @property
+    def delete_message_html(self):
+        return message_with_heading(
+            heading="Symptom deleted",
+            html=mark_safe(f"<p>Deleted {escape(self.name)}.</p>"),
+        )
+
+    @property
+    def add_message_html(self):
+        return message_with_heading(
+            heading="Symptom added",
+            html=mark_safe(f"<p>Added {escape(self.name)}.</p>"),
+        )
