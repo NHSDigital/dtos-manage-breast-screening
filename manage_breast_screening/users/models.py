@@ -29,6 +29,21 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "nhs_uid"
     REQUIRED_FIELDS = []
 
+    @property
+    def current_provider(self):
+        """
+        The provider that the user is currently logged into.
+        This should be set by CurrentProviderMiddleware
+        """
+        try:
+            return self._current_provider
+        except AttributeError:
+            return None
+
+    @current_provider.setter
+    def current_provider(self, provider):
+        self._current_provider = provider
+
     def get_session_auth_hash(self):
         """
         Override this method in AbstractBaseUser. It's purpose is to invalidate

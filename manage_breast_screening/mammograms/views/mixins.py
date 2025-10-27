@@ -19,8 +19,9 @@ class AppointmentMixin:
 
     @cached_property
     def appointment(self):
+        provider = self.request.user.current_provider
         try:
-            return self.request.current_provider.appointments.select_related(
+            return provider.appointments.select_related(
                 "clinic_slot__clinic",
                 "screening_episode__participant",
                 "screening_episode__participant__address",
@@ -35,10 +36,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     If the appointment is not in progress, redirect to the appointment show page.
     """
 
-    permission_required = Permission.PERFORM_MAMMOGRAM_APPOINTMENT
-
-    def get_permission_object(self):
-        return self.request.current_provider
+    permission_required = Permission.VIEW_MAMMOGRAM_APPOINTMENT
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore

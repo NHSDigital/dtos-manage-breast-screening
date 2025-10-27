@@ -64,18 +64,20 @@ class TestCurrentProviderMiddleware:
         provider = ProviderFactory(name="Test Provider")
         request = RequestFactory().get("/")
         request.session = {"current_provider": str(provider.pk)}
+        request.user = Mock(is_authenticated=True)
 
         mw = _make_middleware()
         mw(request)
 
-        assert request.current_provider == provider
-        assert request.current_provider.name == "Test Provider"
+        assert request.user.current_provider == provider
+        assert request.user.current_provider.name == "Test Provider"
 
     def test_sets_current_provider_to_none_when_not_in_session(self):
         request = RequestFactory().get("/")
         request.session = {}
+        request.user = Mock(is_authenticated=True)
 
         mw = _make_middleware()
         mw(request)
 
-        assert request.current_provider is None
+        assert request.user.current_provider is None

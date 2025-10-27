@@ -47,8 +47,8 @@ class ShowAppointment(AppointmentMixin, View):
         appointment = self.appointment
         if (
             request.user.has_perm(
-                Permission.PERFORM_MAMMOGRAM_APPOINTMENT,
-                request.current_provider,
+                Permission.VIEW_MAMMOGRAM_APPOINTMENT,
+                request.user.current_provider,
             )
             and appointment.current_status.in_progress
         ):
@@ -136,9 +136,8 @@ class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
-        participant = self.request.current_provider.participants.get(
-            screeningepisode__appointment__pk=pk
-        )
+        provider = self.request.user.current_provider
+        participant = provider.participants.get(screeningepisode__appointment__pk=pk)
 
         context.update(
             {
@@ -176,8 +175,9 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs["pk"]
+        provider = self.request.user.current_provider
         try:
-            participant = self.request.current_provider.participants.get(
+            participant = provider.participants.get(
                 screeningepisode__appointment__pk=pk,
             )
         except Participant.DoesNotExist:
@@ -212,8 +212,8 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        participant = self.request.current_provider.participants.get(
+        provider = self.request.user.current_provider
+        participant = provider.participants.get(
             screeningepisode__appointment__pk=self.appointment.pk
         )
         context.update(
@@ -246,7 +246,8 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
 @require_http_methods(["POST"])
 def check_in(request, pk):
     try:
-        appointment = request.current_provider.appointments.get(pk=pk)
+        provider = request.user.current_provider
+        appointment = provider.appointments.get(pk=pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)

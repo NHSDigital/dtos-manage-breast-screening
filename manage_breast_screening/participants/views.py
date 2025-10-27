@@ -33,7 +33,7 @@ def parse_return_url(request, default: str) -> str:
 
 
 def show(request, pk):
-    provider = request.current_provider
+    provider = request.user.current_provider
     try:
         participant = provider.participants.get(pk=pk)
     except Participant.DoesNotExist:
@@ -74,7 +74,8 @@ def show(request, pk):
 
 def edit_ethnicity(request, pk):
     try:
-        participant = request.current_provider.participants.get(pk=pk)
+        provider = request.user.current_provider
+        participant = provider.participants.get(pk=pk)
     except Participant.DoesNotExist:
         raise Http404("Participant not found")
 
@@ -110,7 +111,8 @@ def edit_ethnicity(request, pk):
 
 def add_previous_mammogram(request, pk):
     try:
-        participant = request.current_provider.participants.get(pk=pk)
+        provider = request.user.current_provider
+        participant = provider.participants.get(pk=pk)
     except Participant.DoesNotExist:
         raise Http404("Participant not found")
     most_recent_provider = fetch_most_recent_provider(pk)

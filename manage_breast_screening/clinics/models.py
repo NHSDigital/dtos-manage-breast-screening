@@ -228,6 +228,9 @@ class UserAssignment(BaseModel):
             self.roles = sorted(list(set(self.roles)))
         super().save(*args, **kwargs)
 
+    def make_current(self):
+        self.user.current_provider = self.provider
+
     class Meta:
         unique_together = ["user", "provider"]
         verbose_name = "User provider assignment"
