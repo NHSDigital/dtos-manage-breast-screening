@@ -27,7 +27,7 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv \
 
 # Install python dependencies to a virtualenv
 COPY pyproject.toml uv.lock ./
-RUN pip install uv
+RUN pip install uv==0.9.5
 RUN uv sync --frozen --no-dev && rm -rf $UV_CACHE_DIR
 
 #### FINAL RUNTIME IMAGE
