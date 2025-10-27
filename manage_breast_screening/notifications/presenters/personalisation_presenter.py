@@ -24,6 +24,7 @@ class PersonalisationPresenter:
         return {
             "appointment_date": self.appointment_date,
             "appointment_time": self.appointment_time,
+            "appointment_clinic_name": self.titlecase(self.clinic.name),
             "appointment_location_address": self.appointment_location_address,
             "appointment_location_description": self.clinic_location_data.description,
             "appointment_location_url": self.clinic_location_data.url,
@@ -33,30 +34,18 @@ class PersonalisationPresenter:
 
     def presented_address_fields(self) -> dict[str:str]:
         return {
-            "appointment_location_address1": self.present_address(
-                self.clinic.address_line_1
-            ),
-            "appointment_location_address2": self.present_address(
-                self.clinic.address_line_2
-            ),
-            "appointment_location_address3": self.present_address(
-                self.clinic.address_line_3
-            ),
-            "appointment_location_address4": self.present_address(
-                self.clinic.address_line_4
-            ),
-            "appointment_location_address5": self.present_address(
-                self.clinic.address_line_5
-            ),
-            "appointment_location_postcode": self.present_postcode(
-                self.clinic.postcode
-            ),
+            "appointment_location_address1": self.titlecase(self.clinic.address_line_1),
+            "appointment_location_address2": self.titlecase(self.clinic.address_line_2),
+            "appointment_location_address3": self.titlecase(self.clinic.address_line_3),
+            "appointment_location_address4": self.titlecase(self.clinic.address_line_4),
+            "appointment_location_address5": self.titlecase(self.clinic.address_line_5),
+            "appointment_location_postcode": self.uppercase(self.clinic.postcode),
         }
 
     @staticmethod
-    def present_address(value):
+    def titlecase(value):
         return (value or "").title()
 
     @staticmethod
-    def present_postcode(value):
+    def uppercase(value):
         return (value or "").upper()
