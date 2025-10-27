@@ -61,7 +61,7 @@ githooks-run: # Run git hooks configured in this repository @Operations
 _install-uv:
 	@if ! uv --version >/dev/null 2>&1; then \
 		echo "Installing uv..."; \
-		pip install uv; \
+		pip install uv==0.9.7; \
 	else \
 		echo "uv already installed"; \
 	fi
