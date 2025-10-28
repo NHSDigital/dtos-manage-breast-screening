@@ -120,7 +120,7 @@ class TestCreateReports:
                 "commands.create_reports.BlobStorage"
             )
         ) as mock_blob_storage:
-            mock_blob_storage.client.side_effect = an_exception
+            mock_blob_storage.side_effect = an_exception
             with pytest.raises(CommandError):
                 Command().handle()
 
