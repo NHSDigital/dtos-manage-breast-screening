@@ -5,6 +5,8 @@ from django.db import models
 
 from ..core.models import BaseModel
 
+ZONE_INFO = ZoneInfo("Europe/London")
+
 
 class MessageBatchStatusChoices(models.Choices):
     FAILED_RECOVERABLE = "failed_recoverable"
@@ -145,7 +147,7 @@ class Appointment(models.Model):
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
     def localised_starts_at(self):
-        return self.starts_at.replace(tzinfo=ZoneInfo("Europe/London"))
+        return self.starts_at.replace(tzinfo=ZONE_INFO)
 
     def __str__(self):
         return f"Appointment {self.nbss_id} for {self.localised_starts_at()} at {self.clinic}"
