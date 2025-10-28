@@ -13,9 +13,6 @@ from manage_breast_screening.notifications.management.commands.retry_failed_mess
     CommandError,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
-)
 from manage_breast_screening.notifications.services.queue import Queue
 from manage_breast_screening.notifications.tests.factories import MessageBatchFactory
 
@@ -33,14 +30,6 @@ def setup(monkeypatch):
 @patch.object(MessageBatchHelpers, "mark_batch_as_sent")
 @patch.object(MessageBatchHelpers, "mark_batch_as_failed")
 class TestRetryFailedMessageBatch:
-    @pytest.fixture(autouse=True)
-    def mock_insights_logger(self, monkeypatch):
-        mock_insights_logger = MagicMock()
-        monkeypatch.setattr(
-            ApplicationInsightsLogging, "exception", mock_insights_logger
-        )
-        return mock_insights_logger
-
     @pytest.mark.django_db
     def test_handle_batch_not_found(
         self,
@@ -48,6 +37,7 @@ class TestRetryFailedMessageBatch:
         mock_mark_batch_as_sent,
         mock_retry_message_batches,
         mock_send_message_batch,
+        mock_insights_logger,
     ):
         batch_id = uuid.uuid4()
         mock_retry_message_batches.return_value.item.return_value.content = json.dumps(
@@ -72,6 +62,7 @@ class TestRetryFailedMessageBatch:
         mock_mark_batch_as_sent,
         mock_retry_message_batches,
         mock_send_message_batch,
+        mock_insights_logger,
     ):
         subject = Command()
         batch_id = uuid.uuid4()
@@ -165,6 +156,7 @@ class TestRetryFailedMessageBatch:
         mock_mark_batch_as_sent,
         mock_retry_message_batches,
         mock_send_message_batch,
+        mock_insights_logger,
     ):
         subject = Command()
         batch_id = uuid.uuid4()

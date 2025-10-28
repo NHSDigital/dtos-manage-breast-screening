@@ -8,9 +8,6 @@ from django.core.management.base import CommandError
 from manage_breast_screening.notifications.management.commands.create_reports import (
     Command,
 )
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
-)
 
 
 class TestCreateReports:
@@ -25,14 +22,6 @@ class TestCreateReports:
     @pytest.fixture
     def now(self):
         return datetime.today()
-
-    @pytest.fixture(autouse=True)
-    def mock_insights_logger(self, monkeypatch):
-        mock_insights_logger = MagicMock()
-        monkeypatch.setattr(
-            ApplicationInsightsLogging, "exception", mock_insights_logger
-        )
-        return mock_insights_logger
 
     @contextmanager
     def mocked_dependencies(self, dataframe, csv_data, now):
@@ -99,7 +88,7 @@ class TestCreateReports:
             report_type="invites_not_sent",
         )
 
-    def test_handle_raises_command_error(self):
+    def test_handle_raises_command_error(self, mock_insights_logger):
         with patch(
             "manage_breast_screening.notifications.queries.helper.Helper"
         ) as mock_query:
@@ -110,15 +99,11 @@ class TestCreateReports:
 
     @pytest.mark.django_db
     def test_calls_insights_logger_if_exception_raised(
-        self,
-        mock_insights_logger,
+        self, mock_insights_logger, commands_module_str
     ):
         an_exception = Exception("'BlobStorage' object has no attribute 'client'")
         with patch(
-            (
-                "manage_breast_screening.notifications.management."
-                "commands.create_reports.BlobStorage"
-            )
+            f"{commands_module_str}.create_reports.BlobStorage"
         ) as mock_blob_storage:
             mock_blob_storage.side_effect = an_exception
             with pytest.raises(CommandError):
