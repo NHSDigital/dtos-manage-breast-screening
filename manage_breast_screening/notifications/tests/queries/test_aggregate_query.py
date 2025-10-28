@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 import pytest
 from django.db import connection
 
-from manage_breast_screening.notifications.models import Clinic
+from manage_breast_screening.notifications.models import ZONE_INFO, Clinic
 from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
@@ -31,22 +30,24 @@ class TestAggregateQuery:
             episode_type=episode_type,
         )
         message = MessageFactory(
-            appointment=appt, status=message_status, sent_at=datetime.now()
+            appointment=appt, status=message_status, sent_at=datetime.now(tz=ZONE_INFO)
         )
         MessageStatusFactory(
-            message=message, status=message_status, status_updated_at=datetime.now()
+            message=message,
+            status=message_status,
+            status_updated_at=datetime.now(tz=ZONE_INFO),
         )
         for channel, status in channel_statuses.items():
             ChannelStatusFactory(
                 message=message,
                 channel=channel,
                 status=status,
-                status_updated_at=datetime.now(),
+                status_updated_at=datetime.now(tz=ZONE_INFO),
             )
         return appt
 
     def test_query_aggregates_appointments_and_cascade_counts(self):
-        now = datetime.now(tz=ZoneInfo("Europe/London"))
+        now = datetime.now(tz=ZONE_INFO)
         clinic1 = ClinicFactory(code="BU001", bso_code="BSO1", name="BSU 1")
         clinic2 = ClinicFactory(code="BU002", bso_code="BSO2", name="BSU 2")
 
@@ -117,8 +118,8 @@ class TestAggregateQuery:
             assert expectations[idx] == list(res)
 
     def test_aggregate_uses_date_range(self):
-        over_a_week_ago = datetime.now() - timedelta(days=9)
-        yesterday = datetime.now() - timedelta(days=1)
+        over_a_week_ago = datetime.now(tz=ZONE_INFO) - timedelta(days=9)
+        yesterday = datetime.now(tz=ZONE_INFO) - timedelta(days=1)
         self.create_appointment_set(
             over_a_week_ago,
             ClinicFactory(),
@@ -137,8 +138,8 @@ class TestAggregateQuery:
         assert len(results) == 1
 
     def test_aggregate_cascade_overlaps_are_counted_once(self):
-        appt_date = datetime.now() - timedelta(days=20)
-        message_sent_at = datetime.now() - timedelta(days=6)
+        appt_date = datetime.now(tz=ZONE_INFO) - timedelta(days=20)
+        message_sent_at = datetime.now(tz=ZONE_INFO) - timedelta(days=6)
         appt = AppointmentFactory(
             clinic=ClinicFactory(code="BU006", bso_code="BSO6", name="BSU 6"),
             starts_at=appt_date,
