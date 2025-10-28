@@ -64,7 +64,7 @@ class NhsMail:
 
         message = MIMEMultipart()
 
-        message.attach(MIMEText(content["body"], "plain"))
+        message.attach(MIMEText(content["body"], "html"))
 
         message["Subject"] = content["subject"]
         message["From"] = self._sender_email
