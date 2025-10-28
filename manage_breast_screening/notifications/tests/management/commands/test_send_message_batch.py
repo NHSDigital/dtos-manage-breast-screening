@@ -36,8 +36,12 @@ class TestSendMessageBatch:
     def mock_insights_logger(self, monkeypatch):
         mock_insights_logger = MagicMock()
         monkeypatch.setattr(
+            ApplicationInsightsLogging, "exception", mock_insights_logger
+        )
+        monkeypatch.setattr(
             ApplicationInsightsLogging, "getLogger", mock_insights_logger
         )
+        return mock_insights_logger
 
     def test_handle_with_a_batch_to_send(
         self, mock_mark_batch_as_sent, mock_send_message_batch
@@ -261,3 +265,15 @@ class TestSendMessageBatch:
         with patch.object(RoutingPlan, "all", side_effect=Exception("Nooooo!")):
             with pytest.raises(CommandError):
                 Command().handle()
+
+    def test_calls_insights_logger_if_exception_raised(
+        self,
+        mock_mark_batch_as_sent,
+        mock_send_message_batch,
+        mock_insights_logger,
+    ):
+        with patch.object(RoutingPlan, "all", side_effect=Exception("Nooooo!")):
+            with pytest.raises(CommandError):
+                Command().handle()
+
+        mock_insights_logger.assert_called_with("SendMessageBatchError: Nooooo!")
