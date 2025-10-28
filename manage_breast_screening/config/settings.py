@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_extensions",
+    "django_fsm_log",
     "manage_breast_screening.core",
     "manage_breast_screening.auth",
     "manage_breast_screening.users",

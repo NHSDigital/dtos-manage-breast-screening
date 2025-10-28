@@ -805,6 +805,21 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-appconf"
+version = "1.1.0"
+description = "A helper class for handling configuration defaults of packaged apps gracefully."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "django-appconf-1.1.0.tar.gz", hash = "sha256:9fcead372f82a0f21ee189434e7ae9c007cbb29af1118c18251720f3d06243e4"},
+    {file = "django_appconf-1.1.0-py3-none-any.whl", hash = "sha256:7abd5a163ff57557f216e84d3ce9dac36c37ffce1ab9a044d3d53b7c943dd10f"},
+]
+
+[package.dependencies]
+django = "*"
+
+[[package]]
 name = "django-debug-toolbar"
 version = "6.0.0"
 description = "A configurable set of panels that display various debug information about the current request/response."
@@ -834,6 +849,39 @@ files = [
 
 [package.dependencies]
 django = ">=4.2"
+
+[[package]]
+name = "django-fsm"
+version = "3.0.1"
+description = "Django friendly finite state machine support."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "django-fsm-3.0.1.tar.gz", hash = "sha256:d6436f5931e09d76e9a434781548627deab80c74cd6726adce95b31b5ddd4d1e"},
+    {file = "django_fsm-3.0.1-py2.py3-none-any.whl", hash = "sha256:ea07be2da221efa5cb8743cc94e0bb64fd962adff594f82269040eb4708c30c6"},
+]
+
+[[package]]
+name = "django-fsm-log"
+version = "3.1.0"
+description = "Transition's persistence for django-fsm"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "django-fsm-log-3.1.0.tar.gz", hash = "sha256:9ef766f5e6d7c573d1953cf91df73538a611373cc1ef97488eff19a3f71d6ed6"},
+    {file = "django_fsm_log-3.1.0-py3-none-any.whl", hash = "sha256:ac4394f22659e7fb8e5ac42d1cc075490cd5a2af37202377ab2a1cb221c5f3db"},
+]
+
+[package.dependencies]
+django = ">=1.8"
+django-appconf = "*"
+django-fsm = ">=2"
+
+[package.extras]
+docs = ["myst-parser", "sphinx", "sphinx-rtd-theme"]
+testing = ["pytest", "pytest-cov", "pytest-django", "pytest-mock"]
 
 [[package]]
 name = "django-qsessions"
@@ -3356,4 +3404,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0.0"
-content-hash = "48bd6a6409920b8787dee848e503cde107efa26876d8045c5d0a44fd428f94f7"
+content-hash = "3fbf3dd45935a6e1c340f01847b0f429e7be0552687de625a9c2df3e99f9da18"
