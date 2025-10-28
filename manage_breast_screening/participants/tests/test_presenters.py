@@ -157,7 +157,7 @@ class TestParticipantAppointmentPresenter:
                 "Screening",
                 "West of London BSS",
                 {
-                    "classes": "nhsuk-tag--blue app-nowrap",
+                    "classes": "nhsuk-tag--blue app-u-nowrap",
                     "key": "CONFIRMED",
                     "text": "Confirmed",
                 },
@@ -178,7 +178,7 @@ class TestParticipantAppointmentPresenter:
                 "Screening",
                 "West of London BSS",
                 {
-                    "classes": "nhsuk-tag--orange app-nowrap",
+                    "classes": "nhsuk-tag--orange app-u-nowrap",
                     "key": "PARTIALLY_SCREENED",
                     "text": "Partially screened",
                 },
@@ -189,7 +189,7 @@ class TestParticipantAppointmentPresenter:
                 "Screening",
                 "West of London BSS",
                 {
-                    "classes": "nhsuk-tag--green app-nowrap",
+                    "classes": "nhsuk-tag--green app-u-nowrap",
                     "key": "SCREENED",
                     "text": "Screened",
                 },

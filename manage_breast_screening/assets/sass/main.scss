@@ -61,6 +61,10 @@ a[href="#"] {
   }
 }
 
+.app-u-nowrap {
+  white-space: nowrap;
+}
+
 /*
   The design system has an inline variant for radios, but it's overriden when conditionals are used,
   and it uses floats

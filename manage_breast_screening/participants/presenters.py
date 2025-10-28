@@ -142,7 +142,9 @@ class ParticipantAppointmentsPresenter:
         colour = status_colour(current_status.state)
 
         return {
-            "classes": f"nhsuk-tag--{colour} app-nowrap" if colour else "app-nowrap",
+            "classes": f"nhsuk-tag--{colour} app-u-nowrap"
+            if colour
+            else "app-u-nowrap",
             "text": current_status.get_state_display(),
             "key": current_status.state,
         }

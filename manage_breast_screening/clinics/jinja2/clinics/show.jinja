@@ -68,7 +68,7 @@
       {{
         appointment_status(presented_appointment)
       }}
-      <p class="nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0 app-nowrap">
+      <p class="nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0 app-u-nowrap">
         <a href="{{ url('mammograms:show_appointment', kwargs={"pk": presented_appointment.pk}) }}" class="nhsuk-link">
           View appointment <span class="nhsuk-u-visually-hidden"> for {{ presented_appointment.participant.full_name }}</span>
         </a>
