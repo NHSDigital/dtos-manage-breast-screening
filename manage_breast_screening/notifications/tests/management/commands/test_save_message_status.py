@@ -12,6 +12,9 @@ from manage_breast_screening.notifications.management.commands.save_message_stat
     Command,
 )
 from manage_breast_screening.notifications.models import ChannelStatus, MessageStatus
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.tests.factories import (
     ChannelStatusFactory,
     MessageFactory,
@@ -22,6 +25,14 @@ from manage_breast_screening.notifications.tests.factories import (
     "manage_breast_screening.notifications.management.commands.save_message_status.Queue.MessageStatusUpdates"
 )
 class TestSaveMessageStatus:
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(self, monkeypatch):
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "exception", mock_insights_logger
+        )
+        return mock_insights_logger
+
     @pytest.mark.django_db
     def test_message_status_is_saved(self, mock_queue):
         message = MessageFactory.create()
@@ -197,3 +208,15 @@ class TestSaveMessageStatus:
         Command().handle()
 
         assert len(ChannelStatus.objects.filter(message=message)) == 0
+
+    def test_calls_insights_logger_if_exception_raised(
+        self, mock_queue, mock_insights_logger
+    ):
+        mock_queue.return_value.items.side_effect = Exception("this is an error")
+
+        with pytest.raises(CommandError):
+            Command().handle()
+
+        mock_insights_logger.assert_called_once_with(
+            "SaveMessageStatusError: this is an error"
+        )

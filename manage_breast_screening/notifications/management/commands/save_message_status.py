@@ -10,8 +10,12 @@ from manage_breast_screening.notifications.models import (
     Message,
     MessageStatus,
 )
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.queue import Queue
 
+INSIGHTS_ERROR_NAME = "SaveMessageStatusError"
 logger = getLogger(__name__)
 
 
@@ -24,21 +28,25 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         logger.info("Save Message Status Command started")
         try:
-            queue = Queue.MessageStatusUpdates()
-            for item in queue.items():
-                logger.debug(f"Processing message status update {item}")
-                payload = json.loads(item.content)
-                queue.delete(item)
-                self.data = payload["data"][0]
-                message_id = self.data["attributes"]["messageReference"]
-                self.message = Message.objects.get(pk=message_id)
-                self.idempotency_key = self.data["meta"]["idempotencyKey"]
+            return self.save_message_batch()
 
-                if self.save_status_update():
-                    logger.info(f"Message status update {item} saved")
         except Exception as e:
-            logger.error(e)
+            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
             raise CommandError(e)
+
+    def save_message_batch(self):
+        queue = Queue.MessageStatusUpdates()
+        for item in queue.items():
+            logger.debug(f"Processing message status update {item}")
+            payload = json.loads(item.content)
+            queue.delete(item)
+            self.data = payload["data"][0]
+            message_id = self.data["attributes"]["messageReference"]
+            self.message = Message.objects.get(pk=message_id)
+            self.idempotency_key = self.data["meta"]["idempotencyKey"]
+
+            if self.save_status_update():
+                logger.info(f"Message status update {item} saved")
 
     def save_status_update(self) -> bool:
         try:
