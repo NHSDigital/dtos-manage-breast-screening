@@ -20,6 +20,7 @@ class TestPersonalisationPresenter:
             clinic=ClinicFactory(
                 code="MDSVH",
                 bso_code="MBD",
+                name="BREAST SCREENING UNIT",
                 address_line_1="Victoria Health Centre",
                 address_line_2="5 Suffrage Street",
                 address_line_3="off Windmill Lane",
@@ -32,6 +33,7 @@ class TestPersonalisationPresenter:
 
         assert subject["appointment_date"] == "Monday 13 October 2025"
         assert subject["appointment_time"] == "3:15pm"
+        assert subject["appointment_clinic_name"] == "Breast Screening Unit"
         assert subject["appointment_location_address"] == (
             "Victoria Health Centre, 5 Suffrage Street, Off Windmill Lane, Smethwick, West Midlands, B66 3PZ"
         )
