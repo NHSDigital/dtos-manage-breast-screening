@@ -60,6 +60,7 @@ class TestNhsMail:
             "Breast screening digital comms invites not sent report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
+        assert "Content-Type: text/html" in email_content
         assert (
             "It's important that you take action when you receive this email"
             in email_content
