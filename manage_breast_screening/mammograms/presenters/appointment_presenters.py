@@ -2,6 +2,8 @@ from functools import cached_property
 
 from django.urls import reverse
 
+from manage_breast_screening.auth.models import Permission
+
 from ...core.utils.date_formatting import format_date, format_relative_date, format_time
 from ...participants.models import AppointmentStatus, SupportReasons
 from ...participants.presenters import ParticipantPresenter, status_colour
@@ -54,7 +56,14 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_made_special(self):
-        return not self.is_special_appointment and self._appointment.in_progress
+        return not self.is_special_appointment and self._appointment.active
+
+    @cached_property
+    def active(self):
+        return self._appointment.active
+
+    def can_be_started_by(self, user):
+        return user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment)
 
     @cached_property
     def special_appointment_tag_properties(self):

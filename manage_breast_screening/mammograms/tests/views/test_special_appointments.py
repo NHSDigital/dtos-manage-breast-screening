@@ -44,7 +44,7 @@ class TestProvideDetails:
         assertRedirects(
             response,
             reverse(
-                "mammograms:start_screening",
+                "mammograms:show_appointment",
                 kwargs={"pk": appointment.pk},
             ),
         )
@@ -69,7 +69,7 @@ class TestProvideDetails:
         assertRedirects(
             response,
             reverse(
-                "mammograms:start_screening",
+                "mammograms:show_appointment",
                 kwargs={"pk": appointment.pk},
             ),
         )
@@ -187,7 +187,7 @@ class TestMarkTemporary:
         assertRedirects(
             response,
             reverse(
-                "mammograms:start_screening",
+                "mammograms:show_appointment",
                 kwargs={"pk": appointment_with_selected_reasons.pk},
             ),
         )

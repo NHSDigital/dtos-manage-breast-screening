@@ -23,7 +23,7 @@ class TestRecordingAMammogram(SystemTestCase):
         self.then_i_should_see_the_demographic_banner()
         self.and_i_should_see_the_participant_details()
 
-        self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
+        self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_medical_information_page()
         self.and_i_should_be_prompted_to_ask_about_relevant_medical_information()
 
@@ -38,7 +38,7 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
 
-        self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
+        self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_medical_information_page()
         self.and_i_should_be_prompted_to_ask_about_relevant_medical_information()
 
@@ -56,10 +56,8 @@ class TestRecordingAMammogram(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
-        self.when_i_submit_the_form()
-        self.then_i_am_prompted_to_answer_can_the_screening_go_ahead()
 
-        self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
+        self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_medical_information_page()
 
         self.when_i_submit_the_form()
@@ -77,7 +75,7 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
 
-        self.when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date()
+        self.when_i_click_start_this_appointment()
         self.then_the_accessibility_baseline_is_met()
 
         self.when_i_mark_that_the_participant_shared_medical_information()
@@ -111,11 +109,10 @@ class TestRecordingAMammogram(SystemTestCase):
             self.page.locator(".nhsuk-summary-list__row", has_text="Full name")
         ).to_contain_text("Janet Williams")
 
-    def when_i_check_the_participants_identity_and_confirm_the_last_mammogram_date(
+    def when_i_click_start_this_appointment(
         self,
     ):
-        self.page.get_by_label("Yes, go to medical information").check()
-        self.page.get_by_role("button", name="Continue").click()
+        self.page.get_by_text("Start this appointment").click()
 
     def when_i_submit_the_form(self):
         self.page.get_by_role("button", name="Continue").click()

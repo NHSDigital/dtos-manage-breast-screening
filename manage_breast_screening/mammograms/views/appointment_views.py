@@ -7,7 +7,6 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
-from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
     Appointment,
@@ -20,7 +19,6 @@ from ..forms import (
     AppointmentCannotGoAheadForm,
     AskForMedicalInformationForm,
     RecordMedicalInformationForm,
-    ScreeningAppointmentForm,
 )
 from ..presenters import (
     AppointmentPresenter,
@@ -45,15 +43,6 @@ class ShowAppointment(AppointmentMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        if (
-            request.user.has_perm(
-                Permission.VIEW_MAMMOGRAM_APPOINTMENT,
-                request.user.current_provider,
-            )
-            and appointment.current_status.in_progress
-        ):
-            return redirect("mammograms:start_screening", pk=self.appointment.pk)
-
         participant_pk = appointment.screening_episode.participant.pk
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
             participant_id=participant_pk
@@ -80,53 +69,6 @@ class ShowAppointment(AppointmentMixin, View):
             template_name="mammograms/show/appointment_details.jinja",
             context=context,
         )
-
-
-class StartScreening(InProgressAppointmentMixin, FormView):
-    template_name = "mammograms/start_screening.jinja"
-    form_class = ScreeningAppointmentForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        appointment = self.appointment
-        participant_pk = appointment.screening_episode.participant.pk
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant_pk
-        ).order_by("-created_at")
-        appointment_presenter = AppointmentPresenter(appointment)
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_mammograms,
-            participant_pk=participant_pk,
-            current_url=self.request.path,
-        )
-
-        context.update(
-            {
-                "heading": appointment_presenter.participant.full_name,
-                "caption": appointment_presenter.caption,
-                "page_title": appointment_presenter.caption,
-                "presented_appointment": appointment_presenter,
-                "presented_participant": appointment_presenter.participant,
-                "presented_mammograms": last_known_mammogram_presenter,
-            }
-        )
-
-        return context
-
-    def form_valid(self, form):
-        form.save()
-
-        if form.cleaned_data["decision"] == "continue":
-            return redirect(
-                "mammograms:ask_for_medical_information",
-                pk=self.appointment.pk,
-            )
-        else:
-            return redirect(
-                "mammograms:appointment_cannot_go_ahead",
-                pk=self.appointment.pk,
-            )
 
 
 class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
@@ -250,8 +192,26 @@ def check_in(request, pk):
         appointment = provider.appointments.get(pk=pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
+
+    # TODO: this transition should depend on the current state
     status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)
 
-    return redirect("mammograms:start_screening", pk=pk)
+    return redirect("mammograms:show_appointment", pk=pk)
+
+
+@require_http_methods(["POST"])
+def start_appointment(request, pk):
+    try:
+        provider = request.user.current_provider
+        appointment = provider.appointments.get(pk=pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
+
+    # TODO: this transition should depend on the current state
+    status = appointment.statuses.create(state=AppointmentStatus.IN_PROGRESS)
+
+    Auditor.from_request(request).audit_create(status)
+
+    return redirect("mammograms:ask_for_medical_information", pk=pk)

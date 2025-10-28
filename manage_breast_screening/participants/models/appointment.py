@@ -113,24 +113,26 @@ class Appointment(BaseModel):
         return statuses[0]
 
     @property
-    def in_progress(self):
-        return self.current_status.in_progress
+    def active(self):
+        return self.current_status.active
 
 
 class AppointmentStatus(models.Model):
     CONFIRMED = "CONFIRMED"
+    CHECKED_IN = "CHECKED_IN"
+    IN_PROGRESS = "IN_PROGRESS"
     CANCELLED = "CANCELLED"
     DID_NOT_ATTEND = "DID_NOT_ATTEND"
-    CHECKED_IN = "CHECKED_IN"
     SCREENED = "SCREENED"
     PARTIALLY_SCREENED = "PARTIALLY_SCREENED"
     ATTENDED_NOT_SCREENED = "ATTENDED_NOT_SCREENED"
 
     STATUS_CHOICES = {
         CONFIRMED: "Confirmed",
+        CHECKED_IN: "Checked in",
+        IN_PROGRESS: "In progress",
         CANCELLED: "Cancelled",
         DID_NOT_ATTEND: "Did not attend",
-        CHECKED_IN: "Checked in",
         SCREENED: "Screened",
         PARTIALLY_SCREENED: "Partially screened",
         ATTENDED_NOT_SCREENED: "Attended not screened",
@@ -147,8 +149,8 @@ class AppointmentStatus(models.Model):
         ordering = ["-created_at"]
 
     @property
-    def in_progress(self):
+    def active(self):
         """
-        Is this state one of the in-progress states?
+        Is this state one of the active, non-final states?
         """
-        return self.state in [self.CONFIRMED, self.CHECKED_IN]
+        return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
