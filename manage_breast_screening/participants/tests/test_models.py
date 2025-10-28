@@ -226,11 +226,17 @@ class TestAppointment:
         appointment = AppointmentFactory.create()
 
         assert appointment.state == Appointment.CONFIRMED
+        assert appointment.statuses.first() is None
 
         appointment.check_in(current_user=user)
 
         assert appointment.state == Appointment.CHECKED_IN
         assert appointment.last_updated_by == user
+
+        # Changes are propagated to the history table
+        first = appointment.statuses.first()
+        assert first.state == Appointment.CHECKED_IN
+        assert first.updated_by == user
 
         with pytest.raises(TransitionNotAllowed):
             appointment.check_in(current_user=user)
@@ -238,6 +244,10 @@ class TestAppointment:
         appointment.screen(current_user=user)
         assert appointment.state == Appointment.SCREENED
         assert appointment.last_updated_by == user
+
+        first = appointment.statuses.first()
+        assert first.state == Appointment.SCREENED
+        assert first.updated_by == user
 
         with pytest.raises(TransitionNotAllowed):
             appointment.check_in(current_user=user)

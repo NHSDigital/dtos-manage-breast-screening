@@ -151,3 +151,17 @@ class Appointment(BaseModel):
     @property
     def in_progress(self):
         return self.state in [self.CONFIRMED, self.CHECKED_IN]
+
+    def create_history_object(self):
+        return self.statuses.create(state=self.state, updated_by=self.last_updated_by)
+
+
+class AppointmentStatusHistory(BaseModel):
+    appointment = models.ForeignKey(
+        Appointment, on_delete=models.CASCADE, related_name="statuses"
+    )
+    state = models.CharField(choices=Appointment.STATUS_CHOICES, max_length=50)
+    updated_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+
+    class Meta:
+        ordering = ["-created_at"]
