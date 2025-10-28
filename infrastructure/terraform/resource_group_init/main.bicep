@@ -194,7 +194,7 @@ resource CDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-// Let the managed identity assign the Key Vault Secrets User role to the container app managed identity
+// Let the managed identity assign the Key Vault Secrets User role to other principals
 resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, envConfig, 'rbacAdmin')
   properties: {
@@ -206,7 +206,6 @@ resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01
   }
 }
 
-// Entra ID Group RBAC assignments - mirroring the managed identity permissions (excluding RBAC Admin)
 // Let the Entra ID group manage monitoring resources (Application Insights, Log Analytics)
 resource groupMonitoringContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(subscription().subscriptionId, userGroupName, 'monitoringContributor')

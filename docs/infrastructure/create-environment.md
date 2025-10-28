@@ -15,7 +15,9 @@ The environment requires a shared Azure front door profile created in the hub. T
 
 ## Entra ID
 
-- Create postgres Entra ID group in `DTOS Administrative Unit (AU)`: `postgres_manbrs_[environment]_uks_admin`
+- Create Entra ID groups in `Digital screening` Administrative Unit:
+  - `postgres_manbrs_[environment]_uks_admin`
+  - `screening_manbrs_[environment]`
 - Ask CCOE to assign role:
   - [Form for PIM](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=28f3ab4f1bf3ca1078ac4337b04bcb78&sysparm_category=114fced51bdae1502eee65b9bd4bcbdc)
   - Approver: Add someone from the infrastructure team
@@ -27,7 +29,9 @@ The environment requires a shared Azure front door profile created in the hub. T
 
 ## Bicep
 
-- Run bicep from AVD: `make [environment] resource-group-init`
+- From AVD:
+  - Login with Microsoft Graph scope: `az login --scope https://graph.microsoft.com//.default -t HSCIC365.onmicrosoft.com`
+  - Run bicep: `make [environment] resource-group-init`
 
 ## Infra secrets
 
@@ -39,7 +43,7 @@ Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[environment]-i
 ## Azure devops
 
 - Create ADO group
-  - Name: `px prettier --write docs/infrastructure/create-environment.md[environment]`
+  - Name: `Run pipeline - [environment]`
   - Members: `mi-manbrs-[environment]-ghtoado-uks`. There may be more than 1 in the list. Check client id printed below the name.
   - Permissions:
     - View project-level information
