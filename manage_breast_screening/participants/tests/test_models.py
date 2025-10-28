@@ -4,10 +4,14 @@ from random import choice
 
 import pytest
 from pytest_django.asserts import assertQuerySetEqual
+from statemachine.exceptions import TransitionNotAllowed
 
 from manage_breast_screening.clinics.tests.factories import (
     ClinicFactory,
     ClinicSlotFactory,
+)
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStateMachine,
 )
 
 from .. import models
@@ -257,3 +261,24 @@ def test_appointment_status_in_progress():
     ).in_progress
     assert not AppointmentStatus(state=AppointmentStatus.PARTIALLY_SCREENED).in_progress
     assert not AppointmentStatus(state=AppointmentStatus.SCREENED).in_progress
+
+
+@pytest.mark.django_db
+class TestAppointmentStateMachine:
+    def test_appointment_state_transitions(self, user):
+        appointment = AppointmentFactory.create(
+            current_status=models.AppointmentStatus.CONFIRMED
+        )
+        sm = AppointmentStateMachine(appointment, user)
+        sm.check_in()
+        assert sm.current_state.value == AppointmentStatus.CHECKED_IN.lower()
+
+        with pytest.raises(TransitionNotAllowed):
+            sm.check_in()
+
+        sm.screen()
+
+        with pytest.raises(TransitionNotAllowed):
+            sm.check_in()
+
+        assert sm.current_state.value == AppointmentStatus.SCREENED.lower()

@@ -4,6 +4,7 @@ from logging import getLogger
 
 from django.db import models
 from django.db.models import OuterRef, Subquery
+from statemachine import State, StateMachine
 
 from ...core.models import BaseModel
 from .screening_episode import ScreeningEpisode
@@ -115,6 +116,41 @@ class Appointment(BaseModel):
     @property
     def in_progress(self):
         return self.current_status.in_progress
+
+
+# TODO: move this to a service layer
+class AppointmentStateMachine(StateMachine):
+    confirmed = State(initial=True)
+    checked_in = State()
+    screened = State()
+    partially_screened = State()
+    attented_not_screened = State()
+    cancelled = State()
+    not_attended = State()
+
+    check_in = confirmed.to(checked_in)
+    screen = checked_in.to(screened) | confirmed.to(screened)
+    partially_screen = checked_in.to(partially_screened) | confirmed.to(
+        partially_screened
+    )
+    do_not_screen = checked_in.to(attented_not_screened) | confirmed.to(
+        attented_not_screened
+    )
+    cancel = confirmed.to(cancelled) | not_attended.to(cancelled)
+    mark_not_attended = confirmed.to(not_attended)
+
+    def __init__(self, appointment, current_user, *args, **kwargs):
+        self.appointment = appointment
+        self.current_user = current_user
+        start_value = appointment.current_status.state.lower()
+        super().__init__(*args, start_value=start_value, **kwargs)
+
+    def on_enter_state(self, event, state):
+        self.appointment.statuses.create(
+            state=state.value.upper(),  # user=self.current_user
+        )
+
+        # note: appointment.current_status could still be out of sync due to the prefetch cache
 
 
 class AppointmentStatus(models.Model):
