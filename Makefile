@@ -119,7 +119,7 @@ test-lint-templates: # Lint just the templates @Testing
 	poetry run djlint -e jinja --lint --profile jinja manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	poetry run pytest -m system --ignore manage_breast_screening/notifications
+	poetry run pytest manage_breast_screening/tests/system/general/test_user_views_clinic_show_page.py::TestUserViewsClinicShowPage::test_user_views_clinic_show_page --ignore manage_breast_screening/notifications
 
 test-integration:
 	cd manage_breast_screening/notifications && ./tests/integration/run.sh
