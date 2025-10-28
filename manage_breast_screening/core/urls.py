@@ -45,6 +45,10 @@ urlpatterns = [
         "clinics/", include("manage_breast_screening.clinics.urls", namespace="clinics")
     ),
     path(
+        "/",
+        health_check,
+    ),
+    path(
         "healthcheck",
         health_check,
     ),
