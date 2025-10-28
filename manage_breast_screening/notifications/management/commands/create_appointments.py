@@ -2,12 +2,12 @@ import io
 import os
 from datetime import datetime
 from logging import getLogger
-from zoneinfo import ZoneInfo
 
 import pandas
 from django.core.management.base import BaseCommand, CommandError
 
 from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
     Appointment,
     AppointmentStatusChoices,
     Clinic,
@@ -17,7 +17,6 @@ from manage_breast_screening.notifications.services.application_insights_logging
 )
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
-TZ_INFO = ZoneInfo("Europe/London")
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
 INSIGHTS_ERROR_NAME = "CreateAppointmentsError"
 logger = getLogger(__name__)
@@ -33,7 +32,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "date_str",
             nargs="?",
-            default=datetime.now(tz=TZ_INFO).strftime(DIR_NAME_DATE_FORMAT),
+            default=datetime.now(tz=ZONE_INFO).strftime(DIR_NAME_DATE_FORMAT),
             help="yyy-MM-dd formatted date reflecting the Azure storage directory",
         )
 
@@ -115,7 +114,7 @@ class Command(BaseCommand):
                 clinic=clinic,
                 episode_started_at=datetime.strptime(
                     row["Episode Start"], "%Y%m%d"
-                ).replace(tzinfo=TZ_INFO),
+                ).replace(tzinfo=ZONE_INFO),
                 episode_type=self.handle_aliased_column(
                     "Episode Type", "Epsiode Type", row
                 ),
@@ -165,12 +164,12 @@ class Command(BaseCommand):
         return (
             appointment is not None
             and row["Status"] in ["A", "D"]
-            and appointment.starts_at < datetime.now(tz=TZ_INFO)
+            and appointment.starts_at < datetime.now(tz=ZONE_INFO)
         )
 
     def workflow_action_date_and_time(self, timestamp: str) -> datetime:
         dt = datetime.strptime(timestamp, "%Y%m%d-%H%M%S")
-        return dt.replace(tzinfo=TZ_INFO)
+        return dt.replace(tzinfo=ZONE_INFO)
 
     def handle_aliased_column(
         self, expected_name: str, fallback_name: str, row: pandas.Series
@@ -182,4 +181,4 @@ class Command(BaseCommand):
             f"{row['Appt Date']} {row['Appt Time']}",
             "%Y%m%d %H%M",
         )
-        return dt.replace(tzinfo=TZ_INFO)
+        return dt.replace(tzinfo=ZONE_INFO)

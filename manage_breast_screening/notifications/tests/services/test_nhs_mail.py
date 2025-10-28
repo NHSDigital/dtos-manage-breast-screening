@@ -6,13 +6,11 @@ from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
-from manage_breast_screening.notifications.management.commands.send_message_batch import (
-    TZ_INFO,
-)
+from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
 
-@pytest.mark.time_machine(datetime(2025, 10, 11, tzinfo=TZ_INFO))
+@pytest.mark.time_machine(datetime(2025, 10, 11, tzinfo=ZONE_INFO))
 class TestNhsMail:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):

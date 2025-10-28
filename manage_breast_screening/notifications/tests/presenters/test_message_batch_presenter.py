@@ -1,11 +1,11 @@
 import json
 import os
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import pytest
 from jsonschema import ValidationError, validate
 
+from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.presenters.message_batch_presenter import (
     MessageBatchPresenter,
 )
@@ -24,7 +24,7 @@ from manage_breast_screening.notifications.tests.factories import (
 class TestMessageBatchPresenter:
     def test_present(self):
         appointment1 = AppointmentFactory(
-            starts_at=datetime(2025, 9, 9, 9, 30, tzinfo=ZoneInfo("Europe/London")),
+            starts_at=datetime(2025, 9, 9, 9, 30, tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 code="MDSSH",
                 bso_code="MBD",
@@ -37,7 +37,7 @@ class TestMessageBatchPresenter:
             ),
         )
         appointment2 = AppointmentFactory(
-            starts_at=datetime(2025, 11, 12, 9, 45, tzinfo=ZoneInfo("Europe/London")),
+            starts_at=datetime(2025, 11, 12, 9, 45, tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 code="MDSVH",
                 bso_code="MBD",
@@ -78,7 +78,7 @@ class TestMessageBatchPresenter:
 
     def test_present_is_valid_for_notify_schema(self):
         appointment = AppointmentFactory(
-            starts_at=datetime(2025, 9, 9, 9, 30, tzinfo=ZoneInfo("Europe/London")),
+            starts_at=datetime(2025, 9, 9, 9, 30, tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 code="MDSSH",
                 bso_code="MBD",

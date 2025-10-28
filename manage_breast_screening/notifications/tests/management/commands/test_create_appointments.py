@@ -8,10 +8,9 @@ from azure.storage.blob import BlobProperties
 from django.core.management.base import CommandError
 
 from manage_breast_screening.notifications.management.commands.create_appointments import (
-    TZ_INFO,
     Command,
 )
-from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.models import ZONE_INFO, Appointment, Clinic
 from manage_breast_screening.notifications.services.application_insights_logging import (
     ApplicationInsightsLogging,
 )
@@ -98,10 +97,10 @@ class TestCreateAppointments:
         assert appointments[1].nhs_number == 9449306621
 
         assert appointments[0].starts_at == datetime(
-            2025, 3, 14, 13, 45, tzinfo=TZ_INFO
+            2025, 3, 14, 13, 45, tzinfo=ZONE_INFO
         )
         assert appointments[1].starts_at == datetime(
-            2025, 3, 14, 14, 45, tzinfo=TZ_INFO
+            2025, 3, 14, 14, 45, tzinfo=ZONE_INFO
         )
 
         assert appointments[0].status == "B"
@@ -116,11 +115,11 @@ class TestCreateAppointments:
         assert appointments[0].booked_by == "H"
         assert appointments[0].booked_at == datetime.strptime(
             "20250128-154003", "%Y%m%d-%H%M%S"
-        ).replace(tzinfo=TZ_INFO)
+        ).replace(tzinfo=ZONE_INFO)
         assert appointments[1].booked_by == "H"
         assert appointments[1].booked_at == datetime.strptime(
             "20250128-154004", "%Y%m%d-%H%M%S"
-        ).replace(tzinfo=TZ_INFO)
+        ).replace(tzinfo=ZONE_INFO)
 
         assert appointments[0].clinic == clinics[1]
         assert appointments[1].clinic == clinics[1]
@@ -162,7 +161,7 @@ class TestCreateAppointments:
         existing_appointment = AppointmentFactory(
             nbss_id=nbss_id,
             nhs_number=9449305552,
-            starts_at=starts_at.replace(tzinfo=TZ_INFO),
+            starts_at=starts_at.replace(tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 bso_code="KMK",
                 code="BU011",
@@ -186,7 +185,7 @@ class TestCreateAppointments:
         assert appointments[0].cancelled_by == "C"
         assert appointments[0].cancelled_at == datetime.strptime(
             "20250128-175555", "%Y%m%d-%H%M%S"
-        ).replace(tzinfo=TZ_INFO)
+        ).replace(tzinfo=ZONE_INFO)
 
     def test_only_updates_cancelled_appointments(self):
         """We should not update Appointments unless its a Cancellation"""
@@ -201,7 +200,7 @@ class TestCreateAppointments:
         existing_appt_no_update = AppointmentFactory(
             nbss_id=nbss_id_no_update,
             nhs_number=9449305552,
-            starts_at=starts_at.replace(tzinfo=TZ_INFO),
+            starts_at=starts_at.replace(tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 bso_code="KMK",
                 code="BU011",
@@ -213,7 +212,7 @@ class TestCreateAppointments:
         existing_appt_to_cancel = AppointmentFactory(
             nbss_id=nbss_id_cancelled,
             nhs_number=9449304424,
-            starts_at=starts_at.replace(tzinfo=TZ_INFO),
+            starts_at=starts_at.replace(tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 bso_code="KMK",
                 code="BU003",
@@ -239,7 +238,7 @@ class TestCreateAppointments:
         booked_appt1 = AppointmentFactory(
             nbss_id="BU011-67278-RA1-DN-Y1111-1",
             nhs_number=9449305552,
-            starts_at=datetime(2025, 3, 14, 13, 45, tzinfo=TZ_INFO),
+            starts_at=datetime(2025, 3, 14, 13, 45, tzinfo=ZONE_INFO),
             clinic=clinic,
             status="B",
         )
@@ -247,7 +246,7 @@ class TestCreateAppointments:
         booked_appt2 = AppointmentFactory(
             nbss_id="BU011-67278-RA1-DN-X0000-1",
             nhs_number=9449306621,
-            starts_at=datetime(2025, 3, 14, 14, 45, tzinfo=TZ_INFO),
+            starts_at=datetime(2025, 3, 14, 14, 45, tzinfo=ZONE_INFO),
             clinic=clinic,
             status="B",
         )

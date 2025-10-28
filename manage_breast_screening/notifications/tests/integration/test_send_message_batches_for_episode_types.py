@@ -7,10 +7,10 @@ from manage_breast_screening.notifications.management.commands.helpers.routing_p
     RoutingPlan,
 )
 from manage_breast_screening.notifications.management.commands.send_message_batch import (
-    TZ_INFO,
     Command,
 )
 from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
     Appointment,
     Message,
     MessageBatchStatusChoices,
@@ -38,7 +38,7 @@ class TestSendMessageBatch:
         for routing_plan in RoutingPlan.all():
             for episode_type in routing_plan.episode_types:
                 AppointmentFactory(
-                    starts_at=datetime.datetime.now(tz=TZ_INFO),
+                    starts_at=datetime.datetime.now(tz=ZONE_INFO),
                     episode_type=episode_type,
                     status="B",
                 )

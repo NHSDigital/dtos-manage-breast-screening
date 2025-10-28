@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from logging import getLogger
-from zoneinfo import ZoneInfo
 
 from business.calendar import Calendar
 from django.core.management.base import BaseCommand, CommandError
@@ -12,6 +11,7 @@ from manage_breast_screening.notifications.management.commands.helpers.routing_p
     RoutingPlan,
 )
 from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
     Appointment,
     Message,
     MessageBatch,
@@ -22,7 +22,6 @@ from manage_breast_screening.notifications.services.application_insights_logging
     ApplicationInsightsLogging,
 )
 
-TZ_INFO = ZoneInfo("Europe/London")
 INSIGHTS_ERROR_NAME = "SendMessageBatchError"
 logger = getLogger(__name__)
 
@@ -69,7 +68,7 @@ class Command(BaseCommand):
 
             message_batch = MessageBatch.objects.create(
                 routing_plan_id=routing_plan.id,
-                scheduled_at=datetime.now(tz=TZ_INFO),
+                scheduled_at=datetime.now(tz=ZONE_INFO),
                 status=MessageBatchStatusChoices.SCHEDULED.value,
             )
 
@@ -92,10 +91,10 @@ class Command(BaseCommand):
                 )
 
     def bso_working_day(self):
-        return Calendar().is_business_day(datetime.now(tz=TZ_INFO))
+        return Calendar().is_business_day(datetime.now(tz=ZONE_INFO))
 
     def schedule_date(self) -> datetime:
-        today = datetime.now(tz=TZ_INFO)
+        today = datetime.now(tz=ZONE_INFO)
         today_end = today.replace(hour=23, minute=59, second=59, microsecond=999999)
 
         return today_end + timedelta(weeks=4)

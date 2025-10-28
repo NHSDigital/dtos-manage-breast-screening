@@ -2,11 +2,11 @@ import json
 import logging
 import re
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 from requests import Response
 
 from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
     Message,
     MessageBatch,
     MessageBatchStatusChoices,
@@ -19,7 +19,6 @@ from manage_breast_screening.notifications.services.queue import Queue
 
 logger = logging.getLogger(__name__)
 
-TZ_INFO = ZoneInfo("Europe/London")
 RECOVERABLE_STATUS_CODES = [
     # Client side issue
     408,
@@ -42,7 +41,7 @@ class MessageBatchHelpers:
     @staticmethod
     def mark_batch_as_sent(message_batch: MessageBatch, response_json: dict):
         message_batch.notify_id = response_json["data"]["id"]
-        message_batch.sent_at = datetime.now(tz=TZ_INFO)
+        message_batch.sent_at = datetime.now(tz=ZONE_INFO)
         message_batch.status = MessageBatchStatusChoices.SENT.value
         message_batch.save()
 
@@ -124,7 +123,7 @@ class MessageBatchHelpers:
         message_batch.save()
         for message in message_batch.messages.all():
             message.status = MessageStatusChoices.FAILED.value
-            message.sent_at = datetime.now(tz=TZ_INFO)
+            message.sent_at = datetime.now(tz=ZONE_INFO)
             message.save()
 
         logger.error(

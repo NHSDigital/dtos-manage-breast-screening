@@ -9,10 +9,10 @@ import requests
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MESSAGE_PATH_REGEX,
-    TZ_INFO,
     MessageBatchHelpers,
 )
 from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
     Message,
     MessageBatch,
     MessageBatchStatusChoices,
@@ -88,7 +88,7 @@ class TestMessageBatchHelpers:
         mock_response.status_code = status_code
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_response.json.return_value = notify_errors
-        mock_now = datetime(2023, 1, 31, 0, 0, 0, tzinfo=TZ_INFO)
+        mock_now = datetime(2023, 1, 31, 0, 0, 0, tzinfo=ZONE_INFO)
 
         message = MessageFactory(status="scheduled")
         message_batch = MessageBatchFactory(routing_plan_id=routing_plan_id)
