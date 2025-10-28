@@ -1,9 +1,9 @@
-import uuid
 from datetime import date
 from logging import getLogger
 
 from django.db import models
-from django.db.models import OuterRef, Subquery
+from django_fsm import FSMField, transition
+from django_fsm_log.decorators import fsm_log_by
 
 from ...core.models import BaseModel
 from .screening_episode import ScreeningEpisode
@@ -13,33 +13,24 @@ logger = getLogger(__name__)
 
 class AppointmentQuerySet(models.QuerySet):
     def in_status(self, *statuses):
-        return self.filter(
-            statuses=Subquery(
-                AppointmentStatus.objects.filter(
-                    appointment=OuterRef("pk"),
-                    state__in=statuses,
-                )
-                .values("pk")
-                .order_by("-created_at")[:1]
-            )
-        )
+        return self.filter(state__in=statuses)
 
     def remaining(self):
         return self.in_status(
-            AppointmentStatus.CONFIRMED,
-            AppointmentStatus.CHECKED_IN,
+            Appointment.CONFIRMED,
+            Appointment.CHECKED_IN,
         )
 
     def checked_in(self):
-        return self.in_status(AppointmentStatus.CHECKED_IN)
+        return self.in_status(Appointment.CHECKED_IN)
 
     def complete(self):
         return self.in_status(
-            AppointmentStatus.CANCELLED,
-            AppointmentStatus.DID_NOT_ATTEND,
-            AppointmentStatus.SCREENED,
-            AppointmentStatus.PARTIALLY_SCREENED,
-            AppointmentStatus.ATTENDED_NOT_SCREENED,
+            Appointment.CANCELLED,
+            Appointment.DID_NOT_ATTEND,
+            Appointment.SCREENED,
+            Appointment.PARTIALLY_SCREENED,
+            Appointment.ATTENDED_NOT_SCREENED,
         )
 
     def upcoming(self):
@@ -68,56 +59,6 @@ class AppointmentQuerySet(models.QuerySet):
 
 
 class Appointment(BaseModel):
-    objects = AppointmentQuerySet.as_manager()
-
-    screening_episode = models.ForeignKey(ScreeningEpisode, on_delete=models.PROTECT)
-    clinic_slot = models.ForeignKey(
-        "clinics.ClinicSlot",
-        on_delete=models.PROTECT,
-    )
-    reinvite = models.BooleanField(default=False)
-    stopped_reasons = models.JSONField(null=True, blank=True)
-
-    @classmethod
-    def filter_counts_for_clinic(cls, clinic):
-        counts = {}
-        for filter in ["remaining", "checked_in", "complete", "all"]:
-            counts[filter] = clinic.appointments.for_filter(filter).count()
-        return counts
-
-    @property
-    def provider(self):
-        return self.clinic_slot.provider
-
-    @property
-    def participant(self):
-        return self.screening_episode.participant
-
-    @property
-    def current_status(self) -> "AppointmentStatus":
-        """
-        Fetch the most recent status associated with this appointment.
-        If there are no statuses for any reason, assume the default one.
-        """
-        # avoid `first()` here so that `statuses` can be prefetched
-        # when fetching many appointments
-        statuses = list(self.statuses.order_by("-created_at").all())
-
-        if not statuses:
-            status = AppointmentStatus()
-            logger.info(
-                f"Appointment {self.pk} has no statuses. Assuming {status.state}"
-            )
-            return status
-
-        return statuses[0]
-
-    @property
-    def in_progress(self):
-        return self.current_status.in_progress
-
-
-class AppointmentStatus(models.Model):
     CONFIRMED = "CONFIRMED"
     CANCELLED = "CANCELLED"
     DID_NOT_ATTEND = "DID_NOT_ATTEND"
@@ -135,20 +76,66 @@ class AppointmentStatus(models.Model):
         PARTIALLY_SCREENED: "Partially screened",
         ATTENDED_NOT_SCREENED: "Attended not screened",
     }
-    state = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    appointment = models.ForeignKey(
-        "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
+    objects = AppointmentQuerySet.as_manager()
+
+    screening_episode = models.ForeignKey(ScreeningEpisode, on_delete=models.PROTECT)
+    clinic_slot = models.ForeignKey(
+        "clinics.ClinicSlot",
+        on_delete=models.PROTECT,
+    )
+    reinvite = models.BooleanField(default=False)
+    stopped_reasons = models.JSONField(null=True, blank=True)
+
+    state = FSMField(
+        choices=STATUS_CHOICES, max_length=50, default=CONFIRMED, protected=True
     )
 
-    class Meta:
-        ordering = ["-created_at"]
+    @fsm_log_by
+    @transition(field=state, source=CONFIRMED, target=CHECKED_IN)
+    def check_in(self, by=None):
+        pass
+
+    @fsm_log_by
+    @transition(field=state, source=[CONFIRMED, CHECKED_IN], target=SCREENED)
+    def screen(self, by=None):
+        pass
+
+    @fsm_log_by
+    @transition(field=state, source=[CONFIRMED, CHECKED_IN], target=PARTIALLY_SCREENED)
+    def partially_screen(self, by=None):
+        pass
+
+    @fsm_log_by
+    @transition(field=state, source=[CONFIRMED, CHECKED_IN], target=DID_NOT_ATTEND)
+    def mark_did_not_screen(self, by=None):
+        pass
+
+    @fsm_log_by
+    @transition(field=state, source=CONFIRMED, target=CANCELLED)
+    def cancel(self, by=None):
+        pass
+
+    @fsm_log_by
+    @transition(field=state, source=CONFIRMED, target=DID_NOT_ATTEND)
+    def mark_did_not_attend(self, by=None):
+        pass
+
+    @classmethod
+    def filter_counts_for_clinic(cls, clinic):
+        counts = {}
+        for filter in ["remaining", "checked_in", "complete", "all"]:
+            counts[filter] = clinic.appointments.for_filter(filter).count()
+        return counts
+
+    @property
+    def provider(self):
+        return self.clinic_slot.provider
+
+    @property
+    def participant(self):
+        return self.screening_episode.participant
 
     @property
     def in_progress(self):
-        """
-        Is this state one of the in-progress states?
-        """
         return self.state in [self.CONFIRMED, self.CHECKED_IN]

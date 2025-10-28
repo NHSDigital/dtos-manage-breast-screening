@@ -2,8 +2,10 @@ from functools import cached_property
 
 from django.urls import reverse
 
+from manage_breast_screening.notifications.models import Appointment
+
 from ...core.utils.date_formatting import format_date, format_relative_date, format_time
-from ...participants.models import AppointmentStatus, SupportReasons
+from ...participants.models import SupportReasons
 from ...participants.presenters import ParticipantPresenter, status_colour
 
 
@@ -11,7 +13,7 @@ class AppointmentPresenter:
     def __init__(self, appointment):
         self._appointment = appointment
 
-        self.allStatuses = AppointmentStatus
+        self.allStatuses = Appointment
         self.pk = appointment.pk
         self.clinic_slot = ClinicSlotPresenter(appointment.clinic_slot)
         self.participant = ParticipantPresenter(
@@ -73,8 +75,8 @@ class AppointmentPresenter:
             "classes": f"nhsuk-tag--{colour} app-nowrap" if colour else "app-nowrap",
             "text": current_status.get_state_display(),
             "key": current_status.state,
-            "is_confirmed": current_status.state == AppointmentStatus.CONFIRMED,
-            "is_screened": current_status.state == AppointmentStatus.SCREENED,
+            "is_confirmed": current_status.state == Appointment.CONFIRMED,
+            "is_screened": current_status.state == Appointment.SCREENED,
         }
 
 

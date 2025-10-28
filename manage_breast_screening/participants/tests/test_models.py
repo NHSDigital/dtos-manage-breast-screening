@@ -11,7 +11,7 @@ from manage_breast_screening.clinics.tests.factories import (
 )
 
 from .. import models
-from ..models import AppointmentStatus, Ethnicity
+from ..models import Appointment, Ethnicity
 from .factories import AppointmentFactory, ParticipantFactory, ScreeningEpisodeFactory
 
 
@@ -75,26 +75,18 @@ class TestScreeningEvent:
 @pytest.mark.django_db
 class TestAppointment:
     def test_state_filtering(self):
-        confirmed = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CONFIRMED
-        )
-        checked_in = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CHECKED_IN
-        )
-        screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.SCREENED
-        )
-        cancelled = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CANCELLED
-        )
+        confirmed = AppointmentFactory.create(state=models.Appointment.CONFIRMED)
+        checked_in = AppointmentFactory.create(state=models.Appointment.CHECKED_IN)
+        screened = AppointmentFactory.create(state=models.Appointment.SCREENED)
+        cancelled = AppointmentFactory.create(state=models.Appointment.CANCELLED)
         did_not_attend = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.DID_NOT_ATTEND
+            state=models.Appointment.DID_NOT_ATTEND
         )
         partially_screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.PARTIALLY_SCREENED
+            state=models.Appointment.PARTIALLY_SCREENED
         )
         attended_not_screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.ATTENDED_NOT_SCREENED
+            state=models.Appointment.ATTENDED_NOT_SCREENED
         )
 
         assertQuerySetEqual(
@@ -146,15 +138,9 @@ class TestAppointment:
         )
 
     def test_for_filter(self):
-        confirmed = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CONFIRMED
-        )
-        checked_in = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CHECKED_IN
-        )
-        screened = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.SCREENED
-        )
+        confirmed = AppointmentFactory.create(state=models.Appointment.CONFIRMED)
+        checked_in = AppointmentFactory.create(state=models.Appointment.CHECKED_IN)
+        screened = AppointmentFactory.create(state=models.Appointment.SCREENED)
 
         assertQuerySetEqual(
             models.Appointment.objects.for_filter("remaining"),
@@ -185,26 +171,26 @@ class TestAppointment:
 
         # Create appointments with different statuses
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=clinic_slot1, state=models.Appointment.CONFIRMED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=clinic_slot2, state=models.Appointment.CONFIRMED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CHECKED_IN
+            clinic_slot=clinic_slot1, state=models.Appointment.CHECKED_IN
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.SCREENED
+            clinic_slot=clinic_slot2, state=models.Appointment.SCREENED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CANCELLED
+            clinic_slot=clinic_slot1, state=models.Appointment.CANCELLED
         )
 
         # Create another clinic with appointments that shouldn't be counted
         other_clinic = ClinicFactory.create()
         other_slot = ClinicSlotFactory.create(clinic=other_clinic)
         AppointmentFactory.create(
-            clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=other_slot, state=models.Appointment.CONFIRMED
         )
 
         counts = models.Appointment.filter_counts_for_clinic(clinic)
@@ -235,25 +221,13 @@ class TestAppointment:
             [late, middle, early],
         )
 
+    def test_appointment_transitions(self, user):
+        appointment = AppointmentFactory.create()
 
-@pytest.mark.django_db
-def test_appointment_current_status():
-    appointment = AppointmentFactory.create(
-        current_status=models.AppointmentStatus.CONFIRMED
-    )
-    appointment.statuses.create(state=models.AppointmentStatus.CHECKED_IN)
+        assert appointment.state == Appointment.CONFIRMED
 
-    assert appointment.statuses.first().state == models.AppointmentStatus.CHECKED_IN
-    assert appointment.current_status.state == models.AppointmentStatus.CHECKED_IN
+        appointment.check_in(by=user)
 
+        assert appointment.state == Appointment.CHECKED_IN
 
-def test_appointment_status_in_progress():
-    assert AppointmentStatus(state=AppointmentStatus.CONFIRMED).in_progress
-    assert AppointmentStatus(state=AppointmentStatus.CHECKED_IN).in_progress
-    assert not AppointmentStatus(state=AppointmentStatus.CANCELLED).in_progress
-    assert not AppointmentStatus(state=AppointmentStatus.DID_NOT_ATTEND).in_progress
-    assert not AppointmentStatus(
-        state=AppointmentStatus.ATTENDED_NOT_SCREENED
-    ).in_progress
-    assert not AppointmentStatus(state=AppointmentStatus.PARTIALLY_SCREENED).in_progress
-    assert not AppointmentStatus(state=AppointmentStatus.SCREENED).in_progress
+        appointment.check_in(by=user)

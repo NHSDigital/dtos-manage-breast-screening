@@ -8,7 +8,7 @@ import rules
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.auth.rules import is_clinical
-from manage_breast_screening.participants.models import AppointmentStatus
+from manage_breast_screening.participants.models import Appointment
 
 
 @rules.predicate
@@ -17,8 +17,8 @@ def can_start_appointment(user, appointment):
         return False
 
     return appointment and appointment.current_status.state in (
-        AppointmentStatus.CONFIRMED,
-        AppointmentStatus.CHECKED_IN,
+        Appointment.CONFIRMED,
+        Appointment.CHECKED_IN,
     )
 
 

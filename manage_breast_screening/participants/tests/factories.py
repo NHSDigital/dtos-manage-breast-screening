@@ -89,13 +89,6 @@ class ScreeningEpisodeFactory(DjangoModelFactory):
     participant = SubFactory(ParticipantFactory)
 
 
-class AppointmentStatusFactory(DjangoModelFactory):
-    class Meta:
-        model = models.AppointmentStatus
-
-    appointment = None
-
-
 class AppointmentFactory(DjangoModelFactory):
     class Meta:
         model = models.Appointment
@@ -103,6 +96,7 @@ class AppointmentFactory(DjangoModelFactory):
 
     clinic_slot = SubFactory(ClinicSlotFactory)
     screening_episode = SubFactory(ScreeningEpisodeFactory)
+    state = models.Appointment.CONFIRMED
 
     @post_generation
     def starts_at(obj, create, extracted, **kwargs):
@@ -112,17 +106,6 @@ class AppointmentFactory(DjangoModelFactory):
         obj.clinic_slot.starts_at = extracted
         if create:
             obj.clinic_slot.save()
-
-    # Allow passing an explicit status
-    # e.g. `current_status=AppointmentStatus.CHECKED_IN`
-    @post_generation
-    def current_status(obj, create, extracted, **kwargs):
-        if not create or not extracted:
-            return
-
-        obj.statuses.add(
-            AppointmentStatusFactory.create(state=extracted, appointment=obj)
-        )
 
 
 class SymptomFactory(DjangoModelFactory):

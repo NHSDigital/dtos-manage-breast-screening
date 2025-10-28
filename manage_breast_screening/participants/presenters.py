@@ -11,7 +11,7 @@ from ..core.utils.string_formatting import (
     format_phone_number,
     sentence_case,
 )
-from .models import AppointmentStatus, Ethnicity
+from .models import Appointment, Ethnicity
 
 
 def status_colour(status):
@@ -19,16 +19,13 @@ def status_colour(status):
     Color to render the status tag
     """
     match status:
-        case AppointmentStatus.CHECKED_IN:
+        case Appointment.CHECKED_IN:
             return ""  # no colour will get solid dark blue
-        case AppointmentStatus.SCREENED:
+        case Appointment.SCREENED:
             return "green"
-        case AppointmentStatus.DID_NOT_ATTEND | AppointmentStatus.CANCELLED:
+        case Appointment.DID_NOT_ATTEND | Appointment.CANCELLED:
             return "red"
-        case (
-            AppointmentStatus.ATTENDED_NOT_SCREENED
-            | AppointmentStatus.PARTIALLY_SCREENED
-        ):
+        case Appointment.ATTENDED_NOT_SCREENED | Appointment.PARTIALLY_SCREENED:
             return "orange"
         case _:
             return "blue"  # default blue

@@ -11,7 +11,6 @@ from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models import (
     Appointment,
-    AppointmentStatus,
     Participant,
     ParticipantReportedMammogram,
 )
@@ -250,7 +249,7 @@ def check_in(request, pk):
         appointment = provider.appointments.get(pk=pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
-    status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
+    status = appointment.statuses.create(state=Appointment.CHECKED_IN)
 
     Auditor.from_request(request).audit_create(status)
 

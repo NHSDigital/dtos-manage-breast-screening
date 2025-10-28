@@ -5,7 +5,7 @@ from django.views.decorators.http import require_http_methods
 
 from ..core.decorators import current_provider_exempt
 from ..core.utils.urls import extract_next_path_from_params
-from ..participants.models import Appointment, AppointmentStatus
+from ..participants.models import Appointment
 from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 
@@ -54,7 +54,7 @@ def check_in(request, pk, appointment_pk):
         appointment = provider.appointments.get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
-    appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
+    appointment.statuses.create(state=Appointment.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)
 
