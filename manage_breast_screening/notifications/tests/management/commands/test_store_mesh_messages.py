@@ -1,14 +1,11 @@
 import datetime
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from django.core.management.base import CommandError
 
 from manage_breast_screening.notifications.management.commands.store_mesh_messages import (
     Command,
-)
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
 )
 
 
@@ -19,14 +16,6 @@ from manage_breast_screening.notifications.services.application_insights_logging
     "manage_breast_screening.notifications.management.commands.store_mesh_messages.MeshInbox"
 )
 class TestStoreMeshMessages:
-    @pytest.fixture(autouse=True)
-    def mock_insights_logger(self, monkeypatch):
-        mock_insights_logger = MagicMock()
-        monkeypatch.setattr(
-            ApplicationInsightsLogging, "exception", mock_insights_logger
-        )
-        return mock_insights_logger
-
     def test_handle_stores_blobs(self, mock_mesh_inbox, mock_blob_storage, monkeypatch):
         dirname = datetime.datetime.now().strftime("%Y-%m-%d")
         message1 = Mock()
@@ -61,7 +50,9 @@ class TestStoreMeshMessages:
         mock_mesh_inbox.return_value.__enter__().acknowledge.assert_not_called()
         mock_blob_storage.return_value.add.assert_not_called()
 
-    def test_handle_raises_command_error(self, mock_mesh_inbox, _x):
+    def test_handle_raises_command_error(
+        self, mock_mesh_inbox, _x, mock_insights_logger
+    ):
         mock_mesh_inbox.side_effect = Exception("Noooo!")
 
         with pytest.raises(CommandError):
