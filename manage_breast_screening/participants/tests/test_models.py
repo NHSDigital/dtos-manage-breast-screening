@@ -3,6 +3,7 @@ from datetime import timezone as tz
 from random import choice
 
 import pytest
+from django_fsm import TransitionNotAllowed
 from pytest_django.asserts import assertQuerySetEqual
 
 from manage_breast_screening.clinics.tests.factories import (
@@ -226,8 +227,17 @@ class TestAppointment:
 
         assert appointment.state == Appointment.CONFIRMED
 
-        appointment.check_in(by=user)
+        appointment.check_in(current_user=user)
 
         assert appointment.state == Appointment.CHECKED_IN
+        assert appointment.last_updated_by == user
 
-        appointment.check_in(by=user)
+        with pytest.raises(TransitionNotAllowed):
+            appointment.check_in(current_user=user)
+
+        appointment.screen(current_user=user)
+        assert appointment.state == Appointment.SCREENED
+        assert appointment.last_updated_by == user
+
+        with pytest.raises(TransitionNotAllowed):
+            appointment.check_in(current_user=user)

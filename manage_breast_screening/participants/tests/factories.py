@@ -97,6 +97,7 @@ class AppointmentFactory(DjangoModelFactory):
     clinic_slot = SubFactory(ClinicSlotFactory)
     screening_episode = SubFactory(ScreeningEpisodeFactory)
     state = models.Appointment.CONFIRMED
+    last_updated_by = None
 
     @post_generation
     def starts_at(obj, create, extracted, **kwargs):

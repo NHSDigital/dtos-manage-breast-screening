@@ -1,14 +1,25 @@
 from datetime import date
+from functools import wraps
 from logging import getLogger
 
 from django.db import models
 from django_fsm import FSMField, transition
-from django_fsm_log.decorators import fsm_log_by
+
+from manage_breast_screening.users.models import User
 
 from ...core.models import BaseModel
 from .screening_episode import ScreeningEpisode
 
 logger = getLogger(__name__)
+
+
+def with_current_user(fn):
+    @wraps(fn)
+    def wrapped(instance, current_user, *args, **kwargs):
+        instance.last_updated_by = current_user
+        return fn(instance, *args, **kwargs)
+
+    return wrapped
 
 
 class AppointmentQuerySet(models.QuerySet):
@@ -90,35 +101,36 @@ class Appointment(BaseModel):
     state = FSMField(
         choices=STATUS_CHOICES, max_length=50, default=CONFIRMED, protected=True
     )
+    last_updated_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
-    @fsm_log_by
+    @with_current_user
     @transition(field=state, source=CONFIRMED, target=CHECKED_IN)
-    def check_in(self, by=None):
+    def check_in(self):
         pass
 
-    @fsm_log_by
+    @with_current_user
     @transition(field=state, source=[CONFIRMED, CHECKED_IN], target=SCREENED)
-    def screen(self, by=None):
+    def screen(self):
         pass
 
-    @fsm_log_by
+    @with_current_user
     @transition(field=state, source=[CONFIRMED, CHECKED_IN], target=PARTIALLY_SCREENED)
-    def partially_screen(self, by=None):
+    def partially_screen(self):
         pass
 
-    @fsm_log_by
+    @with_current_user
     @transition(field=state, source=[CONFIRMED, CHECKED_IN], target=DID_NOT_ATTEND)
-    def mark_did_not_screen(self, by=None):
+    def mark_did_not_screen(self):
         pass
 
-    @fsm_log_by
+    @with_current_user
     @transition(field=state, source=CONFIRMED, target=CANCELLED)
-    def cancel(self, by=None):
+    def cancel(self):
         pass
 
-    @fsm_log_by
+    @with_current_user
     @transition(field=state, source=CONFIRMED, target=DID_NOT_ATTEND)
-    def mark_did_not_attend(self, by=None):
+    def mark_did_not_attend(self):
         pass
 
     @classmethod
