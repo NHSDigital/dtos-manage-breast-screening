@@ -13,11 +13,14 @@ from manage_breast_screening.notifications.management.commands.helpers.routing_p
     RoutingPlan,
 )
 from manage_breast_screening.notifications.management.commands.send_message_batch import (
-    TZ_INFO,
     Command,
     CommandError,
 )
-from manage_breast_screening.notifications.models import Message, MessageBatch
+from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
+    Message,
+    MessageBatch,
+)
 from manage_breast_screening.notifications.services.api_client import ApiClient
 from manage_breast_screening.notifications.services.application_insights_logging import (
     ApplicationInsightsLogging,
@@ -49,7 +52,7 @@ class TestSendMessageBatch:
         """Test sending message batch with valid Appointment data"""
         mock_send_message_batch.return_value.status_code = 201
 
-        appointment = AppointmentFactory(starts_at=datetime.now(tz=TZ_INFO))
+        appointment = AppointmentFactory(starts_at=datetime.now(tz=ZONE_INFO))
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
         Command().handle()
@@ -72,10 +75,10 @@ class TestSendMessageBatch:
         routing_plans = RoutingPlan.all()
 
         appointment1 = AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO), episode_type="R"
+            starts_at=datetime.now(tz=ZONE_INFO), episode_type="R"
         )
         appointment2 = AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO), episode_type="F"
+            starts_at=datetime.now(tz=ZONE_INFO), episode_type="F"
         )
 
         Command().handle()
@@ -111,7 +114,7 @@ class TestSendMessageBatch:
         """Test that appointments with date inside the schedule period are notified"""
         mock_send_message_batch.return_value.status_code = 201
         appointment = AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4)
+            starts_at=datetime.now(tz=ZONE_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -135,7 +138,7 @@ class TestSendMessageBatch:
     ):
         """Test that appointments with date inside the schedule period are notified"""
         AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4, days=1)
+            starts_at=datetime.now(tz=ZONE_INFO) + timedelta(weeks=4, days=1)
         )
 
         Command().handle()
@@ -153,13 +156,13 @@ class TestSendMessageBatch:
         """Test that that cancelled appointments are not notified"""
         mock_send_message_batch.return_value.status_code = 201
 
-        valid_appointment = AppointmentFactory(starts_at=datetime.now(tz=TZ_INFO))
+        valid_appointment = AppointmentFactory(starts_at=datetime.now(tz=ZONE_INFO))
         routing_plan_id = RoutingPlan.for_episode_type(
             valid_appointment.episode_type
         ).id
 
         _cancelled_appointment = AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO), status="C"
+            starts_at=datetime.now(tz=ZONE_INFO), status="C"
         )
 
         Command().handle()
@@ -179,7 +182,7 @@ class TestSendMessageBatch:
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_send_message_batch.return_value.json.return_value = notify_errors
         appointment = AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4)
+            starts_at=datetime.now(tz=ZONE_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -205,7 +208,7 @@ class TestSendMessageBatch:
         mock_send_message_batch.return_value.json.return_value = notify_errors
 
         appointment = AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4)
+            starts_at=datetime.now(tz=ZONE_INFO) + timedelta(weeks=4)
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
@@ -229,7 +232,7 @@ class TestSendMessageBatch:
     def test_handle_does_nothing_on_weekend(
         self, mock_mark_batch_as_sent, mock_send_message_batch, time_machine
     ):
-        AppointmentFactory(starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4))
+        AppointmentFactory(starts_at=datetime.now(tz=ZONE_INFO) + timedelta(weeks=4))
         time_machine.move_to(datetime.now() + relativedelta.relativedelta(weekday=5))
 
         Command().handle()
@@ -250,7 +253,7 @@ class TestSendMessageBatch:
     ):
         """Test that appointments with date inside the schedule period are notified"""
         AppointmentFactory(
-            starts_at=datetime.now(tz=TZ_INFO) + timedelta(weeks=4),
+            starts_at=datetime.now(tz=ZONE_INFO) + timedelta(weeks=4),
             number="2",
         )
 

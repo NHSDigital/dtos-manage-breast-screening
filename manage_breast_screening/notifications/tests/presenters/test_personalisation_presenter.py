@@ -1,8 +1,8 @@
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 import pytest
 
+from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.presenters.personalisation_presenter import (
     PersonalisationPresenter,
 )
@@ -16,7 +16,7 @@ from manage_breast_screening.notifications.tests.factories import (
 class TestPersonalisationPresenter:
     def test_present(self):
         appointment = AppointmentFactory(
-            starts_at=datetime(2025, 10, 13, 15, 15, tzinfo=ZoneInfo("Europe/London")),
+            starts_at=datetime(2025, 10, 13, 15, 15, tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 code="MDSVH",
                 bso_code="MBD",
@@ -51,7 +51,7 @@ class TestPersonalisationPresenter:
 
     def test_present_with_null_values(self):
         appointment = AppointmentFactory(
-            starts_at=datetime(2025, 10, 13, 9, 5, tzinfo=ZoneInfo("Europe/London")),
+            starts_at=datetime(2025, 10, 13, 9, 5, tzinfo=ZONE_INFO),
             clinic=ClinicFactory(
                 code="NOPE",
                 bso_code="MBD",

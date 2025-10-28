@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 import pytest
 import time_machine
 from django.db import connection
 
+from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
@@ -21,19 +21,19 @@ class TestFailuresQuery:
         message_status_params: dict = None,
     ):
         appt = AppointmentFactory(**appt_params)
-        message_params["sent_at"] = datetime.now() - timedelta(minutes=5)
+        message_params["sent_at"] = datetime.now(tz=ZONE_INFO) - timedelta(minutes=5)
         message = MessageFactory(appointment=appt, **message_params)
         if message_status_params:
-            message_status_params["status_updated_at"] = datetime.now() - timedelta(
-                minutes=7
-            )
+            message_status_params["status_updated_at"] = datetime.now(
+                tz=ZONE_INFO
+            ) - timedelta(minutes=7)
             MessageStatusFactory(message=message, **message_status_params)
 
         return appt
 
     @pytest.mark.django_db
     def test_failures_query_data_today(self):
-        appt_time = datetime.now(tz=ZoneInfo("Europe/London"))
+        appt_time = datetime.now(tz=ZONE_INFO)
         appt1 = self.create_message_set(
             {"starts_at": appt_time, "nhs_number": "9990001111", "episode_type": "S"},
             {"status": "failed"},
@@ -96,10 +96,10 @@ class TestFailuresQuery:
         appt9 = AppointmentFactory(
             starts_at=appt_time, nhs_number="9990001120", number="2"
         )
-        today_formatted = datetime.today().strftime("%Y-%m-%d")
+        today_formatted = datetime.now(tz=ZONE_INFO).strftime("%Y-%m-%d")
 
         with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("failures"), (datetime.now().date(),))
+            cursor.execute(Helper.sql("failures"), (datetime.now(tz=ZONE_INFO).date(),))
             results = cursor.fetchall()
 
         assert len(results) == 7
@@ -184,7 +184,7 @@ class TestFailuresQuery:
 
     @pytest.mark.django_db
     def test_failures_query_for_given_date(self):
-        the_date = datetime.today() - timedelta(days=2)
+        the_date = datetime.now(tz=ZONE_INFO) - timedelta(days=2)
         self.create_message_set(
             {"starts_at": the_date, "nhs_number": "9990001111", "episode_type": "S"},
             {"status": "failed"},
@@ -215,9 +215,13 @@ class TestFailuresQuery:
         """
 
         # Before bst (should be excluded)
-        before_bst = datetime(2025, 3, 30, 00, 30)  # 30 mins before boundary
+        before_bst = datetime(
+            2025, 3, 30, 00, 30, tzinfo=ZONE_INFO
+        )  # 30 mins before boundary
         # After bst (should be included)
-        after_bst = datetime(2025, 3, 30, 1, 30)  # 30 mins after boundary
+        after_bst = datetime(
+            2025, 3, 30, 1, 30, tzinfo=ZONE_INFO
+        )  # 30 mins after boundary
 
         self.create_message_set(
             {
@@ -240,7 +244,7 @@ class TestFailuresQuery:
         )
 
         with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("failures"), (datetime.now().date(),))
+            cursor.execute(Helper.sql("failures"), (datetime.now(tz=ZONE_INFO).date(),))
             results = cursor.fetchall()
 
         assert len(results) == 2
@@ -249,7 +253,8 @@ class TestFailuresQuery:
     def test_failures_query_columns(self):
         with connection.cursor() as cursor:
             cursor.execute(
-                Helper.sql("failures") + "\nLIMIT 0", (datetime.now().date(),)
+                Helper.sql("failures") + "\nLIMIT 0",
+                (datetime.now(tz=ZONE_INFO).date(),),
             )
             columns = [col[0] for col in cursor.description]
 

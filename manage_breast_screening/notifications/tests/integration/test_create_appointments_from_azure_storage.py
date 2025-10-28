@@ -3,10 +3,9 @@ from datetime import datetime
 import pytest
 
 from manage_breast_screening.notifications.management.commands.create_appointments import (
-    TZ_INFO,
     Command,
 )
-from manage_breast_screening.notifications.models import Appointment, Clinic
+from manage_breast_screening.notifications.models import ZONE_INFO, Appointment, Clinic
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
 
@@ -67,10 +66,10 @@ class TestCreateAppointmentsFromAzureStorage:
         assert appointments[1].nhs_number == 9449306621
 
         assert appointments[0].starts_at == datetime(
-            2025, 3, 14, 13, 45, tzinfo=TZ_INFO
+            2025, 3, 14, 13, 45, tzinfo=ZONE_INFO
         )
         assert appointments[1].starts_at == datetime(
-            2025, 3, 14, 14, 45, tzinfo=TZ_INFO
+            2025, 3, 14, 14, 45, tzinfo=ZONE_INFO
         )
 
         assert appointments[0].clinic == clinics[1]
