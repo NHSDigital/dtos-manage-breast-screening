@@ -17,8 +17,13 @@ def commands_module_str(base_module_str) -> str:
     return f"{base_module_str}.management.commands"
 
 
-@pytest.fixture
-def mock_insights_logger(monkeypatch):
+@pytest.fixture(autouse=True)
+def mock_insights_logger(request, monkeypatch):
+    if "skip_insights_mock" in request.keywords:
+        return
     mock_insights_logger = MagicMock()
     monkeypatch.setattr(ApplicationInsightsLogging, "exception", mock_insights_logger)
+    monkeypatch.setattr(
+        ApplicationInsightsLogging, "custom_event", mock_insights_logger
+    )
     return mock_insights_logger

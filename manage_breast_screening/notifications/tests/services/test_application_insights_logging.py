@@ -14,6 +14,7 @@ from manage_breast_screening.notifications.services.application_insights_logging
 @patch(
     "manage_breast_screening.notifications.services.application_insights_logging.logging"
 )
+@pytest.mark.skip_insights_mock
 class TestApplicationInsightsLogging:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch):

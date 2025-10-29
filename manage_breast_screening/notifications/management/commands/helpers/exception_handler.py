@@ -12,5 +12,5 @@ def exception_handler(exception_name):
     try:
         yield
     except Exception as e:
-        ApplicationInsightsLogging.exception(f"{exception_name}: {e}")
+        ApplicationInsightsLogging().exception(f"{exception_name}: {e}")
         raise CommandError(e)
