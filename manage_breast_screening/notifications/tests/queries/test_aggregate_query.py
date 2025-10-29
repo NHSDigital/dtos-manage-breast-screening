@@ -110,9 +110,7 @@ class TestAggregateQuery:
         for d in test_data:
             self.create_appointment_set(*d)
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("aggregate"), ("1 month",))
-            results = cursor.fetchall()
+        results = Helper.fetchall("aggregate", ("1 month",))
 
         for idx, res in enumerate(results):
             assert expectations[idx] == list(res)
@@ -131,9 +129,7 @@ class TestAggregateQuery:
             yesterday, ClinicFactory(), "F", "delivered", {"nhsapp": "read"}
         )
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("aggregate"), ("1 week",))
-            results = cursor.fetchall()
+        results = Helper.fetchall("aggregate", ("1 week",))
 
         assert len(results) == 1
 
@@ -162,9 +158,7 @@ class TestAggregateQuery:
             status_updated_at=(message_sent_at + timedelta(days=4)),
         )
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("aggregate"), ("1 month",))
-            results = cursor.fetchall()
+        results = Helper.fetchall("aggregate", ("1 month",))
 
         assert list(results[0]) == [
             appt_date.strftime("%Y-%m-%d"),
@@ -188,9 +182,7 @@ class TestAggregateQuery:
             status_updated_at=(message_sent_at + timedelta(days=5)),
         )
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("aggregate"), ("1 month",))
-            results = cursor.fetchall()
+        results = Helper.fetchall("aggregate", ("1 month",))
 
         assert list(results[0]) == [
             appt_date.strftime("%Y-%m-%d"),
