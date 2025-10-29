@@ -684,7 +684,7 @@ clinic:
       appointment:
         id: 0a382d89-0042-49b8-87ba-fa0d9c817fd3
         statuses:
-          - CONFIRMED
+          - IN_PROGRESS
         screening_episode:
           id: 1ddfad46-b4de-47b9-b2ce-50a76e2d1a57
           participant:
