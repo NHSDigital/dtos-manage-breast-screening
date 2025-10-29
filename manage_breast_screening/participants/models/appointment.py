@@ -28,10 +28,14 @@ class AppointmentQuerySet(models.QuerySet):
         return self.in_status(
             AppointmentStatus.CONFIRMED,
             AppointmentStatus.CHECKED_IN,
+            AppointmentStatus.IN_PROGRESS,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatus.CHECKED_IN)
+
+    def in_progress(self):
+        return self.in_status(AppointmentStatus.IN_PROGRESS)
 
     def complete(self):
         return self.in_status(
@@ -54,6 +58,8 @@ class AppointmentQuerySet(models.QuerySet):
                 return self.remaining()
             case "checked_in":
                 return self.checked_in()
+            case "in_progress":
+                return self.in_progress()
             case "complete":
                 return self.complete()
             case "all":
@@ -81,7 +87,7 @@ class Appointment(BaseModel):
     @classmethod
     def filter_counts_for_clinic(cls, clinic):
         counts = {}
-        for filter in ["remaining", "checked_in", "complete", "all"]:
+        for filter in ["remaining", "checked_in", "in_progress", "complete", "all"]:
             counts[filter] = clinic.appointments.for_filter(filter).count()
         return counts
 

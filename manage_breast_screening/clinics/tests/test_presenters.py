@@ -50,7 +50,13 @@ class TestAppointmentListPresenter:
     def test_secondary_nav_data(self):
         clinic_pk = uuid.uuid4()
         filter_value = "checked_in"
-        counts_by_filter = {"remaining": 5, "checked_in": 3, "complete": 2, "all": 10}
+        counts_by_filter = {
+            "remaining": 5,
+            "checked_in": 3,
+            "in_progress": 2,
+            "complete": 2,
+            "all": 10,
+        }
 
         presenter = AppointmentListPresenter(
             clinic_pk, [], filter_value, counts_by_filter
@@ -73,18 +79,27 @@ class TestAppointmentListPresenter:
         assert nav_data[1]["href"] == expected_checked_in_url
         assert nav_data[1]["current"]
 
-        assert nav_data[2]["label"] == "Complete"
+        assert nav_data[2]["label"] == "In progress"
         assert nav_data[2]["count"] == 2
+        expected_in_progress_url = reverse(
+            "clinics:show_in_progress",
+            kwargs={"pk": clinic_pk, "filter": "in_progress"},
+        )
+        assert nav_data[2]["href"] == expected_in_progress_url
+        assert not nav_data[2]["current"]
+
+        assert nav_data[3]["label"] == "Complete"
+        assert nav_data[3]["count"] == 2
         expected_complete_url = reverse(
             "clinics:show_complete", kwargs={"pk": clinic_pk, "filter": "complete"}
         )
-        assert nav_data[2]["href"] == expected_complete_url
-        assert not nav_data[2]["current"]
+        assert nav_data[3]["href"] == expected_complete_url
+        assert not nav_data[3]["current"]
 
-        assert nav_data[3]["label"] == "All"
-        assert nav_data[3]["count"] == 10
+        assert nav_data[4]["label"] == "All"
+        assert nav_data[4]["count"] == 10
         expected_all_url = reverse(
             "clinics:show_all", kwargs={"pk": clinic_pk, "filter": "all"}
         )
-        assert nav_data[3]["href"] == expected_all_url
-        assert not nav_data[3]["current"]
+        assert nav_data[4]["href"] == expected_all_url
+        assert not nav_data[4]["current"]
