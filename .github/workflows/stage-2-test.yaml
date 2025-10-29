@@ -226,6 +226,9 @@ jobs:
       - name: Install dependencies
         run: make dependencies
 
+      - name: Compile frontend assets
+        run: npm run compile
+
       - name: Install Playwright browsers
         run: poetry run playwright install chromium --with-deps --only-shell
 
