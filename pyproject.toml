@@ -60,6 +60,7 @@ addopts = "--doctest-modules"
 markers = [
   "system: mark a test as a system test",
   "integration: mark a test as an integration test",
+  "skip_insights_mock: don't auto use the mock_insights_logging fixture"
 ]
 
 [tool.ruff]
