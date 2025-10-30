@@ -244,6 +244,10 @@ locals {
       container_name        = "notifications-reports"
       container_access_type = "private"
     }
+    notifications-smoke-test-reports = {
+      container_name        = "notifications-smoke-test-reports"
+      container_access_type = "private"
+    }
   }
   storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
 
