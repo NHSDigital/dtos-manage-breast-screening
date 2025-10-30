@@ -21,21 +21,21 @@
     {
       "name": field.subwidgets.0.data.name,
       "label": "Day",
-      "classes": "nhsuk-input--width-2",
+      "classes": "nhsuk-input--width-2" + (' nhsuk-textarea--error' if field.errors else ''),
       "value": field.subwidgets.0.data.value,
       "id": field.auto_id
     },
     {
       "name": field.subwidgets.1.data.name,
       "label": "Month",
-      "classes": "nhsuk-input--width-2",
+      "classes": "nhsuk-input--width-2" + (' nhsuk-textarea--error' if field.errors else ''),
       "value": field.subwidgets.1.data.value,
       "id": field.auto_id ~ "_1"
     },
     {
       "name": field.subwidgets.2.data.name,
       "label": "Year",
-      "classes": "nhsuk-input--width-4",
+      "classes": "nhsuk-input--width-4" + (' nhsuk-textarea--error' if field.errors else ''),
       "value": field.subwidgets.2.data.value,
       "id": field.auto_id ~ "_2"
     }
