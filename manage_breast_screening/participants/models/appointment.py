@@ -5,6 +5,8 @@ from logging import getLogger
 from django.db import models
 from django.db.models import OuterRef, Subquery
 
+from manage_breast_screening.users.models import User
+
 from ...core.models import BaseModel
 from .screening_episode import ScreeningEpisode
 
@@ -144,6 +146,7 @@ class AppointmentStatus(models.Model):
     appointment = models.ForeignKey(
         "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
     )
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     class Meta:
         ordering = ["-created_at"]
