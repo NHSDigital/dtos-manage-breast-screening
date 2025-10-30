@@ -150,6 +150,7 @@ class AppointmentStatus(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        unique_together = ("appointment", "state")
 
     @property
     def active(self):

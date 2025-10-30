@@ -3,6 +3,9 @@ from functools import cached_property
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.mammograms.services.appointment_services import (
+    AppointmentStatusUpdater,
+)
 
 from ...core.utils.date_formatting import format_date, format_relative_date, format_time
 from ...participants.models import AppointmentStatus, SupportReasons
@@ -63,7 +66,9 @@ class AppointmentPresenter:
         return self._appointment.active
 
     def can_be_started_by(self, user):
-        return user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment)
+        return user.has_perm(
+            Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
+        ) and AppointmentStatusUpdater.is_startable(self._appointment)
 
     @cached_property
     def special_appointment_tag_properties(self):
