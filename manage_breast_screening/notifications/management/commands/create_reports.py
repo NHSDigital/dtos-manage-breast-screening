@@ -9,6 +9,7 @@ from django.db import connection
 from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
     exception_handler,
 )
+from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
@@ -32,7 +33,8 @@ class Command(BaseCommand):
 
     REPORTS = [
         ["aggregate", ("3 months",), "aggregate"],
-        ["failures", (datetime.now(),), "invites_not_sent"],
+        ["failures", (datetime.now(tz=ZONE_INFO),), "invites_not_sent"],
+        ["reconciliation", (datetime.now(tz=ZONE_INFO),), "reconciliation"],
     ]
 
     def handle(self, *args, **options):

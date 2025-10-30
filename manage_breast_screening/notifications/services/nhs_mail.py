@@ -56,17 +56,11 @@ class NhsMail:
 
     def _get_email_content(self, attachment_data, attachment_filename, report_type):
         todays_date = datetime.today().strftime("%d-%m-%Y")
-        content = (
-            self.invites_not_sent_content(todays_date)
-            if report_type == "invites_not_sent"
-            else self.aggregate_report_content(todays_date)
-        )
-
         message = MIMEMultipart()
 
-        message.attach(MIMEText(content["body"], "html"))
+        message.attach(MIMEText(self._body(report_type), "html"))
 
-        message["Subject"] = content["subject"]
+        message["Subject"] = self._subject(report_type, todays_date)
         message["From"] = self._sender_email
         message["To"] = ",".join(self._recipient_emails)
 
@@ -78,26 +72,8 @@ class NhsMail:
 
         return message
 
-    def invites_not_sent_content(self, date) -> dict[str, str]:
-        return {
-            "subject": self._invites_not_sent_subject_text(date),
-            "body": self._invites_not_sent_body_text(),
-        }
+    def _subject(self, report_type, date, bso="Birmingham (MCR)") -> str:
+        return f"Breast screening digital comms {report_type.replace('_', ' ')} report – {date} – {bso}"
 
-    def _invites_not_sent_subject_text(self, date) -> str:
-        return f"Breast screening digital comms invites not sent report – {date} – Birmingham (MCR)"
-
-    def _invites_not_sent_body_text(self) -> str:
-        return render_to_string("report_emails/invites_not_sent.html")
-
-    def aggregate_report_content(self, date) -> dict[str, str]:
-        return {
-            "subject": self._aggregate_report_subject_text(date),
-            "body": self._aggregate_report_body_text(),
-        }
-
-    def _aggregate_report_subject_text(self, date) -> str:
-        return f"Breast screening digital comms daily aggregate report – {date} – Birmingham (MCR)"
-
-    def _aggregate_report_body_text(self) -> str:
-        return render_to_string("report_emails/aggregate.html")
+    def _body(self, report_type) -> str:
+        return render_to_string(f"report_emails/{report_type}.html")

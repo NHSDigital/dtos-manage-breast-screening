@@ -59,9 +59,12 @@ class TestCreateReports:
         failures_filename = now.strftime(
             "%Y-%m-%dT%H:%M:%S-invites-not-sent-report.csv"
         )
+        reconciliation_filename = now.strftime(
+            "%Y-%m-%dT%H:%M:%S-reconciliation-report.csv"
+        )
 
         mock_blob_storage = md[0]
-        assert mock_blob_storage.add.call_count == 2
+        assert mock_blob_storage.add.call_count == 3
         mock_blob_storage.add.assert_any_call(
             aggregate_filename,
             csv_data,
@@ -74,9 +77,15 @@ class TestCreateReports:
             content_type="text/csv",
             container_name="reports",
         )
+        mock_blob_storage.add.assert_any_call(
+            reconciliation_filename,
+            csv_data,
+            content_type="text/csv",
+            container_name="reports",
+        )
 
         mock_email_service = md[1]
-        assert mock_email_service.send_report_email.call_count == 2
+        assert mock_email_service.send_report_email.call_count == 3
         mock_email_service.send_report_email.assert_any_call(
             attachment_data=csv_data,
             attachment_filename=aggregate_filename,
@@ -86,6 +95,11 @@ class TestCreateReports:
             attachment_data=csv_data,
             attachment_filename=failures_filename,
             report_type="invites_not_sent",
+        )
+        mock_email_service.send_report_email.assert_any_call(
+            attachment_data=csv_data,
+            attachment_filename=reconciliation_filename,
+            report_type="reconciliation",
         )
 
     def test_handle_raises_command_error(self, mock_insights_logger):

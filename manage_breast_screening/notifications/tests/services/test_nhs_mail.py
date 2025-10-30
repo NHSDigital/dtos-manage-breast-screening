@@ -90,7 +90,7 @@ class TestNhsMail:
         decoded_subject_line = str(make_header(decode_header(mime_message["Subject"])))
 
         assert (
-            "Breast screening digital comms daily aggregate report – 11-10-2025 – Birmingham (MCR)"
+            "Breast screening digital comms aggregate report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
         assert (

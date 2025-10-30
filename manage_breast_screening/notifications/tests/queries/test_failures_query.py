@@ -98,9 +98,7 @@ class TestFailuresQuery:
         )
         today_formatted = datetime.now(tz=ZONE_INFO).strftime("%Y-%m-%d")
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("failures"), (datetime.now(tz=ZONE_INFO).date(),))
-            results = cursor.fetchall()
+        results = Helper.fetchall("failures", (datetime.now(tz=ZONE_INFO).date(),))
 
         assert len(results) == 7
 
@@ -200,9 +198,7 @@ class TestFailuresQuery:
             {"status": "failed", "description": "Patient has an exit code"},
         )
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("failures"), (the_date.date(),))
-            results = cursor.fetchall()
+        results = Helper.fetchall("failures", (the_date.date(),))
 
         assert len(results) == 1
         assert list(results[0])[0] == 9990001111
@@ -243,9 +239,7 @@ class TestFailuresQuery:
             {"status": "failed", "description": "No reachable communication channel"},
         )
 
-        with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("failures"), (datetime.now(tz=ZONE_INFO).date(),))
-            results = cursor.fetchall()
+        results = Helper.fetchall("failures", (datetime.now(tz=ZONE_INFO).date(),))
 
         assert len(results) == 2
 
