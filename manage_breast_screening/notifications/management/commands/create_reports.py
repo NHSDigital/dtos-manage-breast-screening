@@ -34,7 +34,7 @@ class Command(BaseCommand):
     REPORTS = [
         ["aggregate", ("3 months",), "aggregate"],
         ["failures", (datetime.now(tz=ZONE_INFO),), "invites_not_sent"],
-        ["reconciliation", (datetime.now(tz=ZONE_INFO),), "reconciliation"],
+        ["reconciliation", (datetime.now(tz=ZONE_INFO), "MBD"), "reconciliation"],
     ]
 
     def handle(self, *args, **options):
