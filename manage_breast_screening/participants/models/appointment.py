@@ -157,3 +157,6 @@ class AppointmentStatus(models.Model):
         Is this state one of the active, non-final states?
         """
         return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
+
+    def __str__(self):
+        return self.state
