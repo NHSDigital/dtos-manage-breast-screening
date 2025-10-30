@@ -194,9 +194,7 @@ def check_in(request, pk):
         raise Http404("Appointment not found")
 
     # TODO: this transition should depend on the current state
-    status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
-
-    Auditor.from_request(request).audit_create(status)
+    appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
 
     return redirect("mammograms:show_appointment", pk=pk)
 
@@ -210,8 +208,6 @@ def start_appointment(request, pk):
         raise Http404("Appointment not found")
 
     # TODO: this transition should depend on the current state
-    status = appointment.statuses.create(state=AppointmentStatus.IN_PROGRESS)
-
-    Auditor.from_request(request).audit_create(status)
+    appointment.statuses.create(state=AppointmentStatus.IN_PROGRESS)
 
     return redirect("mammograms:ask_for_medical_information", pk=pk)

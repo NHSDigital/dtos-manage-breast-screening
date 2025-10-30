@@ -1,10 +1,8 @@
 import pytest
-from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
 from manage_breast_screening.core.models import AuditLog
-from manage_breast_screening.participants.models import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
@@ -106,21 +104,6 @@ class TestCheckIn:
             reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
         )
 
-    def test_audit(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        clinical_user_client.http.post(
-            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
-        )
-        assert (
-            AuditLog.objects.filter(
-                content_type=ContentType.objects.get_for_model(AppointmentStatus),
-                operation=AuditLog.Operations.CREATE,
-            ).count()
-            == 1
-        )
-
 
 @pytest.mark.django_db
 class TestStartAppointment:
@@ -136,21 +119,6 @@ class TestStartAppointment:
             reverse(
                 "mammograms:ask_for_medical_information", kwargs={"pk": appointment.pk}
             ),
-        )
-
-    def test_audit(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        clinical_user_client.http.post(
-            reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
-        )
-        assert (
-            AuditLog.objects.filter(
-                content_type=ContentType.objects.get_for_model(AppointmentStatus),
-                operation=AuditLog.Operations.CREATE,
-            ).count()
-            == 1
         )
 
 
