@@ -1,6 +1,9 @@
 import logging
 import os
 
+from azure.storage.queue import QueueClient, QueueMessage
+from azure.identity import ManagedIdentityCredential
+from azure.core.exceptions import ResourceExistsError
 from azure.monitor.opentelemetry.exporter import AzureMonitorMetricExporter
 from opentelemetry import metrics
 from opentelemetry.sdk.metrics import MeterProvider
@@ -35,8 +38,8 @@ class Queue:
         exporter = AzureMonitorMetricExporter(connection_string=os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"])
         reader = PeriodicExportingMetricReader(exporter)
         metrics.set_meter_provider(MeterProvider(metric_readers=[reader]))
-        self.meter = metrics.get_meter(__name__)
-        self.gauge = self.meter.create_gauge(self.queue_name, unit="messages", description="Queue length")
+        meter = metrics.get_meter(__name__)
+        self.gauge = meter.create_gauge(self.queue_name, unit="messages", description="Queue length")
 
         self.metrics()
 
