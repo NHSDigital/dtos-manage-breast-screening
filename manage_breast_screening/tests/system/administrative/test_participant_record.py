@@ -107,23 +107,22 @@ class TestParticipantRecord(SystemTestCase):
     and_i_am_on_the_participant_record_page = and_i_am_on_the_participant_record_page
 
     def when_i_click_on_view_participant_record(self):
-        self.page.get_by_text("View participant record").click()
+        self.page.get_by_role("link", name="Participant details").click()
 
     def then_i_should_be_on_the_participant_record_page(self):
         path = reverse(
-            "participants:show",
-            kwargs={"pk": self.participant.pk},
+            "mammograms:participant_details",
+            kwargs={"pk": self.upcoming_appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
-        self.assert_page_title_contains("Participant")
 
     def and_i_should_see_the_participant_record(self):
         main = self.page.get_by_role("main")
         expect(main).to_contain_text("Janet Williams")
-        expect(main).to_contain_text("Personal details")
+        expect(main).to_contain_text("Participant details")
 
     def when_i_click_on_the_back_link(self):
-        self.page.go_back()
+        self.page.get_by_role("link", name="Appointment details").click()
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(

@@ -109,5 +109,22 @@
      },
      "actions": ethnicity_change_link
    },
+   {
+     "key": {
+       "text": "Last known mammograms"
+     },
+     "value": {
+       "html": last_mammogram_html
+     },
+     "actions": {
+       "items": [
+         {
+           "href": presented_mammograms.add_link.href,
+           "text": presented_mammograms.add_link.text,
+           "visuallyHiddenText": presented_mammograms.add_link.visually_hidden_text
+         }
+       ]
+     }
+   } if presented_mammograms and screening_protocol else undefined,
   ]
 }) }}
