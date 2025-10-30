@@ -28,7 +28,7 @@ class TestBooelanField:
                 </div>
                 <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                     <div class="nhsuk-checkboxes__item">
-                        <input class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
+                        <input aria-describedby="id_field-hint" class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
                     </div>
                 </div>
@@ -46,7 +46,7 @@ class TestBooelanField:
                 </div>
                 <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                     <div class="nhsuk-checkboxes__item">
-                        <input checked class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
+                        <input aria-describedby="id_field-hint" checked class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
                     </div>
                 </div>
@@ -64,7 +64,7 @@ class TestBooelanField:
                 </div>
                 <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                     <div class="nhsuk-checkboxes__item">
-                        <input class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
+                        <input aria-describedby="id_field-hint" class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
                     </div>
                 </div>
@@ -82,7 +82,7 @@ class TestBooelanField:
                 </div>
                 <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                     <div class="nhsuk-checkboxes__item">
-                        <input checked class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
+                        <input aria-describedby="id_field-hint" checked class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
                     </div>
                 </div>
@@ -100,7 +100,7 @@ class TestBooelanField:
                 </div>
                 <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                     <div class="nhsuk-checkboxes__item">
-                        <input class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
+                        <input aria-describedby="id_field-hint" class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
                     </div>
                 </div>

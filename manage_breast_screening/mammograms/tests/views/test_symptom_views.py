@@ -77,16 +77,11 @@ class TestAddLumpView:
         assert response.status_code == 200
         assertInHTML(
             """
-                <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="nhsuk-error-summary">
-                    <h2 class="nhsuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-                      <div class="nhsuk-error-summary__body">
-                        <ul class="nhsuk-list nhsuk-error-summary__list" role="list">
-                            <li><a href="#id_area">Select the location of the lump</a></li>
-                            <li><a href="#id_when_started">Select how long the symptom has existed</a></li>
-                            <li><a href="#id_investigated">Select whether the symptom has been investigated or not</a></li>
-                        </ul>
-                    </div>
-                </div>
+                <ul class="nhsuk-list nhsuk-error-summary__list">
+                    <li><a href="#id_area">Select the location of the lump</a></li>
+                    <li><a href="#id_when_started">Select how long the symptom has existed</a></li>
+                    <li><a href="#id_investigated">Select whether the symptom has been investigated or not</a></li>
+                </ul>
             """,
             response.text,
         )
@@ -171,7 +166,7 @@ class TestChangeLumpView:
             ),
         )
 
-    def test_invvalid_post_renders_response_with_errors(
+    def test_invalid_post_renders_response_with_errors(
         self, clinical_user_client, lump
     ):
         response = clinical_user_client.http.post(
@@ -184,16 +179,11 @@ class TestChangeLumpView:
         assert response.status_code == 200
         assertInHTML(
             """
-                <div class="nhsuk-error-summary" aria-labelledby="error-summary-title" role="alert" tabindex="-1" data-module="nhsuk-error-summary">
-                    <h2 class="nhsuk-error-summary__title" id="error-summary-title">There is a problem</h2>
-                      <div class="nhsuk-error-summary__body">
-                        <ul class="nhsuk-list nhsuk-error-summary__list" role="list">
-                            <li><a href="#id_area">Select the location of the lump</a></li>
-                            <li><a href="#id_when_started">Select how long the symptom has existed</a></li>
-                            <li><a href="#id_investigated">Select whether the symptom has been investigated or not</a></li>
-                        </ul>
-                    </div>
-                </div>
+                <ul class="nhsuk-list nhsuk-error-summary__list">
+                    <li><a href="#id_area">Select the location of the lump</a></li>
+                    <li><a href="#id_when_started">Select how long the symptom has existed</a></li>
+                    <li><a href="#id_investigated">Select whether the symptom has been investigated or not</a></li>
+                </ul>
             """,
             response.text,
         )

@@ -74,13 +74,13 @@ class TestChoiceField:
                     <div class="nhsuk-hint" id="id_field-hint">
                         Pick either one
                     </div>
-                    <div class="nhsuk-radios nhsuk-radios--conditional" data-module="nhsuk-radios">
+                    <div class="nhsuk-radios" data-module="nhsuk-radios">
                         <div class="nhsuk-radios__item">
                             <input class="nhsuk-radios__input" id="id_field" name="field" type="radio" value="a">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
                         </div>
                         <div class="nhsuk-radios__item">
-                            <input aria-controls="conditional-id_field-2" aria-expanded="false" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                            <input aria-controls="conditional-id_field-2" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
                         </div>
                         <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
@@ -209,13 +209,13 @@ class TestMultipleChoiceField:
                     <div class="nhsuk-hint" id="id_checkbox_field-hint">
                         Pick any number
                     </div>
-                    <div class="nhsuk-checkboxes nhsuk-checkboxes--conditional" data-module="nhsuk-checkboxes">
+                    <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                         <div class="nhsuk-checkboxes__item">
                             <input class="nhsuk-checkboxes__input" id="id_checkbox_field" name="checkbox_field" type="checkbox" value="a">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
                         </div>
                         <div class="nhsuk-checkboxes__item">
-                            <input aria-controls="conditional-id_checkbox_field-2" aria-expanded="false" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
+                            <input aria-controls="conditional-id_checkbox_field-2" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
                         </div>
                         <div class="nhsuk-checkboxes__conditional nhsuk-checkboxes__conditional--hidden" id="conditional-id_checkbox_field-2">
@@ -246,11 +246,11 @@ class TestMultipleChoiceField:
                 </div>
                 <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
                     <div class="nhsuk-checkboxes__item">
-                        <input class="nhsuk-checkboxes__input" id="id_checkbox_field" name="checkbox_field" type="checkbox" value="a">
+                        <input aria-describedby="id_checkbox_field-hint" class="nhsuk-checkboxes__input" id="id_checkbox_field" name="checkbox_field" type="checkbox" value="a">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
                     </div>
                     <div class="nhsuk-checkboxes__item">
-                        <input class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
+                        <input aria-describedby="id_checkbox_field-hint" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
                         <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
                     </div>
                 </div>

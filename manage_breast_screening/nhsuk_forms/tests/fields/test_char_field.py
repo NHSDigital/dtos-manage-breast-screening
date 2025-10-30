@@ -109,7 +109,7 @@ class TestCharField:
                     With hint
                 </label>
                 <div class="nhsuk-hint" id="id_field_with_hint-hint">ALL UPPERCASE</div>
-                <input class="nhsuk-input" id="id_field_with_hint" name="field_with_hint" type="text" aria-describedby="id_field_with_hint-hint">
+                <input class="nhsuk-input" id="id_field_with_hint" name="field_with_hint" type="text" aria-describedby="id_field_with_hint-hint" value="">
             </div>
             """,
         )
@@ -122,7 +122,7 @@ class TestCharField:
                 <label class="nhsuk-label" for="id_field_with_classes">
                     With classes
                 </label>
-                <input class="nhsuk-input nhsuk-u-width-two-thirds" id="id_field_with_classes" name="field_with_classes" type="text">
+                <input class="nhsuk-input nhsuk-u-width-two-thirds" id="id_field_with_classes" name="field_with_classes" type="text" value="">
             </div>
             """,
         )
@@ -135,7 +135,7 @@ class TestCharField:
                 <label class="nhsuk-label" for="id_field_with_extra_attrs">
                     Extra
                 </label>
-                <input autocomplete="off" autocapitalize="none" spellcheck="false" inputmode="numeric" pattern="\\d{3}" class="nhsuk-input" id="id_field_with_extra_attrs" name="field_with_extra_attrs" type="text">
+                <input autocomplete="off" autocapitalize="none" spellcheck="false" inputmode="numeric" pattern="\\d{3}" class="nhsuk-input" id="id_field_with_extra_attrs" name="field_with_extra_attrs" type="text" value="">
             </div>
             """,
         )
@@ -174,7 +174,7 @@ class TestCharField:
             <div class="nhsuk-form-group">
                 <label class="nhsuk-label" for="id_telephone_field">
                     Ring ring
-                </label><input type="tel" class="nhsuk-input" id="id_telephone_field" name="telephone_field">
+                </label><input type="tel" class="nhsuk-input" id="id_telephone_field" name="telephone_field" value="">
             </div>
             """,
         )
@@ -209,13 +209,11 @@ class TestCharField:
         assertHTMLEqual(
             form_class()["char_count"].as_field_group(),
             """
-            <div class="nhsuk-character-count" data-maxlength="10" data-threshold="25" data-module="nhsuk-character-count">
-                <div class="nhsuk-form-group">
-                    <label class="nhsuk-label" for="id_char_count">
-                        Text
-                    </label>
-                    <textarea aria-describedby="id_char_count-info" class="nhsuk-js-character-count nhsuk-textarea" id="id_char_count" name="char_count" rows="10"></textarea>
-                </div>
+            <div class="nhsuk-character-count nhsuk-form-group" data-maxlength="10" data-threshold="25" data-module="nhsuk-character-count">
+                <label class="nhsuk-label" for="id_char_count">
+                    Text
+                </label>
+                <textarea aria-describedby="id_char_count-info" class="nhsuk-js-character-count nhsuk-textarea" id="id_char_count" name="char_count" rows="10"></textarea>
                 <div class="nhsuk-character-count__message nhsuk-hint" id="id_char_count-info">
                     You can enter up to 10 characters
                 </div>
@@ -227,13 +225,11 @@ class TestCharField:
         assertHTMLEqual(
             form_class()["char_count_max_words"].as_field_group(),
             """
-            <div class="nhsuk-character-count" data-maxwords="5" data-threshold="25" data-module="nhsuk-character-count">
-                <div class="nhsuk-form-group">
-                    <label class="nhsuk-label" for="id_char_count_max_words">
-                        Text
-                    </label>
-                    <textarea aria-describedby="id_char_count_max_words-info" class="nhsuk-js-character-count nhsuk-textarea" id="id_char_count_max_words" name="char_count_max_words" rows="10"></textarea>
-                </div>
+            <div class="nhsuk-character-count nhsuk-form-group" data-maxwords="5" data-threshold="25" data-module="nhsuk-character-count">
+                <label class="nhsuk-label" for="id_char_count_max_words">
+                    Text
+                </label>
+                <textarea aria-describedby="id_char_count_max_words-info" class="nhsuk-js-character-count nhsuk-textarea" id="id_char_count_max_words" name="char_count_max_words" rows="10"></textarea>
                 <div class="nhsuk-character-count__message nhsuk-hint" id="id_char_count_max_words-info">
                     You can enter up to 5 words
                 </div>
