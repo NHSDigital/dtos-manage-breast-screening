@@ -19,7 +19,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        self.and_i_am_on_the_appointment_show_page()
+        self.and_i_am_on_the_participant_details_page()
         self.then_i_should_see_no_reported_mammograms()
 
         self.when_i_click_on_add_mammogram()
@@ -40,7 +40,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        self.and_i_am_on_the_appointment_show_page()
+        self.and_i_am_on_the_participant_details_page()
         self.then_i_should_see_no_reported_mammograms()
 
         self.when_i_click_on_add_mammogram()
@@ -68,11 +68,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
             clinic_slot__clinic__setting__provider=self.current_provider,
         )
 
-    def and_i_am_on_the_appointment_show_page(self):
+    def and_i_am_on_the_participant_details_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:show_appointment",
+                "mammograms:participant_details",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -102,7 +102,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(
-            "mammograms:show_appointment",
+            "mammograms:participant_details",
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
