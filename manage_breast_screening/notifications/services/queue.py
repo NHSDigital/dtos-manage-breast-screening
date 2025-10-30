@@ -1,13 +1,12 @@
 import logging
 import os
 
-from azure.core.exceptions import ResourceExistsError
-from azure.identity import ManagedIdentityCredential
-from azure.storage.queue import QueueClient, QueueMessage
-from opentelemetry.metrics import get_meter_provider
+from azure.monitor.opentelemetry.exporter import AzureMonitorMetricExporter
+from opentelemetry import metrics
+from opentelemetry.sdk.metrics import MeterProvider
+from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 
 logger = logging.getLogger(__name__)
-
 
 class Queue:
     def __init__(self, queue_name):
@@ -33,13 +32,21 @@ class Queue:
             except ResourceExistsError:
                 pass
 
+        exporter = AzureMonitorMetricExporter(connection_string=os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"])
+        reader = PeriodicExportingMetricReader(exporter)
+        metrics.set_meter_provider(MeterProvider(metric_readers=[reader]))
+        self.meter = metrics.get_meter(__name__)
+        self.gauge = self.meter.create_gauge(self.queue_name, unit="messages", description="Queue length")
+
         self.metrics()
 
     def add(self, message: str):
         self.client.send_message(message)
+        self.metrics()
 
     def delete(self, message: str | QueueMessage):
         self.client.delete_message(message)
+        self.metrics()
 
     def items(self, limit=50):
         return self.client.receive_messages(max_messages=limit)
@@ -51,27 +58,18 @@ class Queue:
         return self.client.receive_message()
 
     def metrics(self):
-        logger.exception("going into metrics")
+        logger.exception("record the metrics")
         try:
             properties = self.client.get_queue_properties()
             self.message_count = properties.approximate_message_count
         except Exception as e:
             logger.exception(e)
             self.message_count = None
-            return None
+            return
 
         try:
-            logger.exception("going into metrics")
-            meter = get_meter_provider().get_meter("queue_metrics")
-
-            gauge = meter.create_gauge(
-                name=self.queue_name,
-                description="Approximate number of messages in the queue",
-                unit="messages",
-            )
-
-            if self.message_count is not None:
-                gauge.record(self.message_count)
+            print(f"Reporting queue size: {self.message_count}")
+            self.gauge.set(self.message_count, {"queue_name": self.queue_name})
 
         except Exception as e:
             logger.exception(e)
