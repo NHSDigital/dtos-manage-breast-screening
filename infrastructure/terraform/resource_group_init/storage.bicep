@@ -59,26 +59,35 @@ var roleID = {
   blobContributor: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 }
 
-// Let the managed identity edit the terraform state
-resource blobContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, miPrincipalID, 'blobContributor')
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.blobContributor)
-    principalId: miPrincipalID
-    description: '${miName} Network Contributor access to subscription'
+// Define role assignments array
+var roleAssignments = [
+  {
+    roleName: 'blobContributor'
+    roleId: roleID.blobContributor
+    description: 'Blob Contributor access to subscription'
   }
-}
+]
 
-// Let the Entra ID group edit the terraform state
-resource groupBlobContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (!empty(userGroupPrincipalID)) {
-  name: guid(subscription().subscriptionId, userGroupPrincipalID, 'blobContributor')
+// Managed identity RBAC assignments using loop
+resource miRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for role in roleAssignments: {
+  name: guid(subscription().subscriptionId, miPrincipalID, role.roleName)
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.blobContributor)
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', role.roleId)
+    principalId: miPrincipalID
+    description: '${miName} ${role.description}'
+  }
+}]
+
+// Entra ID Group RBAC assignments using loop
+resource groupRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for role in roleAssignments:{
+  name: guid(subscription().subscriptionId, userGroupPrincipalID, role.roleName)
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', role.roleId)
     principalId: userGroupPrincipalID
     principalType: 'Group'
-    description: '${userGroupName} Blob Contributor access to subscription'
+    description: '${userGroupName} ${role.description}'
   }
-}
+}]
 
 // Output the storage account ID so it can be used to create the private endpoint
 output storageAccountID string = storageAccount.id
