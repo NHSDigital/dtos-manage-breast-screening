@@ -2,6 +2,10 @@
 
 This is the initial manual process to create a new environment like review, dev, production...
 
+## Hub
+
+The environment requires a shared Azure front door profile created in the hub. The service name must be declared in [the hub configuration](https://github.com/NHSDigital/dtos-hub/tree/main/infrastructure/environments). And run the Azure devops pipeline for the corresponding hub (non-live or live).
+
 ## Code
 
 - Create the configuration files in `infrastructure/environments/[environment]`
@@ -27,7 +31,10 @@ This is the initial manual process to create a new environment like review, dev,
 
 ## Infra secrets
 
-- Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[environment]-inf`
+Add the infrastructure secrets to the _inf_ key vault `kv-manbrs-[environment]-inf`:
+
+- For entra ID authentication (when `enable_entra_id_authentication` is true): aad-client-audiences, aad-client-id, aad-client-secret
+- `monitoring-email-address`: email distribution list to receive alerts
 
 ## Azure devops
 
@@ -87,7 +94,3 @@ This is the initial manual process to create a new environment like review, dev,
 - Set `fetch_secrets_from_app_key_vault` terraform variable to `true`
 - Test running terraform manually from the AVD (Optional)
 - Raise a pull request, review and merge to trigger the pipeline
-
-## Add
-
-run the hub repo to deploy front door profile afd-live-hub-manbrs
