@@ -60,7 +60,7 @@ resource miRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' =
 }]
 
 // Entra ID Group RBAC assignments using loop
-resource groupRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for role in groupRoleAssignments: if (!empty(userGroupPrincipalID)) {
+resource groupRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [for role in groupRoleAssignments: {
   name: guid(subscription().subscriptionId, userGroupPrincipalID, role.roleName)
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', role.roleId)
