@@ -70,6 +70,14 @@
   "rows": [
    {
      "key": {
+       "text": "NHS Number"
+     },
+     "value": {
+       "text": presented_participant.nhs_number
+     }
+   } if full_details else undefined,
+   {
+     "key": {
        "text": "Full name"
      },
      "value": {
@@ -82,14 +90,6 @@
      },
      "value": {
        "text": presented_participant.gender
-     }
-   } if full_details else undefined,
-   {
-     "key": {
-       "text": "NHS Number"
-     },
-     "value": {
-       "text": presented_participant.nhs_number
      }
    } if full_details else undefined,
    {
@@ -109,54 +109,5 @@
      },
      "actions": ethnicity_change_link
    },
-   {
-     "key": {
-       "text": "Address"
-     },
-     "value": {
-       "html": address_html
-     }
-   },
-   {
-     "key": {
-       "text": "Phone"
-     },
-     "value": {
-       "html": presented_participant.phone
-     }
-   },
-   {
-     "key": {
-       "text": "Screening protocol"
-     },
-     "value": {
-       "html": screening_protocol
-     }
-   } if screening_protocol else undefined,
-   {
-     "key": {
-       "text": "Email"
-     },
-     "value": {
-       "html": presented_participant.email
-     }
-   },
-   {
-     "key": {
-       "text": "Last known mammograms"
-     },
-     "value": {
-       "html": last_mammogram_html
-     },
-     "actions": {
-        "items": [
-          {
-            "href": presented_mammograms.add_link.href,
-            "text": presented_mammograms.add_link.text,
-            "visuallyHiddenText": presented_mammograms.add_link.visually_hidden_text
-          }
-        ]
-      }
-   } if presented_mammograms else undefined
   ]
 }) }}
