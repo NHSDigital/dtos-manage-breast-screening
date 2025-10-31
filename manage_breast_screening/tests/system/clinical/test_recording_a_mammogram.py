@@ -24,6 +24,9 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_i_should_see_the_participant_details()
 
         self.when_i_click_start_this_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+
+        self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_medical_information_page()
         self.and_i_should_be_prompted_to_ask_about_relevant_medical_information()
 
@@ -39,6 +42,9 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_i_am_on_the_appointment_show_page()
 
         self.when_i_click_start_this_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+
+        self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_medical_information_page()
         self.and_i_should_be_prompted_to_ask_about_relevant_medical_information()
 
@@ -58,6 +64,9 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_i_am_on_the_appointment_show_page()
 
         self.when_i_click_start_this_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+
+        self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_medical_information_page()
 
         self.when_i_submit_the_form()
@@ -76,6 +85,9 @@ class TestRecordingAMammogram(SystemTestCase):
         self.then_the_accessibility_baseline_is_met()
 
         self.when_i_click_start_this_appointment()
+        self.then_the_accessibility_baseline_is_met()
+
+        self.when_i_click_confirm_identity()
         self.then_the_accessibility_baseline_is_met()
 
         self.when_i_mark_that_the_participant_shared_medical_information()
@@ -120,6 +132,14 @@ class TestRecordingAMammogram(SystemTestCase):
     def when_i_submit_the_form(self):
         self.page.get_by_role("button", name="Continue").click()
 
+    def then_i_should_be_on_the_confirm_identity_page(self):
+        path = reverse(
+            "mammograms:confirm_identity",
+            kwargs={"pk": self.appointment.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Confirm identity")
+
     def then_i_should_be_on_the_medical_information_page(self):
         path = reverse(
             "mammograms:ask_for_medical_information",
@@ -142,6 +162,11 @@ class TestRecordingAMammogram(SystemTestCase):
                 "Has the participant shared any relevant medical information?"
             )
         ).to_be_visible()
+
+    def when_i_click_confirm_identity(self):
+        self.page.get_by_role("button").filter(
+            has_text="Confirm identity"
+        ).first.click()
 
     def when_i_mark_that_the_participant_shared_no_medical_information(self):
         self.page.get_by_label("No - proceed to imaging").check()
