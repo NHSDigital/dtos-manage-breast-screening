@@ -58,7 +58,7 @@ jobs:
       - name: 'Checkout code'
         uses: actions/checkout@v5
 
-      - name: Detect notifications code changes
+      - name: Detect specific kinds of code change by path
         uses: dorny/paths-filter@v3
         id: path-changes
         with:
