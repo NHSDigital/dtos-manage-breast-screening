@@ -1,8 +1,9 @@
 import pytest
 
 from manage_breast_screening.mammograms.services.appointment_services import (
-    ActionNotPermitted,
+    ActionPerformedByDifferentUser,
     AppointmentStatusUpdater,
+    InvalidState,
 )
 from manage_breast_screening.participants.models.appointment import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import (
@@ -21,7 +22,7 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(InvalidState):
             service.check_in()
 
     def test_valid_check_in(self, clinical_user):
@@ -43,7 +44,7 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(InvalidState):
             service.start()
 
     @pytest.mark.parametrize(
@@ -66,7 +67,7 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(InvalidState):
             service.cancel()
 
     def test_valid_cancel(self, clinical_user):
@@ -88,7 +89,7 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(InvalidState):
             service.mark_did_not_attend()
 
     def test_valid_mark_did_not_attend(self, clinical_user):
@@ -110,10 +111,10 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(InvalidState):
             service.screen()
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(InvalidState):
             service.screen(partial=True)
 
     def test_valid_screen(self, clinical_user):
@@ -165,5 +166,5 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        with pytest.raises(ActionNotPermitted):
+        with pytest.raises(ActionPerformedByDifferentUser):
             service.start()

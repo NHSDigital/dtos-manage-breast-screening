@@ -12,6 +12,18 @@ class ActionNotPermitted(Exception):
     """
 
 
+class InvalidState(Exception):
+    """
+    The appointment is not in a valid state to perform the action.
+    """
+
+
+class ActionPerformedByDifferentUser(Exception):
+    """
+    The action has already been performed, but by a different user.
+    """
+
+
 class AppointmentStatusUpdater:
     """
     Transition an appointment to another state.
@@ -71,7 +83,7 @@ class AppointmentStatusUpdater:
     def _transition(self, to_state, from_states):
         current_state = self.appointment.current_status.state
         if current_state != to_state and current_state not in from_states:
-            raise ActionNotPermitted(self.appointment.current_status)
+            raise InvalidState(self.appointment.current_status)
 
         return self._get_or_create(state=to_state)
 
@@ -89,6 +101,6 @@ class AppointmentStatusUpdater:
             logger.warning(
                 f"Current status is already {new_status}, and was set by a different user"
             )
-            raise ActionNotPermitted(new_status)
+            raise ActionPerformedByDifferentUser(new_status)
 
         return new_status
