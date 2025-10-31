@@ -54,7 +54,7 @@ def test_create_message_status_with_valid_request():
         queue_instance.add.assert_called_once_with(json.dumps(body))
 
 
-def test_create_message_status_with_invalid_request():
+def test_create_message_status_with_invalid_request(mock_insights_logger):
     req = RequestFactory().post(
         "/notifications/message-status/create",
         {"some": "data"},
@@ -68,3 +68,7 @@ def test_create_message_status_with_invalid_request():
 
     assert response.status_code == expected_response.status_code
     assert response.text == expected_response.text
+
+    mock_insights_logger.assert_called_once_with(
+        "Request validation failed: Signature does not match"
+    )
