@@ -29,6 +29,9 @@ The environment requires a shared Azure front door profile created in the hub. T
 
 ## Bicep
 
+> [!IMPORTANT]
+> **Required permissions**: Owner role on both the hub and resource subscriptions
+
 - From AVD:
   - Login with Microsoft Graph scope: `az login --scope https://graph.microsoft.com//.default -t HSCIC365.onmicrosoft.com`
   - Run bicep: `make [environment] resource-group-init`
