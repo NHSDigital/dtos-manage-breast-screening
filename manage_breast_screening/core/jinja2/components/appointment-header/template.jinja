@@ -11,8 +11,6 @@
 <p><a href="{{ appointment.special_appointment_url }}">Make special appointment</a></p>
 {% endif %}
 
-<p class="nhsuk-u-margin-bottom-4"><a href="{{ appointment.participant_url }}">View participant record</a></p>
-
 {% if appointment.can_be_started_by(user) %}
   <form action="{{ url('mammograms:start_appointment', kwargs={'pk': appointment.pk}) }}" method="post">
     <div class="nhsuk-grid-row">
