@@ -15,6 +15,9 @@ from manage_breast_screening.notifications.models import (
     MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.services.queue import Queue
 
 logger = getLogger(__name__)
@@ -30,6 +33,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with exception_handler(INSIGHTS_ERROR_NAME):
             logger.info("Retry Failed Message Batch Command started")
+            ApplicationInsightsLogging().custom_event(
+                message="this is a test message",
+                event_name="batch_marked_as_failed",
+            )
+
             queue = Queue.RetryMessageBatches()
             logger.debug("Retry queue items: %s", queue.peek())
             queue_message = queue.item()
