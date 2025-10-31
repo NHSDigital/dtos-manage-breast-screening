@@ -1,6 +1,6 @@
 from datetime import date
 
-from factory import post_generation
+from factory import Faker, post_generation
 from factory.declarations import (
     Iterator,
     LazyAttribute,
@@ -41,8 +41,8 @@ class ParticipantFactory(DjangoModelFactory):
         django_get_or_create = ("nhs_number",)
         skip_postgeneration_save = True
 
-    first_name = "Janet"
-    last_name = "Williams"
+    first_name = Faker("first_name")
+    last_name = Faker("last_name")
     gender = "Female"
     nhs_number = Sequence(lambda n: f"9{n:010d}")
     phone = "07700900829"
@@ -103,6 +103,24 @@ class AppointmentFactory(DjangoModelFactory):
 
     clinic_slot = SubFactory(ClinicSlotFactory)
     screening_episode = SubFactory(ScreeningEpisodeFactory)
+
+    @post_generation
+    def first_name(obj, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+
+        obj.screening_episode.participant.first_name = extracted
+        if create:
+            obj.screening_episode.participant.save()
+
+    @post_generation
+    def last_name(obj, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+
+        obj.screening_episode.participant.last_name = extracted
+        if create:
+            obj.screening_episode.participant.save()
 
     @post_generation
     def starts_at(obj, create, extracted, **kwargs):

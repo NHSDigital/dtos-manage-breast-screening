@@ -38,6 +38,12 @@ urlpatterns = [
         kwargs={"filter": "checked_in"},
     ),
     path(
+        "<uuid:pk>/in_progress/",
+        views.clinic,
+        name="show_in_progress",
+        kwargs={"filter": "in_progress"},
+    ),
+    path(
         "<uuid:pk>/complete/",
         views.clinic,
         name="show_complete",

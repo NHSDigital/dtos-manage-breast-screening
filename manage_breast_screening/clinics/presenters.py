@@ -85,6 +85,10 @@ class AppointmentListPresenter:
                 "filter": "checked_in",
             },
             {
+                "label": "In progress",
+                "filter": "in_progress",
+            },
+            {
                 "label": "Complete",
                 "filter": "complete",
             },

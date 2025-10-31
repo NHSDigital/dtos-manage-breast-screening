@@ -75,35 +75,32 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         tzinfo = ZoneInfo("Europe/London")
         self.confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now().replace(
-                hour=9, minute=0, tzinfo=tzinfo
-            ),
+            starts_at=datetime.now().replace(hour=9, minute=0, tzinfo=tzinfo),
             current_status=AppointmentStatus.CONFIRMED,
-            screening_episode__participant__first_name="Janet",
-            screening_episode__participant__last_name="Confirmed",
+            first_name="Janet",
+            last_name="Confirmed",
         )
         self.another_confirmed_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now(timezone.utc).replace(
-                hour=9, minute=0, tzinfo=tzinfo
-            ),
-            screening_episode__participant__first_name="Also",
-            screening_episode__participant__last_name="Confirmed",
+            starts_at=datetime.now().replace(hour=9, minute=15, tzinfo=tzinfo),
+            first_name="Also",
+            last_name="Confirmed",
             current_status=AppointmentStatus.CONFIRMED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now().replace(
-                hour=9, minute=30, tzinfo=tzinfo
-            ),
+            starts_at=datetime.now().replace(hour=9, minute=30, tzinfo=tzinfo),
             current_status=AppointmentStatus.CHECKED_IN,
         )
         self.screened_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            clinic_slot__starts_at=datetime.now().replace(
-                hour=10, minute=45, tzinfo=tzinfo
-            ),
+            starts_at=datetime.now().replace(hour=10, minute=45, tzinfo=tzinfo),
             current_status=AppointmentStatus.SCREENED,
+        )
+        self.in_progress_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
+            current_status=AppointmentStatus.IN_PROGRESS,
         )
 
     def and_i_am_on_the_clinic_list(self):
@@ -129,7 +126,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def and_i_can_see_remaining_appointments(self):
         remaining_link = self.page.get_by_role("link", name=re.compile("Remaining"))
         count_span = remaining_link.locator(".app-count")
-        expect(count_span).to_contain_text("3")
+        expect(count_span).to_contain_text("4")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
             rows,
@@ -137,6 +134,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
                 self.confirmed_appointment,
                 self.another_confirmed_appointment,
                 self.checked_in_appointment,
+                self.in_progress_appointment,
             ],
         )
 
@@ -166,7 +164,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def then_i_can_see_all_appointments(self):
         all_link = self.page.get_by_role("link", name=re.compile("All"))
         count_span = all_link.locator(".app-count")
-        expect(count_span).to_contain_text("4")
+        expect(count_span).to_contain_text("5")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
             rows,
@@ -175,6 +173,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
                 self.another_confirmed_appointment,
                 self.checked_in_appointment,
                 self.screened_appointment,
+                self.in_progress_appointment,
             ],
         )
 
