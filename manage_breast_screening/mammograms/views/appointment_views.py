@@ -8,9 +8,11 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.mammograms.services.appointment_services import (
+    AppointmentStatusUpdater,
+)
 from manage_breast_screening.participants.models import (
     Appointment,
-    AppointmentStatus,
     Participant,
     ParticipantReportedMammogram,
 )
@@ -193,10 +195,9 @@ def check_in(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    # TODO: this transition should depend on the current state
-    status = appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
-
-    Auditor.from_request(request).audit_create(status)
+    AppointmentStatusUpdater(
+        appointment=appointment, current_user=request.user
+    ).check_in()
 
     return redirect("mammograms:show_appointment", pk=pk)
 
@@ -209,9 +210,6 @@ def start_appointment(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    # TODO: this transition should depend on the current state
-    status = appointment.statuses.create(state=AppointmentStatus.IN_PROGRESS)
-
-    Auditor.from_request(request).audit_create(status)
+    AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
     return redirect("mammograms:ask_for_medical_information", pk=pk)

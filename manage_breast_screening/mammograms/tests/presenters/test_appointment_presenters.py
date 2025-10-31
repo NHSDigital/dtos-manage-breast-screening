@@ -107,13 +107,24 @@ class TestAppointmentPresenter:
             AppointmentPresenter(mock_appointment).can_be_made_special == expected_value
         )
 
-    @pytest.mark.parametrize("has_permission", [True, False])
-    def test_can_be_started_by(self, mock_appointment, mock_user, has_permission):
+    @pytest.mark.parametrize(
+        "has_permission, state, result",
+        [
+            (True, AppointmentStatus.CONFIRMED, True),
+            (True, AppointmentStatus.CHECKED_IN, True),
+            (False, AppointmentStatus.CONFIRMED, False),
+            (True, AppointmentStatus.IN_PROGRESS, False),
+        ],
+    )
+    def test_can_be_started_by(
+        self, mock_appointment, mock_user, has_permission, state, result
+    ):
         mock_user.has_perm.return_value = has_permission
+        mock_appointment.current_status.state = state
 
         assert (
             AppointmentPresenter(mock_appointment).can_be_started_by(mock_user)
-            == has_permission
+            == result
         )
 
         mock_user.has_perm.assert_called_once_with(

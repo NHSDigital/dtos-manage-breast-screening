@@ -33,7 +33,7 @@ class TestViewMammogramAppointmentPermission:
 
 
 @pytest.mark.django_db
-class TestStartMammogramAppointmentPermission:
+class TestAppointmentActionPermissions:
     @pytest.fixture
     def confirmed_appointment(self):
         return AppointmentFactory.create(current_status=AppointmentStatus.CONFIRMED)
@@ -46,48 +46,23 @@ class TestStartMammogramAppointmentPermission:
     def screened_appointment(self):
         return AppointmentFactory.create(current_status=AppointmentStatus.SCREENED)
 
-    def test_returns_true_if_user_is_clinical_and_appointment_is_confirmed(
-        self, clinical_user, confirmed_appointment
-    ):
-        assert clinical_user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, obj=confirmed_appointment
-        )
+    @pytest.fixture
+    def in_progress_appointment(self):
+        return AppointmentFactory.create(current_status=AppointmentStatus.IN_PROGRESS)
 
-    def test_returns_true_if_user_is_clinical_and_appointment_is_checked_in(
-        self, clinical_user, checked_in_appointment
-    ):
-        assert clinical_user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, obj=checked_in_appointment
-        )
+    def test_can_start_if_user_is_clinical(self, clinical_user):
+        assert clinical_user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
 
-    def test_returns_false_if_user_is_clinical_and_appointment_is_screened(
-        self, clinical_user, screened_appointment
-    ):
-        assert not clinical_user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, obj=screened_appointment
-        )
+    def test_cannot_start_for_administrative_user(self, administrative_user):
+        assert not administrative_user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
 
-    def test_returns_false_for_administrative_user(
-        self, administrative_user, confirmed_appointment
-    ):
-        assert not administrative_user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, confirmed_appointment
-        )
-
-    def test_returns_false_for_user_without_roles(self, confirmed_appointment):
+    def test_cannot_start_for_user_without_roles(self):
         user_assignment = UserAssignmentFactory.create()
         user_assignment.make_current()
 
-        assert not user_assignment.user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, confirmed_appointment
-        )
+        assert not user_assignment.user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
 
-    def test_returns_false_if_no_current_provider(self, confirmed_appointment):
+    def test_cannot_start_if_no_current_provider(self):
         user_assignment = UserAssignmentFactory.create()
 
-        assert not user_assignment.user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, confirmed_appointment
-        )
-
-    def test_returns_false_if_no_appointment_provided(self, clinical_user):
-        assert not clinical_user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
+        assert not user_assignment.user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)

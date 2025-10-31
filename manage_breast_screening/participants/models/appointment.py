@@ -5,6 +5,8 @@ from logging import getLogger
 from django.db import models
 from django.db.models import OuterRef, Subquery
 
+from manage_breast_screening.users.models import User
+
 from ...core.models import BaseModel
 from .screening_episode import ScreeningEpisode
 
@@ -150,9 +152,14 @@ class AppointmentStatus(models.Model):
     appointment = models.ForeignKey(
         "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
     )
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
     class Meta:
         ordering = ["-created_at"]
+
+        # Note: this is only valid as long as we can't undo a state transition.
+        # https://nhsd-jira.digital.nhs.uk/browse/DTOSS-11522
+        unique_together = ("appointment", "state")
 
     @property
     def active(self):
@@ -160,3 +167,6 @@ class AppointmentStatus(models.Model):
         Is this state one of the active, non-final states?
         """
         return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
+
+    def __str__(self):
+        return self.state
