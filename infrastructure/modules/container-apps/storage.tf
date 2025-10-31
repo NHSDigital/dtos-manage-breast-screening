@@ -33,22 +33,9 @@ module "storage" {
     private_endpoint_resource_group_name = azurerm_resource_group.main.name
     private_service_connection_is_manual = false
   }
+  rbac_roles          = ["Storage Queue Data Contributor", "Storage Blob Data Contributor"]
   queues              = local.storage_queues
   resource_group_name = azurerm_resource_group.main.name
-}
-
-module "blob_storage_role_assignment" {
-  source               = "../dtos-devops-templates/infrastructure/modules/rbac-assignment"
-  principal_id         = module.azure_blob_storage_identity.principal_id
-  role_definition_name = "Storage Blob Data Contributor"
-  scope                = module.storage.storage_account_id
-  depends_on           = [module.storage, module.azure_blob_storage_identity]
-}
-
-module "queue_storage_role_assignment" {
-  source               = "../dtos-devops-templates/infrastructure/modules/rbac-assignment"
-  principal_id         = module.azure_queue_storage_identity.principal_id
-  role_definition_name = "Storage Queue Data Contributor"
-  scope                = module.storage.storage_account_id
-  depends_on           = [module.storage, module.azure_queue_storage_identity]
+  action_group_id     = var.action_group_id
+  enable_alerting     = var.enable_alerting
 }
