@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
 from django.urls import reverse
-from playwright.sync_api import expect
 
 from manage_breast_screening.clinics.tests.factories import ClinicFactory
 from manage_breast_screening.participants.models import AppointmentStatus
@@ -41,4 +40,5 @@ class TestJavascriptLoadsInSystemTests(SystemTestCase):
 
     def then_the_check_in_component_is_initialised(self):
         component = self.page.locator('[data-module="app-check-in"]').first
-        expect(component).to_have_attribute("data-app-check-in-init", "")
+        dataset = component.evaluate("el => el.dataset")
+        assert "appCheckInInit" in dataset
