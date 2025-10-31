@@ -29,10 +29,7 @@
     </h1>
 
     <div class="app-header__status-tag">
-      {{ appointment_status(
-        appointment=presented_appointment,
-        csrf_input=csrf_input
-      ) }}
+      {{ appointment_status(presented_appointment) }}
     </div>
   </div>
 
