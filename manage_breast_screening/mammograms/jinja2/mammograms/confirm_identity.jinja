@@ -1,0 +1,18 @@
+{% extends "wizard_step.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+
+{% block step_content %}
+  {% set confirm_button %}
+    <form method="post">
+      {{ csrf_input }}
+      {{ button({"text": "Confirm identity"}) }}
+    </form>
+  {% endset %}
+
+  {{ confirm_button }}
+
+  <!-- TODO -->
+
+  {{ confirm_button }}
+
+{% endblock %}

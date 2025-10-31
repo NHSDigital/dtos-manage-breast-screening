@@ -22,6 +22,39 @@ class TestShowAppointment:
 
 
 @pytest.mark.django_db
+class TestConfirmIdentity:
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_redirects_to_medical_information_page(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:ask_for_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
 class TestAskForMedicalInformation:
     def test_continue_to_record(self, clinical_user_client):
         appointment = AppointmentFactory.create(
@@ -116,9 +149,7 @@ class TestStartAppointment:
         )
         assertRedirects(
             response,
-            reverse(
-                "mammograms:ask_for_medical_information", kwargs={"pk": appointment.pk}
-            ),
+            reverse("mammograms:confirm_identity", kwargs={"pk": appointment.pk}),
         )
 
 

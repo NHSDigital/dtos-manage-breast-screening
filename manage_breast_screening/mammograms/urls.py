@@ -21,6 +21,11 @@ urlpatterns = [
         name="show_appointment",
     ),
     path(
+        "<uuid:pk>/confirm-identity/",
+        appointment_views.ConfirmIdentity.as_view(),
+        name="confirm_identity",
+    ),
+    path(
         "<uuid:pk>/ask-for-medical-information/",
         appointment_views.AskForMedicalInformation.as_view(),
         name="ask_for_medical_information",

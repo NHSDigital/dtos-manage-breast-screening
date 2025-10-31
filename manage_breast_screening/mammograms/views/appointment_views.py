@@ -73,6 +73,16 @@ class ShowAppointment(AppointmentMixin, View):
         )
 
 
+class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
+    template_name = "mammograms/confirm_identity.jinja"
+
+    def get_context_data(self, **kwargs):
+        return {"heading": "Confirm identity", "page_title": "Confirm identity"}
+
+    def post(self, request, pk):
+        return redirect("mammograms:ask_for_medical_information", pk=pk)
+
+
 class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/ask_for_medical_information.jinja"
     form_class = AskForMedicalInformationForm
@@ -212,4 +222,4 @@ def start_appointment(request, pk):
 
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
-    return redirect("mammograms:ask_for_medical_information", pk=pk)
+    return redirect("mammograms:confirm_identity", pk=pk)
