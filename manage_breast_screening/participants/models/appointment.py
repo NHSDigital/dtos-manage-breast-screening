@@ -150,6 +150,9 @@ class AppointmentStatus(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+        # Note: this is only valid as long as we can't undo a state transition.
+        # https://nhsd-jira.digital.nhs.uk/browse/DTOSS-11522
         unique_together = ("appointment", "state")
 
     @property
