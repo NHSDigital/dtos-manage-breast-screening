@@ -3,9 +3,8 @@ import { Component, ElementError } from 'nhsuk-frontend'
 import setSubmit from './set-submit.js'
 
 /**
- * Enhance an HTML form to intercept submit events and instead fetch the form action URL.
- * If successful, show child elements with data-show-on-submit, and hide those with data-hide-on-submit.
- * If unsuccessful, or the fetch times out, force a page refresh.
+ * Enhance a check-in form to submit via fetch and update the appointment
+ * status without a full page reload.
  */
 export class CheckIn extends Component {
   /**
@@ -23,18 +22,26 @@ export class CheckIn extends Component {
       })
     }
 
-    this.$form = $form
-    this.$showOnSubmit = this.$root.querySelectorAll('[data-show-on-submit]')
-    this.$hideOnSubmit = this.$root.querySelectorAll('[data-hide-on-submit]')
+    const appointmentId = this.$root.getAttribute('data-appointment-id')
+    if (!appointmentId) {
+      throw new ElementError({
+        element: $root,
+        component: CheckIn,
+        identifier: 'data-appointment-id attribute'
+      })
+    }
 
-    const showResult = this.showResult.bind(this)
+    this.$form = $form
+    this.appointmentId = appointmentId
+
+    const updateStatus = this.updateStatus.bind(this)
 
     setSubmit(this.$form, {
       onBeforeSubmit() {
-        console.log('Submitting form...')
+        console.log('Checking in appointment...')
       },
       onSuccess() {
-        showResult()
+        updateStatus()
       },
       onError(error) {
         console.error(error)
@@ -42,10 +49,37 @@ export class CheckIn extends Component {
     })
   }
 
-  showResult() {
-    this.$form.setAttribute('hidden', '')
-    this.$hideOnSubmit.forEach(($elem) => $elem.setAttribute('hidden', ''))
-    this.$showOnSubmit.forEach(($elem) => $elem.removeAttribute('hidden'))
+  updateStatus() {
+    const $statusContainer = document.querySelector(
+      `[data-event-status-container="${this.appointmentId}"]`
+    )
+
+    if (!$statusContainer) {
+      throw new ElementError({
+        element: this.$root,
+        component: CheckIn,
+        identifier: 'Status container element (`$statusContainer`)'
+      })
+    }
+
+    // Hide the current status
+    const $hideOnCheckIn = $statusContainer.querySelector(
+      '[data-hide-on-check-in]'
+    )
+    if ($hideOnCheckIn) {
+      $hideOnCheckIn.setAttribute('hidden', '')
+    }
+
+    // Show the checked-in status
+    const $showOnCheckIn = $statusContainer.querySelector(
+      '[data-show-on-check-in]'
+    )
+    if ($showOnCheckIn) {
+      $showOnCheckIn.removeAttribute('hidden')
+    }
+
+    // Hide the check-in form
+    this.$root.setAttribute('hidden', '')
   }
 
   /**

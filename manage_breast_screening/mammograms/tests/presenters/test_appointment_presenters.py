@@ -34,7 +34,7 @@ class TestAppointmentPresenter:
         [
             (
                 AppointmentStatus.CONFIRMED,
-                "nhsuk-tag--blue app-nowrap",
+                "nhsuk-tag--blue app-u-nowrap",
                 "Confirmed",
                 "CONFIRMED",
                 True,
@@ -42,7 +42,7 @@ class TestAppointmentPresenter:
             ),
             (
                 AppointmentStatus.CHECKED_IN,
-                "app-nowrap",
+                "app-u-nowrap",
                 "Checked in",
                 "CHECKED_IN",
                 False,
@@ -50,7 +50,7 @@ class TestAppointmentPresenter:
             ),
             (
                 AppointmentStatus.ATTENDED_NOT_SCREENED,
-                "nhsuk-tag--orange app-nowrap",
+                "nhsuk-tag--orange app-u-nowrap",
                 "Attended not screened",
                 "ATTENDED_NOT_SCREENED",
                 False,
@@ -58,7 +58,7 @@ class TestAppointmentPresenter:
             ),
             (
                 AppointmentStatus.SCREENED,
-                "nhsuk-tag--green app-nowrap",
+                "nhsuk-tag--green app-u-nowrap",
                 "Screened",
                 "SCREENED",
                 False,

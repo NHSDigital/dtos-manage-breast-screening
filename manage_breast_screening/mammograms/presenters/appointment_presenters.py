@@ -59,6 +59,10 @@ class AppointmentPresenter:
         return not self.is_special_appointment and self._appointment.active
 
     @cached_property
+    def can_be_checked_in(self):
+        return self._appointment.current_status.state == AppointmentStatus.CONFIRMED
+
+    @cached_property
     def active(self):
         return self._appointment.active
 
@@ -79,7 +83,9 @@ class AppointmentPresenter:
         colour = status_colour(current_status.state)
 
         return {
-            "classes": f"nhsuk-tag--{colour} app-nowrap" if colour else "app-nowrap",
+            "classes": f"nhsuk-tag--{colour} app-u-nowrap"
+            if colour
+            else "app-u-nowrap",
             "text": current_status.get_state_display(),
             "key": current_status.state,
             "is_confirmed": current_status.state == AppointmentStatus.CONFIRMED,
