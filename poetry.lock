@@ -859,14 +859,14 @@ django = ">=4.2"
 
 [[package]]
 name = "django-qsessions"
-version = "2.0.0"
+version = "2.1.0"
 description = "Extended session backends for Django"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "django_qsessions-2.0.0-py3-none-any.whl", hash = "sha256:505837d25d4857696c1b9dc553b02a5dca5f3d761bd6a0a127e9f468bf22dc09"},
-    {file = "django_qsessions-2.0.0.tar.gz", hash = "sha256:d3efc4151fbd732d7aaa5452a0e1bae49829db7962f1bf7942b4ed370699e470"},
+    {file = "django_qsessions-2.1.0-py3-none-any.whl", hash = "sha256:4be9a35a1a636ff9b2454b06eec84e655b443136097ad5570cc53d531b296bfe"},
+    {file = "django_qsessions-2.1.0.tar.gz", hash = "sha256:b3da4dc3d47d3a43734663c2ca67bf275a92ce80e2e8a4bb85bedb68067034fa"},
 ]
 
 [package.dependencies]
@@ -874,7 +874,8 @@ Django = ">=4.2"
 ua-parser = {version = ">=1.0.1", extras = ["regex"]}
 
 [package.extras]
-dev = ["geoip2", "pre-commit", "pytest (>=7)", "pytest-cov", "pytest-django"]
+dev = ["geoip2 (>=4.1.0)", "pre-commit", "pytest (>=7)", "pytest-cov", "pytest-django"]
+geoip2 = ["geoip2 (>=4.1.0)"]
 
 [[package]]
 name = "djlint"
