@@ -5,8 +5,7 @@ include scripts/terraform/terraform.mk
 
 .PHONY: _clean-docker _install-uv assets build clean config db dependencies deploy \
 	diagrams githooks-config githooks-run help local migrate models personas rebuild-db run \
-	seed seed-demo-data shell test test-end-to-end test-integration test-lint \
-	test-lint-templates test-ui test-unit
+	seed seed-demo-data shell test test-end-to-end test-integration test-lint \ test-lint-templates test-ui test-unit
 .SILENT: help run
 
 # ---------------------------------------------------------------------------
