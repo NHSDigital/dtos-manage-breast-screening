@@ -4,10 +4,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from django.core.management.base import CommandError
+from django.db import connection
 
 from manage_breast_screening.notifications.management.commands.create_reports import (
     Command,
 )
+from manage_breast_screening.notifications.queries.helper import Helper
 
 
 class TestCreateReports:
@@ -43,7 +45,7 @@ class TestCreateReports:
                         mock_email_service = MagicMock()
                         mock_email.return_value = mock_email_service
 
-                        yield (mock_blob_storage, mock_email_service)
+                        yield (mock_read_sql, mock_blob_storage, mock_email_service)
 
     @pytest.fixture
     def dataframe(self, csv_data):
@@ -55,6 +57,18 @@ class TestCreateReports:
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
             Command().handle()
 
+        mock_read_sql = md[0]
+
+        mock_read_sql.assert_any_call(
+            Helper.sql("aggregate"), connection, params=("3 months",)
+        )
+        mock_read_sql.assert_any_call(
+            Helper.sql("failures"), connection, params=(now.date(),)
+        )
+        mock_read_sql.assert_any_call(
+            Helper.sql("reconciliation"), connection, params=(now.date(), "MBD")
+        )
+
         aggregate_filename = now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv")
         failures_filename = now.strftime(
             "%Y-%m-%dT%H:%M:%S-invites-not-sent-report.csv"
@@ -63,7 +77,7 @@ class TestCreateReports:
             "%Y-%m-%dT%H:%M:%S-reconciliation-report.csv"
         )
 
-        mock_blob_storage = md[0]
+        mock_blob_storage = md[1]
         assert mock_blob_storage.add.call_count == 3
         mock_blob_storage.add.assert_any_call(
             aggregate_filename,
@@ -84,7 +98,7 @@ class TestCreateReports:
             container_name="reports",
         )
 
-        mock_email_service = md[1]
+        mock_email_service = md[2]
         assert mock_email_service.send_report_email.call_count == 3
         mock_email_service.send_report_email.assert_any_call(
             attachment_data=csv_data,
