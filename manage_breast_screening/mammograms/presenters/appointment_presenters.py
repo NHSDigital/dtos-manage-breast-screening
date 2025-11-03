@@ -13,8 +13,9 @@ from ...participants.presenters import ParticipantPresenter, status_colour
 
 
 class AppointmentPresenter:
-    def __init__(self, appointment):
+    def __init__(self, appointment, tab_description="Appointment details"):
         self._appointment = appointment
+        self.tab_description = tab_description
 
         self.allStatuses = AppointmentStatus
         self.pk = appointment.pk
@@ -48,6 +49,10 @@ class AppointmentPresenter:
     @cached_property
     def caption(self):
         return f"{self.clinic_slot.clinic_type} appointment"
+
+    @cached_property
+    def page_title(self):
+        return f"{self.caption}: {self.tab_description}"
 
     @cached_property
     def start_time(self):
