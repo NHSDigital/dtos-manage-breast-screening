@@ -21,7 +21,7 @@
 
   {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
 
-  {% call card({"headingHtml": "", "classes": "nhsuk-u-margin-bottom-4"}) %}
+  {% call card({"headingHtml": "<!-- no heading -->", "classes": "nhsuk-u-margin-bottom-4"}) %}
     {{ summaryList({
       "rows": [
         {
