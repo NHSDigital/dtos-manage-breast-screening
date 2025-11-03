@@ -1,8 +1,7 @@
 pre-commit 3.6.0
-python 3.13.7
+python 3.14.0
 nodejs 24.11.0
 uv 0.9.7
-
 # TODO: can we switch all these docker scripts to github actions instead? Or at least something that
 # will be maintained by Dependabot?
 # docker/ghcr.io/gitleaks/gitleaks v8.18.0@sha256:fd2b5cab12b563d2cc538b14631764a1c25577780e3b7dba71657d58da45d9d9 # SEE: https://github.com/gitleaks/gitleaks/pkgs/container/gitleaks
