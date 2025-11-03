@@ -49,7 +49,7 @@ class TestViewingACompletedAppointment(SystemTestCase):
                 kwargs={"pk": self.appointment.pk},
             )
         )
-        self.assert_page_title_contains("Screening appointment")
+        self.assert_page_title_contains("Screening appointment: Appointment details")
 
     def then_i_should_see_the_demographic_banner(self):
         expect(self.page.get_by_text("NHS Number")).to_be_visible()

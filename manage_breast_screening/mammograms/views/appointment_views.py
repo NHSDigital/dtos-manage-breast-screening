@@ -49,7 +49,9 @@ class ShowAppointment(AppointmentMixin, View):
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
             participant_id=participant_pk
         ).order_by("-created_at")
-        appointment_presenter = AppointmentPresenter(appointment)
+        appointment_presenter = AppointmentPresenter(
+            appointment, tab_description="Appointment details"
+        )
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
             last_known_mammograms,
             participant_pk=participant_pk,
@@ -59,7 +61,7 @@ class ShowAppointment(AppointmentMixin, View):
         context = {
             "heading": appointment_presenter.participant.full_name,
             "caption": appointment_presenter.caption,
-            "page_title": appointment_presenter.caption,
+            "page_title": appointment_presenter.page_title,
             "presented_appointment": appointment_presenter,
             "presented_participant": appointment_presenter.participant,
             "presented_mammograms": last_known_mammogram_presenter,
