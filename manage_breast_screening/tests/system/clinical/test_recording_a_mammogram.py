@@ -13,6 +13,18 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestRecordingAMammogram(SystemTestCase):
+    def test_appointment_tabs(self):
+        """
+        I can switch between tabs to see all the information about an appointment
+        """
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_appointment_show_page()
+        self.then_i_should_see_the_demographic_banner()
+
+        self.when_i_change_to_the_participant_details_tab()
+        self.then_i_should_see_the_participant_details()
+
     def test_recording_a_mammogram_without_capturing_medical_information(self):
         """
         I can record a mammogram without entering any relevant medical information.
@@ -21,10 +33,10 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_the_demographic_banner()
-        self.and_i_should_see_the_participant_details()
 
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
+        self.and_i_should_see_the_participant_details()
 
         self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_medical_information_page()
@@ -84,6 +96,9 @@ class TestRecordingAMammogram(SystemTestCase):
         self.and_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
 
+        self.when_i_change_to_the_participant_details_tab()
+        self.then_the_accessibility_baseline_is_met()
+
         self.when_i_click_start_this_appointment()
         self.then_the_accessibility_baseline_is_met()
 
@@ -116,13 +131,15 @@ class TestRecordingAMammogram(SystemTestCase):
     def then_i_should_see_the_demographic_banner(self):
         expect(self.page.get_by_text("NHS Number")).to_be_visible()
 
-    def and_i_should_see_the_participant_details(self):
+    def when_i_change_to_the_participant_details_tab(self):
         self.page.get_by_role("link", name="Participant details").click()
+
+    def and_i_should_see_the_participant_details(self):
         expect(
             self.page.locator(".nhsuk-summary-list__row", has_text="Full name")
         ).to_contain_text("Janet Williams")
-        # Navigate back to appointment tab
-        self.page.get_by_role("link", name="Appointment details").click()
+
+    then_i_should_see_the_participant_details = and_i_should_see_the_participant_details
 
     def when_i_click_start_this_appointment(
         self,
