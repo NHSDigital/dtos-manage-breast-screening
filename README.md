@@ -57,11 +57,11 @@ Running `make config` beforehand will ensure you have necessary dependencies ins
 
 ### Dependency management
 
-Python dependencies are managed via [poetry](https://python-poetry.org/docs/basic-usage/).
+Python dependencies are managed via [uv](https://docs.astral.sh/uv/).
 
-- `poetry install` installs dependencies from the lockfile
-- `poetry add` and `poetry remove` adds and removes dependencies
-- `poetry run [COMMAND]` runs a command in the context of the project's virtual environment
+- `uv sync` installs dependencies from the lockfile
+- `uv add` and `uv remove` adds and removes dependencies
+- `uv run [COMMAND]` runs a command in the context of the project's virtual environment
 
 `npm` is used to manage javascript dependencies and frontend assets.
 
@@ -86,8 +86,8 @@ The makefile spins up a postgres DB using docker/podman.
 
 Database migrations are handled by [Django's database migration functionality](https://docs.djangoproject.com/en/5.2/topics/migrations/)
 
-- `poetry run manage.py migrate` loads database migrations
-- `poetry run manage.py makemigrations` generates new database migrations
+- `uv run manage.py migrate` loads database migrations
+- `uv run manage.py makemigrations` generates new database migrations
 
 Note the database migration runs in the deployment pipeline _after_ the application deployment. The deployed code must be compatible with the schema before AND after the schema changes. This also removes potential errors when using a rolling app deployment as multiple app versions may access the database at the same time. To enforce it, make sure to always separate code changes and database migrations into different pull requests.
 
@@ -122,7 +122,7 @@ The `manage_breast_screening` directory contains all the Django project code.
 To generate a new app, run:
 
 ```sh
-poetry run ./manage.py startapp <app_name> manage_breast_screening/`
+uv run ./manage.py startapp <app_name> manage_breast_screening/`
 ```
 
 ## Deployment

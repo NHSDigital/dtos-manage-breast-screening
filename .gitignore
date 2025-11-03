@@ -13,6 +13,7 @@ lines-of-code-report.json
 
 # Python
 __pycache__
+.venv/
 
 # Python coverage
 .coverage
