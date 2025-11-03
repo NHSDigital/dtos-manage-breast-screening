@@ -21,6 +21,7 @@ def present_secondary_nav(pk):
         },
         {"id": "medical_information", "text": "Medical information", "href": "#"},
         {"id": "images", "text": "Images", "href": "#"},
+        {"id": "note", "text": "Note", "href": "#"},
     ]
 
 
