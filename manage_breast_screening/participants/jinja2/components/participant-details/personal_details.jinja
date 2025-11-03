@@ -2,36 +2,26 @@
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 
 {% macro personal_details(presented_participant, return_url) %}
-{% set dob %}
-  {{ presented_participant.date_of_birth }}<br>
-  <span class="nhsuk-hint">({{ presented_participant.age }})</span>
-{% endset %}
+  {% set dob %}
+    {{ presented_participant.date_of_birth }}<br>
+    <span class="nhsuk-hint">({{ presented_participant.age }})</span>
+  {% endset %}
 
-{% set ethnic_background = presented_participant.ethnic_background %}
-{% set ethnic_background_category = presented_participant.ethnic_category %}
-{% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
-{% set ethnicity_details_link %}
-  <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
-{% endset %}
-{% set ethnicity_html %}
-  {% if presented_participant.ethnicity_not_shared %}
-    {{ ethnic_background }}
-  {% elif ethnic_background %}
-    {{ ethnic_background_category }} ({{ ethnic_background }})
-  {% else %}
-    {{ ethnicity_details_link | safe }}
-  {% endif %}
-{% endset %}
-
-{% set ethnicity_change_link = {
-    "items": [
-      {
-        "href": ethnicity_details_url,
-        "text": "Change",
-        "visuallyHiddenText": "ethnicity"
-      }
-    ]
-  } if ethnic_background else undefined %}
+  {% set ethnic_background = presented_participant.ethnic_background %}
+  {% set ethnic_background_category = presented_participant.ethnic_category %}
+  {% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
+  {% set ethnicity_details_link %}
+    <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
+  {% endset %}
+  {% set ethnicity_html %}
+    {% if presented_participant.ethnicity_not_shared %}
+      {{ ethnic_background }}
+    {% elif ethnic_background %}
+      {{ ethnic_background_category }} ({{ ethnic_background }})
+    {% else %}
+      {{ ethnicity_details_link | safe }}
+    {% endif %}
+  {% endset %}
 
   {% call card({
     "heading": "Personal details"
@@ -77,7 +67,7 @@
           "value": {
             "html": ethnicity_html | safe
           },
-          "actions": ethnicity_change_link
+          "actions": presented_participant.ethnicity_actions(return_url)
         },
       ]
     }) }}

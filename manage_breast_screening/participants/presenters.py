@@ -61,6 +61,22 @@ class ParticipantPresenter:
             url += "?return_url=" + quote(return_url)
         return url
 
+    def ethnicity_actions(self, return_url):
+        change_url = self.ethnicity_url(return_url)
+        return (
+            {
+                "items": [
+                    {
+                        "href": change_url,
+                        "text": "Change",
+                        "visuallyHiddenText": "ethnicity",
+                    }
+                ]
+            }
+            if self.ethnic_background
+            else None
+        )
+
     @property
     def address(self):
         address = self._participant.address
@@ -142,9 +158,9 @@ class ParticipantAppointmentsPresenter:
         colour = status_colour(current_status.state)
 
         return {
-            "classes": f"nhsuk-tag--{colour} app-u-nowrap"
-            if colour
-            else "app-u-nowrap",
+            "classes": (
+                f"nhsuk-tag--{colour} app-u-nowrap" if colour else "app-u-nowrap"
+            ),
             "text": current_status.get_state_display(),
             "key": current_status.state,
         }
