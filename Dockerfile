@@ -28,7 +28,7 @@ ENV UV_PROJECT_ENVIRONMENT=/app/.venv \
 # Install python dependencies to a virtualenv
 COPY pyproject.toml uv.lock ./
 COPY --from=ghcr.io/astral-sh/uv:0.9.7 /uv /uvx /bin/
-RUN uv sync --frozen --no-dev && rm -rf $UV_CACHE_DIR
+RUN uv sync --frozen --no-dev --compile-bytecode --no-editable && rm -rf $UV_CACHE_DIR
 
 #### FINAL RUNTIME IMAGE
 
