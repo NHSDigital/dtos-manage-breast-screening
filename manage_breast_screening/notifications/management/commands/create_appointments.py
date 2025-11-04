@@ -60,7 +60,7 @@ class Command(BaseCommand):
                             logger.info("%s created", clinic)
 
                         appt, appt_created = self.update_or_create_appointment(
-                            row, clinic
+                            row, clinic, blob.name
                         )
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
             logger.info("Create Appointments command finished successfully")
@@ -99,7 +99,7 @@ class Command(BaseCommand):
         )
 
     def update_or_create_appointment(
-        self, row: pandas.Series, clinic: Clinic
+        self, row: pandas.Series, clinic: Clinic, extract: str
     ) -> tuple[Appointment | None, bool]:
         appointment = Appointment.objects.filter(nbss_id=row["Appointment ID"]).first()
 
@@ -126,6 +126,7 @@ class Command(BaseCommand):
                     )
                     == "A"
                 ),
+                extract=extract,
             )
             logger.info("%s created", new_appointment)
             return (new_appointment, True)

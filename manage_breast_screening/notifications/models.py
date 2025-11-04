@@ -1,6 +1,7 @@
 import uuid
 from zoneinfo import ZoneInfo
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from ..core.models import BaseModel
@@ -143,6 +144,7 @@ class Appointment(models.Model):
     completed_at = models.DateTimeField(null=True)
     attended_not_screened = models.CharField(max_length=30, default="")
     assessment = models.BooleanField(default=False)
+    originating_file = ArrayField(models.CharField(max_length=50))
 
     clinic = models.ForeignKey("notifications.Clinic", on_delete=models.PROTECT)
 
