@@ -32,7 +32,7 @@ class TestMeshInbox:
         )
 
     def test_client_initialises_with_prod_endpoint(self, mock_mesh_client, monkeypatch):
-        monkeypatch.setenv("DJANGO_ENV", "production")
+        monkeypatch.setenv("DJANGO_ENV", "prod")
         with patch.object(
             MeshInbox,
             "ssl_credentials",
