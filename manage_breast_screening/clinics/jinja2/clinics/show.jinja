@@ -7,6 +7,7 @@
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
 {% from 'components/check-in/macro.jinja' import check_in %}
+{% from 'components/start-appointment/macro.jinja' import start_appointment %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -83,6 +84,17 @@
             'pk': presented_clinic.pk,
             'appointment_pk': presented_appointment.pk,
             }
+        ),
+        csrf_input=csrf_input
+      ) }}
+      {{ start_appointment(
+        request.user,
+        presented_appointment,
+        start_appointment_url=url(
+          'mammograms:start_appointment',
+          kwargs={
+            'pk': presented_appointment.pk,
+          }
         ),
         csrf_input=csrf_input
       ) }}

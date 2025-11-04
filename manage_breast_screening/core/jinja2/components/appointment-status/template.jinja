@@ -2,7 +2,7 @@
 
 {% set can_be_checked_in = presented_appointment.can_be_checked_in %}
 
-<div data-event-status-container="{{ presented_appointment.pk }}" >
+<div data-appointment-status-container="{{ presented_appointment.pk }}" >
   <span {% if can_be_checked_in %}data-hide-on-check-in{% endif %}>
     {{ tag({
     "text": presented_appointment.current_status.text,
