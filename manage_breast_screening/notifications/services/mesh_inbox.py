@@ -26,7 +26,7 @@ class MeshInbox:
 
     def endpoint_for_env(self) -> Endpoint:
         current_environment = os.getenv("DJANGO_ENV", "dev")
-        if current_environment == "production":
+        if current_environment == "prod":
             return LIVE_ENDPOINT
         elif current_environment == "test":
             return Endpoint(os.getenv("NBSS_MESH_HOST"), None, None, False, False)
