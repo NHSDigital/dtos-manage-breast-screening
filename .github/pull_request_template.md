@@ -1,4 +1,4 @@
-<!-- Prefix the PR title with the Jira issue number in square brackets (eg - [DTOSS-XXXX]), if applicable -->
+<!-- Provide a brief, sentence-case description of the change in the PR title, eg "Update appointment show page" -->
 
 ## Description
 
@@ -9,3 +9,7 @@
 ## Review notes
 
 <!-- Add notable context, discussion items, and anything else that would be helpful for a reviewer to know. -->
+
+## Review checklist
+
+- [ ] Check database queries are correctly scoped to current_provider
