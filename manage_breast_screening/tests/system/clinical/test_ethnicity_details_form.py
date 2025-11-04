@@ -78,7 +78,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:show_appointment",
+                "mammograms:participant_details",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -116,7 +116,7 @@ class TestEthnicityDetailsForm(SystemTestCase):
         expect(self.page).to_have_url(
             re.compile(
                 reverse(
-                    "mammograms:show_appointment",
+                    "mammograms:participant_details",
                     kwargs={"pk": self.appointment.pk},
                 )
             )

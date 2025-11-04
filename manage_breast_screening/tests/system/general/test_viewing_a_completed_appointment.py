@@ -55,6 +55,7 @@ class TestViewingACompletedAppointment(SystemTestCase):
         expect(self.page.get_by_text("NHS Number")).to_be_visible()
 
     def and_i_should_see_the_participant_details(self):
+        self.page.get_by_role("link", name="Participant details").click()
         expect(
             self.page.locator(".nhsuk-summary-list__row", has_text="Full name")
         ).to_contain_text("Janet Williams")

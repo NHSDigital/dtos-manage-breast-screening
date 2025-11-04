@@ -2,10 +2,10 @@
 {% from 'nhsuk/components/card/macro.jinja' import card %}
 {% from 'nhsuk/components/warning-callout/macro.jinja' import warningCallout %}
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
-{% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
 {% from 'components/appointment-header/macro.jinja' import appointment_header %}
-{% from 'components/check-in/macro.jinja' import check_in %}
+{% from 'components/participant-details/template.jinja' import participant_details %}
+{% from 'components/participant-details/contact_details.jinja' import contact_details %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 
@@ -30,20 +30,7 @@
 
     <div class="app-header__status-tag">
       {{ appointment_status(presented_appointment) }}
-      <p class="nhsuk-u-margin-bottom-2">
-        {{ check_in(
-          presented_appointment,
-          check_in_url=url(
-            'mammograms:check_in',
-             kwargs={
-              'pk': presented_appointment.pk,
-              }
-          ),
-          csrf_input=csrf_input
-        ) }}
-      </p>
     </div>
-
   </div>
 
   {{ appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
@@ -55,50 +42,17 @@
     "items": secondary_nav_items
   }) }}
 
-  {% set appointment_details_html %}
-    {{ summaryList({
-      "rows": [
-       {
-         "key": {
-           "text": "Appointment time"
-         },
-         "value": {
-           "text": presented_appointment.clinic_slot.slot_time_and_clinic_date
-         }
-       },
-       {
-         "key": {
-           "text": "Appointment type"
-         },
-         "value": {
-           "text": presented_appointment.clinic_slot.clinic_type
-         }
-       },
-       {
-         "key": {
-           "text": "Screening protocol"
-         },
-         "value": {
-           "text": presented_appointment.screening_protocol
-         }
-       },
-       {
-         "key": {
-           "text": "Status"
-         },
-         "value": {
-           "text": presented_appointment.current_status.text
-         }
-       }
-      ]
-    }) }}
-  {% endset %}
-
   {{ card({
-    "headingHtml": " ",
-    "headingLevel": "2",
-    "descriptionHtml": appointment_details_html
+    "heading": "Participant details",
+    "descriptionHtml": participant_details(
+      presented_participant=presented_participant,
+      presented_mammograms=presented_mammograms,
+      return_url=request.path,
+      screening_protocol=presented_appointment.screening_protocol
+    )
   }) }}
+
+  {{ contact_details(presented_participant) }}
   </div>
 </div>
 {% endblock %}

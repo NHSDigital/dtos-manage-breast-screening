@@ -1,162 +1,136 @@
-{% from "summary-list/macro.jinja" import summaryList %}
-
-{% set dob %}
-  {{ presented_participant.date_of_birth }}<br>
-  <span class="nhsuk-hint">({{ presented_participant.age }})</span>
-{% endset %}
-
-{% set ethnic_background = presented_participant.ethnic_background %}
-{% set ethnic_background_category = presented_participant.ethnic_category %}
-{% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
-{% set ethnicity_details_link %}
-  <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
-{% endset %}
-{% set ethnicity_html %}
-  {% if ethnic_background == "Prefer not to say" %}
-    {{ ethnic_background }}
-  {% elif ethnic_background %}
-    {{ ethnic_background_category }} ({{ ethnic_background }})
-  {% else %}
-    {{ ethnicity_details_link | safe }}
+{% macro participant_details(presented_participant, presented_mammograms, return_url=none, full_details=true, screening_protocol=none) %}
+  {% if return_url is none %}
+    {{ raise('return_url is required') }}
   {% endif %}
-{% endset %}
 
-{% set ethnicity_change_link = {
-    "items": [
-      {
-        "href": ethnicity_details_url,
-        "text": "Change",
-        "visuallyHiddenText": "ethnicity"
-      }
+  {% from "summary-list/macro.jinja" import summaryList %}
+
+  {% set dob %}
+    {{ presented_participant.date_of_birth }}<br>
+    <span class="nhsuk-hint">({{ presented_participant.age }})</span>
+  {% endset %}
+
+  {% set ethnic_background = presented_participant.ethnic_background %}
+  {% set ethnic_background_category = presented_participant.ethnic_category %}
+  {% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
+  {% set ethnicity_details_link %}
+    <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
+  {% endset %}
+  {% set ethnicity_html %}
+    {% if ethnic_background == "Prefer not to say" %}
+      {{ ethnic_background }}
+    {% elif ethnic_background %}
+      {{ ethnic_background_category }} ({{ ethnic_background }})
+    {% else %}
+      {{ ethnicity_details_link | safe }}
+    {% endif %}
+  {% endset %}
+
+  {% set ethnicity_change_link = {
+      "items": [
+        {
+          "href": ethnicity_details_url,
+          "text": "Change",
+          "visuallyHiddenText": "ethnicity"
+        }
+      ]
+    } if ethnic_background else undefined %}
+
+  {% set address_html %}
+    {% if presented_participant.address %}
+      {% for line in presented_participant.address.lines %}
+        {{ line }}<br>
+      {% endfor %}
+      {{ address.postcode }}
+    {% endif %}
+  {% endset %}
+  {% set address_html = address_html | trim | default("Not provided") %}
+
+  {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
+  {% set last_mammogram_html %}
+    <div data-testid="mammograms">
+    {% if mammograms_by_date_added %}
+      {% for mammogram in mammograms_by_date_added %}
+        <p>
+        <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
+        <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-color">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
+        <br>{{ mammogram.location }}
+
+        {% if mammogram.different_name %}
+          <br>Previous name: {{ mammogram.different_name }}
+        {% endif %}
+
+        {% if mammogram.additional_information %}
+          <br>Additional information: {{ mammogram.additional_information | nl2br }}
+        {% endif %}
+        </p>
+      {% endfor %}
+    {% else %}
+    {{ "Not known" | as_hint }}
+    {% endif %}
+    </div>
+  {% endset %}
+
+  {{ summaryList({
+    "rows": [
+     {
+       "key": {
+         "text": "NHS Number"
+       },
+       "value": {
+         "text": presented_participant.nhs_number
+       }
+     } if full_details else undefined,
+     {
+       "key": {
+         "text": "Full name"
+       },
+       "value": {
+         "text": presented_participant.full_name
+       }
+     },
+     {
+       "key": {
+         "text": "Gender"
+       },
+       "value": {
+         "text": presented_participant.gender
+       }
+     } if full_details else undefined,
+     {
+       "key": {
+         "text": "Date of birth"
+       },
+       "value": {
+         "html": dob
+       }
+     },
+     {
+       "key": {
+         "text": "Ethnicity"
+       },
+       "value": {
+         "html": ethnicity_html | safe
+       },
+       "actions": ethnicity_change_link
+     },
+     {
+       "key": {
+         "text": "Last known mammograms"
+       },
+       "value": {
+         "html": last_mammogram_html
+       },
+       "actions": {
+         "items": [
+           {
+             "href": presented_mammograms.add_link.href,
+             "text": presented_mammograms.add_link.text,
+             "visuallyHiddenText": presented_mammograms.add_link.visually_hidden_text
+           }
+         ]
+       }
+     } if presented_mammograms and screening_protocol else undefined,
     ]
-  } if ethnic_background else undefined %}
-
-{% set address_html %}
-  {% if presented_participant.address %}
-    {% for line in presented_participant.address.lines %}
-      {{ line }}<br>
-    {% endfor %}
-    {{ address.postcode }}
-  {% endif %}
-{% endset %}
-{% set address_html = address_html | trim | default("Not provided") %}
-
-{% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
-{% set last_mammogram_html %}
-  <div data-testid="mammograms">
-  {% if mammograms_by_date_added %}
-    {% for mammogram in mammograms_by_date_added %}
-      <p>
-      <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
-      <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-color">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
-      <br>{{ mammogram.location }}
-
-      {% if mammogram.different_name %}
-        <br>Previous name: {{ mammogram.different_name }}
-      {% endif %}
-
-      {% if mammogram.additional_information %}
-        <br>Additional information: {{ mammogram.additional_information | nl2br }}
-      {% endif %}
-      </p>
-    {% endfor %}
-  {% else %}
-  {{ "Not known" | as_hint }}
-  {% endif %}
-  </div>
-{% endset %}
-
-{{ summaryList({
-  "rows": [
-   {
-     "key": {
-       "text": "Full name"
-     },
-     "value": {
-       "text": presented_participant.full_name
-     }
-   },
-   {
-     "key": {
-       "text": "Gender"
-     },
-     "value": {
-       "text": presented_participant.gender
-     }
-   } if full_details else undefined,
-   {
-     "key": {
-       "text": "NHS Number"
-     },
-     "value": {
-       "text": presented_participant.nhs_number
-     }
-   } if full_details else undefined,
-   {
-     "key": {
-       "text": "Date of birth"
-     },
-     "value": {
-       "html": dob
-     }
-   },
-   {
-     "key": {
-       "text": "Ethnicity"
-     },
-     "value": {
-       "html": ethnicity_html | safe
-     },
-     "actions": ethnicity_change_link
-   },
-   {
-     "key": {
-       "text": "Address"
-     },
-     "value": {
-       "html": address_html
-     }
-   },
-   {
-     "key": {
-       "text": "Phone"
-     },
-     "value": {
-       "html": presented_participant.phone
-     }
-   },
-   {
-     "key": {
-       "text": "Screening protocol"
-     },
-     "value": {
-       "html": screening_protocol
-     }
-   } if screening_protocol else undefined,
-   {
-     "key": {
-       "text": "Email"
-     },
-     "value": {
-       "html": presented_participant.email
-     }
-   },
-   {
-     "key": {
-       "text": "Last known mammograms"
-     },
-     "value": {
-       "html": last_mammogram_html
-     },
-     "actions": {
-        "items": [
-          {
-            "href": presented_mammograms.add_link.href,
-            "text": presented_mammograms.add_link.text,
-            "visuallyHiddenText": presented_mammograms.add_link.visually_hidden_text
-          }
-        ]
-      }
-   } if presented_mammograms else undefined
-  ]
-}) }}
+  }) }}
+{% endmacro %}
