@@ -3,6 +3,8 @@ import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
 
+from manage_breast_screening.config.settings import boolean_env
+
 
 class ApplicationInsightsLogging:
     def __init__(self) -> None:
@@ -12,7 +14,7 @@ class ApplicationInsightsLogging:
         self.logger = self.getLogger()
 
     def configure_azure_monitor(self):
-        if os.getenv("APPLICATIONINSIGHTS_IS_ENABLED", "False") == "True":
+        if boolean_env("APPLICATIONINSIGHTS_IS_ENABLED", False):
             # Configure OpenTelemetry to use Azure Monitor with the
             # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
             configure_azure_monitor(
