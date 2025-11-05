@@ -12,7 +12,12 @@ from manage_breast_screening.clinics.tests.factories import (
 
 from .. import models
 from ..models import AppointmentStatus, Ethnicity
-from .factories import AppointmentFactory, ParticipantFactory, ScreeningEpisodeFactory
+from .factories import (
+    AppointmentFactory,
+    AppointmentStatusFactory,
+    ParticipantFactory,
+    ScreeningEpisodeFactory,
+)
 
 
 class TestParticipant:
@@ -235,24 +240,107 @@ class TestAppointment:
             [late, middle, early],
         )
 
+    @pytest.mark.django_db
+    class TestEagerLoadCurrentStatus:
+        def test_eager_loads_most_recent_status_with_created_by(
+            self, django_assert_num_queries
+        ):
+            appointment = AppointmentFactory.create()
 
-@pytest.mark.django_db
-def test_appointment_current_status():
-    appointment = AppointmentFactory.create(
-        current_status=models.AppointmentStatus.CONFIRMED
-    )
-    appointment.statuses.create(state=models.AppointmentStatus.CHECKED_IN)
+            latest_status = AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.IN_PROGRESS,
+                created_at=datetime(2025, 1, 1, 10, tzinfo=tz.utc),
+            )
 
-    assert appointment.statuses.first().state == models.AppointmentStatus.CHECKED_IN
-    assert appointment.current_status.state == models.AppointmentStatus.CHECKED_IN
+            AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.CHECKED_IN,
+                created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+            )
+
+            AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.CONFIRMED,
+                created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
+            )
+
+            appointment_with_status = (
+                models.Appointment.objects.eager_load_current_status().get(
+                    pk=appointment.pk
+                )
+            )
+
+            prefetched_status = appointment_with_status._prefetched_current_status[0]
+            assert prefetched_status == latest_status
+            # Verify no additional queries when accessing created_by
+            with django_assert_num_queries(0):
+                assert prefetched_status.created_by is not None
+                prefetched_status.created_by.nhs_uid
+
+    @pytest.mark.django_db
+    class TestCurrentStatus:
+        def test_returns_prefetched_current_status_if_available(
+            self, django_assert_num_queries
+        ):
+            appointment = AppointmentFactory.create()
+            latest_status = AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.IN_PROGRESS,
+                created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+            )
+            AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.CHECKED_IN,
+                created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
+            )
+
+            fetched_appointment = (
+                models.Appointment.objects.eager_load_current_status().first()
+            )
+            with django_assert_num_queries(0):
+                fetched_appointment.current_status.created_by
+            assert fetched_appointment.current_status == latest_status
+
+        def test_returns_current_status_even_if_not_prefetched(
+            self, django_assert_num_queries
+        ):
+            appointment = AppointmentFactory.create()
+            latest_status = AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.IN_PROGRESS,
+                created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+            )
+            AppointmentStatusFactory.create(
+                appointment=appointment,
+                state=models.AppointmentStatus.CHECKED_IN,
+                created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
+            )
+
+            fetched_appointment = models.Appointment.objects.first()
+            with django_assert_num_queries(2):
+                fetched_appointment.current_status.created_by
+            assert fetched_appointment.current_status == latest_status
+
+        def test_returns_default_status_if_no_statuses(self, django_assert_num_queries):
+            appointment = AppointmentFactory.create()
+            assert (
+                appointment.current_status.state == models.AppointmentStatus.CONFIRMED
+            )
 
 
-def test_appointment_status_active():
-    assert AppointmentStatus(state=AppointmentStatus.CONFIRMED).active
-    assert AppointmentStatus(state=AppointmentStatus.CHECKED_IN).active
-    assert AppointmentStatus(state=AppointmentStatus.IN_PROGRESS).active
-    assert not AppointmentStatus(state=AppointmentStatus.CANCELLED).active
-    assert not AppointmentStatus(state=AppointmentStatus.DID_NOT_ATTEND).active
-    assert not AppointmentStatus(state=AppointmentStatus.ATTENDED_NOT_SCREENED).active
-    assert not AppointmentStatus(state=AppointmentStatus.PARTIALLY_SCREENED).active
-    assert not AppointmentStatus(state=AppointmentStatus.SCREENED).active
+class TestAppointmentStatus:
+    class TestActive:
+        def test_active_states_return_true(self):
+            assert AppointmentStatus(state=AppointmentStatus.CONFIRMED).active
+            assert AppointmentStatus(state=AppointmentStatus.CHECKED_IN).active
+            assert AppointmentStatus(state=AppointmentStatus.IN_PROGRESS).active
+            assert not AppointmentStatus(state=AppointmentStatus.CANCELLED).active
+            assert not AppointmentStatus(state=AppointmentStatus.DID_NOT_ATTEND).active
+            assert not AppointmentStatus(
+                state=AppointmentStatus.ATTENDED_NOT_SCREENED
+            ).active
+            assert not AppointmentStatus(
+                state=AppointmentStatus.PARTIALLY_SCREENED
+            ).active
+            assert not AppointmentStatus(state=AppointmentStatus.SCREENED).active

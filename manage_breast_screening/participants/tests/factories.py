@@ -13,6 +13,7 @@ from factory.declarations import (
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
+from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
@@ -95,6 +96,15 @@ class AppointmentStatusFactory(DjangoModelFactory):
         model = models.AppointmentStatus
 
     appointment = None
+    created_by = SubFactory(UserFactory)
+
+    @post_generation
+    def created_at(obj, create, extracted, **kwargs):
+        if not create or not extracted:
+            return
+
+        obj.created_at = extracted
+        obj.save()
 
 
 class AppointmentFactory(DjangoModelFactory):
