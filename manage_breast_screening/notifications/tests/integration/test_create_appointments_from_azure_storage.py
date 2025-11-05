@@ -65,8 +65,8 @@ class TestCreateAppointmentsFromAzureStorage:
         assert appointments[0].nhs_number == 9449305552
         assert appointments[1].nhs_number == 9449306621
 
-        assert appointments[0].extract == test_file_name
-        assert appointments[1].extract == test_file_name
+        assert appointments[0].originating_file == [blob_name]
+        assert appointments[1].originating_file == [blob_name]
 
         assert appointments[0].starts_at == datetime(
             2025, 3, 14, 13, 45, tzinfo=ZONE_INFO
