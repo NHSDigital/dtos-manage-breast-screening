@@ -101,3 +101,7 @@ class TestCreateAppointmentsFromAzureStorage:
         assert booked_then_cancelled.cancelled_at is not None
         assert assessment.created_at < booked_then_cancelled.updated_at
         assert booked_then_cancelled.booked_at < booked_then_cancelled.cancelled_at
+        assert booked_then_cancelled.originating_file == [
+            f"{today_dirname}/{test_file_names[0]}",
+            f"{today_dirname}/{test_file_names[1]}",
+        ]
