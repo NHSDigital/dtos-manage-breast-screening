@@ -37,6 +37,7 @@ AND     msg_fld.status = 'failed'
 LEFT OUTER JOIN notifications_messagestatus msg_sts ON msg_sts.message_id = msg.id
 AND     msg_sts.status = 'failed'
 WHERE   appt.starts_at::date = %s
+AND     cl.bso_code = %s
 AND   (
   msg_fld.nhs_notify_errors @> ANY(ARRAY[
     '[{"code":"CM_INVALID_NHS_NUMBER"}]',

@@ -35,5 +35,6 @@ LEFT OUTER JOIN notifications_channelstatus ltr_sent ON ltr_sent.message_id = ms
 AND    ltr_sent.channel = 'letter'
 AND    ltr_sent.status = 'received'
 WHERE  appt.starts_at > CURRENT_DATE - INTERVAL %s
+AND    cl.bso_code = %s
 GROUP BY appt.starts_at, cl.bso_code, cl.code, cl.name, appt.episode_type
 ORDER BY appt.starts_at DESC

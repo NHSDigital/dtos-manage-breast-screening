@@ -8,6 +8,7 @@ from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
+    ClinicFactory,
     MessageFactory,
     MessageStatusFactory,
 )
@@ -20,7 +21,8 @@ class TestFailuresQuery:
         message_params: dict,
         message_status_params: dict = None,
     ):
-        appt = AppointmentFactory(**appt_params)
+        clinic = ClinicFactory(bso_code="BSO1", code="BSU1")
+        appt = AppointmentFactory(clinic=clinic, **appt_params)
         message_params["sent_at"] = datetime.now(tz=ZONE_INFO) - timedelta(minutes=5)
         message = MessageFactory(appointment=appt, **message_params)
         if message_status_params:
@@ -90,15 +92,22 @@ class TestFailuresQuery:
             {"status": "failed", "description": "No reachable communication channel"},
         )
 
+        clinic = ClinicFactory(bso_code="BSO1", code="BSU1")
+
         appt8 = AppointmentFactory(
-            starts_at=appt_time, nhs_number="9990001119", episode_type="T"
+            clinic=clinic,
+            starts_at=appt_time,
+            nhs_number="9990001119",
+            episode_type="T",
         )
         appt9 = AppointmentFactory(
-            starts_at=appt_time, nhs_number="9990001120", number="2"
+            clinic=clinic, starts_at=appt_time, nhs_number="9990001120", number="2"
         )
         today_formatted = datetime.now(tz=ZONE_INFO).strftime("%Y-%m-%d")
 
-        results = Helper.fetchall("failures", (datetime.now(tz=ZONE_INFO).date(),))
+        results = Helper.fetchall(
+            "failures", [datetime.now(tz=ZONE_INFO).date(), "BSO1"]
+        )
 
         assert len(results) == 7
 
@@ -198,7 +207,7 @@ class TestFailuresQuery:
             {"status": "failed", "description": "Patient has an exit code"},
         )
 
-        results = Helper.fetchall("failures", (the_date.date(),))
+        results = Helper.fetchall("failures", [the_date.date(), "BSO1"])
 
         assert len(results) == 1
         assert list(results[0])[0] == 9990001111
@@ -239,7 +248,9 @@ class TestFailuresQuery:
             {"status": "failed", "description": "No reachable communication channel"},
         )
 
-        results = Helper.fetchall("failures", (datetime.now(tz=ZONE_INFO).date(),))
+        results = Helper.fetchall(
+            "failures", [datetime.now(tz=ZONE_INFO).date(), "BSO1"]
+        )
 
         assert len(results) == 2
 
@@ -248,7 +259,7 @@ class TestFailuresQuery:
         with connection.cursor() as cursor:
             cursor.execute(
                 Helper.sql("failures") + "\nLIMIT 0",
-                (datetime.now(tz=ZONE_INFO).date(),),
+                [datetime.now(tz=ZONE_INFO).date(), "BSO1"],
             )
             columns = [col[0] for col in cursor.description]
 

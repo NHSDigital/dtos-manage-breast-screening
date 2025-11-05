@@ -11,7 +11,9 @@ from .. import models
 class ClinicFactory(DjangoModelFactory):
     class Meta:
         model = models.Clinic
+        django_get_or_create = ("bso_code", "code")
 
+    bso_code = Sequence(lambda n: f"BSO{n}")
     code = Sequence(lambda n: f"BU00{n}")
     name = "BREAST CARE UNIT"
     holding_clinic = False
