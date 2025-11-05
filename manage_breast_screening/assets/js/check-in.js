@@ -80,6 +80,13 @@ export class CheckIn extends Component {
 
     // Hide the check-in form
     this.$root.setAttribute('hidden', '')
+
+    // Emit an event to notify of the change
+    this.$root.dispatchEvent(
+      new CustomEvent('appointment-status-changed', {
+        detail: { status: 'Checked in' }
+      })
+    )
   }
 
   /**

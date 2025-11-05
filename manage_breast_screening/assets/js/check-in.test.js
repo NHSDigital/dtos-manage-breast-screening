@@ -79,6 +79,24 @@ describe('Check in', () => {
     expect(console.error).not.toHaveBeenCalled()
   })
 
+  it('emits a custom event on successful check-in', async () => {
+    const root = document.querySelector(`[data-module="${CheckIn.moduleName}"]`)
+    const dispatchEventSpy = jest.spyOn(root, 'dispatchEvent')
+
+    jest.mocked(fetch).mockResolvedValue(
+      /** @type {Response} */ ({
+        ok: true,
+        status: 200
+      })
+    )
+
+    createAll(CheckIn)
+
+    await user.click(button)
+
+    expect(dispatchEventSpy).toHaveBeenCalledWith(expect.any(CustomEvent))
+  })
+
   it('does not change the DOM if the request fails', async () => {
     jest.mocked(fetch).mockResolvedValue(
       /** @type {Response} */ ({
