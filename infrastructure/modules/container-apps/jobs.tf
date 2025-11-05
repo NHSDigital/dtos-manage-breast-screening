@@ -73,8 +73,7 @@ module "db_setup" {
     ? "python manage.py migrate && python manage.py seed_demo_data --noinput && python manage.py create_personas"
     : "python manage.py migrate"
   ]
-  secret_variables = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
-  docker_image     = var.docker_image
+  docker_image = var.docker_image
   user_assigned_identity_ids = flatten([
     [module.azure_blob_storage_identity.id],
     [module.azure_queue_storage_identity.id],
@@ -83,6 +82,10 @@ module "db_setup" {
   environment_variables = merge(
     local.common_env,
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
+  )
+  secret_variables = merge(
+    { APPLICATIONINSIGHTS_CONNECTION_STRING = var.app_insights_connection_string },
+    var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   )
 
   # alerts
@@ -113,7 +116,6 @@ module "scheduled_jobs" {
     "python manage.py ${each.value.job_container_args}"
   ]
 
-  secret_variables    = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   docker_image        = var.docker_image
   replica_retry_limit = 0
   user_assigned_identity_ids = flatten([
@@ -131,6 +133,10 @@ module "scheduled_jobs" {
     },
     each.value.environment_variables,
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
+  )
+  secret_variables = merge(
+    { APPLICATIONINSIGHTS_CONNECTION_STRING = var.app_insights_connection_string },
+    var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   )
 
   # alerts
