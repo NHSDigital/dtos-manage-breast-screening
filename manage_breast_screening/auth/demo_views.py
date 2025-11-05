@@ -6,12 +6,14 @@ from django.db.models import Case, Q, When
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from manage_breast_screening.core.utils.urls import extract_next_path_from_params
 
 from .models import PERSONAS
 
 
+@csrf_exempt
 @login_not_required
 def persona_login(request):
     users = _get_users(request.user)
