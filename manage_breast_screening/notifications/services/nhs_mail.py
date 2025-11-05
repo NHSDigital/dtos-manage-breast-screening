@@ -85,7 +85,12 @@ class NhsMail:
         return message
 
     def _subject(self, report_type, date, bso="Birmingham (MCR)") -> str:
-        return f"Breast screening digital comms {report_type.replace('_', ' ')} report – {date} – {bso}"
+        default_subject = f"Breast screening digital comms {report_type.replace('_', ' ')} report – {date} – {bso}"
+        environment = os.getenv("DJANGO_ENV", "local")
+        if environment != "prod":
+            return f"[{environment.upper()}] {default_subject}"
+        else:
+            return default_subject
 
     def _body(self, report_type) -> str:
         return render_to_string(f"report_emails/{report_type}.html")

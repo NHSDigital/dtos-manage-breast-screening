@@ -18,6 +18,7 @@ class TestNhsMail:
         monkeypatch.setenv("NOTIFICATIONS_SMTP_USERNAME", "sender@nhsmail.net")
         monkeypatch.setenv("NOTIFICATIONS_SMTP_PASSWORD", "password")
         monkeypatch.setenv("NOTIFICATIONS_SMTP_IS_ENABLED", "True")
+        monkeypatch.setenv("DJANGO_ENV", "test")
 
     @pytest.fixture()
     def mock_smtp_server(self):
@@ -58,7 +59,7 @@ class TestNhsMail:
 
         decoded_subject_line = str(make_header(decode_header(mime_message["Subject"])))
         assert (
-            "Breast screening digital comms invites not sent report – 11-10-2025 – Birmingham (MCR)"
+            "[TEST] Breast screening digital comms invites not sent report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
         assert "Content-Type: text/html" in email_content
@@ -91,7 +92,7 @@ class TestNhsMail:
         decoded_subject_line = str(make_header(decode_header(mime_message["Subject"])))
 
         assert (
-            "Breast screening digital comms aggregate report – 11-10-2025 – Birmingham (MCR)"
+            "[TEST] Breast screening digital comms aggregate report – 11-10-2025 – Birmingham (MCR)"
             in decoded_subject_line
         )
         assert (
@@ -127,3 +128,20 @@ class TestNhsMail:
         mock_smtp_server.starttls.assert_not_called()
         mock_smtp_server.login.assert_not_called()
         mock_smtp_server.sendmail.assert_not_called()
+
+    def test_does_not_add_environment_name_in_production(
+        self, mock_smtp_server, csv_data, monkeypatch
+    ):
+        monkeypatch.setenv("DJANGO_ENV", "prod")
+
+        subject = NhsMail()
+        subject.send_report_email(csv_data, "filename.csv", "invites_not_sent")
+
+        email_content = mock_smtp_server.sendmail.call_args[0][2]
+        mime_message = email.message_from_string(email_content)
+
+        decoded_subject_line = str(make_header(decode_header(mime_message["Subject"])))
+        assert (
+            "Breast screening digital comms invites not sent report – 11-10-2025 – Birmingham (MCR)"
+            in decoded_subject_line
+        )
