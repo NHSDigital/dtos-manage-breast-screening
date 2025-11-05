@@ -50,6 +50,7 @@ class TestAggregateQuery:
         now = datetime.now(tz=ZONE_INFO)
         clinic1 = ClinicFactory(code="BU001", bso_code="BSO1", name="BSU 1")
         clinic2 = ClinicFactory(code="BU002", bso_code="BSO2", name="BSU 2")
+        clinic3 = ClinicFactory(code="BU003", bso_code="BSO2", name="BSU 3")
 
         date1 = now - timedelta(days=10)
         df1 = date1.strftime("%Y-%m-%d")
@@ -72,64 +73,75 @@ class TestAggregateQuery:
 
         test_data = [
             # Date 1
-            # BU000, R, 1, 0, 0, 0, 1
+            # BU001, R, 1, 0, 0, 0, 1
             [date1, clinic1, "R", "failed", failed],
-            # BU000, S, 2, 1, 1, 0, 0
+            # BU001, S, 2, 1, 1, 0, 0
             [date1, clinic1, "S", "delivered", nhsapp_read],
             [date1, clinic1, "S", "delivered", sms_delivered],
-            # BU001, F, 3, 2, 1, 0, 0
+            # BU002, F, 3, 2, 1, 0, 0
             [date1, clinic2, "F", "delivered", nhsapp_read],
             [date1, clinic2, "F", "delivered", nhsapp_read],
             [date1, clinic2, "F", "delivered", sms_delivered],
-            # BU001, S, 1, 1, 0, 0, 0
+            # BU002, S, 1, 1, 0, 0, 0
             [date1, clinic2, "S", "delivered", nhsapp_read],
             # Date 2
-            # BU000, F, 1, 0, 0, 0, 1
+            # BU001, F, 1, 0, 0, 0, 1
             [date2, clinic1, "F", "failed", failed],
-            # BU000, R, 2, 0, 0, 2, 0
+            # BU001, R, 2, 0, 0, 2, 0
             [date2, clinic1, "R", "delivered", letter_sent],
             [date2, clinic1, "R", "delivered", letter_sent],
-            # BU001, F, 5, 5, 0, 0, 0
+            # BU002, F, 2, 2, 0, 0, 0
             [date2, clinic2, "F", "delivered", nhsapp_read],
             [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
-            [date2, clinic2, "F", "delivered", nhsapp_read],
+            # BU003, F, 3, 3, 0, 0, 0
+            [date2, clinic3, "F", "delivered", nhsapp_read],
+            [date2, clinic3, "F", "delivered", nhsapp_read],
+            [date2, clinic3, "F", "delivered", nhsapp_read],
         ]
 
-        expectations = [
-            [df1, "BSO1", "BU001", "BSU 1", "Routine recall", 1, 0, 0, 0, 1],
-            [df1, "BSO1", "BU001", "BSU 1", "Self referral", 2, 1, 1, 0, 0],
-            [df1, "BSO2", "BU002", "BSU 2", "Routine first call", 3, 2, 1, 0, 0],
-            [df1, "BSO2", "BU002", "BSU 2", "Self referral", 1, 1, 0, 0, 0],
-            [df2, "BSO1", "BU001", "BSU 1", "Routine first call", 1, 0, 0, 0, 1],
-            [df2, "BSO1", "BU001", "BSU 1", "Routine recall", 2, 0, 0, 2, 0],
-            [df2, "BSO2", "BU002", "BSU 2", "Routine first call", 5, 5, 0, 0, 0],
-        ]
+        expectations = {
+            "BSO1": [
+                [df1, "BSO1", "BU001", "BSU 1", "Routine recall", 1, 0, 0, 0, 1],
+                [df1, "BSO1", "BU001", "BSU 1", "Self referral", 2, 1, 1, 0, 0],
+                [df2, "BSO1", "BU001", "BSU 1", "Routine first call", 1, 0, 0, 0, 1],
+                [df2, "BSO1", "BU001", "BSU 1", "Routine recall", 2, 0, 0, 2, 0],
+            ],
+            "BSO2": [
+                [df1, "BSO2", "BU002", "BSU 2", "Routine first call", 3, 2, 1, 0, 0],
+                [df1, "BSO2", "BU002", "BSU 2", "Self referral", 1, 1, 0, 0, 0],
+                [df2, "BSO2", "BU002", "BSU 2", "Routine first call", 2, 2, 0, 0, 0],
+                [df2, "BSO2", "BU003", "BSU 3", "Routine first call", 3, 3, 0, 0, 0],
+            ],
+        }
 
         for d in test_data:
             self.create_appointment_set(*d)
 
-        results = Helper.fetchall("aggregate", ("1 month",))
+        for bso_code, expectation in expectations.items():
+            results = Helper.fetchall("aggregate", ["1 month", bso_code])
 
-        for idx, res in enumerate(results):
-            assert expectations[idx] == list(res)
+            for idx, res in enumerate(results):
+                assert expectation[idx] == list(res)
 
     def test_aggregate_uses_date_range(self):
         over_a_week_ago = datetime.now(tz=ZONE_INFO) - timedelta(days=9)
         yesterday = datetime.now(tz=ZONE_INFO) - timedelta(days=1)
         self.create_appointment_set(
             over_a_week_ago,
-            ClinicFactory(),
+            ClinicFactory(bso_code="BSO1"),
             "F",
             "delivered",
             {"nhsapp": "read"},
         )
         self.create_appointment_set(
-            yesterday, ClinicFactory(), "F", "delivered", {"nhsapp": "read"}
+            yesterday,
+            ClinicFactory(bso_code="BSO1"),
+            "F",
+            "delivered",
+            {"nhsapp": "read"},
         )
 
-        results = Helper.fetchall("aggregate", ("1 week",))
+        results = Helper.fetchall("aggregate", ["1 week", "BSO1"])
 
         assert len(results) == 1
 
@@ -158,7 +170,7 @@ class TestAggregateQuery:
             status_updated_at=(message_sent_at + timedelta(days=4)),
         )
 
-        results = Helper.fetchall("aggregate", ("1 month",))
+        results = Helper.fetchall("aggregate", ["1 month", "BSO6"])
 
         assert list(results[0]) == [
             appt_date.strftime("%Y-%m-%d"),
@@ -182,7 +194,7 @@ class TestAggregateQuery:
             status_updated_at=(message_sent_at + timedelta(days=5)),
         )
 
-        results = Helper.fetchall("aggregate", ("1 month",))
+        results = Helper.fetchall("aggregate", ["1 month", "BSO6"])
 
         assert list(results[0]) == [
             appt_date.strftime("%Y-%m-%d"),
@@ -200,7 +212,7 @@ class TestAggregateQuery:
     @pytest.mark.django_db
     def test_aggregate_columns(self):
         with connection.cursor() as cursor:
-            cursor.execute(Helper.sql("aggregate") + "\nLIMIT 0", ("1 month",))
+            cursor.execute(Helper.sql("aggregate") + "\nLIMIT 0", ["1 month", "ANY"])
             columns = [col[0] for col in cursor.description]
 
         assert columns == [
