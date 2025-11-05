@@ -4,11 +4,9 @@ Helpers to handle conditionally required fields
 
 from dataclasses import dataclass
 from typing import Any
-from urllib.parse import urlencode
 
 from django.forms import Form, ValidationError
 from django.forms.widgets import MultiWidget
-from django.http import QueryDict
 
 
 @dataclass
@@ -169,7 +167,8 @@ class FormWithConditionalFields(Form):
                 else:
                     self.data.pop(field_name, None)
 
-                self.data = QueryDict(urlencode(self.data), mutable=False)
+                if hasattr(self.data, "_mutable"):
+                    self.data._mutable = False
 
         super().full_clean()
 
