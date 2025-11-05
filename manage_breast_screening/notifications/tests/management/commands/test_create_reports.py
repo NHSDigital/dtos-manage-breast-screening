@@ -57,64 +57,63 @@ class TestCreateReports:
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
             Command().handle()
 
-        mock_read_sql = md[0]
+        mock_read_sql, mock_blob_storage, mock_email_service = md
 
-        mock_read_sql.assert_any_call(
-            Helper.sql("aggregate"), connection, params=("3 months",)
-        )
-        mock_read_sql.assert_any_call(
-            Helper.sql("failures"), connection, params=(now.date(),)
-        )
-        mock_read_sql.assert_any_call(
-            Helper.sql("reconciliation"), connection, params=(now.date(), "MBD")
-        )
+        assert mock_read_sql.call_count == 6
+        assert mock_blob_storage.add.call_count == 6
+        assert mock_email_service.send_report_email.call_count == 6
 
-        aggregate_filename = now.strftime("%Y-%m-%dT%H:%M:%S-aggregate-report.csv")
-        failures_filename = now.strftime(
-            "%Y-%m-%dT%H:%M:%S-invites-not-sent-report.csv"
-        )
-        reconciliation_filename = now.strftime(
-            "%Y-%m-%dT%H:%M:%S-reconciliation-report.csv"
-        )
+        for bso_code in Command.BSO_CODES:
+            mock_read_sql.assert_any_call(
+                Helper.sql("aggregate"), connection, params=["3 months", bso_code]
+            )
+            mock_read_sql.assert_any_call(
+                Helper.sql("failures"), connection, params=[now.date(), bso_code]
+            )
+            mock_read_sql.assert_any_call(
+                Helper.sql("reconciliation"), connection, params=[now.date(), bso_code]
+            )
 
-        mock_blob_storage = md[1]
-        assert mock_blob_storage.add.call_count == 3
-        mock_blob_storage.add.assert_any_call(
-            aggregate_filename,
-            csv_data,
-            content_type="text/csv",
-            container_name="reports",
-        )
-        mock_blob_storage.add.assert_any_call(
-            failures_filename,
-            csv_data,
-            content_type="text/csv",
-            container_name="reports",
-        )
-        mock_blob_storage.add.assert_any_call(
-            reconciliation_filename,
-            csv_data,
-            content_type="text/csv",
-            container_name="reports",
-        )
+            aggregate_filename = (
+                f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-aggregate-report.csv"
+            )
+            failures_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-invites-not-sent-report.csv"
+            reconciliation_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-reconciliation-report.csv"
 
-        mock_email_service = md[2]
-        assert mock_email_service.send_report_email.call_count == 3
-        mock_email_service.send_report_email.assert_any_call(
-            attachment_data=csv_data,
-            attachment_filename=aggregate_filename,
-            report_type="aggregate",
-        )
-        mock_email_service.send_report_email.assert_any_call(
-            attachment_data=csv_data,
-            attachment_filename=failures_filename,
-            report_type="invites_not_sent",
-        )
-        mock_email_service.send_report_email.assert_any_call(
-            attachment_data=csv_data,
-            attachment_filename=reconciliation_filename,
-            report_type="reconciliation",
-        )
+            mock_blob_storage.add.assert_any_call(
+                aggregate_filename,
+                csv_data,
+                content_type="text/csv",
+                container_name="reports",
+            )
+            mock_blob_storage.add.assert_any_call(
+                failures_filename,
+                csv_data,
+                content_type="text/csv",
+                container_name="reports",
+            )
+            mock_blob_storage.add.assert_any_call(
+                reconciliation_filename,
+                csv_data,
+                content_type="text/csv",
+                container_name="reports",
+            )
+
+            mock_email_service.send_report_email.assert_any_call(
+                attachment_data=csv_data,
+                attachment_filename=aggregate_filename,
+                report_type="aggregate",
+            )
+            mock_email_service.send_report_email.assert_any_call(
+                attachment_data=csv_data,
+                attachment_filename=failures_filename,
+                report_type="invites_not_sent",
+            )
+            mock_email_service.send_report_email.assert_any_call(
+                attachment_data=csv_data,
+                attachment_filename=reconciliation_filename,
+                report_type="reconciliation",
+            )
 
     def test_handle_raises_command_error(self, mock_insights_logger):
         with patch(

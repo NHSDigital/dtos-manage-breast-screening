@@ -31,41 +31,44 @@ class Command(BaseCommand):
     Reports are stored in Azure Blob storage.
     """
 
+    SMOKE_TEST_BSO_CODE = "SM0K3"
+    BSO_CODES = ["MBD", SMOKE_TEST_BSO_CODE]
+
     REPORTS = [
-        ["aggregate", ("3 months",), "aggregate"],
-        ["failures", (datetime.now(tz=ZONE_INFO).date(),), "invites_not_sent"],
-        [
-            "reconciliation",
-            (datetime.now(tz=ZONE_INFO).date(), "MBD"),
-            "reconciliation",
-        ],
+        ["aggregate", ["3 months"], None],
+        ["failures", [datetime.now(tz=ZONE_INFO).date()], "invites_not_sent"],
+        ["reconciliation", [datetime.now(tz=ZONE_INFO).date()], None],
     ]
 
     def handle(self, *args, **options):
         with exception_handler(INSIGHTS_ERROR_NAME):
             logger.info("Create Report Command started")
-            for sqlfile, params, report_type in self.REPORTS:
-                dataframe = pandas.read_sql(
-                    Helper.sql(sqlfile), connection, params=params
-                )
+            for bso_code in self.BSO_CODES:
+                for filename, params, report_type in self.REPORTS:
+                    dataframe = pandas.read_sql(
+                        Helper.sql(filename), connection, params=(params + [bso_code])
+                    )
 
-                csv = dataframe.to_csv(index=False)
+                    csv = dataframe.to_csv(index=False)
 
-                BlobStorage().add(
-                    self.filename(report_type),
-                    csv,
-                    content_type="text/csv",
-                    container_name=os.getenv("REPORTS_CONTAINER_NAME"),
-                )
+                    if not report_type:
+                        report_type = filename
 
-                NhsMail().send_report_email(
-                    attachment_data=csv,
-                    attachment_filename=self.filename(report_type),
-                    report_type=report_type,
-                )
+                    BlobStorage().add(
+                        self.filename(bso_code, report_type),
+                        csv,
+                        content_type="text/csv",
+                        container_name=os.getenv("REPORTS_CONTAINER_NAME"),
+                    )
 
-                logger.info("Report %s created", report_type)
+                    NhsMail().send_report_email(
+                        attachment_data=csv,
+                        attachment_filename=self.filename(bso_code, report_type),
+                        report_type=report_type,
+                    )
 
-    def filename(self, report_type: str) -> str:
+                    logger.info("Report %s created", report_type)
+
+    def filename(self, bso_code: str, report_type: str) -> str:
         formatted_time = datetime.today().strftime("%Y-%m-%dT%H:%M:%S")
-        return f"{formatted_time}-{report_type.replace('_', '-')}-report.csv"
+        return f"{formatted_time}-{bso_code}-{report_type.replace('_', '-')}-report.csv"
