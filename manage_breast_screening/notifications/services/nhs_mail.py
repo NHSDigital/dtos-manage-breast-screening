@@ -8,6 +8,8 @@ from smtplib import SMTP
 
 from django.template.loader import render_to_string
 
+from manage_breast_screening.config.settings import boolean_env
+
 logger = getLogger(__name__)
 
 SMTP_SERVER = "smtp.office365.com"
@@ -32,6 +34,16 @@ class NhsMail:
             attachment_data, attachment_filename, report_type
         )
 
+        logger.info(
+            f"Email for report type {report_type} created with attachment {attachment_filename}"
+        )
+
+        if boolean_env("NOTIFICATIONS_SMTP_IS_ENABLED", False):
+            self._send_via_smtp(email)
+        else:
+            logger.info("SMTP connection is not enabled")
+
+    def _send_via_smtp(self, email):
         try:
             with SMTP(SMTP_SERVER, SMTP_PORT) as server:
                 server.ehlo()

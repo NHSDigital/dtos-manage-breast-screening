@@ -17,6 +17,7 @@ class TestNhsMail:
         monkeypatch.setenv("NOTIFICATIONS_SMTP_RECIPIENTS", "recipient@nhsmail.net")
         monkeypatch.setenv("NOTIFICATIONS_SMTP_USERNAME", "sender@nhsmail.net")
         monkeypatch.setenv("NOTIFICATIONS_SMTP_PASSWORD", "password")
+        monkeypatch.setenv("NOTIFICATIONS_SMTP_IS_ENABLED", "True")
 
     @pytest.fixture()
     def mock_smtp_server(self):
@@ -113,3 +114,16 @@ class TestNhsMail:
         with pytest.raises(smtplib.SMTPException):
             subject = NhsMail()
             subject.send_report_email(csv_data, "filename.csv")
+
+    def test_does_not_send_email_if_disabled(
+        self, mock_smtp_server, csv_data, monkeypatch
+    ):
+        monkeypatch.setenv("NOTIFICATIONS_SMTP_IS_ENABLED", "False")
+
+        subject = NhsMail()
+        subject.send_report_email(csv_data, "filename.csv", "invites_not_sent")
+
+        mock_smtp_server.ehlo.assert_not_called()
+        mock_smtp_server.starttls.assert_not_called()
+        mock_smtp_server.login.assert_not_called()
+        mock_smtp_server.sendmail.assert_not_called()
