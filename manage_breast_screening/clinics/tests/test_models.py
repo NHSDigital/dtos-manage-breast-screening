@@ -26,7 +26,7 @@ def test_clinic_current_status():
 
 @pytest.mark.django_db
 @time_machine.travel(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
-def test_status_filtering():
+def test_date_filtering():
     current = ClinicFactory.create(starts_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc))
     future = ClinicFactory.create(starts_at=datetime(2025, 1, 2, 9, tzinfo=tz.utc))
     past = ClinicFactory.create(starts_at=datetime(2024, 1, 1, 9, tzinfo=tz.utc))
@@ -36,7 +36,55 @@ def test_status_filtering():
     )
     assertQuerySetEqual(models.Clinic.objects.today(), {current}, ordered=False)
     assertQuerySetEqual(models.Clinic.objects.upcoming(), {future}, ordered=False)
-    assertQuerySetEqual(models.Clinic.objects.completed(), {past}, ordered=False)
+
+
+@pytest.mark.django_db
+@time_machine.travel(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
+def test_completed_filtering_by_date_and_status():
+    past_closed = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 31, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 31, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+
+    past_cancelled = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 30, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 30, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CANCELLED,
+    )
+
+    # Past clinic with SCHEDULED status - should be excluded
+    ClinicFactory.create(
+        starts_at=datetime(2024, 12, 29, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 29, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.SCHEDULED,
+    )
+    completed = models.Clinic.objects.completed()
+
+    assertQuerySetEqual(completed, [past_closed, past_cancelled], ordered=False)
+
+
+@pytest.mark.django_db
+@time_machine.travel(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
+def test_completed_ordering_by_ends_at():
+    clinic1 = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 31, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 31, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+    clinic2 = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 30, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 30, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+    clinic3 = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 29, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 29, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+
+    completed = models.Clinic.objects.completed()
+    assertQuerySetEqual(completed, [clinic1, clinic2, clinic3])
 
 
 class TestUserAssignment:

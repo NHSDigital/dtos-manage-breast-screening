@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import OuterRef, Subquery
 
 from ..auth.models import Role
 from ..core.models import BaseModel
@@ -76,10 +77,22 @@ class ClinicQuerySet(models.QuerySet):
 
     def completed(self):
         """
-        Clinics that started in the past
-        (note: we may want to also consider the clinic state when splitting things out by date)
+        Completed clinics that started in the past
         """
-        return self.filter(starts_at__date__lt=date.today())
+        from .models import ClinicStatus
+
+        latest_status = (
+            ClinicStatus.objects.filter(clinic=OuterRef("pk"))
+            .order_by("-created_at")
+            .values("state")[:1]
+        )
+
+        return (
+            self.filter(starts_at__date__lt=date.today())
+            .annotate(latest_status=Subquery(latest_status))
+            .filter(latest_status__in=["CLOSED", "CANCELLED"])
+            .order_by("-ends_at")
+        )
 
     def with_statuses(self):
         return self.prefetch_related("statuses")
