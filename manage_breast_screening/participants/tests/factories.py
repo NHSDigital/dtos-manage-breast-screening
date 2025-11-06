@@ -179,6 +179,19 @@ class ImplantedMedicalDeviceHistoryItemFactory(DjangoModelFactory):
     device = Iterator(ImplantedMedicalDeviceHistoryItem.Device)
 
 
+class BreastAugmentationHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.BreastAugmentationHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    right_breast_procedures = [
+        models.BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+    ]
+    left_breast_procedures = [
+        models.BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+    ]
+
+
 class SymptomFactory(DjangoModelFactory):
     class Meta:
         model = models.Symptom

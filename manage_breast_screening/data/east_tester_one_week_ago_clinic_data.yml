@@ -127,6 +127,13 @@ clinic:
                 - 237 Clinic Road
                 - Birmingham
               postcode: M3 9C6
+
+        medical_information:
+          breast_augmentation_history_items:
+            - right_breast_procedures:
+                - OTHER_AUGMENTATION
+            - left_breast_procedures:
+                - NO_PROCEDURES
     - id: 848c9ecf-94af-45f7-b072-29ba1f82d24b
       duration_in_minutes: 8
       starts_at_time: 09:32
