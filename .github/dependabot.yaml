@@ -42,6 +42,7 @@ updates:
       lint:
         patterns:
           - '@typescript-eslint/*'
+          - '@eslint/*'
           - 'eslint'
           - 'eslint-*'
           - 'prettier'
@@ -70,7 +71,7 @@ updates:
     groups:
       infra:
         patterns:
-          - azure-identity
+          - azure-*
           - gunicorn
           - psycopg
 
