@@ -1,0 +1,12 @@
+{% if start_appointment_url is undefined %}
+  {{ raise('start_appointment_url is required') }}
+{% endif %}
+
+<div data-module="app-start-appointment" data-appointment-id="{{ presented_appointment.pk }}" {% if presented_appointment.can_be_checked_in or not presented_appointment.can_be_started_by(user) %}hidden{% endif %}>
+  <form action="{{ start_appointment_url }}" method="post" novalidate>
+    <p>
+      <button class="app-button app-button--link">Start appointment<span class="nhsuk-u-visually-hidden"> {{ presented_appointment.participant.full_name }}</span></button>
+    </p>
+    {{ csrf_input }}
+  </form>
+</div>

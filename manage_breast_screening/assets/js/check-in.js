@@ -51,7 +51,11 @@ export class CheckIn extends Component {
 
   updateStatus() {
     const $statusContainer = document.querySelector(
-      `[data-event-status-container="${this.appointmentId}"]`
+      `[data-appointment-status-container="${this.appointmentId}"]`
+    )
+
+    const $startAppointmentContainer = document.querySelector(
+      `[data-appointment-id="${this.appointmentId}"][data-module="app-start-appointment"]`
     )
 
     if (!$statusContainer) {
@@ -80,6 +84,9 @@ export class CheckIn extends Component {
 
     // Hide the check-in form
     this.$root.setAttribute('hidden', '')
+    if ($startAppointmentContainer) {
+      $startAppointmentContainer.removeAttribute('hidden')
+    }
   }
 
   /**

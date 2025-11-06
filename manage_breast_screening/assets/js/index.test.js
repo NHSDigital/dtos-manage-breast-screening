@@ -8,7 +8,7 @@ describe('Automatic initialisation', () => {
     jest.spyOn(CheckIn, 'checkSupport')
 
     document.body.innerHTML = outdent`
-      <div data-module="${CheckIn.moduleName}">
+      <div data-module="${CheckIn.moduleName}" data-appointment-id="123">
         <form method="post" action="/example" novalidate></form>
       </div>
     `
