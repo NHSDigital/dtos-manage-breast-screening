@@ -1,5 +1,8 @@
 from django.urls import reverse
 
+from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_presenter import (
+    BreastCancerHistoryItemPresenter,
+)
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
@@ -11,11 +14,14 @@ from .appointment_presenters import AppointmentPresenter
 class MedicalInformationPresenter:
     def __init__(self, appointment):
         self.appointment = AppointmentPresenter(appointment)
-
         symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
             "symptom_type__name", "reported_at"
         )
         self.symptoms = [SymptomPresenter(symptom) for symptom in symptoms]
+        self.breast_cancer_history = [
+            BreastCancerHistoryItemPresenter(item)
+            for item in appointment.breast_cancer_history_items.all()
+        ]
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms
         }

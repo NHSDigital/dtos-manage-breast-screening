@@ -33,8 +33,10 @@
 {% endcall %}
 
 {% set medical_history_card_html %}
-  {% set breast_cancer_history_link %}
-  <a class="nhsuk-link" href="#">Enter breast cancer history</a>
+  {% set breast_cancer_history_html %}
+    {% for presented_item in presenter.breast_cancer_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
   {% endset %}
   {% set non_cancerous_lump_diagnosis_link %}
   <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
@@ -49,7 +51,7 @@
          "text": "Breast cancer history"
        },
        "value": {
-         "html": breast_cancer_history_link
+         "html": breast_cancer_history_html
        },
        "actions": {
           "items": []

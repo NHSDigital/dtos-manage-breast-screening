@@ -48,7 +48,11 @@ class BreastCancerHistoryItem(BaseModel):
         MULTIPLE_LOCATIONS = "MULTIPLE_LOCATIONS", "In multiple locations"
         EXACT_LOCATION_UNKNOWN = "EXACT_LOCATION_UNKNOWN", "Exact location unknown"
 
-    appointment = models.ForeignKey(Appointment, on_delete=models.PROTECT)
+    appointment = models.ForeignKey(
+        Appointment,
+        on_delete=models.PROTECT,
+        related_name="breast_cancer_history_items",
+    )
     diagnosis_location = models.CharField(choices=DiagnosisLocationChoices)
     diagnosis_year = models.IntegerField(null=True)
     left_breast_procedure = models.CharField(choices=Procedure)
