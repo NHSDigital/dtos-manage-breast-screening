@@ -5,6 +5,12 @@ from azure.identity import ManagedIdentityCredential
 from azure.storage.queue import QueueClient, QueueMessage
 
 
+class QueueConfigurationError(Exception):
+    """Raised when queue is not properly configured"""
+
+    pass
+
+
 class Queue:
     def __init__(self, queue_name):
         storage_account_name = os.getenv("STORAGE_ACCOUNT_NAME")
@@ -26,8 +32,15 @@ class Queue:
                 self.client.create_queue()
             except ResourceExistsError:
                 pass
+        else:
+            raise QueueConfigurationError(
+                "Queue not configured: Either QUEUE_STORAGE_CONNECTION_STRING or "
+                "(STORAGE_ACCOUNT_NAME and QUEUE_MI_CLIENT_ID) must be set"
+            )
 
     def add(self, message: str):
+        if not hasattr(self, "client") or self.client is None:
+            raise QueueConfigurationError("Queue client not initialized")
         self.client.send_message(message)
 
     def delete(self, message: str | QueueMessage):

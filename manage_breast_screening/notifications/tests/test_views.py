@@ -7,6 +7,7 @@ import pytest
 from django.http import JsonResponse
 from django.test import RequestFactory
 
+from manage_breast_screening.notifications.services.queue import QueueConfigurationError
 from manage_breast_screening.notifications.views import create_message_status
 
 
@@ -72,3 +73,48 @@ def test_create_message_status_with_invalid_request(mock_insights_logger):
     mock_insights_logger.assert_called_once_with(
         "Request validation failed: Signature does not match"
     )
+
+
+def test_create_message_status_with_queue_configuration_error(mock_insights_logger):
+    body = {"some": "data"}
+
+    signature = hmac.new(
+        bytes("application_id.api_key", "ASCII"),
+        msg=bytes(json.dumps(body), "ASCII"),
+        digestmod=hashlib.sha256,
+    ).hexdigest()
+
+    headers = {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "X-Api-Key": "api_key",
+        "X-HMAC-sha256-signature": signature,
+    }
+
+    req = RequestFactory().post(
+        "/notifications/message-status/create",
+        body,
+        content_type="application/json",
+        headers=headers,
+    )
+
+    with patch(
+        "manage_breast_screening.notifications.views.Queue.MessageStatusUpdates"
+    ) as mock_queue:
+        mock_queue.side_effect = QueueConfigurationError("Queue not configured")
+
+        response = create_message_status(req)
+        expected_response = JsonResponse(
+            {
+                "error": {
+                    "message": "Queue service not configured. Check QUEUE_STORAGE_CONNECTION_STRING or STORAGE_ACCOUNT_NAME/QUEUE_MI_CLIENT_ID environment variables."
+                }
+            },
+            status=500,
+        )
+
+        assert response.status_code == expected_response.status_code
+        assert response.content.decode() == expected_response.content.decode()
+
+        mock_insights_logger.assert_called_once()
+        assert "Queue configuration error" in str(mock_insights_logger.call_args)

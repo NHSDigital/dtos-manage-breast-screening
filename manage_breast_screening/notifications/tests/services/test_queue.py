@@ -2,7 +2,10 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from manage_breast_screening.notifications.services.queue import Queue
+from manage_breast_screening.notifications.services.queue import (
+    Queue,
+    QueueConfigurationError,
+)
 
 
 class TestQueue:
@@ -135,3 +138,15 @@ class TestQueue:
             queue_client.from_connection_string.assert_called_once_with(
                 "qqq111", "retries"
             )
+
+    def test_queue_raises_configuration_error_when_no_config_provided(
+        self, monkeypatch
+    ):
+        monkeypatch.delenv("QUEUE_STORAGE_CONNECTION_STRING", raising=False)
+        monkeypatch.delenv("STORAGE_ACCOUNT_NAME", raising=False)
+        monkeypatch.delenv("QUEUE_MI_CLIENT_ID", raising=False)
+
+        with pytest.raises(QueueConfigurationError) as exc_info:
+            Queue("test-queue")
+
+        assert "Queue not configured" in str(exc_info.value)
