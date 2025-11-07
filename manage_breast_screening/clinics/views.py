@@ -28,7 +28,7 @@ def clinic(request, pk, filter="remaining"):
     presented_clinic = ClinicPresenter(clinic)
     appointments = (
         clinic.appointments.for_filter(filter)
-        .prefetch_related("statuses")
+        .eager_load_current_status()
         .select_related("clinic_slot__clinic", "screening_episode__participant")
         .order_by_starts_at()
     )

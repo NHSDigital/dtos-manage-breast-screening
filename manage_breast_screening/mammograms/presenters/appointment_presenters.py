@@ -102,6 +102,17 @@ class AppointmentPresenter:
             "is_screened": current_status.state == AppointmentStatus.SCREENED,
         }
 
+    @cached_property
+    def status_attribution(self):
+        if self._appointment.current_status.is_in_progress():
+            return (
+                "with " + self._appointment.current_status.created_by.get_short_name()
+            )
+        elif self._appointment.current_status.is_final_state():
+            return "by " + self._appointment.current_status.created_by.get_short_name()
+        else:
+            return None
+
 
 class ClinicSlotPresenter:
     def __init__(self, clinic_slot):
