@@ -59,9 +59,9 @@ class TestCreateReports:
 
         mock_read_sql, mock_blob_storage, mock_email_service = md
 
-        assert mock_read_sql.call_count == 6
-        assert mock_blob_storage.add.call_count == 6
-        assert mock_email_service.send_report_email.call_count == 6
+        assert mock_read_sql.call_count == 3
+        assert mock_blob_storage.add.call_count == 3
+        assert mock_email_service.send_report_email.call_count == 3
 
         for bso_code in Command.BSO_CODES:
             mock_read_sql.assert_any_call(
@@ -139,3 +139,23 @@ class TestCreateReports:
                 mock_insights_logger.assert_called_with(
                     f"CreateReportsError: {an_exception}"
                 )
+
+    @pytest.mark.django_db
+    def test_smoke_test_argument_uses_correct_configuration(
+        self, dataframe, csv_data, now
+    ):
+        with self.mocked_dependencies(dataframe, csv_data, now) as md:
+            Command().handle(**{"smoke-test": True})
+
+        mock_read_sql, mock_blob_storage, mock_email_service = md
+
+        mock_read_sql.assert_called_once_with(
+            Helper.sql("reconciliation"), connection, params=[now.date(), "SM0K3"]
+        )
+        mock_blob_storage.add.assert_called_once_with(
+            "SM0K3-reconciliation-report.csv",
+            csv_data,
+            content_type="text/csv",
+            container_name="reports",
+        )
+        mock_email_service.assert_not_called()

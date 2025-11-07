@@ -17,6 +17,9 @@ describe('Check in', () => {
   let checkInContainer
 
   /** @type {HTMLDivElement} */
+  let startAppointmentContainer
+
+  /** @type {HTMLDivElement} */
   let statusContainer
 
   /** @type {HTMLSpanElement} */
@@ -31,7 +34,7 @@ describe('Check in', () => {
         <tbody>
           <tr>
             <td>
-              <div data-event-status-container="123">
+              <div data-appointment-status-container="123">
                 <span data-hide-on-check-in>Confirmed</span>
                 <span data-show-on-check-in hidden>Checked in</span>
               </div>
@@ -42,6 +45,13 @@ describe('Check in', () => {
                   <button>Check in</button>
                 </form>
               </div>
+              <div data-module="app-start-appointment" data-appointment-id="123" hidden>
+                <form action="/example" method="post" novalidate>
+                  <p>
+                    <button class="app-button app-button--link">Start appointment</button>
+                  </p>
+                </form>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -49,8 +59,11 @@ describe('Check in', () => {
     `
 
     checkInContainer = document.querySelector('[data-module="app-check-in"]')
+    startAppointmentContainer = document.querySelector(
+      '[data-module="app-start-appointment"]'
+    )
     statusContainer = document.querySelector(
-      '[data-event-status-container="123"]'
+      '[data-appointment-status-container="123"]'
     )
     form = checkInContainer.querySelector('form')
     button = getByRole(form, 'button', { name: 'Check in' })
@@ -77,6 +90,23 @@ describe('Check in', () => {
     expect(currentStatus).toHaveAttribute('hidden')
     expect(checkedInStatus).not.toHaveAttribute('hidden')
     expect(console.error).not.toHaveBeenCalled()
+  })
+
+  it('displays start-appointment', async () => {
+    jest.mocked(fetch).mockResolvedValue(
+      /** @type {Response} */ ({
+        ok: true,
+        status: 200
+      })
+    )
+
+    createAll(CheckIn)
+
+    expect(startAppointmentContainer).toHaveAttribute('hidden')
+
+    await user.click(button)
+
+    expect(startAppointmentContainer).not.toHaveAttribute('hidden')
   })
 
   it('does not change the DOM if the request fails', async () => {

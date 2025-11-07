@@ -32,7 +32,7 @@ class Command(BaseCommand):
     """
 
     SMOKE_TEST_BSO_CODE = "SM0K3"
-    BSO_CODES = ["MBD", SMOKE_TEST_BSO_CODE]
+    BSO_CODES = ["MBD"]
 
     REPORTS = [
         ["aggregate", ["3 months"], None],
@@ -40,11 +40,17 @@ class Command(BaseCommand):
         ["reconciliation", [datetime.now(tz=ZONE_INFO).date()], None],
     ]
 
+    def add_arguments(self, parser):
+        parser.add_argument("--smoke-test", action="store_true")
+
     def handle(self, *args, **options):
         with exception_handler(INSIGHTS_ERROR_NAME):
             logger.info("Create Report Command started")
-            for bso_code in self.BSO_CODES:
-                for filename, params, report_type in self.REPORTS:
+
+            bso_codes, report_configs = self.configuration(options)
+
+            for bso_code in bso_codes:
+                for filename, params, report_type in report_configs:
                     dataframe = pandas.read_sql(
                         Helper.sql(filename), connection, params=(params + [bso_code])
                     )
@@ -60,15 +66,28 @@ class Command(BaseCommand):
                         content_type="text/csv",
                         container_name=os.getenv("REPORTS_CONTAINER_NAME"),
                     )
-
-                    NhsMail().send_report_email(
-                        attachment_data=csv,
-                        attachment_filename=self.filename(bso_code, report_type),
-                        report_type=report_type,
-                    )
+                    if not options.get("smoke-test", False):
+                        NhsMail().send_report_email(
+                            attachment_data=csv,
+                            attachment_filename=self.filename(bso_code, report_type),
+                            report_type=report_type,
+                        )
 
                     logger.info("Report %s created", report_type)
 
+    def configuration(self, options: dict) -> list[list]:
+        if options.get("smoke-test", False):
+            reconciliation_report_config = self.REPORTS[2]
+            bso_codes = [self.SMOKE_TEST_BSO_CODE]
+            report_configs = [reconciliation_report_config]
+        else:
+            bso_codes = self.BSO_CODES
+            report_configs = self.REPORTS
+
+        return bso_codes, report_configs
+
     def filename(self, bso_code: str, report_type: str) -> str:
-        formatted_time = datetime.today().strftime("%Y-%m-%dT%H:%M:%S")
-        return f"{formatted_time}-{bso_code}-{report_type.replace('_', '-')}-report.csv"
+        name = f"{bso_code}-{report_type.replace('_', '-')}-report.csv"
+        if bso_code != self.SMOKE_TEST_BSO_CODE:
+            name = f"{datetime.today().strftime('%Y-%m-%dT%H:%M:%S')}-{name}"
+        return name
