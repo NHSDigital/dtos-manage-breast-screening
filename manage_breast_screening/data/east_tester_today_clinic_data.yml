@@ -42,6 +42,13 @@ clinic:
               systemic_treatments: NO_SYSTEMIC_TREATMENTS
               intervention_location: NHS_HOSPITAL
               intervention_location_details: East Tester Hospital
+          implanted_medical_device_history_items:
+            - id: b19a4300-82ea-4f14-8bba-cb70b4f83008
+              device: OTHER_MEDICAL_DEVICE
+              other_medical_device_details: Lorem ipsum dolor sit amet
+              procedure_year: 2005
+              removal_year: 2010
+              additional_details: Recalled device, removed in 2010
     - id: aa1b4c5c-3742-4f97-aa68-04a6f3bd631b
       duration_in_minutes: 8
       starts_at_time: 09:08
