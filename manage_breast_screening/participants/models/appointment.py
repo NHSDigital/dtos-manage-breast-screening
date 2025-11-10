@@ -3,7 +3,7 @@ from datetime import date
 from logging import getLogger
 
 from django.db import models
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Prefetch, Subquery
 
 from manage_breast_screening.users.models import User
 
@@ -74,6 +74,17 @@ class AppointmentQuerySet(models.QuerySet):
             "-clinic_slot__starts_at" if desc else "clinic_slot__starts_at"
         )
 
+    def prefetch_current_status(self):
+        return self.prefetch_related(
+            Prefetch(
+                "statuses",
+                queryset=AppointmentStatus.objects.select_related(
+                    "created_by"
+                ).order_by("-created_at")[:1],  # Limit to most recent
+                to_attr="_prefetched_current_status",  # Store in named attribute
+            )
+        )
+
 
 class Appointment(BaseModel):
     objects = AppointmentQuerySet.as_manager()
@@ -105,12 +116,14 @@ class Appointment(BaseModel):
     def current_status(self) -> "AppointmentStatus":
         """
         Fetch the most recent status associated with this appointment.
+        Check if a prefetched status is available, otherwise do a query.
         If there are no statuses for any reason, assume the default one.
         """
-        # avoid `first()` here so that `statuses` can be prefetched
-        # when fetching many appointments
-        statuses = list(self.statuses.order_by("-created_at").all())
+        prefetched_current_status = getattr(self, "_prefetched_current_status", None)
+        if prefetched_current_status:
+            return prefetched_current_status[0]
 
+        statuses = list(self.statuses.order_by("-created_at").all())
         if not statuses:
             status = AppointmentStatus()
             logger.info(
@@ -167,6 +180,18 @@ class AppointmentStatus(models.Model):
         Is this state one of the active, non-final states?
         """
         return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
+
+    def is_final_state(self):
+        return self.state in [
+            self.CANCELLED,
+            self.DID_NOT_ATTEND,
+            self.SCREENED,
+            self.PARTIALLY_SCREENED,
+            self.ATTENDED_NOT_SCREENED,
+        ]
+
+    def is_in_progress(self):
+        return self.state == self.IN_PROGRESS
 
     def __str__(self):
         return self.state

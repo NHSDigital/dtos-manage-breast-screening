@@ -180,6 +180,25 @@ class TestAppointmentPresenter:
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.is_special_appointment == expected_result
 
+    @pytest.mark.parametrize(
+        "is_in_progress, is_final_state, expected_result",
+        [
+            (True, False, "with A. Tester"),
+            (False, True, "by A. Tester"),
+            (False, False, None),
+        ],
+    )
+    def test_status_attribution(
+        self, mock_appointment, is_in_progress, is_final_state, expected_result
+    ):
+        mock_appointment.current_status.created_by.get_short_name.return_value = (
+            "A. Tester"
+        )
+        mock_appointment.current_status.is_in_progress.return_value = is_in_progress
+        mock_appointment.current_status.is_final_state.return_value = is_final_state
+        presenter = AppointmentPresenter(mock_appointment)
+        assert presenter.status_attribution == expected_result
+
 
 class TestClinicSlotPresenter:
     @pytest.fixture

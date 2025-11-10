@@ -6,6 +6,7 @@ import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.models import Clinic
 from manage_breast_screening.clinics.tests.factories import ClinicFactory
 from manage_breast_screening.core.utils.date_formatting import format_date, format_time
@@ -61,6 +62,14 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.and_there_are_appointments()
         self.and_i_am_on_the_clinic_show_page()
         self.then_the_accessibility_baseline_is_met()
+
+    def test_status_attribution_display(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_a_clinic_exists_that_is_run_by_my_provider()
+        self.and_there_are_appointments_in_various_states_with_attributed_users()
+        self.and_i_am_on_the_clinic_show_page()
+        self.when_i_click_on_all()
+        self.then_i_can_see_status_attribution_for_relevant_appointments()
 
     def and_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
@@ -249,3 +258,67 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         expect(banner).to_be_visible()
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text("Wheelchair user")
+
+    def and_there_are_appointments_in_various_states_with_attributed_users(self):
+        # Create users for attribution
+        user_in_progress = UserFactory(first_name="Alice", last_name="User")
+        user_screened = UserFactory(first_name="Bob", last_name="User")
+        user_cancelled = UserFactory(first_name="Charlie", last_name="User")
+
+        # CONFIRMED status
+        self.confirmed_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            current_status=AppointmentStatus.CONFIRMED,
+            first_name="Participant",
+            last_name="Confirmed",
+        )
+
+        # IN_PROGRESS status
+        self.in_progress_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            first_name="Participant",
+            last_name="InProgress",
+        )
+        self.in_progress_appointment.statuses.create(
+            state=AppointmentStatus.IN_PROGRESS,
+            created_by=user_in_progress,
+        )
+
+        # SCREENED status
+        self.screened_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            first_name="Participant",
+            last_name="Screened",
+        )
+        self.screened_appointment.statuses.create(
+            state=AppointmentStatus.SCREENED,
+            created_by=user_screened,
+        )
+
+        # CANCELLED status
+        self.cancelled_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            first_name="Participant",
+            last_name="Cancelled",
+        )
+        self.cancelled_appointment.statuses.create(
+            state=AppointmentStatus.CANCELLED,
+            created_by=user_cancelled,
+        )
+
+    def then_i_can_see_status_attribution_for_relevant_appointments(self):
+        confirmed_row = self.page.locator("tr").filter(has_text="Participant Confirmed")
+
+        expect(confirmed_row).not_to_contain_text("with")
+        expect(confirmed_row).not_to_contain_text("by")
+
+        in_progress_row = self.page.locator("tr").filter(
+            has_text="Participant InProgress"
+        )
+        expect(in_progress_row).to_contain_text("with A. User")
+
+        screened_row = self.page.locator("tr").filter(has_text="Participant Screened")
+        expect(screened_row).to_contain_text("by B. User")
+
+        cancelled_row = self.page.locator("tr").filter(has_text="Participant Cancelled")
+        expect(cancelled_row).to_contain_text("by C. User")

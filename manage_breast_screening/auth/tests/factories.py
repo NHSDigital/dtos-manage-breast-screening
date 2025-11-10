@@ -10,5 +10,5 @@ class UserFactory(DjangoModelFactory):
         skip_postgeneration_save = True
 
     nhs_uid = Sequence(lambda n: "alice%d" % n)
-    first_name = Sequence(lambda n: "alice%d" % n)
+    first_name = Sequence(lambda n: "Alice%d" % n)
     last_name = "Lastname"
