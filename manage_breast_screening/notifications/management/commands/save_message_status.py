@@ -1,4 +1,5 @@
 import json
+import os
 from logging import getLogger
 
 from dateutil import parser
@@ -13,6 +14,7 @@ from manage_breast_screening.notifications.models import (
     Message,
     MessageStatus,
 )
+from manage_breast_screening.notifications.services.metrics import Metrics
 from manage_breast_screening.notifications.services.queue import Queue
 
 INSIGHTS_JOB_NAME = "SaveMessageStatus"
@@ -29,6 +31,13 @@ class Command(BaseCommand):
         with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Save Message Status Command started")
             queue = Queue.MessageStatusUpdates()
+            self.metrics = Metrics(
+                queue.queue_name,
+                "messages",
+                "Queue length",
+                os.getenv("ENVIRONMENT"),
+            )
+            self.metrics.add(queue.get_message_count())
             for item in queue.items():
                 logger.debug(f"Processing message status update {item}")
                 payload = json.loads(item.content)
