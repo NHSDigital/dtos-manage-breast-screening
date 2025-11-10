@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
@@ -8,6 +10,8 @@ from ...models import PERSONAS
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     """
@@ -16,7 +20,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not settings.PERSONAS_ENABLED:
-            raise CommandError("PERSONAS_ENABLED=False. Refusing to create.")
+            logger.info("PERSONAS_ENABLED=False. Skipping persona creation.")
+            return
 
         try:
             provider = Provider.objects.first()
