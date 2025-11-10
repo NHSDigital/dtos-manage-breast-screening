@@ -74,7 +74,7 @@ class AppointmentQuerySet(models.QuerySet):
             "-clinic_slot__starts_at" if desc else "clinic_slot__starts_at"
         )
 
-    def eager_load_current_status(self):
+    def prefetch_current_status(self):
         return self.prefetch_related(
             Prefetch(
                 "statuses",

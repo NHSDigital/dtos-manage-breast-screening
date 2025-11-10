@@ -266,7 +266,7 @@ class TestAppointment:
             )
 
             appointment_with_status = (
-                models.Appointment.objects.eager_load_current_status().get(
+                models.Appointment.objects.prefetch_current_status().get(
                     pk=appointment.pk
                 )
             )
@@ -296,7 +296,7 @@ class TestAppointment:
             )
 
             fetched_appointment = (
-                models.Appointment.objects.eager_load_current_status().first()
+                models.Appointment.objects.prefetch_current_status().first()
             )
             with django_assert_num_queries(0):
                 fetched_appointment.current_status.created_by
