@@ -10,4 +10,3 @@ vnet_address_space                    = "10.142.0.0/16"
 deploy_database_as_container          = true
 seed_demo_data                        = true
 nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"
-enable_alerting                       = true
