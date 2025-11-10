@@ -17,6 +17,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
 )
+from manage_breast_screening.participants.models import BreastCancerHistoryItem
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
@@ -141,6 +142,20 @@ class AppointmentFactory(DjangoModelFactory):
         obj.statuses.add(
             AppointmentStatusFactory.create(state=extracted, appointment=obj)
         )
+
+
+class BreastCancerHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.BreastCancerHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    diagnosis_location = Iterator(BreastCancerHistoryItem.DiagnosisLocationChoices)
+    left_breast_procedure = BreastCancerHistoryItem.Procedure.NO_PROCEDURE
+    right_breast_procedure = BreastCancerHistoryItem.Procedure.NO_PROCEDURE
+    left_breast_other_surgery = [BreastCancerHistoryItem.Surgery.NO_SURGERY]
+    right_breast_other_surgery = [BreastCancerHistoryItem.Surgery.NO_SURGERY]
+    left_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
+    right_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
 
 
 class SymptomFactory(DjangoModelFactory):
