@@ -200,6 +200,11 @@ variable "app_insights_id" {
   type        = string
 }
 
+variable "queue_length_alert_threshold" {
+  description = "If alerting is enabled, alert if storage account queues are greater than this threshold."
+  type        = number
+}
+
 variable "enable_notifications_jobs_schedule" {
   description = "Whether we apply the cron schedules for the notifications container app jobs"
   type        = bool

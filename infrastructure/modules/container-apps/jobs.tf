@@ -17,6 +17,7 @@ locals {
       job_container_args = "create_appointments"
     }
     send_message_batch = {
+
       # cron_expression = "0,30 9 * * 1-5"
       cron_expression = null
       environment_variables = {
@@ -43,6 +44,7 @@ locals {
       cron_expression = null
       environment_variables = {
         STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
+        ENVIRONMENT               = var.environment
       }
       job_short_name     = "sms"
       job_container_args = "save_message_status"
