@@ -18,7 +18,10 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
 )
-from manage_breast_screening.participants.models import BreastCancerHistoryItem
+from manage_breast_screening.participants.models import (
+    BreastCancerHistoryItem,
+    ImplantedMedicalDeviceHistoryItem,
+)
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
@@ -166,6 +169,14 @@ class BreastCancerHistoryItemFactory(DjangoModelFactory):
     right_breast_other_surgery = [BreastCancerHistoryItem.Surgery.NO_SURGERY]
     left_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
     right_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
+
+
+class ImplantedMedicalDeviceHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ImplantedMedicalDeviceHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    device = Iterator(ImplantedMedicalDeviceHistoryItem.Device)
 
 
 class SymptomFactory(DjangoModelFactory):
