@@ -75,6 +75,7 @@ jobs:
               - 'manage_breast_screening/nonprod/**'
               - 'manage_breast_screening/participants/**'
               - 'manage_breast_screening/static/**'
+              - 'manage_breast_screening/tests/system/**'
             notifications:
               - 'manage_breast_screening/notifications/**'
 
