@@ -28,7 +28,7 @@ class TestAppointmentButtons(SystemTestCase):
         self.when_i_check_in_an_appointment()
         self.then_i_see_that_it_is_checked_in()
         self.when_i_start_the_appointment()
-        self.then_i_should_be_on_the_medical_information_page()
+        self.then_i_should_be_on_the_confirm_identity_page()
 
     def and_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
@@ -97,10 +97,10 @@ class TestAppointmentButtons(SystemTestCase):
     def when_i_start_the_appointment(self):
         self.appointment_row.get_by_text("Start appointment").click()
 
-    def then_i_should_be_on_the_medical_information_page(self):
+    def then_i_should_be_on_the_confirm_identity_page(self):
         path = reverse(
-            "mammograms:ask_for_medical_information",
+            "mammograms:confirm_identity",
             kwargs={"pk": self.confirmed_appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
-        self.assert_page_title_contains("Medical information")
+        self.assert_page_title_contains("Confirm identity")
