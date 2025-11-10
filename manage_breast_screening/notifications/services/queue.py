@@ -1,8 +1,11 @@
+import logging
 import os
 
 from azure.core.exceptions import ResourceExistsError
 from azure.identity import ManagedIdentityCredential
 from azure.storage.queue import QueueClient, QueueMessage
+
+logger = logging.getLogger(__name__)
 
 
 class QueueConfigurationError(Exception):
@@ -16,6 +19,7 @@ class Queue:
         storage_account_name = os.getenv("STORAGE_ACCOUNT_NAME")
         queue_mi_client_id = os.getenv("QUEUE_MI_CLIENT_ID")
         connection_string = os.getenv("QUEUE_STORAGE_CONNECTION_STRING")
+        self.queue_name = queue_name
 
         if storage_account_name and queue_mi_client_id:
             self.client = QueueClient(
@@ -54,6 +58,12 @@ class Queue:
 
     def item(self):
         return self.client.receive_message()
+
+    def get_message_count(self):
+        message_count = self.client.get_queue_properties().approximate_message_count
+        logger.debug(f"get_message_count: {message_count}")
+
+        return message_count
 
     @classmethod
     def MessageStatusUpdates(cls):
