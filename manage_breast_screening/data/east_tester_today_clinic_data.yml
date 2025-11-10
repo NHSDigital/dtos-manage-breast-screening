@@ -49,6 +49,12 @@ clinic:
               procedure_year: 2005
               removal_year: 2010
               additional_details: Recalled device, removed in 2010
+          other_procedure_history_items:
+            - id: e3f5c8a1-4d2b-4c6e-9f3a-2b8e5d6c7f8a
+              procedure: BREAST_REDUCTION
+              procedure_details: Lorem ipsum dolor sit amet
+              procedure_year: 2018
+              additional_details: No complications
     - id: aa1b4c5c-3742-4f97-aa68-04a6f3bd631b
       duration_in_minutes: 8
       starts_at_time: 09:08

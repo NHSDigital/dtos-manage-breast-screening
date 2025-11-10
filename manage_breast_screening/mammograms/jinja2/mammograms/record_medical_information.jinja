@@ -51,6 +51,12 @@
     {% endfor %}
   {% endset %}
 
+  {% set other_procedure_history_html %}
+    {% for presented_item in presenter.other_procedure_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
+
   {% set non_cancerous_lump_diagnosis_link %}
   <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
   {% endset %}
@@ -87,6 +93,17 @@
        },
        "value": {
          "html": breast_augmentation_history_html
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Other procedure history"
+       },
+       "value": {
+         "html": other_procedure_history_html
        },
        "actions": {
           "items": []
