@@ -108,6 +108,24 @@ class TestParticipantPresenter:
 
         assert result == expected
 
+    def test_ethnicity_actions_is_none(self, participant):
+        participant.ethnic_background_id = None
+        presenter = ParticipantPresenter(participant)
+        assert presenter.ethnicity_actions(return_url="/return") is None
+
+    def test_ethnicity_actions(self, participant):
+        participant.ethnic_background_id = "any_other_white_background"
+        presenter = ParticipantPresenter(participant)
+        assert presenter.ethnicity_actions(return_url="/return") == {
+            "items": [
+                {
+                    "href": f"/participants/{participant.pk}/edit-ethnicity?return_url=/return",
+                    "text": "Change",
+                    "visuallyHiddenText": "ethnicity",
+                },
+            ],
+        }
+
 
 class TestParticipantAppointmentPresenter:
     def mock_appointment(self, starts_at, pk, state=AppointmentStatus.CONFIRMED):

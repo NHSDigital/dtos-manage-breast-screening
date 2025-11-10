@@ -16,6 +16,7 @@ from manage_breast_screening.participants.models import (
     Participant,
     ParticipantReportedMammogram,
 )
+from manage_breast_screening.participants.presenters import ParticipantPresenter
 
 from ..forms import (
     AppointmentCannotGoAheadForm,
@@ -115,6 +116,25 @@ class ParticipantDetails(AppointmentMixin, View):
             template_name="mammograms/show/participant_details.jinja",
             context=context,
         )
+
+
+class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
+    template_name = "mammograms/confirm_identity.jinja"
+
+    def get_context_data(self, pk, **kwargs):
+        participant = self.appointment.participant
+
+        return {
+            "heading": "Confirm identity",
+            "page_title": "Confirm identity",
+            "presented_participant": ParticipantPresenter(participant),
+            "appointment_cannot_proceed_href": reverse(
+                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": pk}
+            ),
+        }
+
+    def post(self, request, pk):
+        return redirect("mammograms:ask_for_medical_information", pk=pk)
 
 
 class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
@@ -256,4 +276,4 @@ def start_appointment(request, pk):
 
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
-    return redirect("mammograms:ask_for_medical_information", pk=pk)
+    return redirect("mammograms:confirm_identity", pk=pk)

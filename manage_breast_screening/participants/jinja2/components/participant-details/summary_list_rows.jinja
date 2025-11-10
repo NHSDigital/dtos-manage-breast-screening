@@ -1,0 +1,32 @@
+{% macro address_html(presented_participant) %}
+  {% if presented_participant.address %}
+    {% for line in presented_participant.address.lines %}
+      {{ line }}{% if not loop.last %}<br>{% endif %}
+    {% endfor %}
+    {% if presented_participant.address.postcode %}
+      <br>{{ presented_participant.address.postcode }}
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+
+{% macro date_of_birth_and_age_html(presented_participant) %}
+  {{ presented_participant.date_of_birth }}<br>
+  <span class="nhsuk-hint">({{ presented_participant.age }})</span>
+{% endmacro %}
+
+{% macro ethnicity_html(presented_participant) %}
+  {% set ethnic_background = presented_participant.ethnic_background %}
+  {% set ethnic_background_category = presented_participant.ethnic_category %}
+  {% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
+  {% set ethnicity_details_link %}
+    <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
+  {% endset %}
+
+  {% if presented_participant.ethnicity_not_shared %}
+    {{ ethnic_background }}
+  {% elif ethnic_background %}
+    {{ ethnic_background_category }} ({{ ethnic_background }})
+  {% else %}
+    {{ ethnicity_details_link | safe }}
+  {% endif %}
+{% endmacro %}

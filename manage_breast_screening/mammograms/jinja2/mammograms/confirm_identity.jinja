@@ -1,0 +1,103 @@
+{% extends "wizard_step.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
+{% from "components/participant-details/summary_list_rows.jinja" import address_html, date_of_birth_and_age_html, ethnicity_html %}
+
+{% block step_content %}
+  {% set confirm_button %}
+    <div class="nhsuk-form-group">
+      <form method="post">
+        {{ csrf_input }}
+        {{ button({"text": "Confirm identity", "classes": "nhsuk-u-margin-bottom-0"}) }}
+      </form>
+    </div>
+  {% endset %}
+
+  {{ confirm_button }}
+
+  <hr class="nhsuk-section-break nhsuk-section-break--m nhsuk-section-break--visible">
+
+  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
+
+  {% call card({"headingHtml": "<!-- no heading -->", "classes": "nhsuk-u-margin-bottom-4"}) %}
+    {{ summaryList({
+      "rows": [
+        {
+          "key": {
+            "text": "NHS Number"
+          },
+          "value": {
+            "text": presented_participant.nhs_number
+          }
+        },
+        {
+          "key": {
+            "text": "Full name"
+          },
+          "value": {
+            "text": presented_participant.full_name
+          }
+        },
+        {
+          "key": {
+            "text": "Gender"
+          },
+          "value": {
+            "text": presented_participant.gender
+          }
+        },
+        {
+          "key": {
+            "text": "Date of birth"
+          },
+          "value": {
+            "html": date_of_birth_and_age_html(presented_participant) | safe
+          }
+        },
+        {
+          "key": {
+            "text": "Address"
+          },
+          "value": {
+            "html": address_html(presented_participant)
+          }
+        },
+        {
+          "key": {
+            "text": "Phone"
+          },
+          "value": {
+            "html": presented_participant.phone
+          }
+        },
+        {
+          "key": {
+            "text": "Email"
+          },
+          "value": {
+            "html": presented_participant.email
+          }
+        },
+        {
+          "key": {
+            "text": "Ethnicity"
+          },
+          "value": {
+            "html": ethnicity_html(presented_participant) | safe
+          },
+          "actions": presented_participant.ethnicity_actions(return_url)
+        }
+      ]
+    }) }}
+  {% endcall %}
+
+  {{ confirm_button }}
+
+  <p>
+    <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ appointment_cannot_proceed_href }}">Appointment cannot proceed</a>
+  </p>
+
+{% endblock %}
+
