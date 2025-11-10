@@ -35,7 +35,9 @@ class TestMetrics:
         mock_metrics.get_meter.return_value = mock_meter
         mock_meter.create_gauge.return_value = mock_gauge
 
-        subject = Metrics("metric-name", "metric-units", "metric-description")
+        subject = Metrics(
+            "metric-name", "metric-units", "metric-description", "metric-environment"
+        )
 
         mock_metric_exporter.assert_called_once_with(connection_string=str(conn_string))
         mock_metric_reader.assert_called_once_with(mock_metric_exporter.return_value)
@@ -49,7 +51,9 @@ class TestMetrics:
             "manage_breast_screening.notifications.services.metrics"
         )
         mock_meter.create_gauge.assert_called_once_with(
-            "metric-name", unit="metric-units", description="metric-description"
+            "metric-name",
+            unit="metric-units",
+            description="metric-description",
         )
         assert subject.gauge == mock_gauge
 
@@ -73,7 +77,9 @@ class TestMetrics:
         mock_metrics.get_meter.return_value = mock_meter
         mock_meter.create_gauge.return_value = mock_gauge
 
-        subject = Metrics("TheQ", "yards", "desc")
+        subject = Metrics("TheQ", "yards", "desc", "env")
         subject.add("Yay!")
 
-        subject.gauge.set.assert_called_once_with("Yay!", {"queue_name": "TheQ"})
+        subject.gauge.set.assert_called_once_with(
+            "Yay!", {"queue_name": "TheQ", "environment": "env"}
+        )

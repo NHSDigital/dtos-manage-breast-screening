@@ -16,10 +16,10 @@ class Metrics:
         self.metric_name = metric_name
 
         try:
-            logger.info(f"metric_name: {metric_name}")
-            logger.info(f"metric_units: {metric_units}")
-            logger.info(f"metric_description: {metric_description}")
-            logger.info(f"metric_environment: {metric_environment}")
+            logger.debug(f"metric_name: {metric_name}")
+            logger.debug(f"metric_units: {metric_units}")
+            logger.debug(f"metric_description: {metric_description}")
+            logger.debug(f"metric_environment: {metric_environment}")
 
             exporter = AzureMonitorMetricExporter(
                 connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
