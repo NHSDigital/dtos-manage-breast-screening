@@ -26,6 +26,7 @@ from manage_breast_screening.participants.models import (
     BenignLumpHistoryItem,
     BreastAugmentationHistoryItem,
     BreastCancerHistoryItem,
+    CystHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
     MastectomyOrLumpectomyHistoryItem,
     OtherProcedureHistoryItem,
@@ -41,6 +42,7 @@ from manage_breast_screening.participants.tests.factories import (
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
+    CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
     OtherProcedureHistoryItemFactory,
@@ -201,6 +203,9 @@ class Command(BaseCommand):
                 appointment, mastectomy_or_lumpectomy_history_item
             )
 
+        for cyst_history_item in medical_information_key.get("cyst_history_items", []):
+            self.create_cyst_history_item(appointment, cyst_history_item)
+
         for implanted_medical_device_history_item in medical_information_key.get(
             "implanted_medical_device_history_items", []
         ):
@@ -240,6 +245,9 @@ class Command(BaseCommand):
         MastectomyOrLumpectomyHistoryItemFactory(
             appointment=appointment, **mastectomy_or_lumpectomy_history_item
         )
+
+    def create_cyst_history_item(self, appointment, cyst_history_item):
+        CystHistoryItemFactory(appointment=appointment, **cyst_history_item)
 
     def create_implanted_medical_device_history_item(
         self, appointment, implanted_medical_device_history_item
@@ -301,6 +309,7 @@ class Command(BaseCommand):
         BreastAugmentationHistoryItem.objects.all().delete()
         BreastCancerHistoryItem.objects.all().delete()
         MastectomyOrLumpectomyHistoryItem.objects.all().delete()
+        CystHistoryItem.objects.all().delete()
         ImplantedMedicalDeviceHistoryItem.objects.all().delete()
         OtherProcedureHistoryItem.objects.all().delete()
         BenignLumpHistoryItem.objects.all().delete()

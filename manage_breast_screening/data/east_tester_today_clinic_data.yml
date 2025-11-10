@@ -63,6 +63,10 @@ clinic:
               procedure_location: NHS_HOSPITAL
               procedure_location_details: East Tester Hospital
               additional_details: Lorem ipsum dolor sit amet
+          cyst_history_items:
+            - id: 5c3d6f4e-3f4b-4e2a-9f7b-2d6e8f4c9a1b
+              treatment: NO_TREATMENT
+              additional_details: Diagnosed in 2022, monitored regularly.
     - id: aa1b4c5c-3742-4f97-aa68-04a6f3bd631b
       duration_in_minutes: 8
       starts_at_time: 09:08

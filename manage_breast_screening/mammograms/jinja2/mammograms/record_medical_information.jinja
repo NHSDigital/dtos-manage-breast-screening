@@ -63,6 +63,12 @@
     {% endfor %}
   {% endset %}
 
+  {% set cyst_history_html %}
+    {% for presented_item in presenter.cyst_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
+
   {% set non_cancerous_lump_diagnosis_link %}
   <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
   {% endset %}
@@ -93,6 +99,14 @@
        },
        "value": {
          "html": implanted_medical_device_history_html
+       }
+     },
+     {
+       "key": {
+         "text": "Cyst history"
+       },
+       "value": {
+         "html": cyst_history_html
        },
        "actions": {
           "items": []
