@@ -55,6 +55,14 @@ clinic:
               procedure_details: Lorem ipsum dolor sit amet
               procedure_year: 2018
               additional_details: No complications
+          benign_lump_history_items:
+            - id: 271E4B10-BBB2-4FCD-A777-5CE7E9411FEC
+              right_breast_procedures: [NEEDLE_BIOPSY, LUMP_REMOVED]
+              left_breast_procedures: [LUMP_REMOVED]
+              procedure_year: 2005
+              procedure_location: NHS_HOSPITAL
+              procedure_location_details: East Tester Hospital
+              additional_details: Lorem ipsum dolor sit amet
     - id: aa1b4c5c-3742-4f97-aa68-04a6f3bd631b
       duration_in_minutes: 8
       starts_at_time: 09:08

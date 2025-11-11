@@ -23,6 +23,7 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
+    BenignLumpHistoryItem,
     BreastAugmentationHistoryItem,
     BreastCancerHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
@@ -36,6 +37,7 @@ from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     AppointmentStatusFactory,
+    BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
@@ -198,6 +200,11 @@ class Command(BaseCommand):
                 appointment, implanted_medical_device_history_item
             )
 
+        for benign_lump_history_item in medical_information_key.get(
+            "benign_lump_history_items", []
+        ):
+            self.create_benign_lump_history_item(appointment, benign_lump_history_item)
+
         for breast_augmentation_history_item in medical_information_key.get(
             "breast_augmentation_history_items", []
         ):
@@ -234,6 +241,11 @@ class Command(BaseCommand):
     ):
         OtherProcedureHistoryItemFactory(
             appointment=appointment, **other_procedure_history_item
+        )
+
+    def create_benign_lump_history_item(self, appointment, benign_lump_history_item):
+        BenignLumpHistoryItemFactory(
+            appointment=appointment, **benign_lump_history_item
         )
 
     def create_participant(self, **participant_key):
@@ -275,6 +287,7 @@ class Command(BaseCommand):
         BreastCancerHistoryItem.objects.all().delete()
         ImplantedMedicalDeviceHistoryItem.objects.all().delete()
         OtherProcedureHistoryItem.objects.all().delete()
+        BenignLumpHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
         ParticipantReportedMammogram.objects.all().delete()
