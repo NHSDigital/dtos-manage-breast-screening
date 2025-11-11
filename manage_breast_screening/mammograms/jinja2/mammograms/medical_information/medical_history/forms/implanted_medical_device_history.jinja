@@ -1,0 +1,24 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+  {% do form.device.add_conditional_html('OTHER_MEDICAL_DEVICE', form.other_medical_device_details.as_field_group()) %}
+
+  {% do form.removal_status.add_conditional_html('HAS_BEEN_REMOVED', form.removal_year.as_field_group()) %}
+
+  {{ form.device.as_field_group() }}
+
+  {{ form.procedure_year.as_field_group() }}
+
+  {{ form.removal_status.as_field_group() }}
+
+  {{ form.additional_details.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+{% endblock %}
+

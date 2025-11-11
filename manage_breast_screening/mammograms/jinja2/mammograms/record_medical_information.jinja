@@ -49,6 +49,7 @@
     {% for presented_item in presenter.implanted_medical_device_history %}
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
+    <a href="{{ presenter.add_implanted_medical_device_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_implanted_medical_device_history_link.text }}</a><br>
   {% endset %}
 
   {% set breast_augmentation_history_html %}

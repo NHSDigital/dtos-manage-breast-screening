@@ -1,4 +1,6 @@
-from manage_breast_screening.core.template_helpers import nl2br
+from manage_breast_screening.core.template_helpers import (
+    nl2br,
+)
 
 
 class ImplantedMedicalDeviceHistoryItemPresenter:

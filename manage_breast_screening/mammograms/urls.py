@@ -1,6 +1,11 @@
 from django.urls import path
 
-from .views import appointment_views, special_appointment_views, symptom_views
+from .views import (
+    appointment_views,
+    implanted_medical_device_history_view,
+    special_appointment_views,
+    symptom_views,
+)
 
 app_name = "mammograms"
 
@@ -114,5 +119,10 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
         symptom_views.DeleteSymptomView.as_view(),
         name="delete_symptom",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/implanted-medical-device-history/",
+        implanted_medical_device_history_view.AddImplantedMedicalDeviceHistoryView.as_view(),
+        name="add_implanted_medical_device_history_item",
     ),
 ]
