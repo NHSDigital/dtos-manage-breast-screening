@@ -1,5 +1,8 @@
 from django.urls import reverse
 
+from manage_breast_screening.mammograms.presenters.benign_lump_history_item_presenter import (
+    BenignLumpHistoryItemPresenter,
+)
 from manage_breast_screening.mammograms.presenters.breast_augmentation_history_item_presenter import (
     BreastAugmentationHistoryItemPresenter,
 )
@@ -42,6 +45,10 @@ class MedicalInformationPresenter:
         self.other_procedure_history = [
             OtherProcedureHistoryItemPresenter(item)
             for item in appointment.other_procedure_history_items.all()
+        ]
+        self.benign_lump_history = [
+            BenignLumpHistoryItemPresenter(item)
+            for item in appointment.benign_lump_history_items.all()
         ]
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms
