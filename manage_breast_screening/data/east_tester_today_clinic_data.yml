@@ -76,6 +76,13 @@ clinic:
                 - 182 Clinic Road
                 - Leeds
               postcode: L4 8M5
+        medical_information:
+          breast_augmentation_history_items:
+            - right_breast_procedures:
+                - BREAST_IMPLANTS
+              left_breast_procedures:
+                - BREAST_IMPLANTS
+              procedure_year: 2010
     - id: 00edaf2f-71ce-4595-ad07-31940a76dade
       duration_in_minutes: 8
       starts_at_time: 09:16
