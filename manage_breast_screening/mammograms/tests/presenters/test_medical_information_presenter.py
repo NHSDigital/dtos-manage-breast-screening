@@ -123,3 +123,11 @@ class TestRecordMedicalInformationPresenter:
             "href": f"/mammograms/{appointment.pk}/record-medical-information/implanted-medical-device-history/",
             "text": "Add implanted medical device history",
         }
+
+    def test_cyst_history_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(appointment).add_cyst_history_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/cyst-history/",
+            "text": "Add cyst history",
+        }

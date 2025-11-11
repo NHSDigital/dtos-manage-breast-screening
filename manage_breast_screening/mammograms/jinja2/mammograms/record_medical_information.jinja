@@ -68,6 +68,7 @@
     {% for presented_item in presenter.cyst_history %}
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
+    <a href="{{ presenter.add_cyst_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_cyst_history_link.text }}</a><br>
   {% endset %}
 
   {% set non_cancerous_lump_diagnosis_link %}
