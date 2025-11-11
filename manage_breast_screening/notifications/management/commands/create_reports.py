@@ -66,7 +66,7 @@ class Command(BaseCommand):
                         content_type="text/csv",
                         container_name=os.getenv("REPORTS_CONTAINER_NAME"),
                     )
-                    if not options.get("smoke-test", False):
+                    if not self.is_smoke_test(options):
                         NhsMail().send_report_email(
                             attachment_data=csv,
                             attachment_filename=self.filename(bso_code, report_type),
@@ -76,7 +76,7 @@ class Command(BaseCommand):
                     logger.info("Report %s created", report_type)
 
     def configuration(self, options: dict) -> list[list]:
-        if options.get("smoke-test", False):
+        if self.is_smoke_test(options):
             reconciliation_report_config = self.REPORTS[2]
             bso_codes = [self.SMOKE_TEST_BSO_CODE]
             report_configs = [reconciliation_report_config]
@@ -91,3 +91,6 @@ class Command(BaseCommand):
         if bso_code != self.SMOKE_TEST_BSO_CODE:
             name = f"{datetime.today().strftime('%Y-%m-%dT%H:%M:%S')}-{name}"
         return name
+
+    def is_smoke_test(self, options):
+        return options.get("smoke_test", False)
