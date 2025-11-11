@@ -145,7 +145,7 @@ class TestCreateReports:
         self, dataframe, csv_data, now
     ):
         with self.mocked_dependencies(dataframe, csv_data, now) as md:
-            Command().handle(**{"smoke-test": True})
+            Command().handle(**{"smoke_test": True})
 
         mock_read_sql, mock_blob_storage, mock_email_service = md
 
