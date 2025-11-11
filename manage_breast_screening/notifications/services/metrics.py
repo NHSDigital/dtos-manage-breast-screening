@@ -10,37 +10,37 @@ logger = logging.getLogger(__name__)
 
 
 class Metrics:
-    def __init__(
-        self, metric_name, metric_units, metric_description, metric_environment
-    ):
-        self.metric_name = metric_name
-
+    def __init__(self, name, units, description, environment):
         try:
-            logger.debug(f"metric_name: {metric_name}")
-            logger.debug(f"metric_units: {metric_units}")
-            logger.debug(f"metric_description: {metric_description}")
-            logger.debug(f"metric_environment: {metric_environment}")
+            logger.debug(
+                (
+                    f"Initialising Metrics(name: {name}, units: {units}, "
+                    f"description: {description}, environment: {environment})"
+                )
+            )
 
             exporter = AzureMonitorMetricExporter(
                 connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
             )
-            reader = PeriodicExportingMetricReader(exporter)
-            metrics.set_meter_provider(MeterProvider(metric_readers=[reader]))
+            metrics.set_meter_provider(
+                MeterProvider(metric_readers=[PeriodicExportingMetricReader(exporter)])
+            )
             meter = metrics.get_meter(__name__)
-            self.environment = metric_environment
+            self.name = name
+            self.environment = environment
             self.gauge = meter.create_gauge(
-                self.metric_name, unit=metric_units, description=metric_description
+                self.name, unit=units, description=description
             )
         except ValueError as e:
             logger.warning(f"Skipping Azure Monitor setup: {e}")
             self.gauge = None
 
-    def add(self, value):
+    def add(self, key, value):
         if self.gauge:
             try:
                 self.gauge.set(
                     value,
-                    {"queue_name": self.metric_name, "environment": self.environment},
+                    {key: self.name, "environment": self.environment},
                 )
             except Exception:
                 logger.exception("Failed to update gauge")

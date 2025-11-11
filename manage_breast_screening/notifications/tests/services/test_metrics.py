@@ -78,7 +78,7 @@ class TestMetrics:
         mock_meter.create_gauge.return_value = mock_gauge
 
         subject = Metrics("TheQ", "yards", "desc", "env")
-        subject.add("Yay!")
+        subject.add("queue_name", "Yay!")
 
         subject.gauge.set.assert_called_once_with(
             "Yay!", {"queue_name": "TheQ", "environment": "env"}
