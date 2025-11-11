@@ -60,10 +60,7 @@ class Queue:
         return self.client.receive_message()
 
     def get_message_count(self):
-        message_count = self.client.get_queue_properties().approximate_message_count
-        logger.debug(f"get_message_count: {message_count}")
-
-        return message_count
+        return self.client.get_queue_properties().approximate_message_count
 
     @classmethod
     def MessageStatusUpdates(cls):
