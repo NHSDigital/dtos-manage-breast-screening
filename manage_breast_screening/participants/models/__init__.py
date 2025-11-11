@@ -1,6 +1,7 @@
 from .appointment import Appointment, AppointmentStatus
 from .breast_cancer_history_item import BreastCancerHistoryItem
 from .ethnicity import Ethnicity
+from .mastectomy_or_lumpectomy_history_item import MastectomyOrLumpectomyHistoryItem
 from .participant import Participant, ParticipantAddress
 from .reported_mammograms import ParticipantReportedMammogram, SupportReasons
 from .screening_episode import ScreeningEpisode
@@ -10,6 +11,7 @@ __all__ = [
     "Appointment",
     "AppointmentStatus",
     "BreastCancerHistoryItem",
+    "MastectomyOrLumpectomyHistoryItem",
     "Participant",
     "ParticipantAddress",
     "Ethnicity",

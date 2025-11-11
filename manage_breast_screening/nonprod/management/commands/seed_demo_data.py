@@ -24,6 +24,7 @@ from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
     BreastCancerHistoryItem,
+    MastectomyOrLumpectomyHistoryItem,
     Participant,
     ParticipantAddress,
     ParticipantReportedMammogram,
@@ -34,6 +35,7 @@ from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     AppointmentStatusFactory,
     BreastCancerHistoryItemFactory,
+    MastectomyOrLumpectomyHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
     ParticipantReportedMammogramFactory,
@@ -184,12 +186,25 @@ class Command(BaseCommand):
             self.create_breast_cancer_history_item(
                 appointment, breast_cancer_history_item
             )
+        for mastectomy_or_lumpectomy_history_item in medical_information_key.get(
+            "mastectomy_or_lumpectomy_history_items", []
+        ):
+            self.create_mastectomy_or_lumpectomy_history_item(
+                appointment, mastectomy_or_lumpectomy_history_item
+            )
 
     def create_breast_cancer_history_item(
         self, appointment, breast_cancer_history_item
     ):
         BreastCancerHistoryItemFactory(
             appointment=appointment, **breast_cancer_history_item
+        )
+
+    def create_mastectomy_or_lumpectomy_history_item(
+        self, appointment, mastectomy_or_lumpectomy_history_item
+    ):
+        MastectomyOrLumpectomyHistoryItemFactory(
+            appointment=appointment, **mastectomy_or_lumpectomy_history_item
         )
 
     def create_participant(self, **participant_key):
@@ -228,6 +243,7 @@ class Command(BaseCommand):
         UserAssignment.objects.all().delete()
         Symptom.objects.all().delete()
         BreastCancerHistoryItem.objects.all().delete()
+        MastectomyOrLumpectomyHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
         ParticipantReportedMammogram.objects.all().delete()

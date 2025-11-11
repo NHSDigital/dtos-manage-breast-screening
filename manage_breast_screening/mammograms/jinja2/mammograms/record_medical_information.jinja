@@ -38,6 +38,11 @@
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
   {% endset %}
+  {% set mastectomy_or_lumpectomy_history_html %}
+    {% for presented_item in presenter.mastectomy_or_lumpectomy_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
   {% set non_cancerous_lump_diagnosis_link %}
   <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
   {% endset %}
@@ -63,6 +68,17 @@
        },
        "value": {
          "html": non_cancerous_lump_diagnosis_link
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Mastectomy or lumpectomy history"
+       },
+       "value": {
+         "html": mastectomy_or_lumpectomy_history_html
        },
        "actions": {
           "items": []

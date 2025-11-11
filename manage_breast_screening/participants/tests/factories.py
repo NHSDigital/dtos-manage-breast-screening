@@ -18,7 +18,10 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
 )
-from manage_breast_screening.participants.models import BreastCancerHistoryItem
+from manage_breast_screening.participants.models import (
+    BreastCancerHistoryItem,
+    MastectomyOrLumpectomyHistoryItem,
+)
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
@@ -166,6 +169,20 @@ class BreastCancerHistoryItemFactory(DjangoModelFactory):
     right_breast_other_surgery = [BreastCancerHistoryItem.Surgery.NO_SURGERY]
     left_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
     right_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
+
+
+class MastectomyOrLumpectomyHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.MastectomyOrLumpectomyHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    right_breast_procedure = MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE
+    left_breast_procedure = MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE
+    right_breast_other_surgery = [MastectomyOrLumpectomyHistoryItem.Surgery.NO_SURGERY]
+    left_breast_other_surgery = [MastectomyOrLumpectomyHistoryItem.Surgery.NO_SURGERY]
+    year_of_surgery = None
+    surgery_reason = MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON
+    additional_details = ""
 
 
 class SymptomFactory(DjangoModelFactory):
