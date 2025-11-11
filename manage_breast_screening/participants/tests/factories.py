@@ -21,6 +21,7 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     BreastCancerHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
+    OtherProcedureHistoryItem,
 )
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
@@ -190,6 +191,14 @@ class BreastAugmentationHistoryItemFactory(DjangoModelFactory):
     left_breast_procedures = [
         models.BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
     ]
+
+
+class OtherProcedureHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.OtherProcedureHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    procedure = Iterator(OtherProcedureHistoryItem.Procedure)
 
 
 class SymptomFactory(DjangoModelFactory):

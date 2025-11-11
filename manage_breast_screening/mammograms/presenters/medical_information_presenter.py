@@ -9,6 +9,9 @@ from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_pr
 from manage_breast_screening.mammograms.presenters.implanted_medical_device_history_item_presenter import (
     ImplantedMedicalDeviceHistoryItemPresenter,
 )
+from manage_breast_screening.mammograms.presenters.other_procedure_history_item_presenter import (
+    OtherProcedureHistoryItemPresenter,
+)
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
@@ -35,6 +38,10 @@ class MedicalInformationPresenter:
         self.breast_augmentation_history = [
             BreastAugmentationHistoryItemPresenter(item)
             for item in appointment.breast_augmentation_history_items.all()
+        ]
+        self.other_procedure_history = [
+            OtherProcedureHistoryItemPresenter(item)
+            for item in appointment.other_procedure_history_items.all()
         ]
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms

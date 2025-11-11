@@ -23,8 +23,10 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
+    BreastAugmentationHistoryItem,
     BreastCancerHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
+    OtherProcedureHistoryItem,
     Participant,
     ParticipantAddress,
     ParticipantReportedMammogram,
@@ -37,6 +39,7 @@ from manage_breast_screening.participants.tests.factories import (
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
+    OtherProcedureHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
     ParticipantReportedMammogramFactory,
@@ -202,6 +205,13 @@ class Command(BaseCommand):
                 appointment, breast_augmentation_history_item
             )
 
+        for other_procedure_history_item in medical_information_key.get(
+            "other_procedure_history_items", []
+        ):
+            self.create_other_procedure_history_item(
+                appointment, other_procedure_history_item
+            )
+
     def create_breast_cancer_history_item(
         self, appointment, breast_cancer_history_item
     ):
@@ -218,6 +228,13 @@ class Command(BaseCommand):
 
     def create_breast_augmentation_history_item(self, appointment, item):
         BreastAugmentationHistoryItemFactory(appointment=appointment, **item)
+
+    def create_other_procedure_history_item(
+        self, appointment, other_procedure_history_item
+    ):
+        OtherProcedureHistoryItemFactory(
+            appointment=appointment, **other_procedure_history_item
+        )
 
     def create_participant(self, **participant_key):
         address_key = participant_key.pop("address", None)
@@ -254,8 +271,10 @@ class Command(BaseCommand):
     def reset_db(self):
         UserAssignment.objects.all().delete()
         Symptom.objects.all().delete()
+        BreastAugmentationHistoryItem.objects.all().delete()
         BreastCancerHistoryItem.objects.all().delete()
         ImplantedMedicalDeviceHistoryItem.objects.all().delete()
+        OtherProcedureHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
         ParticipantReportedMammogram.objects.all().delete()
