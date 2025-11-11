@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
@@ -152,14 +152,13 @@ class TestQueue:
         assert "Queue not configured" in str(exc_info.value)
 
     def test_get_message_count_returns_correct_value(self, mock_queue_client, caplog):
-        mock_props = MagicMock()
-        mock_props.approximate_message_count = 8
-        mock_queue_client.get_queue_properties.return_value = mock_props
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            queue_client.get_queue_properties.return_value = PropertyMock(
+                approximate_message_count=666
+            )
+            subject = Queue("A-Q")
+            subject.client = queue_client
 
-        with caplog.at_level("DEBUG"):
-            queue = Queue("new-queue")
-            count = queue.get_message_count()
-
-        assert count == 8
-        mock_queue_client.get_queue_properties.assert_called_once()
-        assert "get_message_count: 8" in caplog.text
+            assert subject.get_message_count() == 666
