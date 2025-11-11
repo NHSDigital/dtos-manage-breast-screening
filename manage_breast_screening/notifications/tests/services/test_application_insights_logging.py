@@ -20,12 +20,37 @@ class TestApplicationInsightsLogging:
     def setup(self, monkeypatch):
         monkeypatch.setenv("APPLICATIONINSIGHTS_LOGGER_NAME", "insights-logger")
 
-    def test_configure_azure_monitor(
+    def test_configures_azure_monitor_when_env_correct(
         self, mock_logging, mock_configure_azure, monkeypatch
     ):
         monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
+        monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
         ApplicationInsightsLogging().configure_azure_monitor()
         mock_configure_azure.assert_called_with(logger_name="insights-logger")
+
+    def test_does_not_configure_if_flag_not_enabled(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "False")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_not_called()
+
+    def test_does_not_configure_if_connection_string_not_present(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.delenv("APPLICATIONINSIGHTS_CONNECTION_STRING", False)
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_not_called()
+
+    def test_does_not_configure_if_connection_string_is_empty(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_not_called()
 
     def test_getLogger(self, mock_logging, mock_configure_azure):
         ApplicationInsightsLogging().getLogger()
