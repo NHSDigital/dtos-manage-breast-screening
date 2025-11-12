@@ -21,16 +21,19 @@ class PersonalisationPresenter:
         self.bso_contact_data = BsoContactData(self.clinic)
 
     def present(self) -> dict[str:str]:
-        return {
-            "appointment_date": self.appointment_date,
-            "appointment_time": self.appointment_time,
-            "appointment_clinic_name": self.titlecase(self.clinic.name),
-            "appointment_location_address": self.appointment_location_address,
-            "appointment_location_description": "",
-            "appointment_location_url": self.clinic_location_data.url,
-            "BSO_phone_number": self.bso_contact_data.phone,
-            "BSO_email_address": self.bso_contact_data.email,
-        } | self.address_fields
+        return (
+            {
+                "appointment_date": self.appointment_date,
+                "appointment_time": self.appointment_time,
+                "appointment_clinic_name": self.titlecase(self.clinic.name),
+                "appointment_location_address": self.appointment_location_address,
+                "appointment_location_description": "",  # Not used, but still part of the Notify template's personalisationData object, so fails validation if not present.
+                "appointment_location_url": self.clinic_location_data.url,
+                "BSO_phone_number": self.bso_contact_data.phone,
+                "BSO_email_address": self.bso_contact_data.email,
+            }
+            | self.address_fields
+        )
 
     def presented_address_fields(self) -> dict[str:str]:
         return {
