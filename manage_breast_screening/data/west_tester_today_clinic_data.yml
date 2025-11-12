@@ -167,6 +167,18 @@ clinic:
                 location_details: Radiology department
                 exact_date: '2025-01-17'
                 created_at: '2019-09-10'
+        medical_information:
+          mastectomy_or_lumpectomy_history_items:
+            - id: 8c3e50e9-7e49-4c2b-8c9c-9b1f7b3a1ab5
+              right_breast_procedure: MASTECTOMY_NO_TISSUE_REMAINING
+              left_breast_procedure: NO_PROCEDURE
+              right_breast_other_surgery:
+                - RECONSTRUCTION
+              left_breast_other_surgery:
+                - NO_SURGERY
+              year_of_surgery: 2018
+              surgery_reason: RISK_REDUCTION
+              additional_details: Right mastectomy with reconstruction following genetic testing
     - id: 33e30fe8-0c9b-470f-9c34-c008df8ec7ed
       duration_in_minutes: 8
       starts_at_time: 09:40

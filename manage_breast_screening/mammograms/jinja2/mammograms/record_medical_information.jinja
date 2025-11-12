@@ -39,6 +39,12 @@
     {% endfor %}
   {% endset %}
 
+  {% set mastectomy_or_lumpectomy_history_html %}
+    {% for presented_item in presenter.mastectomy_or_lumpectomy_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
+
   {% set implanted_medical_device_history_html %}
     {% for presented_item in presenter.implanted_medical_device_history %}
       {{ summaryList(presented_item.summary_list_params) }}
@@ -131,6 +137,17 @@
        },
        "value": {
          "html": non_cancerous_lump_diagnosis_link
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Mastectomy or lumpectomy history"
+       },
+       "value": {
+         "html": mastectomy_or_lumpectomy_history_html
        },
        "actions": {
           "items": []

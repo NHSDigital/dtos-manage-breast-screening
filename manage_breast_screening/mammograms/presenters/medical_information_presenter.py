@@ -12,6 +12,9 @@ from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_pr
 from manage_breast_screening.mammograms.presenters.implanted_medical_device_history_item_presenter import (
     ImplantedMedicalDeviceHistoryItemPresenter,
 )
+from manage_breast_screening.mammograms.presenters.mastectomy_or_lumpectomy_history_item_presenter import (
+    MastectomyOrLumpectomyHistoryItemPresenter,
+)
 from manage_breast_screening.mammograms.presenters.other_procedure_history_item_presenter import (
     OtherProcedureHistoryItemPresenter,
 )
@@ -33,6 +36,10 @@ class MedicalInformationPresenter:
         self.breast_cancer_history = [
             BreastCancerHistoryItemPresenter(item)
             for item in appointment.breast_cancer_history_items.all()
+        ]
+        self.mastectomy_or_lumpectomy_history = [
+            MastectomyOrLumpectomyHistoryItemPresenter(item)
+            for item in appointment.mastectomy_or_lumpectomy_history_items.all()
         ]
         self.implanted_medical_device_history = [
             ImplantedMedicalDeviceHistoryItemPresenter(item)

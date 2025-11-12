@@ -27,6 +27,7 @@ from manage_breast_screening.participants.models import (
     BreastAugmentationHistoryItem,
     BreastCancerHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
+    MastectomyOrLumpectomyHistoryItem,
     OtherProcedureHistoryItem,
     Participant,
     ParticipantAddress,
@@ -41,6 +42,7 @@ from manage_breast_screening.participants.tests.factories import (
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
+    MastectomyOrLumpectomyHistoryItemFactory,
     OtherProcedureHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
@@ -192,6 +194,12 @@ class Command(BaseCommand):
             self.create_breast_cancer_history_item(
                 appointment, breast_cancer_history_item
             )
+        for mastectomy_or_lumpectomy_history_item in medical_information_key.get(
+            "mastectomy_or_lumpectomy_history_items", []
+        ):
+            self.create_mastectomy_or_lumpectomy_history_item(
+                appointment, mastectomy_or_lumpectomy_history_item
+            )
 
         for implanted_medical_device_history_item in medical_information_key.get(
             "implanted_medical_device_history_items", []
@@ -224,6 +232,13 @@ class Command(BaseCommand):
     ):
         BreastCancerHistoryItemFactory(
             appointment=appointment, **breast_cancer_history_item
+        )
+
+    def create_mastectomy_or_lumpectomy_history_item(
+        self, appointment, mastectomy_or_lumpectomy_history_item
+    ):
+        MastectomyOrLumpectomyHistoryItemFactory(
+            appointment=appointment, **mastectomy_or_lumpectomy_history_item
         )
 
     def create_implanted_medical_device_history_item(
@@ -285,6 +300,7 @@ class Command(BaseCommand):
         Symptom.objects.all().delete()
         BreastAugmentationHistoryItem.objects.all().delete()
         BreastCancerHistoryItem.objects.all().delete()
+        MastectomyOrLumpectomyHistoryItem.objects.all().delete()
         ImplantedMedicalDeviceHistoryItem.objects.all().delete()
         OtherProcedureHistoryItem.objects.all().delete()
         BenignLumpHistoryItem.objects.all().delete()

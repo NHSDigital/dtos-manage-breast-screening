@@ -4,6 +4,7 @@ from .breast_augmentation_history_item import BreastAugmentationHistoryItem
 from .breast_cancer_history_item import BreastCancerHistoryItem
 from .ethnicity import Ethnicity
 from .implanted_medical_device_history_item import ImplantedMedicalDeviceHistoryItem
+from .mastectomy_or_lumpectomy_history_item import MastectomyOrLumpectomyHistoryItem
 from .other_procedure_history_item import OtherProcedureHistoryItem
 from .participant import Participant, ParticipantAddress
 from .reported_mammograms import ParticipantReportedMammogram, SupportReasons
@@ -16,6 +17,7 @@ __all__ = [
     "BenignLumpHistoryItem",
     "BreastAugmentationHistoryItem",
     "BreastCancerHistoryItem",
+    "MastectomyOrLumpectomyHistoryItem",
     "ImplantedMedicalDeviceHistoryItem",
     "OtherProcedureHistoryItem",
     "Participant",
