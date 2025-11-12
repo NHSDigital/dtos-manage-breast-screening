@@ -18,7 +18,7 @@ review: # Target the review infrastructure, or a review app if PR_NUMBER is used
 	$(if ${PR_NUMBER}, $(eval export ENVIRONMENT=pr-${PR_NUMBER}), $(eval export ENVIRONMENT=review))
 
 db-setup:
-	$(if ${TF_VAR_deploy_container_apps},, scripts/bash/db_run_job.sh ${ENVIRONMENT} ${PR_NUMBER})
+	$(if ${TF_VAR_deploy_container_apps},, scripts/bash/run_container_app_job.sh ${ENVIRONMENT} dbm ${PR_NUMBER})
 
 ci: # Skip manual approvals when running in CI - make ci <env> <action>
 	$(eval AUTO_APPROVE=-auto-approve)

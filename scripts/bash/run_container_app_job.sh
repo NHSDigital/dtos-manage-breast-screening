@@ -2,10 +2,19 @@
 
 set -euo pipefail
 
-ENV=$1
-JOB_SHORT_NAME=${2}
-JOB_NAME=manbrs-${JOB_SHORT_NAME}-${ENV}
+ENV_CONFIG=$1
+JOB_SHORT_NAME=$2
+PR_NUMBER=${3:-}
 
+if [ -z "$PR_NUMBER" ]; then
+    # On permanent environments, the environment name is the environment config name, i.e. "production"
+    ENV=${ENV_CONFIG}
+else
+    # On a review app, the environment name uses the PR number, i.e. "pr-1234"
+    ENV=pr-${PR_NUMBER}
+fi
+
+JOB_NAME=manbrs-${JOB_SHORT_NAME}-${ENV}
 RG_NAME=rg-manbrs-${ENV}-container-app-uks
 TIMEOUT=300
 WAIT=5
@@ -16,7 +25,6 @@ get_job_status() {
 }
 
 echo Starting job "$JOB_NAME"...
-
 execution_name=$(az containerapp job start --name "$JOB_NAME" --resource-group "$RG_NAME" | jq -r '.id|split("/")[-1]')
 
 while [[ $(get_job_status) = "Running" ]]; do

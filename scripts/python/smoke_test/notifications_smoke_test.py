@@ -48,7 +48,11 @@ def test_notifications():
         for job in ["smm", "cap", "smb", "smk"]:
             logging.info(f"Running container app job manbrs-{job}-{environment}")
             job_result = subprocess.run(
-                [f"{working_dir()}/run_container_app_job.sh", environment, job],
+                [
+                    f"{working_dir()}/../../bash/run_container_app_job.sh",
+                    environment,
+                    job,
+                ],
                 capture_output=True,
                 text=True,
             )
