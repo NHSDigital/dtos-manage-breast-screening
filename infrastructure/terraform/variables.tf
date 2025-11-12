@@ -166,6 +166,12 @@ variable "enable_notifications_jobs_schedule" {
   default     = false
 }
 
+variable "run_notifications_smoke_test" {
+  description = "Whether we run the smoke test for the notifications container app jobs"
+  default     = false
+  type        = bool
+}
+
 locals {
   region = "uksouth"
 
