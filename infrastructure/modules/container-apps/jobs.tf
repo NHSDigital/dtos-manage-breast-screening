@@ -56,6 +56,14 @@ locals {
       job_short_name     = "crp"
       job_container_args = "create_reports"
     }
+    smoke_test = {
+      cron_expression = null
+      environment_variables = {
+        BLOB_CONTAINER_NAME = "notifications-reports"
+      }
+      job_short_name     = "smk"
+      job_container_args = "create_reports --smoke-test"
+    }
   }
 }
 
