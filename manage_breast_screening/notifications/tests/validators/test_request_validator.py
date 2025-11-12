@@ -71,6 +71,20 @@ class TestRequestValidator:
         req = self.mock_request(headers)
         assert RequestValidator(req).valid() == (False, "Invalid API key")
 
+    def test_valid_invalid_signature(self, mock_insights_logger):
+        """Test that valid headers with invalid signature doesn't pass verification."""
+        signature = "invalid_signature"
+        headers = {
+            RequestValidator.API_KEY_HEADER_NAME: "api_key",
+            RequestValidator.SIGNATURE_HEADER_NAME: signature,
+        }
+        req = self.mock_request(headers)
+        assert RequestValidator(req).valid() == (False, "Signature does not match")
+        mock_insights_logger.assert_called_with(
+            message="Signature does not match",
+            event_name="create_message_status_validation_error",
+        )
+
     def test_valid(self):
         """Test that valid API key and signature headers pass verification."""
         body = '{"this": "that"}'

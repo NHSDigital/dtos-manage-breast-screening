@@ -2,6 +2,10 @@ import hashlib
 import hmac
 import os
 
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
+
 
 class RequestValidator:
     ENCODING = "ASCII"
@@ -18,7 +22,12 @@ class RequestValidator:
             return False, error_message
 
         if not self.verify_signature():
-            return False, "Signature does not match"
+            error_message = "Signature does not match"
+            ApplicationInsightsLogging().custom_event(
+                message=error_message,
+                event_name="create_message_status_validation_error",
+            )
+            return False, error_message
 
         return True, ""
 
