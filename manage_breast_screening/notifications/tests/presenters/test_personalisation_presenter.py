@@ -37,7 +37,7 @@ class TestPersonalisationPresenter:
         assert subject["appointment_location_address"] == (
             "Victoria Health Centre, 5 Suffrage Street, Off Windmill Lane, Smethwick, West Midlands, B66 3PZ"
         )
-        assert subject["appointment_location_description"] == "Off Windmill Lane"
+        assert subject["appointment_location_description"] == ""
         assert (
             subject["appointment_location_url"]
             == "https://www.google.com/maps/search/B66+3PZ"
@@ -79,3 +79,19 @@ class TestPersonalisationPresenter:
         assert subject["appointment_location_postcode"] == "B66 3PZ"
         assert subject["appointment_location_description"] == ""
         assert subject["appointment_location_url"] == ""
+
+    def test_appointment_location_description_is_always_blank(self):
+        """
+        Test that appointment_location_description is always an empty string.
+        This field is not used but is still part of the Notify template,
+        so it must be present to avoid validation failures.
+        """
+        appointment = AppointmentFactory(
+            starts_at=datetime(2025, 10, 13, 15, 15, tzinfo=ZONE_INFO),
+            clinic=ClinicFactory(
+                code="MDSVH",
+                bso_code="MBD",
+            ),
+        )
+        subject = PersonalisationPresenter(appointment).present()
+        assert subject["appointment_location_description"] == ""
