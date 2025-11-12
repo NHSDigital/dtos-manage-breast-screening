@@ -73,3 +73,7 @@ terraform-destroy: terraform-init # Destroy Terraform resources - make <env> ter
 
 terraform-validate: terraform-init-no-backend # Validate Terraform changes - make <env> terraform-validate
 	terraform -chdir=infrastructure/terraform validate
+
+notifications-smoke-test:
+	pip install pytest mesh-client
+	$(if ${TF_VAR_deploy_container_apps},,pytest -vv scripts/python/smoke_test/notifications_smoke_test.py)
