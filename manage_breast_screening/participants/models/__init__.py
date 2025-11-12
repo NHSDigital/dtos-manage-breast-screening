@@ -3,8 +3,8 @@ from .benign_lump_history_item import BenignLumpHistoryItem
 from .breast_augmentation_history_item import BreastAugmentationHistoryItem
 from .breast_cancer_history_item import BreastCancerHistoryItem
 from .ethnicity import Ethnicity
-from .mastectomy_or_lumpectomy_history_item import MastectomyOrLumpectomyHistoryItem
 from .implanted_medical_device_history_item import ImplantedMedicalDeviceHistoryItem
+from .mastectomy_or_lumpectomy_history_item import MastectomyOrLumpectomyHistoryItem
 from .other_procedure_history_item import OtherProcedureHistoryItem
 from .participant import Participant, ParticipantAddress
 from .reported_mammograms import ParticipantReportedMammogram, SupportReasons

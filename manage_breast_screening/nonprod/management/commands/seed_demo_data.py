@@ -26,8 +26,8 @@ from manage_breast_screening.participants.models import (
     BenignLumpHistoryItem,
     BreastAugmentationHistoryItem,
     BreastCancerHistoryItem,
-    MastectomyOrLumpectomyHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
+    MastectomyOrLumpectomyHistoryItem,
     OtherProcedureHistoryItem,
     Participant,
     ParticipantAddress,
@@ -41,8 +41,8 @@ from manage_breast_screening.participants.tests.factories import (
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
-    MastectomyOrLumpectomyHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
+    MastectomyOrLumpectomyHistoryItemFactory,
     OtherProcedureHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
@@ -240,7 +240,7 @@ class Command(BaseCommand):
         MastectomyOrLumpectomyHistoryItemFactory(
             appointment=appointment, **mastectomy_or_lumpectomy_history_item
         )
-        
+
     def create_implanted_medical_device_history_item(
         self, appointment, implanted_medical_device_history_item
     ):

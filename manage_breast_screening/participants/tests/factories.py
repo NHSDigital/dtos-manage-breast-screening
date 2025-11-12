@@ -19,11 +19,10 @@ from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
 )
 from manage_breast_screening.participants.models import (
-    BreastCancerHistoryItem,
-    MastectomyOrLumpectomyHistoryItem,
     BenignLumpHistoryItem,
     BreastCancerHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
+    MastectomyOrLumpectomyHistoryItem,
     OtherProcedureHistoryItem,
 )
 from manage_breast_screening.participants.models.symptom import (
@@ -188,7 +187,7 @@ class MastectomyOrLumpectomyHistoryItemFactory(DjangoModelFactory):
     surgery_reason = MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON
     additional_details = ""
 
-    
+
 class ImplantedMedicalDeviceHistoryItemFactory(DjangoModelFactory):
     class Meta:
         model = models.ImplantedMedicalDeviceHistoryItem
