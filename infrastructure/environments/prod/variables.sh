@@ -6,3 +6,4 @@ HUB=prod
 TERRAFORM_MODULES_REF=main
 ENABLE_SOFT_DELETE=false
 ADO_MANAGEMENT_POOL=private-pool-prod-uks
+RUN_SMOKE_TEST=false
