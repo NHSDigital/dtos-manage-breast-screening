@@ -118,6 +118,7 @@ class ClinicLocationData:
         self.code = clinic.code
         self.bso_code = clinic.bso_code
         self.data = self.location_data()
+        self.description = ""
         self.url = self.data.get("location_url", "")
 
     def location_data(self) -> dict:
