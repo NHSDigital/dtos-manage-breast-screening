@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     appointment_views,
     breast_augmentation_history_view,
+    breast_cancer_history_views,
     cyst_history_view,
     implanted_medical_device_history_view,
     special_appointment_views,
@@ -121,6 +122,11 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
         symptom_views.DeleteSymptomView.as_view(),
         name="delete_symptom",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/breast-cancer-history/",
+        breast_cancer_history_views.AddBreastCancerHistoryView.as_view(),
+        name="add_breast_cancer_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/",

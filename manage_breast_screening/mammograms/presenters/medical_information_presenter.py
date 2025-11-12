@@ -151,6 +151,18 @@ class MedicalInformationPresenter:
         }
 
     @property
+    def add_breast_cancer_history_link(self):
+        url = reverse(
+            "mammograms:add_breast_cancer_history_item",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": ("Add breast cancer history"),
+        }
+
+    @property
     def add_implanted_medical_device_history_link(self):
         url = reverse(
             "mammograms:add_implanted_medical_device_history_item",
