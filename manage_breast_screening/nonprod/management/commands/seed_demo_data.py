@@ -23,8 +23,12 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentStatus,
+    BenignLumpHistoryItem,
+    BreastAugmentationHistoryItem,
     BreastCancerHistoryItem,
     MastectomyOrLumpectomyHistoryItem,
+    ImplantedMedicalDeviceHistoryItem,
+    OtherProcedureHistoryItem,
     Participant,
     ParticipantAddress,
     ParticipantReportedMammogram,
@@ -34,8 +38,12 @@ from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     AppointmentStatusFactory,
+    BenignLumpHistoryItemFactory,
+    BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
+    ImplantedMedicalDeviceHistoryItemFactory,
+    OtherProcedureHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
     ParticipantReportedMammogramFactory,
@@ -193,6 +201,32 @@ class Command(BaseCommand):
                 appointment, mastectomy_or_lumpectomy_history_item
             )
 
+        for implanted_medical_device_history_item in medical_information_key.get(
+            "implanted_medical_device_history_items", []
+        ):
+            self.create_implanted_medical_device_history_item(
+                appointment, implanted_medical_device_history_item
+            )
+
+        for benign_lump_history_item in medical_information_key.get(
+            "benign_lump_history_items", []
+        ):
+            self.create_benign_lump_history_item(appointment, benign_lump_history_item)
+
+        for breast_augmentation_history_item in medical_information_key.get(
+            "breast_augmentation_history_items", []
+        ):
+            self.create_breast_augmentation_history_item(
+                appointment, breast_augmentation_history_item
+            )
+
+        for other_procedure_history_item in medical_information_key.get(
+            "other_procedure_history_items", []
+        ):
+            self.create_other_procedure_history_item(
+                appointment, other_procedure_history_item
+            )
+
     def create_breast_cancer_history_item(
         self, appointment, breast_cancer_history_item
     ):
@@ -205,6 +239,28 @@ class Command(BaseCommand):
     ):
         MastectomyOrLumpectomyHistoryItemFactory(
             appointment=appointment, **mastectomy_or_lumpectomy_history_item
+        )
+        
+    def create_implanted_medical_device_history_item(
+        self, appointment, implanted_medical_device_history_item
+    ):
+        ImplantedMedicalDeviceHistoryItemFactory(
+            appointment=appointment, **implanted_medical_device_history_item
+        )
+
+    def create_breast_augmentation_history_item(self, appointment, item):
+        BreastAugmentationHistoryItemFactory(appointment=appointment, **item)
+
+    def create_other_procedure_history_item(
+        self, appointment, other_procedure_history_item
+    ):
+        OtherProcedureHistoryItemFactory(
+            appointment=appointment, **other_procedure_history_item
+        )
+
+    def create_benign_lump_history_item(self, appointment, benign_lump_history_item):
+        BenignLumpHistoryItemFactory(
+            appointment=appointment, **benign_lump_history_item
         )
 
     def create_participant(self, **participant_key):
@@ -242,8 +298,12 @@ class Command(BaseCommand):
     def reset_db(self):
         UserAssignment.objects.all().delete()
         Symptom.objects.all().delete()
+        BreastAugmentationHistoryItem.objects.all().delete()
         BreastCancerHistoryItem.objects.all().delete()
         MastectomyOrLumpectomyHistoryItem.objects.all().delete()
+        ImplantedMedicalDeviceHistoryItem.objects.all().delete()
+        OtherProcedureHistoryItem.objects.all().delete()
+        BenignLumpHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         Appointment.objects.all().delete()
         ParticipantReportedMammogram.objects.all().delete()

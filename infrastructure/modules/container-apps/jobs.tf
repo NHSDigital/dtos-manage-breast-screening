@@ -81,12 +81,10 @@ module "db_setup" {
   ])
   environment_variables = merge(
     local.common_env,
-    var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
+    var.deploy_database_as_container ? local.container_db_env : local.azure_db_env,
+    { APPLICATIONINSIGHTS_IS_ENABLED = "False" },
   )
-  secret_variables = merge(
-    { APPLICATIONINSIGHTS_CONNECTION_STRING = var.app_insights_connection_string },
-    var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
-  )
+  secret_variables = var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
 
   # alerts
   action_group_id            = var.action_group_id

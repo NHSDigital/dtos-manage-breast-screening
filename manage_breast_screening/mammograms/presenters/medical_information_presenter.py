@@ -1,10 +1,22 @@
 from django.urls import reverse
 
+from manage_breast_screening.mammograms.presenters.benign_lump_history_item_presenter import (
+    BenignLumpHistoryItemPresenter,
+)
+from manage_breast_screening.mammograms.presenters.breast_augmentation_history_item_presenter import (
+    BreastAugmentationHistoryItemPresenter,
+)
 from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
 )
 from manage_breast_screening.mammograms.presenters.mastectomy_or_lumpectomy_history_item_presenter import (
     MastectomyOrLumpectomyHistoryItemPresenter,
+)
+from manage_breast_screening.mammograms.presenters.implanted_medical_device_history_item_presenter import (
+    ImplantedMedicalDeviceHistoryItemPresenter,
+)
+from manage_breast_screening.mammograms.presenters.other_procedure_history_item_presenter import (
+    OtherProcedureHistoryItemPresenter,
 )
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
@@ -28,6 +40,22 @@ class MedicalInformationPresenter:
         self.mastectomy_or_lumpectomy_history = [
             MastectomyOrLumpectomyHistoryItemPresenter(item)
             for item in appointment.mastectomy_or_lumpectomy_history_items.all()
+        ]
+        self.implanted_medical_device_history = [
+            ImplantedMedicalDeviceHistoryItemPresenter(item)
+            for item in appointment.implanted_medical_device_history_items.all()
+        ]
+        self.breast_augmentation_history = [
+            BreastAugmentationHistoryItemPresenter(item)
+            for item in appointment.breast_augmentation_history_items.all()
+        ]
+        self.other_procedure_history = [
+            OtherProcedureHistoryItemPresenter(item)
+            for item in appointment.other_procedure_history_items.all()
+        ]
+        self.benign_lump_history = [
+            BenignLumpHistoryItemPresenter(item)
+            for item in appointment.benign_lump_history_items.all()
         ]
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms

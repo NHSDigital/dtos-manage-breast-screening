@@ -21,6 +21,10 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     BreastCancerHistoryItem,
     MastectomyOrLumpectomyHistoryItem,
+    BenignLumpHistoryItem,
+    BreastCancerHistoryItem,
+    ImplantedMedicalDeviceHistoryItem,
+    OtherProcedureHistoryItem,
 )
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
@@ -183,6 +187,45 @@ class MastectomyOrLumpectomyHistoryItemFactory(DjangoModelFactory):
     year_of_surgery = None
     surgery_reason = MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON
     additional_details = ""
+
+    
+class ImplantedMedicalDeviceHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ImplantedMedicalDeviceHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    device = Iterator(ImplantedMedicalDeviceHistoryItem.Device)
+
+
+class BreastAugmentationHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.BreastAugmentationHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    right_breast_procedures = [
+        models.BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+    ]
+    left_breast_procedures = [
+        models.BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+    ]
+
+
+class OtherProcedureHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.OtherProcedureHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    procedure = Iterator(OtherProcedureHistoryItem.Procedure)
+
+
+class BenignLumpHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.BenignLumpHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    left_breast_procedures = [BenignLumpHistoryItem.Procedure.NO_PROCEDURES]
+    right_breast_procedures = [BenignLumpHistoryItem.Procedure.NO_PROCEDURES]
+    procedure_location = Iterator(BenignLumpHistoryItem.ProcedureLocation)
 
 
 class SymptomFactory(DjangoModelFactory):

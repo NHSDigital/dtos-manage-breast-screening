@@ -71,7 +71,8 @@ def test_create_message_status_with_invalid_request(mock_insights_logger):
     assert response.text == expected_response.text
 
     mock_insights_logger.assert_called_once_with(
-        "Request validation failed: Signature does not match"
+        message="Signature does not match",
+        event_name="create_message_status_validation_error",
     )
 
 

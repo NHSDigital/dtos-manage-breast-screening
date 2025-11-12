@@ -42,6 +42,27 @@ clinic:
               systemic_treatments: NO_SYSTEMIC_TREATMENTS
               intervention_location: NHS_HOSPITAL
               intervention_location_details: East Tester Hospital
+          implanted_medical_device_history_items:
+            - id: b19a4300-82ea-4f14-8bba-cb70b4f83008
+              device: OTHER_MEDICAL_DEVICE
+              other_medical_device_details: Lorem ipsum dolor sit amet
+              procedure_year: 2005
+              removal_year: 2010
+              additional_details: Recalled device, removed in 2010
+          other_procedure_history_items:
+            - id: e3f5c8a1-4d2b-4c6e-9f3a-2b8e5d6c7f8a
+              procedure: BREAST_REDUCTION
+              procedure_details: Lorem ipsum dolor sit amet
+              procedure_year: 2018
+              additional_details: No complications
+          benign_lump_history_items:
+            - id: 271E4B10-BBB2-4FCD-A777-5CE7E9411FEC
+              right_breast_procedures: [NEEDLE_BIOPSY, LUMP_REMOVED]
+              left_breast_procedures: [LUMP_REMOVED]
+              procedure_year: 2005
+              procedure_location: NHS_HOSPITAL
+              procedure_location_details: East Tester Hospital
+              additional_details: Lorem ipsum dolor sit amet
     - id: aa1b4c5c-3742-4f97-aa68-04a6f3bd631b
       duration_in_minutes: 8
       starts_at_time: 09:08
@@ -69,6 +90,13 @@ clinic:
                 - 182 Clinic Road
                 - Leeds
               postcode: L4 8M5
+        medical_information:
+          breast_augmentation_history_items:
+            - right_breast_procedures:
+                - BREAST_IMPLANTS
+              left_breast_procedures:
+                - BREAST_IMPLANTS
+              procedure_year: 2010
     - id: 00edaf2f-71ce-4595-ad07-31940a76dade
       duration_in_minutes: 8
       starts_at_time: 09:16

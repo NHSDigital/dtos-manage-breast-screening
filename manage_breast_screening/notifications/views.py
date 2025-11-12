@@ -26,8 +26,9 @@ def create_message_status(request):
     valid, message = RequestValidator(request).valid()
 
     if not valid:
-        ApplicationInsightsLogging().exception(
-            (f"Request validation failed: {message}")
+        ApplicationInsightsLogging().custom_event(
+            message=message,
+            event_name="create_message_status_validation_error",
         )
         return JsonResponse({"error": {"message": message}}, status=400)
 

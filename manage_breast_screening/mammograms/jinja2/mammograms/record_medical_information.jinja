@@ -38,13 +38,38 @@
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
   {% endset %}
+
   {% set mastectomy_or_lumpectomy_history_html %}
     {% for presented_item in presenter.mastectomy_or_lumpectomy_history %}
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
   {% endset %}
+
+  {% set implanted_medical_device_history_html %}
+    {% for presented_item in presenter.implanted_medical_device_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
+
+  {% set breast_augmentation_history_html %}
+    {% for presented_item in presenter.breast_augmentation_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
+
+  {% set other_procedure_history_html %}
+    {% for presented_item in presenter.other_procedure_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
+
   {% set non_cancerous_lump_diagnosis_link %}
   <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
+  {% endset %}
+  {% set benign_lump_history_html %}
+    {% for presented_item in presenter.benign_lump_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
   {% endset %}
   {% set chest_procedures_link %}
   <a class="nhsuk-link" href="#">Enter other breast or chest procedures</a>
@@ -57,6 +82,50 @@
        },
        "value": {
          "html": breast_cancer_history_html
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Implanted medical device history"
+       },
+       "value": {
+         "html": implanted_medical_device_history_html
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+      "key": {
+         "text": "Breast implants or augmentation"
+       },
+       "value": {
+         "html": breast_augmentation_history_html
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Other procedure history"
+       },
+       "value": {
+         "html": other_procedure_history_html
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Benign lump history"
+       },
+       "value": {
+         "html": benign_lump_history_html
        },
        "actions": {
           "items": []

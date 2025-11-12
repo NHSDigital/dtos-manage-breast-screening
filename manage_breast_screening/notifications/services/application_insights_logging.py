@@ -14,7 +14,9 @@ class ApplicationInsightsLogging:
         self.logger = self.getLogger()
 
     def configure_azure_monitor(self):
-        if boolean_env("APPLICATIONINSIGHTS_IS_ENABLED", False):
+        if boolean_env("APPLICATIONINSIGHTS_IS_ENABLED", False) and os.getenv(
+            "APPLICATIONINSIGHTS_CONNECTION_STRING", ""
+        ):
             # Configure OpenTelemetry to use Azure Monitor with the
             # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
             configure_azure_monitor(
