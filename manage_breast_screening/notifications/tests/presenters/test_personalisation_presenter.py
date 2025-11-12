@@ -37,7 +37,7 @@ class TestPersonalisationPresenter:
         assert subject["appointment_location_address"] == (
             "Victoria Health Centre, 5 Suffrage Street, Off Windmill Lane, Smethwick, West Midlands, B66 3PZ"
         )
-        assert subject["appointment_location_description"] == "Off Windmill Lane"
+        assert subject["appointment_location_description"] == ""
         assert (
             subject["appointment_location_url"]
             == "https://www.google.com/maps/search/B66+3PZ"
