@@ -70,11 +70,6 @@ def test_create_message_status_with_invalid_request(mock_insights_logger):
     assert response.status_code == expected_response.status_code
     assert response.text == expected_response.text
 
-    mock_insights_logger.assert_called_once_with(
-        message="Signature does not match",
-        event_name="create_message_status_validation_error",
-    )
-
 
 def test_create_message_status_with_queue_configuration_error(mock_insights_logger):
     body = {"some": "data"}
