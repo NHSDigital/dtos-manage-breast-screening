@@ -68,6 +68,9 @@ def test_notifications():
 
         assert report_filename in download_result.stdout
 
+        report_contents = open(f"{working_dir()}/{report_filename}").read()
+        assert "SM0K3" in report_contents
+
         logging.info("Finished notifications smoke test")
     finally:
         # Delete smoke test generated report
