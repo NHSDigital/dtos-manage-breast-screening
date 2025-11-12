@@ -26,7 +26,7 @@ class PersonalisationPresenter:
             "appointment_time": self.appointment_time,
             "appointment_clinic_name": self.titlecase(self.clinic.name),
             "appointment_location_address": self.appointment_location_address,
-            "appointment_location_description": self.clinic_location_data.description,
+            "appointment_location_description": "",
             "appointment_location_url": self.clinic_location_data.url,
             "BSO_phone_number": self.bso_contact_data.phone,
             "BSO_email_address": self.bso_contact_data.email,
