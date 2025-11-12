@@ -71,6 +71,7 @@ clinic:
               systemic_treatments: NO_RADIOTHERAPY
               intervention_location: NHS_HOSPITAL
               intervention_location_details: East Tester Hospital
+
     - id: c19bf83e-a1b5-4374-a84d-ab29d24e995d
       duration_in_minutes: 8
       starts_at_time: 09:16

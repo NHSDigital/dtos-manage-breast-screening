@@ -60,6 +60,11 @@
   {% set non_cancerous_lump_diagnosis_link %}
   <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
   {% endset %}
+  {% set benign_lump_history_html %}
+    {% for presented_item in presenter.benign_lump_history %}
+      {{ summaryList(presented_item.summary_list_params) }}
+    {% endfor %}
+  {% endset %}
   {% set chest_procedures_link %}
   <a class="nhsuk-link" href="#">Enter other breast or chest procedures</a>
   {% endset %}
@@ -104,6 +109,17 @@
        },
        "value": {
          "html": other_procedure_history_html
+       },
+       "actions": {
+          "items": []
+       }
+     },
+     {
+       "key": {
+         "text": "Benign lump history"
+       },
+       "value": {
+         "html": benign_lump_history_html
        },
        "actions": {
           "items": []

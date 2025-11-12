@@ -19,6 +19,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
 )
 from manage_breast_screening.participants.models import (
+    BenignLumpHistoryItem,
     BreastCancerHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
     OtherProcedureHistoryItem,
@@ -199,6 +200,16 @@ class OtherProcedureHistoryItemFactory(DjangoModelFactory):
 
     appointment = SubFactory(AppointmentFactory)
     procedure = Iterator(OtherProcedureHistoryItem.Procedure)
+
+
+class BenignLumpHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.BenignLumpHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    left_breast_procedures = [BenignLumpHistoryItem.Procedure.NO_PROCEDURES]
+    right_breast_procedures = [BenignLumpHistoryItem.Procedure.NO_PROCEDURES]
+    procedure_location = Iterator(BenignLumpHistoryItem.ProcedureLocation)
 
 
 class SymptomFactory(DjangoModelFactory):
