@@ -1,4 +1,7 @@
+from urllib.parse import urlencode
+
 import pytest
+from django.http import QueryDict
 
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
@@ -14,10 +17,15 @@ class TestAppointmentCannotGoAheadForm:
         appointment = AppointmentFactory()
         assert not appointment.reinvite
 
-        form_data = {
-            "stopped_reasons": ["failed_identity_check"],
-            "decision": decision,
-        }
+        form_data = QueryDict(
+            urlencode(
+                {
+                    "stopped_reasons": ["failed_identity_check"],
+                    "decision": decision,
+                },
+                doseq=True,
+            )
+        )
         form = AppointmentCannotGoAheadForm(form_data, instance=appointment)
         form.is_valid()
         form.save()
