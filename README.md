@@ -91,6 +91,14 @@ Database migrations are handled by [Django's database migration functionality](h
 
 Note the database migration runs in the deployment pipeline _after_ the application deployment. The deployed code must be compatible with the schema before AND after the schema changes. This also removes potential errors when using a rolling app deployment as multiple app versions may access the database at the same time. To enforce it, make sure to always separate code changes and database migrations into different pull requests.
 
+We are using [django-linear-migrations](https://adamj.eu/tech/2020/12/10/introducing-django-linear-migrations/) to manage conflicts in the migration history. If you get a conflict in `max_migrations.txt`, you will need to:
+
+1. migrate back to the common anscestor migration, e.g. `uv run ./manage.py migrate mammograms 0030`.
+2. rebase your git branch
+3. resolve the migration conflict using `uv run ./manage.py rebase_migration`.
+
+If you have multiple migrations on your branch, you will need to squash them together before running `rebase_migration`.
+
 #### Demo data
 
 There is a make task to seed a non-production instance of the service with example data
