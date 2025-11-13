@@ -166,13 +166,11 @@ class TestCreateReports:
         """
         Test that reports with should_email=False are not emailed but still stored.
         """
-        # Patching the original reports to add an "internal" report - this won't be necessary
-        # once we have a real internal report. See DTOSS-11616
-        original_reports = Command.REPORTS.copy()
-        reports_with_internal_report = original_reports + [
-            ["internal_report", [now.date()], "internal_report", False]
+        test_reports = [
+            ["external_report", [now.date()], "external_report", True],
+            ["internal_report", [now.date()], "internal_report", False],
         ]
-        monkeypatch.setattr(Command, "REPORTS", reports_with_internal_report)
+        monkeypatch.setattr(Command, "REPORTS", test_reports)
 
         with patch(
             "manage_breast_screening.notifications.queries.helper.Helper.sql"
@@ -184,9 +182,9 @@ class TestCreateReports:
 
             mock_read_sql, mock_blob_storage, mock_email_service = md
 
-            assert mock_read_sql.call_count == 4
-            assert mock_blob_storage.add.call_count == 4
-            assert mock_email_service.send_report_email.call_count == 3
+            assert mock_read_sql.call_count == 2
+            assert mock_blob_storage.add.call_count == 2
+            assert mock_email_service.send_report_email.call_count == 1
 
             internal_filename = (
                 f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-internal-report-report.csv"
