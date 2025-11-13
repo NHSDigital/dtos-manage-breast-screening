@@ -172,6 +172,13 @@ class BreastCancerHistoryItemFactory(DjangoModelFactory):
     right_breast_other_surgery = [BreastCancerHistoryItem.Surgery.NO_SURGERY]
     left_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
     right_breast_treatment = [BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY]
+    systemic_treatments = (
+        BreastCancerHistoryItem.SystemicTreatment.NO_SYSTEMIC_TREATMENTS
+    )
+
+    intervention_location = (
+        BreastCancerHistoryItem.InterventionLocation.EXACT_LOCATION_UNKNOWN
+    )
 
 
 class MastectomyOrLumpectomyHistoryItemFactory(DjangoModelFactory):

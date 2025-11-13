@@ -1,6 +1,8 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
+from manage_breast_screening.nhsuk_forms.validators import ExcludesOtherOptionsValidator
+
 from ...core.models import BaseModel
 from .appointment import Appointment
 
@@ -54,24 +56,44 @@ class BreastCancerHistoryItem(BaseModel):
         related_name="breast_cancer_history_items",
     )
     diagnosis_location = models.CharField(choices=DiagnosisLocationChoices)
-    diagnosis_year = models.IntegerField(null=True)
+    diagnosis_year = models.IntegerField(null=True, blank=True)
     left_breast_procedure = models.CharField(choices=Procedure)
     right_breast_procedure = models.CharField(choices=Procedure)
     left_breast_other_surgery = ArrayField(
         base_field=models.CharField(choices=Surgery),
         default=list,
+        validators=[
+            ExcludesOtherOptionsValidator(
+                Surgery.NO_SURGERY.value, Surgery.NO_SURGERY.label
+            )
+        ],
     )
     right_breast_other_surgery = ArrayField(
         base_field=models.CharField(choices=Surgery),
         default=list,
+        validators=[
+            ExcludesOtherOptionsValidator(
+                Surgery.NO_SURGERY.value, Surgery.NO_SURGERY.label
+            )
+        ],
     )
     left_breast_treatment = ArrayField(
         base_field=models.CharField(choices=Treatment),
         default=list,
+        validators=[
+            ExcludesOtherOptionsValidator(
+                Treatment.NO_RADIOTHERAPY.value, Treatment.NO_RADIOTHERAPY.label
+            )
+        ],
     )
     right_breast_treatment = ArrayField(
         base_field=models.CharField(choices=Treatment),
         default=list,
+        validators=[
+            ExcludesOtherOptionsValidator(
+                Treatment.NO_RADIOTHERAPY.value, Treatment.NO_RADIOTHERAPY.label
+            )
+        ],
     )
 
     systemic_treatments = models.CharField(choices=SystemicTreatment)
