@@ -35,9 +35,9 @@ class Command(BaseCommand):
     BSO_CODES = ["MBD"]
 
     REPORTS = [
-        ["aggregate", ["3 months"], None],
-        ["failures", [datetime.now(tz=ZONE_INFO).date()], "invites_not_sent"],
-        ["reconciliation", [datetime.now(tz=ZONE_INFO).date()], None],
+        ["aggregate", ["3 months"], None, True],
+        ["failures", [datetime.now(tz=ZONE_INFO).date()], "invites_not_sent", True],
+        ["reconciliation", [datetime.now(tz=ZONE_INFO).date()], None, True],
     ]
 
     def add_arguments(self, parser):
@@ -50,7 +50,7 @@ class Command(BaseCommand):
             bso_codes, report_configs = self.configuration(options)
 
             for bso_code in bso_codes:
-                for filename, params, report_type in report_configs:
+                for filename, params, report_type, should_email in report_configs:
                     dataframe = pandas.read_sql(
                         Helper.sql(filename), connection, params=(params + [bso_code])
                     )
@@ -66,7 +66,7 @@ class Command(BaseCommand):
                         content_type="text/csv",
                         container_name=os.getenv("REPORTS_CONTAINER_NAME"),
                     )
-                    if not self.is_smoke_test(options):
+                    if not self.is_smoke_test(options) and should_email:
                         NhsMail().send_report_email(
                             attachment_data=csv,
                             attachment_filename=self.filename(bso_code, report_type),
