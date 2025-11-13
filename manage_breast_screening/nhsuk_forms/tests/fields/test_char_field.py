@@ -61,6 +61,7 @@ class TestCharField:
                 max_words=None,
             )
             char_count_max_words = CharField(label="Text", widget=Textarea, max_words=5)
+            inputmode = CharField(label="Inputmode", inputmode="numeric")
 
         return TestForm
 
@@ -242,3 +243,15 @@ class TestCharField:
 
         with pytest.raises(ValidationError, match="Enter 5 words or less"):
             field.clean("one two three four five six")
+
+    def test_renders_inputmode(self, form_class):
+        assertHTMLEqual(
+            form_class()["inputmode"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_inputmode">
+                    Inputmode
+                </label><input class="nhsuk-input" id="id_inputmode" name="inputmode" type="text" inputmode="numeric" value="">
+            </div>
+            """,
+        )

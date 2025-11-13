@@ -8,6 +8,7 @@ class IntegerField(forms.IntegerField):
         hint=None,
         label_classes=None,
         classes=None,
+        inputmode="numeric",
         **kwargs,
     ):
         kwargs["template_name"] = "forms/input.jinja"
@@ -15,6 +16,7 @@ class IntegerField(forms.IntegerField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
+        self.inputmode = inputmode
 
         super().__init__(*args, **kwargs)
 

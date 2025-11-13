@@ -23,6 +23,7 @@ class CharField(forms.CharField):
         label_classes=None,
         classes=None,
         visually_hidden_label_suffix=None,
+        inputmode=None,
         **kwargs,
     ):
         self.hint = hint
@@ -32,6 +33,7 @@ class CharField(forms.CharField):
         self.max_length = max_length
         self.max_words = max_words
         self.threshold = threshold
+        self.inputmode = inputmode
 
         if max_length and max_words:
             raise ValueError("Cannot set both max_length and max_words")

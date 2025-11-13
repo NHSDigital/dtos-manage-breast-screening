@@ -20,7 +20,7 @@ class TestIntegerField:
             <div class="nhsuk-form-group">
                 <label class="nhsuk-label" for="id_field">
                     Abc
-                </label><input class="nhsuk-input" id="id_field" name="field" type="number" value="1">
+                </label><input class="nhsuk-input" id="id_field" name="field" type="number" value="1" inputmode="numeric">
             </div>
             """,
         )
