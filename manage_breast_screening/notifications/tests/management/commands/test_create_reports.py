@@ -8,6 +8,7 @@ from django.db import connection
 
 from manage_breast_screening.notifications.management.commands.create_reports import (
     Command,
+    ReportConfig,
 )
 from manage_breast_screening.notifications.queries.helper import Helper
 
@@ -167,8 +168,18 @@ class TestCreateReports:
         Test that reports with should_email=False are not emailed but still stored.
         """
         test_reports = [
-            ["external_report", [now.date()], "external_report", True],
-            ["internal_report", [now.date()], "internal_report", False],
+            ReportConfig(
+                query_filename="external_report",
+                params=[now.date()],
+                report_filename="external_report",
+                should_send_email=True,
+            ),
+            ReportConfig(
+                query_filename="internal_report",
+                params=[now.date()],
+                report_filename="internal_report",
+                should_send_email=False,
+            ),
         ]
         monkeypatch.setattr(Command, "REPORTS", test_reports)
 
