@@ -58,6 +58,8 @@ class ChoiceField(forms.ChoiceField):
         *args,
         hint=None,
         label_classes="nhsuk-fieldset__legend--m",
+        visually_hidden_label_prefix=None,
+        visually_hidden_label_suffix=None,
         classes=None,
         **kwargs,
     ):
@@ -68,6 +70,8 @@ class ChoiceField(forms.ChoiceField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
+        self.visually_hidden_label_prefix = visually_hidden_label_prefix
+        self.visually_hidden_label_suffix = visually_hidden_label_suffix
 
         super().__init__(*args, **kwargs)
 
@@ -100,6 +104,8 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         *args,
         hint=None,
         label_classes="nhsuk-fieldset__legend--m",
+        visually_hidden_label_prefix=None,
+        visually_hidden_label_suffix=None,
         classes=None,
         **kwargs,
     ):
@@ -108,5 +114,7 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
+        self.visually_hidden_label_prefix = visually_hidden_label_prefix
+        self.visually_hidden_label_suffix = visually_hidden_label_suffix
 
         super().__init__(*args, **kwargs)

@@ -7,6 +7,8 @@ class IntegerField(forms.IntegerField):
         *args,
         hint=None,
         label_classes=None,
+        visually_hidden_label_prefix=None,
+        visually_hidden_label_suffix=None,
         classes=None,
         inputmode="numeric",
         **kwargs,
@@ -16,6 +18,8 @@ class IntegerField(forms.IntegerField):
         self.hint = hint
         self.classes = classes
         self.label_classes = label_classes
+        self.visually_hidden_label_prefix = visually_hidden_label_prefix
+        self.visually_hidden_label_suffix = visually_hidden_label_suffix
         self.inputmode = inputmode
 
         super().__init__(*args, **kwargs)

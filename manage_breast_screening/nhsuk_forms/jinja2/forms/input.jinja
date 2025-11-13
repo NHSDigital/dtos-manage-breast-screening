@@ -1,15 +1,10 @@
 {% from "nhsuk/components/input/macro.jinja" import input %}
+{% from "forms/label.jinja" import label_html %}
 {% set unbound_field = field.field %}
 {% set widget = unbound_field.widget %}
-{% if unbound_field.visually_hidden_label_suffix %}
-  {% set label_html %}
-    {{ field.label }}<span class="nhsuk-u-visually-hidden">: {{ unbound_field.visually_hidden_label_suffix }}</span>
-  {% endset %}
-{% endif %}
 {% set input_params = {
     "label": {
-      "text": field.label,
-      "html": label_html if label_html,
+      "html": label_html(field),
       "classes": unbound_field.label_classes if unbound_field.label_classes
     },
     "hint": {

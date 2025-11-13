@@ -1,9 +1,10 @@
 {% from "textarea/macro.jinja" import textarea %}
+{% from "forms/label.jinja" import label_html %}
 {% set unbound_field = field.field %}
 {% set widget = unbound_field.widget %}
 {% set textarea_params = {
     "label": {
-      "text": field.label,
+      "html": label_html(field),
       "classes": unbound_field.label_classes if unbound_field.label_classes
     },
     "hint": {

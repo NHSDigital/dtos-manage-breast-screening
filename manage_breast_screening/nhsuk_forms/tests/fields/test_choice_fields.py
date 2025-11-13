@@ -28,6 +28,13 @@ class TestChoiceField:
                 hint="Pick either one",
                 widget=Select,
             )
+            with_prefix_suffix = ChoiceField(
+                label="Abc",
+                visually_hidden_label_prefix="prefix: ",
+                visually_hidden_label_suffix=" - suffix",
+                choices=(("a", "A"), ("b", "B")),
+                hint="Pick either one",
+            )
             details = CharField(label="Abc", initial="")
 
         return TestForm
@@ -85,6 +92,33 @@ class TestChoiceField:
                         </div>
                         <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
                             <p>Hello</p>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            """,
+        )
+
+    def test_renders_labels_with_visually_hidden_text(self, form_class):
+        assertHTMLEqual(
+            form_class()["with_prefix_suffix"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <fieldset aria-describedby="id_with_prefix_suffix-hint" class="nhsuk-fieldset">
+                    <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+                        <span class="nhsuk-u-visually-hidden">prefix: </span>Abc<span class="nhsuk-u-visually-hidden"> - suffix</span>
+                    </legend>
+                    <div class="nhsuk-hint" id="id_with_prefix_suffix-hint">
+                        Pick either one
+                    </div>
+                    <div class="nhsuk-radios" data-module="nhsuk-radios">
+                        <div class="nhsuk-radios__item">
+                            <input class="nhsuk-radios__input" id="id_with_prefix_suffix" name="with_prefix_suffix" type="radio" value="a">
+                            <label class="nhsuk-label nhsuk-radios__label" for="id_with_prefix_suffix">A</label>
+                        </div>
+                        <div class="nhsuk-radios__item">
+                            <input class="nhsuk-radios__input" id="id_with_prefix_suffix-2" name="with_prefix_suffix" type="radio" value="b">
+                            <label class="nhsuk-label nhsuk-radios__label" for="id_with_prefix_suffix-2">B</label>
                         </div>
                     </div>
                 </fieldset>

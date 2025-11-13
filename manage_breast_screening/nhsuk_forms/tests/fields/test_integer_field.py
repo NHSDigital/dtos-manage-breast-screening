@@ -9,7 +9,13 @@ class TestIntegerField:
     @pytest.fixture
     def form_class(self):
         class TestForm(Form):
-            field = IntegerField(label="Abc", initial=1, max_value=10)
+            field = IntegerField(
+                label="Abc",
+                initial=1,
+                max_value=10,
+                visually_hidden_label_prefix="prefix: ",
+                visually_hidden_label_suffix=" - suffix",
+            )
 
         return TestForm
 
@@ -19,7 +25,7 @@ class TestIntegerField:
             """
             <div class="nhsuk-form-group">
                 <label class="nhsuk-label" for="id_field">
-                    Abc
+                    <span class="nhsuk-u-visually-hidden">prefix: </span>Abc<span class="nhsuk-u-visually-hidden"> - suffix</span>
                 </label><input class="nhsuk-input" id="id_field" name="field" type="number" value="1" inputmode="numeric">
             </div>
             """,

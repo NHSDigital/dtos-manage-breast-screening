@@ -18,10 +18,15 @@ class TestCharField:
                 initial="somevalue",
                 label_classes="nhsuk-u-visually-hidden",
             )
+            field_with_visually_hidden_label_prefix = CharField(
+                label="Abc",
+                initial="somevalue",
+                visually_hidden_label_prefix="some prefix: ",
+            )
             field_with_visually_hidden_label_suffix = CharField(
                 label="Abc",
                 initial="somevalue",
-                visually_hidden_label_suffix="some suffix",
+                visually_hidden_label_suffix=": some suffix",
             )
             field_with_hint = CharField(
                 label="With hint", initial="", hint="ALL UPPERCASE"
@@ -85,6 +90,18 @@ class TestCharField:
                 <label class="nhsuk-label nhsuk-u-visually-hidden" for="id_field_with_visually_hidden_label">
                     Abc
                 </label><input class="nhsuk-input" id="id_field_with_visually_hidden_label" name="field_with_visually_hidden_label" type="text" value="somevalue">
+            </div>
+            """,
+        )
+
+    def test_renders_nhs_input_with_visually_hidden_label_prefix(self, form_class):
+        assertHTMLEqual(
+            form_class()["field_with_visually_hidden_label_prefix"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <label class="nhsuk-label" for="id_field_with_visually_hidden_label_prefix">
+                    <span class="nhsuk-u-visually-hidden">some prefix: </span>Abc
+                </label><input class="nhsuk-input" id="id_field_with_visually_hidden_label_prefix" name="field_with_visually_hidden_label_prefix" type="text" value="somevalue">
             </div>
             """,
         )

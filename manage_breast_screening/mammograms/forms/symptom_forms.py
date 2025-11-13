@@ -233,13 +233,15 @@ class SymptomForm(FormWithConditionalFields):
 class LumpForm(SymptomForm):
     area = CommonFields.area_radios(symptom_name="lump")
     area_description_right_breast = CommonFields.area_description(
-        "lump", visually_hidden_label_suffix="right breast"
+        "lump", visually_hidden_label_suffix=": right breast"
     )
     area_description_left_breast = CommonFields.area_description(
-        "lump", visually_hidden_label_suffix="left breast"
+        "lump", visually_hidden_label_suffix=": left breast"
     )
     area_description_other = CommonFields.area_description(
-        "lump", visually_hidden_label_suffix="other", classes="nhsuk-u-width-two-thirds"
+        "lump",
+        visually_hidden_label_suffix=": other",
+        classes="nhsuk-u-width-two-thirds",
     )
     when_started = CommonFields.when_started
     specific_date = CommonFields.specific_date
@@ -269,14 +271,14 @@ class LumpForm(SymptomForm):
 class SwellingOrShapeChangeForm(SymptomForm):
     area = CommonFields.area_radios(symptom_name="swelling or shape change")
     area_description_right_breast = CommonFields.area_description(
-        "swelling or shape change", visually_hidden_label_suffix="right breast"
+        "swelling or shape change", visually_hidden_label_suffix=": right breast"
     )
     area_description_left_breast = CommonFields.area_description(
-        "swelling or shape change", visually_hidden_label_suffix="left breast"
+        "swelling or shape change", visually_hidden_label_suffix=": left breast"
     )
     area_description_other = CommonFields.area_description(
         "swelling or shape change",
-        visually_hidden_label_suffix="other",
+        visually_hidden_label_suffix=": other",
         classes="nhsuk-u-width-two-thirds",
     )
     when_started = CommonFields.when_started
@@ -311,14 +313,14 @@ class SwellingOrShapeChangeForm(SymptomForm):
 class SkinChangeForm(SymptomForm):
     area = CommonFields.area_radios(symptom_name="skin change")
     area_description_right_breast = CommonFields.area_description(
-        "skin change", visually_hidden_label_suffix="right breast"
+        "skin change", visually_hidden_label_suffix=": right breast"
     )
     area_description_left_breast = CommonFields.area_description(
-        "skin change", visually_hidden_label_suffix="left breast"
+        "skin change", visually_hidden_label_suffix=": left breast"
     )
     area_description_other = CommonFields.area_description(
         "skin change",
-        visually_hidden_label_suffix="other",
+        visually_hidden_label_suffix=": other",
         classes="nhsuk-u-width-two-thirds",
     )
     symptom_sub_type = ChoiceField(
@@ -442,13 +444,13 @@ class NippleChangeForm(SymptomForm):
 class OtherSymptomForm(SymptomForm):
     area = CommonFields.area_radios()
     area_description_right_breast = CommonFields.area_description(
-        visually_hidden_label_suffix="right breast"
+        visually_hidden_label_suffix=": right breast"
     )
     area_description_left_breast = CommonFields.area_description(
-        visually_hidden_label_suffix="left breast"
+        visually_hidden_label_suffix=": left breast"
     )
     area_description_other = CommonFields.area_description(
-        visually_hidden_label_suffix="other", classes="nhsuk-u-width-two-thirds"
+        visually_hidden_label_suffix=": other", classes="nhsuk-u-width-two-thirds"
     )
     symptom_sub_type_details = CharField(
         label="Describe the symptom",
