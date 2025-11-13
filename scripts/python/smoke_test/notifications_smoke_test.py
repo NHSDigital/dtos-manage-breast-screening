@@ -8,97 +8,79 @@ from tempfile import NamedTemporaryFile
 
 from mesh_client import INT_ENDPOINT, MeshClient
 
+CONTAINER_NAME = "notifications-reports"
+REPORT_FILENAME = "SM0K3-reconciliation-report.csv"
+WORK_DIR = os.path.dirname(os.path.realpath(__file__))
+STARTUP_SCRIPT_PATH = f"{WORK_DIR}/../../bash/run_container_app_job.sh"
+
 
 def test_notifications():
     try:
-        environment = os.getenv("ENVIRONMENT", "dev")
-        pr_number = os.getenv("PR_NUMBER")
+        logging.info("Running notifications smoke test")
+
+        environment, storage_account, resource_group_name = configure()
 
         if environment == "prod":
             return
 
-        storage_account = f"stmanbrs{environment}uks"
+        setup_mesh_inbox_test_data(environment, resource_group_name)
 
-        if pr_number is not None:
-            environment = f"pr-{pr_number}"
-            storage_account = f"stmanbrspr{pr_number}uks"
-
-        logging.info("Running notifications smoke test")
-        resource_group_name = f"rg-manbrs-{environment}-container-app-uks"
-        containerapp_name = f"manbrs-web-{environment}"
-        container_name = "notifications-reports"
-        pattern = "SM0K3-*-report.csv"
-
-        # Fetch MESH connection secrets and store in env
-        populate_mesh_env_vars(resource_group_name, containerapp_name)
-
-        # Add smoke test data DAT file to MESH inbox
-        mesh_client().send_message(
-            os.getenv("NBSS_MESH_INBOX_NAME"),
-            smoke_test_data().encode("ASCII"),
-            subject="Smoke test data",
-        )
-
-        # Execute container app jobs:
-        # smm: Store MESH messages - Move the DAT file from MESH to blob storage.
-        # cap: Create Appointments - Read today's files from blob storage and create
-        #      Clinic and Appointment records for them.
-        # smb: Send Message Batch - Send messages for today's Appointment records.
-        # smk: Create smoke test report - Create and export report to blob storage.
         for job in ["smm", "cap", "smb", "smk"]:
-            logging.info(f"Running container app job manbrs-{job}-{environment}")
-            job_result = subprocess.run(
-                [
-                    f"{working_dir()}/../../bash/run_container_app_job.sh",
-                    environment,
-                    job,
-                ],
-                capture_output=True,
-                text=True,
+            job_result = run_subprocess(
+                f"Starting notifications container app job manbrs-{job}-{environment}",
+                [STARTUP_SCRIPT_PATH, environment, job],
             )
             assert job_result.returncode == 0
 
-        # Download report
-        download_result = subprocess.run(
-            azure_storage_blob_download_reports_command(
-                container_name, storage_account, pattern
-            ),
-            capture_output=True,
-            text=True,
+        download_result = run_subprocess(
+            "Downloading generated smoke test report from blob storage",
+            azure_storage_blob_download_reports_command(storage_account),
         )
         assert download_result.returncode == 0
+        assert REPORT_FILENAME in download_result.stdout
 
-        report_filename = "SM0K3-reconciliation-report.csv"
-
-        assert report_filename in download_result.stdout
-
-        report_contents = open(f"{working_dir()}/{report_filename}").read()
+        report_contents = open(f"{WORK_DIR}/{REPORT_FILENAME}").read()
         assert "SM0K3" in report_contents
 
         logging.info("Finished notifications smoke test")
     finally:
-        # Delete smoke test generated report
-        subprocess.run(
-            azure_storage_blob_delete_reports_command(
-                container_name, storage_account, pattern
-            )
+        run_subprocess(
+            "Deleting generated smoke test report from blob storage",
+            azure_storage_blob_delete_reports_command(storage_account),
         )
 
 
-def azure_storage_blob_download_reports_command(
-    container_name, storage_account, pattern
-) -> list[str]:
+def configure():
+    environment = os.getenv("ENVIRONMENT", "dev")
+    pr_number = os.getenv("PR_NUMBER")
+    storage_account = f"stmanbrs{environment}uks"
+
+    if pr_number is not None:
+        environment = f"pr-{pr_number}"
+        storage_account = f"stmanbrspr{pr_number}uks"
+
+    resource_group_name = f"rg-manbrs-{environment}-container-app-uks"
+
+    return (environment, storage_account, resource_group_name)
+
+
+def run_subprocess(description: str, command: list[str]):
+    logging.info(description)
+    return subprocess.run(command, capture_output=True, text=True)
+
+
+def azure_storage_blob_download_reports_command(storage_account: str) -> list[str]:
     return [
         "az",
         "storage",
         "blob",
         "download-batch",
         "--destination",
-        working_dir(),
+        WORK_DIR,
         "--source",
-        container_name,
+        CONTAINER_NAME,
         "--pattern",
-        pattern,
+        REPORT_FILENAME,
         "--account-name",
         storage_account,
         "--auth-mode",
@@ -106,18 +88,16 @@ def azure_storage_blob_download_reports_command(
     ]
 
 
-def azure_storage_blob_delete_reports_command(
-    container_name, storage_account, pattern
-) -> list[str]:
+def azure_storage_blob_delete_reports_command(storage_account: str) -> list[str]:
     return [
         "az",
         "storage",
         "blob",
         "delete-batch",
         "--source",
-        container_name,
+        CONTAINER_NAME,
         "--pattern",
-        pattern,
+        REPORT_FILENAME,
         "--account-name",
         storage_account,
         "--auth-mode",
@@ -125,7 +105,17 @@ def azure_storage_blob_delete_reports_command(
     ]
 
 
-def populate_mesh_env_vars(resource_group: str, containerapp_name: str):
+def setup_mesh_inbox_test_data(environment: str, resource_group_name: str):
+    populate_mesh_env_vars(environment, resource_group_name)
+    mesh_client().send_message(
+        os.getenv("NBSS_MESH_INBOX_NAME"),
+        smoke_test_data().encode("ASCII"),
+        subject="Smoke test data",
+    )
+
+
+def populate_mesh_env_vars(environment: str, resource_group: str):
+    containerapp_name = f"manbrs-web-{environment}"
     secret_names = [
         "NBSS-MESH-INBOX-NAME",
         "NBSS-MESH-PASSWORD",
@@ -165,12 +155,8 @@ def populate_env_secret_from_azure_containerapp(
     os.environ[env_var_name] = data["value"]
 
 
-def working_dir() -> str:
-    return os.path.dirname(os.path.realpath(__file__))
-
-
 def smoke_test_data() -> str:
-    data = open(f"{working_dir()}/smoke_test_data.dat").read()
+    data = open(f"{WORK_DIR}/smoke_test_data.dat").read()
     data = data.replace("20250101", datetime.now().strftime("%Y%m%d"))
     return data.replace("SM0K3-0000000000", f"SM0K3-{time.time_ns()}")
 
