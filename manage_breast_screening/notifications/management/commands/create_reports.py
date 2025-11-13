@@ -18,6 +18,22 @@ logger = getLogger(__name__)
 INSIGHTS_ERROR_NAME = "CreateReportsError"
 
 
+class ReportConfig:
+    """Config for a report to be generated. Report filename defaults to the query filename if not provided."""
+
+    def __init__(
+        self,
+        query_filename: str,
+        params: list,
+        report_filename: str | None = None,
+        should_send_email: bool = False,
+    ):
+        self.query_filename = query_filename
+        self.params = params
+        self.report_filename = report_filename or query_filename
+        self.should_send_email = should_send_email
+
+
 class Command(BaseCommand):
     """
     Django Admin command which generates and stores CSV report data based on
@@ -35,9 +51,24 @@ class Command(BaseCommand):
     BSO_CODES = ["MBD"]
 
     REPORTS = [
-        ["aggregate", ["3 months"], None, True],
-        ["failures", [datetime.now(tz=ZONE_INFO).date()], "invites_not_sent", True],
-        ["reconciliation", [datetime.now(tz=ZONE_INFO).date()], None, True],
+        ReportConfig(
+            query_filename="aggregate",
+            params=["3 months"],
+            report_filename="aggregate",
+            should_send_email=True,
+        ),
+        ReportConfig(
+            query_filename="failures",
+            params=[datetime.now(tz=ZONE_INFO).date()],
+            report_filename="invites_not_sent",
+            should_send_email=True,
+        ),
+        ReportConfig(
+            query_filename="reconciliation",
+            params=[datetime.now(tz=ZONE_INFO).date()],
+            report_filename="reconciliation",
+            should_send_email=True,
+        ),
     ]
 
     def add_arguments(self, parser):
@@ -50,32 +81,36 @@ class Command(BaseCommand):
             bso_codes, report_configs = self.configuration(options)
 
             for bso_code in bso_codes:
-                for filename, params, report_type, should_email in report_configs:
+                for report_config in report_configs:
                     dataframe = pandas.read_sql(
-                        Helper.sql(filename), connection, params=(params + [bso_code])
+                        Helper.sql(report_config.query_filename),
+                        connection,
+                        params=(report_config.params + [bso_code]),
                     )
 
                     csv = dataframe.to_csv(index=False)
 
-                    if not report_type:
-                        report_type = filename
-
                     BlobStorage().add(
-                        self.filename(bso_code, report_type),
+                        self.filename(bso_code, report_config.report_filename),
                         csv,
                         content_type="text/csv",
                         container_name=os.getenv("REPORTS_CONTAINER_NAME"),
                     )
-                    if not self.is_smoke_test(options) and should_email:
+                    if (
+                        not self.is_smoke_test(options)
+                        and report_config.should_send_email
+                    ):
                         NhsMail().send_report_email(
                             attachment_data=csv,
-                            attachment_filename=self.filename(bso_code, report_type),
-                            report_type=report_type,
+                            attachment_filename=self.filename(
+                                bso_code, report_config.report_filename
+                            ),
+                            report_type=report_config.report_filename,
                         )
 
-                    logger.info("Report %s created", report_type)
+                    logger.info("Report %s created", report_config.report_filename)
 
-    def configuration(self, options: dict) -> list[list]:
+    def configuration(self, options: dict) -> tuple[list[str], list[ReportConfig]]:
         if self.is_smoke_test(options):
             reconciliation_report_config = self.REPORTS[2]
             bso_codes = [self.SMOKE_TEST_BSO_CODE]
