@@ -161,46 +161,45 @@ class TestCreateReports:
         mock_email_service.assert_not_called()
 
     def test_handle_does_not_email_reports_with_should_email_false(
-        self, dataframe, csv_data, now
+        self, dataframe, csv_data, now, monkeypatch
     ):
         """
         Test that reports with should_email=False are not emailed but still stored.
         """
-        # Copying the original reports to restore later - this won't be necessary
-        # once we have an internal report. See DTOSS-11616
+        # Patching the original reports to add an "internal" report - this won't be necessary
+        # once we have a real internal report. See DTOSS-11616
         original_reports = Command.REPORTS.copy()
-        Command.REPORTS.append(
+        reports_with_internal_report = original_reports + [
             ["internal_report", [now.date()], "internal_report", False]
-        )
+        ]
+        monkeypatch.setattr(Command, "REPORTS", reports_with_internal_report)
 
-        try:
-            with patch(
-                "manage_breast_screening.notifications.queries.helper.Helper.sql"
-            ) as mock_helper_sql:
-                mock_helper_sql.return_value = "SELECT 1"
+        with patch(
+            "manage_breast_screening.notifications.queries.helper.Helper.sql"
+        ) as mock_helper_sql:
+            mock_helper_sql.return_value = "SELECT 1"
 
-                with self.mocked_dependencies(dataframe, csv_data, now) as md:
-                    Command().handle()
+            with self.mocked_dependencies(dataframe, csv_data, now) as md:
+                Command().handle()
 
-                mock_read_sql, mock_blob_storage, mock_email_service = md
+            mock_read_sql, mock_blob_storage, mock_email_service = md
 
-                assert mock_read_sql.call_count == 4
-                assert mock_blob_storage.add.call_count == 4
-                assert mock_email_service.send_report_email.call_count == 3
+            assert mock_read_sql.call_count == 4
+            assert mock_blob_storage.add.call_count == 4
+            assert mock_email_service.send_report_email.call_count == 3
 
-                internal_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-internal-report-report.csv"
-                mock_blob_storage.add.assert_any_call(
-                    internal_filename,
-                    csv_data,
-                    content_type="text/csv",
-                    container_name="reports",
-                )
+            internal_filename = (
+                f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-internal-report-report.csv"
+            )
+            mock_blob_storage.add.assert_any_call(
+                internal_filename,
+                csv_data,
+                content_type="text/csv",
+                container_name="reports",
+            )
 
-                email_calls = [
-                    call[1]["report_type"]
-                    for call in mock_email_service.send_report_email.call_args_list
-                ]
-                assert "internal_report" not in email_calls
-        finally:
-            # Restore original reports
-            Command.REPORTS = original_reports
+            email_calls = [
+                call[1]["report_type"]
+                for call in mock_email_service.send_report_email.call_args_list
+            ]
+            assert "internal_report" not in email_calls
