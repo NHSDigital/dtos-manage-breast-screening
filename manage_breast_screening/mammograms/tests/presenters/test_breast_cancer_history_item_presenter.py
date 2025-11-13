@@ -52,7 +52,7 @@ class TestBreastCancerHistoryItemPresenter:
                         "text": "Treatment",
                     },
                     "value": {
-                        "html": "Right breast: No radiotherapy<br>Left breast: No radiotherapy<br>Systemic treatements: ",
+                        "html": "Right breast: No radiotherapy<br>Left breast: No radiotherapy<br>Systemic treatements: No systemic treatments",
                     },
                 },
                 {
