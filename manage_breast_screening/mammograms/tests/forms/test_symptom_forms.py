@@ -1,4 +1,7 @@
+from urllib.parse import urlencode
+
 import pytest
+from django.http import QueryDict
 from django.test import RequestFactory
 
 from manage_breast_screening.mammograms.forms.symptom_forms import (
@@ -28,17 +31,21 @@ from manage_breast_screening.participants.tests.factories import (
 class TestLumpForm:
     def test_valid_form(self):
         form = LumpForm(
-            data={
-                "area": RightLeftOtherChoices.LEFT_BREAST,
-                "area_description_left_breast": "LIQ",
-                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-                "investigated": YesNo.NO,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.LEFT_BREAST,
+                        "area_description_left_breast": "LIQ",
+                        "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                        "investigated": YesNo.NO,
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
     def test_missing_required_fields(self):
-        form = LumpForm(data={})
+        form = LumpForm(data=QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -49,12 +56,16 @@ class TestLumpForm:
 
     def test_missing_conditionally_required_fields(self):
         form = LumpForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "recently_resolved": True,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "recently_resolved": True,
+                    }
+                )
+            )
         )
 
         assert not form.is_valid()
@@ -69,17 +80,21 @@ class TestLumpForm:
 
     def test_valid_form_with_conditionally_required_fields(self):
         form = LumpForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "area_description_other": "abc",
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-                "recently_resolved": True,
-                "when_resolved": "3 months ago",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "area_description_other": "abc",
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                        "recently_resolved": True,
+                        "when_resolved": "3 months ago",
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
@@ -90,15 +105,19 @@ class TestLumpForm:
         request.user = clinical_user
 
         form = LumpForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "area_description_other": "abc",
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "area_description_other": "abc",
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                    }
+                )
+            )
         )
 
         assert form.is_valid()
@@ -122,16 +141,20 @@ class TestLumpForm:
         request.user = clinical_user
 
         form = LumpForm(
-            data={
-                "area": RightLeftOtherChoices.RIGHT_BREAST,
-                "area_description_right_breast": "uiq",
-                "area_description_left_breast": "liq",
-                "when_started": RelativeDateChoices.NOT_SURE,
-                "investigated": YesNo.NO,
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.RIGHT_BREAST,
+                        "area_description_right_breast": "uiq",
+                        "area_description_left_breast": "liq",
+                        "when_started": RelativeDateChoices.NOT_SURE,
+                        "investigated": YesNo.NO,
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                    }
+                )
+            )
         )
 
         assert form.is_valid()
@@ -157,13 +180,17 @@ class TestLumpForm:
         request.user = clinical_user
 
         form = LumpForm(
-            data={
-                "area": RightLeftOtherChoices.LEFT_BREAST,
-                "area_description_left_breast": "uoq",
-                "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
-                "investigated": YesNo.YES,
-                "investigation_details": "abc",
-            },
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.LEFT_BREAST,
+                        "area_description_left_breast": "uoq",
+                        "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+                        "investigated": YesNo.YES,
+                        "investigation_details": "abc",
+                    }
+                )
+            ),
             instance=symptom,
         )
 
@@ -183,17 +210,21 @@ class TestLumpForm:
 class TestSwellingOrShapeChangeForm:
     def test_valid_form(self):
         form = SwellingOrShapeChangeForm(
-            data={
-                "area": RightLeftOtherChoices.LEFT_BREAST,
-                "area_description_left_breast": "loq",
-                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-                "investigated": YesNo.NO,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.LEFT_BREAST,
+                        "area_description_left_breast": "loq",
+                        "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                        "investigated": YesNo.NO,
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
     def test_missing_required_fields(self):
-        form = SwellingOrShapeChangeForm(data={})
+        form = SwellingOrShapeChangeForm(data=QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -204,12 +235,16 @@ class TestSwellingOrShapeChangeForm:
 
     def test_missing_conditionally_required_fields(self):
         form = SwellingOrShapeChangeForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "recently_resolved": True,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "recently_resolved": True,
+                    }
+                )
+            )
         )
 
         assert not form.is_valid()
@@ -224,17 +259,21 @@ class TestSwellingOrShapeChangeForm:
 
     def test_valid_form_with_conditionally_required_fields(self):
         form = SwellingOrShapeChangeForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "area_description_other": "abc",
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-                "recently_resolved": True,
-                "when_resolved": "3 months ago",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "area_description_other": "abc",
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                        "recently_resolved": True,
+                        "when_resolved": "3 months ago",
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
@@ -242,18 +281,22 @@ class TestSwellingOrShapeChangeForm:
 class TestSkinChangeForm:
     def test_valid_form(self):
         form = SkinChangeForm(
-            data={
-                "area": RightLeftOtherChoices.LEFT_BREAST,
-                "area_description_left_breast": "loq",
-                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
-                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-                "investigated": YesNo.NO,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.LEFT_BREAST,
+                        "area_description_left_breast": "loq",
+                        "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
+                        "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                        "investigated": YesNo.NO,
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
     def test_missing_required_fields(self):
-        form = SkinChangeForm(data={})
+        form = SkinChangeForm(data=QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -265,12 +308,16 @@ class TestSkinChangeForm:
 
     def test_missing_conditionally_required_fields(self):
         form = SkinChangeForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "symptom_sub_type": SkinChangeChoices.OTHER,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "symptom_sub_type": SkinChangeChoices.OTHER,
+                    }
+                )
+            )
         )
 
         assert not form.is_valid()
@@ -285,17 +332,21 @@ class TestSkinChangeForm:
 
     def test_valid_form_with_conditionally_required_fields(self):
         form = SkinChangeForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "symptom_sub_type": SkinChangeChoices.OTHER,
-                "symptom_sub_type_details": "abc",
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "area_description_other": "abc",
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "symptom_sub_type": SkinChangeChoices.OTHER,
+                        "symptom_sub_type_details": "abc",
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "area_description_other": "abc",
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
@@ -303,20 +354,25 @@ class TestSkinChangeForm:
 class TestNippleChangeForm:
     def test_valid_form(self):
         form = NippleChangeForm(
-            data={
-                "area": [
-                    RightLeftNippleChoices.LEFT_BREAST,
-                    RightLeftNippleChoices.RIGHT_BREAST,
-                ],
-                "symptom_sub_type": NippleChangeChoices.COLOUR_CHANGE,
-                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-                "investigated": YesNo.NO,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": [
+                            RightLeftNippleChoices.LEFT_BREAST,
+                            RightLeftNippleChoices.RIGHT_BREAST,
+                        ],
+                        "symptom_sub_type": NippleChangeChoices.COLOUR_CHANGE,
+                        "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                        "investigated": YesNo.NO,
+                    },
+                    doseq=True,
+                )
+            )
         )
         assert form.is_valid()
 
     def test_missing_required_fields(self):
-        form = NippleChangeForm(data={})
+        form = NippleChangeForm(data=QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -328,12 +384,17 @@ class TestNippleChangeForm:
 
     def test_missing_conditionally_required_fields(self):
         form = NippleChangeForm(
-            data={
-                "area": [RightLeftNippleChoices.RIGHT_BREAST],
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "symptom_sub_type": NippleChangeChoices.OTHER,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": [RightLeftNippleChoices.RIGHT_BREAST],
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "symptom_sub_type": NippleChangeChoices.OTHER,
+                    },
+                    doseq=True,
+                )
+            )
         )
 
         assert not form.is_valid()
@@ -345,16 +406,21 @@ class TestNippleChangeForm:
 
     def test_valid_form_with_conditionally_required_fields(self):
         form = NippleChangeForm(
-            data={
-                "area": [RightLeftNippleChoices.RIGHT_BREAST],
-                "symptom_sub_type": NippleChangeChoices.OTHER,
-                "symptom_sub_type_details": "abc",
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": [RightLeftNippleChoices.RIGHT_BREAST],
+                        "symptom_sub_type": NippleChangeChoices.OTHER,
+                        "symptom_sub_type_details": "abc",
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                    },
+                    doseq=True,
+                )
+            )
         )
         assert form.is_valid()
 
@@ -381,18 +447,23 @@ class TestNippleChangeForm:
         request.user = clinical_user
 
         form = NippleChangeForm(
-            data={
-                "area": [
-                    RightLeftNippleChoices.RIGHT_BREAST,
-                    RightLeftNippleChoices.LEFT_BREAST,
-                ],
-                "symptom_sub_type": NippleChangeChoices.OTHER_DISCHARGE,
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": [
+                            RightLeftNippleChoices.RIGHT_BREAST,
+                            RightLeftNippleChoices.LEFT_BREAST,
+                        ],
+                        "symptom_sub_type": NippleChangeChoices.OTHER_DISCHARGE,
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                    },
+                    doseq=True,
+                )
+            )
         )
 
         assert form.is_valid()
@@ -423,13 +494,18 @@ class TestNippleChangeForm:
         request.user = clinical_user
 
         form = NippleChangeForm(
-            data={
-                "area": [RightLeftNippleChoices.LEFT_BREAST],
-                "symptom_sub_type": NippleChangeChoices.INVERSION,
-                "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
-                "investigated": YesNo.YES,
-                "investigation_details": "abc",
-            },
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": [RightLeftNippleChoices.LEFT_BREAST],
+                        "symptom_sub_type": NippleChangeChoices.INVERSION,
+                        "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+                        "investigated": YesNo.YES,
+                        "investigation_details": "abc",
+                    },
+                    doseq=True,
+                )
+            ),
             instance=symptom,
         )
 
@@ -459,13 +535,18 @@ class TestNippleChangeForm:
         request.user = clinical_user
 
         form = NippleChangeForm(
-            data={
-                "area": [RightLeftNippleChoices.LEFT_BREAST],
-                "symptom_sub_type": NippleChangeChoices.INVERSION,
-                "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
-                "investigated": YesNo.YES,
-                "investigation_details": "abc",
-            },
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": [RightLeftNippleChoices.LEFT_BREAST],
+                        "symptom_sub_type": NippleChangeChoices.INVERSION,
+                        "when_started": RelativeDateChoices.ONE_TO_THREE_YEARS,
+                        "investigated": YesNo.YES,
+                        "investigation_details": "abc",
+                    },
+                    doseq=True,
+                )
+            ),
             instance=symptom,
         )
 
@@ -490,19 +571,23 @@ class TestNippleChangeForm:
 class TestOtherSymptomForm:
     def test_valid_form(self):
         form = OtherSymptomForm(
-            data={
-                "area": RightLeftOtherChoices.LEFT_BREAST,
-                "area_description_left_breast": "uoq",
-                "symptom_sub_type_details": "abc symptom",
-                "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
-                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-                "investigated": YesNo.NO,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.LEFT_BREAST,
+                        "area_description_left_breast": "uoq",
+                        "symptom_sub_type_details": "abc symptom",
+                        "symptom_sub_type": SkinChangeChoices.COLOUR_CHANGE,
+                        "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                        "investigated": YesNo.NO,
+                    }
+                )
+            )
         )
         assert form.is_valid()
 
     def test_missing_required_fields(self):
-        form = OtherSymptomForm(data={})
+        form = OtherSymptomForm(data=QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -514,12 +599,16 @@ class TestOtherSymptomForm:
 
     def test_missing_conditionally_required_fields(self):
         form = OtherSymptomForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "symptom_sub_type_details": "abc symptom",
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "symptom_sub_type_details": "abc symptom",
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                    }
+                )
+            )
         )
 
         assert not form.is_valid()
@@ -533,15 +622,19 @@ class TestOtherSymptomForm:
 
     def test_valid_form_with_conditionally_required_fields(self):
         form = OtherSymptomForm(
-            data={
-                "area": RightLeftOtherChoices.OTHER,
-                "area_description_other": "abc",
-                "symptom_sub_type_details": "abc",
-                "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
-                "investigated": YesNo.YES,
-                "specific_date_0": "2",
-                "specific_date_1": "2025",
-                "investigation_details": "def",
-            }
+            data=QueryDict(
+                urlencode(
+                    {
+                        "area": RightLeftOtherChoices.OTHER,
+                        "area_description_other": "abc",
+                        "symptom_sub_type_details": "abc",
+                        "when_started": RelativeDateChoices.SINCE_A_SPECIFIC_DATE,
+                        "investigated": YesNo.YES,
+                        "specific_date_0": "2",
+                        "specific_date_1": "2025",
+                        "investigation_details": "def",
+                    }
+                )
+            )
         )
         assert form.is_valid()
