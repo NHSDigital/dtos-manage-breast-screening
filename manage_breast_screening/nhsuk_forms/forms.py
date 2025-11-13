@@ -5,6 +5,7 @@ Helpers to handle conditionally required fields
 from dataclasses import dataclass
 from typing import Any
 
+from django import forms
 from django.forms import Form, ValidationError
 from django.forms.widgets import MultiWidget
 
@@ -82,9 +83,13 @@ class ConditionalFieldValidator:
         form = self.form
         for requirement in self.conditional_requirements:
             field = requirement.conditionally_required_field
-            predicate_field_value = form.cleaned_data.get(requirement.predicate_field)
+            predicate_field_values = form.cleaned_data.get(requirement.predicate_field)
 
-            if predicate_field_value == requirement.predicate_field_value:
+            if requirement.predicate_field_value in (
+                predicate_field_values
+                if isinstance(predicate_field_values, list)
+                else [predicate_field_values]
+            ):
                 cleaned_value = form.cleaned_data.get(field)
                 if isinstance(cleaned_value, str):
                     cleaned_value = cleaned_value.strip()
@@ -148,15 +153,23 @@ class FormWithConditionalFields(Form):
     def full_clean(self):
         for requirement in self.conditional_field_validator.conditional_requirements:
             field_name = requirement.conditionally_required_field
-            predicate_field_value = self.data.get(requirement.predicate_field)
-            if predicate_field_value is None:
-                cleaned_predicate_field_value = None
-            else:
-                cleaned_predicate_field_value = self.fields[
+            predicate_field_values = self.data.getlist(requirement.predicate_field)
+            if not predicate_field_values:
+                cleaned_predicate_field_values = []
+            elif isinstance(
+                self.fields[requirement.predicate_field], forms.MultipleChoiceField
+            ):
+                cleaned_predicate_field_values = self.fields[
                     requirement.predicate_field
-                ].clean(predicate_field_value)
+                ].clean(predicate_field_values)
+            else:
+                cleaned_predicate_field_values = [
+                    self.fields[requirement.predicate_field].clean(
+                        predicate_field_values[0]
+                    )
+                ]
 
-            if cleaned_predicate_field_value != requirement.predicate_field_value:
+            if requirement.predicate_field_value not in cleaned_predicate_field_values:
                 # makes QueryDict mutable
                 self.data = self.data.copy()
 
