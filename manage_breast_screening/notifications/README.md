@@ -64,3 +64,22 @@ uv run pytest manage_breast_screening/notifications/tests/ --ignore manage_breas
 ```
 
 This will run only the unit tests for the notifications app, excluding the integration and end-to-end test directories.
+
+### Smoke Test
+
+The smoke test for notifications container app jobs runs on non-production environments as part of the [Azure DevOps deployment pipeline](../../.azuredevops/pipelines/deploy.yml).
+The test performs the following steps:
+
+1. Uploads test data to a non-production MESH inbox
+2. Calls the `store_mesh_messages` Django admin command via the deployed container app job.
+3. Calls the `create_appointments` command which processes the test data and creates 1 clinic and 1 appointment.
+4. Calls `send_message_batch` which sends an appointment invite via integration NHS Notify API
+5. Calls `create_reports --smoke-test` which generates a smoke test specific report for the test data.
+6. Downloads the report from blob storage and verifies the contents.
+
+To run the smoke test on a deployed environment:
+
+```bash
+az login
+make dev notifications-smoke-test
+```
