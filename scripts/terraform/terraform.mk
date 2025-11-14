@@ -76,5 +76,8 @@ terraform-validate: terraform-init-no-backend # Validate Terraform changes - mak
 	terraform -chdir=infrastructure/terraform validate
 
 notifications-smoke-test:
-	pip install pytest mesh-client
-	$(if ${RUN_NOTIFICATIONS_SMOKE_TEST}, pytest -vv scripts/python/smoke_test/notifications_smoke_test.py,)
+	$(if ${TF_VAR_run_notifications_smoke_test}, \
+		pip install pytest mesh-client \
+		pytest -vv scripts/python/smoke_test/notifications_smoke_test.py, \
+		echo "Notifications smoke test skipped." \
+	)
