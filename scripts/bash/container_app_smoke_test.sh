@@ -22,21 +22,23 @@ else
     ENDPOINT="https://pr-${PR_NUMBER}.${DNS_ZONE_NAME}/sha"
 fi
 
-TIMEOUT=300
+# Script timeout and check interval in seconds
+TIMEOUT=$((15*60))
 INTERVAL=5
 
 start_time=$(date +%s)
 
 while true; do
-  if ACTUAL_SHA=$(curl -fsSL "$ENDPOINT" 2>/dev/null); then
-      echo "Endpoint responded: $ACTUAL_SHA"
-      if [ "$ACTUAL_SHA" = "$EXPECTED_SHA" ]; then
-        echo "✅ SHA matches expected commit: $EXPECTED_SHA"
-        exit 0
-      else
-        echo "❌ SHA mismatch. Expected $EXPECTED_SHA but got $ACTUAL_SHA"
-        exit 1
-      fi
+  # Send request to /sha URL. Only print the sha and fail if required.
+  # It should fail initially until front door presents the right certificate.
+  if ACTUAL_SHA=$(curl -fsS "$ENDPOINT" 2>/dev/null); then
+    echo "Endpoint responded: $ACTUAL_SHA"
+    if [ "$ACTUAL_SHA" = "$EXPECTED_SHA" ]; then
+      echo "✅ SHA matches expected commit: $EXPECTED_SHA"
+      exit 0
+    else
+      echo "❌ SHA mismatch. Expected $EXPECTED_SHA but got $ACTUAL_SHA"
+    fi
   fi
 
   now=$(date +%s)
