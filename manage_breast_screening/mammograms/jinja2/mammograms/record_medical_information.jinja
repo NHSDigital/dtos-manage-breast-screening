@@ -79,6 +79,7 @@
     {% for presented_item in presenter.benign_lump_history %}
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
+    <a href="{{ presenter.add_benign_lump_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_benign_lump_history_link.text }}</a><br>
   {% endset %}
   {% set chest_procedures_link %}
   <a class="nhsuk-link" href="#">Enter other breast or chest procedures</a>

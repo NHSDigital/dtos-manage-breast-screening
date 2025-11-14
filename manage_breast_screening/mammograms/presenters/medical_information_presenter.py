@@ -185,3 +185,15 @@ class MedicalInformationPresenter:
             "href": url,
             "text": ("Add breast augmentation history"),
         }
+
+    @property
+    def add_benign_lump_history_link(self):
+        url = reverse(
+            "mammograms:add_benign_lump_history_item",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": "Add benign lump history",
+        }
