@@ -79,6 +79,23 @@ class MessageBatchHelpers:
             MessageBatchHelpers.process_unrecoverable_batch(message_batch)
 
     @staticmethod
+    def mark_batch_as_silent_sent(message_batch: MessageBatch):
+        sent_at = datetime.now(tz=ZONE_INFO)
+        message_batch.sent_at = sent_at
+        message_batch.status = MessageBatchStatusChoices.SENT.value
+        message_batch.save()
+
+        for message in message_batch.messages.all():
+            message.sent_at = sent_at
+            message.status = MessageStatusChoices.SENDING.value
+            message.save()
+
+        ApplicationInsightsLogging().custom_event_info(
+            message=f"Marking batch {message_batch.id} as silently sent.",
+            event_name="batch_marked_as_silent_sent",
+        )
+
+    @staticmethod
     def process_validation_errors(message_batch: MessageBatch, retry_count: int = 0):
         message_batch_errors = message_batch.nhs_notify_errors.get("errors")
 

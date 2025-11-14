@@ -4,6 +4,7 @@ from logging import getLogger
 from business.calendar import Calendar
 from django.core.management.base import BaseCommand
 
+from manage_breast_screening.config.settings import boolean_env
 from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
     CommandHandler,
 )
@@ -67,6 +68,7 @@ class Command(BaseCommand):
                 routing_plan_id=routing_plan.id,
                 scheduled_at=datetime.now(tz=ZONE_INFO),
                 status=MessageBatchStatusChoices.SCHEDULED.value,
+                silent=self.silent_mode(),
             )
 
             for appointment in appointments:
@@ -76,16 +78,23 @@ class Command(BaseCommand):
                 f"Created MessageBatch with ID {message_batch.id} containing {appointments.count()} messages."
             )
 
-            response = ApiClient().send_message_batch(message_batch)
-
-            if response.status_code == 201:
-                MessageBatchHelpers.mark_batch_as_sent(message_batch, response.json())
-                logger.info(f"{message_batch} sent successfully")
+            if self.silent_mode():
+                MessageBatchHelpers.mark_batch_as_silent_sent(message_batch)
             else:
-                logger.error(f"Failed to send batch. Status: {response.status_code}")
-                MessageBatchHelpers.mark_batch_as_failed(
-                    message_batch, response, retry_count=0
-                )
+                response = ApiClient().send_message_batch(message_batch)
+
+                if response.status_code == 201:
+                    MessageBatchHelpers.mark_batch_as_sent(
+                        message_batch, response.json()
+                    )
+                    logger.info(f"{message_batch} sent successfully")
+                else:
+                    logger.error(
+                        f"Failed to send batch. Status: {response.status_code}"
+                    )
+                    MessageBatchHelpers.mark_batch_as_failed(
+                        message_batch, response, retry_count=0
+                    )
 
     def bso_working_day(self):
         return Calendar().is_business_day(datetime.now(tz=ZONE_INFO))
@@ -95,3 +104,6 @@ class Command(BaseCommand):
         today_end = today.replace(hour=23, minute=59, second=59, microsecond=999999)
 
         return today_end + timedelta(weeks=4)
+
+    def silent_mode(self):
+        return boolean_env("NOTIFICATIONS_SILENT_MODE", False)
