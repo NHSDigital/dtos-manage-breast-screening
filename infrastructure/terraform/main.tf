@@ -66,6 +66,7 @@ module "container-apps" {
   postgres_storage_tier                 = var.postgres_storage_tier
   postgres_subnet_id                    = var.deploy_infra ? module.infra[0].postgres_subnet_id : data.azurerm_subnet.postgres[0].id
   main_subnet_id                        = var.deploy_infra ? module.infra[0].main_subnet_id : data.azurerm_subnet.main[0].id
+  run_notifications_smoke_test          = var.run_notifications_smoke_test
   seed_demo_data                        = var.seed_demo_data
   use_apex_domain                       = var.use_apex_domain
   infra_key_vault_name                  = local.infra_key_vault_name

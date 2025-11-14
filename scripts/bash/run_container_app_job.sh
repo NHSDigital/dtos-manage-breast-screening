@@ -3,7 +3,8 @@
 set -euo pipefail
 
 ENV_CONFIG=$1
-PR_NUMBER=${2:-}
+JOB_SHORT_NAME=$2
+PR_NUMBER=${3:-}
 
 if [ -z "$PR_NUMBER" ]; then
     # On permanent environments, the environment name is the environment config name, i.e. "production"
@@ -13,7 +14,7 @@ else
     ENV=pr-${PR_NUMBER}
 fi
 
-JOB_NAME=manbrs-dbm-${ENV}
+JOB_NAME=manbrs-${JOB_SHORT_NAME}-${ENV}
 RG_NAME=rg-manbrs-${ENV}-container-app-uks
 TIMEOUT=300
 WAIT=5

@@ -56,6 +56,14 @@ locals {
       job_short_name     = "crp"
       job_container_args = "create_reports"
     }
+    smoke_test = {
+      cron_expression = null
+      environment_variables = {
+        BLOB_CONTAINER_NAME = "notifications-reports"
+      }
+      job_short_name     = "smk"
+      job_container_args = "create_reports --smoke-test"
+    }
   }
 }
 
@@ -99,8 +107,11 @@ module "db_setup" {
 }
 
 module "scheduled_jobs" {
-  source   = "../dtos-devops-templates/infrastructure/modules/container-app-job"
-  for_each = local.scheduled_jobs
+  source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
+  for_each = {
+    for k, v in local.scheduled_jobs : k => v
+    if var.run_notifications_smoke_test
+  }
 
   name                         = "${var.app_short_name}-${each.value.job_short_name}-${var.environment}"
   container_app_environment_id = var.container_app_environment_id

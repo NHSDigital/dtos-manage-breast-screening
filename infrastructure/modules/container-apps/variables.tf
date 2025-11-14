@@ -201,6 +201,11 @@ variable "enable_notifications_jobs_schedule" {
   default     = false
 }
 
+variable "run_notifications_smoke_test" {
+  description = "Whether we run the smoke test for the notifications container app jobs"
+  type        = bool
+}
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
@@ -242,10 +247,6 @@ locals {
     }
     notifications-reports = {
       container_name        = "notifications-reports"
-      container_access_type = "private"
-    }
-    notifications-smoke-test-reports = {
-      container_name        = "notifications-smoke-test-reports"
       container_access_type = "private"
     }
   }
