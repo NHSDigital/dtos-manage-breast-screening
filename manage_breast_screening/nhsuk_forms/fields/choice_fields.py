@@ -1,6 +1,8 @@
 from django import forms
 from django.forms import widgets
 
+from manage_breast_screening.nhsuk_forms.validators import ExcludesOtherOptionsValidator
+
 
 class RadioSelectWithoutFieldset(widgets.RadioSelect):
     use_fieldset = False
@@ -23,6 +25,7 @@ class BoundChoiceField(forms.BoundField):
 
         self._conditional_html = {}
         self.dividers = {}
+        self._exclusive_options = set()
 
     def add_conditional_html(self, value, html):
         if isinstance(self.field.widget, widgets.Select):
@@ -106,6 +109,7 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         label_classes="nhsuk-fieldset__legend--m",
         visually_hidden_label_prefix=None,
         visually_hidden_label_suffix=None,
+        exclusive_choices=(),
         classes=None,
         **kwargs,
     ):
@@ -116,5 +120,21 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         self.label_classes = label_classes
         self.visually_hidden_label_prefix = visually_hidden_label_prefix
         self.visually_hidden_label_suffix = visually_hidden_label_suffix
+        self.exclusive_choices = exclusive_choices
 
         super().__init__(*args, **kwargs)
+
+        choice_labels = {choice: label for choice, label in self.choices}
+
+        for exclusive_choice in self.exclusive_choices:
+            try:
+                label = choice_labels[exclusive_choice]
+            except KeyError:
+                raise ValueError(f"{exclusive_choice} is not in choices")
+
+            self.validators.append(
+                ExcludesOtherOptionsValidator(exclusive_choice, label)
+            )
+
+    def is_exclusive(self, value):
+        return value in self.exclusive_choices

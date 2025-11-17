@@ -12,6 +12,7 @@
     "value": value,
     "text": text,
     "checked": value in (field.value() or []),
+    "exclusive": unbound_field.is_exclusive(value),
     "conditional": {
       "html": conditional_html
     } if conditional_html else undefined
