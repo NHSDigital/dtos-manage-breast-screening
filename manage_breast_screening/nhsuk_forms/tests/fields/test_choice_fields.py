@@ -1,6 +1,7 @@
 import pytest
 from django.forms import Form
 from django.forms.widgets import CheckboxSelectMultiple, Select
+from django.http import QueryDict
 from pytest_django.asserts import assertHTMLEqual
 
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
@@ -197,6 +198,9 @@ class TestMultipleChoiceField:
                 hint="Pick any number",
                 widget=CheckboxSelectMultiple,
             )
+            checkbox_field_with_exclusive_option = MultipleChoiceField(
+                label="Abc", choices=(("a", "A"), ("b", "B")), exclusive_choices={"b"}
+            )
             details = CharField(label="Abc", initial="")
 
         return TestForm
@@ -260,6 +264,44 @@ class TestMultipleChoiceField:
             </div>
             """,
         )
+
+    def test_renders_exclusive_options(self, form_class):
+        form = form_class()
+
+        assertHTMLEqual(
+            form["checkbox_field_with_exclusive_option"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <fieldset class="nhsuk-fieldset">
+                    <legend class="nhsuk-fieldset__legend nhsuk-fieldset__legend--m">
+                        Abc
+                    </legend>
+                    <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
+                        <div class="nhsuk-checkboxes__item">
+                            <input class="nhsuk-checkboxes__input" id="id_checkbox_field_with_exclusive_option" name="checkbox_field_with_exclusive_option" type="checkbox" value="a">
+                            <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field_with_exclusive_option">A</label>
+                        </div>
+                        <div class="nhsuk-checkboxes__item">
+                            <input class="nhsuk-checkboxes__input" id="id_checkbox_field_with_exclusive_option-2" name="checkbox_field_with_exclusive_option" type="checkbox" value="b" data-checkbox-exclusive>
+                            <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field_with_exclusive_option-2">B</label>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            """,
+        )
+
+    def test_exclusive_options_are_validated(self, form_class):
+        form = form_class(
+            QueryDict(
+                "checkbox_field=a&details=abc&checkbox_field_with_exclusive_option=a&checkbox_field_with_exclusive_option=b"
+            )
+        )
+        assert form.errors == {
+            "checkbox_field_with_exclusive_option": [
+                'Unselect "B" in order to select other options'
+            ]
+        }
 
     def test_renders_without_fieldset(self, form_class):
         class TestForm(Form):
