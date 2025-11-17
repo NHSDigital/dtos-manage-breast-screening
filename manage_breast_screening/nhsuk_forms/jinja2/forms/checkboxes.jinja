@@ -1,4 +1,5 @@
 {% from 'nhsuk/components/checkboxes/macro.jinja' import checkboxes %}
+{% from "forms/label.jinja" import label_html %}
 {% set unbound_field = field.field %}
 {% if field.errors %}
   {% set error_message = {"text": field.errors | first} %}
@@ -25,7 +26,7 @@
   "idPrefix": field.auto_id,
   "fieldset":  {
     "legend": {
-      "text": field.label,
+      "html": label_html(field),
       "classes": unbound_field.label_classes
     }
   } if field.use_fieldset else none,

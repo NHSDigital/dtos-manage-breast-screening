@@ -1,4 +1,5 @@
 {% from 'nhsuk/components/select/macro.jinja' import select as select %}
+{% from "forms/label.jinja" import label_html %}
 {% set unbound_field = field.field %}
 {% if field.errors %}
   {% set error_message = {"text": field.errors | first} %}
@@ -16,7 +17,10 @@
 {{ select({
   "name": field.html_name,
   "id": field.auto_id,
-  "label": {"text": field.label, "classes": unbound_field.label_classes},
+  "label": {
+    "html": label_html(field),
+    "classes": unbound_field.label_classes
+  },
   "errorMessage": error_message,
   "classes": unbound_field.classes if unbound_field.classes,
   "hint": {

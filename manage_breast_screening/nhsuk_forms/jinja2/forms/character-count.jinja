@@ -1,9 +1,10 @@
 {% from "character-count/macro.jinja" import characterCount %}
+{% from "forms/label.jinja" import label_html %}
 {% set unbound_field = field.field %}
 {% set widget = unbound_field.widget %}
 {% set character_count_params = {
     "label": {
-      "text": field.label,
+      "html": label_html(field),
       "classes": unbound_field.label_classes if unbound_field.label_classes
     },
     "hint": {

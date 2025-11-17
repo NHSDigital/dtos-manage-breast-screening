@@ -1,0 +1,10 @@
+{% macro label_html(field) %}
+  {% set unbound_field = field.field %}
+  {% if unbound_field.visually_hidden_label_prefix -%}
+  <span class="nhsuk-u-visually-hidden">{{ unbound_field.visually_hidden_label_prefix }}</span>
+  {% endif -%}
+  {{ field.label }}
+  {%- if unbound_field.visually_hidden_label_suffix -%}
+  <span class="nhsuk-u-visually-hidden">{{ unbound_field.visually_hidden_label_suffix }}</span>
+  {% endif %}
+{% endmacro %}
