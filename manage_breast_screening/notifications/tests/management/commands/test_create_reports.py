@@ -168,18 +168,8 @@ class TestCreateReports:
         Test that reports with should_email=False are not emailed but still stored.
         """
         test_reports = [
-            ReportConfig(
-                query_filename="external_report",
-                params=[now.date()],
-                report_filename="external_report",
-                should_send_email=True,
-            ),
-            ReportConfig(
-                query_filename="internal_report",
-                params=[now.date()],
-                report_filename="internal_report",
-                should_send_email=False,
-            ),
+            ReportConfig("external_report", [now.date()], True),
+            ReportConfig("internal_report", [now.date()], False),
         ]
         monkeypatch.setattr(Command, "REPORTS", test_reports)
 

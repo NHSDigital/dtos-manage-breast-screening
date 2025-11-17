@@ -25,24 +25,19 @@ class ReportConfig:
         self,
         query_filename: str,
         params: list,
+        send_email: bool = False,
         report_filename: str | None = None,
-        should_send_email: bool = False,
     ):
         self.query_filename = query_filename
         self.params = params
+        self.send_email = send_email
         self.report_filename = report_filename or query_filename
-        self.should_send_email = should_send_email
 
 
 class Command(BaseCommand):
     """
     Django Admin command which generates and stores CSV report data based on
-    common reporting queries:
-    'aggregate' covers all notifications sent, failures and deliveries counts
-    grouped by appointment date, clinic code and bso code. This report covers
-    a 3 month time period and can be resource intensive.
-    'failures' covers all failed status updates from NHS Notify and contains
-    NHS numbers, Clinic and BSO code and failure dates and reasons for one day.
+    common reporting queries.
     Reports are generated sequentially.
     Reports are stored in Azure Blob storage.
     """
@@ -51,24 +46,11 @@ class Command(BaseCommand):
     BSO_CODES = ["MBD"]
 
     REPORTS = [
+        ReportConfig("aggregate", ["3 months"], True),
         ReportConfig(
-            query_filename="aggregate",
-            params=["3 months"],
-            report_filename="aggregate",
-            should_send_email=True,
+            "failures", [datetime.now(tz=ZONE_INFO).date()], True, "invites_not_sent"
         ),
-        ReportConfig(
-            query_filename="failures",
-            params=[datetime.now(tz=ZONE_INFO).date()],
-            report_filename="invites_not_sent",
-            should_send_email=True,
-        ),
-        ReportConfig(
-            query_filename="reconciliation",
-            params=[datetime.now(tz=ZONE_INFO).date()],
-            report_filename="reconciliation",
-            should_send_email=True,
-        ),
+        ReportConfig("reconciliation", [datetime.now(tz=ZONE_INFO).date()], True),
     ]
 
     def add_arguments(self, parser):
@@ -96,10 +78,7 @@ class Command(BaseCommand):
                         content_type="text/csv",
                         container_name=os.getenv("REPORTS_CONTAINER_NAME"),
                     )
-                    if (
-                        not self.is_smoke_test(options)
-                        and report_config.should_send_email
-                    ):
+                    if self.should_send_email(options, report_config):
                         NhsMail().send_report_email(
                             attachment_data=csv,
                             attachment_filename=self.filename(
@@ -129,3 +108,6 @@ class Command(BaseCommand):
 
     def is_smoke_test(self, options):
         return options.get("smoke_test", False)
+
+    def should_send_email(self, options, report_config) -> bool:
+        return report_config.send_email and not self.is_smoke_test(options)
