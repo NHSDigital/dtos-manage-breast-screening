@@ -65,6 +65,7 @@ module "container-apps" {
   postgres_storage_mb                   = var.postgres_storage_mb
   postgres_storage_tier                 = var.postgres_storage_tier
   postgres_subnet_id                    = var.deploy_infra ? module.infra[0].postgres_subnet_id : data.azurerm_subnet.postgres[0].id
+  postgres_enable_high_availability     = var.postgres_enable_high_availability
   main_subnet_id                        = var.deploy_infra ? module.infra[0].main_subnet_id : data.azurerm_subnet.main[0].id
   run_notifications_smoke_test          = var.run_notifications_smoke_test
   seed_demo_data                        = var.seed_demo_data

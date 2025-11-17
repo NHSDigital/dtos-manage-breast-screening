@@ -102,6 +102,12 @@ variable "postgres_storage_tier" {
   type        = string
 }
 
+variable "postgres_enable_high_availability" {
+  description = "Whether to enable high availability for the PostgreSQL Flexible Server."
+  type        = bool
+  default     = false
+}
+
 variable "enable_entra_id_authentication" {
   description = <<EOT
     Enable Entra ID authentication for the container app. If true, authentication will be required to access the application.
