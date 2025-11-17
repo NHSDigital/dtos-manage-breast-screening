@@ -130,6 +130,11 @@ variable "postgres_subnet_id" {
   type        = string
 }
 
+variable "postgres_enable_high_availability" {
+  description = "Whether to enable high availability for the PostgreSQL Flexible Server."
+  type        = bool
+}
+
 variable "main_subnet_id" {
   description = "The main subnet id. Created in the infra module."
   type        = string
