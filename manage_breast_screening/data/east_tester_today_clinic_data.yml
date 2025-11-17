@@ -67,6 +67,11 @@ clinic:
             - id: 5c3d6f4e-3f4b-4e2a-9f7b-2d6e8f4c9a1b
               treatment: NO_TREATMENT
               additional_details: Diagnosed in 2022, monitored regularly.
+          breast_augmentation_history_items:
+            - id: d4e5f6a7-b8c9-4d0e-9f1a-2b3c4d5e6f7a
+              right_breast_procedures: [BREAST_IMPLANTS]
+              left_breast_procedures: [BREAST_IMPLANTS]
+              procedure_year: 2015
     - id: aa1b4c5c-3742-4f97-aa68-04a6f3bd631b
       duration_in_minutes: 8
       starts_at_time: 09:08

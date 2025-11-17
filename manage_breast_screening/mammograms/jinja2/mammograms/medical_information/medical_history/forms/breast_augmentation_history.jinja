@@ -1,0 +1,38 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+  <h2 aria-hidden="true">What procedures has {{ participant_first_name }} had?</h2>
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.right_breast_procedures.add_divider_after("OTHER_AUGMENTATION", "or") %}
+      {{ form.right_breast_procedures.as_field_group() }}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.left_breast_procedures.add_divider_after("OTHER_AUGMENTATION", "or") %}
+      {{ form.left_breast_procedures.as_field_group() }}
+    </div>
+  </div>
+
+  {{ form.procedure_year.as_field_group() }}
+
+  {% do form.implants_have_been_removed.add_conditional_html('true', form.removal_year.as_field_group()) %}
+  {% call fieldset({
+    "legend": {
+      "text": "Removed devices",
+      "classes": "nhsuk-fieldset__legend--m"
+    }
+  }) %}
+    {{ form.implants_have_been_removed.as_field_group() }}
+  {% endcall %}
+
+  {{ form.additional_details.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+{% endblock %}
+

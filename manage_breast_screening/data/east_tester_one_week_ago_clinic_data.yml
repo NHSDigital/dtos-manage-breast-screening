@@ -135,6 +135,7 @@ clinic:
                 - OTHER_AUGMENTATION
             - left_breast_procedures:
                 - NO_PROCEDURES
+            - implants_have_been_removed: False
     - id: 848c9ecf-94af-45f7-b072-29ba1f82d24b
       duration_in_minutes: 8
       starts_at_time: 09:32

@@ -223,6 +223,7 @@ class BreastAugmentationHistoryItemFactory(DjangoModelFactory):
     left_breast_procedures = [
         models.BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
     ]
+    implants_have_been_removed = False
 
 
 class OtherProcedureHistoryItemFactory(DjangoModelFactory):
