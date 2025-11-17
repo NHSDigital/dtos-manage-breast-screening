@@ -21,6 +21,7 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     BenignLumpHistoryItem,
     BreastCancerHistoryItem,
+    CystHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
     MastectomyOrLumpectomyHistoryItem,
     OtherProcedureHistoryItem,
@@ -193,6 +194,13 @@ class MastectomyOrLumpectomyHistoryItemFactory(DjangoModelFactory):
     year_of_surgery = None
     surgery_reason = MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON
     additional_details = ""
+
+class CystHistoryItemFactory(DjangoModelFactory):
+    class Meta:
+        model = models.CystHistoryItem
+
+    appointment = SubFactory(AppointmentFactory)
+    treatment = Iterator(CystHistoryItem.Treatment)
 
 
 class ImplantedMedicalDeviceHistoryItemFactory(DjangoModelFactory):

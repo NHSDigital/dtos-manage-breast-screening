@@ -9,6 +9,9 @@ from manage_breast_screening.mammograms.presenters.breast_augmentation_history_i
 from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
 )
+from manage_breast_screening.mammograms.presenters.cyst_history_item_presenter import (
+    CystHistoryItemPresenter,
+)
 from manage_breast_screening.mammograms.presenters.implanted_medical_device_history_item_presenter import (
     ImplantedMedicalDeviceHistoryItemPresenter,
 )
@@ -56,6 +59,10 @@ class MedicalInformationPresenter:
         self.benign_lump_history = [
             BenignLumpHistoryItemPresenter(item)
             for item in appointment.benign_lump_history_items.all()
+        ]
+        self.cyst_history = [
+            CystHistoryItemPresenter(item)
+            for item in appointment.cyst_history_items.all()
         ]
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms

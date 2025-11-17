@@ -2,6 +2,7 @@ from .appointment import Appointment, AppointmentStatus
 from .benign_lump_history_item import BenignLumpHistoryItem
 from .breast_augmentation_history_item import BreastAugmentationHistoryItem
 from .breast_cancer_history_item import BreastCancerHistoryItem
+from .cyst_history_item import CystHistoryItem
 from .ethnicity import Ethnicity
 from .implanted_medical_device_history_item import ImplantedMedicalDeviceHistoryItem
 from .mastectomy_or_lumpectomy_history_item import MastectomyOrLumpectomyHistoryItem
@@ -18,6 +19,7 @@ __all__ = [
     "BreastAugmentationHistoryItem",
     "BreastCancerHistoryItem",
     "MastectomyOrLumpectomyHistoryItem",
+    "CystHistoryItem",
     "ImplantedMedicalDeviceHistoryItem",
     "OtherProcedureHistoryItem",
     "Participant",
