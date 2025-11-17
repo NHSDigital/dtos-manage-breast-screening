@@ -35,6 +35,27 @@
     </div>
   </div>
 
+  {# H2 hidden from AT as it's included in the fieldset legend of each set of checkboxes #}
+  <h2 aria-hidden="true">What treatment have they had?</h2>
+
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.right_breast_treatment.add_divider_after("LYMPH_NODE_RADIOTHERAPY", "or") %}
+      {{ form.right_breast_treatment.as_field_group() }}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.left_breast_treatment.add_divider_after("LYMPH_NODE_RADIOTHERAPY", "or") %}
+      {{ form.left_breast_treatment.as_field_group() }}
+    </div>
+  </div>
+
+  {% do form.systemic_treatments.add_divider_after("OTHER", "or") %}
+  {{ form.systemic_treatments.as_field_group() }}
+
+  {{ form.intervention_location.as_field_group() }}
+
+  {{ form.additional_details.as_field_group() }}
+
   <div class="nhsuk-button-group">
     {{ button({
       "text": "Save"

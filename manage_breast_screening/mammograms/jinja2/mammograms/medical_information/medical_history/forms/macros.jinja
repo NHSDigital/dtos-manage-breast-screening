@@ -1,65 +1,74 @@
 {% from "nhsuk/components/checkboxes/macro.jinja" import checkboxes %}
 {% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
 
+{# A single field with its options arranged on a grid. #}
+{# Taborder is left to right, top to bottom. #}
+{# Error messages belong to the field as a whole so are displayed above the grid. #}
 {% macro diagnosis_location_field(form_field) %}
-  {% call fieldset({
-    "legend": {
-      "text": form_field.label,
-      "classes": "nhsuk-fieldset__legend--m"
-    },
-    "attributes": {
-      "aria-describedby": "breast-location-hint"
-    }
-  }) %}
-    <div class="nhsuk-grid-row">
-      <div class="nhsuk-grid-column-one-half">
-        {{ checkboxes({
-          "name": form_field.name,
-          "values": form_field.value(),
-          "idPrefix": form_field.auto_id ~ "_right",
-          "formGroup": {
-            "classes": "nhsuk-u-margin-bottom-2"
-          },
-          "items": [
-            {
-              "value": "Right breast",
-              "text": "Right breast"
-            }
-          ]
-        }) }}
-      </div>
-      <div class="nhsuk-grid-column-one-half">
-        {{ checkboxes({
-          "name": form_field.name,
-          "values": form_field.value(),
-          "idPrefix": form_field.auto_id ~ "_left",
-          "formGroup": {
-            "classes": "nhsuk-u-margin-bottom-2"
-          },
-          "items": [
-            {
-              "value": "Left breast",
-              "text": "Left breast"
-            }
-          ]
-        }) }}
-      </div>
-    </div>
+  <div class="nhsuk-form-group {%- if form_field.errors %} nhsuk-form-group--error{% endif %}">
+    {% call fieldset({
+      "legend": {
+        "text": form_field.label,
+        "classes": "nhsuk-fieldset__legend--m"
+      }
+    }) %}
 
-    {{ checkboxes({
-      "name": form_field.name,
-      "values": form_field.value(),
-      "idPrefix": form_field.auto_id ~ "_not_known",
-      "items": [
-        {
-          "divider": "or"
-        },
-        {
-          "value": "Does not know",
-          "text": "Does not know",
-          "exclusive": true
-        }
-      ]
-    }) }}
-  {% endcall %}
+    {% if form_field.errors %}
+      <span class="nhsuk-error-message" id="{{ form_field.name }}-error">
+        <span class="nhsuk-u-visually-hidden">Error:</span> {{ form_field.errors | first }}
+      </span>
+    {% endif %}
+
+      <div class="nhsuk-grid-row">
+        <div class="nhsuk-grid-column-one-half">
+          {{ checkboxes({
+            "name": form_field.name,
+            "values": form_field.value(),
+            "idPrefix": form_field.auto_id,
+            "formGroup": {
+              "classes": "nhsuk-u-margin-bottom-2"
+            },
+            "items": [
+              {
+                "value": "RIGHT_BREAST",
+                "text": "Right breast"
+              }
+            ]
+          }) }}
+        </div>
+        <div class="nhsuk-grid-column-one-half">
+          {{ checkboxes({
+            "name": form_field.name,
+            "values": form_field.value(),
+            "idPrefix": form_field.auto_id ~ "_left",
+            "formGroup": {
+              "classes": "nhsuk-u-margin-bottom-2"
+            },
+            "items": [
+              {
+                "value": "LEFT_BREAST",
+                "text": "Left breast"
+              }
+            ]
+          }) }}
+        </div>
+      </div>
+
+      {{ checkboxes({
+        "name": form_field.name,
+        "values": form_field.value(),
+        "idPrefix": form_field.auto_id ~ "_not_known",
+        "items": [
+          {
+            "divider": "or"
+          },
+          {
+            "value": "DONT_KNOW",
+            "text": "Does not know",
+            "exclusive": true
+          }
+        ]
+      }) }}
+    {% endcall %}
+  </div>
 {% endmacro %}

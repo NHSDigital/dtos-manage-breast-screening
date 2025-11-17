@@ -1,6 +1,7 @@
 from django.db.models import TextChoices
 from django.forms import Textarea
 
+from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields.char_field import CharField
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     ChoiceField,
@@ -20,7 +21,10 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         DONT_KNOW = "DONT_KNOW", "Don't know"
 
     diagnosis_location = MultipleChoiceField(
-        label="In which breasts was cancer diagnosed?", choices=DiagnosisLocationChoices
+        label="In which breasts was cancer diagnosed?",
+        choices=DiagnosisLocationChoices,
+        error_messages={"required": "Select which breasts cancer was diagnosed in"},
+        exclusive_choices={DiagnosisLocationChoices.DONT_KNOW},
     )
     # todo: constrain min/max
     diagnosis_year = IntegerField(
@@ -28,31 +32,30 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         label_classes="nhsuk-label--m",
         classes="nhsuk-input--width-4",
         hint="Leave blank if unknown",
+        required=False,
     )
 
-    left_breast_procedure = ChoiceField(
-        label="Left breast (or axilla)",
-        visually_hidden_label_prefix="What procedure have they had in their ",
-        visually_hidden_label_suffix="?",
-        label_classes="nhsuk-fieldset__legend--s",
-        choices=BreastCancerHistoryItem.Procedure,
-    )
     right_breast_procedure = ChoiceField(
         label="Right breast (or axilla)",
         visually_hidden_label_prefix="What procedure have they had in their ",
         visually_hidden_label_suffix="?",
         label_classes="nhsuk-fieldset__legend--s",
         choices=BreastCancerHistoryItem.Procedure,
+        error_messages={
+            "required": "Select which procedure they have had in the right breast"
+        },
     )
-
-    left_breast_other_surgery = MultipleChoiceField(
+    left_breast_procedure = ChoiceField(
         label="Left breast (or axilla)",
-        visually_hidden_label_prefix="What other surgery have they had in their ",
+        visually_hidden_label_prefix="What procedure have they had in their ",
         visually_hidden_label_suffix="?",
         label_classes="nhsuk-fieldset__legend--s",
-        choices=BreastCancerHistoryItem.Surgery,
-        exclusive_choices={BreastCancerHistoryItem.Surgery.NO_SURGERY},
+        choices=BreastCancerHistoryItem.Procedure,
+        error_messages={
+            "required": "Select which procedure they have had in the left breast"
+        },
     )
+
     right_breast_other_surgery = MultipleChoiceField(
         label="Right breast (or axilla)",
         visually_hidden_label_prefix="What other surgery have they had in their ",
@@ -60,39 +63,144 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         label_classes="nhsuk-fieldset__legend--s",
         choices=BreastCancerHistoryItem.Surgery,
         exclusive_choices={BreastCancerHistoryItem.Surgery.NO_SURGERY},
+        error_messages={
+            "required": "Select any other surgery they have had in the right breast"
+        },
+    )
+    left_breast_other_surgery = MultipleChoiceField(
+        label="Left breast (or axilla)",
+        visually_hidden_label_prefix="What other surgery have they had in their ",
+        visually_hidden_label_suffix="?",
+        label_classes="nhsuk-fieldset__legend--s",
+        choices=BreastCancerHistoryItem.Surgery,
+        exclusive_choices={BreastCancerHistoryItem.Surgery.NO_SURGERY},
+        error_messages={
+            "required": "Select any other surgery they have had in the left breast"
+        },
     )
 
-    left_breast_treatment = MultipleChoiceField(
-        label="Left breast (or axilla)",
-        visually_hidden_label_prefix="What treatment have they had in their ",
-        visually_hidden_label_suffix="?",
-        choices=BreastCancerHistoryItem.Treatment,
-        exclusive_choices={BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY},
-    )
     right_breast_treatment = MultipleChoiceField(
         label="Right breast (or axilla)",
         visually_hidden_label_prefix="What treatment have they had in their ",
         visually_hidden_label_suffix="?",
+        label_classes="nhsuk-fieldset__legend--s",
         choices=BreastCancerHistoryItem.Treatment,
         exclusive_choices={BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY},
+        error_messages={
+            "required": "Select what treatment they have had in the right breast"
+        },
+    )
+    left_breast_treatment = MultipleChoiceField(
+        label="Left breast (or axilla)",
+        visually_hidden_label_prefix="What treatment have they had in their ",
+        visually_hidden_label_suffix="?",
+        label_classes="nhsuk-fieldset__legend--s",
+        choices=BreastCancerHistoryItem.Treatment,
+        exclusive_choices={BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY},
+        error_messages={
+            "required": "Select what treatment they have had in the left breast"
+        },
     )
 
-    systemic_treatments = ChoiceField(
+    systemic_treatments = MultipleChoiceField(
         visually_hidden_label_prefix="What treatment have they had that are ",
         visually_hidden_label_suffix="?",
         label="Systemic treatments",
+        label_classes="nhsuk-fieldset__legend--s",
         choices=BreastCancerHistoryItem.SystemicTreatment,
+        exclusive_choices={
+            BreastCancerHistoryItem.SystemicTreatment.NO_SYSTEMIC_TREATMENTS
+        },
+        error_messages={"required": "Select what systemic treatments they have had"},
     )
-    systemic_treatment_other_treatment_details = CharField(
-        label="Provide details", required=False
+    systemic_treatments_other_treatment_details = CharField(
+        label="Provide details",
+        required=False,
+        error_messages={"required": "Provide details of the other systemic treatment"},
     )
 
     intervention_location = ChoiceField(
         label="Where did surgery and treatment take place?",
         choices=BreastCancerHistoryItem.InterventionLocation,
+        error_messages={"required": "Select where surgery and treatment took place"},
     )
-    intervention_location_details = CharField(label="Provide details", required=False)
 
-    additional_details = CharField(
-        label="Additional details (optional)", required=False, widget=Textarea
-    )
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.given_field_value(
+            "systemic_treatments", BreastCancerHistoryItem.SystemicTreatment.OTHER
+        ).require_field("systemic_treatments_other_treatment_details")
+
+        for location_value in BreastCancerHistoryItem.InterventionLocation:
+            self.fields[f"intervention_location_details_{location_value.lower()}"] = (
+                CharField(
+                    label="Provide details",
+                    required=False,
+                    error_messages={
+                        "required": "Provide details about where the surgery and treatment took place"
+                    },
+                )
+            )
+
+        self.fields["additional_details"] = CharField(
+            label="Additional details (optional)",
+            label_classes="nhsuk-label--m",
+            hint="Include any other relevant information about the treatment",
+            required=False,
+            widget=Textarea({"rows": 3}),
+        )
+
+        self.given_field("intervention_location").require_field_with_prefix(
+            "intervention_location_details"
+        )
+
+    def model_values(self):
+        match self.cleaned_data.get("diagnosis_location", []):
+            case [
+                self.DiagnosisLocationChoices.RIGHT_BREAST,
+                self.DiagnosisLocationChoices.LEFT_BREAST,
+            ]:
+                diagnosis_location = (
+                    BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS.value
+                )
+            case [other]:
+                diagnosis_location = other
+
+        location_value = self.cleaned_data["intervention_location"]
+
+        return dict(
+            diagnosis_location=diagnosis_location,
+            diagnosis_year=self.cleaned_data.get("diagnosis_year"),
+            right_breast_procedure=self.cleaned_data.get("right_breast_procedure"),
+            left_breast_procedure=self.cleaned_data.get("left_breast_procedure"),
+            right_breast_other_surgery=self.cleaned_data.get(
+                "right_breast_other_surgery"
+            ),
+            left_breast_other_surgery=self.cleaned_data.get(
+                "left_breast_other_surgery"
+            ),
+            right_breast_treatment=self.cleaned_data.get("right_breast_treatment"),
+            left_breast_treatment=self.cleaned_data.get("left_breast_treatment"),
+            systemic_treatments=self.cleaned_data.get("systemic_treatments"),
+            systemic_treatments_other_treatment_details=self.cleaned_data.get(
+                "systemic_treatments_other_treatment_details"
+            ),
+            intervention_location=location_value,
+            intervention_location_details=self.cleaned_data.get(
+                f"intervention_location_details_{location_value.lower()}"
+            ),
+            additional_details=self.cleaned_data.get("additional_details"),
+        )
+
+    def create(self, appointment, request):
+        auditor = Auditor.from_request(request)
+        field_values = self.model_values()
+
+        instance = appointment.breast_cancer_history_items.create(
+            **field_values,
+        )
+
+        auditor.audit_create(instance)
+
+        return instance
