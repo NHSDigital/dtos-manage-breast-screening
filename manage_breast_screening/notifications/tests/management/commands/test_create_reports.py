@@ -62,7 +62,7 @@ class TestCreateReports:
 
         assert mock_read_sql.call_count == 3
         assert mock_blob_storage.add.call_count == 3
-        assert mock_email_service.send_report_email.call_count == 3
+        assert mock_email_service.send_reports_email.call_count == 1
 
         for bso_code in Command.BSO_CODES:
             mock_read_sql.assert_any_call(
@@ -85,35 +85,24 @@ class TestCreateReports:
                 aggregate_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
             )
             mock_blob_storage.add.assert_any_call(
                 failures_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
             )
             mock_blob_storage.add.assert_any_call(
                 reconciliation_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
             )
 
-            mock_email_service.send_report_email.assert_any_call(
-                attachment_data=csv_data,
-                attachment_filename=aggregate_filename,
-                report_type="aggregate",
-            )
-            mock_email_service.send_report_email.assert_any_call(
-                attachment_data=csv_data,
-                attachment_filename=failures_filename,
-                report_type="invites_not_sent",
-            )
-            mock_email_service.send_report_email.assert_any_call(
-                attachment_data=csv_data,
-                attachment_filename=reconciliation_filename,
-                report_type="reconciliation",
+            mock_email_service.send_reports_email.assert_called_once_with(
+                {
+                    aggregate_filename: csv_data,
+                    failures_filename: csv_data,
+                    reconciliation_filename: csv_data,
+                }
             )
 
     def test_handle_raises_command_error(self, mock_insights_logger):
@@ -157,19 +146,18 @@ class TestCreateReports:
             "SM0K3-reconciliation-report.csv",
             csv_data,
             content_type="text/csv",
-            container_name="reports",
         )
         mock_email_service.assert_not_called()
 
-    def test_handle_does_not_email_reports_with_should_email_false(
+    def test_handle_does_not_email_reports_with_send_email_false(
         self, dataframe, csv_data, now, monkeypatch
     ):
         """
-        Test that reports with should_email=False are not emailed but still stored.
+        Test that internal reports are not emailed but still stored.
         """
         test_reports = [
-            ReportConfig("external_report", [now.date()], True),
-            ReportConfig("internal_report", [now.date()], False),
+            ReportConfig("external-report", [now.date()], True),
+            ReportConfig("internal-report", [now.date()], False),
         ]
         monkeypatch.setattr(Command, "REPORTS", test_reports)
 
@@ -185,20 +173,25 @@ class TestCreateReports:
 
             assert mock_read_sql.call_count == 2
             assert mock_blob_storage.add.call_count == 2
-            assert mock_email_service.send_report_email.call_count == 1
+            assert mock_email_service.send_reports_email.call_count == 1
 
             internal_filename = (
                 f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-internal-report-report.csv"
+            )
+            external_filename = (
+                f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-external-report-report.csv"
             )
             mock_blob_storage.add.assert_any_call(
                 internal_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
+            )
+            mock_blob_storage.add.assert_any_call(
+                external_filename,
+                csv_data,
+                content_type="text/csv",
             )
 
-            email_calls = [
-                call[1]["report_type"]
-                for call in mock_email_service.send_report_email.call_args_list
-            ]
-            assert "internal_report" not in email_calls
+            mock_email_service.send_reports_email.assert_called_once_with(
+                {external_filename: csv_data}
+            )

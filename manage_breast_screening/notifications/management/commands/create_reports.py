@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 from logging import getLogger
 
@@ -23,15 +22,15 @@ class ReportConfig:
 
     def __init__(
         self,
-        query_filename: str,
+        name: str,
         params: list,
         send_email: bool = False,
-        report_filename: str | None = None,
+        query: str | None = None,
     ):
-        self.query_filename = query_filename
+        self.name = name
         self.params = params
         self.send_email = send_email
-        self.report_filename = report_filename or query_filename
+        self.query = query or name
 
 
 class Command(BaseCommand):
@@ -42,16 +41,18 @@ class Command(BaseCommand):
     Reports are stored in Azure Blob storage.
     """
 
-    SMOKE_TEST_BSO_CODE = "SM0K3"
     BSO_CODES = ["MBD"]
-
     REPORTS = [
         ReportConfig("aggregate", ["3 months"], True),
         ReportConfig(
-            "failures", [datetime.now(tz=ZONE_INFO).date()], True, "invites_not_sent"
+            "invites-not-sent", [datetime.now(tz=ZONE_INFO).date()], True, "failures"
         ),
         ReportConfig("reconciliation", [datetime.now(tz=ZONE_INFO).date()], True),
     ]
+    SMOKE_TEST_BSO_CODE = "SM0K3"
+    SMOKE_TEST_CONFIG = ReportConfig(
+        "reconciliation", [datetime.now(tz=ZONE_INFO).date()], False
+    )
 
     def add_arguments(self, parser):
         parser.add_argument("--smoke-test", action="store_true")
@@ -61,39 +62,36 @@ class Command(BaseCommand):
             logger.info("Create Report Command started")
 
             bso_codes, report_configs = self.configuration(options)
+            external_reports = {}
 
             for bso_code in bso_codes:
                 for report_config in report_configs:
                     dataframe = pandas.read_sql(
-                        Helper.sql(report_config.query_filename),
+                        Helper.sql(report_config.query),
                         connection,
                         params=(report_config.params + [bso_code]),
                     )
 
                     csv = dataframe.to_csv(index=False)
+                    filename = self.filename(bso_code, report_config.name)
 
-                    BlobStorage().add(
-                        self.filename(bso_code, report_config.report_filename),
-                        csv,
-                        content_type="text/csv",
-                        container_name=os.getenv("REPORTS_CONTAINER_NAME"),
-                    )
-                    if self.should_send_email(options, report_config):
-                        NhsMail().send_report_email(
-                            attachment_data=csv,
-                            attachment_filename=self.filename(
-                                bso_code, report_config.report_filename
-                            ),
-                            report_type=report_config.report_filename,
-                        )
+                    BlobStorage().add(filename, csv, content_type="text/csv")
 
-                    logger.info("Report %s created", report_config.report_filename)
+                    if report_config.send_email:
+                        external_reports[filename] = csv
+
+                    logger.info("Report %s created", report_config.name)
+
+            if not options.get("smoke_test", False):
+                NhsMail().send_reports_email(external_reports)
+                logger.info(f"Reports sent: {', '.join(external_reports.keys())}")
+
+            logger.info("Create Report Command finished")
 
     def configuration(self, options: dict) -> tuple[list[str], list[ReportConfig]]:
-        if self.is_smoke_test(options):
-            reconciliation_report_config = self.REPORTS[2]
+        if options.get("smoke_test", False):
             bso_codes = [self.SMOKE_TEST_BSO_CODE]
-            report_configs = [reconciliation_report_config]
+            report_configs = [self.SMOKE_TEST_CONFIG]
         else:
             bso_codes = self.BSO_CODES
             report_configs = self.REPORTS
@@ -101,13 +99,7 @@ class Command(BaseCommand):
         return bso_codes, report_configs
 
     def filename(self, bso_code: str, report_type: str) -> str:
-        name = f"{bso_code}-{report_type.replace('_', '-')}-report.csv"
+        name = f"{bso_code}-{report_type}-report.csv"
         if bso_code != self.SMOKE_TEST_BSO_CODE:
             name = f"{datetime.today().strftime('%Y-%m-%dT%H:%M:%S')}-{name}"
         return name
-
-    def is_smoke_test(self, options):
-        return options.get("smoke_test", False)
-
-    def should_send_email(self, options, report_config) -> bool:
-        return report_config.send_email and not self.is_smoke_test(options)
