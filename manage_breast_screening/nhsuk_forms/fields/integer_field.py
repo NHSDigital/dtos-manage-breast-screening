@@ -1,3 +1,5 @@
+from datetime import date
+
 from django import forms
 
 
@@ -33,3 +35,34 @@ class IntegerField(forms.IntegerField):
         attrs.pop("step", None)
 
         return attrs
+
+
+class YearField(IntegerField):
+    def __init__(
+        self,
+        *args,
+        hint=None,
+        label_classes=None,
+        classes=None,
+        min_value=None,
+        max_value=None,
+        **kwargs,
+    ):
+        if min_value is None:
+            min_value = date.today().year - 80
+        if max_value is None:
+            max_value = date.today().year
+
+        year_bounds_error = f"Year must be between {min_value} and {max_value}"
+
+        if "error_messages" not in kwargs:
+            kwargs["error_messages"] = {}
+
+        kwargs["error_messages"].setdefault("min_value", year_bounds_error)
+        kwargs["error_messages"].setdefault("max_value", year_bounds_error)
+        kwargs["min_value"] = min_value
+        kwargs["max_value"] = max_value
+
+        super().__init__(
+            *args, hint=hint, label_classes=label_classes, classes=classes, **kwargs
+        )

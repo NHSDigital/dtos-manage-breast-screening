@@ -6,7 +6,7 @@ from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     ChoiceField,
     MultipleChoiceField,
 )
-from manage_breast_screening.nhsuk_forms.fields.integer_field import IntegerField
+from manage_breast_screening.nhsuk_forms.fields.integer_field import YearField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.participants.models.benign_lump_history_item import (
     BenignLumpHistoryItem,
@@ -33,7 +33,7 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         choices=BenignLumpHistoryItem.Procedure,
     )
 
-    procedure_year = IntegerField(
+    procedure_year = YearField(
         label="Year of procedure (optional)",
         label_classes="nhsuk-label--m",
         classes="nhsuk-input--width-4",
