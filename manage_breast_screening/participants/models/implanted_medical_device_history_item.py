@@ -8,7 +8,10 @@ class ImplantedMedicalDeviceHistoryItem(BaseModel):
     class Device(models.TextChoices):
         CARDIAC_DEVICE = "CARDIAC_DEVICE", "Cardiac device (such as a pacemaker or ICD)"
         HICKMAN_LINE = "HICKMAN_LINE", "Hickman line"
-        OTHER_MEDICAL_DEVICE = "OTHER_MEDICAL_DEVICE", "Other medical device"
+        OTHER_MEDICAL_DEVICE = (
+            "OTHER_MEDICAL_DEVICE",
+            "Other medical device (or does not know)",
+        )
 
     appointment = models.ForeignKey(
         Appointment,

@@ -27,7 +27,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
                         "text": "Device",
                     },
                     "value": {
-                        "html": "Other medical device",
+                        "html": "Other medical device (or does not know)",
                     },
                 },
                 {

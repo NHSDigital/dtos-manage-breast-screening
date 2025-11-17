@@ -149,3 +149,15 @@ class MedicalInformationPresenter:
                 else "Add a symptom (other symptom)"
             ),
         }
+
+    @property
+    def add_implanted_medical_device_history_link(self):
+        url = reverse(
+            "mammograms:add_implanted_medical_device_history_item",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": ("Add implanted medical device history"),
+        }
