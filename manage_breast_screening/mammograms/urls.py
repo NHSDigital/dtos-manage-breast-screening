@@ -2,6 +2,7 @@ from django.urls import path
 
 from .views import (
     appointment_views,
+    cyst_history_view,
     implanted_medical_device_history_view,
     special_appointment_views,
     symptom_views,
@@ -124,5 +125,10 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/",
         implanted_medical_device_history_view.AddImplantedMedicalDeviceHistoryView.as_view(),
         name="add_implanted_medical_device_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/cyst-history/",
+        cyst_history_view.AddCystHistoryView.as_view(),
+        name="add_cyst_history_item",
     ),
 ]
