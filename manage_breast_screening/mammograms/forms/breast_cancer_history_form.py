@@ -51,6 +51,7 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         visually_hidden_label_suffix="?",
         label_classes="nhsuk-fieldset__legend--s",
         choices=BreastCancerHistoryItem.Surgery,
+        exclusive_choices={BreastCancerHistoryItem.Surgery.NO_SURGERY},
     )
     right_breast_other_surgery = MultipleChoiceField(
         label="Right breast (or axilla)",
@@ -58,6 +59,7 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         visually_hidden_label_suffix="?",
         label_classes="nhsuk-fieldset__legend--s",
         choices=BreastCancerHistoryItem.Surgery,
+        exclusive_choices={BreastCancerHistoryItem.Surgery.NO_SURGERY},
     )
 
     left_breast_treatment = MultipleChoiceField(
@@ -65,12 +67,14 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         visually_hidden_label_prefix="What treatment have they had in their ",
         visually_hidden_label_suffix="?",
         choices=BreastCancerHistoryItem.Treatment,
+        exclusive_choices={BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY},
     )
     right_breast_treatment = MultipleChoiceField(
         label="Right breast (or axilla)",
         visually_hidden_label_prefix="What treatment have they had in their ",
         visually_hidden_label_suffix="?",
         choices=BreastCancerHistoryItem.Treatment,
+        exclusive_choices={BreastCancerHistoryItem.Treatment.NO_RADIOTHERAPY},
     )
 
     systemic_treatments = ChoiceField(
