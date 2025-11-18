@@ -469,15 +469,15 @@ wheels = [
 
 [[package]]
 name = "django-qsessions"
-version = "2.0.0"
+version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
     { name = "ua-parser", extra = ["regex"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c5/48/07fb00170512f479ccd9000920b361fa9b3e9316cf9d59587340817734f0/django_qsessions-2.0.0.tar.gz", hash = "sha256:d3efc4151fbd732d7aaa5452a0e1bae49829db7962f1bf7942b4ed370699e470", size = 33590, upload-time = "2025-02-23T10:17:59.187Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b2/83/b1180c699754b9d21b68c168a72b596732805dc1186c6619758e35adc364/django_qsessions-2.1.0.tar.gz", hash = "sha256:b3da4dc3d47d3a43734663c2ca67bf275a92ce80e2e8a4bb85bedb68067034fa", size = 33533, upload-time = "2025-09-21T18:33:30.639Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/26/a1bcc6f50cc5fe8a329056feec66a74ea123615ab595bce39c9b980fce9f/django_qsessions-2.0.0-py3-none-any.whl", hash = "sha256:505837d25d4857696c1b9dc553b02a5dca5f3d761bd6a0a127e9f468bf22dc09", size = 13867, upload-time = "2025-02-23T10:17:57.092Z" },
+    { url = "https://files.pythonhosted.org/packages/da/65/1cb57321118a54f832facd82d862a0bdfb910bc3b258d18a1a9eed44de07/django_qsessions-2.1.0-py3-none-any.whl", hash = "sha256:4be9a35a1a636ff9b2454b06eec84e655b443136097ad5570cc53d531b296bfe", size = 13960, upload-time = "2025-09-21T18:33:28.282Z" },
 ]
 
 [[package]]
