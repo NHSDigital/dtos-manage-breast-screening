@@ -25,7 +25,8 @@ jobs:
         environment: ${{ fromJson(inputs.environments) }}
       max-parallel: 1
     environment: ${{ matrix.environment }}
-    concurrency: deploy-${{ matrix.environment }}-${{ github.ref }}
+    # Prevent concurrent jobs on the same environment and between deploy and delete workflows
+    concurrency: deploy-${{ matrix.environment }}-${{inputs.pr_number}}
 
     steps:
       - name: Checkout code
