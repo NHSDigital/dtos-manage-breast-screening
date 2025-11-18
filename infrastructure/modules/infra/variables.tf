@@ -43,6 +43,11 @@ variable "infra_key_vault_rg" {
   type        = string
 }
 
+variable "cae_zone_redundancy_enabled" {
+  description = "Specifies whether the Container App Environment should be zone redundant."
+  type        = bool
+}
+
 locals {
   hub_vnet_rg_name = "rg-hub-${var.hub}-uks-hub-networking"
 }

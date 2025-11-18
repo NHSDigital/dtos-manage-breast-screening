@@ -12,3 +12,4 @@ nhs_notify_api_message_batch_url      = "https://api.service.nhs.uk/comms/v1/mes
 allowed_paths                         = ["/notifications/message-status/create"]
 enable_alerting                       = true
 use_apex_domain                       = true
+cae_zone_redundancy_enabled           = true
