@@ -82,7 +82,7 @@ class Command(BaseCommand):
 
                     logger.info("Report %s created", report_config.name)
 
-            if not options.get("smoke_test", False):
+            if bool(external_reports):
                 NhsMail().send_reports_email(external_reports)
                 logger.info(f"Reports sent: {', '.join(external_reports.keys())}")
 

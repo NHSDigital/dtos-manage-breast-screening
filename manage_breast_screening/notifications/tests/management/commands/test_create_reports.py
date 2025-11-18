@@ -28,21 +28,17 @@ class TestCreateReports:
 
     @contextmanager
     def mocked_dependencies(self, dataframe, csv_data, now):
-        module = (
-            "manage_breast_screening.notifications.management.commands.create_reports"
-        )
-
-        with patch(f"{module}.BlobStorage") as mock_storage:
+        with patch(f"{Command.__module__}.BlobStorage") as mock_storage:
             mock_blob_storage = MagicMock()
             mock_storage.return_value = mock_blob_storage
 
-            with patch(f"{module}.pandas.read_sql") as mock_read_sql:
+            with patch(f"{Command.__module__}.pandas.read_sql") as mock_read_sql:
                 mock_read_sql.return_value = dataframe
 
-                with patch(f"{module}.datetime") as mock_datetime:
+                with patch(f"{Command.__module__}.datetime") as mock_datetime:
                     mock_datetime.today.return_value = now
 
-                    with patch(f"{module}.NhsMail") as mock_email:
+                    with patch(f"{Command.__module__}.NhsMail") as mock_email:
                         mock_email_service = MagicMock()
                         mock_email.return_value = mock_email_service
 
@@ -106,22 +102,16 @@ class TestCreateReports:
             )
 
     def test_handle_raises_command_error(self, mock_insights_logger):
-        with patch(
-            "manage_breast_screening.notifications.queries.helper.Helper"
-        ) as mock_query:
+        with patch(f"{Helper.__module__}.Helper") as mock_query:
             mock_query.sql.side_effect = Exception("err")
 
             with pytest.raises(CommandError):
                 Command().handle()
 
     @pytest.mark.django_db
-    def test_calls_insights_logger_if_exception_raised(
-        self, mock_insights_logger, commands_module_str
-    ):
+    def test_calls_insights_logger_if_exception_raised(self, mock_insights_logger):
         an_exception = Exception("'BlobStorage' object has no attribute 'client'")
-        with patch(
-            f"{commands_module_str}.create_reports.BlobStorage"
-        ) as mock_blob_storage:
+        with patch(f"{Command.__module__}.BlobStorage") as mock_blob_storage:
             mock_blob_storage.side_effect = an_exception
             with pytest.raises(CommandError):
                 Command().handle()
@@ -161,9 +151,7 @@ class TestCreateReports:
         ]
         monkeypatch.setattr(Command, "REPORTS", test_reports)
 
-        with patch(
-            "manage_breast_screening.notifications.queries.helper.Helper.sql"
-        ) as mock_helper_sql:
+        with patch(f"{Helper.__module__}.Helper.sql") as mock_helper_sql:
             mock_helper_sql.return_value = "SELECT 1"
 
             with self.mocked_dependencies(dataframe, csv_data, now) as md:
@@ -195,3 +183,25 @@ class TestCreateReports:
             mock_email_service.send_reports_email.assert_called_once_with(
                 {external_filename: csv_data}
             )
+
+    def test_handle_with_internal_reports_does_not_call_email_service(
+        self, dataframe, csv_data, now, monkeypatch
+    ):
+        """
+        Test that internal reports are not emailed but still stored.
+        """
+        monkeypatch.setattr(
+            Command, "REPORTS", [ReportConfig("internal-report", [1], False)]
+        )
+
+        with patch(f"{Helper.__module__}.Helper.sql") as mock_helper_sql:
+            mock_helper_sql.return_value = "SELECT 1"
+
+            with self.mocked_dependencies(dataframe, csv_data, now) as md:
+                Command().handle()
+
+            mock_read_sql, mock_blob_storage, mock_email_service = md
+
+            assert mock_read_sql.call_count == 1
+            assert mock_blob_storage.add.call_count == 1
+            assert mock_email_service.send_reports_email.call_count == 0
