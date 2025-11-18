@@ -26,11 +26,13 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         label="Left breast",
         label_classes="nhsuk-fieldset__legend--s",
         choices=BenignLumpHistoryItem.Procedure,
+        exclusive_choices={"NO_PROCEDURES"},
     )
     right_breast_procedures = MultipleChoiceField(
         label="Right breast",
         label_classes="nhsuk-fieldset__legend--s",
         choices=BenignLumpHistoryItem.Procedure,
+        exclusive_choices={"NO_PROCEDURES"},
     )
 
     procedure_year = YearField(
