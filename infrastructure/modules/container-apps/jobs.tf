@@ -110,7 +110,7 @@ module "scheduled_jobs" {
   source = "../dtos-devops-templates/infrastructure/modules/container-app-job"
   for_each = {
     for k, v in local.scheduled_jobs : k => v
-    if var.run_notifications_smoke_test
+    if(var.run_notifications_smoke_test || k != "smoke_test")
   }
 
   name                         = "${var.app_short_name}-${each.value.job_short_name}-${var.environment}"
