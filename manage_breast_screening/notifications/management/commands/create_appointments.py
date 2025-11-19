@@ -18,7 +18,7 @@ from manage_breast_screening.notifications.models import (
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
-INSIGHTS_ERROR_NAME = "CreateAppointmentsError"
+INSIGHTS_JOB_NAME = "CreateAppointments"
 logger = getLogger(__name__)
 
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with exception_handler(INSIGHTS_JOB_NAME):
             logger.info("Create Appointments command started")
             container_client = BlobStorage().find_or_create_container(
                 os.getenv("BLOB_CONTAINER_NAME", "")

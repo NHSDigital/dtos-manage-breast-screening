@@ -14,7 +14,7 @@ from manage_breast_screening.notifications.services.blob_storage import BlobStor
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
 logger = getLogger(__name__)
-INSIGHTS_ERROR_NAME = "CreateReportsError"
+INSIGHTS_JOB_NAME = "CreateReports"
 
 
 class ReportConfig:
@@ -58,7 +58,7 @@ class Command(BaseCommand):
         parser.add_argument("--smoke-test", action="store_true")
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with exception_handler(INSIGHTS_JOB_NAME):
             logger.info("Create Report Command started")
 
             bso_codes, report_configs = self.configuration(options)

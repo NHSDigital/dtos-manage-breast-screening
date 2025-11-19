@@ -8,9 +8,9 @@ from manage_breast_screening.notifications.services.application_insights_logging
 
 
 @contextmanager
-def exception_handler(exception_name):
+def exception_handler(command_name):
     try:
         yield
     except Exception as e:
-        ApplicationInsightsLogging().exception(f"{exception_name}: {e}")
+        ApplicationInsightsLogging().exception(f"{command_name}Error: {e}")
         raise CommandError(e)

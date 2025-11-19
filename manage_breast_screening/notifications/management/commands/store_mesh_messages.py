@@ -10,7 +10,7 @@ from manage_breast_screening.notifications.services.blob_storage import BlobStor
 from manage_breast_screening.notifications.services.mesh_inbox import MeshInbox
 
 logger = getLogger(__name__)
-INSIGHTS_ERROR_NAME = "StoreMeshMessagesError"
+INSIGHTS_JOB_NAME = "StoreMeshMessages"
 
 
 class Command(BaseCommand):
@@ -20,7 +20,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with exception_handler(INSIGHTS_JOB_NAME):
             logger.info("Store MESH Messages command started")
             today_dirname = datetime.today().strftime("%Y-%m-%d")
             with MeshInbox() as inbox:

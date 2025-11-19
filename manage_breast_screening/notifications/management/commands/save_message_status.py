@@ -15,7 +15,7 @@ from manage_breast_screening.notifications.models import (
 )
 from manage_breast_screening.notifications.services.queue import Queue
 
-INSIGHTS_ERROR_NAME = "SaveMessageStatusError"
+INSIGHTS_JOB_NAME = "SaveMessageStatus"
 logger = getLogger(__name__)
 
 
@@ -26,7 +26,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with exception_handler(INSIGHTS_JOB_NAME):
             logger.info("Save Message Status Command started")
             queue = Queue.MessageStatusUpdates()
             for item in queue.items():
