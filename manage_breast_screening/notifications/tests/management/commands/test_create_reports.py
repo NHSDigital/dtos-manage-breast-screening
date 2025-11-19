@@ -28,21 +28,17 @@ class TestCreateReports:
 
     @contextmanager
     def mocked_dependencies(self, dataframe, csv_data, now):
-        module = (
-            "manage_breast_screening.notifications.management.commands.create_reports"
-        )
-
-        with patch(f"{module}.BlobStorage") as mock_storage:
+        with patch(f"{Command.__module__}.BlobStorage") as mock_storage:
             mock_blob_storage = MagicMock()
             mock_storage.return_value = mock_blob_storage
 
-            with patch(f"{module}.pandas.read_sql") as mock_read_sql:
+            with patch(f"{Command.__module__}.pandas.read_sql") as mock_read_sql:
                 mock_read_sql.return_value = dataframe
 
-                with patch(f"{module}.datetime") as mock_datetime:
+                with patch(f"{Command.__module__}.datetime") as mock_datetime:
                     mock_datetime.today.return_value = now
 
-                    with patch(f"{module}.NhsMail") as mock_email:
+                    with patch(f"{Command.__module__}.NhsMail") as mock_email:
                         mock_email_service = MagicMock()
                         mock_email.return_value = mock_email_service
 
@@ -62,7 +58,7 @@ class TestCreateReports:
 
         assert mock_read_sql.call_count == 3
         assert mock_blob_storage.add.call_count == 3
-        assert mock_email_service.send_report_email.call_count == 3
+        assert mock_email_service.send_reports_email.call_count == 1
 
         for bso_code in Command.BSO_CODES:
             mock_read_sql.assert_any_call(
@@ -85,54 +81,37 @@ class TestCreateReports:
                 aggregate_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
             )
             mock_blob_storage.add.assert_any_call(
                 failures_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
             )
             mock_blob_storage.add.assert_any_call(
                 reconciliation_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
             )
 
-            mock_email_service.send_report_email.assert_any_call(
-                attachment_data=csv_data,
-                attachment_filename=aggregate_filename,
-                report_type="aggregate",
-            )
-            mock_email_service.send_report_email.assert_any_call(
-                attachment_data=csv_data,
-                attachment_filename=failures_filename,
-                report_type="invites_not_sent",
-            )
-            mock_email_service.send_report_email.assert_any_call(
-                attachment_data=csv_data,
-                attachment_filename=reconciliation_filename,
-                report_type="reconciliation",
+            mock_email_service.send_reports_email.assert_called_once_with(
+                {
+                    aggregate_filename: csv_data,
+                    failures_filename: csv_data,
+                    reconciliation_filename: csv_data,
+                }
             )
 
     def test_handle_raises_command_error(self, mock_insights_logger):
-        with patch(
-            "manage_breast_screening.notifications.queries.helper.Helper"
-        ) as mock_query:
+        with patch(f"{Helper.__module__}.Helper") as mock_query:
             mock_query.sql.side_effect = Exception("err")
 
             with pytest.raises(CommandError):
                 Command().handle()
 
     @pytest.mark.django_db
-    def test_calls_insights_logger_if_exception_raised(
-        self, mock_insights_logger, commands_module_str
-    ):
+    def test_calls_insights_logger_if_exception_raised(self, mock_insights_logger):
         an_exception = Exception("'BlobStorage' object has no attribute 'client'")
-        with patch(
-            f"{commands_module_str}.create_reports.BlobStorage"
-        ) as mock_blob_storage:
+        with patch(f"{Command.__module__}.BlobStorage") as mock_blob_storage:
             mock_blob_storage.side_effect = an_exception
             with pytest.raises(CommandError):
                 Command().handle()
@@ -157,35 +136,22 @@ class TestCreateReports:
             "SM0K3-reconciliation-report.csv",
             csv_data,
             content_type="text/csv",
-            container_name="reports",
         )
         mock_email_service.assert_not_called()
 
-    def test_handle_does_not_email_reports_with_should_email_false(
+    def test_handle_does_not_email_reports_with_send_email_false(
         self, dataframe, csv_data, now, monkeypatch
     ):
         """
-        Test that reports with should_email=False are not emailed but still stored.
+        Test that internal reports are not emailed but still stored.
         """
         test_reports = [
-            ReportConfig(
-                query_filename="external_report",
-                params=[now.date()],
-                report_filename="external_report",
-                should_send_email=True,
-            ),
-            ReportConfig(
-                query_filename="internal_report",
-                params=[now.date()],
-                report_filename="internal_report",
-                should_send_email=False,
-            ),
+            ReportConfig("external-report", [now.date()], True),
+            ReportConfig("internal-report", [now.date()], False),
         ]
         monkeypatch.setattr(Command, "REPORTS", test_reports)
 
-        with patch(
-            "manage_breast_screening.notifications.queries.helper.Helper.sql"
-        ) as mock_helper_sql:
+        with patch(f"{Helper.__module__}.Helper.sql") as mock_helper_sql:
             mock_helper_sql.return_value = "SELECT 1"
 
             with self.mocked_dependencies(dataframe, csv_data, now) as md:
@@ -195,20 +161,47 @@ class TestCreateReports:
 
             assert mock_read_sql.call_count == 2
             assert mock_blob_storage.add.call_count == 2
-            assert mock_email_service.send_report_email.call_count == 1
+            assert mock_email_service.send_reports_email.call_count == 1
 
             internal_filename = (
                 f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-internal-report-report.csv"
+            )
+            external_filename = (
+                f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-MBD-external-report-report.csv"
             )
             mock_blob_storage.add.assert_any_call(
                 internal_filename,
                 csv_data,
                 content_type="text/csv",
-                container_name="reports",
+            )
+            mock_blob_storage.add.assert_any_call(
+                external_filename,
+                csv_data,
+                content_type="text/csv",
             )
 
-            email_calls = [
-                call[1]["report_type"]
-                for call in mock_email_service.send_report_email.call_args_list
-            ]
-            assert "internal_report" not in email_calls
+            mock_email_service.send_reports_email.assert_called_once_with(
+                {external_filename: csv_data}
+            )
+
+    def test_handle_with_internal_reports_does_not_call_email_service(
+        self, dataframe, csv_data, now, monkeypatch
+    ):
+        """
+        Test that internal reports are not emailed but still stored.
+        """
+        monkeypatch.setattr(
+            Command, "REPORTS", [ReportConfig("internal-report", [1], False)]
+        )
+
+        with patch(f"{Helper.__module__}.Helper.sql") as mock_helper_sql:
+            mock_helper_sql.return_value = "SELECT 1"
+
+            with self.mocked_dependencies(dataframe, csv_data, now) as md:
+                Command().handle()
+
+            mock_read_sql, mock_blob_storage, mock_email_service = md
+
+            assert mock_read_sql.call_count == 1
+            assert mock_blob_storage.add.call_count == 1
+            assert mock_email_service.send_reports_email.call_count == 0
