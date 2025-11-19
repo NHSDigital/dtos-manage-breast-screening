@@ -24,7 +24,10 @@ class BreastCancerHistoryItemPresenter:
         self.left_breast_treatment = self._format_multiple_choices(
             self._item.left_breast_treatment, BreastCancerHistoryItem.Treatment
         )
-        self.systemic_treatments = self._item.get_systemic_treatments_display()
+        self.systemic_treatments = self._format_multiple_choices(
+            self._item.systemic_treatments,
+            BreastCancerHistoryItem.SystemicTreatment,
+        )
         self.additional_details = nl2br(self._item.additional_details)
 
     @property

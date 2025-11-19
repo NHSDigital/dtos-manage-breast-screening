@@ -96,7 +96,16 @@ class BreastCancerHistoryItem(BaseModel):
         ],
     )
 
-    systemic_treatments = models.CharField(choices=SystemicTreatment)
+    systemic_treatments = ArrayField(
+        base_field=models.CharField(choices=SystemicTreatment),
+        default=list,
+        validators=[
+            ExcludesOtherOptionsValidator(
+                SystemicTreatment.NO_SYSTEMIC_TREATMENTS.value,
+                SystemicTreatment.NO_SYSTEMIC_TREATMENTS.label,
+            )
+        ],
+    )
     systemic_treatments_other_treatment_details = models.CharField(
         blank=True, null=False, default=""
     )

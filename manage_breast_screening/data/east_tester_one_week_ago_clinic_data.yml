@@ -68,7 +68,7 @@ clinic:
               diagnosis_year: 2024
               left_breast_procedure: NO_PROCEDURE
               right_breast_procedure: LUMPECTOMY
-              systemic_treatments: NO_RADIOTHERAPY
+              systemic_treatments: [NO_SYSTEMIC_TREATMENTS]
               intervention_location: NHS_HOSPITAL
               intervention_location_details: East Tester Hospital
 
