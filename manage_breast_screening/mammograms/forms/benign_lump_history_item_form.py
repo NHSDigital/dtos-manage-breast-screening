@@ -27,12 +27,18 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         label_classes="nhsuk-fieldset__legend--s",
         choices=BenignLumpHistoryItem.Procedure,
         exclusive_choices={"NO_PROCEDURES"},
+        error_messages={
+            "required": "Select which procedures they have had in the left breast",
+        },
     )
     right_breast_procedures = MultipleChoiceField(
         label="Right breast",
         label_classes="nhsuk-fieldset__legend--s",
         choices=BenignLumpHistoryItem.Procedure,
         exclusive_choices={"NO_PROCEDURES"},
+        error_messages={
+            "required": "Select which procedures they have had in the right breast",
+        },
     )
 
     procedure_year = YearField(
@@ -46,6 +52,9 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
     procedure_location = ChoiceField(
         label="Where were the tests and treatment done?",
         choices=BenignLumpHistoryItem.ProcedureLocation,
+        error_messages={
+            "required": "Select where the tests and treatment were done",
+        },
     )
     nhs_hospital_details = CharField(label="Provide details", required=False)
     private_clinic_uk_details = CharField(label="Provide details", required=False)
@@ -69,11 +78,11 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
                 detail_field
             )
 
-    def create(self, request):
+    def create(self, appointment, request):
         auditor = Auditor.from_request(request)
 
         benign_lump_history_item = BenignLumpHistoryItem.objects.create(
-            appointment=self.appointment,
+            appointment=appointment,
             left_breast_procedures=self.cleaned_data.get("left_breast_procedures", []),
             right_breast_procedures=self.cleaned_data.get(
                 "right_breast_procedures", []
