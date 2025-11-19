@@ -38,5 +38,3 @@ class Command(BaseCommand):
                     inbox.acknowledge(message_id)
 
                     logger.info("Message %s acknowledged", message_id)
-
-            logger.info("Store MESH Messages command completed successfully")

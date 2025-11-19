@@ -63,7 +63,6 @@ class Command(BaseCommand):
                             row, clinic
                         )
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
-            logger.info("Create Appointments command finished successfully")
 
     def is_not_holding_clinic(self, row):
         return row.get("Holding Clinic") != "Y"

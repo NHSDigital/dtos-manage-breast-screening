@@ -86,8 +86,6 @@ class Command(BaseCommand):
                 NhsMail().send_reports_email(external_reports)
                 logger.info(f"Reports sent: {', '.join(external_reports.keys())}")
 
-            logger.info("Create Report Command finished")
-
     def configuration(self, options: dict) -> tuple[list[str], list[ReportConfig]]:
         if options.get("smoke_test", False):
             bso_codes = [self.SMOKE_TEST_BSO_CODE]
