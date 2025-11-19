@@ -6,8 +6,8 @@ from logging import getLogger
 import pandas
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.models import (
     ZONE_INFO,
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
             logger.info("Create Appointments command started")
             container_client = BlobStorage().find_or_create_container(
                 os.getenv("BLOB_CONTAINER_NAME", "")

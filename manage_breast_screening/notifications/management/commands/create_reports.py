@@ -5,8 +5,8 @@ import pandas
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
@@ -58,7 +58,7 @@ class Command(BaseCommand):
         parser.add_argument("--smoke-test", action="store_true")
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
             logger.info("Create Report Command started")
 
             bso_codes, report_configs = self.configuration(options)

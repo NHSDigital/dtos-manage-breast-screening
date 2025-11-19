@@ -200,14 +200,10 @@ class TestSaveMessageStatus:
 
         assert len(ChannelStatus.objects.filter(message=message)) == 0
 
-    def test_calls_insights_logger_if_exception_raised(
-        self, mock_queue, mock_insights_logger
+    def test_calls_command_handler(
+        self,
+        mock_queue,
+        mock_command_handler,
     ):
-        mock_queue.return_value.items.side_effect = Exception("this is an error")
-
-        with pytest.raises(CommandError):
-            Command().handle()
-
-        mock_insights_logger.assert_called_once_with(
-            "SaveMessageStatusError: this is an error"
-        )
+        Command().handle()
+        mock_command_handler.assert_called_with("SaveMessageStatus")

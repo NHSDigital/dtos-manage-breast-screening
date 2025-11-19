@@ -4,8 +4,8 @@ from logging import getLogger
 from business.calendar import Calendar
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
@@ -33,7 +33,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
             return self.send_message_batch()
 
     def send_message_batch(self):

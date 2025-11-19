@@ -175,25 +175,14 @@ class TestRetryFailedMessageBatch:
         )
 
     @pytest.mark.django_db
-    def test_calls_insights_logger_if_exception_raised(
+    def test_calls_command_handler(
         self,
         mock_mark_batch_as_failed,
         mock_mark_batch_as_sent,
         mock_retry_message_batches,
         mock_send_message_batch,
-        mock_insights_logger,
+        mock_command_handler,
     ):
-        subject = Command()
-        batch_id = uuid.uuid4()
-        _failed_batch = MessageBatchFactory(id=batch_id, status="failed_recoverable")
-
-        mock_retry_message_batches.return_value.item.return_value.content = json.dumps(
-            {"message_batch_id": str(batch_id), "retry_count": 5}
-        )
-
-        with pytest.raises(CommandError):
-            subject.handle()
-
-        mock_insights_logger.assert_called_with(
-            f"RetryFailedMessageBatchError: Message Batch with id {str(batch_id)} not sent: Retry limit exceeded"
-        )
+        mock_retry_message_batches.return_value.item.return_value = None
+        Command().handle()
+        mock_command_handler.assert_called_with("RetryFailedMessageBatch")

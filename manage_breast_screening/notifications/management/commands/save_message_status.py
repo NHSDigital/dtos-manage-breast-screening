@@ -5,8 +5,8 @@ from dateutil import parser
 from django.core.exceptions import ValidationError
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.models import (
     ChannelStatus,
@@ -26,7 +26,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
             logger.info("Save Message Status Command started")
             queue = Queue.MessageStatusUpdates()
             for item in queue.items():
