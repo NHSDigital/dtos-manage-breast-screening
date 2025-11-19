@@ -61,7 +61,7 @@ class MessageBatchHelpers:
             response.status_code,
             response.text,
         )
-        ApplicationInsightsLogging().custom_event(
+        ApplicationInsightsLogging().custom_event_warning(
             message=log_msg,
             event_name="batch_marked_as_failed",
         )

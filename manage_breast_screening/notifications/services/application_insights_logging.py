@@ -33,8 +33,17 @@ class ApplicationInsightsLogging:
     def exception(self, exception_name: str):
         self.logger.exception(exception_name, stack_info=True)
 
-    def custom_event(self, message: str, event_name: str):
+    def custom_event_warning(self, message: str, event_name: str):
         self.logger.warning(
+            message,
+            extra={
+                "microsoft.custom_event.name": event_name,
+                "additional_attrs": message,
+            },
+        )
+
+    def custom_event_info(self, message: str, event_name: str):
+        self.logger.info(
             message,
             extra={
                 "microsoft.custom_event.name": event_name,

@@ -23,7 +23,7 @@ class RequestValidator:
 
         if not self.verify_signature():
             error_message = "Signature does not match"
-            ApplicationInsightsLogging().custom_event(
+            ApplicationInsightsLogging().custom_event_warning(
                 message=error_message,
                 event_name="create_message_status_validation_error",
             )

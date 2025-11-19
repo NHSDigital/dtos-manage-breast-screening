@@ -17,9 +17,6 @@ from manage_breast_screening.notifications.models import (
     MessageBatch,
     MessageBatchStatusChoices,
 )
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
-)
 from manage_breast_screening.notifications.tests.factories import (
     MessageBatchFactory,
     MessageFactory,
@@ -30,14 +27,6 @@ class TestMessageBatchHelpers:
     @pytest.fixture
     def routing_plan_id(self):
         return str(uuid.uuid4())
-
-    @pytest.fixture(autouse=True)
-    def mock_insights_logger(self, monkeypatch):
-        mock_insights_logger = MagicMock()
-        monkeypatch.setattr(
-            ApplicationInsightsLogging, "custom_event", mock_insights_logger
-        )
-        return mock_insights_logger
 
     @pytest.mark.django_db
     def test_mark_messages_as_sent(self):

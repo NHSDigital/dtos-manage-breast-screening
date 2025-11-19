@@ -17,7 +17,7 @@ class CommandHandler:
             ApplicationInsightsLogging().exception(f"{command_name}Error: {e}")
             raise CommandError(e)
         else:
-            ApplicationInsightsLogging().custom_event(
+            ApplicationInsightsLogging().custom_event_info(
                 event_name=f"{command_name}Completed",
                 message=f"{command_name} completed successfully",
             )

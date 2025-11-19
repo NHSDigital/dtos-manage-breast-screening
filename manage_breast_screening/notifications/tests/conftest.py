@@ -27,7 +27,10 @@ def mock_insights_logger(request, monkeypatch):
     mock_insights_logger = MagicMock()
     monkeypatch.setattr(ApplicationInsightsLogging, "exception", mock_insights_logger)
     monkeypatch.setattr(
-        ApplicationInsightsLogging, "custom_event", mock_insights_logger
+        ApplicationInsightsLogging, "custom_event_warning", mock_insights_logger
+    )
+    monkeypatch.setattr(
+        ApplicationInsightsLogging, "custom_event_info", mock_insights_logger
     )
     return mock_insights_logger
 
