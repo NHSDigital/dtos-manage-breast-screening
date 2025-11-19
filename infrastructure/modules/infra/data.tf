@@ -1,3 +1,5 @@
+data "azurerm_subscription" "current" {}
+
 data "azurerm_key_vault" "infra" {
   provider = azurerm.hub
 
