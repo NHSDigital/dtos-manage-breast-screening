@@ -7,21 +7,18 @@
   {% do form.left_breast_procedures.add_divider_after("LUMP_REMOVED", "or") %}
   {% do form.right_breast_procedures.add_divider_after("LUMP_REMOVED", "or") %}
 
-  {% call fieldset({
-    "legend": {
-      "text": "What benign lump procedures has " ~ participant_first_name ~ " had?",
-      "classes": "nhsuk-fieldset__legend--m"
-    }
-  }) %}
-    <div class="nhsuk-grid-row">
-      <div class="nhsuk-grid-column-one-half">
-        {{ form.right_breast_procedures.as_field_group() }}
-      </div>
-      <div class="nhsuk-grid-column-one-half">
-        {{ form.left_breast_procedures.as_field_group() }}
-      </div>
+  <h2 aria-hidden="true">
+    What benign lump procedures has {{ participant_first_name }} had?
+  </h2>
+
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {{ form.right_breast_procedures.as_field_group() }}
     </div>
-  {% endcall %}
+    <div class="nhsuk-grid-column-one-half">
+      {{ form.left_breast_procedures.as_field_group() }}
+    </div>
+  </div>
 
   {{ form.procedure_year.as_field_group() }}
 
