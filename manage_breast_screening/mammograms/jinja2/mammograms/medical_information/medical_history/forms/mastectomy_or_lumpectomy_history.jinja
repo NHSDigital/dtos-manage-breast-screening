@@ -1,0 +1,51 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+
+{% block form %}
+  <p>
+    This is designed to capture information on prophylactic or elective surgery.
+    <a href="{{ presenter.add_breast_cancer_history_link.href }}" class="nhsuk-link">
+      Add breast cancer details
+    </a>
+    if that was the reason for this surgery.
+  </p>
+
+  <h2 aria-hidden="true">What procedure has {{ participant_first_name }} had?</h2>
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.right_breast_procedure.add_divider_after("MASTECTOMY_NO_TISSUE_REMAINING", "or") %}
+      {{ form.right_breast_procedure.as_field_group() }}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.left_breast_procedure.add_divider_after("MASTECTOMY_NO_TISSUE_REMAINING", "or") %}
+      {{ form.left_breast_procedure.as_field_group() }}
+    </div>
+  </div>
+
+  <h2 aria-hidden="true">What other surgery has {{ participant_first_name }} had?</h2>
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.right_breast_other_surgery.add_divider_after("SYMMETRISATION", "or") %}
+      {{ form.right_breast_other_surgery.as_field_group() }}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {% do form.left_breast_other_surgery.add_divider_after("SYMMETRISATION", "or") %}
+      {{ form.left_breast_other_surgery.as_field_group() }}
+    </div>
+  </div>
+
+  {{ form.year_of_surgery.as_field_group() }}
+
+  {{ form.surgery_reason.as_field_group() }}
+
+  {{ form.additional_details.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+{% endblock %}
+

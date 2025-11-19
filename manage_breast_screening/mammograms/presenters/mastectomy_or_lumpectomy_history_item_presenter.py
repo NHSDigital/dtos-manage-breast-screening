@@ -25,6 +25,7 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
             else "Not specified"
         )
         self.surgery_reason = self._item.get_surgery_reason_display()
+        self.surgery_other_reason_details = self._item.surgery_other_reason_details
         self.additional_details = nl2br(self._item.additional_details)
 
     @property
@@ -60,6 +61,10 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
                 {
                     "key": {"text": "Surgery reason"},
                     "value": {"html": self.surgery_reason},
+                },
+                {
+                    "key": {"text": "Surgery other reason details"},
+                    "value": {"text": self.surgery_other_reason_details},
                 },
                 {
                     "key": {"text": "Additional details"},

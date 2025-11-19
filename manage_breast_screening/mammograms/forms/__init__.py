@@ -3,6 +3,7 @@ from .ask_for_medical_information_form import AskForMedicalInformationForm
 from .breast_augmentation_history_form import BreastAugmentationHistoryForm
 from .cyst_history_form import CystHistoryForm
 from .implanted_medical_device_history_form import ImplantedMedicalDeviceHistoryForm
+from .mastectomy_or_lumpectomy_history_form import MastectomyOrLumpectomyHistoryForm
 from .record_medical_information_form import RecordMedicalInformationForm
 from .screening_appointment_form import ScreeningAppointmentForm
 from .special_appointment_forms import (
@@ -19,5 +20,6 @@ __all__ = [
     "ScreeningAppointmentForm",
     "ProvideSpecialAppointmentDetailsForm",
     "MarkReasonsTemporaryForm",
+    "MastectomyOrLumpectomyHistoryForm",
     "ImplantedMedicalDeviceHistoryForm",
 ]

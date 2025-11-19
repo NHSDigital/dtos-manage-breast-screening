@@ -21,7 +21,7 @@ class MastectomyOrLumpectomyHistoryItem(BaseModel):
     class Surgery(models.TextChoices):
         RECONSTRUCTION = "RECONSTRUCTION", "Reconstruction"
         SYMMETRISATION = "SYMMETRISATION", "Symmetrisation"
-        NO_SURGERY = "NO_SURGERY", "No surgery"
+        NO_OTHER_SURGERY = "NO_OTHER_SURGERY", "No other surgery"
 
     class SurgeryReason(models.TextChoices):
         RISK_REDUCTION = "RISK_REDUCTION", "Risk reduction"
@@ -43,6 +43,9 @@ class MastectomyOrLumpectomyHistoryItem(BaseModel):
         base_field=models.CharField(choices=Surgery),
         default=list,
     )
+    # TODO should we rename year_of_surgery to surgery_year
+    #      to be more consitent with names used elsewhere. e.g. procedure_year
     year_of_surgery = models.IntegerField(null=True, blank=True)
     surgery_reason = models.CharField(choices=SurgeryReason)
+    surgery_other_reason_details = models.CharField(blank=True, null=False, default="")
     additional_details = models.TextField(blank=True, null=False, default="")
