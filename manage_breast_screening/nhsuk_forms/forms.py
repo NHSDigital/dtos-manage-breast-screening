@@ -103,6 +103,15 @@ class ConditionalFieldDeclarations:
                         ),
                     )
 
+    def conditionally_required_fields(self, predicate_field, predicate_field_value):
+        matches = [
+            requirement
+            for requirement in self.conditional_requirements
+            if requirement.predicate_field == predicate_field
+            and requirement.predicate_field_value == predicate_field_value
+        ]
+        return matches
+
 
 class FormWithConditionalFields(Form):
     """
@@ -119,6 +128,25 @@ class FormWithConditionalFields(Form):
         self.conditional_field_declarations = ConditionalFieldDeclarations(self)
 
         super().__init__(*args, **kwargs)
+
+    def conditionally_shown_html(self, field, value):
+        """
+        If a single field is conditionally shown when `field` is set to `value`,
+        then return the HTML for that field.
+
+        If there is no conditional logic, return None.
+
+        If there are multiple conditional fields that get shown, also return None,
+        (it is up to the template to decide how to combine them).
+        """
+        conditional_fields = (
+            self.conditional_field_declarations.conditionally_required_fields(
+                field, value
+            )
+        )
+        if len(conditional_fields) == 1:
+            field_name = conditional_fields[0].conditionally_required_field
+            return self[field_name].as_field_group()
 
     def given_field_value(self, field, field_value):
         """

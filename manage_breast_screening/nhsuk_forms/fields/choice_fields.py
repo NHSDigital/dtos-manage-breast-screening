@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import widgets
 
+from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.nhsuk_forms.validators import ExcludesOtherOptionsValidator
 
 
@@ -34,7 +35,14 @@ class BoundChoiceField(forms.BoundField):
         self._conditional_html[value] = html
 
     def conditional_html(self, value):
-        return self._conditional_html.get(value)
+        explicitly_set_html = self._conditional_html.get(value)
+        if explicitly_set_html:
+            return explicitly_set_html
+
+        if isinstance(self.form, FormWithConditionalFields):
+            return self.form.conditionally_shown_html(self.name, value)
+
+        return None
 
     def add_divider_after(self, previous, divider):
         self.dividers[previous] = divider
