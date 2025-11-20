@@ -173,3 +173,15 @@ class MedicalInformationPresenter:
             "href": url,
             "text": ("Add cyst history"),
         }
+
+    @property
+    def add_breast_augmentation_history_link(self):
+        url = reverse(
+            "mammograms:add_breast_augmentation_history_item",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": ("Add breast augmentation history"),
+        }
