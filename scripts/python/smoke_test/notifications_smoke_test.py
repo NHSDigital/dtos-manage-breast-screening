@@ -15,7 +15,8 @@ STARTUP_SCRIPT_PATH = f"{WORK_DIR}/../../bash/run_container_app_job.sh"
 def test_notifications():
     logging.info("Running notifications smoke test")
 
-    environment, storage_account, resource_group_name = configure()
+    environment = os.getenv("ENVIRONMENT")
+    resource_group_name = f"rg-manbrs-{environment}-container-app-uks"
 
     if environment == "prod":
         return
@@ -36,20 +37,6 @@ def test_notifications():
         assert job_result.returncode == 0
 
     logging.info("Finished notifications smoke test")
-
-
-def configure():
-    environment = os.getenv("ENVIRONMENT", "dev")
-    pr_number = os.getenv("PR_NUMBER", "")
-    storage_account = f"stmanbrs{environment}uks"
-
-    if pr_number != "":
-        environment = f"pr-{pr_number}"
-        storage_account = f"stmanbrspr{pr_number}uks"
-
-    resource_group_name = f"rg-manbrs-{environment}-container-app-uks"
-
-    return (environment, storage_account, resource_group_name)
 
 
 def setup_mesh_inbox_test_data(environment: str, resource_group_name: str):
