@@ -103,12 +103,12 @@ class TestBreastCancerHistory(SystemTestCase):
         fieldset = self.get_fieldset_by_legend(
             "What other surgery have they had in their Right breast (or axilla)?"
         )
-        fieldset.get_by_label("No surgery").click()
+        fieldset.get_by_label("No other surgery").click()
 
         fieldset = self.get_fieldset_by_legend(
             "What other surgery have they had in their Left breast (or axilla)?"
         )
-        fieldset.get_by_label("No surgery").click()
+        fieldset.get_by_label("No other surgery").click()
 
     def and_i_select_no_radiotherapy(self):
         fieldset = self.get_fieldset_by_legend(
