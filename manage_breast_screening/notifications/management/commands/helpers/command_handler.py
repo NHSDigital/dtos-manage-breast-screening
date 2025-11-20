@@ -13,11 +13,10 @@ class CommandHandler:
     def command_handler(command_name):
         try:
             yield
-        except Exception as e:
-            ApplicationInsightsLogging().exception(f"{command_name}Error: {e}")
-            raise CommandError(e)
-        else:
             ApplicationInsightsLogging().custom_event_info(
                 event_name=f"{command_name}Completed",
                 message=f"{command_name} completed successfully",
             )
+        except Exception as e:
+            ApplicationInsightsLogging().exception(f"{command_name}Error: {e}")
+            raise CommandError(e)

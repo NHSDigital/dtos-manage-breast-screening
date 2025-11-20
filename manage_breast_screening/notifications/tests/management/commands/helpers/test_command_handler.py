@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
 import pytest
 from django.core.management.base import CommandError
@@ -28,6 +28,11 @@ def test_command_handler_logs_and_raises(mock_insights_logger):
             mock.do_stuff("this")
             mock.do_more_stuff("that")
     mock_insights_logger.assert_called_once_with(f"SomeJobError: {an_exception}")
+    assert (
+        call(event_name="SomeJobCompleted", message="SomeJob completed successfully")
+        not in mock_insights_logger.mock_calls
+    )
+
     assert "Nooooo!" in str(exc_info.value)
 
 
