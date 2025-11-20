@@ -52,10 +52,10 @@ def test_notifications():
 
 def configure():
     environment = os.getenv("ENVIRONMENT", "dev")
-    pr_number = os.getenv("PR_NUMBER")
+    pr_number = os.getenv("PR_NUMBER", "")
     storage_account = f"stmanbrs{environment}uks"
 
-    if pr_number is not None:
+    if pr_number != "":
         environment = f"pr-{pr_number}"
         storage_account = f"stmanbrspr{pr_number}uks"
 
