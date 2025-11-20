@@ -39,6 +39,14 @@ class TestBreastCancerHistory(SystemTestCase):
         self.when_i_click_on_add_breast_cancer_history()
         self.then_the_accessibility_baseline_is_met()
 
+    def test_validation_errors(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.when_i_click_on_add_breast_cancer_history()
+        self.and_i_click_save()
+        self.then_i_am_prompted_to_fill_in_required_fields()
+
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
@@ -136,3 +144,18 @@ class TestBreastCancerHistory(SystemTestCase):
             "Where did surgery and treatment take place?"
         )
         fieldset.get_by_label("Provide details").filter(visible=True).fill("Abc clinic")
+
+    def then_i_am_prompted_to_fill_in_required_fields(self):
+        self.expect_validation_error(
+            error_text="Select which breasts cancer was diagnosed in",
+            fieldset_legend="In which breasts was cancer diagnosed?",
+            field_label="Right breast",
+            field_name="diagnosis_location",
+        )
+
+        self.expect_validation_error(
+            error_text="Select which procedure they have had in the right breast",
+            fieldset_legend="What procedure have they had in their Right breast (or axilla)",
+            field_label="Lumpectomy",
+            field_name="right_breast_procedure",
+        )
