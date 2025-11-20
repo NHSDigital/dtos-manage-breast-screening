@@ -38,5 +38,5 @@ def mock_insights_logger(request, monkeypatch):
 @pytest.fixture
 def mock_command_handler(request, monkeypatch):
     mock_command_handler = MagicMock()
-    monkeypatch.setattr(CommandHandler, "command_handler", mock_command_handler)
+    monkeypatch.setattr(CommandHandler, "handle", mock_command_handler)
     return mock_command_handler

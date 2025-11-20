@@ -28,7 +28,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Retry Failed Message Batch Command started")
             queue = Queue.RetryMessageBatches()
             logger.debug("Retry queue items: %s", queue.peek())

@@ -37,7 +37,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Create Appointments command started")
             container_client = BlobStorage().find_or_create_container(
                 os.getenv("BLOB_CONTAINER_NAME", "")

@@ -20,7 +20,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Store MESH Messages command started")
             today_dirname = datetime.today().strftime("%Y-%m-%d")
             with MeshInbox() as inbox:

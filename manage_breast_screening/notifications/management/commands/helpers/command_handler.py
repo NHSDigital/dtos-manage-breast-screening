@@ -10,7 +10,7 @@ from manage_breast_screening.notifications.services.application_insights_logging
 class CommandHandler:
     @contextmanager
     @staticmethod
-    def command_handler(command_name):
+    def handle(command_name):
         try:
             yield
             ApplicationInsightsLogging().custom_event_info(

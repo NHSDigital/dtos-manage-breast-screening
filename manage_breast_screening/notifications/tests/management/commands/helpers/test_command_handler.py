@@ -10,7 +10,7 @@ from manage_breast_screening.notifications.management.commands.helpers.command_h
 
 def test_command_handler_yields():
     mock = MagicMock()
-    with CommandHandler.command_handler("SomeJob"):
+    with CommandHandler.handle("SomeJob"):
         mock.do_stuff("this")
         mock.do_more_stuff("that")
 
@@ -24,7 +24,7 @@ def test_command_handler_logs_and_raises(mock_insights_logger):
     mock.do_more_stuff.side_effect = an_exception
 
     with pytest.raises(CommandError) as exc_info:
-        with CommandHandler.command_handler("SomeJob"):
+        with CommandHandler.handle("SomeJob"):
             mock.do_stuff("this")
             mock.do_more_stuff("that")
     mock_insights_logger.assert_called_once_with(f"SomeJobError: {an_exception}")
@@ -38,7 +38,7 @@ def test_command_handler_logs_and_raises(mock_insights_logger):
 
 def test_command_handler_logs_success(mock_insights_logger):
     mock = MagicMock()
-    with CommandHandler.command_handler("SomeJob"):
+    with CommandHandler.handle("SomeJob"):
         mock.do_stuff("this")
         mock.do_more_stuff("that")
 

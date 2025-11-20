@@ -33,7 +33,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             return self.send_message_batch()
 
     def send_message_batch(self):

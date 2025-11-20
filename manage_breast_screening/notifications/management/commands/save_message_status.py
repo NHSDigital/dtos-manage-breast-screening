@@ -26,7 +26,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with CommandHandler.command_handler(INSIGHTS_JOB_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Save Message Status Command started")
             queue = Queue.MessageStatusUpdates()
             for item in queue.items():
