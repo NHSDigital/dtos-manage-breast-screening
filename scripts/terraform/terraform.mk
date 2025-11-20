@@ -77,6 +77,7 @@ terraform-validate: terraform-init-no-backend # Validate Terraform changes - mak
 
 notifications-smoke-test:
 	if test "${RUN_NOTIFICATIONS_SMOKE_TEST}" == "true"; then
+		export ENVIRONMENT
 		pip install pytest mesh-client
 		pytest -vv scripts/python/smoke_test/notifications_smoke_test.py
 	else
