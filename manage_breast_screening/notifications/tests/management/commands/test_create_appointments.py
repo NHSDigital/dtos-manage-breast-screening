@@ -305,18 +305,16 @@ class TestCreateAppointments:
 
         assert Appointment.objects.count() == 0
 
-    @pytest.mark.django_db
-    def test_calls_insights_logger_if_exception_raised(
+    def test_calls_command_handler(
         self,
-        mock_insights_logger,
+        mock_command_handler,
     ):
         with mocked_blob_storage() as mock_blob_storage:
             mock_container_client = (
                 mock_blob_storage.return_value.find_or_create_container.return_value
             )
-            mock_container_client.list_blobs = Mock(side_effect=Exception("Error!"))
+            mock_container_client.list_blobs.return_value = []
 
-            with pytest.raises(CommandError):
-                Command().handle(**{"date_str": "Noooo!"})
+            Command().handle(**{"date_str": "2000-01-01"})
 
-        mock_insights_logger.assert_called_with("CreateAppointmentsError: Error!")
+        mock_command_handler.assert_called_with("CreateAppointments")

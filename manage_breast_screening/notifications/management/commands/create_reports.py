@@ -5,8 +5,8 @@ import pandas
 from django.core.management.base import BaseCommand
 from django.db import connection
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
@@ -14,7 +14,7 @@ from manage_breast_screening.notifications.services.blob_storage import BlobStor
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
 logger = getLogger(__name__)
-INSIGHTS_ERROR_NAME = "CreateReportsError"
+INSIGHTS_JOB_NAME = "CreateReports"
 
 
 class ReportConfig:
@@ -58,7 +58,7 @@ class Command(BaseCommand):
         parser.add_argument("--smoke-test", action="store_true")
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Create Report Command started")
 
             bso_codes, report_configs = self.configuration(options)
@@ -85,8 +85,6 @@ class Command(BaseCommand):
             if bool(external_reports):
                 NhsMail().send_reports_email(external_reports)
                 logger.info(f"Reports sent: {', '.join(external_reports.keys())}")
-
-            logger.info("Create Report Command finished")
 
     def configuration(self, options: dict) -> tuple[list[str], list[ReportConfig]]:
         if options.get("smoke_test", False):

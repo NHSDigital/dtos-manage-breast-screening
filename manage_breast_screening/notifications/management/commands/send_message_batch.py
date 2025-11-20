@@ -2,8 +2,11 @@ from datetime import datetime, timedelta
 from logging import getLogger
 
 from business.calendar import Calendar
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
+)
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
 )
@@ -18,11 +21,8 @@ from manage_breast_screening.notifications.models import (
     MessageBatchStatusChoices,
 )
 from manage_breast_screening.notifications.services.api_client import ApiClient
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
-)
 
-INSIGHTS_ERROR_NAME = "SendMessageBatchError"
+INSIGHTS_JOB_NAME = "SendMessageBatch"
 logger = getLogger(__name__)
 
 
@@ -33,11 +33,8 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        try:
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             return self.send_message_batch()
-        except Exception as e:
-            ApplicationInsightsLogging().exception(f"{INSIGHTS_ERROR_NAME}: {e}")
-            raise CommandError(e)
 
     def send_message_batch(self):
         logger.info("Send Message Batch Command started")

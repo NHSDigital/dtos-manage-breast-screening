@@ -6,8 +6,8 @@ from logging import getLogger
 import pandas
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.models import (
     ZONE_INFO,
@@ -18,7 +18,7 @@ from manage_breast_screening.notifications.models import (
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
 DIR_NAME_DATE_FORMAT = "%Y-%m-%d"
-INSIGHTS_ERROR_NAME = "CreateAppointmentsError"
+INSIGHTS_JOB_NAME = "CreateAppointments"
 logger = getLogger(__name__)
 
 
@@ -37,7 +37,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Create Appointments command started")
             container_client = BlobStorage().find_or_create_container(
                 os.getenv("BLOB_CONTAINER_NAME", "")
@@ -63,7 +63,6 @@ class Command(BaseCommand):
                             row, clinic
                         )
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
-            logger.info("Create Appointments command finished successfully")
 
     def is_not_holding_clinic(self, row):
         return row.get("Holding Clinic") != "Y"

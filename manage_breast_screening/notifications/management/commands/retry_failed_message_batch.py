@@ -4,8 +4,8 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand, CommandError
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
@@ -18,7 +18,7 @@ from manage_breast_screening.notifications.services.api_client import ApiClient
 from manage_breast_screening.notifications.services.queue import Queue
 
 logger = getLogger(__name__)
-INSIGHTS_ERROR_NAME = "RetryFailedMessageBatchError"
+INSIGHTS_JOB_NAME = "RetryFailedMessageBatch"
 
 
 class Command(BaseCommand):
@@ -28,7 +28,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Retry Failed Message Batch Command started")
             queue = Queue.RetryMessageBatches()
             logger.debug("Retry queue items: %s", queue.peek())

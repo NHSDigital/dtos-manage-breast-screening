@@ -3,14 +3,14 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.exception_handler import (
-    exception_handler,
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
 )
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.services.mesh_inbox import MeshInbox
 
 logger = getLogger(__name__)
-INSIGHTS_ERROR_NAME = "StoreMeshMessagesError"
+INSIGHTS_JOB_NAME = "StoreMeshMessages"
 
 
 class Command(BaseCommand):
@@ -20,7 +20,7 @@ class Command(BaseCommand):
     """
 
     def handle(self, *args, **options):
-        with exception_handler(INSIGHTS_ERROR_NAME):
+        with CommandHandler.handle(INSIGHTS_JOB_NAME):
             logger.info("Store MESH Messages command started")
             today_dirname = datetime.today().strftime("%Y-%m-%d")
             with MeshInbox() as inbox:
@@ -38,5 +38,3 @@ class Command(BaseCommand):
                     inbox.acknowledge(message_id)
 
                     logger.info("Message %s acknowledged", message_id)
-
-            logger.info("Store MESH Messages command completed successfully")

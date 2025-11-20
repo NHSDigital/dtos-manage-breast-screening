@@ -5,6 +5,7 @@ from unittest.mock import ANY, MagicMock, patch
 import pytest
 import requests
 from dateutil import relativedelta
+from django.core.management.base import CommandError
 
 from manage_breast_screening.notifications.management.commands.helpers.message_batch_helpers import (
     MessageBatchHelpers,
@@ -14,7 +15,6 @@ from manage_breast_screening.notifications.management.commands.helpers.routing_p
 )
 from manage_breast_screening.notifications.management.commands.send_message_batch import (
     Command,
-    CommandError,
 )
 from manage_breast_screening.notifications.models import (
     ZONE_INFO,
@@ -255,14 +255,11 @@ class TestSendMessageBatch:
             with pytest.raises(CommandError):
                 Command().handle()
 
-    def test_calls_insights_logger_if_exception_raised(
+    def test_calls_command_handler(
         self,
         mock_mark_batch_as_sent,
         mock_send_message_batch,
-        mock_insights_logger,
+        mock_command_handler,
     ):
-        with patch.object(RoutingPlan, "all", side_effect=Exception("Nooooo!")):
-            with pytest.raises(CommandError):
-                Command().handle()
-
-        mock_insights_logger.assert_called_with("SendMessageBatchError: Nooooo!")
+        Command().handle()
+        mock_command_handler.assert_called_with("SendMessageBatch")

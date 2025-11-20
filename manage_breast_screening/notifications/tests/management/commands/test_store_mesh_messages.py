@@ -58,15 +58,11 @@ class TestStoreMeshMessages:
         with pytest.raises(CommandError):
             Command().handle()
 
-    def test_calls_insights_logger_if_exception_raised(
+    def test_calls_command_handler(
         self,
         mock_mesh_inbox,
-        _y,
-        mock_insights_logger,
+        mock_blob_storage,
+        mock_command_handler,
     ):
-        mock_mesh_inbox.side_effect = Exception("inbox wrong")
-
-        with pytest.raises(CommandError):
-            Command().handle()
-
-        mock_insights_logger.assert_called_with("StoreMeshMessagesError: inbox wrong")
+        Command().handle()
+        mock_command_handler.assert_called_with("StoreMeshMessages")

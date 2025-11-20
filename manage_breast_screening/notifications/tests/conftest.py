@@ -2,6 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
+from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+    CommandHandler,
+)
 from manage_breast_screening.notifications.services.application_insights_logging import (
     ApplicationInsightsLogging,
 )
@@ -24,6 +27,16 @@ def mock_insights_logger(request, monkeypatch):
     mock_insights_logger = MagicMock()
     monkeypatch.setattr(ApplicationInsightsLogging, "exception", mock_insights_logger)
     monkeypatch.setattr(
-        ApplicationInsightsLogging, "custom_event", mock_insights_logger
+        ApplicationInsightsLogging, "custom_event_warning", mock_insights_logger
+    )
+    monkeypatch.setattr(
+        ApplicationInsightsLogging, "custom_event_info", mock_insights_logger
     )
     return mock_insights_logger
+
+
+@pytest.fixture
+def mock_command_handler(request, monkeypatch):
+    mock_command_handler = MagicMock()
+    monkeypatch.setattr(CommandHandler, "handle", mock_command_handler)
+    return mock_command_handler

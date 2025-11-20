@@ -121,6 +121,18 @@ class TestCreateReports:
                 )
 
     @pytest.mark.django_db
+    def test_calls_command_handler(
+        self,
+        dataframe,
+        csv_data,
+        now,
+        mock_command_handler,
+    ):
+        with self.mocked_dependencies(dataframe, csv_data, now):
+            Command().handle()
+        mock_command_handler.assert_called_with("CreateReports")
+
+    @pytest.mark.django_db
     def test_smoke_test_argument_uses_correct_configuration(
         self, dataframe, csv_data, now
     ):
