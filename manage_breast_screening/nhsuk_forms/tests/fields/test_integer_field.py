@@ -47,10 +47,10 @@ class TestYearField:
         bounds["max"] = 2002
         form = TestForm(data={"field": 2003})
         assert not form.is_valid()
-        assert form.errors["field"] == ["Year must be less than 2002"]
+        assert form.errors["field"] == ["Year must be 2002 or earlier"]
 
         bounds["min"] = 2000
         form = TestForm(data={"field": 1999})
 
         assert not form.is_valid()
-        assert form.errors["field"] == ["Year must be greater than 2000"]
+        assert form.errors["field"] == ["Year must be 2000 or later"]

@@ -138,4 +138,4 @@ class TestBenignLumpHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Added benign lump history")
+        expect(alert).to_contain_text("Benign lump history added")

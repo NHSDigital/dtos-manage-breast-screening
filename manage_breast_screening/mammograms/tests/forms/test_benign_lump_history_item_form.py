@@ -54,20 +54,26 @@ class TestBenignLumpHistoryItemForm:
         )
 
         assert not form.is_valid()
-        assert form.errors.get(detail_field) == ["This field is required."]
+        assert form.errors.get(detail_field) == [
+            "Provide details about where the surgery and treatment took place"
+        ]
 
     @pytest.mark.parametrize(
-        "procedure_year",
+        ("procedure_year", "expected_message"),
         [
-            datetime.date.today().year - 80 - 1,
-            datetime.date.today().year + 1,
+            (
+                datetime.date.today().year - 80 - 1,
+                f"Year must be {datetime.date.today().year - 80} or later",
+            ),
+            (
+                datetime.date.today().year + 1,
+                f"Year must be {datetime.date.today().year} or earlier",
+            ),
         ],
     )
-    def test_procedure_year_must_be_within_range(self, procedure_year):
-        max_year = datetime.date.today().year
-        min_year = max_year - 80
-        year_outside_range_message = f"Year must be between {min_year} and {max_year}"
-
+    def test_procedure_year_must_be_within_range(
+        self, procedure_year, expected_message
+    ):
         form = BenignLumpHistoryItemForm(
             _form_data(
                 [
@@ -77,7 +83,7 @@ class TestBenignLumpHistoryItemForm:
         )
 
         assert not form.is_valid()
-        assert form.errors.get("procedure_year") == [year_outside_range_message]
+        assert form.errors.get("procedure_year") == [expected_message]
 
     def test_create_persists_data_and_audits(self, clinical_user):
         appointment = AppointmentFactory()

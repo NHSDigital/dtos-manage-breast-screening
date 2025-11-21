@@ -19,7 +19,7 @@ class AddBenignLumpHistoryItemView(InProgressAppointmentMixin, FormView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Added benign lump history",
+            "Benign lump history added",
         )
 
         return super().form_valid(form)

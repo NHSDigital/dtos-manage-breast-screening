@@ -76,7 +76,7 @@ class YearField(IntegerField):
         if value < min_value:
             raise forms.ValidationError(
                 self.error_messages.get(
-                    "min_value", "Year must be greater than %(min_value)s"
+                    "min_value", "Year must be %(min_value)s or later"
                 ),
                 code="min_value",
                 params={"min_value": min_value},
@@ -85,11 +85,8 @@ class YearField(IntegerField):
         if value > max_value:
             raise forms.ValidationError(
                 self.error_messages.get(
-                    "max_value", "Year must be less than %(max_value)s"
+                    "max_value", "Year must be %(max_value)s or earlier"
                 ),
                 code="max_value",
                 params={"max_value": max_value},
             )
-
-
-# End of file
