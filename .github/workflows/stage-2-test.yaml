@@ -56,7 +56,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Detect specific kinds of code change by path
         uses: dorny/paths-filter@v3
@@ -123,7 +123,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -169,7 +169,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -215,7 +215,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -252,7 +252,7 @@ jobs:
 
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
@@ -281,7 +281,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # Full history is needed to improving relevancy of reporting
       - name: 'Perform static analysis'
