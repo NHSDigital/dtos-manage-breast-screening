@@ -44,25 +44,52 @@ class YearField(IntegerField):
         hint=None,
         label_classes=None,
         classes=None,
-        min_value=None,
-        max_value=None,
+        min_value_callable=None,
+        max_value_callable=None,
         **kwargs,
     ):
-        if min_value is None:
-            min_value = date.today().year - 80
-        if max_value is None:
-            max_value = date.today().year
-
-        year_bounds_error = f"Year must be between {min_value} and {max_value}"
-
-        if "error_messages" not in kwargs:
-            kwargs["error_messages"] = {}
-
-        kwargs["error_messages"].setdefault("min_value", year_bounds_error)
-        kwargs["error_messages"].setdefault("max_value", year_bounds_error)
-        kwargs["min_value"] = min_value
-        kwargs["max_value"] = max_value
+        self.min_value_callable = min_value_callable
+        self.max_value_callable = max_value_callable
 
         super().__init__(
             *args, hint=hint, label_classes=label_classes, classes=classes, **kwargs
         )
+
+    def _default_min_year(self):
+        return date.today().year - 80
+
+    def _default_max_year(self):
+        return date.today().year
+
+    def validate(self, value):
+        super().validate(value)
+
+        if value in self.empty_values:
+            return
+
+        min_value_callable = self.min_value_callable or self._default_min_year
+        max_value_callable = self.max_value_callable or self._default_max_year
+
+        min_value = min_value_callable()
+        max_value = max_value_callable()
+
+        if value < min_value:
+            raise forms.ValidationError(
+                self.error_messages.get(
+                    "min_value", "Year must be greater than %(min_value)s"
+                ),
+                code="min_value",
+                params={"min_value": min_value},
+            )
+
+        if value > max_value:
+            raise forms.ValidationError(
+                self.error_messages.get(
+                    "max_value", "Year must be less than %(max_value)s"
+                ),
+                code="max_value",
+                params={"max_value": max_value},
+            )
+
+
+# End of file
