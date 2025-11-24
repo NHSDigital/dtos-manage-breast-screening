@@ -1,17 +1,12 @@
-import datetime
-
 from django import forms
-from django.db.models import TextChoices
 from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import (
+    BooleanField,
     CharField,
     ChoiceField,
-    IntegerField,
-)
-from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
-    MultipleChoiceField,
+    YearField,
 )
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.participants.models.implanted_medical_device_history_item import (
@@ -19,21 +14,9 @@ from manage_breast_screening.participants.models.implanted_medical_device_histor
 )
 
 
-class RemovalStatusChoices(TextChoices):
-    HAS_BEEN_REMOVED = "HAS_BEEN_REMOVED", "Implanted device has been removed"
-
-
 class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
     def __init__(self, *args, participant, **kwargs):
         super().__init__(*args, **kwargs)
-
-        # if entered, years should be between 80 years ago and this year
-        max_year = datetime.date.today().year
-        min_year = max_year - 80
-        year_outside_range_error_message = (
-            f"Year should be between {min_year} and {max_year}."
-        )
-        year_invalid_format_error_message = "Enter year as a number."
 
         self.fields["device"] = ChoiceField(
             choices=ImplantedMedicalDeviceHistoryItem.Device,
@@ -46,39 +29,22 @@ class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
             error_messages={"required": "Provide details of the device"},
             classes="nhsuk-u-width-two-thirds",
         )
-        self.fields["procedure_year"] = IntegerField(
+        self.fields["procedure_year"] = YearField(
             hint="Leave blank if unknown",
             required=False,
             label="Year of procedure (optional)",
             label_classes="nhsuk-label--m",
             classes="nhsuk-input--width-4",
-            min_value=min_year,
-            max_value=max_year,
-            error_messages={
-                "min_value": year_outside_range_error_message,
-                "max_value": year_outside_range_error_message,
-                "invalid": year_invalid_format_error_message,
-            },
         )
-        self.fields["removal_status"] = MultipleChoiceField(
+        self.fields["device_has_been_removed"] = BooleanField(
             required=False,
-            choices=RemovalStatusChoices,
-            widget=forms.CheckboxSelectMultiple,
-            label="Removed implants",
+            label="Implanted device has been removed",
             classes="app-checkboxes",
         )
-        self.fields["removal_year"] = IntegerField(
+        self.fields["removal_year"] = YearField(
             required=False,
-            label="Year removed",
+            label="Year removed (if available)",
             classes="nhsuk-input--width-4",
-            min_value=min_year,
-            max_value=max_year,
-            error_messages={
-                "required": "Enter the year the device was removed",
-                "min_value": year_outside_range_error_message,
-                "max_value": year_outside_range_error_message,
-                "invalid": year_invalid_format_error_message,
-            },
         )
         self.fields["additional_details"] = CharField(
             hint="Include any other relevant information about the device or procedure",
@@ -95,9 +61,6 @@ class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
         self.given_field_value(
             "device", ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE
         ).require_field("other_medical_device_details")
-        self.given_field_value(
-            "removal_status", RemovalStatusChoices.HAS_BEEN_REMOVED
-        ).require_field("removal_year")
 
     def model_values(self):
         return dict(
@@ -105,6 +68,7 @@ class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
             other_medical_device_details=self.cleaned_data.get(
                 "other_medical_device_details", ""
             ),
+            device_has_been_removed=self.cleaned_data.get("device_has_been_removed"),
             removal_year=self.cleaned_data.get("removal_year", ""),
             procedure_year=self.cleaned_data.get("procedure_year", ""),
             additional_details=self.cleaned_data.get("additional_details", ""),
@@ -124,6 +88,19 @@ class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
         auditor.audit_create(implanted_medical_device_history)
 
         return implanted_medical_device_history
+
+    def full_clean(self):
+        # if a removal_year is provided then remove it if device_has_been_removed is False
+        if self.data.get("removal_year") and not self.data.get(
+            "device_has_been_removed"
+        ):
+            # makes QueryDict mutable
+            self.data = self.data.copy()
+            self.data["removal_year"] = None
+            if hasattr(self.data, "_mutable"):
+                self.data._mutable = False
+
+        super().full_clean()
 
     def clean(self):
         cleaned_data = super().clean()

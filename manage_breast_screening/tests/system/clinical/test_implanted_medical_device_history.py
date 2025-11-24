@@ -18,7 +18,13 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         self.when_i_click_on_add_a_implanted_medical_device()
         self.then_i_see_the_add_a_implanted_medical_device_form()
 
+        self.when_i_click_save_device_without_entering_details()
+        self.then_i_see_validation_errors_for_missing_implanted_medical_device_details()
+
         self.when_i_select_hickman_line()
+        self.and_i_enter_the_procedure_year()
+        self.and_i_enter_the_removal_year()
+        self.and_i_enter_additional_details()
         self.and_i_click_save_device()
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_device_is_listed()
@@ -57,8 +63,30 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         ).to_be_visible()
         self.assert_page_title_contains("Details of the implanted medical device")
 
+    def then_i_see_validation_errors_for_missing_implanted_medical_device_details(self):
+        self.expect_validation_error(
+            error_text="Select the device type",
+            fieldset_legend="What device does Janet have?",
+            field_label="Cardiac device (such as a pacemaker or ICD)",
+        )
+
     def when_i_select_hickman_line(self):
         self.page.get_by_label("Hickman line", exact=True).click()
+
+    def and_i_enter_the_procedure_year(self):
+        self.page.get_by_label("Year of procedure (optional)", exact=True).fill("2000")
+
+    def and_i_enter_the_removal_year(self):
+        self.page.get_by_text("Implanted device has been removed").click()
+        self.page.get_by_label("Year removed (if available)", exact=True).fill("2025")
+
+    def and_i_enter_additional_details(self):
+        self.page.get_by_label("Additional details (optional)", exact=True).fill(
+            "additional details for test of implanted medical device history"
+        )
+
+    def when_i_click_save_device_without_entering_details(self):
+        self.and_i_click_save_device()
 
     def and_i_click_save_device(self):
         self.page.get_by_text("Save").click()
@@ -73,6 +101,11 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         )
         row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
         expect(row).to_contain_text("Hickman line")
+        expect(row).to_contain_text("2000")
+        expect(row).to_contain_text("Yes (2025)")
+        expect(row).to_contain_text(
+            "additional details for test of implanted medical device history"
+        )
 
     def and_the_message_says_device_added(self):
         alert = self.page.get_by_role("alert")

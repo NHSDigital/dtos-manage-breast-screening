@@ -12,7 +12,6 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 
 from ...forms.implanted_medical_device_history_form import (
     ImplantedMedicalDeviceHistoryForm,
-    RemovalStatusChoices,
 )
 
 
@@ -69,7 +68,7 @@ class TestImplantedMedicalDeviceHistoryForm:
         )
 
         assert not form.is_valid()
-        assert form.errors == {"procedure_year": ["Enter year as a number."]}
+        assert form.errors == {"procedure_year": ["Enter a whole number."]}
 
     def test_removal_year_invalid_format(self, clinical_user):
         appointment = AppointmentFactory()
@@ -81,7 +80,7 @@ class TestImplantedMedicalDeviceHistoryForm:
                 urlencode(
                     {
                         "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                        "device_has_been_removed": True,
                         "removal_year": "qwerty",
                     },
                 )
@@ -92,8 +91,7 @@ class TestImplantedMedicalDeviceHistoryForm:
         assert not form.is_valid()
         assert form.errors == {
             "removal_year": [
-                "Enter year as a number.",
-                "Enter the year the device was removed",
+                "Enter a whole number.",
             ]
         }
 
@@ -112,10 +110,8 @@ class TestImplantedMedicalDeviceHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        max_year = datetime.date.today().year
-        min_year = max_year - 80
         year_outside_range_error_message = (
-            f"Year should be between {min_year} and {max_year}."
+            self.create_year_outside_range_error_messsage(procedure_year)
         )
         form = ImplantedMedicalDeviceHistoryForm(
             QueryDict(
@@ -147,17 +143,15 @@ class TestImplantedMedicalDeviceHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        max_year = datetime.date.today().year
-        min_year = max_year - 80
         year_outside_range_error_message = (
-            f"Year should be between {min_year} and {max_year}."
+            self.create_year_outside_range_error_messsage(removal_year)
         )
         form = ImplantedMedicalDeviceHistoryForm(
             QueryDict(
                 urlencode(
                     {
                         "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                        "device_has_been_removed": True,
                         "removal_year": removal_year,
                     },
                 )
@@ -169,7 +163,6 @@ class TestImplantedMedicalDeviceHistoryForm:
         assert form.errors == {
             "removal_year": [
                 year_outside_range_error_message,
-                "Enter the year the device was removed",
             ]
         }
 
@@ -194,7 +187,7 @@ class TestImplantedMedicalDeviceHistoryForm:
                     {
                         "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
                         "procedure_year": procedure_year,
-                        "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                        "device_has_been_removed": True,
                         "removal_year": removal_year,
                     },
                 )
@@ -207,7 +200,7 @@ class TestImplantedMedicalDeviceHistoryForm:
             "removal_year": ["Year removed cannot be before year of procedure"]
         }
 
-    def test_has_been_removed_without_removal_date(self, clinical_user):
+    def test_removal_year_when_not_removed(self, clinical_user):
         appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
@@ -217,17 +210,37 @@ class TestImplantedMedicalDeviceHistoryForm:
                 urlencode(
                     {
                         "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                        "procedure_year": 2010,
+                        "removal_year": 1900,
+                        "additional_details": "removal_year provided but not device_has_been_removed",
                     },
+                    doseq=True,
                 )
             ),
             participant=appointment.participant,
         )
 
-        assert not form.is_valid()
-        assert form.errors == {
-            "removal_year": ["Enter the year the device was removed"]
-        }
+        # confirm full_clean removes removal_year but keeps procedure_year
+        assert form.data["removal_year"] == "1900"
+        form.full_clean()
+        assert form.data["removal_year"] is None
+        assert form.cleaned_data["removal_year"] is None
+        assert form.cleaned_data["procedure_year"] == 2010
+
+        assert form.is_valid()
+
+        obj = form.create(appointment=appointment, request=request)
+
+        obj.refresh_from_db()
+        assert obj.appointment == appointment
+        assert obj.device == ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE
+        assert obj.procedure_year == 2010
+        assert not obj.device_has_been_removed
+        assert obj.removal_year is None
+        assert (
+            obj.additional_details
+            == "removal_year provided but not device_has_been_removed"
+        )
 
     @pytest.mark.parametrize(
         "data",
@@ -239,14 +252,14 @@ class TestImplantedMedicalDeviceHistoryForm:
                 "device": ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
                 "other_medical_device_details": "Some details about the device",
                 "procedure_year": 2010,
-                "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                "device_has_been_removed": True,
                 "removal_year": 2015,
                 "additional_details": "Some additional details",
             },
             {
                 "device": ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
                 "procedure_year": 2015,
-                "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                "device_has_been_removed": True,
                 "removal_year": 2015,
             },
             {
@@ -255,7 +268,7 @@ class TestImplantedMedicalDeviceHistoryForm:
             },
             {
                 "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                "removal_status": RemovalStatusChoices.HAS_BEEN_REMOVED,
+                "device_has_been_removed": True,
                 "removal_year": 2015,
             },
         ],
@@ -282,3 +295,12 @@ class TestImplantedMedicalDeviceHistoryForm:
         assert obj.procedure_year == data.get("procedure_year", None)
         assert obj.removal_year == data.get("removal_year", None)
         assert obj.additional_details == data.get("additional_details", "")
+
+    def create_year_outside_range_error_messsage(self, request_year):
+        max_year = datetime.date.today().year
+        min_year = max_year - 80
+        return (
+            (f"Year must be {max_year} or earlier")
+            if request_year > max_year
+            else (f"Year must be {min_year} or later")
+        )

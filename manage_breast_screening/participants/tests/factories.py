@@ -214,6 +214,7 @@ class ImplantedMedicalDeviceHistoryItemFactory(DjangoModelFactory):
 
     appointment = SubFactory(AppointmentFactory)
     device = Iterator(ImplantedMedicalDeviceHistoryItem.Device)
+    device_has_been_removed = False
 
 
 class BreastAugmentationHistoryItemFactory(DjangoModelFactory):
