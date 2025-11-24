@@ -5,7 +5,6 @@ import pytest
 from manage_breast_screening.notifications.management.commands.collect_metrics import (
     Command,
 )
-from manage_breast_screening.notifications.services.metrics import Metrics
 
 
 class TestCollectMetrics:
@@ -14,25 +13,37 @@ class TestCollectMetrics:
         monkeypatch.setenv("ENVIRONMENT", "test")
 
     @patch(f"{Command.__module__}.Queue")
-    def test_handle_sends_queue_lengths(self, mock_queue):
-        mock_metrics_1 = MagicMock(spec=Metrics)
-        mock_metrics_2 = MagicMock(spec=Metrics)
-        mock_queue.RetryMessageBatches.return_value.queue_name = "queue 1"
-        mock_queue.RetryMessageBatches.return_value.get_message_count.return_value = 8
-        mock_queue.MessageStatusUpdates.return_value.queue_name = "queue 2"
-        mock_queue.MessageStatusUpdates.return_value.get_message_count.return_value = 2
+    @patch(f"{Command.__module__}.Metrics")
+    def test_handle_sends_queue_lengths(self, mock_metrics_class, mock_queue):
+        mock_retry = MagicMock()
+        mock_retry.queue_name = "retry_queue"
+        mock_retry.get_message_count.return_value = 8
 
-        with patch(
-            f"{Command.__module__}.Metrics",
-            side_effect=[mock_metrics_1, mock_metrics_2],
-        ) as mock_metrics_class:
-            Command().handle()
+        mock_status = MagicMock()
+        mock_status.queue_name = "status_queue"
+        mock_status.get_message_count.return_value = 2
 
-        mock_metrics_class.assert_any_call(
-            "queue 1", "messages", "Queue length", "test"
+        mock_queue.RetryMessageBatches.return_value = mock_retry
+        mock_queue.MessageStatusUpdates.return_value = mock_status
+
+        mock_metrics_instance = MagicMock()
+        mock_metrics_class.return_value = mock_metrics_instance
+
+        Command().handle()
+
+        mock_metrics_class.assert_called_once_with("test")
+
+        mock_metrics_instance.set_gauge_value.assert_any_call(
+            "queue_size_retry_queue",
+            "messages",
+            "Queue length",
+            8,
         )
-        mock_metrics_class.assert_any_call(
-            "queue 2", "messages", "Queue length", "test"
+        mock_metrics_instance.set_gauge_value.assert_any_call(
+            "queue_size_status_queue",
+            "messages",
+            "Queue length",
+            2,
         )
-        mock_metrics_1.add.assert_called_once_with("queue_name", 8)
-        mock_metrics_2.add.assert_called_once_with("queue_name", 2)
+
+        assert mock_metrics_instance.set_gauge_value.call_count == 2

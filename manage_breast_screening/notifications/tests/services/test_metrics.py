@@ -31,13 +31,9 @@ class TestMetrics:
         conn_string,
     ):
         mock_meter = MagicMock()
-        mock_gauge = MagicMock()
         mock_metrics.get_meter.return_value = mock_meter
-        mock_meter.create_gauge.return_value = mock_gauge
 
-        subject = Metrics(
-            "metric-name", "metric-units", "metric-description", "metric-environment"
-        )
+        subject = Metrics(environment="dev")
 
         mock_metric_exporter.assert_called_once_with(connection_string=str(conn_string))
         mock_metric_reader.assert_called_once_with(mock_metric_exporter.return_value)
@@ -50,12 +46,9 @@ class TestMetrics:
         mock_metrics.get_meter.assert_called_once_with(
             "manage_breast_screening.notifications.services.metrics"
         )
-        mock_meter.create_gauge.assert_called_once_with(
-            "metric-name",
-            unit="metric-units",
-            description="metric-description",
-        )
-        assert subject.gauge == mock_gauge
+
+        assert subject.meter == mock_meter
+        assert subject.environment == "dev"
 
     @patch(
         "manage_breast_screening.notifications.services.metrics.AzureMonitorMetricExporter"
@@ -65,21 +58,35 @@ class TestMetrics:
     )
     @patch("manage_breast_screening.notifications.services.metrics.metrics")
     @patch("manage_breast_screening.notifications.services.metrics.MeterProvider")
-    def test_add(
+    def test_set_gauge_value(
         self,
         mock_meter_provider,
         mock_metrics,
-        mock_metric_reader,
-        mock_metric_exporter,
+        mock_reader,
+        mock_exporter,
     ):
         mock_meter = MagicMock()
         mock_gauge = MagicMock()
+
         mock_metrics.get_meter.return_value = mock_meter
         mock_meter.create_gauge.return_value = mock_gauge
 
-        subject = Metrics("TheQ", "yards", "desc", "env")
-        subject.add("queue_name", "Yay!")
+        subject = Metrics(environment="prod")
 
-        subject.gauge.set.assert_called_once_with(
-            "Yay!", {"queue_name": "TheQ", "environment": "env"}
+        subject.set_gauge_value(
+            metric_name="queue_depth",
+            units="messages",
+            description="Number of messages",
+            value=999,
+        )
+
+        mock_meter.create_gauge.assert_called_once_with(
+            "queue_depth",
+            unit="messages",
+            description="Number of messages",
+        )
+
+        mock_gauge.set.assert_called_once_with(
+            999,
+            {"environment": "prod"},
         )
