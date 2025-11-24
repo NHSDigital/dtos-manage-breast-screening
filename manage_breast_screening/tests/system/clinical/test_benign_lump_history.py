@@ -84,11 +84,13 @@ class TestBenignLumpHistory(SystemTestCase):
         )
 
     def when_i_select_procedures_for_each_breast(self):
-        right_fieldset = self.page.get_by_role("group", name="Right breast", exact=True)
+        right_fieldset = self.page.get_by_role(
+            "group", name="Right breast", exact=False
+        )
         right_fieldset.get_by_label("Needle biopsy", exact=True).check()
         right_fieldset.get_by_label("Lump removed", exact=True).check()
 
-        left_fieldset = self.page.get_by_role("group", name="Left breast", exact=True)
+        left_fieldset = self.page.get_by_role("group", name="Left breast", exact=False)
         left_fieldset.get_by_label("Lump removed", exact=True).check()
 
     def and_i_enter_the_year_and_select_a_location(self):
@@ -110,7 +112,7 @@ class TestBenignLumpHistory(SystemTestCase):
 
     def then_i_see_a_validation_error_for_missing_location_details(self):
         self.expect_validation_error(
-            error_text="This field is required.",
+            error_text="Provide details about where the surgery and treatment took place",
             fieldset_legend="Where were the tests and treatment done?",
             field_label="Provide details",
             field_name="nhs_hospital_details",
