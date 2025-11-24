@@ -2,9 +2,7 @@ from django.contrib import messages
 from django.urls import reverse
 from django.views.generic import FormView
 
-from ..forms.breast_augmentation_history_form import (
-    BreastAugmentationHistoryForm,
-)
+from ..forms.breast_augmentation_history_form import BreastAugmentationHistoryForm
 from .mixins import InProgressAppointmentMixin
 
 
