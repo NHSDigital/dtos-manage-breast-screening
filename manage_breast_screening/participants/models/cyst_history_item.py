@@ -16,3 +16,7 @@ class CystHistoryItem(BaseModel):
     )
     treatment = models.CharField(choices=Treatment)
     additional_details = models.TextField(blank=True, null=False, default="")
+
+    @property
+    def participant(self):
+        return self.appointment.participant
