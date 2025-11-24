@@ -44,7 +44,7 @@ class TestBreastCancerHistoryItemPresenter:
                         "text": "Other surgery",
                     },
                     "value": {
-                        "html": "Right breast: No surgery<br>Left breast: No surgery",
+                        "html": "Right breast: No other surgery<br>Left breast: No other surgery",
                     },
                 },
                 {

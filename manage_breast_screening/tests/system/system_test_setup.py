@@ -155,3 +155,8 @@ class SystemTestCase(StaticLiveServerTestCase):
         assert components[-1] == "NHS", components
         assert components[-2] == "Manage breast screening", components
         assert components[-3] == component, components
+
+    def get_fieldset_by_legend(self, legend):
+        return self.page.locator("fieldset").filter(
+            has=self.page.locator("legend", has_text=legend)
+        )

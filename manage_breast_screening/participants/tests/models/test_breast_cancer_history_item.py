@@ -24,7 +24,7 @@ class TestBreastCancerHistoryItem:
 
         with pytest.raises(
             ValidationError,
-            match=r"\['Unselect \"No surgery\" in order to select other options'\]",
+            match=r"\['Unselect \"No other surgery\" in order to select other options'\]",
         ):
             item.full_clean()
 

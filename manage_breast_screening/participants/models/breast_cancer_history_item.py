@@ -30,7 +30,7 @@ class BreastCancerHistoryItem(BaseModel):
         LYMPH_NODE_SURGERY = "LYMPH_NODE_SURGERY", "Lymph node surgery"
         RECONSTRUCTION = "RECONSTRUCTION", "Reconstruction"
         SYMMETRISATION = "SYMMETRISATION", "Symmetrisation"
-        NO_SURGERY = "NO_SURGERY", "No surgery"
+        NO_SURGERY = "NO_SURGERY", "No other surgery"
 
     class Treatment(models.TextChoices):
         BREAST_RADIOTHERAPY = "BREAST_RADIOTHERAPY", "Breast radiotherapy"

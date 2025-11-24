@@ -37,6 +37,7 @@
     {% for presented_item in presenter.breast_cancer_history %}
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
+    <a href="{{ presenter.add_breast_cancer_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_breast_cancer_history_link.text }}</a><br>
   {% endset %}
 
   {% set mastectomy_or_lumpectomy_history_html %}

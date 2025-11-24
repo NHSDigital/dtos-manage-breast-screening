@@ -8,6 +8,7 @@ from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     CheckboxSelectMultipleWithoutFieldset,
     RadioSelectWithoutFieldset,
 )
+from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 
 from ...fields import CharField, ChoiceField, MultipleChoiceField
 
@@ -40,6 +41,23 @@ class TestChoiceField:
 
         return TestForm
 
+    @pytest.fixture
+    def conditional_form_class(self):
+        class TestForm(FormWithConditionalFields):
+            predicate = ChoiceField(
+                label="Abc",
+                label_classes="app-abc",
+                choices=(("a", "A"), ("b", "B")),
+                hint="Pick either one",
+            )
+            details = CharField()
+
+            def __init__(self):
+                super().__init__()
+                self.given_field_value("predicate", "b").require_field("details")
+
+        return TestForm
+
     def test_renders_nhs_radios(self, form_class):
         assertHTMLEqual(
             form_class()["field"].as_field_group(),
@@ -67,7 +85,37 @@ class TestChoiceField:
             """,
         )
 
-    def test_renders_radios_with_conditional_html(self, form_class):
+    def test_renders_radios_with_conditional_field(self, conditional_form_class):
+        form = conditional_form_class()
+
+        assertHTMLEqual(
+            form["predicate"].as_field_group(),
+            """
+            <div class="nhsuk-form-group">
+                <fieldset aria-describedby="id_predicate-hint" class="nhsuk-fieldset">
+                    <legend class="app-abc nhsuk-fieldset__legend">Abc</legend>
+                    <div class="nhsuk-hint" id="id_predicate-hint">Pick either one</div>
+                    <div class="nhsuk-radios" data-module="nhsuk-radios">
+                    <div class="nhsuk-radios__item">
+                        <input class="nhsuk-radios__input" id="id_predicate" name="predicate" type="radio" value="a">
+                        <label class="nhsuk-label nhsuk-radios__label" for="id_predicate">A</label>
+                    </div>
+                    <div class="nhsuk-radios__item">
+                        <input aria-controls="conditional-id_predicate-2" class="nhsuk-radios__input" id="id_predicate-2" name="predicate" type="radio" value="b">
+                        <label class="nhsuk-label nhsuk-radios__label" for="id_predicate-2">B</label>
+                    </div>
+                    <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_predicate-2">
+                        <div class="nhsuk-form-group">
+                            <label class="nhsuk-label" for="id_details">Details</label>
+                            <input class="nhsuk-input" id="id_details" name="details" type="text" value="">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            """,
+        )
+
+    def test_renders_radios_with_explicitly_set_conditional_html(self, form_class):
         form = form_class()
         form["field"].add_conditional_html("b", "<p>Hello</p>")
 

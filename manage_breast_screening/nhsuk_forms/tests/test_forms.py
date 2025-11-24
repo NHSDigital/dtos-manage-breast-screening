@@ -5,10 +5,9 @@ import pytest
 from django.db.models import TextChoices
 from django.forms import CharField, CheckboxSelectMultiple, ChoiceField, IntegerField
 from django.http import QueryDict
+from pytest_django.asserts import assertHTMLEqual
 
-from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
-    MultipleChoiceField,
-)
+from manage_breast_screening.nhsuk_forms.fields.choice_fields import MultipleChoiceField
 from manage_breast_screening.nhsuk_forms.fields.split_date_field import SplitDateField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 
@@ -283,6 +282,20 @@ class TestFormWithConditionalFields:
         form = FormWithSimpleConditional(QueryDict())
         assert not form.is_valid()
         assert form.errors == {"foo": ["This field is required."]}
+
+    def test_simple_conditional_rendering(self, FormWithSimpleConditional):
+        form = FormWithSimpleConditional()
+
+        assertHTMLEqual(
+            form.conditionally_shown_html("foo", "a"),
+            """
+                <label for="id_bar">Bar:</label>
+
+
+                <input type="text" name="bar" id="id_bar">
+            """,
+        )
+        assert form.conditionally_shown_html("foo", "b") is None
 
     def test_per_value_conditional_missing_value(
         self, FormWithConditionalFieldsPerValue

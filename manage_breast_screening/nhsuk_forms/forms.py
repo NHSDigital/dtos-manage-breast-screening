@@ -46,7 +46,7 @@ class FieldValuePredicate:
         )
 
 
-class ConditionalFieldValidator:
+class ConditionalFieldDeclarations:
     """
     Helper class to perform the conditional validation for the FormWithConditionalFields
     """
@@ -103,6 +103,15 @@ class ConditionalFieldValidator:
                         ),
                     )
 
+    def conditionally_required_fields(self, predicate_field, predicate_field_value):
+        matches = [
+            requirement
+            for requirement in self.conditional_requirements
+            if requirement.predicate_field == predicate_field
+            and requirement.predicate_field_value == predicate_field_value
+        ]
+        return matches
+
 
 class FormWithConditionalFields(Form):
     """
@@ -116,9 +125,28 @@ class FormWithConditionalFields(Form):
     """
 
     def __init__(self, *args, **kwargs):
-        self.conditional_field_validator = ConditionalFieldValidator(self)
+        self.conditional_field_declarations = ConditionalFieldDeclarations(self)
 
         super().__init__(*args, **kwargs)
+
+    def conditionally_shown_html(self, field, value):
+        """
+        If a single field is conditionally shown when `field` is set to `value`,
+        then return the HTML for that field.
+
+        If there is no conditional logic, return None.
+
+        If there are multiple conditional fields that get shown, also return None,
+        (it is up to the template to decide how to combine them).
+        """
+        conditional_fields = (
+            self.conditional_field_declarations.conditionally_required_fields(
+                field, value
+            )
+        )
+        if len(conditional_fields) == 1:
+            field_name = conditional_fields[0].conditionally_required_field
+            return self[field_name].as_field_group()
 
     def given_field_value(self, field, field_value):
         """
@@ -127,7 +155,7 @@ class FormWithConditionalFields(Form):
         e.g. self.given_field_value('foo', 'choice1').require_field('other_details')
         """
         return FieldValuePredicate(
-            self.conditional_field_validator, field=field, field_value=field_value
+            self.conditional_field_declarations, field=field, field_value=field_value
         )
 
     def given_field(self, predicate_field):
@@ -137,7 +165,7 @@ class FormWithConditionalFields(Form):
         e.g. self.given_field('foo').require_field_with_prefix('other')
         """
         return FieldPredicate(
-            self.conditional_field_validator,
+            self.conditional_field_declarations,
             field_name=predicate_field,
             field_choices=self.fields[predicate_field].choices,
         )
@@ -148,10 +176,10 @@ class FormWithConditionalFields(Form):
         This can happen when the user selects one option, fills out the conditional field, and then changes
         to a different option.
         """
-        return self.conditional_field_validator.clean_conditional_fields()
+        return self.conditional_field_declarations.clean_conditional_fields()
 
     def full_clean(self):
-        for requirement in self.conditional_field_validator.conditional_requirements:
+        for requirement in self.conditional_field_declarations.conditional_requirements:
             field_name = requirement.conditionally_required_field
             predicate_field_values = self.data.getlist(requirement.predicate_field)
             if not predicate_field_values:

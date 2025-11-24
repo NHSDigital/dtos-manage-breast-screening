@@ -114,6 +114,16 @@ class TestRecordMedicalInformationPresenter:
             "text": "Add another nipple change",
         }
 
+    def test_add_breast_cancer_history_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(
+            appointment
+        ).add_breast_cancer_history_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/breast-cancer-history/",
+            "text": "Add breast cancer history",
+        }
+
     def test_implanted_medical_device_history_link(self):
         appointment = AppointmentFactory()
 
