@@ -12,14 +12,20 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
+            # Create metrics collection
+            metrics = Metrics(
+                os.getenv("ENVIRONMENT"),
+            )
+
+            # Set queue_size metrics
             for queue in [Queue.RetryMessageBatches(), Queue.MessageStatusUpdates()]:
-                metrics = Metrics(
-                    queue.queue_name,
+                metrics.set_gauge_value(
+                    f"queue_size_{queue.queue_name}",
                     "messages",
                     "Queue length",
-                    os.getenv("ENVIRONMENT"),
+                    queue.get_message_count(),
                 )
-                metrics.add("queue_name", queue.get_message_count())
+
         except Exception as e:
             logger.error(e, exc_info=True)
             raise CommandError(e)
