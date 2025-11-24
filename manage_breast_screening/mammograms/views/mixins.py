@@ -29,6 +29,10 @@ class AppointmentMixin:
         except Appointment.DoesNotExist:
             raise Http404
 
+    @cached_property
+    def participant(self):
+        return self.appointment.participant
+
 
 class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     """
