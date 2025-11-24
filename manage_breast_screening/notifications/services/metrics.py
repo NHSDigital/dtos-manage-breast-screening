@@ -10,12 +10,11 @@ logger = logging.getLogger(__name__)
 
 
 class Metrics:
-    def __init__(self, name, units, description, environment):
+    def __init__(self, environment):
         try:
             logger.debug(
                 (
-                    f"Initialising Metrics(name: {name}, units: {units}, "
-                    f"description: {description}, environment: {environment})"
+                    f"Initialising Metrics(environment: {environment})"
                 )
             )
 
@@ -25,22 +24,24 @@ class Metrics:
             metrics.set_meter_provider(
                 MeterProvider(metric_readers=[PeriodicExportingMetricReader(exporter)])
             )
-            meter = metrics.get_meter(__name__)
-            self.name = name
+            self.meter = metrics.get_meter(__name__)
             self.environment = environment
-            self.gauge = meter.create_gauge(
-                self.name, unit=units, description=description
-            )
+
         except ValueError as e:
             logger.warning(f"Skipping Azure Monitor setup: {e}")
             self.gauge = None
 
-    def add(self, key, value):
-        if self.gauge:
-            try:
-                self.gauge.set(
-                    value,
-                    {key: self.name, "environment": self.environment},
-                )
-            except Exception:
-                logger.exception("Failed to update gauge")
+    def set_gauge_value(self, metric_name, units, description, value):
+        try:
+            # Create gauge metric
+            gauge = self.meter.create_gauge(
+                metric_name, unit=units, description=description
+            )
+
+            # Set metric value
+            gauge.set(
+                value,
+                {"environment": self.environment},
+            )
+        except Exception:
+            logger.exception("Failed to update gauge")
