@@ -26,11 +26,11 @@ class AppointmentFactory(DjangoModelFactory):
     clinic = SubFactory(ClinicFactory)
     nhs_number = Sequence(lambda n: int("999%07d" % n))
     batch_id = Sequence(lambda n: "AAA%06d" % n)
-    starts_at = datetime.now(tz=models.ZONE_INFO) + timedelta(weeks=4, days=4)
+    starts_at = datetime.now(tz=models.ZONE_INFO) + timedelta(weeks=4)
     status = "B"
     nbss_id = Sequence(lambda n: int("123%06d" % n))
     episode_type = "S"
-    episode_started_at = datetime.now(tz=models.ZONE_INFO) - timedelta(weeks=5, days=5)
+    episode_started_at = datetime.now(tz=models.ZONE_INFO) - timedelta(weeks=5)
     assessment = False
     number = "1"
 
