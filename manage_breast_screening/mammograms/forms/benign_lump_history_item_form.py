@@ -25,6 +25,8 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
     left_breast_procedures = MultipleChoiceField(
         label="Left breast",
         label_classes="nhsuk-fieldset__legend--s",
+        visually_hidden_label_prefix="What procedure have they had in their ",
+        visually_hidden_label_suffix="?",
         choices=BenignLumpHistoryItem.Procedure,
         exclusive_choices={"NO_PROCEDURES"},
         error_messages={
@@ -34,6 +36,8 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
     right_breast_procedures = MultipleChoiceField(
         label="Right breast",
         label_classes="nhsuk-fieldset__legend--s",
+        visually_hidden_label_prefix="What procedure have they had in their ",
+        visually_hidden_label_suffix="?",
         choices=BenignLumpHistoryItem.Procedure,
         exclusive_choices={"NO_PROCEDURES"},
         error_messages={
