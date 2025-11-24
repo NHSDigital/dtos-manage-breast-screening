@@ -43,16 +43,13 @@ class Command(BaseCommand):
 
     BSO_CODES = ["MBD"]
     REPORTS = [
-        ReportConfig("aggregate", ["3 months"], True),
         ReportConfig(
             "invites-not-sent", [datetime.now(tz=ZONE_INFO).date()], True, "failures"
         ),
-        ReportConfig("reconciliation", [datetime.now(tz=ZONE_INFO).date()], True),
+        ReportConfig("reconciliation", ["3 months"], True),
     ]
     SMOKE_TEST_BSO_CODE = "SM0K3"
-    SMOKE_TEST_CONFIG = ReportConfig(
-        "reconciliation", [datetime.now(tz=ZONE_INFO).date()], False
-    )
+    SMOKE_TEST_CONFIG = ReportConfig("reconciliation", ["1 week"], False)
 
     def add_arguments(self, parser):
         parser.add_argument("--smoke-test", action="store_true")
