@@ -1,0 +1,42 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+
+  {% do form.left_breast_procedures.add_divider_after("LUMP_REMOVED", "or") %}
+  {% do form.right_breast_procedures.add_divider_after("LUMP_REMOVED", "or") %}
+
+  <h2 aria-hidden="true">
+    What benign lump procedures has {{ participant_first_name }} had?
+  </h2>
+
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {{ form.right_breast_procedures.as_field_group() }}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {{ form.left_breast_procedures.as_field_group() }}
+    </div>
+  </div>
+
+  {{ form.procedure_year.as_field_group() }}
+
+  {% for location_value, detail_field_name in form.location_detail_fields %}
+    {% set detail_field = form[detail_field_name] %}
+    {% do form.procedure_location.add_conditional_html(
+      location_value,
+      detail_field.as_field_group()
+    ) %}
+  {% endfor %}
+  {{ form.procedure_location.as_field_group() }}
+
+  {{ form.additional_details.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+
+{% endblock %}
