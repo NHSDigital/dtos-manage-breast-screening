@@ -60,11 +60,41 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
             "required": "Select where the tests and treatment were done",
         },
     )
-    nhs_hospital_details = CharField(label="Provide details", required=False)
-    private_clinic_uk_details = CharField(label="Provide details", required=False)
-    outside_uk_details = CharField(label="Provide details", required=False)
-    multiple_locations_details = CharField(label="Provide details", required=False)
-    exact_location_unknown_details = CharField(label="Provide details", required=False)
+    nhs_hospital_details = CharField(
+        label="Provide details",
+        required=False,
+        error_messages={
+            "required": "Provide details about where the surgery and treatment took place"
+        },
+    )
+    private_clinic_uk_details = CharField(
+        label="Provide details",
+        required=False,
+        error_messages={
+            "required": "Provide details about where the surgery and treatment took place"
+        },
+    )
+    outside_uk_details = CharField(
+        label="Provide details",
+        required=False,
+        error_messages={
+            "required": "Provide details about where the surgery and treatment took place"
+        },
+    )
+    multiple_locations_details = CharField(
+        label="Provide details",
+        required=False,
+        error_messages={
+            "required": "Provide details about where the surgery and treatment took place"
+        },
+    )
+    exact_location_unknown_details = CharField(
+        label="Provide details",
+        required=False,
+        error_messages={
+            "required": "Provide details about where the surgery and treatment took place"
+        },
+    )
 
     additional_details = CharField(
         label="Additional details (optional)",
