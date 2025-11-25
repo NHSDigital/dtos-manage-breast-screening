@@ -209,3 +209,15 @@ class MedicalInformationPresenter:
             "href": url,
             "text": "Add benign lump history",
         }
+
+    @property
+    def add_mastectomy_or_lumpectomy_history_link(self):
+        url = reverse(
+            "mammograms:add_mastectomy_or_lumpectomy_history_item",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": "Add mastectomy or lumpectomy history",
+        }

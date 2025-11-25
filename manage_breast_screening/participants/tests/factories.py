@@ -189,8 +189,12 @@ class MastectomyOrLumpectomyHistoryItemFactory(DjangoModelFactory):
     appointment = SubFactory(AppointmentFactory)
     right_breast_procedure = MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE
     left_breast_procedure = MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE
-    right_breast_other_surgery = [MastectomyOrLumpectomyHistoryItem.Surgery.NO_SURGERY]
-    left_breast_other_surgery = [MastectomyOrLumpectomyHistoryItem.Surgery.NO_SURGERY]
+    right_breast_other_surgery = [
+        MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY
+    ]
+    left_breast_other_surgery = [
+        MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY
+    ]
     year_of_surgery = None
     surgery_reason = MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON
     additional_details = ""

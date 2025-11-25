@@ -175,7 +175,7 @@ clinic:
               right_breast_other_surgery:
                 - RECONSTRUCTION
               left_breast_other_surgery:
-                - NO_SURGERY
+                - NO_OTHER_SURGERY
               year_of_surgery: 2018
               surgery_reason: RISK_REDUCTION
               additional_details: Right mastectomy with reconstruction following genetic testing

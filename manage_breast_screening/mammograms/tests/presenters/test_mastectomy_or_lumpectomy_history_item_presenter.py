@@ -18,7 +18,7 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
                 MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
             ],
             left_breast_other_surgery=[
-                MastectomyOrLumpectomyHistoryItem.Surgery.NO_SURGERY
+                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY
             ],
             year_of_surgery=2018,
             surgery_reason=MastectomyOrLumpectomyHistoryItem.SurgeryReason.RISK_REDUCTION,
@@ -42,7 +42,7 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
                         "text": "Other surgery",
                     },
                     "value": {
-                        "html": "Right breast: Reconstruction<br>Left breast: No surgery",
+                        "html": "Right breast: Reconstruction<br>Left breast: No other surgery",
                     },
                 },
                 {
@@ -59,6 +59,14 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
                     },
                     "value": {
                         "html": "Risk reduction",
+                    },
+                },
+                {
+                    "key": {
+                        "text": "Surgery other reason details",
+                    },
+                    "value": {
+                        "text": "",
                     },
                 },
                 {

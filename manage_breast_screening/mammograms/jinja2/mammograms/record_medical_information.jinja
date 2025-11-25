@@ -44,6 +44,7 @@
     {% for presented_item in presenter.mastectomy_or_lumpectomy_history %}
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
+    <a href="{{ presenter.add_mastectomy_or_lumpectomy_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_mastectomy_or_lumpectomy_history_link.text }}</a><br>
   {% endset %}
 
   {% set implanted_medical_device_history_html %}

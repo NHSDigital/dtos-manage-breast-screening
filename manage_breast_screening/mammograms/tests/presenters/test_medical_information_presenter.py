@@ -161,3 +161,13 @@ class TestRecordMedicalInformationPresenter:
             "href": f"/mammograms/{appointment.pk}/record-medical-information/benign-lump-history/",
             "text": "Add benign lump history",
         }
+
+    def test_mastectomy_or_lumpectomy_history_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(
+            appointment
+        ).add_mastectomy_or_lumpectomy_history_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/mastectomy-or-lumpectomy-history/",
+            "text": "Add mastectomy or lumpectomy history",
+        }
