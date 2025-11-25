@@ -1,3 +1,4 @@
+from datetime import date
 from urllib.parse import urlencode
 
 import pytest
@@ -51,12 +52,15 @@ class TestBreastCancerHistoryForm:
             "systemic_treatments": ["Select what systemic treatments they have had"],
         }
 
-    def test_valid_form(self):
+    def test_valid_form(self, time_machine):
+        time_machine.move_to(date(2025, 1, 1))
+
         form = BreastCancerHistoryForm(
             data=QueryDict(
                 urlencode(
                     {
                         "diagnosis_location": "RIGHT_BREAST",
+                        "diagnosis_year": "2013",
                         "intervention_location": "NHS_HOSPITAL",
                         "intervention_location_details_nhs_hospital": "abc",
                         "left_breast_other_surgery": "NO_SURGERY",
@@ -72,6 +76,32 @@ class TestBreastCancerHistoryForm:
         )
 
         assert form.is_valid(), form.errors
+
+    def test_invalid_date(self, time_machine):
+        time_machine.move_to(date(2025, 1, 1))
+
+        form = BreastCancerHistoryForm(
+            data=QueryDict(
+                urlencode(
+                    {
+                        "diagnosis_location": "RIGHT_BREAST",
+                        "diagnosis_year": "1900",
+                        "intervention_location": "NHS_HOSPITAL",
+                        "intervention_location_details_nhs_hospital": "abc",
+                        "left_breast_other_surgery": "NO_SURGERY",
+                        "left_breast_procedure": "NO_PROCEDURE",
+                        "left_breast_treatment": "NO_RADIOTHERAPY",
+                        "right_breast_other_surgery": "LYMPH_NODE_SURGERY",
+                        "right_breast_procedure": "LUMPECTOMY",
+                        "right_breast_treatment": "BREAST_RADIOTHERAPY",
+                        "systemic_treatments": "NO_SYSTEMIC_TREATMENTS",
+                    }
+                )
+            )
+        )
+
+        assert not form.is_valid()
+        assert form.errors == {"diagnosis_year": ["Year must be 1945 or later"]}
 
     def test_missing_intervention_location_details(self):
         form = BreastCancerHistoryForm(
