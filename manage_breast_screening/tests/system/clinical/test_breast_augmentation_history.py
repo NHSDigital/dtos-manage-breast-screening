@@ -19,7 +19,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
         self.then_i_see_the_add_breast_augmentation_form()
 
         self.when_i_click_save_without_entering_details()
-        self.then_i_see_validation_errors_for_missing_benign_lump_details()
+        self.then_i_see_validation_errors_for_missing_breast_augmentation_details()
 
         self.when_i_select_procedures()
         self.and_i_enter_the_procedure_year()
@@ -65,7 +65,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
             "Add details of breast implants or augmentation"
         )
 
-    def then_i_see_validation_errors_for_missing_benign_lump_details(self):
+    def then_i_see_validation_errors_for_missing_breast_augmentation_details(self):
         self.expect_validation_error(
             error_text="Select procedures for the right breast",
             fieldset_legend="Right breast",
@@ -97,11 +97,10 @@ class TestBreastAugmentationHistory(SystemTestCase):
             "additional details for test of breast augmentation history"
         )
 
-    def when_i_click_save_without_entering_details(self):
-        self.and_i_click_save_augmentation()
-
     def and_i_click_save_augmentation(self):
         self.page.get_by_text("Save").click()
+
+    when_i_click_save_without_entering_details = and_i_click_save_augmentation
 
     def then_i_am_back_on_the_medical_information_page(self):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)

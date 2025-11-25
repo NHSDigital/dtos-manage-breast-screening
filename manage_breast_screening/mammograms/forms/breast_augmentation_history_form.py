@@ -1,5 +1,3 @@
-import datetime
-
 from django import forms
 from django.forms import Form
 from django.forms.widgets import Textarea
@@ -8,7 +6,7 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import (
     BooleanField,
     CharField,
-    IntegerField,
+    YearField,
 )
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     MultipleChoiceField,
@@ -22,6 +20,8 @@ class BreastAugmentationHistoryForm(Form):
     right_breast_procedures = MultipleChoiceField(
         label="Right breast",
         label_classes="nhsuk-fieldset__legend--s",
+        visually_hidden_label_prefix="What procedure have they had in their ",
+        visually_hidden_label_suffix="?",
         choices=BreastAugmentationHistoryItem.Procedure,
         error_messages={
             "required": "Select procedures for the right breast",
@@ -31,16 +31,30 @@ class BreastAugmentationHistoryForm(Form):
     left_breast_procedures = MultipleChoiceField(
         label="Left breast",
         label_classes="nhsuk-fieldset__legend--s",
+        visually_hidden_label_prefix="What procedure have they had in their ",
+        visually_hidden_label_suffix="?",
         choices=BreastAugmentationHistoryItem.Procedure,
         error_messages={
             "required": "Select procedures for the left breast",
         },
         exclusive_choices={"NO_PROCEDURES"},
     )
+    procedure_year = YearField(
+        hint="Leave blank if unknown",
+        required=False,
+        label="Year of procedure (optional)",
+        label_classes="nhsuk-label--m",
+        classes="nhsuk-input--width-4",
+    )
     implants_have_been_removed = BooleanField(
         required=False,
         label="Implants have been removed",
         classes="app-checkboxes",
+    )
+    removal_year = YearField(
+        required=False,
+        label="Year removed (if available)",
+        classes="nhsuk-input--width-4",
     )
     additional_details = CharField(
         hint="Include any other relevant information about the procedure",
@@ -51,44 +65,6 @@ class BreastAugmentationHistoryForm(Form):
         max_words=500,
         error_messages={"max_words": "Additional details must be 500 words or less"},
     )
-
-    def __init__(self, *args, participant, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # if entered, years should be between 80 years ago and this year
-        max_year = datetime.date.today().year
-        min_year = max_year - 80
-        year_outside_range_error_message = (
-            f"Year should be between {min_year} and {max_year}."
-        )
-        year_invalid_format_error_message = "Enter year as a number."
-
-        self.fields["procedure_year"] = IntegerField(
-            hint="Leave blank if unknown",
-            required=False,
-            label="Year of procedure (optional)",
-            label_classes="nhsuk-label--m",
-            classes="nhsuk-input--width-4",
-            min_value=min_year,
-            max_value=max_year,
-            error_messages={
-                "min_value": year_outside_range_error_message,
-                "max_value": year_outside_range_error_message,
-                "invalid": year_invalid_format_error_message,
-            },
-        )
-        self.fields["removal_year"] = IntegerField(
-            required=False,
-            label="Year removed (if available)",
-            classes="nhsuk-input--width-4",
-            min_value=min_year,
-            max_value=max_year,
-            error_messages={
-                "min_value": year_outside_range_error_message,
-                "max_value": year_outside_range_error_message,
-                "invalid": year_invalid_format_error_message,
-            },
-        )
 
     def model_values(self):
         return dict(
