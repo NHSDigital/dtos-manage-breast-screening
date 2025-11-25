@@ -17,13 +17,10 @@ from ...forms.breast_augmentation_history_form import BreastAugmentationHistoryF
 @pytest.mark.django_db
 class TestBreastAugmentationHistoryForm:
     def test_no_data(self, clinical_user):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
-            QueryDict(), participant=appointment.participant
-        )
+        form = BreastAugmentationHistoryForm(QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -32,7 +29,6 @@ class TestBreastAugmentationHistoryForm:
         }
 
     def test_procedure_year_invalid_format(self, clinical_user):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
@@ -51,11 +47,10 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
-        assert form.errors == {"procedure_year": ["Enter year as a number."]}
+        assert form.errors == {"procedure_year": ["Enter a whole number."]}
 
     @pytest.mark.parametrize(
         "selected_breast_procedures",
@@ -78,7 +73,6 @@ class TestBreastAugmentationHistoryForm:
     def test_no_procedures_and_other_options(
         self, clinical_user, selected_breast_procedures
     ):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
@@ -94,7 +88,6 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -116,7 +109,6 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -127,7 +119,6 @@ class TestBreastAugmentationHistoryForm:
         }
 
     def test_removal_year_invalid_format(self, clinical_user):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
@@ -147,13 +138,12 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
         assert form.errors == {
             "removal_year": [
-                "Enter year as a number.",
+                "Enter a whole number.",
             ]
         }
 
@@ -168,14 +158,15 @@ class TestBreastAugmentationHistoryForm:
         ],
     )
     def test_procedure_year_outside_range(self, clinical_user, procedure_year):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
         max_year = datetime.date.today().year
         min_year = max_year - 80
         year_outside_range_error_message = (
-            f"Year should be between {min_year} and {max_year}."
+            (f"Year must be {max_year} or earlier")
+            if procedure_year > max_year
+            else (f"Year must be {min_year} or later")
         )
         form = BreastAugmentationHistoryForm(
             QueryDict(
@@ -192,7 +183,6 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -209,14 +199,15 @@ class TestBreastAugmentationHistoryForm:
         ],
     )
     def test_removal_year_outside_range(self, clinical_user, removal_year):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
         max_year = datetime.date.today().year
         min_year = max_year - 80
         year_outside_range_error_message = (
-            f"Year should be between {min_year} and {max_year}."
+            (f"Year must be {max_year} or earlier")
+            if removal_year > max_year
+            else (f"Year must be {min_year} or later")
         )
         form = BreastAugmentationHistoryForm(
             QueryDict(
@@ -234,7 +225,6 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -255,7 +245,6 @@ class TestBreastAugmentationHistoryForm:
     def test_removal_year_before_procedure_year(
         self, clinical_user, procedure_year, removal_year
     ):
-        appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
@@ -276,7 +265,6 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -306,7 +294,6 @@ class TestBreastAugmentationHistoryForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         # confirm full_clean removes removal_year but keeps procedure_year
@@ -425,7 +412,6 @@ class TestBreastAugmentationHistoryForm:
 
         form = BreastAugmentationHistoryForm(
             QueryDict(urlencode(data, doseq=True)),
-            participant=appointment.participant,
         )
 
         assert form.is_valid()

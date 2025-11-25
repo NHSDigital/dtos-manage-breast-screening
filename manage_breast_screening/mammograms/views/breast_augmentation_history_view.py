@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from django.contrib import messages
 from django.urls import reverse
 from django.views.generic import FormView
@@ -55,12 +53,3 @@ class AddBreastAugmentationHistoryView(InProgressAppointmentMixin, FormView):
         )
 
         return context
-
-    @cached_property
-    def participant(self):
-        return self.appointment.participant
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["participant"] = self.participant
-        return kwargs
