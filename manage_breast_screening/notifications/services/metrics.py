@@ -11,40 +11,32 @@ logger = logging.getLogger(__name__)
 
 class Metrics:
     def __init__(self, environment):
-        try:
-            logger.debug((f"Initialising Metrics(environment: {environment})"))
+        logger.debug((f"Initialising Metrics(environment: {environment})"))
 
-            exporter = AzureMonitorMetricExporter(
-                connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
-            )
-            metrics.set_meter_provider(
-                MeterProvider(metric_readers=[PeriodicExportingMetricReader(exporter)])
-            )
-            self.meter = metrics.get_meter(__name__)
-            self.environment = environment
-
-        except ValueError as e:
-            logger.warning(f"Skipping Azure Monitor setup: {e}")
-            self.gauge = None
+        exporter = AzureMonitorMetricExporter(
+            connection_string=os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+        )
+        metrics.set_meter_provider(
+            MeterProvider(metric_readers=[PeriodicExportingMetricReader(exporter)])
+        )
+        self.meter = metrics.get_meter(__name__)
+        self.environment = environment
 
     def set_gauge_value(self, metric_name, units, description, value):
-        try:
-            logger.debug(
-                (
-                    f"Metrics: set_gauge_value(metric_name: {metric_name} "
-                    f"units: {units}, description: {description}, value: {value})"
-                )
+        logger.debug(
+            (
+                f"Metrics: set_gauge_value(metric_name: {metric_name} "
+                f"units: {units}, description: {description}, value: {value})"
             )
+        )
 
-            # Create gauge metric
-            gauge = self.meter.create_gauge(
-                metric_name, unit=units, description=description
-            )
+        # Create gauge metric
+        gauge = self.meter.create_gauge(
+            metric_name, unit=units, description=description
+        )
 
-            # Set metric value
-            gauge.set(
-                value,
-                {"environment": self.environment},
-            )
-        except Exception:
-            logger.exception("Failed to update gauge")
+        # Set metric value
+        gauge.set(
+            value,
+            {"environment": self.environment},
+        )
