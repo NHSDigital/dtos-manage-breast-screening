@@ -15,6 +15,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
             device=ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
             other_medical_device_details="Test Device",
             procedure_year=2020,
+            device_has_been_removed=True,
             removal_year=2022,
             additional_details="Some additional details",
         )
@@ -48,10 +49,10 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
                 },
                 {
                     "key": {
-                        "text": "Removal year",
+                        "text": "Device has been removed",
                     },
                     "value": {
-                        "html": "2022",
+                        "html": "Yes (2022)",
                     },
                 },
                 {

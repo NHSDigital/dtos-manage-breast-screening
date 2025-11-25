@@ -21,5 +21,6 @@ class ImplantedMedicalDeviceHistoryItem(BaseModel):
     device = models.CharField(choices=Device)
     other_medical_device_details = models.CharField(blank=True, null=False, default="")
     procedure_year = models.IntegerField(null=True)
+    device_has_been_removed = models.BooleanField()
     removal_year = models.IntegerField(null=True)
     additional_details = models.TextField(blank=True, null=False, default="")

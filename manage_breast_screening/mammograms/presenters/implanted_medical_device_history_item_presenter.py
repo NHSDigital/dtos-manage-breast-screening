@@ -12,7 +12,11 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
             self._item.other_medical_device_details or "N/A"
         )
         self.procedure_year = str(self._item.procedure_year)
-        self.removal_year = str(self._item.removal_year) or "N/A"
+        self.device_has_been_removed = (
+            "Yes" if self._item.device_has_been_removed else "No"
+        )
+        if self._item.device_has_been_removed and self._item.removal_year:
+            self.device_has_been_removed += f" ({self._item.removal_year})"
         self.additional_details = nl2br(self._item.additional_details)
 
     @property
@@ -33,8 +37,10 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
                     "value": {"html": self.procedure_year},
                 },
                 {
-                    "key": {"text": "Removal year"},
-                    "value": {"html": self.removal_year},
+                    "key": {"text": "Device has been removed"},
+                    "value": {
+                        "html": self.device_has_been_removed,
+                    },
                 },
                 {
                     "key": {"text": "Additional details"},

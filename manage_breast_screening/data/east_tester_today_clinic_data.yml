@@ -47,6 +47,7 @@ clinic:
               device: OTHER_MEDICAL_DEVICE
               other_medical_device_details: Lorem ipsum dolor sit amet
               procedure_year: 2005
+              device_has_been_removed: true
               removal_year: 2010
               additional_details: Recalled device, removed in 2010
           other_procedure_history_items:
