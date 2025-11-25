@@ -11,12 +11,12 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestBreastCancerHistory(SystemTestCase):
-    def test_adding_breast_cancer_history(self):
+    def test_adding_and_editing_breast_cancer_history(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
         self.when_i_click_on_add_breast_cancer_history()
-        self.then_i_see_the_breast_cancer_history_form()
+        self.then_i_see_the_add_breast_cancer_history_form()
 
         self.when_i_select_right_breast()
         self.and_i_select_lumpectomy_in_right_breast()
@@ -31,6 +31,14 @@ class TestBreastCancerHistory(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_history_item_is_added()
         self.and_the_message_says_device_added()
+
+        self.when_i_click_change()
+        self.then_i_see_the_edit_breast_cancer_history_form()
+        self.when_i_select_breast_radiotherapy_in_right_breast()
+        self.and_i_click_save()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_history_item_shows_the_radiotherapy()
+        self.and_the_message_says_breast_cancer_history_updated()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -67,9 +75,13 @@ class TestBreastCancerHistory(SystemTestCase):
     def when_i_click_on_add_breast_cancer_history(self):
         self.page.get_by_text("Add breast cancer history").click()
 
-    def then_i_see_the_breast_cancer_history_form(self):
+    def then_i_see_the_add_breast_cancer_history_form(self):
         expect(self.page.get_by_text("Add details of breast cancer")).to_be_visible()
         self.assert_page_title_contains("Add details of breast cancer")
+
+    def then_i_see_the_edit_breast_cancer_history_form(self):
+        expect(self.page.get_by_text("Edit details of breast cancer")).to_be_visible()
+        self.assert_page_title_contains("Edit details of breast cancer")
 
     def when_i_select_right_breast(self):
         fieldset = self.get_fieldset_by_legend("In which breasts was cancer diagnosed?")
@@ -159,3 +171,26 @@ class TestBreastCancerHistory(SystemTestCase):
             field_label="Lumpectomy",
             field_name="right_breast_procedure",
         )
+
+    def when_i_click_change(self):
+        self.page.get_by_text("Change breast cancer item").click()
+
+    def when_i_select_breast_radiotherapy_in_right_breast(self):
+        fieldset = self.get_fieldset_by_legend(
+            "What treatment have they had in their Right breast (or axilla)?"
+        )
+        fieldset.get_by_label("Breast radiotherapy").click()
+
+    def and_the_history_item_shows_the_radiotherapy(self):
+        key = self.page.locator(
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Breast cancer history", exact=True),
+        )
+        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        expect(row).to_contain_text("Breast radiotherapy")
+
+    def and_the_message_says_breast_cancer_history_updated(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Breast cancer history updated")
