@@ -7,7 +7,9 @@ from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     ChoiceField,
     MultipleChoiceField,
 )
-from manage_breast_screening.nhsuk_forms.fields.integer_field import IntegerField
+from manage_breast_screening.nhsuk_forms.fields.integer_field import (
+    YearField,
+)
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.participants.models.breast_cancer_history_item import (
     BreastCancerHistoryItem,
@@ -26,13 +28,12 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         error_messages={"required": "Select which breasts cancer was diagnosed in"},
         exclusive_choices={DiagnosisLocationChoices.DONT_KNOW},
     )
-    # todo: constrain min/max
-    diagnosis_year = IntegerField(
+    diagnosis_year = YearField(
+        hint="Leave blank if unknown",
+        required=False,
         label="Year of diagnosis (optional)",
         label_classes="nhsuk-label--m",
         classes="nhsuk-input--width-4",
-        hint="Leave blank if unknown",
-        required=False,
     )
 
     right_breast_procedure = ChoiceField(
