@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
@@ -20,10 +18,6 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
     template_name = (
         "mammograms/special_appointments/provide_special_appointment_details.jinja"
     )
-
-    @cached_property
-    def participant(self):
-        return self.appointment.participant
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -75,10 +69,6 @@ class MarkReasonsTemporary(AppointmentMixin, FormView):
 
     form_class = MarkReasonsTemporaryForm
     template_name = "mammograms/special_appointments/mark_reasons_temporary.jinja"
-
-    @cached_property
-    def participant(self):
-        return self.appointment.participant
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()

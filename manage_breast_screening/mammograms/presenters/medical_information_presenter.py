@@ -60,10 +60,15 @@ class MedicalInformationPresenter:
             BenignLumpHistoryItemPresenter(item)
             for item in appointment.benign_lump_history_items.all()
         ]
-        self.cyst_history = [
-            CystHistoryItemPresenter(item)
-            for item in appointment.cyst_history_items.all()
-        ]
+
+        cyst_history_items = list(appointment.cyst_history_items.all())
+        if len(cyst_history_items) == 1:
+            self.cyst_history = [CystHistoryItemPresenter(cyst_history_items[0])]
+        else:
+            self.cyst_history = [
+                CystHistoryItemPresenter(item, counter=counter)
+                for counter, item in enumerate(cyst_history_items, 1)
+            ]
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms
         }

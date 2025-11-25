@@ -2,16 +2,13 @@ from django.forms import Form
 from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
-from manage_breast_screening.nhsuk_forms.fields import (
-    CharField,
-    ChoiceField,
-)
+from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.participants.models.cyst_history_item import (
     CystHistoryItem,
 )
 
 
-class CystHistoryForm(Form):
+class CystHistoryBaseForm(Form):
     def __init__(self, *args, participant, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -38,6 +35,8 @@ class CystHistoryForm(Form):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
+
+class CystHistoryForm(CystHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -50,3 +49,25 @@ class CystHistoryForm(Form):
         auditor.audit_create(cyst_history)
 
         return cyst_history
+
+
+class CystHistoryUpdateForm(CystHistoryBaseForm):
+    def __init__(self, instance, *args, **kwargs):
+        self.instance = instance
+
+        kwargs["participant"] = instance.participant
+        kwargs["initial"] = {
+            "treatment": instance.treatment,
+            "additional_details": instance.additional_details,
+        }
+
+        super().__init__(*args, **kwargs)
+
+    def update(self, request):
+        self.instance.treatment = self.cleaned_data["treatment"]
+        self.instance.additional_details = self.cleaned_data["additional_details"]
+        self.instance.save()
+
+        Auditor.from_request(request).audit_update(self.instance)
+
+        return self.instance
