@@ -5,7 +5,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-
+    cooldown:
+      default-days: 7
     ignore:
       # Manually track LTS release versions (see .tool-versions, package.json
       # and .browserslistrc)
@@ -15,7 +16,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-
+    cooldown:
+      default-days: 7
     groups:
       docker:
         patterns:
@@ -25,7 +27,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-
+    cooldown:
+      default-days: 7
     ignore:
       # nhsuk-frontend needs to be updated in conjunction with nhsuk-frontend-jinja
       - dependency-name: 'nhsuk-frontend'
@@ -63,7 +66,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
-
+    cooldown:
+      default-days: 7
     ignore:
       # nhsuk-frontend-jinja needs to be updated in conjunction with nhsuk-frontend
       - dependency-name: nhsuk-frontend-jinja
