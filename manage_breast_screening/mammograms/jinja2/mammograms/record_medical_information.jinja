@@ -49,6 +49,9 @@
 
   {% set implanted_medical_device_history_html %}
     {% for presented_item in presenter.implanted_medical_device_history %}
+      <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href}}">
+        {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
+      </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
     <a href="{{ presenter.add_implanted_medical_device_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_implanted_medical_device_history_link.text }}</a><br>

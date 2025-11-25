@@ -10,6 +10,7 @@ from manage_breast_screening.participants.models.symptom import (
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     CystHistoryItemFactory,
+    ImplantedMedicalDeviceHistoryItemFactory,
     SymptomFactory,
 )
 
@@ -125,6 +126,44 @@ class TestRecordMedicalInformationPresenter:
             "text": "Add breast cancer history",
         }
 
+    def test_implanted_medical_device_history_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(
+            appointment
+        ).add_implanted_medical_device_history_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/implanted-medical-device-history/",
+            "text": "Add implanted medical device history",
+        }
+
+    def test_implanted_medical_device_history_items_have_a_counter(self):
+        appointment = AppointmentFactory()
+        ImplantedMedicalDeviceHistoryItemFactory.create_batch(
+            2, appointment=appointment
+        )
+
+        counters = [
+            item.counter
+            for item in MedicalInformationPresenter(
+                appointment
+            ).implanted_medical_device_history
+        ]
+
+        assert counters == [1, 2]
+
+    def test_single_implanted_medical_device_history_item_has_no_counter(self):
+        appointment = AppointmentFactory()
+        ImplantedMedicalDeviceHistoryItemFactory.create(appointment=appointment)
+
+        counters = [
+            item.counter
+            for item in MedicalInformationPresenter(
+                appointment
+            ).implanted_medical_device_history
+        ]
+
+        assert counters == [None]
+
     def test_cyst_history_items_have_a_counter(self):
         appointment = AppointmentFactory()
         CystHistoryItemFactory.create_batch(2, appointment=appointment)
@@ -146,16 +185,6 @@ class TestRecordMedicalInformationPresenter:
         ]
 
         assert counters == [None]
-
-    def test_implanted_medical_device_history_link(self):
-        appointment = AppointmentFactory()
-
-        assert MedicalInformationPresenter(
-            appointment
-        ).add_implanted_medical_device_history_link == {
-            "href": f"/mammograms/{appointment.pk}/record-medical-information/implanted-medical-device-history/",
-            "text": "Add implanted medical device history",
-        }
 
     def test_cyst_history_link(self):
         appointment = AppointmentFactory()

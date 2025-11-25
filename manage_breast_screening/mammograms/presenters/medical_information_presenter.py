@@ -44,10 +44,22 @@ class MedicalInformationPresenter:
             MastectomyOrLumpectomyHistoryItemPresenter(item)
             for item in appointment.mastectomy_or_lumpectomy_history_items.all()
         ]
-        self.implanted_medical_device_history = [
-            ImplantedMedicalDeviceHistoryItemPresenter(item)
-            for item in appointment.implanted_medical_device_history_items.all()
-        ]
+
+        implanted_medical_device_history = list(
+            appointment.implanted_medical_device_history_items.all()
+        )
+        if len(implanted_medical_device_history) == 1:
+            self.implanted_medical_device_history = [
+                ImplantedMedicalDeviceHistoryItemPresenter(
+                    implanted_medical_device_history[0]
+                )
+            ]
+        else:
+            self.implanted_medical_device_history = [
+                ImplantedMedicalDeviceHistoryItemPresenter(item, counter=counter)
+                for counter, item in enumerate(implanted_medical_device_history, 1)
+            ]
+
         self.breast_augmentation_history = [
             BreastAugmentationHistoryItemPresenter(item)
             for item in appointment.breast_augmentation_history_items.all()

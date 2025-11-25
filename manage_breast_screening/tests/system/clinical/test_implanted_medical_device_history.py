@@ -11,7 +11,7 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestImplantedMedicalDeviceHistory(SystemTestCase):
-    def test_adding_a_device(self):
+    def test_adding_and_changing_device(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
@@ -29,6 +29,14 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_device_is_listed()
         self.and_the_message_says_device_added()
+
+        self.when_i_click_change()
+        self.then_i_see_the_edit_implanted_medical_device_form()
+        self.when_i_select_cardiac_device()
+        self.and_i_click_save_device()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_implanted_medical_device_is_updated()
+        self.and_the_message_says_implanted_medical_device_updated()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -112,3 +120,31 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
 
         expect(alert).to_contain_text("Success")
         expect(alert).to_contain_text("Implanted medical device added")
+
+    def when_i_click_change(self):
+        self.page.get_by_text("Change implanted medical device item").click()
+
+    def then_i_see_the_edit_implanted_medical_device_form(self):
+        expect(
+            self.page.get_by_text("Edit details of implanted medical device")
+        ).to_be_visible()
+        self.assert_page_title_contains("Details of the implanted medical device")
+
+    def when_i_select_cardiac_device(self):
+        self.page.get_by_label(
+            "Cardiac device (such as a pacemaker or ICD)", exact=True
+        ).click()
+
+    def and_the_implanted_medical_device_is_updated(self):
+        key = self.page.locator(
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Implanted medical device history", exact=True),
+        )
+        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        expect(row).to_contain_text("Cardiac device (such as a pacemaker or ICD)")
+
+    def and_the_message_says_implanted_medical_device_updated(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Details of implanted medical device updated")
