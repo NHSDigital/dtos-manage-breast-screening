@@ -121,3 +121,35 @@ class BreastAugmentationHistoryForm(BreastAugmentationHistoryBaseForm):
         auditor.audit_create(breast_augmentation_history)
 
         return breast_augmentation_history
+
+
+class BreastAugmentationHistoryUpdateForm(BreastAugmentationHistoryBaseForm):
+    def __init__(self, instance, *args, **kwargs):
+        self.instance = instance
+
+        kwargs["initial"] = {
+            "right_breast_procedures": instance.right_breast_procedures,
+            "left_breast_procedures": instance.left_breast_procedures,
+            "procedure_year": instance.procedure_year,
+            "implants_have_been_removed": instance.implants_have_been_removed,
+            "removal_year": instance.removal_year,
+            "additional_details": instance.additional_details,
+        }
+
+        super().__init__(*args, **kwargs)
+
+    def update(self, request):
+        # fmt: off
+        self.instance.right_breast_procedures = self.cleaned_data["right_breast_procedures"]
+        self.instance.left_breast_procedures = self.cleaned_data["left_breast_procedures"]
+        self.instance.procedure_year = self.cleaned_data["procedure_year"]
+        self.instance.implants_have_been_removed = self.cleaned_data["implants_have_been_removed"]
+        self.instance.removal_year = self.cleaned_data["removal_year"]
+        self.instance.additional_details = self.cleaned_data["additional_details"]
+        # fmt: on
+
+        self.instance.save()
+
+        Auditor.from_request(request).audit_update(self.instance)
+
+        return self.instance
