@@ -53,6 +53,11 @@ variable "enable_alerting" {
   type        = bool
 }
 
+variable "action_group_id" {
+  type        = string
+  description = "ID of the action group to notify."
+}
+
 locals {
   hub_vnet_rg_name = "rg-hub-${var.hub}-uks-hub-networking"
 }
