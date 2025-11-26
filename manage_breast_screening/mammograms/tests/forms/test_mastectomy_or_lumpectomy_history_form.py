@@ -16,7 +16,6 @@ from manage_breast_screening.participants.tests.factories import (
 
 from ...forms.mastectomy_or_lumpectomy_history_form import (
     MastectomyOrLumpectomyHistoryForm,
-    MastectomyOrLumpectomyHistoryUpdateForm,
 )
 
 
@@ -331,7 +330,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
 
 @pytest.mark.django_db
-class TestImplantedMedicalDeviceHistoryUpdateForm:
+class TestUpdateMastectomyOrLumpectomyHistoryForm:
     @pytest.fixture
     def instance(self):
         return MastectomyOrLumpectomyHistoryItemFactory(
@@ -349,7 +348,7 @@ class TestImplantedMedicalDeviceHistoryUpdateForm:
         )
 
     def test_no_data(self, instance):
-        form = MastectomyOrLumpectomyHistoryUpdateForm(instance, QueryDict())
+        form = MastectomyOrLumpectomyHistoryForm(QueryDict(), instance=instance)
 
         assert not form.is_valid()
         assert form.errors == {
@@ -388,9 +387,9 @@ class TestImplantedMedicalDeviceHistoryUpdateForm:
         ],
     )
     def test_success(self, instance, data, dummy_request):
-        form = MastectomyOrLumpectomyHistoryUpdateForm(
-            instance,
+        form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(urlencode(data, doseq=True)),
+            instance=instance,
         )
 
         assert form.is_valid()
