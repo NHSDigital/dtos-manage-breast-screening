@@ -25,6 +25,7 @@ VALID_DATA_FILE = "ABC_20241202091221_APPT_106.dat"
 UPDATED_APPOINTMENT_FILE = "ABC_20241202091321_APPT_107.dat"
 HOLDING_CLINIC_APPOINTMENT_FILE = "ABC_20241202091421_APPT_108.dat"
 COMPLETED_APPOINTMENT_FILE = "ABC_20241202091521_APPT_109.dat"
+WRONG_DATA_FILE = "ABC_20241202091221_APPT_110.dat"
 
 
 def fixture_file_path(filename):
@@ -338,7 +339,7 @@ class TestCreateAppointments:
         first_extract = Extract.objects.all()[0]
         assert first_extract.appointments.count() == 2
         assert first_extract.sequence_number == 13
-        assert first_extract.bso_code == "KMK"
+        assert first_extract.bso_code == "ABC"
         assert first_extract.filename == f"{today_dirname}/{VALID_DATA_FILE}"
         assert first_extract.record_count == 3
 
@@ -370,3 +371,23 @@ class TestCreateAppointments:
 
         assert Extract.objects.count() == 1
         assert Appointment.objects.count() == 2
+
+    @pytest.mark.django_db(transaction=True)
+    def test_errors_with_wrong_format_filename(self):
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+
+        with stored_blob_data(today_dirname, ["wrongfilename.dat"]):
+            with pytest.raises(CommandError):
+                Command().handle(**{"date_str": today_dirname})
+
+        assert Extract.objects.count() == 0
+
+    @pytest.mark.django_db(transaction=True)
+    def test_errors_with_wrong_format_data(self):
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+
+        with stored_blob_data(today_dirname, [WRONG_DATA_FILE]):
+            with pytest.raises(CommandError):
+                Command().handle(**{"date_str": today_dirname})
+
+        assert Extract.objects.count() == 0
