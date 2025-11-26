@@ -59,3 +59,23 @@ class TestBreastAugmentationHistoryItemPresenter:
                 },
             ],
         }
+
+    def test_change_link(self):
+        item = BreastAugmentationHistoryItemFactory.build()
+
+        presenter = BreastAugmentationHistoryItemPresenter(item)
+        assert presenter.change_link == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}",
+            "text": "Change",
+            "visually_hidden_text": " breast implants or augmentation item",
+        }
+
+    def test_change_link_with_counter(self):
+        item = BreastAugmentationHistoryItemFactory.build()
+
+        presenter = BreastAugmentationHistoryItemPresenter(item, counter=2)
+        assert presenter.change_link == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}",
+            "text": "Change",
+            "visually_hidden_text": " breast implants or augmentation item 2",
+        }

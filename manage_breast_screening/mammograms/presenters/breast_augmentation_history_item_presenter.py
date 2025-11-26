@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
 from manage_breast_screening.participants.models.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
@@ -5,8 +7,9 @@ from manage_breast_screening.participants.models.breast_augmentation_history_ite
 
 
 class BreastAugmentationHistoryItemPresenter:
-    def __init__(self, breast_augmentation_history_item):
+    def __init__(self, breast_augmentation_history_item, counter=None):
         self._item = breast_augmentation_history_item
+        self.counter = counter
 
         self.right_breast_procedures = self._format_multiple_choices(
             self._item.right_breast_procedures, BreastAugmentationHistoryItem.Procedure
@@ -57,3 +60,21 @@ class BreastAugmentationHistoryItemPresenter:
 
     def _format_multiple_choices(self, choices, ChoiceClass):
         return ", ".join(ChoiceClass(choice).label for choice in choices)
+
+    @property
+    def change_link(self):
+        return {
+            "href": reverse(
+                "mammograms:change_breast_augmentation_history_item",
+                kwargs={
+                    "pk": self._item.appointment_id,
+                    "history_item_pk": self._item.pk,
+                },
+            ),
+            "text": "Change",
+            "visually_hidden_text": (
+                f" breast implants or augmentation item {self.counter}"
+                if self.counter
+                else " breast implants or augmentation item"
+            ),
+        }
