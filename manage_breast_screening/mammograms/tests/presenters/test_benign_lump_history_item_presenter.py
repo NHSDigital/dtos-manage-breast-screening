@@ -25,7 +25,8 @@ class TestBenignLumpHistoryItemPresenter:
 
         presenter = BenignLumpHistoryItemPresenter(item)
 
-        assert presenter.summary_list_params == {
+        result = presenter.summary_list_params
+        assert result == {
             "rows": [
                 {
                     "key": {"text": "Procedures"},
@@ -51,4 +52,14 @@ class TestBenignLumpHistoryItemPresenter:
                     "value": {"html": "First line<br>Second line"},
                 },
             ],
+        }
+
+    def test_change_link(self):
+        item = BenignLumpHistoryItemFactory.build()
+        presenter = BenignLumpHistoryItemPresenter(item)
+
+        result = presenter.change_link
+        assert result == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/benign-lump-history/{item.id}/",
+            "text": "Change",
         }
