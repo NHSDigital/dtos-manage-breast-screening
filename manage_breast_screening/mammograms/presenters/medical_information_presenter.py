@@ -36,10 +36,11 @@ class MedicalInformationPresenter:
             "symptom_type__name", "reported_at"
         )
         self.symptoms = [SymptomPresenter(symptom) for symptom in symptoms]
-        self.breast_cancer_history = [
-            BreastCancerHistoryItemPresenter(item)
-            for item in appointment.breast_cancer_history_items.all()
-        ]
+        self.breast_cancer_history = self._present_items(
+            appointment.breast_cancer_history_items.all(),
+            BreastCancerHistoryItemPresenter,
+        )
+
         self.mastectomy_or_lumpectomy_history = [
             MastectomyOrLumpectomyHistoryItemPresenter(item)
             for item in appointment.mastectomy_or_lumpectomy_history_items.all()
@@ -73,14 +74,10 @@ class MedicalInformationPresenter:
             for item in appointment.benign_lump_history_items.all()
         ]
 
-        cyst_history_items = list(appointment.cyst_history_items.all())
-        if len(cyst_history_items) == 1:
-            self.cyst_history = [CystHistoryItemPresenter(cyst_history_items[0])]
-        else:
-            self.cyst_history = [
-                CystHistoryItemPresenter(item, counter=counter)
-                for counter, item in enumerate(cyst_history_items, 1)
-            ]
+        self.cyst_history = self._present_items(
+            appointment.cyst_history_items.all(), CystHistoryItemPresenter
+        )
+
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms
         }
@@ -238,3 +235,13 @@ class MedicalInformationPresenter:
             "href": url,
             "text": "Add mastectomy or lumpectomy history",
         }
+
+    def _present_items(self, items, presenter_class):
+        items = list(items)
+        if len(items) == 1:
+            return [presenter_class(items[0])]
+        else:
+            return [
+                presenter_class(item, counter=counter)
+                for counter, item in enumerate(items, 1)
+            ]

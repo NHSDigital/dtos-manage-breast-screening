@@ -16,11 +16,30 @@ from manage_breast_screening.participants.models.breast_cancer_history_item impo
 )
 
 
-class BreastCancerHistoryForm(FormWithConditionalFields):
+class BreastCancerHistoryBaseForm(FormWithConditionalFields):
     class DiagnosisLocationChoices(TextChoices):
         RIGHT_BREAST = "RIGHT_BREAST", "Right breast"
         LEFT_BREAST = "LEFT_BREAST", "Left breast"
         DONT_KNOW = "DONT_KNOW", "Don't know"
+
+        @staticmethod
+        def form_value_to_model_field(form_value):
+            match form_value:
+                case [
+                    BreastCancerHistoryBaseForm.DiagnosisLocationChoices.RIGHT_BREAST,
+                    BreastCancerHistoryBaseForm.DiagnosisLocationChoices.LEFT_BREAST,
+                ]:
+                    return BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS
+                case [other]:
+                    return BreastCancerHistoryItem.DiagnosisLocationChoices(other)
+
+        @classmethod
+        def model_field_to_form_value(cls, model_field):
+            match model_field:
+                case BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS:
+                    return [cls.RIGHT_BREAST, cls.LEFT_BREAST]
+                case other:
+                    return cls(other)
 
     diagnosis_location = MultipleChoiceField(
         label="In which breasts was cancer diagnosed?",
@@ -157,18 +176,10 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         )
 
     def model_values(self):
-        match self.cleaned_data.get("diagnosis_location", []):
-            case [
-                self.DiagnosisLocationChoices.RIGHT_BREAST,
-                self.DiagnosisLocationChoices.LEFT_BREAST,
-            ]:
-                diagnosis_location = (
-                    BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS.value
-                )
-            case [other]:
-                diagnosis_location = other
-
-        location_value = self.cleaned_data["intervention_location"]
+        diagnosis_location = self.DiagnosisLocationChoices.form_value_to_model_field(
+            self.cleaned_data.get("diagnosis_location", [])
+        )
+        intervention_location = self.cleaned_data["intervention_location"]
 
         return dict(
             diagnosis_location=diagnosis_location,
@@ -187,13 +198,15 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
             systemic_treatments_other_treatment_details=self.cleaned_data.get(
                 "systemic_treatments_other_treatment_details"
             ),
-            intervention_location=location_value,
+            intervention_location=intervention_location,
             intervention_location_details=self.cleaned_data.get(
-                f"intervention_location_details_{location_value.lower()}"
+                f"intervention_location_details_{intervention_location.lower()}"
             ),
             additional_details=self.cleaned_data.get("additional_details"),
         )
 
+
+class BreastCancerHistoryForm(BreastCancerHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -205,3 +218,42 @@ class BreastCancerHistoryForm(FormWithConditionalFields):
         auditor.audit_create(instance)
 
         return instance
+
+
+class BreastCancerHistoryUpdateForm(BreastCancerHistoryBaseForm):
+    def __init__(self, instance, **kwargs):
+        self.instance = instance
+        self.appointment = instance.appointment
+
+        kwargs["initial"] = {
+            "diagnosis_location": self.DiagnosisLocationChoices.model_field_to_form_value(
+                instance.diagnosis_location
+            ),
+            "diagnosis_year": instance.diagnosis_year,
+            "right_breast_procedure": instance.right_breast_procedure,
+            "left_breast_procedure": instance.left_breast_procedure,
+            "right_breast_other_surgery": instance.right_breast_other_surgery,
+            "left_breast_other_surgery": instance.left_breast_other_surgery,
+            "right_breast_treatment": instance.right_breast_treatment,
+            "left_breast_treatment": instance.left_breast_treatment,
+            "systemic_treatments": instance.systemic_treatments,
+            "systemic_treatments_other_treatment_details": instance.systemic_treatments_other_treatment_details,
+            "intervention_location": instance.intervention_location,
+            f"intervention_location_details_{instance.intervention_location.lower()}": instance.intervention_location_details,
+            "additional_details": instance.additional_details,
+        }
+
+        super().__init__(**kwargs)
+
+    def update(self, request):
+        auditor = Auditor.from_request(request)
+        field_values = self.model_values()
+
+        for k, v in field_values.items():
+            setattr(self.instance, k, v)
+
+        self.instance.save()
+
+        auditor.audit_create(self.instance)
+
+        return self.instance

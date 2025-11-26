@@ -3,11 +3,14 @@ from django.contrib import messages
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    BreastCancerHistoryItemFactory,
+)
 
 
 @pytest.mark.django_db
-class TestBreastCancerHistoryViews:
+class TestBreastCancerHistoryView:
     def test_renders_response(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
@@ -89,4 +92,71 @@ class TestBreastCancerHistoryViews:
             </ul>
             """,
             response.text,
+        )
+
+
+@pytest.mark.django_db
+class TestBreastCancerHistoryUpdateView:
+    @pytest.fixture
+    def appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+
+    @pytest.fixture
+    def history_item(self, appointment):
+        return BreastCancerHistoryItemFactory.create(appointment=appointment)
+
+    def test_renders_response(self, clinical_user_client, history_item):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:change_breast_cancer_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, history_item
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_breast_cancer_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            ),
+            {
+                "diagnosis_location": "RIGHT_BREAST",
+                "intervention_location": "NHS_HOSPITAL",
+                "intervention_location_details_nhs_hospital": "abc",
+                "left_breast_other_surgery": "NO_SURGERY",
+                "left_breast_procedure": "NO_PROCEDURE",
+                "left_breast_treatment": "NO_RADIOTHERAPY",
+                "right_breast_other_surgery": "LYMPH_NODE_SURGERY",
+                "right_breast_procedure": "LUMPECTOMY",
+                "right_breast_treatment": "BREAST_RADIOTHERAPY",
+                "systemic_treatments": "NO_SYSTEMIC_TREATMENTS",
+            },
+        )
+
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": history_item.appointment_id},
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message="Breast cancer history updated",
+                )
+            ],
         )

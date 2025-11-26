@@ -8,8 +8,15 @@ from django.test import RequestFactory
 
 from manage_breast_screening.mammograms.forms.breast_cancer_history_form import (
     BreastCancerHistoryForm,
+    BreastCancerHistoryUpdateForm,
 )
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.models.breast_cancer_history_item import (
+    BreastCancerHistoryItem,
+)
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    BreastCancerHistoryItemFactory,
+)
 
 
 @pytest.fixture
@@ -178,6 +185,95 @@ class TestBreastCancerHistoryForm:
         )
         assert form.is_valid()
         instance = form.create(appointment, incoming_request)
+
+        assert model_to_dict(instance) == {
+            "additional_details": "",
+            "appointment": appointment.pk,
+            "diagnosis_location": "RIGHT_BREAST",
+            "diagnosis_year": None,
+            "intervention_location": "NHS_HOSPITAL",
+            "intervention_location_details": "abc",
+            "left_breast_other_surgery": [
+                "NO_SURGERY",
+            ],
+            "left_breast_procedure": "NO_PROCEDURE",
+            "left_breast_treatment": [
+                "NO_RADIOTHERAPY",
+            ],
+            "right_breast_other_surgery": [
+                "LYMPH_NODE_SURGERY",
+            ],
+            "right_breast_procedure": "LUMPECTOMY",
+            "right_breast_treatment": [
+                "BREAST_RADIOTHERAPY",
+            ],
+            "systemic_treatments": [
+                "NO_SYSTEMIC_TREATMENTS",
+            ],
+            "systemic_treatments_other_treatment_details": "",
+        }
+
+
+@pytest.mark.django_db
+class TestBreastCancerHistoryUpdateForm:
+    @pytest.fixture
+    def instance(self, appointment):
+        return BreastCancerHistoryItemFactory(
+            appointment=appointment,
+            diagnosis_location=BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS,
+            left_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
+            right_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
+        )
+
+    def test_no_data_not_valid(self, instance):
+        form = BreastCancerHistoryUpdateForm(instance=instance, data=QueryDict())
+        assert not form.is_valid()
+        assert form.errors == {
+            "diagnosis_location": ["Select which breasts cancer was diagnosed in"],
+            "intervention_location": ["Select where surgery and treatment took place"],
+            "left_breast_other_surgery": [
+                "Select any other surgery they have had in the left breast"
+            ],
+            "left_breast_procedure": [
+                "Select which procedure they have had in the left breast"
+            ],
+            "left_breast_treatment": [
+                "Select what treatment they have had in the left breast"
+            ],
+            "right_breast_other_surgery": [
+                "Select any other surgery they have had in the right breast"
+            ],
+            "right_breast_procedure": [
+                "Select which procedure they have had in the right breast"
+            ],
+            "right_breast_treatment": [
+                "Select what treatment they have had in the right breast"
+            ],
+            "systemic_treatments": ["Select what systemic treatments they have had"],
+        }
+
+    def test_update(self, appointment, instance, incoming_request):
+        form = BreastCancerHistoryUpdateForm(
+            instance=instance,
+            data=QueryDict(
+                urlencode(
+                    {
+                        "diagnosis_location": "RIGHT_BREAST",
+                        "intervention_location": "NHS_HOSPITAL",
+                        "intervention_location_details_nhs_hospital": "abc",
+                        "left_breast_other_surgery": "NO_SURGERY",
+                        "left_breast_procedure": "NO_PROCEDURE",
+                        "left_breast_treatment": "NO_RADIOTHERAPY",
+                        "right_breast_other_surgery": "LYMPH_NODE_SURGERY",
+                        "right_breast_procedure": "LUMPECTOMY",
+                        "right_breast_treatment": "BREAST_RADIOTHERAPY",
+                        "systemic_treatments": "NO_SYSTEMIC_TREATMENTS",
+                    }
+                )
+            ),
+        )
+        assert form.is_valid()
+        instance = form.update(incoming_request)
 
         assert model_to_dict(instance) == {
             "additional_details": "",

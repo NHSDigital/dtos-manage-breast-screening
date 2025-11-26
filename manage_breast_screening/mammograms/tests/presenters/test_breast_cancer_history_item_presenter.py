@@ -73,3 +73,23 @@ class TestBreastCancerHistoryItemPresenter:
                 },
             ],
         }
+
+    def test_change_link(self):
+        item = BreastCancerHistoryItemFactory.build()
+
+        presenter = BreastCancerHistoryItemPresenter(item)
+        assert presenter.change_link == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}",
+            "text": "Change",
+            "visually_hidden_text": " breast cancer item",
+        }
+
+    def test_change_link_with_counter(self):
+        item = BreastCancerHistoryItemFactory.build()
+
+        presenter = BreastCancerHistoryItemPresenter(item, counter=2)
+        assert presenter.change_link == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}",
+            "text": "Change",
+            "visually_hidden_text": " breast cancer item 2",
+        }
