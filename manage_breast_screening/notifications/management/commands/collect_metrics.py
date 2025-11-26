@@ -1,5 +1,4 @@
 import logging
-import os
 
 from django.core.management.base import BaseCommand, CommandError
 
@@ -12,14 +11,9 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
-            # Create metrics collection
-            metrics = Metrics(
-                os.getenv("ENVIRONMENT"),
-            )
-
             # Set queue_size metrics
             for queue in [Queue.RetryMessageBatches(), Queue.MessageStatusUpdates()]:
-                metrics.set_gauge_value(
+                Metrics().set_gauge_value(
                     f"queue_size_{queue.queue_name}",
                     "messages",
                     "Queue length",

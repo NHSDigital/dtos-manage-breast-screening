@@ -5,6 +5,10 @@ import pytest
 from manage_breast_screening.notifications.services.metrics import Metrics
 
 
+@patch(f"{Metrics.__module__}.AzureMonitorMetricExporter")
+@patch(f"{Metrics.__module__}.PeriodicExportingMetricReader")
+@patch(f"{Metrics.__module__}.metrics")
+@patch(f"{Metrics.__module__}.MeterProvider")
 class TestMetrics:
     @pytest.fixture
     def conn_string(self):
@@ -13,15 +17,8 @@ class TestMetrics:
     @pytest.fixture(autouse=True)
     def setup(self, monkeypatch, conn_string):
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", conn_string)
+        monkeypatch.setenv("ENVIRONMENT", "dev")
 
-    @patch(
-        "manage_breast_screening.notifications.services.metrics.AzureMonitorMetricExporter"
-    )
-    @patch(
-        "manage_breast_screening.notifications.services.metrics.PeriodicExportingMetricReader"
-    )
-    @patch("manage_breast_screening.notifications.services.metrics.metrics")
-    @patch("manage_breast_screening.notifications.services.metrics.MeterProvider")
     def test_metrics_initialisation(
         self,
         mock_meter_provider,
@@ -33,7 +30,7 @@ class TestMetrics:
         mock_meter = MagicMock()
         mock_metrics.get_meter.return_value = mock_meter
 
-        subject = Metrics(environment="dev")
+        subject = Metrics()
 
         mock_metric_exporter.assert_called_once_with(connection_string=str(conn_string))
         mock_metric_reader.assert_called_once_with(mock_metric_exporter.return_value)
@@ -50,14 +47,17 @@ class TestMetrics:
         assert subject.meter == mock_meter
         assert subject.environment == "dev"
 
-    @patch(
-        "manage_breast_screening.notifications.services.metrics.AzureMonitorMetricExporter"
-    )
-    @patch(
-        "manage_breast_screening.notifications.services.metrics.PeriodicExportingMetricReader"
-    )
-    @patch("manage_breast_screening.notifications.services.metrics.metrics")
-    @patch("manage_breast_screening.notifications.services.metrics.MeterProvider")
+    def test_metrics_is_a_singleton(
+        self,
+        mock_meter_provider,
+        mock_metrics,
+        mock_reader,
+        mock_exporter,
+    ):
+        subject = Metrics()
+        the_same_instance = Metrics()
+        assert subject == the_same_instance
+
     def test_set_gauge_value(
         self,
         mock_meter_provider,
@@ -71,7 +71,7 @@ class TestMetrics:
         mock_metrics.get_meter.return_value = mock_meter
         mock_meter.create_gauge.return_value = mock_gauge
 
-        subject = Metrics(environment="prod")
+        subject = Metrics()
 
         subject.set_gauge_value(
             metric_name="queue_depth",
@@ -88,5 +88,5 @@ class TestMetrics:
 
         mock_gauge.set.assert_called_once_with(
             999,
-            {"environment": "prod"},
+            {"environment": "dev"},
         )

@@ -26,24 +26,21 @@ class TestCollectMetrics:
         mock_queue.RetryMessageBatches.return_value = mock_retry
         mock_queue.MessageStatusUpdates.return_value = mock_status
 
-        mock_metrics_instance = MagicMock()
-        mock_metrics_class.return_value = mock_metrics_instance
-
         Command().handle()
 
-        mock_metrics_class.assert_called_once_with("test")
+        metrics_instance = mock_metrics_class.return_value
 
-        mock_metrics_instance.set_gauge_value.assert_any_call(
+        metrics_instance.set_gauge_value.assert_any_call(
             "queue_size_retry_queue",
             "messages",
             "Queue length",
             8,
         )
-        mock_metrics_instance.set_gauge_value.assert_any_call(
+        metrics_instance.set_gauge_value.assert_any_call(
             "queue_size_status_queue",
             "messages",
             "Queue length",
             2,
         )
 
-        assert mock_metrics_instance.set_gauge_value.call_count == 2
+        assert metrics_instance.set_gauge_value.call_count == 2
