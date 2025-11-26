@@ -14,6 +14,7 @@ from manage_breast_screening.notifications.models import (
     Appointment,
     AppointmentStatusChoices,
     Clinic,
+    Extract,
 )
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
@@ -53,6 +54,15 @@ class Command(BaseCommand):
 
                 data_frame = self.raw_data_to_data_frame(blob_content)
 
+                file_headers = self.get_file_header(blob_content)
+
+                extract = Extract.objects.create(
+                    sequence_number=int(file_headers[1].strip()),
+                    filename=blob.name,
+                    bso_code=data_frame.iloc[0]["BSO"],
+                    record_count=file_headers[4],
+                )
+
                 for idx, row in data_frame.iterrows():
                     if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
@@ -62,6 +72,9 @@ class Command(BaseCommand):
                         appt, appt_created = self.update_or_create_appointment(
                             row, clinic
                         )
+
+                        extract.appointments.add(appt) if appt is not None else None
+
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
 
     def is_not_holding_clinic(self, row):
@@ -78,6 +91,9 @@ class Command(BaseCommand):
             sep="|",
             skipfooter=1,
         )
+
+    def get_file_header(self, raw_data: str) -> pandas.Series:
+        return raw_data.split("\n")[0].replace('"', "").split("|")
 
     def find_or_create_clinic(self, row: pandas.Series) -> tuple[Clinic, bool]:
         return Clinic.objects.get_or_create(

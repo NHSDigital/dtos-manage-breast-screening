@@ -1,7 +1,7 @@
 import os
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from unittest.mock import Mock, PropertyMock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 from azure.storage.blob import BlobProperties
@@ -10,7 +10,12 @@ from django.core.management.base import CommandError
 from manage_breast_screening.notifications.management.commands.create_appointments import (
     Command,
 )
-from manage_breast_screening.notifications.models import ZONE_INFO, Appointment, Clinic
+from manage_breast_screening.notifications.models import (
+    ZONE_INFO,
+    Appointment,
+    Clinic,
+    Extract,
+)
 from manage_breast_screening.notifications.tests.factories import (
     AppointmentFactory,
     ClinicFactory,
@@ -44,7 +49,7 @@ def stored_blob_data(prefix_dir: str, filenames: list[str]):
         mock_blob_contents = []
         for filename in filenames:
             mock_blob = Mock(spec=BlobProperties)
-            mock_blob.name = PropertyMock(return_value=f"{prefix_dir}/{filename}")
+            mock_blob.name = f"{prefix_dir}/{filename}"
             mock_blobs.append(mock_blob)
             mock_blob_contents.append(open(fixture_file_path(filename)).read())
 
@@ -117,6 +122,9 @@ class TestCreateAppointments:
         assert appointments[1].number == ""
 
         assert appointments[1].assessment is True
+
+        assert Extract.objects.count() == 1
+        assert Extract.objects.first().appointments.count() == 2
 
     def test_handles_holding_clinics(self):
         """Test does not create appointments for valid NBSS data marked as a Holding Clinic"""
@@ -318,3 +326,47 @@ class TestCreateAppointments:
             Command().handle(**{"date_str": "2000-01-01"})
 
         mock_command_handler.assert_called_with("CreateAppointments")
+
+    def test_create_extract_and_cancel(self):
+        """Test Extract creation for new booked appointments in NBSS data, stored in Azure storage blob"""
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+
+        with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
+            Command().handle(**{"date_str": today_dirname})
+
+        assert Extract.objects.count() == 1
+        first_extract = Extract.objects.all()[0]
+        assert first_extract.appointments.count() == 2
+        assert first_extract.sequence_number == 13
+        assert first_extract.bso_code == "KMK"
+        assert first_extract.filename == f"{today_dirname}/{VALID_DATA_FILE}"
+        assert first_extract.record_count == 3
+
+        appointment_to_update = Appointment.objects.filter(
+            nbss_id="BU011-67278-RA1-DN-Y1111-1"
+        ).first()
+        assert appointment_to_update.extracts.count() == 1
+
+        with stored_blob_data(today_dirname, [UPDATED_APPOINTMENT_FILE]):
+            Command().handle(**{"date_str": today_dirname})
+
+        assert Extract.objects.count() == 2
+
+        assert appointment_to_update.extracts.count() == 2
+
+    @pytest.mark.django_db(transaction=True)
+    def test_errors_when_same_extract(self):
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+
+        with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
+            Command().handle(**{"date_str": today_dirname})
+
+        assert Extract.objects.count() == 1
+        assert Appointment.objects.count() == 2
+
+        with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
+            with pytest.raises(CommandError):
+                Command().handle(**{"date_str": today_dirname})
+
+        assert Extract.objects.count() == 1
+        assert Appointment.objects.count() == 2
