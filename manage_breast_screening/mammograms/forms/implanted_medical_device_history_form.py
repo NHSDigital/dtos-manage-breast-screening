@@ -14,7 +14,7 @@ from manage_breast_screening.participants.models.implanted_medical_device_histor
 )
 
 
-class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
+class ImplantedMedicalDeviceHistoryBaseForm(FormWithConditionalFields):
     def __init__(self, *args, participant, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -74,21 +74,6 @@ class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
-        field_values = self.model_values()
-
-        implanted_medical_device_history = (
-            appointment.implanted_medical_device_history_items.create(
-                appointment=appointment,
-                **field_values,
-            )
-        )
-
-        auditor.audit_create(implanted_medical_device_history)
-
-        return implanted_medical_device_history
-
     def full_clean(self):
         # if a removal_year is provided then remove it if device_has_been_removed is False
         if self.data.get("removal_year") and not self.data.get(
@@ -114,3 +99,54 @@ class ImplantedMedicalDeviceHistoryForm(FormWithConditionalFields):
                     code="required",
                 ),
             )
+
+
+class ImplantedMedicalDeviceHistoryForm(ImplantedMedicalDeviceHistoryBaseForm):
+    def create(self, appointment, request):
+        auditor = Auditor.from_request(request)
+        field_values = self.model_values()
+
+        implanted_medical_device_history = (
+            appointment.implanted_medical_device_history_items.create(
+                appointment=appointment,
+                **field_values,
+            )
+        )
+
+        auditor.audit_create(implanted_medical_device_history)
+
+        return implanted_medical_device_history
+
+
+class ImplantedMedicalDeviceHistoryUpdateForm(ImplantedMedicalDeviceHistoryBaseForm):
+    def __init__(self, instance, *args, **kwargs):
+        self.instance = instance
+
+        kwargs["participant"] = instance.participant
+        kwargs["initial"] = {
+            "device": instance.device,
+            "other_medical_device_details": instance.other_medical_device_details,
+            "device_has_been_removed": instance.device_has_been_removed,
+            "removal_year": instance.removal_year,
+            "procedure_year": instance.procedure_year,
+            "additional_details": instance.additional_details,
+        }
+
+        super().__init__(*args, **kwargs)
+
+    def update(self, request):
+        self.instance.device = self.cleaned_data["device"]
+        self.instance.other_medical_device_details = self.cleaned_data[
+            "other_medical_device_details"
+        ]
+        self.instance.device_has_been_removed = self.cleaned_data[
+            "device_has_been_removed"
+        ]
+        self.instance.removal_year = self.cleaned_data["removal_year"]
+        self.instance.procedure_year = self.cleaned_data["procedure_year"]
+        self.instance.additional_details = self.cleaned_data["additional_details"]
+        self.instance.save()
+
+        Auditor.from_request(request).audit_update(self.instance)
+
+        return self.instance

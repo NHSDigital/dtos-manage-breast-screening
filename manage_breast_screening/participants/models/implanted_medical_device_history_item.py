@@ -24,3 +24,7 @@ class ImplantedMedicalDeviceHistoryItem(BaseModel):
     device_has_been_removed = models.BooleanField()
     removal_year = models.IntegerField(null=True)
     additional_details = models.TextField(blank=True, null=False, default="")
+
+    @property
+    def participant(self):
+        return self.appointment.participant
