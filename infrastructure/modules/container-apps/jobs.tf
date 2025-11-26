@@ -17,6 +17,7 @@ locals {
       job_container_args = "create_appointments"
     }
     send_message_batch = {
+
       # cron_expression = "0,30 9 * * 1-5"
       cron_expression = null
       environment_variables = {
@@ -43,6 +44,7 @@ locals {
       cron_expression = null
       environment_variables = {
         STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
+        ENVIRONMENT               = var.environment
       }
       job_short_name     = "sms"
       job_container_args = "save_message_status"
@@ -63,6 +65,16 @@ locals {
       }
       job_short_name     = "smk"
       job_container_args = "create_reports --smoke-test"
+    }
+    collect_metrics = {
+      cron_expression = "*/5 * * * *"
+      environment_variables = {
+        RETRY_QUEUE_NAME          = "notifications-message-batch-retries"
+        STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
+        ENVIRONMENT               = var.environment
+      }
+      job_short_name     = "clm"
+      job_container_args = "collect_metrics"
     }
   }
 }
