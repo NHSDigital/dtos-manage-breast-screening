@@ -1,9 +1,22 @@
+import logging
+
 from django.contrib import messages
+from django.http import Http404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from ..forms.breast_augmentation_history_form import BreastAugmentationHistoryForm
+from manage_breast_screening.participants.models.breast_augmentation_history_item import (
+    BreastAugmentationHistoryItem,
+)
+
+from ..forms.breast_augmentation_history_form import (
+    BreastAugmentationHistoryForm,
+    BreastAugmentationHistoryUpdateForm,
+)
 from .mixins import InProgressAppointmentMixin
+
+logger = logging.getLogger(__name__)
 
 
 class BreastAugmentationHistoryBaseView(InProgressAppointmentMixin, FormView):
@@ -60,6 +73,62 @@ class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
             {
                 "heading": "Add details of breast implants or augmentation",
                 "page_title": "Add details of breast implants or augmentation",
+            },
+        )
+
+        return context
+
+
+class ChangeBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
+    form_class = BreastAugmentationHistoryUpdateForm
+
+    def get_instance(self):
+        try:
+            return BreastAugmentationHistoryItem.objects.get(
+                pk=self.kwargs["history_item_pk"],
+                appointment_id=self.kwargs["pk"],
+            )
+        except BreastAugmentationHistoryItem.DoesNotExist:
+            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+            return None
+
+    def get(self, *args, **kwargs):
+        self.instance = self.get_instance()
+        if not self.instance:
+            # For a GET request, if the page shouldn't exist we can
+            # safely redirect to the hub page.
+            return redirect(self.get_success_url())
+        return super().get(*args, **kwargs)
+
+    def post(self, *args, **kwargs):
+        self.instance = self.get_instance()
+        if not self.instance:
+            raise Http404
+        return super().post(*args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = self.instance
+        return kwargs
+
+    def form_valid(self, form):
+        form.update(request=self.request)
+
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Details of breast implants or augmentation updated",
+        )
+
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+
+        context.update(
+            {
+                "heading": "Edit details of breast implants or augmentation",
+                "page_title": "Edit details of breast implants or augmentation",
             },
         )
 

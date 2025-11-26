@@ -161,6 +161,11 @@ urlpatterns = [
         name="add_breast_augmentation_history_item",
     ),
     path(
+        "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>",
+        breast_augmentation_history_views.ChangeBreastAugmentationHistoryView.as_view(),
+        name="change_breast_augmentation_history_item",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/benign-lump-history/",
         benign_lump_history_item_views.AddBenignLumpHistoryItemView.as_view(),
         name="add_benign_lump_history_item",
