@@ -18,6 +18,7 @@ module "infra" {
   protect_keyvault            = var.protect_keyvault
   vnet_address_space          = var.vnet_address_space
   cae_zone_redundancy_enabled = var.cae_zone_redundancy_enabled
+  enable_alerting             = var.enable_alerting
 }
 
 module "shared_config" {
