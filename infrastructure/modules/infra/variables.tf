@@ -48,6 +48,11 @@ variable "cae_zone_redundancy_enabled" {
   type        = bool
 }
 
+variable "enable_alerting" {
+  description = "Whether monitoring and alerting is enabled."
+  type        = bool
+}
+
 locals {
   hub_vnet_rg_name = "rg-hub-${var.hub}-uks-hub-networking"
 }

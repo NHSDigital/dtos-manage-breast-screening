@@ -157,7 +157,7 @@ variable "alert_window_size" {
 }
 
 variable "enable_alerting" {
-  description = "Whether monitoring and alerting is enabled for the PostgreSQL Flexible Server."
+  description = "Whether monitoring and alerting is enabled."
   type        = bool
   default     = false
 }

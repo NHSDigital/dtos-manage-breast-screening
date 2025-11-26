@@ -79,7 +79,7 @@ module "app_insights_audit" {
 
   log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 
-  enable_alerting = var.enable_alerting
+  enable_alerting     = var.enable_alerting
 }
 
 module "private_link_scoped_service_law" {

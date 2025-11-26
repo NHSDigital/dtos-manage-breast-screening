@@ -156,7 +156,7 @@ variable "use_apex_domain" {
 }
 
 variable "enable_alerting" {
-  description = "Whether monitoring and alerting is enabled for the PostgreSQL Flexible Server."
+  description = "Whether monitoring and alerting is enabled."
   type        = bool
 }
 
