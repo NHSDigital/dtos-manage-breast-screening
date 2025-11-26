@@ -1,8 +1,12 @@
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.participants.models.benign_lump_history_item import (
+    BenignLumpHistoryItem,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    BenignLumpHistoryItemFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
 )
@@ -31,6 +35,20 @@ class TestBenignLumpHistory(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_benign_lump_history_item_is_listed()
         self.and_the_message_says_benign_lump_history_added()
+
+    def test_updating_a_benign_lump_history_item(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_there_is_a_benign_lump_history_item()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.then_i_see_a_change_link_for_the_benign_lump_history_item()
+
+        self.when_i_click_on_the_change_link_for_the_benign_lump_history_item()
+        self.when_i_update_the_form_details()
+        self.and_i_click_save_benign_lump_history()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_benign_lump_history_item_is_updated()
+        self.and_the_message_says_benign_lump_history_updated()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -140,4 +158,63 @@ class TestBenignLumpHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Benign lump history added")
+        expect(alert).to_contain_text("Benign lumps added")
+
+    def and_there_is_a_benign_lump_history_item(self):
+        self.benign_lump_history_item = BenignLumpHistoryItemFactory(
+            appointment=self.appointment,
+            left_breast_procedures=[BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY],
+            right_breast_procedures=[BenignLumpHistoryItem.Procedure.NO_PROCEDURES],
+            procedure_year=2019,
+            procedure_location=BenignLumpHistoryItem.ProcedureLocation.PRIVATE_CLINIC_UK,
+            procedure_location_details="Private Hospital London",
+            additional_details="Initial details about the procedure.",
+        )
+
+    def then_i_see_a_change_link_for_the_benign_lump_history_item(self):
+        key = self.page.locator(
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Benign lump history", exact=True),
+        )
+        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+
+        expect(row).to_contain_text("Change")
+
+    def when_i_click_on_the_change_link_for_the_benign_lump_history_item(self):
+        key = self.page.locator(
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Benign lump history", exact=True),
+        )
+        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        row.get_by_role("link", name="Change").click()
+
+    def when_i_update_the_form_details(self):
+        # Update to match the expected values in and_the_benign_lump_history_item_is_listed
+        right_fieldset = self.page.get_by_role(
+            "group", name="Right breast", exact=False
+        )
+        right_fieldset.get_by_label("No procedures", exact=True).uncheck()
+        right_fieldset.get_by_label("Needle biopsy", exact=True).check()
+        right_fieldset.get_by_label("Lump removed", exact=True).check()
+
+        left_fieldset = self.page.get_by_role("group", name="Left breast", exact=False)
+        left_fieldset.get_by_label("Needle biopsy", exact=True).uncheck()
+        left_fieldset.get_by_label("Lump removed", exact=True).check()
+
+        self.page.get_by_label("Year of procedure (optional)", exact=True).fill("2022")
+        self.page.get_by_label("At an NHS hospital", exact=True).click()
+        self.page.locator("#id_nhs_hospital_details").fill(
+            "St Thomas' Hospital, London"
+        )
+        self.page.get_by_label("Additional details (optional)", exact=True).fill(
+            "Participant described no complications following any of the procedures."
+        )
+
+    def and_the_benign_lump_history_item_is_updated(self):
+        self.and_the_benign_lump_history_item_is_listed()
+
+    def and_the_message_says_benign_lump_history_updated(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Benign lumps updated")
