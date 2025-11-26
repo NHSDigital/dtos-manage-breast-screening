@@ -74,6 +74,7 @@ class MessageBatch(BaseModel):
         max_length=50, choices=MessageBatchStatusChoices, default="unscheduled"
     )
     nhs_notify_errors = models.JSONField(blank=True, null=True)
+    silent = models.BooleanField(default=False)
 
     class Meta:
         indexes = [models.Index(fields=["notify_id"])]

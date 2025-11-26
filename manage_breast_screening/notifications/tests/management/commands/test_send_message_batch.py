@@ -52,6 +52,7 @@ class TestSendMessageBatch:
             == 1
         )
         mock_mark_batch_as_sent.assert_called_once_with(message_batches[0], ANY)
+        mock_send_message_batch.assert_called_once_with(message_batches[0])
 
     def test_handle_for_all_routing_plans(
         self, mock_mark_batch_as_sent, mock_send_message_batch
@@ -262,4 +263,32 @@ class TestSendMessageBatch:
         mock_command_handler,
     ):
         Command().handle()
+
         mock_command_handler.assert_called_with("SendMessageBatch")
+
+    def test_handle_in_silent_mode(
+        self, mock_mark_batch_as_sent, mock_send_message_batch, monkeypatch
+    ):
+        """Test sending message batch when running in silent mode"""
+        monkeypatch.setenv("NOTIFICATIONS_SILENT_MODE", "true")
+        mock_send_message_batch.return_value.status_code = 201
+
+        appointment = AppointmentFactory(starts_at=datetime.now(tz=ZONE_INFO))
+        routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
+
+        Command().handle()
+
+        message_batches = MessageBatch.objects.filter(
+            routing_plan_id=routing_plan_id, silent=True
+        )
+        assert message_batches.count() == 1
+
+        messages = Message.objects.filter(
+            appointment=appointment, batch=message_batches[0]
+        )
+        assert messages.count() == 1
+        mock_mark_batch_as_sent.assert_not_called()
+        mock_send_message_batch.assert_not_called()
+
+        assert message_batches[0].status == "sent"
+        assert messages[0].status == "sending"
