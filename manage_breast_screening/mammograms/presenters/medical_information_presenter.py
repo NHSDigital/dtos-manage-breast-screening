@@ -61,10 +61,10 @@ class MedicalInformationPresenter:
                 for counter, item in enumerate(implanted_medical_device_history, 1)
             ]
 
-        self.breast_augmentation_history = [
-            BreastAugmentationHistoryItemPresenter(item)
-            for item in appointment.breast_augmentation_history_items.all()
-        ]
+        self.breast_augmentation_history = self._present_items(
+            appointment.breast_augmentation_history_items.all(),
+            BreastAugmentationHistoryItemPresenter,
+        )
         self.other_procedure_history = [
             OtherProcedureHistoryItemPresenter(item)
             for item in appointment.other_procedure_history_items.all()
