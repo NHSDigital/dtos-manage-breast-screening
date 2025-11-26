@@ -16,7 +16,7 @@ from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_histor
 )
 
 
-class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
+class MastectomyOrLumpectomyHistoryBaseForm(FormWithConditionalFields):
     right_breast_procedure = ChoiceField(
         label="Right breast",
         visually_hidden_label_prefix="What procedure have they had in their ",
@@ -90,7 +90,7 @@ class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
         error_messages={"max_words": "Additional details must be 500 words or less"},
     )
 
-    def __init__(self, *args, participant, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.given_field_value(
@@ -118,6 +118,8 @@ class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
+
+class MastectomyOrLumpectomyHistoryForm(MastectomyOrLumpectomyHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -132,3 +134,44 @@ class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
         auditor.audit_create(mastectomy_or_lumpectomy_history)
 
         return mastectomy_or_lumpectomy_history
+
+
+class MastectomyOrLumpectomyHistoryUpdateForm(MastectomyOrLumpectomyHistoryBaseForm):
+    def __init__(self, instance, *args, **kwargs):
+        self.instance = instance
+
+        kwargs["initial"] = {
+            "left_breast_procedure": instance.left_breast_procedure,
+            "right_breast_procedure": instance.right_breast_procedure,
+            "left_breast_other_surgery": instance.left_breast_other_surgery,
+            "right_breast_other_surgery": instance.right_breast_other_surgery,
+            "year_of_surgery": instance.year_of_surgery,
+            "surgery_reason": instance.surgery_reason,
+            "surgery_other_reason_details": instance.surgery_other_reason_details,
+            "additional_details": instance.additional_details,
+        }
+
+        super().__init__(*args, **kwargs)
+
+    def update(self, request):
+        self.instance.left_breast_procedure = self.cleaned_data["left_breast_procedure"]
+        self.instance.right_breast_procedure = self.cleaned_data[
+            "right_breast_procedure"
+        ]
+        self.instance.left_breast_other_surgery = self.cleaned_data[
+            "left_breast_other_surgery"
+        ]
+        self.instance.right_breast_other_surgery = self.cleaned_data[
+            "right_breast_other_surgery"
+        ]
+        self.instance.year_of_surgery = self.cleaned_data["year_of_surgery"]
+        self.instance.surgery_reason = self.cleaned_data["surgery_reason"]
+        self.instance.surgery_other_reason_details = self.cleaned_data[
+            "surgery_other_reason_details"
+        ]
+        self.instance.additional_details = self.cleaned_data["additional_details"]
+        self.instance.save()
+
+        Auditor.from_request(request).audit_update(self.instance)
+
+        return self.instance

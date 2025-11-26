@@ -79,3 +79,27 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
                 },
             ],
         }
+
+    def test_change_link(self):
+        item = MastectomyOrLumpectomyHistoryItemFactory.build(
+            additional_details="Some additional details",
+        )
+
+        presenter = MastectomyOrLumpectomyHistoryItemPresenter(item)
+        assert presenter.change_link == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/mastectomy-or-lumpectomy-history/{item.pk}",
+            "text": "Change",
+            "visually_hidden_text": " mastectomy or lumpectomy item",
+        }
+
+    def test_change_link_with_counter(self):
+        item = MastectomyOrLumpectomyHistoryItemFactory.build(
+            additional_details="Some additional details",
+        )
+
+        presenter = MastectomyOrLumpectomyHistoryItemPresenter(item, counter=2)
+        assert presenter.change_link == {
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/mastectomy-or-lumpectomy-history/{item.pk}",
+            "text": "Change",
+            "visually_hidden_text": " mastectomy or lumpectomy item 2",
+        }
