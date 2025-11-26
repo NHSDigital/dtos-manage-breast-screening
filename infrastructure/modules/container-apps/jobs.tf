@@ -173,8 +173,4 @@ module "scheduled_jobs" {
 
   cron_expression = var.enable_notifications_jobs_schedule ? each.value.cron_expression : null
 
-  depends_on = [
-    module.queue_storage_role_assignment,
-    module.blob_storage_role_assignment
-  ]
 }
