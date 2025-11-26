@@ -54,7 +54,7 @@ class AddBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Benign lump history added",
+            "Benign lumps added",
         )
 
         return super().form_valid(form)
@@ -91,7 +91,7 @@ class UpdateBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Benign lump history updated",
+            "Benign lumps updated",
         )
 
         return super().form_valid(form)
