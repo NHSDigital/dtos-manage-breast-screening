@@ -80,3 +80,45 @@ a[href="#"] {
     }
   }
 }
+
+.app-status-bar {
+  background-color: #00386e;
+  color: #ffffff;
+  padding: 8px 0;
+  border-bottom: 1px solid #d8dde0;
+}
+
+.app-status-bar a {
+  color: #ffffff;
+}
+.app-status-bar a:hover,
+.app-status-bar a:active {
+  color: #ffffff;
+}
+.app-status-bar a:focus {
+  color: #212b32;
+}
+
+.app-status-bar__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: center;
+}
+
+.app-status-bar__row + .app-status-bar__row {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.app-status-bar__item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.app-status-bar__key {
+  font-weight: 600 !important;
+  opacity: 0.9;
+}

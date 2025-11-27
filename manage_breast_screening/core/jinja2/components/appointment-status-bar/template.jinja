@@ -1,0 +1,33 @@
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
+
+{% if presented_appointment.active %}
+  <div class="app-status-bar undefined app-status-bar--rows-2">
+    <div class="nhsuk-width-container">
+        <div class="app-status-bar__row">
+            <div class="app-status-bar__item">
+              <span class="app-status-bar__key">Appointment:</span>
+              <span>{{ presented_appointment.clinic_slot.slot_time_and_clinic_date }}</span>
+            </div>
+            <div class="app-status-bar__item">
+              {{ tag({
+              "text": presented_appointment.current_status.text,
+              "classes": presented_appointment.current_status.classes
+              }) }}
+            </div>
+        </div>
+        <div class="app-status-bar__row">
+            <div class="app-status-bar__item">
+              <strong>{{ presented_appointment.participant.full_name }}</strong>
+            </div>
+            <div class="app-status-bar__item">
+              <span class="app-status-bar__key">DOB:</span>
+              <span>{{ presented_appointment.participant.date_of_birth }} ({{ presented_appointment.participant.age }})</span>
+            </div>
+            <div class="app-status-bar__item">
+              <span class="app-status-bar__key">NHS:</span>
+              <span>{{ presented_appointment.participant.nhs_number }}</span>
+            </div>
+        </div>
+    </div>
+  </div>
+{% endif %}
