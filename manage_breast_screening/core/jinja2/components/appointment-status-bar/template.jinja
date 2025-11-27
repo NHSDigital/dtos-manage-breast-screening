@@ -1,7 +1,7 @@
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
 
 {% if presented_appointment.active %}
-  <div class="app-status-bar undefined app-status-bar--rows-2">
+  <div class="app-status-bar app-status-bar--rows-2">
     <div class="nhsuk-width-container">
         <div class="app-status-bar__row">
             <div class="app-status-bar__item">
@@ -13,6 +13,11 @@
               "text": presented_appointment.current_status.text,
               "classes": presented_appointment.current_status.classes
               }) }}
+              {% if presented_appointment.is_special_appointment %}
+              <strong class="nhsuk-tag nhsuk-tag--yellow nhsuk-u-nowrap">
+                Special appointment
+              </strong>
+              {% endif %}
             </div>
         </div>
         <div class="app-status-bar__row">
