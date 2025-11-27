@@ -12,3 +12,4 @@ nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1
 seed_demo_data                        = false
 allowed_paths                         = ["/notifications/message-status/create"]
 enable_alerting                       = true
+enable_notifications_jobs_schedule    = true
