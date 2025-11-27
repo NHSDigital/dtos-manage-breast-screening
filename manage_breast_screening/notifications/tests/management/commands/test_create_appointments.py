@@ -1,7 +1,11 @@
 import os
 from contextlib import contextmanager
 from datetime import datetime, timezone
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch, MagicMock
+
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 
 import pytest
 from azure.storage.blob import BlobProperties
@@ -59,6 +63,20 @@ def stored_blob_data(prefix_dir: str, filenames: list[str]):
             mock_blob_contents
         )
         yield
+        
+    @pytest.fixture(autouse=True)
+    def mock_insights_logger(request, monkeypatch):
+        if "skip_insights_mock" in request.keywords:
+            return
+        mock_insights_logger = MagicMock()
+        monkeypatch.setattr(ApplicationInsightsLogging, "exception", mock_insights_logger)
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "custom_event_warning", mock_insights_logger
+        )
+        monkeypatch.setattr(
+            ApplicationInsightsLogging, "custom_event_info", mock_insights_logger
+        )
+        return mock_insights_logger
 
 
 @pytest.mark.django_db
@@ -391,3 +409,23 @@ class TestCreateAppointments:
                 Command().handle(**{"date_str": today_dirname})
 
         assert Extract.objects.count() == 0
+
+    def test_extract_id_less_than_previous_extract(self, mock_insights_logger):
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+        
+        filename = f"{today_dirname}/{VALID_DATA_FILE}"
+        
+        raw_data = '"NBSSAPPT_HDR"|"00000013"|"20250128"|"170922"|"000001"'
+        
+        previous_raw_data = '"NBSSAPPT_HDR"|"00000012"|"20250128"|"170922"|"000001"'
+        
+        Command().create_extract(filename, raw_data)
+        
+        Command().create_extract(filename, previous_raw_data)
+        
+        assert Extract.objects.count() == 2
+        
+        mock_insights_logger.assert_called_with(
+            message="Warning: Extract ID 12 is less than last extract ID 13.",
+            event_name= "extract_non_sequential_error",
+        )

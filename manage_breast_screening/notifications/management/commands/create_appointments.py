@@ -5,7 +5,9 @@ from logging import getLogger
 
 import pandas
 from django.core.management.base import BaseCommand
-
+from manage_breast_screening.notifications.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
     CommandHandler,
 )
@@ -76,6 +78,22 @@ class Command(BaseCommand):
             "\n"
         )[0].split("|")
         formatted_extract_id = int(extract_id.replace('"', "").replace("\r", ""))
+        
+        if Extract.objects.filter(bso_code = bso_code).count() > 0:
+            previous_extract_sequence_number = Extract.objects.filter(bso_code = bso_code).last().sequence_number
+            
+            if formatted_extract_id < previous_extract_sequence_number:
+                
+                log_msg = "Warning: Extract ID %s is less than last extract ID %s." % (
+                    formatted_extract_id,
+                    previous_extract_sequence_number,
+                )
+                
+                ApplicationInsightsLogging().custom_event_warning(
+                    message=log_msg,
+                    event_name="extract_non_sequential_error",
+                )
+            
         formatted_record_count = int(record_count.replace('"', "").replace("\r", ""))
 
         return Extract.objects.create(
