@@ -218,7 +218,7 @@ class SymptomForm(FormWithConditionalFields):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
 
-        symptom = appointment.symptom_set.create(
+        symptom = appointment.symptoms.create(
             appointment=appointment,
             symptom_type_id=self.symptom_type,
             reported_at=date.today(),
