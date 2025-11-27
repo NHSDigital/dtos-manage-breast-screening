@@ -355,22 +355,22 @@ class TestCreateAppointments:
 
         assert appointment_to_update.extracts.count() == 2
 
-    @pytest.mark.django_db(transaction=True)
-    def test_errors_when_same_extract(self):
+    @pytest.mark.django_db
+    def test_skip_file_matching_extract(self):
+        """Test appointment creation where the file has been processed"""
         today_dirname = datetime.now().strftime("%Y-%m-%d")
+        filename = f"{today_dirname}/{VALID_DATA_FILE}"
+
+        Extract.objects.create(
+            sequence_number=13, filename=filename, bso_code="ABC", record_count=0
+        )
 
         with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
             Command().handle(**{"date_str": today_dirname})
 
         assert Extract.objects.count() == 1
-        assert Appointment.objects.count() == 2
-
-        with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
-            with pytest.raises(CommandError):
-                Command().handle(**{"date_str": today_dirname})
-
-        assert Extract.objects.count() == 1
-        assert Appointment.objects.count() == 2
+        assert Extract.objects.first().appointments.count() == 0
+        assert Appointment.objects.count() == 0
 
     @pytest.mark.django_db(transaction=True)
     def test_errors_with_wrong_format_filename(self):

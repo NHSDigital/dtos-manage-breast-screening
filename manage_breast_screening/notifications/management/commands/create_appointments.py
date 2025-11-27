@@ -46,6 +46,9 @@ class Command(BaseCommand):
             for blob in container_client.list_blobs(
                 name_starts_with=options["date_str"]
             ):
+                if Extract.objects.filter(filename=blob.name).exists():
+                    continue
+
                 blob_client = container_client.get_blob_client(blob.name)
                 logger.debug("Processing blob %s", blob.name)
                 blob_content = blob_client.download_blob(
