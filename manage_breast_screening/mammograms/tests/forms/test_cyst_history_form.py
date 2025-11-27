@@ -2,7 +2,6 @@ from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
-from django.test import RequestFactory
 
 from manage_breast_screening.participants.models.cyst_history_item import (
     CystHistoryItem,
@@ -13,13 +12,6 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 from ...forms.cyst_history_form import CystHistoryForm, CystHistoryUpdateForm
-
-
-@pytest.fixture
-def dummy_request(clinical_user):
-    request = RequestFactory().get("/test-form")
-    request.user = clinical_user
-    return request
 
 
 @pytest.mark.django_db

@@ -9,9 +9,15 @@ from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    BreastAugmentationHistoryItemFactory,
+)
 
-from ...forms.breast_augmentation_history_form import BreastAugmentationHistoryForm
+from ...forms.breast_augmentation_history_form import (
+    BreastAugmentationHistoryForm,
+    BreastAugmentationHistoryUpdateForm,
+)
 
 
 @pytest.mark.django_db
@@ -432,3 +438,77 @@ class TestBreastAugmentationHistoryForm:
         assert obj.implants_have_been_removed == ("implants_have_been_removed" in data)
         assert obj.removal_year == data.get("removal_year", None)
         assert obj.additional_details == data.get("additional_details", "")
+
+
+@pytest.mark.django_db
+class TestBreastAugmentationHistoryUpdateForm:
+    @pytest.fixture
+    def instance(self):
+        return BreastAugmentationHistoryItemFactory(
+            right_breast_procedures=[
+                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+            ],
+            left_breast_procedures=[
+                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+            ],
+            procedure_year=2000,
+            implants_have_been_removed=False,
+        )
+
+    def test_no_data(self, instance):
+        form = BreastAugmentationHistoryUpdateForm(instance, QueryDict())
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "left_breast_procedures": ["Select procedures for the left breast"],
+            "right_breast_procedures": ["Select procedures for the right breast"],
+        }
+
+    def test_initial(self, instance):
+        form = BreastAugmentationHistoryUpdateForm(instance, QueryDict())
+        assert form.initial == {
+            "right_breast_procedures": [
+                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+            ],
+            "left_breast_procedures": [
+                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+            ],
+            "procedure_year": 2000,
+            "removal_year": None,
+            "implants_have_been_removed": False,
+            "additional_details": "",
+        }
+
+    def test_success(self, instance, dummy_request):
+        form = BreastAugmentationHistoryUpdateForm(
+            instance,
+            QueryDict(
+                urlencode(
+                    {
+                        "right_breast_procedures": [
+                            BreastAugmentationHistoryItem.Procedure.OTHER_AUGMENTATION
+                        ],
+                        "left_breast_procedures": [
+                            BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+                        ],
+                        "procedure_year": "2001",
+                        "removal_year": "",
+                        "additional_details": "abc",
+                    },
+                    doseq=True,
+                )
+            ),
+        )
+
+        assert form.is_valid()
+
+        obj = form.update(request=dummy_request)
+        assert obj.right_breast_procedures == [
+            BreastAugmentationHistoryItem.Procedure.OTHER_AUGMENTATION
+        ]
+        assert obj.left_breast_procedures == [
+            BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+        ]
+        assert obj.procedure_year == 2001
+        assert obj.removal_year is None
+        assert obj.additional_details == "abc"

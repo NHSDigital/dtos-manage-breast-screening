@@ -8,15 +8,13 @@ from manage_breast_screening.nhsuk_forms.fields import (
     CharField,
     YearField,
 )
-from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
-    MultipleChoiceField,
-)
+from manage_breast_screening.nhsuk_forms.fields.choice_fields import MultipleChoiceField
 from manage_breast_screening.participants.models.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
 
 
-class BreastAugmentationHistoryForm(Form):
+class BreastAugmentationHistoryBaseForm(Form):
     right_breast_procedures = MultipleChoiceField(
         label="Right breast",
         label_classes="nhsuk-fieldset__legend--s",
@@ -80,19 +78,6 @@ class BreastAugmentationHistoryForm(Form):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
-        field_values = self.model_values()
-        breast_augmentation_history = (
-            appointment.breast_augmentation_history_items.create(
-                appointment=appointment,
-                **field_values,
-            )
-        )
-        auditor.audit_create(breast_augmentation_history)
-
-        return breast_augmentation_history
-
     def full_clean(self):
         # if a removal_year is provided then remove it if implants_have_been_removed is False
         if self.data.get("removal_year") and not self.data.get(
@@ -121,3 +106,50 @@ class BreastAugmentationHistoryForm(Form):
             )
 
         return cleaned_data
+
+
+class BreastAugmentationHistoryForm(BreastAugmentationHistoryBaseForm):
+    def create(self, appointment, request):
+        auditor = Auditor.from_request(request)
+        field_values = self.model_values()
+        breast_augmentation_history = (
+            appointment.breast_augmentation_history_items.create(
+                appointment=appointment,
+                **field_values,
+            )
+        )
+        auditor.audit_create(breast_augmentation_history)
+
+        return breast_augmentation_history
+
+
+class BreastAugmentationHistoryUpdateForm(BreastAugmentationHistoryBaseForm):
+    def __init__(self, instance, *args, **kwargs):
+        self.instance = instance
+
+        kwargs["initial"] = {
+            "right_breast_procedures": instance.right_breast_procedures,
+            "left_breast_procedures": instance.left_breast_procedures,
+            "procedure_year": instance.procedure_year,
+            "implants_have_been_removed": instance.implants_have_been_removed,
+            "removal_year": instance.removal_year,
+            "additional_details": instance.additional_details,
+        }
+
+        super().__init__(*args, **kwargs)
+
+    def update(self, request):
+        # fmt: off
+        self.instance.right_breast_procedures = self.cleaned_data["right_breast_procedures"]
+        self.instance.left_breast_procedures = self.cleaned_data["left_breast_procedures"]
+        self.instance.procedure_year = self.cleaned_data["procedure_year"]
+        self.instance.implants_have_been_removed = self.cleaned_data["implants_have_been_removed"]
+        self.instance.removal_year = self.cleaned_data["removal_year"]
+        self.instance.additional_details = self.cleaned_data["additional_details"]
+        # fmt: on
+
+        self.instance.save()
+
+        Auditor.from_request(request).audit_update(self.instance)
+
+        return self.instance

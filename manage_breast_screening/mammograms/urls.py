@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     appointment_views,
     benign_lump_history_item_views,
-    breast_augmentation_history_view,
+    breast_augmentation_history_views,
     breast_cancer_history_views,
     cyst_history_view,
     implanted_medical_device_history_view,
@@ -157,8 +157,13 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/",
-        breast_augmentation_history_view.AddBreastAugmentationHistoryView.as_view(),
+        breast_augmentation_history_views.AddBreastAugmentationHistoryView.as_view(),
         name="add_breast_augmentation_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>",
+        breast_augmentation_history_views.ChangeBreastAugmentationHistoryView.as_view(),
+        name="change_breast_augmentation_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/benign-lump-history/",
