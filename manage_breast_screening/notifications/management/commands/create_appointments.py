@@ -14,6 +14,7 @@ from manage_breast_screening.notifications.models import (
     Appointment,
     AppointmentStatusChoices,
     Clinic,
+    Extract,
 )
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 
@@ -53,6 +54,8 @@ class Command(BaseCommand):
 
                 data_frame = self.raw_data_to_data_frame(blob_content)
 
+                extract = self.create_extract(blob.name, blob_content)
+
                 for idx, row in data_frame.iterrows():
                     if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
@@ -62,7 +65,25 @@ class Command(BaseCommand):
                         appt, appt_created = self.update_or_create_appointment(
                             row, clinic
                         )
+
+                        extract.appointments.add(appt) if appt is not None else None
+
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
+
+    def create_extract(self, filename: str, raw_data: str) -> Extract:
+        bso_code = filename.split("/")[1].split("_")[0]
+        type_id, extract_id, start_date, start_time, record_count = raw_data.split(
+            "\n"
+        )[0].split("|")
+        formatted_extract_id = int(extract_id.replace('"', "").replace("\r", ""))
+        formatted_record_count = int(record_count.replace('"', "").replace("\r", ""))
+
+        return Extract.objects.create(
+            sequence_number=formatted_extract_id,
+            bso_code=bso_code,
+            filename=filename,
+            record_count=formatted_record_count,
+        )
 
     def is_not_holding_clinic(self, row):
         return row.get("Holding Clinic") != "Y"
