@@ -85,7 +85,7 @@ class ChangeSymptomView(BaseSymptomFormView):
         kwargs = super().get_form_kwargs()
 
         try:
-            instance = Symptom.objects.get(
+            instance = self.appointment.symptoms.get(
                 pk=self.kwargs["symptom_pk"],
                 appointment_id=self.kwargs["pk"],
                 **self.extra_filters(),
