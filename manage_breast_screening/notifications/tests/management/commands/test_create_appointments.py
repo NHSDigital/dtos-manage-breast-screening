@@ -356,7 +356,11 @@ class TestCreateAppointments:
         assert appointment_to_update.extracts.count() == 2
 
     @pytest.mark.django_db(transaction=True)
-    def test_errors_when_same_extract(self):
+    def test_skips_processing_when_extract_already_exists(self):
+        """
+        Test that processing the same extract twice skips processing.
+        (Smoke tests which may process the same data multiple times.)
+        """
         today_dirname = datetime.now().strftime("%Y-%m-%d")
 
         with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
@@ -364,13 +368,16 @@ class TestCreateAppointments:
 
         assert Extract.objects.count() == 1
         assert Appointment.objects.count() == 2
+        first_extract = Extract.objects.first()
+        assert first_extract.appointments.count() == 2
 
         with stored_blob_data(today_dirname, [VALID_DATA_FILE]):
-            with pytest.raises(CommandError):
-                Command().handle(**{"date_str": today_dirname})
+            Command().handle(**{"date_str": today_dirname})
 
         assert Extract.objects.count() == 1
         assert Appointment.objects.count() == 2
+        assert Extract.objects.first().id == first_extract.id
+        assert Extract.objects.first().appointments.count() == 2
 
     @pytest.mark.django_db(transaction=True)
     def test_errors_with_wrong_format_filename(self):
