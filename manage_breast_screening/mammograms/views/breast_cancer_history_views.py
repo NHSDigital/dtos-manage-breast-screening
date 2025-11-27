@@ -156,6 +156,9 @@ class DeleteBreastCancerHistoryView(DeleteWithAuditView):
     def get_thing_name(self, object):
         return "item"
 
+    def get_success_message_content(self, object):
+        return "Deleted breast cancer"
+
     def get_object(self):
         provider = self.request.user.current_provider
         appointment = provider.appointments.get(pk=self.kwargs["pk"])

@@ -205,7 +205,7 @@ class TestDeleteSymptomView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Deleted item",
+                    message="Deleted breast cancer",
                 )
             ],
         )
