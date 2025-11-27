@@ -251,7 +251,7 @@ class ChangeOtherSymptomView(ChangeSymptomView):
 class DeleteSymptomView(View):
     def get(self, request, *args, **kwargs):
         try:
-            symptom = Symptom.objects.get(pk=kwargs["symptom_pk"])
+            symptom = self._get_symptom()
         except Symptom.DoesNotExist:
             raise Http404("Symptom not found")
 
@@ -287,9 +287,10 @@ class DeleteSymptomView(View):
 
     def post(self, request, *args, **kwargs):
         try:
-            symptom = Symptom.objects.get(pk=kwargs["symptom_pk"])
+            symptom = self._get_symptom()
         except Symptom.DoesNotExist:
             raise Http404("Symptom not found")
+
         auditor = Auditor.from_request(request)
 
         presenter = SymptomPresenter(symptom)
@@ -304,3 +305,8 @@ class DeleteSymptomView(View):
         )
 
         return redirect("mammograms:record_medical_information", pk=kwargs["pk"])
+
+    def _get_symptom(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.symptoms.get(pk=self.kwargs["symptom_pk"])
