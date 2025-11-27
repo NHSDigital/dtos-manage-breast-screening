@@ -1,4 +1,4 @@
-"NBSSAPPT_HDR"|"00000013"|"20250101"|"170922"|"000003"
+"NBSSAPPT_HDR"|"88888888"|"20250101"|"170922"|"000003"
 "NBSSAPPT_FLDS"|"Sequence"|"BSO"|"Action"|"Clinic Code"|"Holding Clinic"|"Status"|"Attended Not Scr"|"Appointment ID"|"NHS Num"|"Epsiode Type"|"Episode Start"|"BatchID"|"Screen or Asses"|"Screen Appt num"|"Booked By"|"Cancelled By"|"Appt Date"|"Appt Time"|"Location"|"Clinic Name"|"Clinic Name (Let)"|"Clinic Address 1"|"Clinic Address 2"|"Clinic Address 3"|"Clinic Address 4"|"Clinic Address 5"|"Postcode"|"Action Timestamp"
 "NBSSAPPT_DATA"|"000003"|"SM0K3"|"B"|"SM0K3"|"N"|"B"|"N"|"SM0K3-0000000000"|"9449306621"|"F"|"20250101"|"SM0K0000"|"S"|"1"|"H"|""|"20250101"|"1445"|"SMOK"|"SMOKE TEST CLINIC"|"SMOKE TEST CLINIC"|"SMOKE TEST UNIT"|"NOT A REAL HOSPITAL"|"SMOKE TEST LANE"|"LONDON"|"E5 0AB"|"E5 0AB"|"20250101-154004"
 "NBSSAPPT_END"|"00000013"|"20250101"|"17:09:22"|"000003"
