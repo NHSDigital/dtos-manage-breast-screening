@@ -90,8 +90,10 @@ def populate_env_secret_from_azure_containerapp(
 
 
 def smoke_test_data() -> str:
+    minutes_since_epoch = int(time.time() / 60)
     data = open(f"{WORK_DIR}/smoke_test_data.dat").read()
     data = data.replace("20250101", datetime.now().strftime("%Y%m%d"))
+    data = data.replace("88888888", str(minutes_since_epoch))
     return data.replace("SM0K3-0000000000", f"SM0K3-{time.time_ns()}")
 
 
