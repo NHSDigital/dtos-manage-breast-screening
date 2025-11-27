@@ -8,6 +8,8 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import OuterRef, Subquery
 
+from manage_breast_screening.participants.models.symptom import Symptom
+
 from ..auth.models import Role
 from ..core.models import BaseModel
 from ..participants.models import Appointment, Participant
@@ -32,6 +34,12 @@ class Provider(BaseModel):
         return Participant.objects.filter(
             screeningepisode__appointment__clinic_slot__clinic__setting__provider=self
         ).distinct()
+
+    @property
+    def symptoms(self):
+        return Symptom.objects.filter(
+            appointment__clinic_slot__clinic__setting__provider=self
+        )
 
 
 class Setting(BaseModel):
