@@ -1,6 +1,8 @@
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.core.utils.string_formatting import format_nhs_number
+from manage_breast_screening.participants.models import AppointmentStatus
 from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
     BenignLumpHistoryItem,
 )
@@ -21,6 +23,7 @@ class TestBenignLumpHistory(SystemTestCase):
         self.and_i_am_on_the_record_medical_information_page()
         self.when_i_click_on_benign_lumps()
         self.then_i_see_the_add_benign_lump_history_form()
+        self.and_i_see_the_appointment_status_bar()
         self.when_i_try_to_save_without_entering_benign_lump_details()
         self.then_i_see_validation_errors_for_missing_benign_lump_details()
 
@@ -63,6 +66,10 @@ class TestBenignLumpHistory(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
+            current_status_params={
+                "state": AppointmentStatus.IN_PROGRESS,
+                "created_by": self.current_user,
+            },
         )
 
     def and_i_am_on_the_record_medical_information_page(self):
@@ -73,6 +80,13 @@ class TestBenignLumpHistory(SystemTestCase):
                 kwargs={"pk": self.appointment.pk},
             )
         )
+
+    def and_i_see_the_appointment_status_bar(self):
+        status_bar = self.page.locator("div.app-status-bar")
+        expect(status_bar).to_contain_text(
+            format_nhs_number(self.participant.nhs_number)
+        )
+        expect(status_bar).to_contain_text(self.participant.full_name)
 
     def when_i_click_on_benign_lumps(self):
         self.page.get_by_role("button").filter(has_text="Benign lumps").click()
