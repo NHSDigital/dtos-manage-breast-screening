@@ -359,7 +359,7 @@ class TestCreateAppointments:
     def test_skips_processing_when_extract_already_exists(self):
         """
         Test that processing the same extract twice skips processing.
-        (Smoke tests which may process the same data multiple times.)
+        (Smoke tests may process the same data multiple times.)
         """
         today_dirname = datetime.now().strftime("%Y-%m-%d")
 
