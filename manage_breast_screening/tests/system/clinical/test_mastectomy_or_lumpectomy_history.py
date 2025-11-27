@@ -27,6 +27,14 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         self.and_the_mastectomy_or_lumpectomy_is_listed()
         self.and_the_message_says_mastectomy_or_lumpectomy_added()
 
+        self.when_i_click_change()
+        self.then_i_see_the_edit_mastectomy_or_lumpectomy_form()
+        self.when_i_update_additional_details()
+        self.and_i_click_save()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_mastectomy_or_lumpectomy_is_updated()
+        self.and_the_message_says_mastectomy_or_lumpectomy_updated()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -157,3 +165,33 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
 
         expect(alert).to_contain_text("Success")
         expect(alert).to_contain_text("Details of mastectomy or lumpectomy added")
+
+    def when_i_click_change(self):
+        self.page.get_by_text("Change mastectomy or lumpectomy item").click()
+
+    def then_i_see_the_edit_mastectomy_or_lumpectomy_form(self):
+        expect(
+            self.page.get_by_text("Edit details of mastectomy or lumpectomy")
+        ).to_be_visible()
+        self.assert_page_title_contains("Details of the mastectomy or lumpectomy")
+
+    def when_i_update_additional_details(self):
+        self.page.get_by_label("Additional details (optional)", exact=True).fill(
+            "updated additional details for test of mastectomy or lumpectomy details"
+        )
+
+    def and_the_mastectomy_or_lumpectomy_is_updated(self):
+        key = self.page.locator(
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Mastectomy or lumpectomy history", exact=True),
+        )
+        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        expect(row).to_contain_text(
+            "updated additional details for test of mastectomy or lumpectomy details"
+        )
+
+    def and_the_message_says_mastectomy_or_lumpectomy_updated(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Details of mastectomy or lumpectomy updated")

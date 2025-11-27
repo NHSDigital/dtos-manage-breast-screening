@@ -170,4 +170,9 @@ urlpatterns = [
         mastectomy_or_lumpectomy_history_view.AddMastectomyOrLumpectomyHistoryView.as_view(),
         name="add_mastectomy_or_lumpectomy_history_item",
     ),
+    path(
+        "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>",
+        mastectomy_or_lumpectomy_history_view.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
+        name="change_mastectomy_or_lumpectomy_history_item",
+    ),
 ]

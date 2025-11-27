@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
 from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
@@ -5,8 +7,12 @@ from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_histor
 
 
 class MastectomyOrLumpectomyHistoryItemPresenter:
-    def __init__(self, mastectomy_or_lumpectomy_history_item):
+    def __init__(self, mastectomy_or_lumpectomy_history_item, counter=None):
         self._item = mastectomy_or_lumpectomy_history_item
+
+        # If there are more than one of these items, we add a counter to the
+        # visually hidden text
+        self.counter = counter
 
         self.right_breast_procedure = self._item.get_right_breast_procedure_display()
         self.left_breast_procedure = self._item.get_left_breast_procedure_display()
@@ -75,3 +81,21 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
 
     def _format_multiple_choices(self, choices, ChoiceClass):
         return ", ".join(ChoiceClass(choice).label for choice in choices)
+
+    @property
+    def change_link(self):
+        return {
+            "href": reverse(
+                "mammograms:change_mastectomy_or_lumpectomy_history_item",
+                kwargs={
+                    "pk": self._item.appointment_id,
+                    "history_item_pk": self._item.pk,
+                },
+            ),
+            "text": "Change",
+            "visually_hidden_text": (
+                f" mastectomy or lumpectomy item {self.counter}"
+                if self.counter
+                else " mastectomy or lumpectomy item"
+            ),
+        }

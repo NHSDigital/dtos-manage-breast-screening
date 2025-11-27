@@ -9,23 +9,27 @@ from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    MastectomyOrLumpectomyHistoryItemFactory,
+)
 
 from ...forms.mastectomy_or_lumpectomy_history_form import (
     MastectomyOrLumpectomyHistoryForm,
 )
 
 
+@pytest.fixture
+def dummy_request(clinical_user):
+    request = RequestFactory().get("/test-form")
+    request.user = clinical_user
+    return request
+
+
 @pytest.mark.django_db
 class TestMastectomyOrLumpectomyHistoryItemForm:
-    def test_missing_required_fields(self, clinical_user):
-        appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
-        form = MastectomyOrLumpectomyHistoryForm(
-            QueryDict(), participant=appointment.participant
-        )
+    def test_missing_required_fields(self):
+        form = MastectomyOrLumpectomyHistoryForm(QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -44,13 +48,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             "surgery_reason": ["Select the reason for surgery"],
         }
 
-    def test_right_breast_other_surgery_no_other_surgery_and_others(
-        self, clinical_user
-    ):
-        appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
+    def test_right_breast_other_surgery_no_other_surgery_and_others(self):
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(
                 urlencode(
@@ -70,7 +68,6 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
                     doseq=True,
                 ),
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -80,11 +77,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             ],
         }
 
-    def test_left_breast_other_surgery_no_other_surgery_and_others(self, clinical_user):
-        appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
+    def test_left_breast_other_surgery_no_other_surgery_and_others(self):
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(
                 urlencode(
@@ -103,7 +96,6 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
                     doseq=True,
                 ),
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -123,11 +115,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             3000,
         ],
     )
-    def test_year_of_surgery_outside_range(self, clinical_user, year_of_surgery):
-        appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
+    def test_year_of_surgery_outside_range(self, year_of_surgery):
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(
                 urlencode(
@@ -146,7 +134,6 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
                     doseq=True,
                 ),
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -156,11 +143,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             ],
         }
 
-    def test_year_of_surgery_invalid(self, clinical_user):
-        appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
+    def test_year_of_surgery_invalid(self):
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(
                 urlencode(
@@ -179,7 +162,6 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
                     doseq=True,
                 ),
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -187,11 +169,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             "year_of_surgery": ["Enter a whole number."],
         }
 
-    def test_other_reason_without_details(self, clinical_user):
-        appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
+    def test_other_reason_without_details(self):
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(
                 urlencode(
@@ -209,7 +187,6 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
                     doseq=True,
                 ),
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -217,10 +194,8 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             "surgery_other_reason_details": ["Provide details of the surgery"],
         }
 
-    def test_other_reason_details_when_not_other_reason(self, clinical_user):
+    def test_other_reason_details_when_not_other_reason(self, dummy_request):
         appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
 
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(
@@ -240,12 +215,11 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
                     doseq=True,
                 ),
             ),
-            participant=appointment.participant,
         )
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=request)
+        obj = form.create(appointment=appointment, request=dummy_request)
         obj.refresh_from_db()
 
         assert obj.appointment == appointment
@@ -315,20 +289,17 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             },
         ],
     )
-    def test_success(self, clinical_user, data):
+    def test_success(self, clinical_user, data, dummy_request):
         appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
 
         form = MastectomyOrLumpectomyHistoryForm(
             QueryDict(urlencode(data, doseq=True)),
-            participant=appointment.participant,
         )
 
         assert form.is_valid()
 
         existing_log_count = AuditLog.objects.count()
-        obj = form.create(appointment=appointment, request=request)
+        obj = form.create(appointment=appointment, request=dummy_request)
         assert AuditLog.objects.count() == existing_log_count + 1
         audit_log = AuditLog.objects.filter(
             object_id=obj.pk, operation=AuditLog.Operations.CREATE
@@ -356,3 +327,84 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             if request_year > max_year
             else (f"Year must be {min_year} or later")
         )
+
+
+@pytest.mark.django_db
+class TestUpdateMastectomyOrLumpectomyHistoryForm:
+    @pytest.fixture
+    def instance(self):
+        return MastectomyOrLumpectomyHistoryItemFactory(
+            right_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
+            left_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
+            right_breast_other_surgery=[
+                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
+            ],
+            left_breast_other_surgery=[
+                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
+            ],
+            year_of_surgery=None,
+            surgery_reason=MastectomyOrLumpectomyHistoryItem.SurgeryReason.RISK_REDUCTION,
+            additional_details="",
+        )
+
+    def test_no_data(self, instance):
+        form = MastectomyOrLumpectomyHistoryForm(QueryDict(), instance=instance)
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "right_breast_procedure": [
+                "Select which procedure they have had in the right breast",
+            ],
+            "left_breast_procedure": [
+                "Select which procedure they have had in the left breast",
+            ],
+            "right_breast_other_surgery": [
+                "Select any other surgery they have had in the right breast",
+            ],
+            "left_breast_other_surgery": [
+                "Select any other surgery they have had in the left breast",
+            ],
+            "surgery_reason": ["Select the reason for surgery"],
+        }
+
+    @pytest.mark.parametrize(
+        "data",
+        [
+            {
+                "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                "right_breast_other_surgery": [
+                    MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                ],
+                "left_breast_other_surgery": [
+                    MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                ],
+                "year_of_surgery": datetime.date.today().year,
+                "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON,
+                "surgery_other_reason_details": "surgery other details",
+                "additional_details": "additional details",
+            },
+        ],
+    )
+    def test_success(self, instance, data, dummy_request):
+        form = MastectomyOrLumpectomyHistoryForm(
+            QueryDict(urlencode(data, doseq=True)),
+            instance=instance,
+        )
+
+        assert form.is_valid()
+
+        obj = form.update(request=dummy_request)
+
+        obj.refresh_from_db()
+        assert obj.appointment == instance.appointment
+        assert obj.right_breast_procedure == data.get("right_breast_procedure")
+        assert obj.left_breast_procedure == data.get("left_breast_procedure")
+        assert obj.right_breast_other_surgery == data.get("right_breast_other_surgery")
+        assert obj.left_breast_other_surgery == data.get("left_breast_other_surgery")
+        assert obj.year_of_surgery == data.get("year_of_surgery", None)
+        assert obj.surgery_reason == data.get("surgery_reason", "")
+        assert obj.surgery_other_reason_details == data.get(
+            "surgery_other_reason_details", ""
+        )
+        assert obj.additional_details == data.get("additional_details", "")

@@ -49,3 +49,7 @@ class MastectomyOrLumpectomyHistoryItem(BaseModel):
     surgery_reason = models.CharField(choices=SurgeryReason)
     surgery_other_reason_details = models.CharField(blank=True, null=False, default="")
     additional_details = models.TextField(blank=True, null=False, default="")
+
+    @property
+    def participant(self):
+        return self.appointment.participant

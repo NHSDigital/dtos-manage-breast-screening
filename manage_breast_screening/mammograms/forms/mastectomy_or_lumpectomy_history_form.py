@@ -90,7 +90,21 @@ class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
         error_messages={"max_words": "Additional details must be 500 words or less"},
     )
 
-    def __init__(self, *args, participant, **kwargs):
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance", None)
+
+        if self.instance:
+            kwargs["initial"] = {
+                "left_breast_procedure": self.instance.left_breast_procedure,
+                "right_breast_procedure": self.instance.right_breast_procedure,
+                "left_breast_other_surgery": self.instance.left_breast_other_surgery,
+                "right_breast_other_surgery": self.instance.right_breast_other_surgery,
+                "year_of_surgery": self.instance.year_of_surgery,
+                "surgery_reason": self.instance.surgery_reason,
+                "surgery_other_reason_details": self.instance.surgery_other_reason_details,
+                "additional_details": self.instance.additional_details,
+            }
+
         super().__init__(*args, **kwargs)
 
         self.given_field_value(
@@ -132,3 +146,26 @@ class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
         auditor.audit_create(mastectomy_or_lumpectomy_history)
 
         return mastectomy_or_lumpectomy_history
+
+    def update(self, request):
+        self.instance.left_breast_procedure = self.cleaned_data["left_breast_procedure"]
+        self.instance.right_breast_procedure = self.cleaned_data[
+            "right_breast_procedure"
+        ]
+        self.instance.left_breast_other_surgery = self.cleaned_data[
+            "left_breast_other_surgery"
+        ]
+        self.instance.right_breast_other_surgery = self.cleaned_data[
+            "right_breast_other_surgery"
+        ]
+        self.instance.year_of_surgery = self.cleaned_data["year_of_surgery"]
+        self.instance.surgery_reason = self.cleaned_data["surgery_reason"]
+        self.instance.surgery_other_reason_details = self.cleaned_data[
+            "surgery_other_reason_details"
+        ]
+        self.instance.additional_details = self.cleaned_data["additional_details"]
+        self.instance.save()
+
+        Auditor.from_request(request).audit_update(self.instance)
+
+        return self.instance
