@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
+from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.mammograms.forms.breast_cancer_history_form import (
     BreastCancerHistoryForm,
     BreastCancerHistoryUpdateForm,
@@ -84,7 +85,7 @@ class ChangeBreastCancerHistoryView(BaseBreastCancerHistoryView):
 
     def get_instance(self):
         try:
-            return BreastCancerHistoryItem.objects.get(
+            return self.appointment.breast_cancer_history_items.get(
                 pk=self.kwargs["history_item_pk"],
                 appointment_id=self.kwargs["pk"],
             )
@@ -134,7 +135,36 @@ class ChangeBreastCancerHistoryView(BaseBreastCancerHistoryView):
             {
                 "heading": "Edit details of breast cancer",
                 "page_title": "Edit details of breast cancer",
+                "delete_link": {
+                    "text": "Delete this item",
+                    "class": "nhsuk-link app-link--warning",
+                    "href": reverse(
+                        "mammograms:delete_breast_cancer_history_item",
+                        kwargs={
+                            "pk": self.kwargs["pk"],
+                            "history_item_pk": self.kwargs["history_item_pk"],
+                        },
+                    ),
+                },
             },
         )
 
         return context
+
+
+class DeleteBreastCancerHistoryView(DeleteWithAuditView):
+    def get_thing_name(self, object):
+        return "item"
+
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.breast_cancer_history_items.get(
+            pk=self.kwargs["history_item_pk"]
+        )
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.kwargs["pk"]},
+        )

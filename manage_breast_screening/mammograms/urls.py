@@ -136,6 +136,11 @@ urlpatterns = [
         name="change_breast_cancer_history_item",
     ),
     path(
+        "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/delete",
+        breast_cancer_history_views.DeleteBreastCancerHistoryView.as_view(),
+        name="delete_breast_cancer_history_item",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/",
         implanted_medical_device_history_view.AddImplantedMedicalDeviceHistoryView.as_view(),
         name="add_implanted_medical_device_history_item",
