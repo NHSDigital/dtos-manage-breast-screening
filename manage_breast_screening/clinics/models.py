@@ -8,6 +8,9 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import OuterRef, Subquery
 
+from manage_breast_screening.participants.models.breast_cancer_history_item import (
+    BreastCancerHistoryItem,
+)
 from manage_breast_screening.participants.models.symptom import Symptom
 
 from ..auth.models import Role
@@ -38,6 +41,12 @@ class Provider(BaseModel):
     @property
     def symptoms(self):
         return Symptom.objects.filter(
+            appointment__clinic_slot__clinic__setting__provider=self
+        )
+
+    @property
+    def breast_cancer_history_items(self):
+        return BreastCancerHistoryItem.objects.filter(
             appointment__clinic_slot__clinic__setting__provider=self
         )
 

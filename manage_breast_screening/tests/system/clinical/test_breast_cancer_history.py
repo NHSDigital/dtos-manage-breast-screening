@@ -40,6 +40,12 @@ class TestBreastCancerHistory(SystemTestCase):
         self.and_the_history_item_shows_the_radiotherapy()
         self.and_the_message_says_breast_cancer_history_updated()
 
+        self.when_i_click_change()
+        self.and_i_click_delete_this_item()
+        self.and_i_click_delete_item()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_history_item_is_gone()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -194,3 +200,19 @@ class TestBreastCancerHistory(SystemTestCase):
 
         expect(alert).to_contain_text("Success")
         expect(alert).to_contain_text("Breast cancer history updated")
+
+    def and_i_click_delete_this_item(self):
+        self.page.get_by_text("Delete this item").click()
+
+    def and_i_click_delete_item(self):
+        self.page.get_by_text("Delete item").click()
+
+    def and_the_history_item_is_gone(self):
+        key = self.page.locator(
+            ".nhsuk-summary-list__key",
+            has=self.page.get_by_text("Breast cancer history", exact=True),
+        )
+        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        expect(row).not_to_contain_text("Cancer location")
+        expect(row.get_by_text("Change")).not_to_be_attached()
+        expect(row.get_by_text("Add breast cancer history")).to_be_attached()
