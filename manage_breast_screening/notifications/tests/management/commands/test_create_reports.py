@@ -56,26 +56,17 @@ class TestCreateReports:
 
         mock_read_sql, mock_blob_storage, mock_email_service = md
 
-        assert mock_read_sql.call_count == 2
-        assert mock_blob_storage.add.call_count == 2
+        assert mock_read_sql.call_count == 1
+        assert mock_blob_storage.add.call_count == 1
         assert mock_email_service.send_reports_email.call_count == 1
 
         for bso_code in Command.BSO_CODES:
             mock_read_sql.assert_any_call(
-                Helper.sql("failures"), connection, params=[now.date(), bso_code]
-            )
-            mock_read_sql.assert_any_call(
                 Helper.sql("reconciliation"), connection, params=["3 months", bso_code]
             )
 
-            failures_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-invites-not-sent-report.csv"
             reconciliation_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-reconciliation-report.csv"
 
-            mock_blob_storage.add.assert_any_call(
-                failures_filename,
-                csv_data,
-                content_type="text/csv",
-            )
             mock_blob_storage.add.assert_any_call(
                 reconciliation_filename,
                 csv_data,
@@ -84,7 +75,6 @@ class TestCreateReports:
 
             mock_email_service.send_reports_email.assert_called_once_with(
                 {
-                    failures_filename: csv_data,
                     reconciliation_filename: csv_data,
                 }
             )
