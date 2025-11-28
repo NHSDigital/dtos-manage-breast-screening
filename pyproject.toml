@@ -3,7 +3,7 @@ name = "manage-breast-screening"
 version = "0.1.0"
 description = ""
 authors = [{ name = "Your Name", email = "you@example.com" }]
-requires-python = ">=3.13,<4.0.0"
+requires-python = ">=3.14,<4.0.0"
 readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
@@ -62,7 +62,7 @@ addopts = "--doctest-modules"
 markers = [
   "system: mark a test as a system test",
   "integration: mark a test as an integration test",
-  "skip_insights_mock: don't auto use the mock_insights_logging fixture"
+  "skip_insights_mock: don't auto use the mock_insights_logging fixture",
 ]
 
 [tool.ruff]
