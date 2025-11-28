@@ -65,6 +65,9 @@ class TestCreateAppointmentsFromAzureStorage:
         assert appointments[0].nhs_number == 9449305552
         assert appointments[1].nhs_number == 9449306621
 
+        assert appointments[0].originating_file == [blob_name]
+        assert appointments[1].originating_file == [blob_name]
+
         assert appointments[0].starts_at == datetime(
             2025, 3, 14, 13, 45, tzinfo=ZONE_INFO
         )
@@ -98,3 +101,7 @@ class TestCreateAppointmentsFromAzureStorage:
         assert booked_then_cancelled.cancelled_at is not None
         assert assessment.created_at < booked_then_cancelled.updated_at
         assert booked_then_cancelled.booked_at < booked_then_cancelled.cancelled_at
+        assert booked_then_cancelled.originating_file == [
+            f"{today_dirname}/{test_file_names[0]}",
+            f"{today_dirname}/{test_file_names[1]}",
+        ]

@@ -66,7 +66,7 @@ class Command(BaseCommand):
                             logger.info("%s created", clinic)
 
                         appt, appt_created = self.update_or_create_appointment(
-                            row, clinic
+                            row, clinic, blob.name
                         )
 
                         extract.appointments.add(appt) if appt is not None else None
@@ -122,7 +122,7 @@ class Command(BaseCommand):
         )
 
     def update_or_create_appointment(
-        self, row: pandas.Series, clinic: Clinic
+        self, row: pandas.Series, clinic: Clinic, blob_name: str
     ) -> tuple[Appointment | None, bool]:
         appointment = Appointment.objects.filter(nbss_id=row["Appointment ID"]).first()
 
@@ -149,6 +149,7 @@ class Command(BaseCommand):
                     )
                     == "A"
                 ),
+                originating_file=[blob_name],
             )
             logger.info("%s created", new_appointment)
             return (new_appointment, True)
@@ -158,6 +159,7 @@ class Command(BaseCommand):
             appointment.cancelled_at = self.workflow_action_date_and_time(
                 row["Action Timestamp"]
             )
+            appointment.originating_file.append(blob_name)
             appointment.save()
             logger.info("%s cancelled", appointment)
         elif self.is_completed_appointment(row, appointment):
@@ -166,6 +168,7 @@ class Command(BaseCommand):
             appointment.completed_at = self.workflow_action_date_and_time(
                 row["Action Timestamp"]
             )
+            appointment.originating_file.append(blob_name)
             appointment.save()
             logger.info("%s marked completed (%s)", appointment, row.get("Status"))
         elif appointment is None:
