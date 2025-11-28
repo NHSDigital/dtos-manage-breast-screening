@@ -49,3 +49,4 @@ AND   (
   CAST(appt.number AS INTEGER) > 1 OR
   appt.episode_type IN ('H', 'N', 'T')
 )
+ORDER BY appt.created_at

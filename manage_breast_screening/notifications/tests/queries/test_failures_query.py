@@ -33,6 +33,7 @@ class TestFailuresQuery:
 
         return appt
 
+    @time_machine.travel(datetime.now(tz=ZONE_INFO), tick=False)
     @pytest.mark.django_db
     def test_failures_query_data_today(self):
         appt_time = datetime.now(tz=ZONE_INFO)
@@ -189,6 +190,7 @@ class TestFailuresQuery:
         for idx, res in enumerate(results):
             assert expectations[idx] == list(res)
 
+    @time_machine.travel(datetime.now(tz=ZONE_INFO), tick=False)
     @pytest.mark.django_db
     def test_failures_query_for_given_date(self):
         the_date = datetime.now(tz=ZONE_INFO) - timedelta(days=2)
