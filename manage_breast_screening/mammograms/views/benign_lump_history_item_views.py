@@ -1,5 +1,9 @@
+import logging
+from typing import Any
+
 from django.contrib import messages
 from django.http import Http404
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
@@ -11,6 +15,8 @@ from manage_breast_screening.participants.models.benign_lump_history_item import
 )
 
 from .mixins import InProgressAppointmentMixin
+
+logger = logging.getLogger(__name__)
 
 
 class BaseBenignLumpHistoryItemView(InProgressAppointmentMixin, FormView):
@@ -71,18 +77,31 @@ class AddBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
 
 
 class UpdateBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-
+    def get_instance(self):
         try:
-            instance = BenignLumpHistoryItem.objects.get(
+            return BenignLumpHistoryItem.objects.get(
                 pk=self.kwargs["history_item_pk"],
                 appointment_id=self.kwargs["pk"],
             )
         except BenignLumpHistoryItem.DoesNotExist:
-            raise Http404("Benign lump history item not found")
-        kwargs["instance"] = instance
+            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+            return None
 
+    def get(self, request, *args, **kwargs):
+        self.instance = self.get_instance()
+        if self.instance is None:
+            return redirect(self.get_success_url())
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.instance = self.get_instance()
+        if self.instance is None:
+            raise Http404
+        return super().post(request, *args, **kwargs)
+
+    def get_form_kwargs(self) -> dict[str, Any]:
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = self.instance
         return kwargs
 
     def form_valid(self, form):
