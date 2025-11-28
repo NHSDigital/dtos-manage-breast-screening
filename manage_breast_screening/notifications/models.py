@@ -225,7 +225,8 @@ class Extract(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     appointments = models.ManyToManyField(
-        "notifications.Appointment", blank=True, related_name="extracts")
+        "notifications.Appointment", blank=True, related_name="extracts"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     filename = models.CharField(max_length=255, null=False)
     bso_code = models.CharField(max_length=255, null=False)

@@ -8,10 +8,8 @@ from django.db import connection
 from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
     CommandHandler,
 )
-from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
-from manage_breast_screening.notifications.services.nhs_mail import NhsMail
 
 logger = getLogger(__name__)
 INSIGHTS_JOB_NAME = "CreateReports"
@@ -24,12 +22,10 @@ class ReportConfig:
         self,
         name: str,
         params: list,
-        send_email: bool = False,
         query: str | None = None,
     ):
         self.name = name
         self.params = params
-        self.send_email = send_email
         self.query = query or name
 
 
@@ -43,13 +39,10 @@ class Command(BaseCommand):
 
     BSO_CODES = ["MBD"]
     REPORTS = [
-        ReportConfig(
-            "invites-not-sent", [datetime.now(tz=ZONE_INFO).date()], True, "failures"
-        ),
-        ReportConfig("reconciliation", ["3 months"], True),
+        ReportConfig("reconciliation", ["3 months"]),
     ]
     SMOKE_TEST_BSO_CODE = "SM0K3"
-    SMOKE_TEST_CONFIG = ReportConfig("reconciliation", ["1 week"], False)
+    SMOKE_TEST_CONFIG = ReportConfig("reconciliation", ["1 week"])
 
     def add_arguments(self, parser):
         parser.add_argument("--smoke-test", action="store_true")
@@ -59,7 +52,6 @@ class Command(BaseCommand):
             logger.info("Create Report Command started")
 
             bso_codes, report_configs = self.configuration(options)
-            external_reports = {}
 
             for bso_code in bso_codes:
                 for report_config in report_configs:
@@ -74,14 +66,7 @@ class Command(BaseCommand):
 
                     BlobStorage().add(filename, csv, content_type="text/csv")
 
-                    if report_config.send_email:
-                        external_reports[filename] = csv
-
                     logger.info("Report %s created", report_config.name)
-
-            if bool(external_reports):
-                NhsMail().send_reports_email(external_reports)
-                logger.info(f"Reports sent: {', '.join(external_reports.keys())}")
 
     def configuration(self, options: dict) -> tuple[list[str], list[ReportConfig]]:
         if options.get("smoke_test", False):
