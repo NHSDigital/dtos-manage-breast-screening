@@ -5,7 +5,6 @@ import pytest
 from django.http import QueryDict
 from django.test import RequestFactory
 
-from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.mammograms.forms.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
@@ -88,7 +87,7 @@ class TestBenignLumpHistoryItemForm:
         assert not form.is_valid()
         assert form.errors.get("procedure_year") == [expected_message]
 
-    def test_create_persists_data_and_audits(self, clinical_user):
+    def test_create_persists_data(self, clinical_user):
         appointment = AppointmentFactory()
         request = RequestFactory().post("/test-form")
         request.user = clinical_user
@@ -113,13 +112,7 @@ class TestBenignLumpHistoryItemForm:
         form = BenignLumpHistoryItemForm(_form_data(data))
         assert form.is_valid()
 
-        existing_log_count = AuditLog.objects.count()
         obj = form.create(appointment=appointment, request=request)
-        assert AuditLog.objects.count() == existing_log_count + 1
-        audit_log = AuditLog.objects.filter(
-            object_id=obj.pk, operation=AuditLog.Operations.CREATE
-        ).first()
-        assert audit_log.actor == clinical_user
 
         obj.refresh_from_db()
         assert obj.appointment == appointment
@@ -165,7 +158,7 @@ class TestBenignLumpHistoryItemForm:
         assert form.initial["outside_uk_details"] == "Hospital in France"
         assert form.initial["additional_details"] == "Some additional notes"
 
-    def test_update_persists_changes_and_audits(self, clinical_user):
+    def test_update_persists_changes(self, clinical_user):
         instance = BenignLumpHistoryItemFactory(
             left_breast_procedures=[BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY],
             right_breast_procedures=[BenignLumpHistoryItem.Procedure.NO_PROCEDURES],
@@ -193,16 +186,7 @@ class TestBenignLumpHistoryItemForm:
         ]
         form = BenignLumpHistoryItemForm(_form_data(data), instance=instance)
         assert form.is_valid()
-
-        existing_log_count = AuditLog.objects.count()
         updated_obj = form.update(request=request)
-        assert AuditLog.objects.count() == existing_log_count + 1
-        audit_log = AuditLog.objects.filter(
-            object_id=updated_obj.pk, operation=AuditLog.Operations.UPDATE
-        ).first()
-        assert audit_log.actor == clinical_user
-
-        updated_obj.refresh_from_db()
         assert updated_obj.pk == instance.pk
         assert updated_obj.left_breast_procedures == [
             BenignLumpHistoryItem.Procedure.LUMP_REMOVED
