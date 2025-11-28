@@ -172,4 +172,5 @@ module "scheduled_jobs" {
   ]
 
   cron_expression = var.enable_notifications_jobs_schedule ? each.value.cron_expression : null
+
 }
