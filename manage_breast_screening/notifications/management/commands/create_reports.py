@@ -8,7 +8,6 @@ from django.db import connection
 from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
     CommandHandler,
 )
-from manage_breast_screening.notifications.models import ZONE_INFO
 from manage_breast_screening.notifications.queries.helper import Helper
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage
 from manage_breast_screening.notifications.services.nhs_mail import NhsMail
@@ -43,9 +42,6 @@ class Command(BaseCommand):
 
     BSO_CODES = ["MBD"]
     REPORTS = [
-        ReportConfig(
-            "invites-not-sent", [datetime.now(tz=ZONE_INFO).date()], True, "failures"
-        ),
         ReportConfig("reconciliation", ["3 months"], True),
     ]
     SMOKE_TEST_BSO_CODE = "SM0K3"
