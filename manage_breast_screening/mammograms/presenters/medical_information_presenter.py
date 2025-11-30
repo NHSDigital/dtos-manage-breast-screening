@@ -32,7 +32,7 @@ from .appointment_presenters import AppointmentPresenter
 class MedicalInformationPresenter:
     def __init__(self, appointment):
         self.appointment = AppointmentPresenter(appointment)
-        symptoms = appointment.symptom_set.select_related("symptom_type").order_by(
+        symptoms = appointment.symptoms.select_related("symptom_type").order_by(
             "symptom_type__name", "reported_at"
         )
         self.symptoms = [SymptomPresenter(symptom) for symptom in symptoms]

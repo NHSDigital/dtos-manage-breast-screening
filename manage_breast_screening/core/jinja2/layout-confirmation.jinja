@@ -1,5 +1,7 @@
 {% extends "layout-app.jinja" %}
 {% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'nhsuk/components/inset-text/macro.jinja' import insetText %}
+
 
 {% block header %}
   {{ header({
@@ -21,6 +23,13 @@
     </h1>
 
     {% block details %}
+      {% set insetTextHtml %}
+        <p>This action is final and cannot be undone.</p>
+      {% endset %}
+
+      {{ insetText({
+        "html": insetTextHtml
+      }) }}
     {% endblock %}
 
     <form method="post" action="{{ confirm_action.href | default(request.path) }}">
