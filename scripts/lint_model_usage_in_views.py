@@ -3,6 +3,7 @@
 
 import argparse
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -17,14 +18,12 @@ DENYLISTED_MODELS = (
 DENYLISTED_HELPERS = ("get_object_or_404(",)
 
 
+@dataclass
 class Match:
-    __slots__ = ("path", "line_number", "target", "line")
-
-    def __init__(self, path, line_number, target, line):
-        self.path = path
-        self.line_number = line_number
-        self.target = target
-        self.line = line
+    path: Path
+    line_number: int
+    target: str
+    line: str
 
 
 def parse_args():
