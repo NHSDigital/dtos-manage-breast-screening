@@ -1,6 +1,6 @@
 ENV_CONFIG=dev
 ENVIRONMENT=dev
-AZURE_SUBSCRIPTION="Digital Screening DToS - Core Services Dev"
+AZURE_SUBSCRIPTION="Breast Screening - Manage Breast Screening - Dev"
 HUB_SUBSCRIPTION="Digital Screening DToS - DevOps"
 HUB=dev
 TERRAFORM_MODULES_REF=main
