@@ -8,7 +8,13 @@ from pathlib import Path
 # Expected to be run from repository root
 REPO_ROOT = Path.cwd()
 
-DENYLISTED_MODELS = ("Appointment", "Clinic", "Participant")
+DENYLISTED_MODELS = (
+    "Appointment",
+    "Clinic",
+    "Participant",
+    "Symptom",
+    "BreastCancerHistoryItem",
+)
 DENYLISTED_HELPERS = ("get_object_or_404(",)
 
 

@@ -1,11 +1,9 @@
 from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views import View
 from django.views.generic import FormView
 
-from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
@@ -85,7 +83,7 @@ class ChangeSymptomView(BaseSymptomFormView):
         kwargs = super().get_form_kwargs()
 
         try:
-            instance = Symptom.objects.get(
+            instance = self.appointment.symptoms.get(
                 pk=self.kwargs["symptom_pk"],
                 appointment_id=self.kwargs["pk"],
                 **self.extra_filters(),
@@ -248,59 +246,29 @@ class ChangeOtherSymptomView(ChangeSymptomView):
         return context
 
 
-class DeleteSymptomView(View):
-    def get(self, request, *args, **kwargs):
-        try:
-            symptom = Symptom.objects.get(pk=kwargs["symptom_pk"])
-        except Symptom.DoesNotExist:
-            raise Http404("Symptom not found")
+class DeleteSymptomView(DeleteWithAuditView):
+    template_name = "mammograms/medical_information/symptoms/confirm_delete_lump.jinja"
 
-        context = {
-            "page_title": "Are you sure you want to delete this symptom?",
-            "heading": "Are you sure you want to delete this symptom?",
-            "confirm_action": {
-                "text": "Delete symptom",
-                "href": reverse(
-                    "mammograms:delete_symptom",
-                    kwargs={
-                        "pk": kwargs["pk"],
-                        "symptom_pk": kwargs["symptom_pk"],
-                    },
-                ),
-            },
-            "cancel_action": {
-                "href": reverse(
-                    "mammograms:record_medical_information",
-                    kwargs={"pk": kwargs["pk"]},
-                )
-            },
-            "summary_list_row": SymptomPresenter(symptom).build_summary_list_row(
-                include_actions=False
-            ),
-        }
-
-        return render(
-            request,
-            "mammograms/medical_information/symptoms/confirm_delete_lump.jinja",
-            context=context,
+    def get_success_url(self):
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.kwargs["pk"]},
         )
 
-    def post(self, request, *args, **kwargs):
-        try:
-            symptom = Symptom.objects.get(pk=kwargs["symptom_pk"])
-        except Symptom.DoesNotExist:
-            raise Http404("Symptom not found")
-        auditor = Auditor.from_request(request)
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.symptoms.get(pk=self.kwargs["symptom_pk"])
 
+    def get_context_data(self, **kwargs):
+        symptom = self.object
+
+        context = super().get_context_data(**kwargs)
+        context["summary_list_row"] = SymptomPresenter(symptom).build_summary_list_row(
+            include_actions=False
+        )
+        return context
+
+    def get_success_message_content(self, symptom):
         presenter = SymptomPresenter(symptom)
-
-        auditor.audit_delete(symptom)
-        symptom.delete()
-
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            presenter.delete_message_html,
-        )
-
-        return redirect("mammograms:record_medical_information", pk=kwargs["pk"])
+        return presenter.delete_message_html
