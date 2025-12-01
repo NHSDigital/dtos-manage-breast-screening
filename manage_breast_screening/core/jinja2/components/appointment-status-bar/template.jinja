@@ -6,18 +6,15 @@
         <div class="app-status-bar__row">
             <div class="app-status-bar__item">
               <span class="app-status-bar__key">Appointment:</span>
-              <span>{{ presented_appointment.clinic_slot.slot_time_and_clinic_date }}</span>
+              <span>
+                {{ presented_appointment.clinic_slot.slot_time_and_clinic_date }}
+                {% if presented_appointment.is_special_appointment %}
+                  <strong class="nhsuk-tag nhsuk-tag--yellow nhsuk-u-margin-left-1">Special appointment</strong>
+                {% endif %}
+              </span>
             </div>
             <div class="app-status-bar__item">
-              {{ tag({
-              "text": presented_appointment.current_status.text,
-              "classes": presented_appointment.current_status.classes
-              }) }}
-              {% if presented_appointment.is_special_appointment %}
-              <strong class="nhsuk-tag nhsuk-tag--yellow nhsuk-u-nowrap">
-                Special appointment
-              </strong>
-              {% endif %}
+              {{ tag(presented_appointment.clinic_type_tag_properties) }}
             </div>
         </div>
         <div class="app-status-bar__row">

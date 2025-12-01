@@ -80,6 +80,13 @@ class AppointmentPresenter:
         ) and AppointmentStatusUpdater.is_startable(self._appointment)
 
     @cached_property
+    def clinic_type_tag_properties(self):
+        return {
+            "classes": "nhsuk-tag nhsuk-tag--blue",
+            "text": self.clinic_slot.clinic_type,
+        }
+
+    @cached_property
     def special_appointment_tag_properties(self):
         return {
             "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2",
