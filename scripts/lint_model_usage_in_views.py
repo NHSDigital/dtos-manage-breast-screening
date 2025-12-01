@@ -5,8 +5,7 @@ import argparse
 import sys
 from pathlib import Path
 
-# Expected to be run from repository root
-REPO_ROOT = Path.cwd()
+REPO_ROOT = Path(__file__).parent.parent
 
 DENYLISTED_MODELS = (
     "Appointment",
