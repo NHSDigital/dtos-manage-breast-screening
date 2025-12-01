@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simple linter to spot denylisted model usage within Django view modules."""
+"""Check for model usage without provider scoping within Django view modules."""
 
 import argparse
 import re
@@ -9,13 +9,18 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
 
-DENYLISTED_MODELS = (
-    "Appointment",
-    "Clinic",
-    "Participant",
-    "Symptom",
-    "BreastCancerHistoryItem",
+ALLOWLISTED_MODELS = (
+    "User",
+    "Provider",
+    "BenignLumpHistoryItem",  # Temporarily allowed
+    "BreastAugmentationHistoryItem",  # Temporarily allowed
+    "CystHistoryItem",  # Temporarily allowed
+    "ImplantedMedicalDeviceHistoryItem",  # Temporarily allowed
+    "MastectomyOrLumpectomyHistoryItem",  # Temporarily allowed
+    "OtherProcedureHistoryItem",  # Temporarily allowed
+    "ParticipantReportedMammogram",  # Temporarily allowed
 )
+
 TARGETS = {
     "model.objects": re.compile(r"(?P<model_name>\w+)\.objects"),
     "model.get_object_or_404": re.compile(r"(?P<model_name>\w+)\.get_object_or_404"),
@@ -75,7 +80,7 @@ def find_matches(paths):
             for label, regex in TARGETS.items():
                 if match := regex.search(line):
                     model_name = match.group("model_name")
-                    if model_name in DENYLISTED_MODELS:
+                    if model_name not in ALLOWLISTED_MODELS:
                         yield Match(
                             path=path,
                             line_number=line_number,
