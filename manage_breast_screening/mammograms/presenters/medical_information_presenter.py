@@ -79,7 +79,29 @@ class MedicalInformationPresenter:
         return [symptom.summary_list_row for symptom in self.symptoms]
 
     @property
-    def add_lump_link(self):
+    def symptom_buttons(self):
+        return [
+            self.add_lump_button,
+            self.add_swelling_or_shape_change_button,
+            self.add_skin_change_button,
+            self.add_nipple_change_button,
+            self.add_other_symptom_button,
+        ]
+
+    @property
+    def medical_history_buttons(self):
+        return [
+            self.add_breast_cancer_history_button,
+            self.add_implanted_medical_device_history_button,
+            self.add_breast_augmentation_history_button,
+            self.add_mastectomy_or_lumpectomy_history_button,
+            self.add_cyst_history_button,
+            self.add_benign_lump_history_button,
+            self.add_other_procedure_history_button,
+        ]
+
+    @property
+    def add_lump_button(self):
         url = reverse("mammograms:add_symptom_lump", kwargs={"pk": self.appointment.pk})
 
         return {
@@ -92,7 +114,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_swelling_or_shape_change_link(self):
+    def add_swelling_or_shape_change_button(self):
         url = reverse(
             "mammograms:add_symptom_swelling_or_shape_change",
             kwargs={"pk": self.appointment.pk},
@@ -109,7 +131,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_skin_change_link(self):
+    def add_skin_change_button(self):
         url = reverse(
             "mammograms:add_symptom_skin_change",
             kwargs={"pk": self.appointment.pk},
@@ -125,7 +147,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_nipple_change_link(self):
+    def add_nipple_change_button(self):
         url = reverse(
             "mammograms:add_symptom_nipple_change",
             kwargs={"pk": self.appointment.pk},
@@ -141,7 +163,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_other_symptom_link(self):
+    def add_other_symptom_button(self):
         url = reverse(
             "mammograms:add_symptom_other",
             kwargs={"pk": self.appointment.pk},
@@ -157,7 +179,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_breast_cancer_history_link(self):
+    def add_breast_cancer_history_button(self):
         url = reverse(
             "mammograms:add_breast_cancer_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -169,7 +191,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_implanted_medical_device_history_link(self):
+    def add_implanted_medical_device_history_button(self):
         url = reverse(
             "mammograms:add_implanted_medical_device_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -181,7 +203,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_cyst_history_link(self):
+    def add_cyst_history_button(self):
         url = reverse(
             "mammograms:add_cyst_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -193,7 +215,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_breast_augmentation_history_link(self):
+    def add_breast_augmentation_history_button(self):
         url = reverse(
             "mammograms:add_breast_augmentation_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -205,7 +227,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_benign_lump_history_link(self):
+    def add_benign_lump_history_button(self):
         url = reverse(
             "mammograms:add_benign_lump_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -217,7 +239,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_mastectomy_or_lumpectomy_history_link(self):
+    def add_mastectomy_or_lumpectomy_history_button(self):
         url = reverse(
             "mammograms:add_mastectomy_or_lumpectomy_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -229,7 +251,7 @@ class MedicalInformationPresenter:
         }
 
     @property
-    def add_other_procedure_history_link(self):
+    def add_other_procedure_history_button(self):
         url = reverse(
             "mammograms:add_other_procedure_history_item",
             kwargs={"pk": self.appointment.pk},

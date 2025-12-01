@@ -1,4 +1,5 @@
 {% extends "wizard_step.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
@@ -23,13 +24,18 @@
     }) }}
   {% endif %}
 
-  <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-    <a href="{{ presenter.add_lump_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_lump_link.text }}</a><br>
-    <a href="{{ presenter.add_swelling_or_shape_change_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_swelling_or_shape_change_link.text }}</a><br>
-    <a href="{{ presenter.add_skin_change_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_skin_change_link.text }}</a><br>
-    <a href="{{ presenter.add_nipple_change_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_nipple_change_link.text }}</a><br>
-    <a href="{{ presenter.add_other_symptom_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_other_symptom_link.text }}</a>
-  </p>
+  <hr>
+  <h3>Add symptoms</h3>
+
+  <div class="nhsuk-button-group app-button-group--small">
+    {% for button_info in presenter.symptom_buttons %}
+      {{ button({
+        "text": button_info.text,
+        "href": button_info.href,
+        "classes": "nhsuk-button--secondary nhsuk-button--small"
+      }) }}
+    {% endfor %}
+  </div>
 {% endcall %}
 
 {% set medical_history_card_html %}
@@ -40,7 +46,6 @@
       </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
-    <a href="{{ presenter.add_breast_cancer_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_breast_cancer_history_link.text }}</a><br>
   {% endset %}
 
   {% set mastectomy_or_lumpectomy_history_html %}
@@ -50,7 +55,6 @@
       </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
-    <a href="{{ presenter.add_mastectomy_or_lumpectomy_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_mastectomy_or_lumpectomy_history_link.text }}</a><br>
   {% endset %}
 
   {% set implanted_medical_device_history_html %}
@@ -60,7 +64,6 @@
       </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
-    <a href="{{ presenter.add_implanted_medical_device_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_implanted_medical_device_history_link.text }}</a><br>
   {% endset %}
 
   {% set breast_augmentation_history_html %}
@@ -70,7 +73,6 @@
       </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
-    <a href="{{ presenter.add_breast_augmentation_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_breast_augmentation_history_link.text }}</a><br>
   {% endset %}
 
   {% set other_procedure_history_html %}
@@ -80,7 +82,6 @@
       </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
-    <a href="{{ presenter.add_other_procedure_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_other_procedure_history_link.text }}</a><br>
   {% endset %}
 
   {% set cyst_history_html %}
@@ -90,22 +91,15 @@
       </a><br>
       {{ summaryList(presented_item.summary_list_params) }}
     {% endfor %}
-    <a href="{{ presenter.add_cyst_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_cyst_history_link.text }}</a><br>
   {% endset %}
 
-  {% set non_cancerous_lump_diagnosis_link %}
-  <a class="nhsuk-link" href="#">Enter non-cancerous lump diagnosis</a>
-  {% endset %}
   {% set benign_lump_history_html %}
     {% for presented_item in presenter.benign_lump_history %}
       {{ summaryList(presented_item.summary_list_params) }}
       <p><a href="{{ presented_item.change_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presented_item.change_link.text }}</a></p>
     {% endfor %}
-    <a href="{{ presenter.add_benign_lump_history_link.href }}" class="nhsuk-link nhsuk-link--no-visited-state">{{ presenter.add_benign_lump_history_link.text }}</a><br>
   {% endset %}
-  {% set chest_procedures_link %}
-  <a class="nhsuk-link" href="#">Enter other breast or chest procedures</a>
-  {% endset %}
+
   {{ summaryList({
     "rows": [
      {
@@ -206,6 +200,20 @@
      }
     ]
   }) }}
+
+  <hr>
+  <h3>Add medical history</h3>
+
+  <div class="nhsuk-button-group app-button-group--small">
+    {% for button_info in presenter.medical_history_buttons %}
+      {{ button({
+        "text": button_info.text,
+        "href": button_info.href,
+        "classes": "nhsuk-button--secondary nhsuk-button--small"
+      }) }}
+    {% endfor %}
+  </div>
+
 {% endset %}
 {{ card({
   "heading": "Medical history",
