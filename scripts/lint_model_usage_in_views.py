@@ -2,6 +2,7 @@
 """Simple linter to spot denylisted model usage within Django view modules."""
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -15,7 +16,10 @@ DENYLISTED_MODELS = (
     "Symptom",
     "BreastCancerHistoryItem",
 )
-DENYLISTED_HELPERS = ("get_object_or_404(",)
+TARGETS = {
+    "model.objects": re.compile(r"(?P<model_name>\w+)\.objects"),
+    "model.get_object_or_404": re.compile(r"(?P<model_name>\w+)\.get_object_or_404"),
+}
 
 
 @dataclass
@@ -61,13 +65,6 @@ def find_view_modules(base_dir):
 
 
 def find_matches(paths):
-    targets = {
-        f"{model_name}.objects": f"{model_name}.objects"
-        for model_name in DENYLISTED_MODELS
-    }
-    for helper in DENYLISTED_HELPERS:
-        targets[helper] = helper
-
     for path in paths:
         try:
             text = path.read_text(encoding="utf-8")
@@ -75,14 +72,16 @@ def find_matches(paths):
             continue
 
         for line_number, line in enumerate(text.splitlines(), start=1):
-            for needle, label in targets.items():
-                if needle in line:
-                    yield Match(
-                        path=path,
-                        line_number=line_number,
-                        target=label,
-                        line=line.strip(),
-                    )
+            for label, regex in TARGETS.items():
+                if match := regex.search(line):
+                    model_name = match.group("model_name")
+                    if model_name in DENYLISTED_MODELS:
+                        yield Match(
+                            path=path,
+                            line_number=line_number,
+                            target=label,
+                            line=line.strip(),
+                        )
 
 
 def main():
