@@ -79,11 +79,6 @@ class ShowAppointment(AppointmentMixin, View):
 
 
 class ParticipantDetails(AppointmentMixin, View):
-    """
-    Show a completed appointment. Redirects to the start screening form
-    if the apppointment is in progress.
-    """
-
     template_name = "mammograms/show.jinja"
 
     def get(self, request, *args, **kwargs):
