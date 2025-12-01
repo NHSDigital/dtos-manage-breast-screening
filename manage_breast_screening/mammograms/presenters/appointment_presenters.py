@@ -79,6 +79,14 @@ class AppointmentPresenter:
             Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
         ) and AppointmentStatusUpdater.is_startable(self._appointment)
 
+    def show_status_bar_for(self, user):
+        # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
+        current_status = self._appointment.current_status
+        return (
+            current_status.state == AppointmentStatus.IN_PROGRESS
+            and user.nhs_uid == current_status.created_by.nhs_uid
+        )
+
     @cached_property
     def clinic_type_tag_properties(self):
         return {
@@ -142,6 +150,15 @@ class ClinicSlotPresenter:
         clinic = self._clinic
 
         return f"{format_time(clinic_slot.starts_at)} ({clinic_slot.duration_in_minutes} minutes) - {format_date(clinic.starts_at)} ({format_relative_date(clinic.starts_at)})"
+
+    @cached_property
+    def clinic_date_and_slot_time(self):
+        clinic_slot = self._clinic_slot
+        clinic = self._clinic
+
+        return (
+            f"{format_date(clinic.starts_at)} at {format_time(clinic_slot.starts_at)}"
+        )
 
     @cached_property
     def starts_at(self):

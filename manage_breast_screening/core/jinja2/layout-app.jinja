@@ -36,7 +36,7 @@
   }) }}
 
   {{ 
-    appointment_status_bar(presented_appointment)
+    appointment_status_bar(request.user, presented_appointment)
   }}
 {% endblock %}
 
@@ -76,4 +76,4 @@
 
 {% block bodyEnd %}
   <script type="module" src="{{ static('js/bundle.js' )}}"></script>
-{% endblock %}}
+{% endblock %}
