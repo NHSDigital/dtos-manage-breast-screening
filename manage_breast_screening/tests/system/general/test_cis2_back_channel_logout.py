@@ -11,7 +11,7 @@ from playwright.sync_api import expect
 
 from manage_breast_screening.auth.oauth import oauth
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestCIS2BackChannelLogout(SystemTestCase):

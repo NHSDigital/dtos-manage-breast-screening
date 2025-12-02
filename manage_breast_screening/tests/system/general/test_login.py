@@ -15,7 +15,7 @@ from manage_breast_screening.clinics.tests.factories import (
     UserAssignmentFactory,
 )
 
-from .system_test_setup import SystemTestCase
+from ..system_test_setup import SystemTestCase
 
 
 class TestLogin(SystemTestCase):
