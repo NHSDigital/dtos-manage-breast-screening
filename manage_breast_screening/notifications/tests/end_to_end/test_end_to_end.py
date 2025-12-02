@@ -14,9 +14,6 @@ from test.support.os_helper import EnvironmentVarGuard
 from manage_breast_screening.notifications.management.commands.create_appointments import (
     Command as CreateAppointments,
 )
-from manage_breast_screening.notifications.management.commands.retry_failed_message_batch import (
-    Command as RetryFailedMessageBatch,
-)
 from manage_breast_screening.notifications.management.commands.save_message_status import (
     Command as SaveMessageStatus,
 )
@@ -29,11 +26,9 @@ from manage_breast_screening.notifications.management.commands.store_mesh_messag
 from manage_breast_screening.notifications.models import (
     Appointment,
     ChannelStatus,
-    Message,
     MessageBatch,
     MessageBatchStatusChoices,
     MessageStatus,
-    MessageStatusChoices,
 )
 from manage_breast_screening.notifications.services.queue import Queue
 from manage_breast_screening.notifications.tests.integration.helpers import Helpers
@@ -67,7 +62,6 @@ class TestEndToEnd(TestCase):
             f"{os.path.dirname(os.path.realpath(__file__))}/ABC_20250302091221_APPT_100.dat"
         )
         Queue.MessageStatusUpdates().client.clear_messages()
-        Queue.RetryMessageBatches().client.clear_messages()
 
     @pytest.mark.django_db
     def test_all_commands_in_sequence(self, mock_jwt_encode):
@@ -88,55 +82,11 @@ class TestEndToEnd(TestCase):
 
         assert appointments.count() == 3
 
-        # Respond with a 408 recoverable error
-        self.env.set(
-            "NHS_NOTIFY_API_MESSAGE_BATCH_URL",
-            "http://localhost:8888/message/batch/recoverable-error",
-        )
-
-        SendMessageBatch().handle()
-
-        failed_batches = MessageBatch.objects.filter(
-            status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value
-        )
-
-        assert failed_batches.count() == 1
-
-        messages = Message.objects.filter(
-            batch=failed_batches.first(),
-        )
-
-        assert messages.count() == 3
-
-        # Respond with a 400 validation error
-        self.env.set(
-            "NHS_NOTIFY_API_MESSAGE_BATCH_URL",
-            "http://localhost:8888/message/batch/validation-error",
-        )
-
-        RetryFailedMessageBatch().handle()
-
-        failed_batches = MessageBatch.objects.filter(
-            status=MessageBatchStatusChoices.FAILED_RECOVERABLE.value
-        )
-
-        assert failed_batches.first().messages.count() == 2
-
-        invalid_messages = Message.objects.filter(
-            status=MessageStatusChoices.FAILED.value
-        ).all()
-        assert invalid_messages.count() == 1
-        assert (
-            invalid_messages.first().nhs_notify_errors[0]["code"]
-            == "CM_INVALID_NHS_NUMBER"
-        )
-
-        # Respond with 201 success
         self.env.set(
             "NHS_NOTIFY_API_MESSAGE_BATCH_URL", "http://localhost:8888/message/batch"
         )
 
-        RetryFailedMessageBatch().handle()
+        SendMessageBatch().handle()
 
         sent_batches = MessageBatch.objects.filter(
             status=MessageBatchStatusChoices.SENT.value
@@ -145,11 +95,10 @@ class TestEndToEnd(TestCase):
         assert sent_batches.count() == 1
         sent_batch = sent_batches.first()
         sent_messages = sent_batch.messages.all()
-        assert sent_messages.count() == 2
+        assert sent_messages.count() == 3
         appointments_from_sent_messages = [m.appointment for m in sent_messages]
 
-        assert appointments_from_sent_messages == [appointments[1], appointments[2]]
-        assert len(Queue.RetryMessageBatches().peek()) == 0
+        assert appointments_from_sent_messages == list(appointments)
 
         self.make_callbacks(sent_messages)
 

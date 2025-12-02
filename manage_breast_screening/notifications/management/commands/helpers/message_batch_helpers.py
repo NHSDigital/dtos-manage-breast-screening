@@ -1,4 +1,3 @@
-import json
 import logging
 import re
 from datetime import datetime
@@ -15,7 +14,6 @@ from manage_breast_screening.notifications.models import (
 from manage_breast_screening.notifications.services.application_insights_logging import (
     ApplicationInsightsLogging,
 )
-from manage_breast_screening.notifications.services.queue import Queue
 
 logger = logging.getLogger(__name__)
 
@@ -100,21 +98,12 @@ class MessageBatchHelpers:
 
                 message.save()
 
-        message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
+        message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
         message_batch.save()
 
-        logger.info(
-            "Adding MessageBatch %s to retry queue after validation failure",
+        logger.error(
+            "MessageBatch %s failed to send.",
             message_batch.id,
-        )
-
-        Queue.RetryMessageBatches().add(
-            json.dumps(
-                {
-                    "message_batch_id": str(message_batch.id),
-                    "retry_count": retry_count,
-                }
-            )
         )
 
     @staticmethod
@@ -132,19 +121,15 @@ class MessageBatchHelpers:
 
     @staticmethod
     def process_recoverable_batch(message_batch: MessageBatch, retry_count: int):
-        message_batch.status = MessageBatchStatusChoices.FAILED_RECOVERABLE.value
+        message_batch.status = MessageBatchStatusChoices.FAILED_UNRECOVERABLE.value
         message_batch.save()
 
-        logger.info(
-            "Adding MessageBatch %s to retry queue after recoverable failure",
-            message_batch.id,
-        )
+        for message in message_batch.messages.all():
+            message.status = MessageStatusChoices.FAILED.value
+            message.sent_at = datetime.now(tz=ZONE_INFO)
+            message.save()
 
-        Queue.RetryMessageBatches().add(
-            json.dumps(
-                {
-                    "message_batch_id": str(message_batch.id),
-                    "retry_count": retry_count,
-                }
-            )
+        logger.error(
+            "MessageBatch %s failed to send.",
+            message_batch.id,
         )
