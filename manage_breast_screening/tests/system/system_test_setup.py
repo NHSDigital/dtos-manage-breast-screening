@@ -84,26 +84,32 @@ class SystemTestCase(StaticLiveServerTestCase):
     def expect_validation_error(
         self,
         error_text: str,
-        fieldset_legend: str,
         field_label: str,
-        field_name: str | None = "",
+        fieldset_legend: str | None = None,
+        field_name: str | None = None,
     ):
         summary_box = self.page.locator(".nhsuk-error-summary")
         expect(summary_box).to_contain_text(error_text)
-
         error_link = summary_box.get_by_text(error_text)
         error_link.click()
 
-        fieldset = self.page.locator("fieldset").filter(has_text=fieldset_legend)
-        error_span = fieldset.locator("span").filter(has_text=error_text)
-        expect(error_span).to_contain_text(error_text)
-
-        if field_name:
-            field = fieldset.get_by_label(field_label, exact=True).and_(
-                fieldset.locator(f"[name='{field_name}']")
-            )
+        if fieldset_legend:
+            fieldset = self.page.locator("fieldset").filter(has_text=fieldset_legend)
+            error_span = fieldset.locator("span").filter(has_text=error_text)
+            expect(error_span).to_contain_text(error_text)
+            if field_name:
+                field = fieldset.get_by_label(field_label, exact=True).and_(
+                    fieldset.locator(f"[name='{field_name}']")
+                )
+            else:
+                field = fieldset.get_by_label(field_label, exact=True)
         else:
-            field = fieldset.get_by_label(field_label, exact=True)
+            # No fieldset specified, look for the field directly
+            field = self.page.get_by_label(field_label, exact=True)
+            field_container = field.locator("..")
+            error_span = field_container.locator(".nhsuk-error-message")
+            expect(error_span).to_be_visible()
+            expect(error_span).to_contain_text(error_text)
 
         expect(field).to_be_focused()
 
