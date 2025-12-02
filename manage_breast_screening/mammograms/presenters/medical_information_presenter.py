@@ -55,10 +55,12 @@ class MedicalInformationPresenter:
             appointment.breast_augmentation_history_items.all(),
             BreastAugmentationHistoryItemPresenter,
         )
-        self.other_procedure_history = [
-            OtherProcedureHistoryItemPresenter(item)
-            for item in appointment.other_procedure_history_items.all()
-        ]
+
+        self.other_procedure_history = self._present_items(
+            appointment.other_procedure_history_items.all(),
+            OtherProcedureHistoryItemPresenter,
+        )
+
         self.benign_lump_history = [
             BenignLumpHistoryItemPresenter(item)
             for item in appointment.benign_lump_history_items.all()
@@ -224,6 +226,18 @@ class MedicalInformationPresenter:
         return {
             "href": url,
             "text": "Add mastectomy or lumpectomy history",
+        }
+
+    @property
+    def add_other_procedure_history_link(self):
+        url = reverse(
+            "mammograms:add_other_procedure_history_item",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        return {
+            "href": url,
+            "text": "Add other procedure history",
         }
 
     def _present_items(self, items, presenter_class):

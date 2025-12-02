@@ -12,6 +12,7 @@ from manage_breast_screening.participants.tests.factories import (
     CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
+    OtherProcedureHistoryItemFactory,
     SymptomFactory,
 )
 
@@ -249,6 +250,38 @@ class TestRecordMedicalInformationPresenter:
             for item in MedicalInformationPresenter(
                 appointment
             ).mastectomy_or_lumpectomy_history
+        ]
+
+        assert counters == [None]
+
+    def test_other_procedure_history_link(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(
+            appointment
+        ).add_other_procedure_history_link == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/other-procedure-history/",
+            "text": "Add other procedure history",
+        }
+
+    def test_other_procedure_history_items_have_a_counter(self):
+        appointment = AppointmentFactory()
+        OtherProcedureHistoryItemFactory.create_batch(2, appointment=appointment)
+
+        counters = [
+            item.counter
+            for item in MedicalInformationPresenter(appointment).other_procedure_history
+        ]
+
+        assert counters == [1, 2]
+
+    def test_single_other_procedure_history_item_has_no_counter(self):
+        appointment = AppointmentFactory()
+        OtherProcedureHistoryItemFactory.create(appointment=appointment)
+
+        counters = [
+            item.counter
+            for item in MedicalInformationPresenter(appointment).other_procedure_history
         ]
 
         assert counters == [None]

@@ -1,9 +1,12 @@
+from django.urls import reverse
+
 from manage_breast_screening.core.template_helpers import nl2br
 
 
 class OtherProcedureHistoryItemPresenter:
-    def __init__(self, implanted_medical_device_history_item):
-        self._item = implanted_medical_device_history_item
+    def __init__(self, other_procedure_history_item, counter=None):
+        self._item = other_procedure_history_item
+        self.counter = counter
 
         self.procedure = self._item.get_procedure_display()
         self.procedure_details = self._item.procedure_details or "N/A"
@@ -32,4 +35,22 @@ class OtherProcedureHistoryItemPresenter:
                     "value": {"html": self.additional_details},
                 },
             ],
+        }
+
+    @property
+    def change_link(self):
+        return {
+            "href": reverse(
+                "mammograms:change_other_procedure_history_item",
+                kwargs={
+                    "pk": self._item.appointment_id,
+                    "history_item_pk": self._item.pk,
+                },
+            ),
+            "text": "Change",
+            "visually_hidden_text": (
+                f" other procedure item {self.counter}"
+                if self.counter
+                else " other procedure item"
+            ),
         }
