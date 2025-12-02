@@ -1,0 +1,83 @@
+{% extends 'layout-app.jinja' %}
+{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'nhsuk/components/inset-text/macro.jinja' import insetText %}
+{% from 'components/appointment-status/macro.jinja' import appointment_status %}
+{% from 'components/appointment-header/macro.jinja' import appointment_header %}
+{% from 'components/check-in/macro.jinja' import check_in %}
+{% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
+{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
+{% from 'django_form_helpers.jinja' import form_error_summary %}
+
+{% block beforeContent %}
+{{ backLink({
+  "href": presented_appointment.clinic_url,
+  "text": "Back to clinic"
+}) }}
+{% endblock beforeContent %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-full">
+
+    <div class="app-header">
+      <h1 class="nhsuk-heading-l">
+        <span class="nhsuk-caption-l">
+          {{ caption }}
+        </span>
+        {{ heading }}
+      </h1>
+
+      <div class="app-header__status-tag">
+        {{ appointment_status(presented_appointment) }}
+        <p class="nhsuk-u-margin-bottom-2">
+          {{ check_in(
+            presented_appointment,
+            check_in_url=url(
+              'mammograms:check_in',
+              kwargs={'pk': presented_appointment.pk}
+            ),
+            csrf_input=csrf_input
+          ) }}
+        </p>
+      </div>
+    </div>
+
+    {{ appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
+
+    {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
+
+    {{ app_secondary_navigation({
+      "visuallyHiddenTitle": "Secondary menu",
+      "items": secondary_nav_items
+    }) }}
+
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    {{ form_error_summary(form) }}
+
+    {% set inset_html %}
+      <p>
+        If adjustments are required,
+        <a href="{{ presented_appointment.special_appointment_url }}">
+          provide special appointment details instead
+        </a>
+      </p>
+    {% endset %}
+    {{ insetText({
+      "html": inset_html
+    }) }}
+
+    <form action="{{ request.path }}" method="POST" novalidate>
+      {{ csrf_input }}
+      {{ form.content.as_field_group() }}
+
+      <div class="nhsuk-button-group">
+        {{ button({
+          "text": "Save note"
+        }) }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
