@@ -195,3 +195,15 @@ class AppointmentStatus(models.Model):
 
     def __str__(self):
         return self.state
+
+
+class AppointmentNote(BaseModel):
+    appointment = models.OneToOneField(
+        "participants.Appointment",
+        on_delete=models.PROTECT,
+        related_name="note",
+    )
+    content = models.TextField(blank=True)
+
+    def __str__(self):
+        return f"Note for appointment {self.appointment_id}"
