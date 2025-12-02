@@ -1,3 +1,5 @@
+from django.urls import reverse
+
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
 from manage_breast_screening.participants.models.benign_lump_history_item import (
     BenignLumpHistoryItem,
@@ -20,7 +22,6 @@ class BenignLumpHistoryItemPresenter:
 
     @property
     def summary_list_params(self):
-        # This is a placeholder until we have a properly formatted table.
         return {
             "rows": [
                 {
@@ -48,7 +49,20 @@ class BenignLumpHistoryItemPresenter:
                     "key": {"text": "Additional details"},
                     "value": {"html": self.additional_details},
                 },
-            ],
+            ]
+        }
+
+    @property
+    def change_link(self):
+        return {
+            "href": reverse(
+                "mammograms:change_benign_lump_history_item",
+                kwargs={
+                    "pk": self._item.appointment_id,
+                    "history_item_pk": self._item.id,
+                },
+            ),
+            "text": "Change",
         }
 
     def _format_multiple_choices(self, choices, ChoiceClass):

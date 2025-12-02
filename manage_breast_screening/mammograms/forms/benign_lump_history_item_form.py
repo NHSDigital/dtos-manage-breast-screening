@@ -105,12 +105,32 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
     )
 
     def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop("instance", None)
+
+        if self.instance:
+            kwargs["initial"] = self.initial_values(self.instance)
+
         super().__init__(*args, **kwargs)
 
         for location, detail_field in self.LOCATION_DETAIL_FIELDS.items():
             self.given_field_value("procedure_location", location).require_field(
                 detail_field
             )
+
+    def initial_values(self, instance):
+        initial = {
+            "left_breast_procedures": instance.left_breast_procedures,
+            "right_breast_procedures": instance.right_breast_procedures,
+            "procedure_year": instance.procedure_year,
+            "procedure_location": instance.procedure_location,
+            "additional_details": instance.additional_details,
+        }
+
+        detail_field = self.LOCATION_DETAIL_FIELDS.get(instance.procedure_location)
+        if detail_field:
+            initial[detail_field] = instance.procedure_location_details
+
+        return initial
 
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
@@ -130,6 +150,27 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         auditor.audit_create(benign_lump_history_item)
 
         return benign_lump_history_item
+
+    def update(self, request):
+        auditor = Auditor.from_request(request)
+
+        self.instance.left_breast_procedures = self.cleaned_data.get(
+            "left_breast_procedures", []
+        )
+        self.instance.right_breast_procedures = self.cleaned_data.get(
+            "right_breast_procedures", []
+        )
+        self.instance.procedure_year = self.cleaned_data.get("procedure_year")
+        self.instance.procedure_location = self.cleaned_data["procedure_location"]
+        self.instance.procedure_location_details = self._get_selected_location_details()
+        self.instance.additional_details = self.cleaned_data.get(
+            "additional_details", ""
+        )
+
+        self.instance.save()
+        auditor.audit_update(self.instance)
+
+        return self.instance
 
     @property
     def location_detail_fields(self):
