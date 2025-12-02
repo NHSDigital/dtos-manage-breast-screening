@@ -1,4 +1,3 @@
-import json
 from datetime import datetime, timedelta
 from unittest.mock import ANY, MagicMock, patch
 
@@ -188,7 +187,7 @@ class TestSendMessageBatch:
     def test_handle_with_recoverable_failures(
         self, mark_batch_as_sent, mock_send_message_batch, status_code
     ):
-        """Test that message batches which fail to send are marked correctly"""
+        """Test that message batches which fail to send are marked as unrecoverable"""
         notify_errors = {"errors": [{"some-error": "details"}]}
         mock_send_message_batch.return_value.status_code = status_code
         mock_send_message_batch.return_value.json.return_value = notify_errors
@@ -198,22 +197,12 @@ class TestSendMessageBatch:
         )
         routing_plan_id = RoutingPlan.for_episode_type(appointment.episode_type).id
 
-        with patch(
-            "manage_breast_screening.notifications.views.Queue.RetryMessageBatches"
-        ) as mock_queue:
-            queue_instance = MagicMock()
-            mock_queue.return_value = queue_instance
-            Command().handle()
+        Command().handle()
 
         message_batches = MessageBatch.objects.filter(routing_plan_id=routing_plan_id)
         assert message_batches.count() == 1
-        assert message_batches[0].status == "failed_recoverable"
+        assert message_batches[0].status == "failed_unrecoverable"
         assert message_batches[0].nhs_notify_errors == notify_errors
-        queue_instance.add.assert_called_once_with(
-            json.dumps(
-                {"message_batch_id": str(message_batches[0].id), "retry_count": 0}
-            )
-        )
 
     def test_handle_does_nothing_on_weekend(
         self, mock_mark_batch_as_sent, mock_send_message_batch, time_machine
