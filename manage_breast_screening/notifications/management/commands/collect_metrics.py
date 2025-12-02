@@ -11,14 +11,13 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
-            # Set queue_size metrics
-            for queue in [Queue.RetryMessageBatches(), Queue.MessageStatusUpdates()]:
-                Metrics().set_gauge_value(
-                    f"queue_size_{queue.queue_name}",
-                    "messages",
-                    "Queue length",
-                    queue.get_message_count(),
-                )
+            queue = Queue.MessageStatusUpdates()
+            Metrics().set_gauge_value(
+                f"queue_size_{queue.queue_name}",
+                "messages",
+                "Queue length",
+                queue.get_message_count(),
+            )
 
         except Exception as e:
             logger.error(e, exc_info=True)
