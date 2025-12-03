@@ -8,6 +8,7 @@ from .views import (
     cyst_history_view,
     implanted_medical_device_history_view,
     mastectomy_or_lumpectomy_history_view,
+    other_procedure_history_view,
     special_appointment_views,
     symptom_views,
 )
@@ -189,5 +190,15 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>",
         mastectomy_or_lumpectomy_history_view.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
         name="change_mastectomy_or_lumpectomy_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/other-procedure-history/",
+        other_procedure_history_view.AddOtherProcedureHistoryView.as_view(),
+        name="add_other_procedure_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>",
+        other_procedure_history_view.ChangeOtherProcedureHistoryView.as_view(),
+        name="change_other_procedure_history_item",
     ),
 ]
