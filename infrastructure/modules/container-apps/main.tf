@@ -48,6 +48,8 @@ module "webapp" {
   )
   is_web_app = true
   port       = 8000
+  probe_path = "/healthcheck"
+
 }
 
 module "azurerm_application_insights_standard_web_test" {
