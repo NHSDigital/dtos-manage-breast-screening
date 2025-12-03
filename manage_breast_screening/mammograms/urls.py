@@ -201,4 +201,9 @@ urlpatterns = [
         other_procedure_history_view.ChangeOtherProcedureHistoryView.as_view(),
         name="change_other_procedure_history_item",
     ),
+    path(
+        "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete",
+        other_procedure_history_view.DeleteOtherProcedureHistoryView.as_view(),
+        name="delete_other_procedure_history_item",
+    ),
 ]

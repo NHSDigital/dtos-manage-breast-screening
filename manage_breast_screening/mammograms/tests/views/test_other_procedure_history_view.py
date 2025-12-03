@@ -12,6 +12,11 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 
+@pytest.fixture
+def history_item(appointment):
+    return OtherProcedureHistoryItemFactory.create(appointment=appointment)
+
+
 @pytest.mark.django_db
 class TestAddOtherProcedureView:
     def test_renders_response(self, clinical_user_client):
@@ -107,7 +112,7 @@ class TestChangeOtherProcedureView:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
+    def test_valid_post_redirects_to_record_medical_information(
         self, clinical_user_client, appointment, history_item
     ):
         response = clinical_user_client.http.post(
@@ -136,3 +141,18 @@ class TestChangeOtherProcedureView:
                 )
             ],
         )
+
+    def test_the_other_procedure_is_deleted(self, clinical_user_client, history_item):
+        assert OtherProcedureHistoryItem.objects.filter(pk=history_item.pk).exists()
+
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_other_procedure_history_item",
+                kwargs={
+                    "pk": history_item.appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+
+        assert not OtherProcedureHistoryItem.objects.filter(pk=history_item.pk).exists()

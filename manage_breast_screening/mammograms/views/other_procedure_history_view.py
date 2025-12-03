@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
+from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.participants.models.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
@@ -133,7 +134,39 @@ class ChangeOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
             {
                 "heading": "Edit details of other procedure",
                 "page_title": "Details of the other procedure",
+                "delete_link": {
+                    "text": "Delete this item",
+                    "class": "nhsuk-link app-link--warning",
+                    "href": reverse(
+                        "mammograms:delete_other_procedure_history_item",
+                        kwargs={
+                            "pk": self.kwargs["pk"],
+                            "history_item_pk": self.kwargs["history_item_pk"],
+                        },
+                    ),
+                },
             },
         )
 
         return context
+
+
+class DeleteOtherProcedureHistoryView(DeleteWithAuditView):
+    def get_thing_name(self, object):
+        return "item"
+
+    def get_success_message_content(self, object):
+        return "Deleted other procedure"
+
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.other_procedure_history_items.get(
+            pk=self.kwargs["history_item_pk"]
+        )
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.kwargs["pk"]},
+        )
