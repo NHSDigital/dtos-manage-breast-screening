@@ -28,7 +28,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_a_lump()
+        self.when_i_click_on_lump()
         self.then_i_see_the_add_a_lump_form()
 
         self.when_i_select_right_breast()
@@ -68,7 +68,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_a_lump()
+        self.when_i_click_on_lump()
         self.and_i_select_less_than_three_months()
         self.and_i_select_no_the_symptom_has_not_been_investigated()
         self.and_i_click_save_symptom()
@@ -87,7 +87,7 @@ class TestRecordingSymptoms(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_a_lump()
+        self.when_i_click_on_lump()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -120,8 +120,10 @@ class TestRecordingSymptoms(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_a_lump(self):
-        self.page.get_by_text("Add a lump").click()
+    def when_i_click_on_lump(self):
+        self.page.get_by_role("button").and_(
+            self.page.get_by_text("Lump", exact=True)
+        ).click()
 
     def then_i_see_the_add_a_lump_form(self):
         expect(self.page.get_by_text("Details of the lump")).to_be_visible()

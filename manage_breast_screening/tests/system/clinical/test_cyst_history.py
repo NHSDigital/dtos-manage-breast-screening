@@ -15,7 +15,7 @@ class TestRecordingCyst(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_cyst()
+        self.when_i_click_on_cysts()
         self.then_i_see_the_add_cyst_form()
 
         self.when_i_select_no_treatment()
@@ -36,7 +36,7 @@ class TestRecordingCyst(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_cyst()
+        self.when_i_click_on_cysts()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -56,8 +56,8 @@ class TestRecordingCyst(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_cyst(self):
-        self.page.get_by_text("Add cyst history").click()
+    def when_i_click_on_cysts(self):
+        self.page.get_by_role("button").filter(has_text="Cysts").click()
 
     def then_i_see_the_add_cyst_form(self):
         expect(self.page.get_by_text("Add details of cysts")).to_be_visible()

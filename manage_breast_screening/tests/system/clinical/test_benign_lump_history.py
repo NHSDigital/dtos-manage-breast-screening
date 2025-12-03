@@ -19,7 +19,7 @@ class TestBenignLumpHistory(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_benign_lump_history()
+        self.when_i_click_on_benign_lumps()
         self.then_i_see_the_add_benign_lump_history_form()
         self.when_i_try_to_save_without_entering_benign_lump_details()
         self.then_i_see_validation_errors_for_missing_benign_lump_details()
@@ -54,7 +54,7 @@ class TestBenignLumpHistory(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_benign_lump_history()
+        self.when_i_click_on_benign_lumps()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -74,8 +74,8 @@ class TestBenignLumpHistory(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_benign_lump_history(self):
-        self.page.get_by_text("Add benign lump history", exact=True).click()
+    def when_i_click_on_benign_lumps(self):
+        self.page.get_by_role("button").filter(has_text="Benign lumps").click()
 
     def then_i_see_the_add_benign_lump_history_form(self):
         expect(self.page.get_by_text("Add details of benign lumps")).to_be_visible()

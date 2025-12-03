@@ -24,7 +24,6 @@ from manage_breast_screening.mammograms.presenters.other_procedure_history_item_
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
-from manage_breast_screening.participants.models.symptom import SymptomType
 
 from .appointment_presenters import AppointmentPresenter
 
@@ -104,14 +103,7 @@ class MedicalInformationPresenter:
     def add_lump_button(self):
         url = reverse("mammograms:add_symptom_lump", kwargs={"pk": self.appointment.pk})
 
-        return {
-            "href": url,
-            "text": (
-                "Add another lump"
-                if SymptomType.LUMP in self.existing_symptom_type_ids
-                else "Add a lump"
-            ),
-        }
+        return {"href": url, "text": "Lump"}
 
     @property
     def add_swelling_or_shape_change_button(self):
@@ -120,15 +112,7 @@ class MedicalInformationPresenter:
             kwargs={"pk": self.appointment.pk},
         )
 
-        return {
-            "href": url,
-            "text": (
-                "Add another swelling or shape change"
-                if SymptomType.SWELLING_OR_SHAPE_CHANGE
-                in self.existing_symptom_type_ids
-                else "Add a swelling or shape change"
-            ),
-        }
+        return {"href": url, "text": "Swelling or shape change"}
 
     @property
     def add_skin_change_button(self):
@@ -137,14 +121,7 @@ class MedicalInformationPresenter:
             kwargs={"pk": self.appointment.pk},
         )
 
-        return {
-            "href": url,
-            "text": (
-                "Add another skin change"
-                if SymptomType.SKIN_CHANGE in self.existing_symptom_type_ids
-                else "Add a skin change"
-            ),
-        }
+        return {"href": url, "text": "Skin change"}
 
     @property
     def add_nipple_change_button(self):
@@ -153,14 +130,7 @@ class MedicalInformationPresenter:
             kwargs={"pk": self.appointment.pk},
         )
 
-        return {
-            "href": url,
-            "text": (
-                "Add another nipple change"
-                if SymptomType.NIPPLE_CHANGE in self.existing_symptom_type_ids
-                else "Add a nipple change"
-            ),
-        }
+        return {"href": url, "text": "Nipple change"}
 
     @property
     def add_other_symptom_button(self):
@@ -169,14 +139,7 @@ class MedicalInformationPresenter:
             kwargs={"pk": self.appointment.pk},
         )
 
-        return {
-            "href": url,
-            "text": (
-                "Add another symptom (other symptom)"
-                if SymptomType.NIPPLE_CHANGE in self.existing_symptom_type_ids
-                else "Add a symptom (other symptom)"
-            ),
-        }
+        return {"href": url, "text": "Other"}
 
     @property
     def add_breast_cancer_history_button(self):
@@ -187,7 +150,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": ("Add breast cancer history"),
+            "text": "Breast cancer",
         }
 
     @property
@@ -199,7 +162,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": ("Add implanted medical device history"),
+            "text": "Implanted medical device",
         }
 
     @property
@@ -211,7 +174,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": ("Add cyst history"),
+            "text": ("Cysts"),
         }
 
     @property
@@ -223,7 +186,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": ("Add breast augmentation history"),
+            "text": "Breast implants or augmentation",
         }
 
     @property
@@ -235,7 +198,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": "Add benign lump history",
+            "text": "Benign lumps",
         }
 
     @property
@@ -247,7 +210,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": "Add mastectomy or lumpectomy history",
+            "text": "Mastectomy or lumpectomy",
         }
 
     @property
@@ -259,7 +222,7 @@ class MedicalInformationPresenter:
 
         return {
             "href": url,
-            "text": "Add other procedure history",
+            "text": "Other procedures",
         }
 
     def _present_items(self, items, presenter_class):

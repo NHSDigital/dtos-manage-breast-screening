@@ -15,7 +15,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_a_implanted_medical_device()
+        self.when_i_click_on_implanted_medical_device()
         self.then_i_see_the_add_a_implanted_medical_device_form()
 
         self.when_i_click_save_device_without_entering_details()
@@ -42,7 +42,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_a_implanted_medical_device()
+        self.when_i_click_on_implanted_medical_device()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -62,8 +62,10 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_a_implanted_medical_device(self):
-        self.page.get_by_text("Add implanted medical device history").click()
+    def when_i_click_on_implanted_medical_device(self):
+        self.page.get_by_role("button").filter(
+            has_text="Implanted medical device"
+        ).click()
 
     def then_i_see_the_add_a_implanted_medical_device_form(self):
         expect(

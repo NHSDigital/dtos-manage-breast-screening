@@ -15,7 +15,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_mastectomy_or_lumpectomy()
+        self.when_i_click_on_mastectomy_or_lumpectomy()
         self.then_i_see_the_add_mastectomy_or_lumpectomy_form()
 
         self.when_i_click_save()
@@ -39,7 +39,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_mastectomy_or_lumpectomy()
+        self.when_i_click_on_mastectomy_or_lumpectomy()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -59,8 +59,10 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_mastectomy_or_lumpectomy(self):
-        self.page.get_by_text("Add mastectomy or lumpectomy history").click()
+    def when_i_click_on_mastectomy_or_lumpectomy(self):
+        self.page.get_by_role("button").filter(
+            has_text="Mastectomy or lumpectomy"
+        ).click()
 
     def then_i_see_the_add_mastectomy_or_lumpectomy_form(self):
         expect(
