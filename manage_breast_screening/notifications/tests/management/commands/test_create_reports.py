@@ -51,31 +51,21 @@ class TestCreateReports:
 
         mock_read_sql, mock_blob_storage = md
 
-        assert mock_read_sql.call_count == 2
-        assert mock_blob_storage.add.call_count == 2
+        assert mock_read_sql.call_count == 1
+        assert mock_blob_storage.add.call_count == 1
 
         for bso_code in Command.BSO_CODES:
-            mock_read_sql.assert_any_call(
-                Helper.sql("failures"), connection, params=[now.date(), bso_code]
-            )
             mock_read_sql.assert_any_call(
                 Helper.sql("reconciliation"), connection, params=["3 months", bso_code]
             )
 
-            failures_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-invites-not-sent-report.csv"
             reconciliation_filename = f"{now.strftime('%Y-%m-%dT%H:%M:%S')}-{bso_code}-reconciliation-report.csv"
 
-            mock_blob_storage.add.assert_any_call(
-                failures_filename,
-                csv_data,
-                content_type="text/csv",
-            )
             mock_blob_storage.add.assert_any_call(
                 reconciliation_filename,
                 csv_data,
                 content_type="text/csv",
             )
-
     def test_handle_raises_command_error(self, mock_insights_logger):
         with patch(f"{Helper.__module__}.Helper") as mock_query:
             mock_query.sql.side_effect = Exception("err")
