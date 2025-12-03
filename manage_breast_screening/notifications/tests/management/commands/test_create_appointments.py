@@ -9,6 +9,7 @@ from django.core.management.base import CommandError
 
 from manage_breast_screening.notifications.management.commands.create_appointments import (
     Command,
+    ExtractValidationError,
 )
 from manage_breast_screening.notifications.models import (
     ZONE_INFO,
@@ -59,7 +60,6 @@ def stored_blob_data(prefix_dir: str, filenames: list[str]):
             mock_blob_contents
         )
         yield
-
 
 @pytest.mark.django_db
 class TestCreateAppointments:
@@ -391,3 +391,54 @@ class TestCreateAppointments:
                 Command().handle(**{"date_str": today_dirname})
 
         assert Extract.objects.count() == 0
+
+    def test_extract_id_not_sequential_previous(self, mock_insights_logger):
+        """ Test when an extract is not sequential to the previous extract, a warning is logged """
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+
+        filename = f"{today_dirname}/{VALID_DATA_FILE}"
+
+        raw_data = '"NBSSAPPT_HDR"|"00000013"|"20250128"|"170922"|"000001"'
+
+        previous_raw_data = '"NBSSAPPT_HDR"|"00000012"|"20250128"|"170922"|"000001"'
+
+        Command().create_extract(filename, raw_data)
+        
+        with pytest.raises(ExtractValidationError) as error:
+            Command().validate_extract(filename, previous_raw_data)
+            assert str(error.value) == "Extract ID 12 is not sequential to last extract ID 13."
+        
+        assert Extract.objects.count() == 1
+        
+                
+    def test_extract_same_bso_and_extract_id(self, mock_insights_logger):
+        """ Test when an extract has the same extract id and bso code, a warning is logged """
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+        
+        filename = f"{today_dirname}/{VALID_DATA_FILE}"
+        raw_data = '"NBSSAPPT_HDR"|"00000013"|"20250128"|"170922"|"000001"'
+        Command().create_extract(filename, raw_data)
+
+        same_bso_and_extract_id_raw_data = '"NBSSAPPT_HDR"|"00000013"|"20250128"|"170922"|"000001"'
+        
+        with pytest.raises(ExtractValidationError) as error:
+            Command().validate_extract(filename, same_bso_and_extract_id_raw_data)
+            assert str(error.value) == "Extract ID 13 is not sequential to last extract ID 13."
+        
+    def test_extract_not_sequential_skipped_extract(self, mock_insights_logger):
+        """ Test when an extract is not the next extract in order (i.e. skipped an extract), a warning is logged """
+        today_dirname = datetime.now().strftime("%Y-%m-%d")
+        filename = f"{today_dirname}/{VALID_DATA_FILE}"
+        
+        raw_data = '"NBSSAPPT_HDR"|"00000013"|"20250128"|"170922"|"000001"'
+        
+        Command().create_extract(filename, raw_data)
+        
+        skip_extract_raw_data = '"NBSSAPPT_HDR"|"00000025"|"20250128"|"170922"|"000001"'
+        
+        with pytest.raises(ExtractValidationError) as error:
+            Command().validate_extract(filename, skip_extract_raw_data)
+            assert str(error.value) == "Extract ID 25 is not sequential to last extract ID 13."
+        
+        assert Extract.objects.count() == 1
+        
