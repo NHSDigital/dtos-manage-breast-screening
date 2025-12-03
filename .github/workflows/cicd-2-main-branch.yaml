@@ -92,3 +92,67 @@ jobs:
       environments: '["review","dev","preprod","prod"]'
       commit_sha: ${{ github.sha }}
     secrets: inherit
+
+  notify-failure:
+    name: 'Notify failure'
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    needs: [commit-stage, test-stage, build-stage, deploy-stage]
+    steps:
+      - name: Determine failed stages
+        id: failed_stages
+        run: |
+          failed_stages=""
+
+          if [[ "${{ needs.commit-stage.result }}" == "failure" ]]; then
+            failed_stages="${failed_stages}• Commit stage\n"
+          fi
+          if [[ "${{ needs.test-stage.result }}" == "failure" ]]; then
+            failed_stages="${failed_stages}• Test stage\n"
+          fi
+          if [[ "${{ needs.build-stage.result }}" == "failure" ]]; then
+            failed_stages="${failed_stages}• Build stage\n"
+          fi
+          if [[ "${{ needs.deploy-stage.result }}" == "failure" ]]; then
+            failed_stages="${failed_stages}• Deploy stage (check workflow for environment)\n"
+          fi
+
+          # Format for Slack (remove trailing newline)
+          failed_stages=$(echo -e "$failed_stages" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+
+          # Use delimiter for multiline output
+          echo "stages<<EOF" >> $GITHUB_OUTPUT
+          echo "$failed_stages" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            blocks:
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: ":warning: Main branch CI/CD workflow failed:"
+              - type: section
+                fields:
+                - type: mrkdwn
+                  text: |-
+                    *Workflow:*
+                    <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>
+                - type: mrkdwn
+                  text: |-
+                    *Commit:*
+                    <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>
+                - type: mrkdwn
+                  text: |-
+                    *Repo:*
+                    ${{ github.repository }}
+              - type: section
+                text:
+                  type: mrkdwn
+                  text: |-
+                    *Failed Stages:*
+                    ${{ steps.failed_stages.outputs.stages }}
