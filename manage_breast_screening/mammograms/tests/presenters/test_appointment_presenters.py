@@ -229,6 +229,17 @@ class TestClinicSlotPresenter:
             == "9:30am (30 minutes) - 2 January 2025 (4 months, 17 days ago)"
         )
 
+    @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
+    def test_clinic_date_and_slot_time(self, clinic_slot_mock):
+        clinic_slot_mock.starts_at = datetime(2025, 1, 2, 9, 30)
+        clinic_slot_mock.duration_in_minutes = 30
+        clinic_slot_mock.clinic.starts_at = date(2025, 1, 2)
+
+        assert (
+            ClinicSlotPresenter(clinic_slot_mock).clinic_date_and_slot_time
+            == "2 January 2025 at 9:30am"
+        )
+
 
 class TestSpecialAppointmentPresenter:
     def test_change_url(self):

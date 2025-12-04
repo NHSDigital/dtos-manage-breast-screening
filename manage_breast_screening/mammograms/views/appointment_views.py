@@ -124,10 +124,14 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
     def get_context_data(self, pk, **kwargs):
         participant = self.appointment.participant
 
+        appointment_presenter = AppointmentPresenter(
+            self.appointment, tab_description="Appointment details"
+        )
         return {
             "heading": "Confirm identity",
             "page_title": "Confirm identity",
             "presented_participant": ParticipantPresenter(participant),
+            "presented_appointment": appointment_presenter,
             "appointment_cannot_proceed_href": reverse(
                 "mammograms:appointment_cannot_go_ahead", kwargs={"pk": pk}
             ),
