@@ -23,7 +23,7 @@ def test_notifications():
 
     setup_mesh_inbox_test_data(environment, resource_group_name)
 
-    for job in ["smm", "cap", "smb", "smk"]:
+    for job in ["smm", "cap", "smk"]:
         logging.info(
             "Starting notifications container app job manbrs-%s-%s", job, environment
         )

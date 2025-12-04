@@ -42,10 +42,6 @@ workspace {
               technology "Event driven container app job"
               tags job
           }
-          send_message_batch = component "Send message batch / Retry failed message batch" "2 separate jobs" {
-              technology "Event driven container app job"
-              tags job
-          }
           create_appointments = component "Create appointments" {
               technology "Event driven container app job"
               tags job
@@ -125,10 +121,6 @@ workspace {
     save_message_status -> queue "Gets updates to save"
     store_mesh_messages -> mesh "Fetches appointments from" {
       tags store_mesh
-    }
-    send_message_batch -> notify "Sends message requests"
-    send_message_batch -> retry_queue "Sends failed batches" {
-      tags send_retry
     }
     create_appointments -> mesh_blob_container "Gets MESH messages"
     store_mesh_messages -> mesh_blob_container "Stores MESH messages"
