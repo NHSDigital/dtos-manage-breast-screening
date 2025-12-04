@@ -240,6 +240,21 @@ class TestAppointment:
             [late, middle, early],
         )
 
+    def test_for_participant(self):
+        a = AppointmentFactory.create()
+        b = AppointmentFactory.create(
+            screening_episode__participant=a.screening_episode.participant
+        )
+        AppointmentFactory.create()
+
+        assertQuerySetEqual(
+            models.Appointment.objects.for_participant(
+                a.screening_episode.participant_id
+            ),
+            [a, b],
+            ordered=False,
+        )
+
     @pytest.mark.django_db
     class TestEagerLoadCurrentStatus:
         def test_eager_loads_most_recent_status_with_created_by(
