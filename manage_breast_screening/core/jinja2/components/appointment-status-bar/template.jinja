@@ -1,30 +1,29 @@
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
-
-{% if presented_appointment and presented_appointment.show_status_bar_for(user) %}
+{% if presented_status_bar and presented_status_bar.show_status_bar_for(user) %}
   <div class="app-status-bar app-status-bar--rows-2">
     <div class="nhsuk-width-container">
         <div class="app-status-bar__row">
             <div class="app-status-bar__item">
               <span class="app-status-bar__key">Appointment:</span>
               <span>
-                {{ presented_appointment.clinic_slot.clinic_date_and_slot_time }}
-                {% if presented_appointment.is_special_appointment %}
-                  <strong class="nhsuk-tag nhsuk-tag--yellow nhsuk-u-margin-left-1">Special appointment</strong>
+                {{ presented_status_bar.clinic_slot.clinic_date_and_slot_time }}
+                {% if presented_status_bar.appointment.is_special_appointment %}
+                {{ tag(presented_status_bar.tag_properties) }}
                 {% endif %}
               </span>
             </div>
         </div>
         <div class="app-status-bar__row">
             <div class="app-status-bar__item">
-              <strong>{{ presented_appointment.participant.full_name }}</strong>
+              <strong>{{ presented_status_bar.participant.full_name }}</strong>
             </div>
             <div class="app-status-bar__item">
               <span class="app-status-bar__key">DOB:</span>
-              <span>{{ presented_appointment.participant.date_of_birth }} ({{ presented_appointment.participant.age }})</span>
+              <span>{{ presented_status_bar.participant.date_of_birth }} ({{ presented_status_bar.participant.age }})</span>
             </div>
             <div class="app-status-bar__item">
               <span class="app-status-bar__key">NHS:</span>
-              <span>{{ presented_appointment.participant.nhs_number }}</span>
+              <span>{{ presented_status_bar.participant.nhs_number }}</span>
             </div>
         </div>
     </div>

@@ -79,14 +79,6 @@ class AppointmentPresenter:
             Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
         ) and AppointmentStatusUpdater.is_startable(self._appointment)
 
-    def show_status_bar_for(self, user):
-        # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
-        current_status = self._appointment.current_status
-        return (
-            current_status.state == AppointmentStatus.IN_PROGRESS
-            and user.nhs_uid == current_status.created_by.nhs_uid
-        )
-
     @cached_property
     def special_appointment_tag_properties(self):
         return {
@@ -120,6 +112,32 @@ class AppointmentPresenter:
             return "by " + self._appointment.current_status.created_by.get_short_name()
         else:
             return None
+
+    @cached_property
+    def status_bar(self):
+        return StatusBarPresenter(self)
+
+
+class StatusBarPresenter:
+    def __init__(self, appointment):
+        self.appointment = appointment
+        self.clinic_slot = appointment.clinic_slot
+        self.participant = appointment.participant
+
+    def show_status_bar_for(self, user):
+        # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
+        current_status = self.appointment._appointment.current_status
+        return (
+            current_status.state == AppointmentStatus.IN_PROGRESS
+            and user.nhs_uid == current_status.created_by.nhs_uid
+        )
+
+    @property
+    def tag_properties(self):
+        return {
+            "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2",
+            "text": "Special appointment",
+        }
 
 
 class ClinicSlotPresenter:
