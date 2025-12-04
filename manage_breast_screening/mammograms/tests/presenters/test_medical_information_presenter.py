@@ -78,64 +78,40 @@ class TestRecordMedicalInformationPresenter:
             },
         ]
 
-    def test_add_lump_link(self):
+    def test_add_lump_button(self):
         appointment = AppointmentFactory()
 
-        assert MedicalInformationPresenter(appointment).add_lump_link == {
+        assert MedicalInformationPresenter(appointment).add_lump_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/lump/",
-            "text": "Add a lump",
+            "text": "Lump",
         }
 
-        SymptomFactory.create(
-            appointment=appointment,
-            lump=True,
-            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-            area=SymptomAreas.BOTH_BREASTS,
-        )
-
-        assert MedicalInformationPresenter(appointment).add_lump_link == {
-            "href": f"/mammograms/{appointment.pk}/record-medical-information/lump/",
-            "text": "Add another lump",
-        }
-
-    def test_add_nipple_change_link(self):
+    def test_add_nipple_change_button(self):
         appointment = AppointmentFactory()
 
-        assert MedicalInformationPresenter(appointment).add_nipple_change_link == {
+        assert MedicalInformationPresenter(appointment).add_nipple_change_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/nipple-change/",
-            "text": "Add a nipple change",
+            "text": "Nipple change",
         }
 
-        SymptomFactory.create(
-            appointment=appointment,
-            inversion=True,
-            when_started=RelativeDateChoices.LESS_THAN_THREE_MONTHS,
-            area=SymptomAreas.BOTH_BREASTS,
-        )
-
-        assert MedicalInformationPresenter(appointment).add_nipple_change_link == {
-            "href": f"/mammograms/{appointment.pk}/record-medical-information/nipple-change/",
-            "text": "Add another nipple change",
-        }
-
-    def test_add_breast_cancer_history_link(self):
+    def test_add_breast_cancer_history_button(self):
         appointment = AppointmentFactory()
 
         assert MedicalInformationPresenter(
             appointment
-        ).add_breast_cancer_history_link == {
+        ).add_breast_cancer_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/breast-cancer-history/",
-            "text": "Add breast cancer history",
+            "text": "Breast cancer",
         }
 
-    def test_implanted_medical_device_history_link(self):
+    def test_implanted_medical_device_history_button(self):
         appointment = AppointmentFactory()
 
         assert MedicalInformationPresenter(
             appointment
-        ).add_implanted_medical_device_history_link == {
+        ).add_implanted_medical_device_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/implanted-medical-device-history/",
-            "text": "Add implanted medical device history",
+            "text": "Implanted medical device",
         }
 
     def test_implanted_medical_device_history_items_have_a_counter(self):
@@ -188,42 +164,42 @@ class TestRecordMedicalInformationPresenter:
 
         assert counters == [None]
 
-    def test_cyst_history_link(self):
+    def test_cyst_history_button(self):
         appointment = AppointmentFactory()
 
-        assert MedicalInformationPresenter(appointment).add_cyst_history_link == {
+        assert MedicalInformationPresenter(appointment).add_cyst_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/cyst-history/",
-            "text": "Add cyst history",
+            "text": "Cysts",
         }
 
-    def test_breast_augmentation_history_link(self):
+    def test_breast_augmentation_history_button(self):
         appointment = AppointmentFactory()
 
         assert MedicalInformationPresenter(
             appointment
-        ).add_breast_augmentation_history_link == {
+        ).add_breast_augmentation_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/breast-augmentation-history/",
-            "text": "Add breast augmentation history",
+            "text": "Breast implants or augmentation",
         }
 
-    def test_add_benign_lump_history_link(self):
+    def test_add_benign_lump_history_button(self):
         appointment = AppointmentFactory()
 
         assert MedicalInformationPresenter(
             appointment
-        ).add_benign_lump_history_link == {
+        ).add_benign_lump_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/benign-lump-history/",
-            "text": "Add benign lump history",
+            "text": "Benign lumps",
         }
 
-    def test_mastectomy_or_lumpectomy_history_link(self):
+    def test_mastectomy_or_lumpectomy_history_button(self):
         appointment = AppointmentFactory()
 
         assert MedicalInformationPresenter(
             appointment
-        ).add_mastectomy_or_lumpectomy_history_link == {
+        ).add_mastectomy_or_lumpectomy_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/mastectomy-or-lumpectomy-history/",
-            "text": "Add mastectomy or lumpectomy history",
+            "text": "Mastectomy or lumpectomy",
         }
 
     def test_mastectomy_or_lumpectomy_history_items_have_a_counter(self):
@@ -254,14 +230,14 @@ class TestRecordMedicalInformationPresenter:
 
         assert counters == [None]
 
-    def test_other_procedure_history_link(self):
+    def test_other_procedure_history_button(self):
         appointment = AppointmentFactory()
 
         assert MedicalInformationPresenter(
             appointment
-        ).add_other_procedure_history_link == {
+        ).add_other_procedure_history_button == {
             "href": f"/mammograms/{appointment.pk}/record-medical-information/other-procedure-history/",
-            "text": "Add other procedure history",
+            "text": "Other procedures",
         }
 
     def test_other_procedure_history_items_have_a_counter(self):

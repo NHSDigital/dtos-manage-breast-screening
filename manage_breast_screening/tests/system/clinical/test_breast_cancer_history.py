@@ -15,7 +15,7 @@ class TestBreastCancerHistory(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_breast_cancer_history()
+        self.when_i_click_on_breast_cancer()
         self.then_i_see_the_add_breast_cancer_history_form()
 
         self.when_i_select_right_breast()
@@ -50,14 +50,14 @@ class TestBreastCancerHistory(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_breast_cancer_history()
+        self.when_i_click_on_breast_cancer()
         self.then_the_accessibility_baseline_is_met()
 
     def test_validation_errors(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_breast_cancer_history()
+        self.when_i_click_on_breast_cancer()
         self.and_i_click_save()
         self.then_i_am_prompted_to_fill_in_required_fields()
 
@@ -78,8 +78,8 @@ class TestBreastCancerHistory(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_breast_cancer_history(self):
-        self.page.get_by_text("Add breast cancer history").click()
+    def when_i_click_on_breast_cancer(self):
+        self.page.get_by_role("button").filter(has_text="Breast cancer").click()
 
     def then_i_see_the_add_breast_cancer_history_form(self):
         expect(self.page.get_by_text("Add details of breast cancer")).to_be_visible()
@@ -215,4 +215,3 @@ class TestBreastCancerHistory(SystemTestCase):
         row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
         expect(row).not_to_contain_text("Cancer location")
         expect(row.get_by_text("Change")).not_to_be_attached()
-        expect(row.get_by_text("Add breast cancer history")).to_be_attached()

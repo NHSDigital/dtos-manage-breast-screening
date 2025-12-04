@@ -15,7 +15,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_other_procedure()
+        self.when_i_click_on_other_procedures()
         self.then_i_see_the_add_other_procedure_form()
 
         self.when_i_click_save()
@@ -47,7 +47,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_other_procedure()
+        self.when_i_click_on_other_procedures()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -67,8 +67,8 @@ class TestRecordingOtherProcedure(SystemTestCase):
             )
         )
 
-    def when_i_click_on_add_other_procedure(self):
-        self.page.get_by_text("Add other procedure history").click()
+    def when_i_click_on_other_procedures(self):
+        self.page.get_by_role("button").filter(has_text="Other procedures").click()
 
     def then_i_see_the_add_other_procedure_form(self):
         expect(self.page.get_by_text("Add details of other procedures")).to_be_visible()
@@ -166,4 +166,3 @@ class TestRecordingOtherProcedure(SystemTestCase):
         row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
         expect(row).not_to_contain_text("Procedure details")
         expect(row.get_by_text("Change")).not_to_be_attached()
-        expect(row.get_by_text("Add other procedure history")).to_be_attached()
