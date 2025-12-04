@@ -883,15 +883,16 @@ wheels = [
 
 [[package]]
 name = "mesh-client"
-version = "3.2.3"
+version = "4.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
     { name = "urllib3" },
+    { name = "werkzeug" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/17/d8/1f38d39e51a70f9caa9c818d5561d0c46f7a56b6c6a393bb9f9fc0ec3ff8/Mesh-Client-3.2.3.tar.gz", hash = "sha256:c39adfcdcffb10690202d71661d6a5cb439293ce345657a8efb23b44541e8b1f", size = 93630, upload-time = "2024-02-13T12:47:32.897Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d5/b0/88a5cd999c844d7e1f19c6f31f90ca9015d87d8bacca7dffcb5d24dece35/mesh_client-4.0.1.tar.gz", hash = "sha256:c29e1c3ebcd6596f1d31956d279b8436d11227234160558cdfd740e8df81d2f1", size = 84821, upload-time = "2025-08-06T08:11:57.634Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/7f/757ed863d12bd7029a4fd5477b5f9d54792c9fdf96935fa05a6bd01c8bf4/Mesh_Client-3.2.3-py2.py3-none-any.whl", hash = "sha256:eee4b99021b48ac9edd58fca4c022d6b4a02a6b15c594775df25eabfa80ef569", size = 31140, upload-time = "2024-02-13T12:47:31.735Z" },
+    { url = "https://files.pythonhosted.org/packages/35/23/379d5b7abb1689990e07d84f812bfcaf5ae27a2dc55224c8b545dd6c25e5/mesh_client-4.0.1-py2.py3-none-any.whl", hash = "sha256:81dd57d9684e10b59eaa2eeef463de1476ec5a5030b7ba480daaa26bff655181", size = 31004, upload-time = "2025-08-06T08:11:56.754Z" },
 ]
 
 [[package]]
@@ -2006,6 +2007,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6c/63/53559446a878410fc5a5974feb13d31d78d752eb18aeba59c7fef1af7598/wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5", size = 101301, upload-time = "2024-01-06T02:10:57.829Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/fd/84/fd2ba7aafacbad3c4201d395674fc6348826569da3c0937e75505ead3528/wcwidth-0.2.13-py2.py3-none-any.whl", hash = "sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859", size = 34166, upload-time = "2024-01-06T02:10:55.763Z" },
+]
+
+[[package]]
+name = "werkzeug"
+version = "3.1.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "markupsafe" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/45/ea/b0f8eeb287f8df9066e56e831c7824ac6bab645dd6c7a8f4b2d767944f9b/werkzeug-3.1.4.tar.gz", hash = "sha256:cd3cd98b1b92dc3b7b3995038826c68097dcb16f9baa63abe35f20eafeb9fe5e", size = 864687, upload-time = "2025-11-29T02:15:22.841Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2f/f9/9e082990c2585c744734f85bec79b5dae5df9c974ffee58fe421652c8e91/werkzeug-3.1.4-py3-none-any.whl", hash = "sha256:2ad50fb9ed09cc3af22c54698351027ace879a0b60a3b5edf5730b2f7d876905", size = 224960, upload-time = "2025-11-29T02:15:21.13Z" },
 ]
 
 [[package]]
