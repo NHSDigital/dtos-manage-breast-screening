@@ -1,31 +1,38 @@
 #!/usr/bin/env python3
-"""Simple linter to spot denylisted model usage within Django view modules."""
+"""Check for model usage without provider scoping within Django view modules."""
 
 import argparse
+import re
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 
-# Expected to be run from repository root
-REPO_ROOT = Path.cwd()
+REPO_ROOT = Path(__file__).parent.parent
 
-DENYLISTED_MODELS = (
-    "Appointment",
-    "Clinic",
-    "Participant",
-    "Symptom",
-    "BreastCancerHistoryItem",
+ALLOWLISTED_MODELS = (
+    "User",
+    "Provider",
+    "BenignLumpHistoryItem",  # Temporarily allowed
+    "BreastAugmentationHistoryItem",  # Temporarily allowed
+    "CystHistoryItem",  # Temporarily allowed
+    "ImplantedMedicalDeviceHistoryItem",  # Temporarily allowed
+    "MastectomyOrLumpectomyHistoryItem",  # Temporarily allowed
+    "OtherProcedureHistoryItem",  # Temporarily allowed
+    "ParticipantReportedMammogram",  # Temporarily allowed
 )
-DENYLISTED_HELPERS = ("get_object_or_404(",)
+
+TARGETS = {
+    "model.objects": re.compile(r"(?P<model_name>\w+)\.objects"),
+    "model.get_object_or_404": re.compile(r"(?P<model_name>\w+)\.get_object_or_404"),
+}
 
 
+@dataclass
 class Match:
-    __slots__ = ("path", "line_number", "target", "line")
-
-    def __init__(self, path, line_number, target, line):
-        self.path = path
-        self.line_number = line_number
-        self.target = target
-        self.line = line
+    path: Path
+    line_number: int
+    target: str
+    line: str
 
 
 def parse_args():
@@ -63,13 +70,6 @@ def find_view_modules(base_dir):
 
 
 def find_matches(paths):
-    targets = {
-        f"{model_name}.objects": f"{model_name}.objects"
-        for model_name in DENYLISTED_MODELS
-    }
-    for helper in DENYLISTED_HELPERS:
-        targets[helper] = helper
-
     for path in paths:
         try:
             text = path.read_text(encoding="utf-8")
@@ -77,14 +77,16 @@ def find_matches(paths):
             continue
 
         for line_number, line in enumerate(text.splitlines(), start=1):
-            for needle, label in targets.items():
-                if needle in line:
-                    yield Match(
-                        path=path,
-                        line_number=line_number,
-                        target=label,
-                        line=line.strip(),
-                    )
+            for label, regex in TARGETS.items():
+                if match := regex.search(line):
+                    model_name = match.group("model_name")
+                    if model_name not in ALLOWLISTED_MODELS:
+                        yield Match(
+                            path=path,
+                            line_number=line_number,
+                            target=label,
+                            line=line.strip(),
+                        )
 
 
 def main():
