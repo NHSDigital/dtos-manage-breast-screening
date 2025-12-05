@@ -1,0 +1,21 @@
+{% from 'nhsuk/components/warning-callout/macro.jinja' import warningCallout %}
+{% macro appointment_note_banner(appointment_note, change_url=None, show_change_link=True) %}
+  {% if appointment_note %}
+    {% set appointment_note_html %}
+      <div class="nhsuk-u-margin-bottom-3">
+        {{ appointment_note.content | nl2br }}
+      </div>
+      {% if show_change_link and change_url %}
+        <p class="nhsuk-u-margin-bottom-0">
+          <a href="{{ change_url }}">
+            Change<span class="nhsuk-u-visually-hidden"> appointment note</span>
+          </a>
+        </p>
+      {% endif %}
+    {% endset %}
+    {{ warningCallout({
+      "heading": "Appointment note",
+      "html": appointment_note_html
+    }) }}
+  {% endif %}
+{% endmacro %}

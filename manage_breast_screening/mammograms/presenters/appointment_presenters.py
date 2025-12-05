@@ -8,7 +8,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 
 from ...core.utils.date_formatting import format_date, format_relative_date, format_time
-from ...participants.models import AppointmentStatus, SupportReasons
+from ...participants.models import AppointmentNote, AppointmentStatus, SupportReasons
 from ...participants.presenters import ParticipantPresenter, status_colour
 
 
@@ -111,6 +111,13 @@ class AppointmentPresenter:
         elif self._appointment.current_status.is_final_state():
             return "by " + self._appointment.current_status.created_by.get_short_name()
         else:
+            return None
+
+    @cached_property
+    def note(self):
+        try:
+            return self._appointment.note
+        except AppointmentNote.DoesNotExist:
             return None
 
 

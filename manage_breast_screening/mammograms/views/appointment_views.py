@@ -68,6 +68,7 @@ class ShowAppointment(AppointmentMixin, View):
             "presented_appointment": appointment_presenter,
             "presented_participant": appointment_presenter.participant,
             "presented_mammograms": last_known_mammogram_presenter,
+            "appointment_note": appointment_presenter.note,
             "secondary_nav_items": present_secondary_nav(
                 appointment.pk, current_tab="appointment"
             ),
