@@ -27,7 +27,7 @@ class TestParticipantRecord(SystemTestCase):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
         self.and_i_am_viewing_the_upcoming_appointment()
-        self.when_i_click_on_view_participant_record()
+        self.when_i_click_on_participant_details()
         self.then_i_should_be_on_the_participant_record_page()
         self.and_i_should_see_the_participant_record()
         self.when_i_click_on_the_back_link()
@@ -36,24 +36,8 @@ class TestParticipantRecord(SystemTestCase):
     def test_accessibility(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
-        self.and_i_am_on_the_participant_record_page()
+        self.and_i_am_on_the_participant_details_tab()
         self.then_the_accessibility_baseline_is_met()
-
-    def test_viewing_upcoming_appointments(self):
-        self.given_i_am_logged_in_as_an_administrative_user()
-        self.and_the_participant_has_an_upcoming_appointment()
-        self.and_i_am_on_the_participant_record_page()
-        self.then_i_should_see_the_upcoming_appointment()
-        self.when_i_click_on_the_upcoming_appointment()
-        self.then_i_should_be_on_the_upcoming_appointment_page()
-
-    def test_viewing_past_appointments(self):
-        self.given_i_am_logged_in_as_an_administrative_user()
-        self.and_the_participant_has_past_appointments()
-        self.and_i_am_on_the_participant_record_page()
-        self.then_i_should_see_the_past_appointments()
-        self.when_i_click_on_a_past_appointment()
-        self.then_i_should_be_on_the_past_appointment_page()
 
     def and_the_participant_has_an_upcoming_appointment(self):
         clinic_slot = ClinicSlotFactory(
@@ -95,18 +79,16 @@ class TestParticipantRecord(SystemTestCase):
             )
         )
 
-    def and_i_am_on_the_participant_record_page(self):
+    def and_i_am_on_the_participant_details_tab(self):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "participants:show",
-                kwargs={"pk": self.participant.pk},
+                "mammograms:participant_details",
+                kwargs={"pk": self.upcoming_appointment.pk},
             )
         )
 
-    and_i_am_on_the_participant_record_page = and_i_am_on_the_participant_record_page
-
-    def when_i_click_on_view_participant_record(self):
+    def when_i_click_on_participant_details(self):
         self.page.get_by_role("link", name="Participant details").click()
 
     def then_i_should_be_on_the_participant_record_page(self):

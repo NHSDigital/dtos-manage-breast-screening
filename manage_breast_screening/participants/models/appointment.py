@@ -39,6 +39,9 @@ class AppointmentQuerySet(models.QuerySet):
     def in_progress(self):
         return self.in_status(AppointmentStatus.IN_PROGRESS)
 
+    def for_participant(self, participant_id):
+        return self.filter(screening_episode__participant_id=participant_id)
+
     def complete(self):
         return self.in_status(
             AppointmentStatus.CANCELLED,

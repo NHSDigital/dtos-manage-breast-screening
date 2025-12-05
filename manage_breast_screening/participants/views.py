@@ -5,12 +5,11 @@ from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
+from manage_breast_screening.participants.models.appointment import Appointment
 from manage_breast_screening.participants.services import fetch_most_recent_provider
 
 from .forms import EthnicityForm, ParticipantReportedMammogramForm
-from .models import Participant, ParticipantReportedMammogram
-from .presenters import ParticipantAppointmentsPresenter, ParticipantPresenter
+from .models import Participant
 
 logger = getLogger(__name__)
 
@@ -35,41 +34,18 @@ def parse_return_url(request, default: str) -> str:
 def show(request, pk):
     provider = request.user.current_provider
     try:
-        participant = provider.participants.get(pk=pk)
-    except Participant.DoesNotExist:
-        raise Http404("Participant not found")
-    presented_participant = ParticipantPresenter(participant)
+        appointment_id = (
+            provider.appointments.select_related("clinic_slot")
+            .for_participant(pk)
+            .order_by_starts_at(desc=True)[0:1]
+            .values_list("id", flat=True)
+            .get()
+        )
+    except Appointment.DoesNotExist:
+        logger.exception(f"Appointment not found for participant {pk}")
+        return redirect(reverse("clinics:index"))
 
-    appointments = participant.appointments.order_by_starts_at(
-        desc=True
-    ).select_related("clinic_slot__clinic__setting")
-
-    presented_appointments = ParticipantAppointmentsPresenter(
-        past_appointments=list(appointments.past()),
-        upcoming_appointments=list(appointments.upcoming()),
-    )
-
-    last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-        participant_id=pk
-    ).order_by("-created_at")
-
-    presented_mammograms = LastKnownMammogramPresenter(
-        last_known_mammograms,
-        participant_pk=pk,
-        current_url=request.path,
-    )
-
-    return render(
-        request,
-        "participants/show.jinja",
-        context={
-            "presented_participant": presented_participant,
-            "presented_appointments": presented_appointments,
-            "presented_mammograms": presented_mammograms,
-            "heading": participant.full_name,
-            "page_title": "Participant",
-        },
-    )
+    return redirect("mammograms:participant_details", pk=appointment_id)
 
 
 def edit_ethnicity(request, pk):
