@@ -1,6 +1,5 @@
 {% extends 'layout-app.jinja' %}
 {% from 'nhsuk/components/card/macro.jinja' import card %}
-{% from 'nhsuk/components/warning-callout/macro.jinja' import warningCallout %}
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
 {% from 'components/appointment-status/macro.jinja' import appointment_status %}
@@ -8,6 +7,7 @@
 {% from 'components/check-in/macro.jinja' import check_in %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
+{% from 'mammograms/appointment_notes/appointment_note_banner.jinja' import appointment_note_banner %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -54,6 +54,11 @@
     "visuallyHiddenTitle": "Secondary menu",
     "items": secondary_nav_items
   }) }}
+
+  {{ appointment_note_banner(
+    appointment_note,
+    change_url=url('mammograms:appointment_note', kwargs={'pk': presented_appointment.pk})
+  ) }}
 
   {% set appointment_details_html %}
     {{ summaryList({
