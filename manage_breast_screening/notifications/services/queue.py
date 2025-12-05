@@ -61,11 +61,3 @@ class Queue:
 
     def get_message_count(self):
         return self.client.get_queue_properties().approximate_message_count
-
-    @classmethod
-    def MessageStatusUpdates(cls):
-        return cls(
-            os.getenv(
-                "STATUS_UPDATES_QUEUE_NAME", "notifications-message-status-updates"
-            )
-        )
