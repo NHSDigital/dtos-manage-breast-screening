@@ -13,6 +13,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.participants.models import (
     Appointment,
+    AppointmentNote,
     Participant,
     ParticipantReportedMammogram,
 )
@@ -20,6 +21,7 @@ from manage_breast_screening.participants.presenters import ParticipantPresenter
 
 from ..forms import (
     AppointmentCannotGoAheadForm,
+    AppointmentNoteForm,
     AskForMedicalInformationForm,
     RecordMedicalInformationForm,
 )
@@ -79,11 +81,6 @@ class ShowAppointment(AppointmentMixin, View):
 
 
 class ParticipantDetails(AppointmentMixin, View):
-    """
-    Show a completed appointment. Redirects to the start screening form
-    if the apppointment is in progress.
-    """
-
     template_name = "mammograms/show.jinja"
 
     def get(self, request, *args, **kwargs):
@@ -116,6 +113,49 @@ class ParticipantDetails(AppointmentMixin, View):
             template_name="mammograms/show/participant_details.jinja",
             context=context,
         )
+
+
+class AppointmentNoteView(AppointmentMixin, FormView):
+    template_name = "mammograms/show/appointment_note.jinja"
+    form_class = AppointmentNoteForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(
+            appointment, tab_description="Note"
+        )
+
+        context.update(
+            {
+                "heading": appointment_presenter.participant.full_name,
+                "caption": appointment_presenter.caption,
+                "page_title": appointment_presenter.page_title,
+                "presented_appointment": appointment_presenter,
+                "secondary_nav_items": present_secondary_nav(
+                    appointment.pk, current_tab="note"
+                ),
+            }
+        )
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        try:
+            kwargs["instance"] = self.appointment.note
+        except AppointmentNote.DoesNotExist:
+            kwargs["instance"] = AppointmentNote(appointment=self.appointment)
+        return kwargs
+
+    def form_valid(self, form):
+        is_new_note = form.instance._state.adding
+        note = form.save()
+        auditor = Auditor.from_request(self.request)
+        if is_new_note:
+            auditor.audit_create(note)
+        else:
+            auditor.audit_update(note)
+        return redirect("mammograms:appointment_note", pk=self.appointment.pk)
 
 
 class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):

@@ -1,4 +1,4 @@
-from .appointment import Appointment, AppointmentStatus
+from .appointment import Appointment, AppointmentNote, AppointmentStatus
 from .benign_lump_history_item import BenignLumpHistoryItem
 from .breast_augmentation_history_item import BreastAugmentationHistoryItem
 from .breast_cancer_history_item import BreastCancerHistoryItem
@@ -14,6 +14,7 @@ from .symptom import Symptom, SymptomAreas, SymptomSubType, SymptomType
 
 __all__ = [
     "Appointment",
+    "AppointmentNote",
     "AppointmentStatus",
     "BenignLumpHistoryItem",
     "BreastAugmentationHistoryItem",

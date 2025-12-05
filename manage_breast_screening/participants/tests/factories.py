@@ -161,6 +161,14 @@ class AppointmentFactory(DjangoModelFactory):
         )
 
 
+class AppointmentNoteFactory(DjangoModelFactory):
+    class Meta:
+        model = models.AppointmentNote
+
+    appointment = SubFactory(AppointmentFactory)
+    content = Faker("sentence")
+
+
 class BreastCancerHistoryItemFactory(DjangoModelFactory):
     class Meta:
         model = models.BreastCancerHistoryItem

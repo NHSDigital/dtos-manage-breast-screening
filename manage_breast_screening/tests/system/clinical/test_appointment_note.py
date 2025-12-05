@@ -1,0 +1,63 @@
+from django.urls import reverse
+from playwright.sync_api import expect
+
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
+
+from ..system_test_setup import SystemTestCase
+
+
+class TestAppointmentNote(SystemTestCase):
+    def test_clinical_user_adds_and_updates_an_appointment_note(self):
+        self.initial_note_text = "Participant prefers an evening appointment."
+        self.updated_note_text = "Participant prefers morning appointments only."
+
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment_for_my_provider()
+        self.and_i_am_on_the_appointment_note_page()
+
+        self.when_i_save_the_note()
+        self.then_i_see_a_validation_error()
+
+        self.when_i_enter_a_note()
+        self.and_i_save_the_note()
+        self.then_the_note_field_contains(self.initial_note_text)
+
+        self.when_i_update_the_note()
+        self.and_i_save_the_note()
+        self.then_the_note_field_contains(self.updated_note_text)
+
+    def and_there_is_an_appointment_for_my_provider(self):
+        self.appointment = AppointmentFactory(
+            clinic_slot__clinic__setting__provider=self.current_provider
+        )
+
+    def and_i_am_on_the_appointment_note_page(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse("mammograms:appointment_note", kwargs={"pk": self.appointment.pk})
+        )
+        self.expect_url("mammograms:appointment_note", pk=self.appointment.pk)
+
+    def then_i_see_a_validation_error(self):
+        self.expect_validation_error(
+            error_text="Enter a note",
+            field_label="Note",
+        )
+
+    def when_i_enter_a_note(self):
+        self.page.get_by_label("Note").fill(self.initial_note_text)
+
+    def when_i_update_the_note(self):
+        field = self.page.get_by_label("Note")
+        expect(field).to_have_value(self.initial_note_text)
+        field.fill(self.updated_note_text)
+
+    def and_i_save_the_note(self):
+        self.page.get_by_role("button", name="Save note").click()
+        self.expect_url("mammograms:appointment_note", pk=self.appointment.pk)
+
+    def when_i_save_the_note(self):
+        self.and_i_save_the_note()
+
+    def then_the_note_field_contains(self, text):
+        expect(self.page.get_by_label("Note")).to_have_value(text)
