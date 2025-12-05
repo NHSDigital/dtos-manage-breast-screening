@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -156,6 +157,11 @@ class AppointmentNoteView(AppointmentMixin, FormView):
             auditor.audit_create(note)
         else:
             auditor.audit_update(note)
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Appointment note saved",
+        )
         return redirect("mammograms:appointment_note", pk=self.appointment.pk)
 
 
