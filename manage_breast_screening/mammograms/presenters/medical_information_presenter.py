@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.urls import reverse
 
 from manage_breast_screening.mammograms.presenters.benign_lump_history_item_presenter import (
@@ -224,6 +226,25 @@ class MedicalInformationPresenter:
             "href": url,
             "text": "Other procedures",
         }
+
+    @property
+    def medical_information_url(self):
+        return reverse(
+            "mammograms:record_medical_information", kwargs={"pk": self.appointment.pk}
+        )
+
+    @property
+    def add_mammogram_button(self):
+        url = (
+            reverse(
+                "participants:add_previous_mammogram",
+                kwargs={"pk": self.appointment.participant.pk},
+            )
+            + "?return_url="
+            + quote(self.medical_information_url)
+        )
+
+        return {"href": url, "text": "Add another mammogram"}
 
     def _present_items(self, items, presenter_class):
         items = list(items)
