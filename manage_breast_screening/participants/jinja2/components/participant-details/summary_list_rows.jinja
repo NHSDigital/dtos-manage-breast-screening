@@ -6,7 +6,9 @@
     {% if presented_participant.address.postcode %}
       <br>{{ presented_participant.address.postcode }}
     {% endif %}
-  {% endif %}
+  {% else -%}
+  Not provided
+  {%- endif %}
 {% endmacro %}
 
 {% macro date_of_birth_and_age_html(presented_participant) %}
