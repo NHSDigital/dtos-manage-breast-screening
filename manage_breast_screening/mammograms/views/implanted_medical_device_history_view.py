@@ -10,7 +10,7 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
     ImplantedMedicalDeviceHistoryItem,
 )
 
-from ..forms.implanted_medical_device_history_form import (
+from ..forms.medical_history.implanted_medical_device_history_form import (
     ImplantedMedicalDeviceHistoryForm,
     ImplantedMedicalDeviceHistoryUpdateForm,
 )

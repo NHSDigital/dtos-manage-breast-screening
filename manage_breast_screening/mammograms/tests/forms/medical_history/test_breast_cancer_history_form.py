@@ -6,7 +6,7 @@ from django.forms import model_to_dict
 from django.http import QueryDict
 from django.test import RequestFactory
 
-from manage_breast_screening.mammograms.forms.breast_cancer_history_form import (
+from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_form import (
     BreastCancerHistoryForm,
     BreastCancerHistoryUpdateForm,
 )

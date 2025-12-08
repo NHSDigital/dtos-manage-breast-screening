@@ -14,7 +14,7 @@ from manage_breast_screening.participants.models.medical_history.mastectomy_or_l
     MastectomyOrLumpectomyHistoryItem,
 )
 
-from ..forms.mastectomy_or_lumpectomy_history_form import (
+from ..forms.medical_history.mastectomy_or_lumpectomy_history_form import (
     MastectomyOrLumpectomyHistoryForm,
 )
 from .mixins import InProgressAppointmentMixin

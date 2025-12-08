@@ -14,7 +14,7 @@ from manage_breast_screening.participants.tests.factories import (
     BreastAugmentationHistoryItemFactory,
 )
 
-from ...forms.breast_augmentation_history_form import (
+from ....forms.medical_history.breast_augmentation_history_form import (
     BreastAugmentationHistoryForm,
     BreastAugmentationHistoryUpdateForm,
 )

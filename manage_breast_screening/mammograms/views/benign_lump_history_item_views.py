@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.mammograms.forms.benign_lump_history_item_form import (
+from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
 from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (

@@ -14,7 +14,7 @@ from manage_breast_screening.participants.tests.factories import (
     MastectomyOrLumpectomyHistoryItemFactory,
 )
 
-from ...forms.mastectomy_or_lumpectomy_history_form import (
+from ....forms.medical_history.mastectomy_or_lumpectomy_history_form import (
     MastectomyOrLumpectomyHistoryForm,
 )
 

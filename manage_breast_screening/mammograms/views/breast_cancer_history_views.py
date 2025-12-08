@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.core.views.generic import DeleteWithAuditView
-from manage_breast_screening.mammograms.forms.breast_cancer_history_form import (
+from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_form import (
     BreastCancerHistoryForm,
     BreastCancerHistoryUpdateForm,
 )

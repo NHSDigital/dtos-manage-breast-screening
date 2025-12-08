@@ -11,7 +11,9 @@ from manage_breast_screening.participants.models.medical_history.other_procedure
     OtherProcedureHistoryItem,
 )
 
-from ..forms.other_procedure_history_form import OtherProcedureHistoryForm
+from ..forms.medical_history.other_procedure_history_form import (
+    OtherProcedureHistoryForm,
+)
 from .mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)

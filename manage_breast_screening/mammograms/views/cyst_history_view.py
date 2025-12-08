@@ -10,7 +10,10 @@ from manage_breast_screening.participants.models.medical_history.cyst_history_it
     CystHistoryItem,
 )
 
-from ..forms.cyst_history_form import CystHistoryForm, CystHistoryUpdateForm
+from ..forms.medical_history.cyst_history_form import (
+    CystHistoryForm,
+    CystHistoryUpdateForm,
+)
 from .mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)

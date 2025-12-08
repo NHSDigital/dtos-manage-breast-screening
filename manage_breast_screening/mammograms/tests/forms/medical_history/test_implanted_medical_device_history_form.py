@@ -13,7 +13,7 @@ from manage_breast_screening.participants.tests.factories import (
     ImplantedMedicalDeviceHistoryItemFactory,
 )
 
-from ...forms.implanted_medical_device_history_form import (
+from ....forms.medical_history.implanted_medical_device_history_form import (
     ImplantedMedicalDeviceHistoryForm,
     ImplantedMedicalDeviceHistoryUpdateForm,
 )

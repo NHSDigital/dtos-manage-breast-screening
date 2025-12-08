@@ -11,7 +11,10 @@ from manage_breast_screening.participants.tests.factories import (
     CystHistoryItemFactory,
 )
 
-from ...forms.cyst_history_form import CystHistoryForm, CystHistoryUpdateForm
+from ....forms.medical_history.cyst_history_form import (
+    CystHistoryForm,
+    CystHistoryUpdateForm,
+)
 
 
 @pytest.mark.django_db

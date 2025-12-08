@@ -10,7 +10,7 @@ from manage_breast_screening.participants.models.medical_history.breast_augmenta
     BreastAugmentationHistoryItem,
 )
 
-from ..forms.breast_augmentation_history_form import (
+from ..forms.medical_history.breast_augmentation_history_form import (
     BreastAugmentationHistoryForm,
     BreastAugmentationHistoryUpdateForm,
 )

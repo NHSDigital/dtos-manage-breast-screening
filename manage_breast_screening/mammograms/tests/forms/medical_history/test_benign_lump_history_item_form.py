@@ -5,7 +5,7 @@ import pytest
 from django.http import QueryDict
 from django.test import RequestFactory
 
-from manage_breast_screening.mammograms.forms.benign_lump_history_item_form import (
+from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
 from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
