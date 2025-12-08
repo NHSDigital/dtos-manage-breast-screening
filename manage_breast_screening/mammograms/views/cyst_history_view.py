@@ -82,7 +82,7 @@ class AddCystHistoryView(BaseCystHistoryView):
         return kwargs
 
 
-class ChangeCystHistoryView(BaseCystHistoryView):
+class UpdateCystHistoryView(BaseCystHistoryView):
     form_class = CystHistoryItemForm
 
     def get_instance(self):

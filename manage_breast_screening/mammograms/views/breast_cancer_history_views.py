@@ -79,7 +79,7 @@ class AddBreastCancerHistoryView(BaseBreastCancerHistoryView):
         return context
 
 
-class ChangeBreastCancerHistoryView(BaseBreastCancerHistoryView):
+class UpdateBreastCancerHistoryView(BaseBreastCancerHistoryView):
     form_class = BreastCancerHistoryItemForm
 
     def get_instance(self):

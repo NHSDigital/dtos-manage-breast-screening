@@ -83,7 +83,7 @@ class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
         return kwargs
 
 
-class ChangeOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
+class UpdateOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
     form_class = OtherProcedureHistoryItemForm
 
     def get_instance(self):

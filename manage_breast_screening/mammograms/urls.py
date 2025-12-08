@@ -138,7 +138,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>",
-        breast_cancer_history_views.ChangeBreastCancerHistoryView.as_view(),
+        breast_cancer_history_views.UpdateBreastCancerHistoryView.as_view(),
         name="change_breast_cancer_history_item",
     ),
     path(
@@ -153,7 +153,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>",
-        implanted_medical_device_history_view.ChangeImplantedMedicalDeviceHistoryView.as_view(),
+        implanted_medical_device_history_view.UpdateImplantedMedicalDeviceHistoryView.as_view(),
         name="change_implanted_medical_device_history_item",
     ),
     path(
@@ -163,7 +163,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>",
-        cyst_history_view.ChangeCystHistoryView.as_view(),
+        cyst_history_view.UpdateCystHistoryView.as_view(),
         name="change_cyst_history_item",
     ),
     path(
@@ -173,7 +173,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>",
-        breast_augmentation_history_views.ChangeBreastAugmentationHistoryView.as_view(),
+        breast_augmentation_history_views.UpdateBreastAugmentationHistoryView.as_view(),
         name="change_breast_augmentation_history_item",
     ),
     path(
@@ -203,7 +203,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>",
-        other_procedure_history_view.ChangeOtherProcedureHistoryView.as_view(),
+        other_procedure_history_view.UpdateOtherProcedureHistoryView.as_view(),
         name="change_other_procedure_history_item",
     ),
     path(

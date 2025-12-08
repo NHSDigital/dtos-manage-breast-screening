@@ -97,7 +97,7 @@ class AddImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView
         return kwargs
 
 
-class ChangeImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView):
+class UpdateImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView):
     form_class = ImplantedMedicalDeviceHistoryItemForm
 
     def get_instance(self):

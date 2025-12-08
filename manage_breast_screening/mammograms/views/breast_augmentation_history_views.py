@@ -78,7 +78,7 @@ class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
         return context
 
 
-class ChangeBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
+class UpdateBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
     form_class = BreastAugmentationHistoryItemForm
 
     def get_instance(self):
