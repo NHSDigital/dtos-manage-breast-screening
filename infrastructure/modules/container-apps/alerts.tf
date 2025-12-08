@@ -62,7 +62,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "queue_length_high" {
   criteria {
     query = <<-KQL
       customMetrics
-      | where name == "queue_size_${each.key}"
+      | where name == "${each.key}"
       | extend environment = tostring(customDimensions.environment)
       | where environment == "${var.environment}"
       | extend value = toreal(value)
