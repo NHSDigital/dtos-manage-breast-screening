@@ -1,7 +1,7 @@
 from manage_breast_screening.mammograms.presenters.other_procedure_history_item_presenter import (
     OtherProcedureHistoryItemPresenter,
 )
-from manage_breast_screening.participants.models.other_procedure_history_item import (
+from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

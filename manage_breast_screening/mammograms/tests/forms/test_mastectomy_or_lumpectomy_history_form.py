@@ -6,7 +6,7 @@ from django.http import QueryDict
 from django.test import RequestFactory
 
 from manage_breast_screening.core.models import AuditLog
-from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_history_item import (
+from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

@@ -3,7 +3,7 @@ from urllib.parse import urlencode
 import pytest
 from django.http import QueryDict
 
-from manage_breast_screening.participants.models.cyst_history_item import (
+from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
     CystHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

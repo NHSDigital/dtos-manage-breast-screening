@@ -7,11 +7,9 @@ from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     ChoiceField,
     MultipleChoiceField,
 )
-from manage_breast_screening.nhsuk_forms.fields.integer_field import (
-    YearField,
-)
+from manage_breast_screening.nhsuk_forms.fields.integer_field import YearField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
-from manage_breast_screening.participants.models.breast_cancer_history_item import (
+from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
 )
 

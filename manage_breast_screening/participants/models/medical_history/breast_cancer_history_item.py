@@ -3,8 +3,8 @@ from django.db import models
 
 from manage_breast_screening.nhsuk_forms.validators import ExcludesOtherOptionsValidator
 
-from ...core.models import BaseModel
-from .appointment import Appointment
+from ....core.models import BaseModel
+from ..appointment import Appointment
 
 
 class BreastCancerHistoryItem(BaseModel):

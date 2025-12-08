@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
-from manage_breast_screening.participants.models.implanted_medical_device_history_item import (
+from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

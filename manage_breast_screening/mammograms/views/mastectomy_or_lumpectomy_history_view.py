@@ -10,7 +10,7 @@ from django.views.generic import FormView
 from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
     MedicalInformationPresenter,
 )
-from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_history_item import (
+from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
 

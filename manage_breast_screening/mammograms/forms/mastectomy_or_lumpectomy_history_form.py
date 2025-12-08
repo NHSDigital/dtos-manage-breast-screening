@@ -2,16 +2,10 @@ from django.forms import widgets
 from django.forms.widgets import RadioSelect, Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
-from manage_breast_screening.nhsuk_forms.fields import (
-    CharField,
-    ChoiceField,
-    YearField,
-)
-from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
-    MultipleChoiceField,
-)
+from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField, YearField
+from manage_breast_screening.nhsuk_forms.fields.choice_fields import MultipleChoiceField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
-from manage_breast_screening.participants.models.mastectomy_or_lumpectomy_history_item import (
+from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
 

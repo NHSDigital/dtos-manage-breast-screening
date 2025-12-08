@@ -12,7 +12,7 @@ from manage_breast_screening.mammograms.forms.breast_cancer_history_form import 
     BreastCancerHistoryForm,
     BreastCancerHistoryUpdateForm,
 )
-from manage_breast_screening.participants.models.breast_cancer_history_item import (
+from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
 )
 

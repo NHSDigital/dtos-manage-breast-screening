@@ -3,7 +3,7 @@ from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
-from manage_breast_screening.participants.models.cyst_history_item import (
+from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
     CystHistoryItem,
 )
 

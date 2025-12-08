@@ -10,7 +10,7 @@ from django.views.generic import FormView
 from manage_breast_screening.mammograms.forms.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
-from manage_breast_screening.participants.models.benign_lump_history_item import (
+from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
     BenignLumpHistoryItem,
 )
 

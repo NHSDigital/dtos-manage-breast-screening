@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 import pytest
 from django.http import QueryDict
 
-from manage_breast_screening.participants.models.other_procedure_history_item import (
+from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

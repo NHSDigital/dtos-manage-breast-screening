@@ -7,13 +7,11 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.core.views.generic import DeleteWithAuditView
-from manage_breast_screening.participants.models.other_procedure_history_item import (
+from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
 
-from ..forms.other_procedure_history_form import (
-    OtherProcedureHistoryForm,
-)
+from ..forms.other_procedure_history_form import OtherProcedureHistoryForm
 from .mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)

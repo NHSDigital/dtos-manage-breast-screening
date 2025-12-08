@@ -1,8 +1,8 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from ...core.models import BaseModel
-from .appointment import Appointment
+from ....core.models import BaseModel
+from ..appointment import Appointment
 
 
 class MastectomyOrLumpectomyHistoryItem(BaseModel):

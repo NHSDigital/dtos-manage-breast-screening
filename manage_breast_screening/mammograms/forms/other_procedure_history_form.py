@@ -4,7 +4,7 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.nhsuk_forms.fields.integer_field import YearField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
-from manage_breast_screening.participants.models.other_procedure_history_item import (
+from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
 

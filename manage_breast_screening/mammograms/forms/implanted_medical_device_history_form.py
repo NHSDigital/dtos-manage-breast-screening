@@ -9,7 +9,7 @@ from manage_breast_screening.nhsuk_forms.fields import (
     YearField,
 )
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
-from manage_breast_screening.participants.models.implanted_medical_device_history_item import (
+from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
 )
 

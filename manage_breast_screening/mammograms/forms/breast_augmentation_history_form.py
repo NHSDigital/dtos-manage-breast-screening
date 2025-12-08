@@ -9,7 +9,7 @@ from manage_breast_screening.nhsuk_forms.fields import (
     YearField,
 )
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import MultipleChoiceField
-from manage_breast_screening.participants.models.breast_augmentation_history_item import (
+from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
 
