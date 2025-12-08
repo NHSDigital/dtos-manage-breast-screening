@@ -6,20 +6,21 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
-    CystHistoryItem,
+from manage_breast_screening.core.views.generic import DeleteWithAuditView
+from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
+    OtherProcedureHistoryItem,
 )
 
-from ..forms.medical_history.cyst_history_item_form import CystHistoryItemForm
-from .mixins import InProgressAppointmentMixin
+from ...forms.medical_history.other_procedure_history_item_form import (
+    OtherProcedureHistoryItemForm,
+)
+from ..mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BaseCystHistoryView(InProgressAppointmentMixin, FormView):
-    template_name = (
-        "mammograms/medical_information/medical_history/forms/cyst_history.jinja"
-    )
+class BaseOtherProcedureHistoryView(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/medical_information/medical_history/forms/other_procedure_history.jinja"
 
     def get_success_url(self):
         return reverse(
@@ -50,8 +51,8 @@ class BaseCystHistoryView(InProgressAppointmentMixin, FormView):
         return context
 
 
-class AddCystHistoryView(BaseCystHistoryView):
-    form_class = CystHistoryItemForm
+class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
+    form_class = OtherProcedureHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -59,7 +60,7 @@ class AddCystHistoryView(BaseCystHistoryView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of cysts added",
+            "Details of other procedure added",
         )
 
         return super().form_valid(form)
@@ -69,8 +70,8 @@ class AddCystHistoryView(BaseCystHistoryView):
 
         context.update(
             {
-                "heading": "Add details of cysts",
-                "page_title": "Details of the cysts",
+                "heading": "Add details of other procedures",
+                "page_title": "Details of the other procedure",
             },
         )
 
@@ -82,16 +83,16 @@ class AddCystHistoryView(BaseCystHistoryView):
         return kwargs
 
 
-class UpdateCystHistoryView(BaseCystHistoryView):
-    form_class = CystHistoryItemForm
+class UpdateOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
+    form_class = OtherProcedureHistoryItemForm
 
     def get_instance(self):
         try:
-            return CystHistoryItem.objects.get(
+            return OtherProcedureHistoryItem.objects.get(
                 pk=self.kwargs["history_item_pk"],
                 appointment_id=self.kwargs["pk"],
             )
-        except CystHistoryItem.DoesNotExist:
+        except OtherProcedureHistoryItem.DoesNotExist:
             logger.exception("History item does not exist for kwargs=%s", self.kwargs)
             return None
 
@@ -111,8 +112,8 @@ class UpdateCystHistoryView(BaseCystHistoryView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["instance"] = self.instance
         kwargs["participant"] = self.participant
+        kwargs["instance"] = self.instance
         return kwargs
 
     def form_valid(self, form):
@@ -121,7 +122,7 @@ class UpdateCystHistoryView(BaseCystHistoryView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of cysts updated",
+            "Details of other procedure updated",
         )
 
         return super().form_valid(form)
@@ -131,9 +132,41 @@ class UpdateCystHistoryView(BaseCystHistoryView):
 
         context.update(
             {
-                "heading": "Edit details of cysts",
-                "page_title": "Details of the cysts",
+                "heading": "Edit details of other procedure",
+                "page_title": "Details of the other procedure",
+                "delete_link": {
+                    "text": "Delete this item",
+                    "class": "nhsuk-link app-link--warning",
+                    "href": reverse(
+                        "mammograms:delete_other_procedure_history_item",
+                        kwargs={
+                            "pk": self.kwargs["pk"],
+                            "history_item_pk": self.kwargs["history_item_pk"],
+                        },
+                    ),
+                },
             },
         )
 
         return context
+
+
+class DeleteOtherProcedureHistoryView(DeleteWithAuditView):
+    def get_thing_name(self, object):
+        return "item"
+
+    def get_success_message_content(self, object):
+        return "Deleted other procedure"
+
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.other_procedure_history_items.get(
+            pk=self.kwargs["history_item_pk"]
+        )
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.kwargs["pk"]},
+        )

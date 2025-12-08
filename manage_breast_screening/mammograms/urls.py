@@ -1,16 +1,14 @@
 from django.urls import path
 
-from .views import (
-    appointment_views,
+from .views import appointment_views, special_appointment_views, symptom_views
+from .views.medical_history import (
     benign_lump_history_item_views,
-    breast_augmentation_history_views,
-    breast_cancer_history_views,
-    cyst_history_view,
-    implanted_medical_device_history_view,
-    mastectomy_or_lumpectomy_history_view,
-    other_procedure_history_view,
-    special_appointment_views,
-    symptom_views,
+    breast_augmentation_history_item_views,
+    breast_cancer_history_item_views,
+    cyst_history_item_views,
+    implanted_medical_device_history_item_views,
+    mastectomy_or_lumpectomy_history_item_views,
+    other_procedure_history_item_views,
 )
 
 app_name = "mammograms"
@@ -133,47 +131,47 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-cancer-history/",
-        breast_cancer_history_views.AddBreastCancerHistoryView.as_view(),
+        breast_cancer_history_item_views.AddBreastCancerHistoryView.as_view(),
         name="add_breast_cancer_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>",
-        breast_cancer_history_views.UpdateBreastCancerHistoryView.as_view(),
+        breast_cancer_history_item_views.UpdateBreastCancerHistoryView.as_view(),
         name="change_breast_cancer_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/delete",
-        breast_cancer_history_views.DeleteBreastCancerHistoryView.as_view(),
+        breast_cancer_history_item_views.DeleteBreastCancerHistoryView.as_view(),
         name="delete_breast_cancer_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/",
-        implanted_medical_device_history_view.AddImplantedMedicalDeviceHistoryView.as_view(),
+        implanted_medical_device_history_item_views.AddImplantedMedicalDeviceHistoryView.as_view(),
         name="add_implanted_medical_device_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>",
-        implanted_medical_device_history_view.UpdateImplantedMedicalDeviceHistoryView.as_view(),
+        implanted_medical_device_history_item_views.UpdateImplantedMedicalDeviceHistoryView.as_view(),
         name="change_implanted_medical_device_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/cyst-history/",
-        cyst_history_view.AddCystHistoryView.as_view(),
+        cyst_history_item_views.AddCystHistoryView.as_view(),
         name="add_cyst_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>",
-        cyst_history_view.UpdateCystHistoryView.as_view(),
+        cyst_history_item_views.UpdateCystHistoryView.as_view(),
         name="change_cyst_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/",
-        breast_augmentation_history_views.AddBreastAugmentationHistoryView.as_view(),
+        breast_augmentation_history_item_views.AddBreastAugmentationHistoryView.as_view(),
         name="add_breast_augmentation_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>",
-        breast_augmentation_history_views.UpdateBreastAugmentationHistoryView.as_view(),
+        breast_augmentation_history_item_views.UpdateBreastAugmentationHistoryView.as_view(),
         name="change_breast_augmentation_history_item",
     ),
     path(
@@ -188,27 +186,27 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/",
-        mastectomy_or_lumpectomy_history_view.AddMastectomyOrLumpectomyHistoryView.as_view(),
+        mastectomy_or_lumpectomy_history_item_views.AddMastectomyOrLumpectomyHistoryView.as_view(),
         name="add_mastectomy_or_lumpectomy_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>",
-        mastectomy_or_lumpectomy_history_view.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
+        mastectomy_or_lumpectomy_history_item_views.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
         name="change_mastectomy_or_lumpectomy_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/",
-        other_procedure_history_view.AddOtherProcedureHistoryView.as_view(),
+        other_procedure_history_item_views.AddOtherProcedureHistoryView.as_view(),
         name="add_other_procedure_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>",
-        other_procedure_history_view.UpdateOtherProcedureHistoryView.as_view(),
+        other_procedure_history_item_views.UpdateOtherProcedureHistoryView.as_view(),
         name="change_other_procedure_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete",
-        other_procedure_history_view.DeleteOtherProcedureHistoryView.as_view(),
+        other_procedure_history_item_views.DeleteOtherProcedureHistoryView.as_view(),
         name="delete_other_procedure_history_item",
     ),
 ]

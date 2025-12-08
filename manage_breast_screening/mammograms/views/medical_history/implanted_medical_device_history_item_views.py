@@ -1,5 +1,4 @@
 import logging
-from functools import cached_property
 
 from django.contrib import messages
 from django.http import Http404
@@ -7,23 +6,20 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
-    MedicalInformationPresenter,
-)
-from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
-    MastectomyOrLumpectomyHistoryItem,
+from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
+    ImplantedMedicalDeviceHistoryItem,
 )
 
-from ..forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
-    MastectomyOrLumpectomyHistoryItemForm,
+from ...forms.medical_history.implanted_medical_device_history_item_form import (
+    ImplantedMedicalDeviceHistoryItemForm,
 )
-from .mixins import InProgressAppointmentMixin
+from ..mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BaseMastectomyOrLumpectomyHistoryView(InProgressAppointmentMixin, FormView):
-    template_name = "mammograms/medical_information/medical_history/forms/mastectomy_or_lumpectomy_history.jinja"
+class BaseImplantedMedicalDeviceHistoryView(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/medical_information/medical_history/forms/implanted_medical_device_history.jinja"
 
     def get_success_url(self):
         return reverse(
@@ -48,20 +44,16 @@ class BaseMastectomyOrLumpectomyHistoryView(InProgressAppointmentMixin, FormView
             {
                 "back_link_params": self.get_back_link_params(),
                 "caption": participant.full_name,
-                "participant_first_name": participant.first_name,
-                "presenter": MedicalInformationPresenter(self.appointment),
+                "heading": "Add details of implanted medical device",
+                "page_title": "Details of the implanted medical device",
             },
         )
 
         return context
 
-    @cached_property
-    def participant(self):
-        return self.appointment.participant
 
-
-class AddMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView):
-    form_class = MastectomyOrLumpectomyHistoryItemForm
+class AddImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView):
+    form_class = ImplantedMedicalDeviceHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -69,34 +61,52 @@ class AddMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of mastectomy or lumpectomy added",
+            "Implanted medical device added",
         )
 
         return super().form_valid(form)
 
+    def get_back_link_params(self):
+        return {
+            "href": reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment_pk},
+            ),
+            "text": "Back to appointment",
+        }
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
+        participant = self.appointment.participant
+
         context.update(
             {
-                "heading": "Add details of mastectomy or lumpectomy",
-                "page_title": "Add details of mastectomy or lumpectomy",
+                "back_link_params": self.get_back_link_params(),
+                "caption": participant.full_name,
+                "heading": "Add details of implanted medical device",
+                "page_title": "Details of the implanted medical device",
             },
         )
 
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["participant"] = self.participant
+        return kwargs
 
-class UpdateMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView):
-    form_class = MastectomyOrLumpectomyHistoryItemForm
+
+class UpdateImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView):
+    form_class = ImplantedMedicalDeviceHistoryItemForm
 
     def get_instance(self):
         try:
-            return MastectomyOrLumpectomyHistoryItem.objects.get(
+            return ImplantedMedicalDeviceHistoryItem.objects.get(
                 pk=self.kwargs["history_item_pk"],
                 appointment_id=self.kwargs["pk"],
             )
-        except MastectomyOrLumpectomyHistoryItem.DoesNotExist:
+        except ImplantedMedicalDeviceHistoryItem.DoesNotExist:
             logger.exception("History item does not exist for kwargs=%s", self.kwargs)
             return None
 
@@ -117,6 +127,7 @@ class UpdateMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryV
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["instance"] = self.instance
+        kwargs["participant"] = self.participant
         return kwargs
 
     def form_valid(self, form):
@@ -125,7 +136,7 @@ class UpdateMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryV
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of mastectomy or lumpectomy updated",
+            "Details of implanted medical device updated",
         )
 
         return super().form_valid(form)
@@ -135,8 +146,8 @@ class UpdateMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryV
 
         context.update(
             {
-                "heading": "Edit details of mastectomy or lumpectomy",
-                "page_title": "Details of the mastectomy or lumpectomy",
+                "heading": "Edit details of implanted medical device",
+                "page_title": "Details of the implanted medical device",
             },
         )
 

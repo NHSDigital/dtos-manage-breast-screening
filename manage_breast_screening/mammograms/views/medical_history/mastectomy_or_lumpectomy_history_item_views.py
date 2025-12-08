@@ -1,4 +1,5 @@
 import logging
+from functools import cached_property
 
 from django.contrib import messages
 from django.http import Http404
@@ -6,21 +7,23 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.core.views.generic import DeleteWithAuditView
-from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
-    OtherProcedureHistoryItem,
+from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
+    MedicalInformationPresenter,
+)
+from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
+    MastectomyOrLumpectomyHistoryItem,
 )
 
-from ..forms.medical_history.other_procedure_history_item_form import (
-    OtherProcedureHistoryItemForm,
+from ...forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
+    MastectomyOrLumpectomyHistoryItemForm,
 )
-from .mixins import InProgressAppointmentMixin
+from ..mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BaseOtherProcedureHistoryView(InProgressAppointmentMixin, FormView):
-    template_name = "mammograms/medical_information/medical_history/forms/other_procedure_history.jinja"
+class BaseMastectomyOrLumpectomyHistoryView(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/medical_information/medical_history/forms/mastectomy_or_lumpectomy_history.jinja"
 
     def get_success_url(self):
         return reverse(
@@ -45,14 +48,20 @@ class BaseOtherProcedureHistoryView(InProgressAppointmentMixin, FormView):
             {
                 "back_link_params": self.get_back_link_params(),
                 "caption": participant.full_name,
+                "participant_first_name": participant.first_name,
+                "presenter": MedicalInformationPresenter(self.appointment),
             },
         )
 
         return context
 
+    @cached_property
+    def participant(self):
+        return self.appointment.participant
 
-class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
-    form_class = OtherProcedureHistoryItemForm
+
+class AddMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView):
+    form_class = MastectomyOrLumpectomyHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -60,7 +69,7 @@ class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of other procedure added",
+            "Details of mastectomy or lumpectomy added",
         )
 
         return super().form_valid(form)
@@ -70,29 +79,24 @@ class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
 
         context.update(
             {
-                "heading": "Add details of other procedures",
-                "page_title": "Details of the other procedure",
+                "heading": "Add details of mastectomy or lumpectomy",
+                "page_title": "Add details of mastectomy or lumpectomy",
             },
         )
 
         return context
 
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["participant"] = self.participant
-        return kwargs
 
-
-class UpdateOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
-    form_class = OtherProcedureHistoryItemForm
+class UpdateMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView):
+    form_class = MastectomyOrLumpectomyHistoryItemForm
 
     def get_instance(self):
         try:
-            return OtherProcedureHistoryItem.objects.get(
+            return MastectomyOrLumpectomyHistoryItem.objects.get(
                 pk=self.kwargs["history_item_pk"],
                 appointment_id=self.kwargs["pk"],
             )
-        except OtherProcedureHistoryItem.DoesNotExist:
+        except MastectomyOrLumpectomyHistoryItem.DoesNotExist:
             logger.exception("History item does not exist for kwargs=%s", self.kwargs)
             return None
 
@@ -112,7 +116,6 @@ class UpdateOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["participant"] = self.participant
         kwargs["instance"] = self.instance
         return kwargs
 
@@ -122,7 +125,7 @@ class UpdateOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of other procedure updated",
+            "Details of mastectomy or lumpectomy updated",
         )
 
         return super().form_valid(form)
@@ -132,41 +135,9 @@ class UpdateOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
 
         context.update(
             {
-                "heading": "Edit details of other procedure",
-                "page_title": "Details of the other procedure",
-                "delete_link": {
-                    "text": "Delete this item",
-                    "class": "nhsuk-link app-link--warning",
-                    "href": reverse(
-                        "mammograms:delete_other_procedure_history_item",
-                        kwargs={
-                            "pk": self.kwargs["pk"],
-                            "history_item_pk": self.kwargs["history_item_pk"],
-                        },
-                    ),
-                },
+                "heading": "Edit details of mastectomy or lumpectomy",
+                "page_title": "Details of the mastectomy or lumpectomy",
             },
         )
 
         return context
-
-
-class DeleteOtherProcedureHistoryView(DeleteWithAuditView):
-    def get_thing_name(self, object):
-        return "item"
-
-    def get_success_message_content(self, object):
-        return "Deleted other procedure"
-
-    def get_object(self):
-        provider = self.request.user.current_provider
-        appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.other_procedure_history_items.get(
-            pk=self.kwargs["history_item_pk"]
-        )
-
-    def get_success_url(self) -> str:
-        return reverse(
-            "mammograms:record_medical_information",
-            kwargs={"pk": self.kwargs["pk"]},
-        )

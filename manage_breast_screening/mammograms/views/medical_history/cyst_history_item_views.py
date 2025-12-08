@@ -6,20 +6,20 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
-    BreastAugmentationHistoryItem,
+from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
+    CystHistoryItem,
 )
 
-from ..forms.medical_history.breast_augmentation_history_item_form import (
-    BreastAugmentationHistoryItemForm,
-)
-from .mixins import InProgressAppointmentMixin
+from ...forms.medical_history.cyst_history_item_form import CystHistoryItemForm
+from ..mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BreastAugmentationHistoryBaseView(InProgressAppointmentMixin, FormView):
-    template_name = "mammograms/medical_information/medical_history/forms/breast_augmentation_history.jinja"
+class BaseCystHistoryView(InProgressAppointmentMixin, FormView):
+    template_name = (
+        "mammograms/medical_information/medical_history/forms/cyst_history.jinja"
+    )
 
     def get_success_url(self):
         return reverse(
@@ -44,15 +44,14 @@ class BreastAugmentationHistoryBaseView(InProgressAppointmentMixin, FormView):
             {
                 "back_link_params": self.get_back_link_params(),
                 "caption": participant.full_name,
-                "participant_first_name": participant.first_name,
             },
         )
 
         return context
 
 
-class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
-    form_class = BreastAugmentationHistoryItemForm
+class AddCystHistoryView(BaseCystHistoryView):
+    form_class = CystHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -60,7 +59,7 @@ class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of breast implants or augmentation added",
+            "Details of cysts added",
         )
 
         return super().form_valid(form)
@@ -70,24 +69,29 @@ class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
 
         context.update(
             {
-                "heading": "Add details of breast implants or augmentation",
-                "page_title": "Add details of breast implants or augmentation",
+                "heading": "Add details of cysts",
+                "page_title": "Details of the cysts",
             },
         )
 
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["participant"] = self.participant
+        return kwargs
 
-class UpdateBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
-    form_class = BreastAugmentationHistoryItemForm
+
+class UpdateCystHistoryView(BaseCystHistoryView):
+    form_class = CystHistoryItemForm
 
     def get_instance(self):
         try:
-            return BreastAugmentationHistoryItem.objects.get(
+            return CystHistoryItem.objects.get(
                 pk=self.kwargs["history_item_pk"],
                 appointment_id=self.kwargs["pk"],
             )
-        except BreastAugmentationHistoryItem.DoesNotExist:
+        except CystHistoryItem.DoesNotExist:
             logger.exception("History item does not exist for kwargs=%s", self.kwargs)
             return None
 
@@ -108,6 +112,7 @@ class UpdateBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["instance"] = self.instance
+        kwargs["participant"] = self.participant
         return kwargs
 
     def form_valid(self, form):
@@ -116,7 +121,7 @@ class UpdateBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
         messages.add_message(
             self.request,
             messages.SUCCESS,
-            "Details of breast implants or augmentation updated",
+            "Details of cysts updated",
         )
 
         return super().form_valid(form)
@@ -126,8 +131,8 @@ class UpdateBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
 
         context.update(
             {
-                "heading": "Edit details of breast implants or augmentation",
-                "page_title": "Edit details of breast implants or augmentation",
+                "heading": "Edit details of cysts",
+                "page_title": "Details of the cysts",
             },
         )
 

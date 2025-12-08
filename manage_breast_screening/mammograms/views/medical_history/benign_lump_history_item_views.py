@@ -14,7 +14,7 @@ from manage_breast_screening.participants.models.medical_history.benign_lump_his
     BenignLumpHistoryItem,
 )
 
-from .mixins import InProgressAppointmentMixin
+from ..mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
 

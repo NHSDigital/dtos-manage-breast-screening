@@ -15,7 +15,7 @@ from manage_breast_screening.participants.models.medical_history.breast_cancer_h
     BreastCancerHistoryItem,
 )
 
-from .mixins import InProgressAppointmentMixin
+from ..mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
 
