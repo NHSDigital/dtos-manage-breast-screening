@@ -16,16 +16,6 @@ locals {
       job_short_name     = "cap"
       job_container_args = "create_appointments"
     }
-    save_message_status = {
-      # cron_expression = "0,30 * * * *"
-      cron_expression = null
-      environment_variables = {
-        STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
-        ENVIRONMENT               = var.environment
-      }
-      job_short_name     = "sms"
-      job_container_args = "save_message_status"
-    }
     create_reports = {
       # cron_expression = "0 21 * * 1-5"
       cron_expression = null
