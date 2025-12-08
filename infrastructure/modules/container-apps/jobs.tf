@@ -16,6 +16,29 @@ locals {
       job_short_name     = "cap"
       job_container_args = "create_appointments"
     }
+    send_message_batch = {
+
+      # cron_expression = "0,30 9 * * 1-5"
+      cron_expression = null
+      environment_variables = {
+        API_OAUTH_TOKEN_URL              = var.api_oauth_token_url
+        NHS_NOTIFY_API_MESSAGE_BATCH_URL = var.nhs_notify_api_message_batch_url
+        RETRY_QUEUE_NAME                 = "notifications-message-batch-retries"
+      }
+      job_short_name     = "smb"
+      job_container_args = "send_message_batch"
+    }
+    retry_failed_message_batch = {
+      # cron_expression = "0,30 9-12 * * 1-5"
+      cron_expression = null
+      environment_variables = {
+        API_OAUTH_TOKEN_URL              = var.api_oauth_token_url
+        NHS_NOTIFY_API_MESSAGE_BATCH_URL = var.nhs_notify_api_message_batch_url
+        RETRY_QUEUE_NAME                 = "notifications-message-batch-retries"
+      }
+      job_short_name     = "rmb"
+      job_container_args = "retry_failed_message_batch"
+    }
     save_message_status = {
       # cron_expression = "0,30 * * * *"
       cron_expression = null
@@ -46,6 +69,7 @@ locals {
     collect_metrics = {
       cron_expression = "*/5 * * * *"
       environment_variables = {
+        RETRY_QUEUE_NAME          = "notifications-message-batch-retries"
         STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
         ENVIRONMENT               = var.environment
       }

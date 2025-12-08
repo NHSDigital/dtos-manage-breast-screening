@@ -15,19 +15,32 @@ class TestCollectMetrics:
     @patch(f"{Command.__module__}.Queue")
     @patch(f"{Command.__module__}.Metrics")
     def test_handle_sends_queue_lengths(self, mock_metrics_class, mock_queue):
+        mock_retry = MagicMock()
+        mock_retry.queue_name = "retry_queue"
+        mock_retry.get_message_count.return_value = 8
+
         mock_status = MagicMock()
         mock_status.queue_name = "status_queue"
         mock_status.get_message_count.return_value = 2
 
+        mock_queue.RetryMessageBatches.return_value = mock_retry
         mock_queue.MessageStatusUpdates.return_value = mock_status
 
         Command().handle()
 
         metrics_instance = mock_metrics_class.return_value
 
-        metrics_instance.set_gauge_value.assert_called_once_with(
+        metrics_instance.set_gauge_value.assert_any_call(
+            "queue_size_retry_queue",
+            "messages",
+            "Queue length",
+            8,
+        )
+        metrics_instance.set_gauge_value.assert_any_call(
             "queue_size_status_queue",
             "messages",
             "Queue length",
             2,
         )
+
+        assert metrics_instance.set_gauge_value.call_count == 2

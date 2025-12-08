@@ -56,6 +56,21 @@ class TestQueue:
             mock_client.create_queue.assert_called_once()
             mock_client.send_message.assert_called_once_with("some data")
 
+    def test_failed_message_batches_queue(self):
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            mock_client = MagicMock()
+            queue_client.from_connection_string.return_value = mock_client
+
+            Queue.RetryMessageBatches().add("some data")
+
+            queue_client.from_connection_string.assert_called_once_with(
+                "qqq111", "notifications-message-batch-retries"
+            )
+            mock_client.create_queue.assert_called_once()
+            mock_client.send_message.assert_called_once_with("some data")
+
     def test_items_method_receives_messages(self, mock_queue_client):
         mock_queue_client.receive_messages.return_value = ["this", "that"]
 
@@ -111,6 +126,17 @@ class TestQueue:
 
             queue_client.from_connection_string.assert_called_once_with(
                 "qqq111", "updates"
+            )
+
+    def test_retry_queue_prefers_queue_name_from_env(self, monkeypatch):
+        monkeypatch.setenv("RETRY_QUEUE_NAME", "retries")
+        with patch(
+            "manage_breast_screening.notifications.services.queue.QueueClient"
+        ) as queue_client:
+            Queue.RetryMessageBatches()
+
+            queue_client.from_connection_string.assert_called_once_with(
+                "qqq111", "retries"
             )
 
     def test_queue_raises_configuration_error_when_no_config_provided(

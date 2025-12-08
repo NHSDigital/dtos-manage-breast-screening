@@ -69,3 +69,7 @@ class Queue:
                 "STATUS_UPDATES_QUEUE_NAME", "notifications-message-status-updates"
             )
         )
+
+    @classmethod
+    def RetryMessageBatches(cls):
+        return cls(os.getenv("RETRY_QUEUE_NAME", "notifications-message-batch-retries"))
