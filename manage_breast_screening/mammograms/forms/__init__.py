@@ -1,17 +1,19 @@
 from .appointment_cannot_go_ahead_form import AppointmentCannotGoAheadForm
 from .appointment_note_form import AppointmentNoteForm
 from .ask_for_medical_information_form import AskForMedicalInformationForm
-from .medical_history.breast_augmentation_history_form import (
-    BreastAugmentationHistoryForm,
+from .medical_history.breast_augmentation_history_item_form import (
+    BreastAugmentationHistoryItemForm,
 )
-from .medical_history.cyst_history_form import CystHistoryForm
-from .medical_history.implanted_medical_device_history_form import (
-    ImplantedMedicalDeviceHistoryForm,
+from .medical_history.cyst_history_item_form import CystHistoryItemForm
+from .medical_history.implanted_medical_device_history_item_form import (
+    ImplantedMedicalDeviceHistoryItemForm,
 )
-from .medical_history.mastectomy_or_lumpectomy_history_form import (
-    MastectomyOrLumpectomyHistoryForm,
+from .medical_history.mastectomy_or_lumpectomy_history_item_form import (
+    MastectomyOrLumpectomyHistoryItemForm,
 )
-from .medical_history.other_procedure_history_form import OtherProcedureHistoryForm
+from .medical_history.other_procedure_history_item_form import (
+    OtherProcedureHistoryItemForm,
+)
 from .record_medical_information_form import RecordMedicalInformationForm
 from .screening_appointment_form import ScreeningAppointmentForm
 from .special_appointment_forms import (
@@ -23,13 +25,13 @@ __all__ = [
     "AppointmentCannotGoAheadForm",
     "AskForMedicalInformationForm",
     "AppointmentNoteForm",
-    "BreastAugmentationHistoryForm",
-    "CystHistoryForm",
+    "BreastAugmentationHistoryItemForm",
+    "CystHistoryItemForm",
     "RecordMedicalInformationForm",
     "ScreeningAppointmentForm",
     "ProvideSpecialAppointmentDetailsForm",
     "MarkReasonsTemporaryForm",
-    "MastectomyOrLumpectomyHistoryForm",
-    "ImplantedMedicalDeviceHistoryForm",
-    "OtherProcedureHistoryForm",
+    "MastectomyOrLumpectomyHistoryItemForm",
+    "ImplantedMedicalDeviceHistoryItemForm",
+    "OtherProcedureHistoryItemForm",
 ]

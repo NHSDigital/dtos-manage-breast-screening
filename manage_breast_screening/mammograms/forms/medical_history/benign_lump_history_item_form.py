@@ -104,8 +104,8 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         hint="Include any other relevant information about the procedure (optional)",
     )
 
-    def __init__(self, *args, **kwargs):
-        self.instance = kwargs.pop("instance", None)
+    def __init__(self, *args, instance=None, **kwargs):
+        self.instance = instance
 
         if self.instance:
             kwargs["initial"] = self.initial_values(self.instance)
@@ -152,6 +152,9 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         return benign_lump_history_item
 
     def update(self, request):
+        if self.instance is None:
+            raise ValueError("Form has no instance")
+
         auditor = Auditor.from_request(request)
 
         self.instance.left_breast_procedures = self.cleaned_data.get(

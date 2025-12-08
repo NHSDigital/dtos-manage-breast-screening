@@ -8,8 +8,16 @@ from manage_breast_screening.participants.models.medical_history.cyst_history_it
 )
 
 
-class CystHistoryBaseForm(Form):
-    def __init__(self, *args, participant, **kwargs):
+class CystHistoryItemForm(Form):
+    def __init__(self, *args, participant, instance=None, **kwargs):
+        self.instance = instance
+
+        if instance:
+            kwargs["initial"] = {
+                "treatment": instance.treatment,
+                "additional_details": instance.additional_details,
+            }
+
         super().__init__(*args, **kwargs)
 
         self.fields["treatment"] = ChoiceField(
@@ -35,8 +43,6 @@ class CystHistoryBaseForm(Form):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-
-class CystHistoryForm(CystHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -50,20 +56,10 @@ class CystHistoryForm(CystHistoryBaseForm):
 
         return cyst_history
 
-
-class CystHistoryUpdateForm(CystHistoryBaseForm):
-    def __init__(self, instance, *args, **kwargs):
-        self.instance = instance
-
-        kwargs["participant"] = instance.participant
-        kwargs["initial"] = {
-            "treatment": instance.treatment,
-            "additional_details": instance.additional_details,
-        }
-
-        super().__init__(*args, **kwargs)
-
     def update(self, request):
+        if self.instance is None:
+            raise ValueError("Form has no instance")
+
         self.instance.treatment = self.cleaned_data["treatment"]
         self.instance.additional_details = self.cleaned_data["additional_details"]
         self.instance.save()

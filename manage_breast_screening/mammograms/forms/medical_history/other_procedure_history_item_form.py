@@ -9,7 +9,7 @@ from manage_breast_screening.participants.models.medical_history.other_procedure
 )
 
 
-class OtherProcedureHistoryForm(FormWithConditionalFields):
+class OtherProcedureHistoryItemForm(FormWithConditionalFields):
     PROCEDURE_DETAIL_FIELDS = {
         OtherProcedureHistoryItem.Procedure.BREAST_REDUCTION: "breast_reduction_details",
         OtherProcedureHistoryItem.Procedure.BREAST_SYMMETRISATION: "breast_symmetrisation_details",

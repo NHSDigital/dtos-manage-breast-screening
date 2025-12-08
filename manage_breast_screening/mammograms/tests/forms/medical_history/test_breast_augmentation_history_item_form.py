@@ -14,19 +14,31 @@ from manage_breast_screening.participants.tests.factories import (
     BreastAugmentationHistoryItemFactory,
 )
 
-from ....forms.medical_history.breast_augmentation_history_form import (
-    BreastAugmentationHistoryForm,
-    BreastAugmentationHistoryUpdateForm,
+from ....forms.medical_history.breast_augmentation_history_item_form import (
+    BreastAugmentationHistoryItemForm,
 )
 
 
 @pytest.mark.django_db
-class TestBreastAugmentationHistoryForm:
+class TestBreastAugmentationHistoryItemForm:
+    @pytest.fixture
+    def instance(self):
+        return BreastAugmentationHistoryItemFactory(
+            right_breast_procedures=[
+                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+            ],
+            left_breast_procedures=[
+                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+            ],
+            procedure_year=2000,
+            implants_have_been_removed=False,
+        )
+
     def test_no_data(self, clinical_user):
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(QueryDict())
+        form = BreastAugmentationHistoryItemForm(QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -38,7 +50,7 @@ class TestBreastAugmentationHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -82,7 +94,7 @@ class TestBreastAugmentationHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -103,7 +115,7 @@ class TestBreastAugmentationHistoryForm:
             ]
         }
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -128,7 +140,7 @@ class TestBreastAugmentationHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -174,7 +186,7 @@ class TestBreastAugmentationHistoryForm:
             if procedure_year > max_year
             else (f"Year must be {min_year} or later")
         )
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -215,7 +227,7 @@ class TestBreastAugmentationHistoryForm:
             if removal_year > max_year
             else (f"Year must be {min_year} or later")
         )
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -254,7 +266,7 @@ class TestBreastAugmentationHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -283,7 +295,7 @@ class TestBreastAugmentationHistoryForm:
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -411,19 +423,21 @@ class TestBreastAugmentationHistoryForm:
             },
         ],
     )
-    def test_success(self, clinical_user, data):
+    def test_valid_create(self, clinical_user, data):
         appointment = AppointmentFactory()
         request = RequestFactory().get("/test-form")
         request.user = clinical_user
 
-        form = BreastAugmentationHistoryForm(
+        form = BreastAugmentationHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
         )
 
         assert form.is_valid()
 
         existing_log_count = AuditLog.objects.count()
+
         obj = form.create(appointment=appointment, request=request)
+
         assert AuditLog.objects.count() == existing_log_count + 1
         audit_log = AuditLog.objects.filter(
             object_id=obj.pk, operation=AuditLog.Operations.CREATE
@@ -439,33 +453,8 @@ class TestBreastAugmentationHistoryForm:
         assert obj.removal_year == data.get("removal_year", None)
         assert obj.additional_details == data.get("additional_details", "")
 
-
-@pytest.mark.django_db
-class TestBreastAugmentationHistoryUpdateForm:
-    @pytest.fixture
-    def instance(self):
-        return BreastAugmentationHistoryItemFactory(
-            right_breast_procedures=[
-                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-            ],
-            left_breast_procedures=[
-                BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-            ],
-            procedure_year=2000,
-            implants_have_been_removed=False,
-        )
-
-    def test_no_data(self, instance):
-        form = BreastAugmentationHistoryUpdateForm(instance, QueryDict())
-
-        assert not form.is_valid()
-        assert form.errors == {
-            "left_breast_procedures": ["Select procedures for the left breast"],
-            "right_breast_procedures": ["Select procedures for the right breast"],
-        }
-
     def test_initial(self, instance):
-        form = BreastAugmentationHistoryUpdateForm(instance, QueryDict())
+        form = BreastAugmentationHistoryItemForm(instance=instance, data=QueryDict())
         assert form.initial == {
             "right_breast_procedures": [
                 BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
@@ -480,9 +469,9 @@ class TestBreastAugmentationHistoryUpdateForm:
         }
 
     def test_success(self, instance, dummy_request):
-        form = BreastAugmentationHistoryUpdateForm(
-            instance,
-            QueryDict(
+        form = BreastAugmentationHistoryItemForm(
+            instance=instance,
+            data=QueryDict(
                 urlencode(
                     {
                         "right_breast_procedures": [

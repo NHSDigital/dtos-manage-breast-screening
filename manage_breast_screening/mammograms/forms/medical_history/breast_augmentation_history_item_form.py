@@ -14,7 +14,7 @@ from manage_breast_screening.participants.models.medical_history.breast_augmenta
 )
 
 
-class BreastAugmentationHistoryBaseForm(Form):
+class BreastAugmentationHistoryItemForm(Form):
     right_breast_procedures = MultipleChoiceField(
         label="Right breast",
         label_classes="nhsuk-fieldset__legend--s",
@@ -64,6 +64,21 @@ class BreastAugmentationHistoryBaseForm(Form):
         error_messages={"max_words": "Additional details must be 500 words or less"},
     )
 
+    def __init__(self, *args, instance=None, **kwargs):
+        self.instance = instance
+
+        if instance:
+            kwargs["initial"] = {
+                "right_breast_procedures": instance.right_breast_procedures,
+                "left_breast_procedures": instance.left_breast_procedures,
+                "procedure_year": instance.procedure_year,
+                "implants_have_been_removed": instance.implants_have_been_removed,
+                "removal_year": instance.removal_year,
+                "additional_details": instance.additional_details,
+            }
+
+        super().__init__(*args, **kwargs)
+
     def model_values(self):
         return dict(
             left_breast_procedures=self.cleaned_data.get("left_breast_procedures", []),
@@ -107,8 +122,6 @@ class BreastAugmentationHistoryBaseForm(Form):
 
         return cleaned_data
 
-
-class BreastAugmentationHistoryForm(BreastAugmentationHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -122,23 +135,10 @@ class BreastAugmentationHistoryForm(BreastAugmentationHistoryBaseForm):
 
         return breast_augmentation_history
 
-
-class BreastAugmentationHistoryUpdateForm(BreastAugmentationHistoryBaseForm):
-    def __init__(self, instance, *args, **kwargs):
-        self.instance = instance
-
-        kwargs["initial"] = {
-            "right_breast_procedures": instance.right_breast_procedures,
-            "left_breast_procedures": instance.left_breast_procedures,
-            "procedure_year": instance.procedure_year,
-            "implants_have_been_removed": instance.implants_have_been_removed,
-            "removal_year": instance.removal_year,
-            "additional_details": instance.additional_details,
-        }
-
-        super().__init__(*args, **kwargs)
-
     def update(self, request):
+        if self.instance is None:
+            raise ValueError("Form has no instance")
+
         # fmt: off
         self.instance.right_breast_procedures = self.cleaned_data["right_breast_procedures"]
         self.instance.left_breast_procedures = self.cleaned_data["left_breast_procedures"]

@@ -14,7 +14,7 @@ from manage_breast_screening.participants.models.medical_history.breast_cancer_h
 )
 
 
-class BreastCancerHistoryBaseForm(FormWithConditionalFields):
+class BreastCancerHistoryItemForm(FormWithConditionalFields):
     class DiagnosisLocationChoices(TextChoices):
         RIGHT_BREAST = "RIGHT_BREAST", "Right breast"
         LEFT_BREAST = "LEFT_BREAST", "Left breast"
@@ -24,8 +24,8 @@ class BreastCancerHistoryBaseForm(FormWithConditionalFields):
         def form_value_to_model_field(form_value):
             match form_value:
                 case [
-                    BreastCancerHistoryBaseForm.DiagnosisLocationChoices.RIGHT_BREAST,
-                    BreastCancerHistoryBaseForm.DiagnosisLocationChoices.LEFT_BREAST,
+                    BreastCancerHistoryItemForm.DiagnosisLocationChoices.RIGHT_BREAST,
+                    BreastCancerHistoryItemForm.DiagnosisLocationChoices.LEFT_BREAST,
                 ]:
                     return BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS
                 case [other]:
@@ -143,7 +143,29 @@ class BreastCancerHistoryBaseForm(FormWithConditionalFields):
         error_messages={"required": "Select where surgery and treatment took place"},
     )
 
-    def __init__(self, **kwargs):
+    def __init__(self, instance=None, **kwargs):
+        self.instance = instance
+        self.appointment = instance.appointment if instance else None
+
+        if instance:
+            kwargs["initial"] = {
+                "diagnosis_location": self.DiagnosisLocationChoices.model_field_to_form_value(
+                    instance.diagnosis_location
+                ),
+                "diagnosis_year": instance.diagnosis_year,
+                "right_breast_procedure": instance.right_breast_procedure,
+                "left_breast_procedure": instance.left_breast_procedure,
+                "right_breast_other_surgery": instance.right_breast_other_surgery,
+                "left_breast_other_surgery": instance.left_breast_other_surgery,
+                "right_breast_treatment": instance.right_breast_treatment,
+                "left_breast_treatment": instance.left_breast_treatment,
+                "systemic_treatments": instance.systemic_treatments,
+                "systemic_treatments_other_treatment_details": instance.systemic_treatments_other_treatment_details,
+                "intervention_location": instance.intervention_location,
+                f"intervention_location_details_{instance.intervention_location.lower()}": instance.intervention_location_details,
+                "additional_details": instance.additional_details,
+            }
+
         super().__init__(**kwargs)
 
         self.given_field_value(
@@ -203,8 +225,6 @@ class BreastCancerHistoryBaseForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details"),
         )
 
-
-class BreastCancerHistoryForm(BreastCancerHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -217,33 +237,10 @@ class BreastCancerHistoryForm(BreastCancerHistoryBaseForm):
 
         return instance
 
-
-class BreastCancerHistoryUpdateForm(BreastCancerHistoryBaseForm):
-    def __init__(self, instance, **kwargs):
-        self.instance = instance
-        self.appointment = instance.appointment
-
-        kwargs["initial"] = {
-            "diagnosis_location": self.DiagnosisLocationChoices.model_field_to_form_value(
-                instance.diagnosis_location
-            ),
-            "diagnosis_year": instance.diagnosis_year,
-            "right_breast_procedure": instance.right_breast_procedure,
-            "left_breast_procedure": instance.left_breast_procedure,
-            "right_breast_other_surgery": instance.right_breast_other_surgery,
-            "left_breast_other_surgery": instance.left_breast_other_surgery,
-            "right_breast_treatment": instance.right_breast_treatment,
-            "left_breast_treatment": instance.left_breast_treatment,
-            "systemic_treatments": instance.systemic_treatments,
-            "systemic_treatments_other_treatment_details": instance.systemic_treatments_other_treatment_details,
-            "intervention_location": instance.intervention_location,
-            f"intervention_location_details_{instance.intervention_location.lower()}": instance.intervention_location_details,
-            "additional_details": instance.additional_details,
-        }
-
-        super().__init__(**kwargs)
-
     def update(self, request):
+        if self.instance is None:
+            raise ValueError("Form has no instance")
+
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
 
@@ -252,6 +249,6 @@ class BreastCancerHistoryUpdateForm(BreastCancerHistoryBaseForm):
 
         self.instance.save()
 
-        auditor.audit_create(self.instance)
+        auditor.audit_update(self.instance)
 
         return self.instance

@@ -12,8 +12,8 @@ from manage_breast_screening.participants.tests.factories import (
     OtherProcedureHistoryItemFactory,
 )
 
-from ....forms.medical_history.other_procedure_history_form import (
-    OtherProcedureHistoryForm,
+from ....forms.medical_history.other_procedure_history_item_form import (
+    OtherProcedureHistoryItemForm,
 )
 
 
@@ -28,7 +28,7 @@ class TestOtherProcedureHistoryForm:
 
     def test_create_with_no_data(self):
         appointment = AppointmentFactory()
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(), participant=appointment.participant
         )
 
@@ -37,7 +37,7 @@ class TestOtherProcedureHistoryForm:
 
     def test_update_with_no_data(self, instance):
         appointment = AppointmentFactory()
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(), instance=instance, participant=appointment.participant
         )
 
@@ -65,7 +65,7 @@ class TestOtherProcedureHistoryForm:
     def test_procedure_without_details(self, procedure, procedure_details_field):
         appointment = AppointmentFactory()
 
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -84,7 +84,7 @@ class TestOtherProcedureHistoryForm:
     def test_procedure_year_invalid_format(self):
         appointment = AppointmentFactory()
 
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -120,7 +120,7 @@ class TestOtherProcedureHistoryForm:
             if procedure_year > max_year
             else (f"Year must be {min_year} or later")
         )
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -165,7 +165,7 @@ class TestOtherProcedureHistoryForm:
     )
     def test_create_success(self, data, dummy_request):
         appointment = AppointmentFactory()
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
             participant=appointment.participant,
         )
@@ -182,7 +182,7 @@ class TestOtherProcedureHistoryForm:
     )
     def test_update_success(self, instance, data, dummy_request):
         appointment = AppointmentFactory()
-        form = OtherProcedureHistoryForm(
+        form = OtherProcedureHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
             instance=instance,
             participant=appointment.participant,

@@ -11,8 +11,8 @@ from manage_breast_screening.participants.models.medical_history.other_procedure
     OtherProcedureHistoryItem,
 )
 
-from ..forms.medical_history.other_procedure_history_form import (
-    OtherProcedureHistoryForm,
+from ..forms.medical_history.other_procedure_history_item_form import (
+    OtherProcedureHistoryItemForm,
 )
 from .mixins import InProgressAppointmentMixin
 
@@ -52,7 +52,7 @@ class BaseOtherProcedureHistoryView(InProgressAppointmentMixin, FormView):
 
 
 class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
-    form_class = OtherProcedureHistoryForm
+    form_class = OtherProcedureHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -84,7 +84,7 @@ class AddOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
 
 
 class ChangeOtherProcedureHistoryView(BaseOtherProcedureHistoryView):
-    form_class = OtherProcedureHistoryForm
+    form_class = OtherProcedureHistoryItemForm
 
     def get_instance(self):
         try:

@@ -6,9 +6,8 @@ from django.forms import model_to_dict
 from django.http import QueryDict
 from django.test import RequestFactory
 
-from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_form import (
-    BreastCancerHistoryForm,
-    BreastCancerHistoryUpdateForm,
+from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_item_form import (
+    BreastCancerHistoryItemForm,
 )
 from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
@@ -31,9 +30,18 @@ def incoming_request(clinical_user):
     return request
 
 
-class TestBreastCancerHistoryForm:
+class TestBreastCancerHistoryItemForm:
+    @pytest.fixture
+    def instance(self, appointment):
+        return BreastCancerHistoryItemFactory(
+            appointment=appointment,
+            diagnosis_location=BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS,
+            left_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
+            right_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
+        )
+
     def test_no_data_not_valid(self):
-        form = BreastCancerHistoryForm(data=QueryDict())
+        form = BreastCancerHistoryItemForm(data=QueryDict())
         assert not form.is_valid()
         assert form.errors == {
             "diagnosis_location": ["Select which breasts cancer was diagnosed in"],
@@ -62,7 +70,7 @@ class TestBreastCancerHistoryForm:
     def test_valid_form(self, time_machine):
         time_machine.move_to(date(2025, 1, 1))
 
-        form = BreastCancerHistoryForm(
+        form = BreastCancerHistoryItemForm(
             data=QueryDict(
                 urlencode(
                     {
@@ -87,7 +95,7 @@ class TestBreastCancerHistoryForm:
     def test_invalid_date(self, time_machine):
         time_machine.move_to(date(2025, 1, 1))
 
-        form = BreastCancerHistoryForm(
+        form = BreastCancerHistoryItemForm(
             data=QueryDict(
                 urlencode(
                     {
@@ -111,7 +119,7 @@ class TestBreastCancerHistoryForm:
         assert form.errors == {"diagnosis_year": ["Year must be 1945 or later"]}
 
     def test_missing_intervention_location_details(self):
-        form = BreastCancerHistoryForm(
+        form = BreastCancerHistoryItemForm(
             data=QueryDict(
                 urlencode(
                     {
@@ -137,7 +145,7 @@ class TestBreastCancerHistoryForm:
         }
 
     def test_missing_systemic_treatments_other_treatment_details(self):
-        form = BreastCancerHistoryForm(
+        form = BreastCancerHistoryItemForm(
             data=QueryDict(
                 urlencode(
                     {
@@ -165,7 +173,7 @@ class TestBreastCancerHistoryForm:
 
     @pytest.mark.django_db
     def test_create(self, appointment, incoming_request):
-        form = BreastCancerHistoryForm(
+        form = BreastCancerHistoryItemForm(
             data=QueryDict(
                 urlencode(
                     {
@@ -213,47 +221,9 @@ class TestBreastCancerHistoryForm:
             "systemic_treatments_other_treatment_details": "",
         }
 
-
-@pytest.mark.django_db
-class TestBreastCancerHistoryUpdateForm:
-    @pytest.fixture
-    def instance(self, appointment):
-        return BreastCancerHistoryItemFactory(
-            appointment=appointment,
-            diagnosis_location=BreastCancerHistoryItem.DiagnosisLocationChoices.BOTH_BREASTS,
-            left_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
-            right_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
-        )
-
-    def test_no_data_not_valid(self, instance):
-        form = BreastCancerHistoryUpdateForm(instance=instance, data=QueryDict())
-        assert not form.is_valid()
-        assert form.errors == {
-            "diagnosis_location": ["Select which breasts cancer was diagnosed in"],
-            "intervention_location": ["Select where surgery and treatment took place"],
-            "left_breast_other_surgery": [
-                "Select any other surgery they have had in the left breast"
-            ],
-            "left_breast_procedure": [
-                "Select which procedure they have had in the left breast"
-            ],
-            "left_breast_treatment": [
-                "Select what treatment they have had in the left breast"
-            ],
-            "right_breast_other_surgery": [
-                "Select any other surgery they have had in the right breast"
-            ],
-            "right_breast_procedure": [
-                "Select which procedure they have had in the right breast"
-            ],
-            "right_breast_treatment": [
-                "Select what treatment they have had in the right breast"
-            ],
-            "systemic_treatments": ["Select what systemic treatments they have had"],
-        }
-
+    @pytest.mark.django_db
     def test_update(self, appointment, instance, incoming_request):
-        form = BreastCancerHistoryUpdateForm(
+        form = BreastCancerHistoryItemForm(
             instance=instance,
             data=QueryDict(
                 urlencode(

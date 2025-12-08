@@ -10,10 +10,7 @@ from manage_breast_screening.participants.models.medical_history.cyst_history_it
     CystHistoryItem,
 )
 
-from ..forms.medical_history.cyst_history_form import (
-    CystHistoryForm,
-    CystHistoryUpdateForm,
-)
+from ..forms.medical_history.cyst_history_item_form import CystHistoryItemForm
 from .mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)
@@ -54,7 +51,7 @@ class BaseCystHistoryView(InProgressAppointmentMixin, FormView):
 
 
 class AddCystHistoryView(BaseCystHistoryView):
-    form_class = CystHistoryForm
+    form_class = CystHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -86,7 +83,7 @@ class AddCystHistoryView(BaseCystHistoryView):
 
 
 class ChangeCystHistoryView(BaseCystHistoryView):
-    form_class = CystHistoryUpdateForm
+    form_class = CystHistoryItemForm
 
     def get_instance(self):
         try:
@@ -115,6 +112,7 @@ class ChangeCystHistoryView(BaseCystHistoryView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["instance"] = self.instance
+        kwargs["participant"] = self.participant
         return kwargs
 
     def form_valid(self, form):

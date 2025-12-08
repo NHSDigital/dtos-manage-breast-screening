@@ -10,9 +10,8 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
     ImplantedMedicalDeviceHistoryItem,
 )
 
-from ..forms.medical_history.implanted_medical_device_history_form import (
-    ImplantedMedicalDeviceHistoryForm,
-    ImplantedMedicalDeviceHistoryUpdateForm,
+from ..forms.medical_history.implanted_medical_device_history_item_form import (
+    ImplantedMedicalDeviceHistoryItemForm,
 )
 from .mixins import InProgressAppointmentMixin
 
@@ -54,7 +53,7 @@ class BaseImplantedMedicalDeviceHistoryView(InProgressAppointmentMixin, FormView
 
 
 class AddImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView):
-    form_class = ImplantedMedicalDeviceHistoryForm
+    form_class = ImplantedMedicalDeviceHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -99,7 +98,7 @@ class AddImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView
 
 
 class ChangeImplantedMedicalDeviceHistoryView(BaseImplantedMedicalDeviceHistoryView):
-    form_class = ImplantedMedicalDeviceHistoryUpdateForm
+    form_class = ImplantedMedicalDeviceHistoryItemForm
 
     def get_instance(self):
         try:

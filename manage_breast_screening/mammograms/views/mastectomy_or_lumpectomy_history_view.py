@@ -14,8 +14,8 @@ from manage_breast_screening.participants.models.medical_history.mastectomy_or_l
     MastectomyOrLumpectomyHistoryItem,
 )
 
-from ..forms.medical_history.mastectomy_or_lumpectomy_history_form import (
-    MastectomyOrLumpectomyHistoryForm,
+from ..forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
+    MastectomyOrLumpectomyHistoryItemForm,
 )
 from .mixins import InProgressAppointmentMixin
 
@@ -61,7 +61,7 @@ class BaseMastectomyOrLumpectomyHistoryView(InProgressAppointmentMixin, FormView
 
 
 class AddMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView):
-    form_class = MastectomyOrLumpectomyHistoryForm
+    form_class = MastectomyOrLumpectomyHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -88,7 +88,7 @@ class AddMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView
 
 
 class UpdateMastectomyOrLumpectomyHistoryView(BaseMastectomyOrLumpectomyHistoryView):
-    form_class = MastectomyOrLumpectomyHistoryForm
+    form_class = MastectomyOrLumpectomyHistoryItemForm
 
     def get_instance(self):
         try:

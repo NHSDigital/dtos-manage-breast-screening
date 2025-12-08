@@ -14,8 +14,8 @@ from manage_breast_screening.participants.tests.factories import (
     MastectomyOrLumpectomyHistoryItemFactory,
 )
 
-from ....forms.medical_history.mastectomy_or_lumpectomy_history_form import (
-    MastectomyOrLumpectomyHistoryForm,
+from ....forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
+    MastectomyOrLumpectomyHistoryItemForm,
 )
 
 
@@ -28,8 +28,24 @@ def dummy_request(clinical_user):
 
 @pytest.mark.django_db
 class TestMastectomyOrLumpectomyHistoryItemForm:
+    @pytest.fixture
+    def instance(self):
+        return MastectomyOrLumpectomyHistoryItemFactory(
+            right_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
+            left_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
+            right_breast_other_surgery=[
+                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
+            ],
+            left_breast_other_surgery=[
+                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
+            ],
+            year_of_surgery=None,
+            surgery_reason=MastectomyOrLumpectomyHistoryItem.SurgeryReason.RISK_REDUCTION,
+            additional_details="",
+        )
+
     def test_missing_required_fields(self):
-        form = MastectomyOrLumpectomyHistoryForm(QueryDict())
+        form = MastectomyOrLumpectomyHistoryItemForm(QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -49,7 +65,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         }
 
     def test_right_breast_other_surgery_no_other_surgery_and_others(self):
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -78,7 +94,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         }
 
     def test_left_breast_other_surgery_no_other_surgery_and_others(self):
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -116,7 +132,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         ],
     )
     def test_year_of_surgery_outside_range(self, year_of_surgery):
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -144,7 +160,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         }
 
     def test_year_of_surgery_invalid(self):
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -170,7 +186,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         }
 
     def test_other_reason_without_details(self):
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -197,7 +213,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
     def test_other_reason_details_when_not_other_reason(self, dummy_request):
         appointment = AppointmentFactory()
 
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -289,10 +305,10 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             },
         ],
     )
-    def test_success(self, clinical_user, data, dummy_request):
+    def test_valid_create(self, clinical_user, data, dummy_request):
         appointment = AppointmentFactory()
 
-        form = MastectomyOrLumpectomyHistoryForm(
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
         )
 
@@ -328,45 +344,6 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             else (f"Year must be {min_year} or later")
         )
 
-
-@pytest.mark.django_db
-class TestUpdateMastectomyOrLumpectomyHistoryForm:
-    @pytest.fixture
-    def instance(self):
-        return MastectomyOrLumpectomyHistoryItemFactory(
-            right_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
-            left_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
-            right_breast_other_surgery=[
-                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
-            ],
-            left_breast_other_surgery=[
-                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
-            ],
-            year_of_surgery=None,
-            surgery_reason=MastectomyOrLumpectomyHistoryItem.SurgeryReason.RISK_REDUCTION,
-            additional_details="",
-        )
-
-    def test_no_data(self, instance):
-        form = MastectomyOrLumpectomyHistoryForm(QueryDict(), instance=instance)
-
-        assert not form.is_valid()
-        assert form.errors == {
-            "right_breast_procedure": [
-                "Select which procedure they have had in the right breast",
-            ],
-            "left_breast_procedure": [
-                "Select which procedure they have had in the left breast",
-            ],
-            "right_breast_other_surgery": [
-                "Select any other surgery they have had in the right breast",
-            ],
-            "left_breast_other_surgery": [
-                "Select any other surgery they have had in the left breast",
-            ],
-            "surgery_reason": ["Select the reason for surgery"],
-        }
-
     @pytest.mark.parametrize(
         "data",
         [
@@ -386,8 +363,8 @@ class TestUpdateMastectomyOrLumpectomyHistoryForm:
             },
         ],
     )
-    def test_success(self, instance, data, dummy_request):
-        form = MastectomyOrLumpectomyHistoryForm(
+    def test_valid_update(self, instance, data, dummy_request):
+        form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
             instance=instance,
         )

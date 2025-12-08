@@ -8,9 +8,8 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.core.views.generic import DeleteWithAuditView
-from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_form import (
-    BreastCancerHistoryForm,
-    BreastCancerHistoryUpdateForm,
+from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_item_form import (
+    BreastCancerHistoryItemForm,
 )
 from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
@@ -54,7 +53,7 @@ class BaseBreastCancerHistoryView(InProgressAppointmentMixin, FormView):
 
 
 class AddBreastCancerHistoryView(BaseBreastCancerHistoryView):
-    form_class = BreastCancerHistoryForm
+    form_class = BreastCancerHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -81,7 +80,7 @@ class AddBreastCancerHistoryView(BaseBreastCancerHistoryView):
 
 
 class ChangeBreastCancerHistoryView(BaseBreastCancerHistoryView):
-    form_class = BreastCancerHistoryUpdateForm
+    form_class = BreastCancerHistoryItemForm
 
     def get_instance(self):
         try:

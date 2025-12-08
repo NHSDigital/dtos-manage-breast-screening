@@ -14,8 +14,20 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
 )
 
 
-class ImplantedMedicalDeviceHistoryBaseForm(FormWithConditionalFields):
-    def __init__(self, *args, participant, **kwargs):
+class ImplantedMedicalDeviceHistoryItemForm(FormWithConditionalFields):
+    def __init__(self, *args, participant, instance=None, **kwargs):
+        self.instance = instance
+
+        if instance:
+            kwargs["initial"] = {
+                "device": instance.device,
+                "other_medical_device_details": instance.other_medical_device_details,
+                "device_has_been_removed": instance.device_has_been_removed,
+                "removal_year": instance.removal_year,
+                "procedure_year": instance.procedure_year,
+                "additional_details": instance.additional_details,
+            }
+
         super().__init__(*args, **kwargs)
 
         self.fields["device"] = ChoiceField(
@@ -100,8 +112,6 @@ class ImplantedMedicalDeviceHistoryBaseForm(FormWithConditionalFields):
                 ),
             )
 
-
-class ImplantedMedicalDeviceHistoryForm(ImplantedMedicalDeviceHistoryBaseForm):
     def create(self, appointment, request):
         auditor = Auditor.from_request(request)
         field_values = self.model_values()
@@ -117,24 +127,10 @@ class ImplantedMedicalDeviceHistoryForm(ImplantedMedicalDeviceHistoryBaseForm):
 
         return implanted_medical_device_history
 
-
-class ImplantedMedicalDeviceHistoryUpdateForm(ImplantedMedicalDeviceHistoryBaseForm):
-    def __init__(self, instance, *args, **kwargs):
-        self.instance = instance
-
-        kwargs["participant"] = instance.participant
-        kwargs["initial"] = {
-            "device": instance.device,
-            "other_medical_device_details": instance.other_medical_device_details,
-            "device_has_been_removed": instance.device_has_been_removed,
-            "removal_year": instance.removal_year,
-            "procedure_year": instance.procedure_year,
-            "additional_details": instance.additional_details,
-        }
-
-        super().__init__(*args, **kwargs)
-
     def update(self, request):
+        if self.instance is None:
+            raise ValueError("Form has no instance")
+
         self.instance.device = self.cleaned_data["device"]
         self.instance.other_medical_device_details = self.cleaned_data[
             "other_medical_device_details"

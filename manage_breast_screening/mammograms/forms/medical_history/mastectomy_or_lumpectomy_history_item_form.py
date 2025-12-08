@@ -10,7 +10,7 @@ from manage_breast_screening.participants.models.medical_history.mastectomy_or_l
 )
 
 
-class MastectomyOrLumpectomyHistoryForm(FormWithConditionalFields):
+class MastectomyOrLumpectomyHistoryItemForm(FormWithConditionalFields):
     right_breast_procedure = ChoiceField(
         label="Right breast",
         visually_hidden_label_prefix="What procedure have they had in their ",

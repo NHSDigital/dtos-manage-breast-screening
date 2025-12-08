@@ -13,9 +13,8 @@ from manage_breast_screening.participants.tests.factories import (
     ImplantedMedicalDeviceHistoryItemFactory,
 )
 
-from ....forms.medical_history.implanted_medical_device_history_form import (
-    ImplantedMedicalDeviceHistoryForm,
-    ImplantedMedicalDeviceHistoryUpdateForm,
+from ....forms.medical_history.implanted_medical_device_history_item_form import (
+    ImplantedMedicalDeviceHistoryItemForm,
 )
 
 
@@ -27,10 +26,10 @@ def dummy_request(clinical_user):
 
 
 @pytest.mark.django_db
-class TestImplantedMedicalDeviceHistoryForm:
+class TestImplantedMedicalDeviceHistoryItemForm:
     def test_no_data(self):
         appointment = AppointmentFactory()
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(), participant=appointment.participant
         )
 
@@ -40,7 +39,7 @@ class TestImplantedMedicalDeviceHistoryForm:
     def test_other_device_without_information(self):
         appointment = AppointmentFactory()
 
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -59,7 +58,7 @@ class TestImplantedMedicalDeviceHistoryForm:
     def test_procedure_year_invalid_format(self):
         appointment = AppointmentFactory()
 
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -77,7 +76,7 @@ class TestImplantedMedicalDeviceHistoryForm:
     def test_removal_year_invalid_format(self):
         appointment = AppointmentFactory()
 
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -117,7 +116,7 @@ class TestImplantedMedicalDeviceHistoryForm:
             if procedure_year > max_year
             else (f"Year must be {min_year} or later")
         )
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -152,7 +151,7 @@ class TestImplantedMedicalDeviceHistoryForm:
             if removal_year > max_year
             else (f"Year must be {min_year} or later")
         )
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -183,7 +182,7 @@ class TestImplantedMedicalDeviceHistoryForm:
     def test_removal_year_before_procedure_year(self, procedure_year, removal_year):
         appointment = AppointmentFactory()
 
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -205,7 +204,7 @@ class TestImplantedMedicalDeviceHistoryForm:
     def test_removal_year_when_not_removed(self, dummy_request):
         appointment = AppointmentFactory()
 
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(
                 urlencode(
                     {
@@ -273,10 +272,10 @@ class TestImplantedMedicalDeviceHistoryForm:
             },
         ],
     )
-    def test_success(self, data, dummy_request):
+    def test_valid_create(self, data, dummy_request):
         appointment = AppointmentFactory()
 
-        form = ImplantedMedicalDeviceHistoryForm(
+        form = ImplantedMedicalDeviceHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
             participant=appointment.participant,
         )
@@ -294,20 +293,11 @@ class TestImplantedMedicalDeviceHistoryForm:
         assert obj.removal_year == data.get("removal_year", None)
         assert obj.additional_details == data.get("additional_details", "")
 
-
-@pytest.mark.django_db
-class TestImplantedMedicalDeviceHistoryUpdateForm:
     @pytest.fixture
     def instance(self):
         return ImplantedMedicalDeviceHistoryItemFactory(
             device=ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE
         )
-
-    def test_no_data(self, instance):
-        form = ImplantedMedicalDeviceHistoryUpdateForm(instance, QueryDict())
-
-        assert not form.is_valid()
-        assert form.errors == {"device": ["Select the device type"]}
 
     @pytest.mark.parametrize(
         "data",
@@ -325,10 +315,11 @@ class TestImplantedMedicalDeviceHistoryUpdateForm:
             },
         ],
     )
-    def test_success(self, instance, data, dummy_request):
-        form = ImplantedMedicalDeviceHistoryUpdateForm(
-            instance,
-            QueryDict(urlencode(data, doseq=True)),
+    def test_valid_update(self, instance, data, dummy_request):
+        form = ImplantedMedicalDeviceHistoryItemForm(
+            instance=instance,
+            participant=instance.appointment.participant,
+            data=QueryDict(urlencode(data, doseq=True)),
         )
 
         assert form.is_valid()

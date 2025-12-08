@@ -10,9 +10,8 @@ from manage_breast_screening.participants.models.medical_history.breast_augmenta
     BreastAugmentationHistoryItem,
 )
 
-from ..forms.medical_history.breast_augmentation_history_form import (
-    BreastAugmentationHistoryForm,
-    BreastAugmentationHistoryUpdateForm,
+from ..forms.medical_history.breast_augmentation_history_item_form import (
+    BreastAugmentationHistoryItemForm,
 )
 from .mixins import InProgressAppointmentMixin
 
@@ -53,7 +52,7 @@ class BreastAugmentationHistoryBaseView(InProgressAppointmentMixin, FormView):
 
 
 class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
-    form_class = BreastAugmentationHistoryForm
+    form_class = BreastAugmentationHistoryItemForm
 
     def form_valid(self, form):
         form.create(appointment=self.appointment, request=self.request)
@@ -80,7 +79,7 @@ class AddBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
 
 
 class ChangeBreastAugmentationHistoryView(BreastAugmentationHistoryBaseView):
-    form_class = BreastAugmentationHistoryUpdateForm
+    form_class = BreastAugmentationHistoryItemForm
 
     def get_instance(self):
         try:

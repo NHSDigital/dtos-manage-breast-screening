@@ -11,17 +11,14 @@ from manage_breast_screening.participants.tests.factories import (
     CystHistoryItemFactory,
 )
 
-from ....forms.medical_history.cyst_history_form import (
-    CystHistoryForm,
-    CystHistoryUpdateForm,
-)
+from ....forms.medical_history.cyst_history_item_form import CystHistoryItemForm
 
 
 @pytest.mark.django_db
 class TestCystHistoryForm:
     def test_no_data(self):
         appointment = AppointmentFactory()
-        form = CystHistoryForm(QueryDict(), participant=appointment.participant)
+        form = CystHistoryItemForm(QueryDict(), participant=appointment.participant)
 
         assert not form.is_valid()
         assert form.errors == {"treatment": ["Select the treatment type"]}
@@ -45,9 +42,9 @@ class TestCystHistoryForm:
             },
         ],
     )
-    def test_success(self, data, dummy_request):
+    def test_valid_create(self, data, dummy_request):
         appointment = AppointmentFactory()
-        form = CystHistoryForm(
+        form = CystHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
             participant=appointment.participant,
         )
@@ -60,20 +57,11 @@ class TestCystHistoryForm:
         assert obj.treatment == data.get("treatment")
         assert obj.additional_details == data.get("additional_details", "")
 
-
-@pytest.mark.django_db
-class TestCystHistoryUpdateForm:
     @pytest.fixture
     def instance(self):
         return CystHistoryItemFactory(
             treatment=CystHistoryItem.Treatment.DRAINAGE_OR_REMOVAL
         )
-
-    def test_no_data(self, instance):
-        form = CystHistoryUpdateForm(instance, QueryDict())
-
-        assert not form.is_valid()
-        assert form.errors == {"treatment": ["Select the treatment type"]}
 
     @pytest.mark.parametrize(
         "data",
@@ -94,10 +82,11 @@ class TestCystHistoryUpdateForm:
             },
         ],
     )
-    def test_success(self, instance, data, dummy_request):
-        form = CystHistoryUpdateForm(
-            instance,
-            QueryDict(urlencode(data, doseq=True)),
+    def test_valid_update(self, instance, data, dummy_request):
+        form = CystHistoryItemForm(
+            instance=instance,
+            participant=instance.appointment.participant,
+            data=QueryDict(urlencode(data, doseq=True)),
         )
 
         assert form.is_valid()
