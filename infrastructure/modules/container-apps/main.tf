@@ -38,7 +38,7 @@ module "webapp" {
   environment_variables = merge(
     local.common_env,
     {
-      ALLOWED_HOSTS = "${var.app_short_name}-web-${var.environment}.${var.default_domain}"
+      ALLOWED_HOSTS = "${var.app_short_name}-web-${var.environment}.${var.default_domain},localhost,127.0.0.1"
     },
     var.deploy_database_as_container ? local.container_db_env : local.azure_db_env
   )
@@ -48,6 +48,8 @@ module "webapp" {
   )
   is_web_app = true
   port       = 8000
+  probe_path = "/healthcheck"
+
 }
 
 module "azurerm_application_insights_standard_web_test" {
