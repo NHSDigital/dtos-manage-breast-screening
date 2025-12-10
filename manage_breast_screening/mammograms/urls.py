@@ -135,12 +135,12 @@ urlpatterns = [
         name="add_breast_cancer_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>",
+        "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/",
         breast_cancer_history_item_views.UpdateBreastCancerHistoryView.as_view(),
         name="change_breast_cancer_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/delete",
+        "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/delete/",
         breast_cancer_history_item_views.DeleteBreastCancerHistoryView.as_view(),
         name="delete_breast_cancer_history_item",
     ),
@@ -150,7 +150,7 @@ urlpatterns = [
         name="add_implanted_medical_device_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>",
+        "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>/",
         implanted_medical_device_history_item_views.UpdateImplantedMedicalDeviceHistoryView.as_view(),
         name="change_implanted_medical_device_history_item",
     ),
@@ -160,7 +160,7 @@ urlpatterns = [
         name="add_cyst_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>",
+        "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>/",
         cyst_history_item_views.UpdateCystHistoryView.as_view(),
         name="change_cyst_history_item",
     ),
@@ -170,7 +170,7 @@ urlpatterns = [
         name="add_breast_augmentation_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>",
+        "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>/",
         breast_augmentation_history_item_views.UpdateBreastAugmentationHistoryView.as_view(),
         name="change_breast_augmentation_history_item",
     ),
@@ -190,7 +190,7 @@ urlpatterns = [
         name="add_mastectomy_or_lumpectomy_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>",
+        "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>/",
         mastectomy_or_lumpectomy_history_item_views.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
         name="change_mastectomy_or_lumpectomy_history_item",
     ),
@@ -200,12 +200,12 @@ urlpatterns = [
         name="add_other_procedure_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>",
+        "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/",
         other_procedure_history_item_views.UpdateOtherProcedureHistoryView.as_view(),
         name="change_other_procedure_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete",
+        "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete/",
         other_procedure_history_item_views.DeleteOtherProcedureHistoryView.as_view(),
         name="delete_other_procedure_history_item",
     ),

@@ -79,7 +79,7 @@ class TestBreastCancerHistoryItemPresenter:
 
         presenter = BreastCancerHistoryItemPresenter(item)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " breast cancer item",
         }
@@ -89,7 +89,7 @@ class TestBreastCancerHistoryItemPresenter:
 
         presenter = BreastCancerHistoryItemPresenter(item, counter=2)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " breast cancer item 2",
         }

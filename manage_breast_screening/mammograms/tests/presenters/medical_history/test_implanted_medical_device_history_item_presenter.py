@@ -74,7 +74,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
 
         presenter = ImplantedMedicalDeviceHistoryItemPresenter(item)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/implanted-medical-device-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/implanted-medical-device-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " implanted medical device item",
         }
@@ -87,7 +87,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
 
         presenter = ImplantedMedicalDeviceHistoryItemPresenter(item, counter=2)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/implanted-medical-device-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/implanted-medical-device-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " item 2",
         }
