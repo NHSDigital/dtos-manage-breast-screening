@@ -15,7 +15,6 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentNote,
-    Participant,
     ParticipantReportedMammogram,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
@@ -229,14 +228,17 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        pk = self.kwargs["pk"]
-        provider = self.request.user.current_provider
-        try:
-            participant = provider.participants.get(
-                screeningepisode__appointment__pk=pk,
-            )
-        except Participant.DoesNotExist:
-            raise Http404("Participant not found")
+        participant = self.participant
+        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
+            participant_id=participant.pk
+        ).order_by("-created_at")
+
+        presented_mammograms = LastKnownMammogramPresenter(
+            last_known_mammograms,
+            participant_pk=participant.pk,
+            current_url=self.request.path,
+        )
+
         context.update(
             {
                 "heading": "Record medical information",
@@ -244,6 +246,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "participant": participant,
                 "caption": participant.full_name,
                 "presenter": MedicalInformationPresenter(self.appointment),
+                "presented_mammograms": presented_mammograms,
             }
         )
 

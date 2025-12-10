@@ -3,8 +3,33 @@
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
 
 {% block step_content %}
+
+{% call card({"heading": "Mammogram history"}) %}
+  <p>The last confirmed mammogram and any added manually since then</p>
+
+  {{ summaryList({
+    "rows": [
+      {
+        "key": {
+          "text": "Last known mammograms"
+        },
+        "value": {
+          "html": last_mammogram_html(presented_mammograms)
+        }
+      },
+    ]
+  }) }}
+
+  {{ button({
+    "text": presenter.add_mammogram_button.text,
+    "href": presenter.add_mammogram_button.href,
+    "classes": "nhsuk-button--secondary nhsuk-button--small"
+  }) }}
+
+{% endcall %}
 
 {% call card({
   "heading": "Symptoms",

@@ -1,31 +1,12 @@
+{% from "summary-list/macro.jinja" import summaryList %}
+{% from "components/participant-details/summary_list_rows.jinja" import date_of_birth_and_age_html, ethnicity_html, last_mammogram_html %}
+
 {% macro participant_details(presented_participant, presented_mammograms, return_url=none, full_details=true, screening_protocol=none) %}
   {% if return_url is none %}
     {{ raise('return_url is required') }}
   {% endif %}
 
-  {% from "summary-list/macro.jinja" import summaryList %}
-
-  {% set dob %}
-    {{ presented_participant.date_of_birth }}<br>
-    <span class="nhsuk-hint">({{ presented_participant.age }})</span>
-  {% endset %}
-
-  {% set ethnic_background = presented_participant.ethnic_background %}
-  {% set ethnic_background_category = presented_participant.ethnic_category %}
   {% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
-  {% set ethnicity_details_link %}
-    <a href="{{ ethnicity_details_url }}" class="nhsuk-link">Enter ethnicity details</a>
-  {% endset %}
-  {% set ethnicity_html %}
-    {% if ethnic_background == "Prefer not to say" %}
-      {{ ethnic_background }}
-    {% elif ethnic_background %}
-      {{ ethnic_background_category }} ({{ ethnic_background }})
-    {% else %}
-      {{ ethnicity_details_link | safe }}
-    {% endif %}
-  {% endset %}
-
   {% set ethnicity_change_link = {
       "items": [
         {
@@ -34,42 +15,7 @@
           "visuallyHiddenText": "ethnicity"
         }
       ]
-    } if ethnic_background else undefined %}
-
-  {% set address_html %}
-    {% if presented_participant.address %}
-      {% for line in presented_participant.address.lines %}
-        {{ line }}<br>
-      {% endfor %}
-      {{ address.postcode }}
-    {% endif %}
-  {% endset %}
-  {% set address_html = address_html | trim | default("Not provided") %}
-
-  {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
-  {% set last_mammogram_html %}
-    <div data-testid="mammograms">
-    {% if mammograms_by_date_added %}
-      {% for mammogram in mammograms_by_date_added %}
-        <p>
-        <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
-        <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-color">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
-        <br>{{ mammogram.location }}
-
-        {% if mammogram.different_name %}
-          <br>Previous name: {{ mammogram.different_name }}
-        {% endif %}
-
-        {% if mammogram.additional_information %}
-          <br>Additional information: {{ mammogram.additional_information | nl2br }}
-        {% endif %}
-        </p>
-      {% endfor %}
-    {% else %}
-    {{ "Not known" | as_hint }}
-    {% endif %}
-    </div>
-  {% endset %}
+    } if presented_participant.ethnic_background else undefined %}
 
   {{ summaryList({
     "rows": [
@@ -102,7 +48,7 @@
          "text": "Date of birth"
        },
        "value": {
-         "html": dob
+         "html": date_of_birth_and_age_html(presented_participant)
        }
      },
      {
@@ -110,7 +56,7 @@
          "text": "Ethnicity"
        },
        "value": {
-         "html": ethnicity_html | safe
+         "html": ethnicity_html(presented_participant) | safe
        },
        "actions": ethnicity_change_link
      },
@@ -119,7 +65,7 @@
          "text": "Last known mammograms"
        },
        "value": {
-         "html": last_mammogram_html
+         "html": last_mammogram_html(presented_mammograms)
        },
        "actions": {
          "items": [

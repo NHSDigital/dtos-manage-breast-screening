@@ -60,6 +60,21 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_am_on_the_add_previous_mammograms_page()
         self.then_the_accessibility_baseline_is_met()
 
+    def test_adding_a_mammogram_during_an_appointment(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_record_medical_information_page()
+        self.when_i_click_on_add_another_mammogram()
+        self.then_i_should_be_on_the_add_previous_mammogram_form()
+
+        self.when_i_select_the_same_provider()
+        self.and_i_enter_an_exact_date()
+        self.and_i_select_yes_same_name()
+        self.and_i_enter_additional_information()
+        self.and_i_click_continue()
+        self.then_i_should_be_back_on_the_medical_information_page()
+        self.and_i_should_see_the_mammogram_with_the_same_provider()
+
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
@@ -159,3 +174,18 @@ class TestAddingPreviousMammograms(SystemTestCase):
             expected_inner_text,
             use_inner_text=True,
         )
+
+    def and_i_am_on_the_record_medical_information_page(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+
+    def when_i_click_on_add_another_mammogram(self):
+        self.page.get_by_text("Add another mammogram").click()
+
+    def then_i_should_be_back_on_the_medical_information_page(self):
+        self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)

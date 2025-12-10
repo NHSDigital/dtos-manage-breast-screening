@@ -6,7 +6,9 @@
     {% if presented_participant.address.postcode %}
       <br>{{ presented_participant.address.postcode }}
     {% endif %}
-  {% endif %}
+  {% else -%}
+  Not provided
+  {%- endif %}
 {% endmacro %}
 
 {% macro date_of_birth_and_age_html(presented_participant) %}
@@ -29,4 +31,29 @@
   {% else %}
     {{ ethnicity_details_link | safe }}
   {% endif %}
+{% endmacro %}
+
+{% macro last_mammogram_html(presented_mammograms) %}
+  {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
+  <div data-testid="mammograms">
+  {% if mammograms_by_date_added %}
+    {% for mammogram in mammograms_by_date_added %}
+      <p>
+      <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
+      <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-color">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
+      <br>{{ mammogram.location }}
+
+      {% if mammogram.different_name %}
+        <br>Previous name: {{ mammogram.different_name }}
+      {% endif %}
+
+      {% if mammogram.additional_information %}
+        <br>Additional information: {{ mammogram.additional_information | nl2br }}
+      {% endif %}
+      </p>
+    {% endfor %}
+  {% else %}
+  {{ "Not known" | as_hint }}
+  {% endif %}
+  </div>
 {% endmacro %}

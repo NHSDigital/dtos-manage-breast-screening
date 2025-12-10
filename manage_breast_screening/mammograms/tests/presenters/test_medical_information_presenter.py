@@ -261,3 +261,14 @@ class TestRecordMedicalInformationPresenter:
         ]
 
         assert counters == [None]
+
+    def test_add_mammogram_button(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(appointment).add_mammogram_button == {
+            "href": (
+                f"/participants/{appointment.participant.pk}/previous-mammograms/add"
+                + f"?return_url=/mammograms/{appointment.pk}/record-medical-information/"
+            ),
+            "text": "Add another mammogram",
+        }
