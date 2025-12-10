@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
@@ -79,7 +79,7 @@ class TestBreastCancerHistoryItemPresenter:
 
         presenter = BreastCancerHistoryItemPresenter(item)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " breast cancer item",
         }
@@ -89,7 +89,7 @@ class TestBreastCancerHistoryItemPresenter:
 
         presenter = BreastCancerHistoryItemPresenter(item, counter=2)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-cancer-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " breast cancer item 2",
         }

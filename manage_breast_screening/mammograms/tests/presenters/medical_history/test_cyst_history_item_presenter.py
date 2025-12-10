@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.cyst_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.cyst_history_item_presenter import (
     CystHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
@@ -44,7 +44,7 @@ class TestCystHistoryItemPresenter:
 
         presenter = CystHistoryItemPresenter(item)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/cyst-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/cyst-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " cyst item",
         }
@@ -57,7 +57,7 @@ class TestCystHistoryItemPresenter:
 
         presenter = CystHistoryItemPresenter(item, counter=2)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/cyst-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/cyst-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " cyst item 2",
         }

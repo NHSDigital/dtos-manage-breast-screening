@@ -2,25 +2,25 @@ from urllib.parse import quote
 
 from django.urls import reverse
 
-from manage_breast_screening.mammograms.presenters.benign_lump_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.benign_lump_history_item_presenter import (
     BenignLumpHistoryItemPresenter,
 )
-from manage_breast_screening.mammograms.presenters.breast_augmentation_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.breast_augmentation_history_item_presenter import (
     BreastAugmentationHistoryItemPresenter,
 )
-from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
 )
-from manage_breast_screening.mammograms.presenters.cyst_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.cyst_history_item_presenter import (
     CystHistoryItemPresenter,
 )
-from manage_breast_screening.mammograms.presenters.implanted_medical_device_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.implanted_medical_device_history_item_presenter import (
     ImplantedMedicalDeviceHistoryItemPresenter,
 )
-from manage_breast_screening.mammograms.presenters.mastectomy_or_lumpectomy_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.mastectomy_or_lumpectomy_history_item_presenter import (
     MastectomyOrLumpectomyHistoryItemPresenter,
 )
-from manage_breast_screening.mammograms.presenters.other_procedure_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.other_procedure_history_item_presenter import (
     OtherProcedureHistoryItemPresenter,
 )
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
@@ -37,6 +37,7 @@ class MedicalInformationPresenter:
             "symptom_type__name", "reported_at"
         )
         self.symptoms = [SymptomPresenter(symptom) for symptom in symptoms]
+
         self.breast_cancer_history = self._present_items(
             appointment.breast_cancer_history_items.all(),
             BreastCancerHistoryItemPresenter,
@@ -62,10 +63,9 @@ class MedicalInformationPresenter:
             OtherProcedureHistoryItemPresenter,
         )
 
-        self.benign_lump_history = [
-            BenignLumpHistoryItemPresenter(item)
-            for item in appointment.benign_lump_history_items.all()
-        ]
+        self.benign_lump_history = self._present_items(
+            appointment.benign_lump_history_items.all(), BenignLumpHistoryItemPresenter
+        )
 
         self.cyst_history = self._present_items(
             appointment.cyst_history_items.all(), CystHistoryItemPresenter

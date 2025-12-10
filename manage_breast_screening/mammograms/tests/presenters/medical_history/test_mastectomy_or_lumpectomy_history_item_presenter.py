@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.mastectomy_or_lumpectomy_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.mastectomy_or_lumpectomy_history_item_presenter import (
     MastectomyOrLumpectomyHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
@@ -87,7 +87,7 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
 
         presenter = MastectomyOrLumpectomyHistoryItemPresenter(item)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/mastectomy-or-lumpectomy-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/mastectomy-or-lumpectomy-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " mastectomy or lumpectomy item",
         }
@@ -99,7 +99,7 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
 
         presenter = MastectomyOrLumpectomyHistoryItemPresenter(item, counter=2)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/mastectomy-or-lumpectomy-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/mastectomy-or-lumpectomy-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " mastectomy or lumpectomy item 2",
         }

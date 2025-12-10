@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.breast_augmentation_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.breast_augmentation_history_item_presenter import (
     BreastAugmentationHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
@@ -65,7 +65,7 @@ class TestBreastAugmentationHistoryItemPresenter:
 
         presenter = BreastAugmentationHistoryItemPresenter(item)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " breast implants or augmentation item",
         }
@@ -75,7 +75,7 @@ class TestBreastAugmentationHistoryItemPresenter:
 
         presenter = BreastAugmentationHistoryItemPresenter(item, counter=2)
         assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}",
+            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}/",
             "text": "Change",
             "visually_hidden_text": " breast implants or augmentation item 2",
         }
