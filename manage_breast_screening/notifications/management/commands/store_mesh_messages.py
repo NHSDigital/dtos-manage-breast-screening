@@ -28,6 +28,8 @@ class Command(BaseCommand):
                     logger.debug("Processing message %s", message_id)
                     message = inbox.fetch_message(message_id)
 
+                    logger.debug("Processing message with subject %s", message.subject)
+
                     BlobStorage().add(
                         f"{today_dirname}/{message.filename}",
                         message.read().decode("ASCII"),

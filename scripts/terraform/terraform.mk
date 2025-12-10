@@ -83,3 +83,9 @@ notifications-smoke-test:
 	else
 		echo "Skipping notifications smoke test"
 	fi
+
+notifications-load-test:
+	$(eval export ENVIRONMENT=${ENVIRONMENT})
+	pip install pytest mesh-client
+	pytest -vv scripts/python/load_test/notifications_load_test.py  --log-cli-level=DEBUG
+
