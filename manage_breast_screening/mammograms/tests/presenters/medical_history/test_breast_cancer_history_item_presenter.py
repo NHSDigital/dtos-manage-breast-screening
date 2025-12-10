@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.breast_cancer_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (

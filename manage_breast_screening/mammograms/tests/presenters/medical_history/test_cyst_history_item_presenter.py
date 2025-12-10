@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.cyst_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.cyst_history_item_presenter import (
     CystHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.cyst_history_item import (

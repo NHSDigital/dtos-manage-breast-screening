@@ -7,8 +7,9 @@ from manage_breast_screening.participants.models.medical_history.benign_lump_his
 
 
 class BenignLumpHistoryItemPresenter:
-    def __init__(self, benign_lump_history_item):
+    def __init__(self, benign_lump_history_item, counter=None):
         self._item = benign_lump_history_item
+        self.counter = counter
         self.right_breast_procedures = self._format_multiple_choices(
             self._item.right_breast_procedures, BenignLumpHistoryItem.Procedure
         )
@@ -63,6 +64,11 @@ class BenignLumpHistoryItemPresenter:
                 },
             ),
             "text": "Change",
+            "visually_hidden_text": (
+                f" benign lump item {self.counter}"
+                if self.counter
+                else " benign lump item"
+            ),
         }
 
     def _format_multiple_choices(self, choices, ChoiceClass):

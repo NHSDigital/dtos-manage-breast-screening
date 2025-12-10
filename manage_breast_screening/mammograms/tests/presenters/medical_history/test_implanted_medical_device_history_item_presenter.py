@@ -1,4 +1,4 @@
-from manage_breast_screening.mammograms.presenters.implanted_medical_device_history_item_presenter import (
+from manage_breast_screening.mammograms.presenters.medical_history.implanted_medical_device_history_item_presenter import (
     ImplantedMedicalDeviceHistoryItemPresenter,
 )
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
