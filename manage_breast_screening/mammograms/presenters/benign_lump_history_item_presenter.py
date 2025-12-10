@@ -1,7 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
-from manage_breast_screening.participants.models.benign_lump_history_item import (
+from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
     BenignLumpHistoryItem,
 )
 

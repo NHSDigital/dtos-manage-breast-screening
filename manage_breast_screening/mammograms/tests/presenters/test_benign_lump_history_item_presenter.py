@@ -1,7 +1,7 @@
 from manage_breast_screening.mammograms.presenters.benign_lump_history_item_presenter import (
     BenignLumpHistoryItemPresenter,
 )
-from manage_breast_screening.participants.models.benign_lump_history_item import (
+from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
     BenignLumpHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

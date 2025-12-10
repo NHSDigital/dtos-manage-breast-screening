@@ -1,7 +1,7 @@
 from manage_breast_screening.mammograms.presenters.breast_augmentation_history_item_presenter import (
     BreastAugmentationHistoryItemPresenter,
 )
-from manage_breast_screening.participants.models.breast_augmentation_history_item import (
+from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

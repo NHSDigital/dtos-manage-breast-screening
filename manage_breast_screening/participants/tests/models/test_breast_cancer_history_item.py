@@ -1,7 +1,7 @@
 import pytest
 from django.forms import ValidationError
 
-from manage_breast_screening.participants.models.breast_cancer_history_item import (
+from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (

@@ -1,7 +1,7 @@
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.participants.models.benign_lump_history_item import (
+from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
     BenignLumpHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (
