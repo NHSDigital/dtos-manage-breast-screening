@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -68,6 +69,7 @@ class ShowAppointment(AppointmentMixin, View):
             "presented_appointment": appointment_presenter,
             "presented_participant": appointment_presenter.participant,
             "presented_mammograms": last_known_mammogram_presenter,
+            "appointment_note": appointment_presenter.note,
             "secondary_nav_items": present_secondary_nav(
                 appointment.pk, current_tab="appointment"
             ),
@@ -155,6 +157,11 @@ class AppointmentNoteView(AppointmentMixin, FormView):
             auditor.audit_create(note)
         else:
             auditor.audit_update(note)
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            "Appointment note saved",
+        )
         return redirect("mammograms:appointment_note", pk=self.appointment.pk)
 
 

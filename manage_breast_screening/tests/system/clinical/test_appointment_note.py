@@ -20,11 +20,15 @@ class TestAppointmentNote(SystemTestCase):
 
         self.when_i_enter_a_note()
         self.and_i_save_the_note()
+        self.then_i_see_a_message_confirming_the_save()
         self.then_the_note_field_contains(self.initial_note_text)
+        self.and_the_appointment_details_tab_shows_the_note(self.initial_note_text)
 
         self.when_i_update_the_note()
         self.and_i_save_the_note()
+        self.then_i_see_a_message_confirming_the_save()
         self.then_the_note_field_contains(self.updated_note_text)
+        self.and_the_appointment_details_tab_shows_the_note(self.updated_note_text)
 
     def and_there_is_an_appointment_for_my_provider(self):
         self.appointment = AppointmentFactory(
@@ -48,6 +52,10 @@ class TestAppointmentNote(SystemTestCase):
         self.page.get_by_label("Note").fill(self.initial_note_text)
 
     def when_i_update_the_note(self):
+        secondary_nav = self.page.locator(".app-secondary-navigation")
+        expect(secondary_nav).to_be_visible()
+        note_tab = secondary_nav.get_by_text("Note")
+        note_tab.click()
         field = self.page.get_by_label("Note")
         expect(field).to_have_value(self.initial_note_text)
         field.fill(self.updated_note_text)
@@ -61,3 +69,20 @@ class TestAppointmentNote(SystemTestCase):
 
     def then_the_note_field_contains(self, text):
         expect(self.page.get_by_label("Note")).to_have_value(text)
+
+    def then_i_see_a_message_confirming_the_save(self):
+        banner = self.page.locator(".nhsuk-notification-banner--success")
+        expect(banner).to_be_visible()
+        expect(banner).to_contain_text("Appointment note saved")
+
+    def and_the_appointment_details_tab_shows_the_note(self, text):
+        secondary_nav = self.page.locator(".app-secondary-navigation")
+        expect(secondary_nav).to_be_visible()
+        appointment_details_tab = secondary_nav.get_by_text("Appointment details")
+        appointment_details_tab.click()
+
+        note_container = self.page.locator(
+            ".nhsuk-warning-callout", has_text="Appointment note"
+        )
+        expect(note_container).to_be_visible()
+        expect(note_container).to_contain_text(text)
