@@ -1,6 +1,11 @@
 from django.urls import path
 
-from .views import appointment_views, special_appointment_views, symptom_views
+from .views import (
+    appointment_note_views,
+    appointment_views,
+    special_appointment_views,
+    symptom_views,
+)
 from .views.medical_history import (
     benign_lump_history_item_views,
     breast_augmentation_history_item_views,
@@ -36,8 +41,13 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/note/",
-        appointment_views.AppointmentNoteView.as_view(),
+        appointment_note_views.AppointmentNoteView.as_view(),
         name="appointment_note",
+    ),
+    path(
+        "<uuid:pk>/note/delete/",
+        appointment_note_views.DeleteAppointmentNoteView.as_view(),
+        name="delete_appointment_note",
     ),
     path(
         "<uuid:pk>/confirm-identity/",
