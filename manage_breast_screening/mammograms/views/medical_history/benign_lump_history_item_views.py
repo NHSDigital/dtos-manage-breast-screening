@@ -1,12 +1,10 @@
 import logging
-from typing import Any
 
-from django.contrib import messages
-from django.http import Http404
-from django.shortcuts import redirect
-from django.urls import reverse
-from django.views.generic import FormView
-
+from manage_breast_screening.core.utils.string_formatting import sentence_case
+from manage_breast_screening.core.views.generic import (
+    AddWithAuditView,
+    UpdateWithAuditView,
+)
 from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
@@ -14,70 +12,38 @@ from manage_breast_screening.participants.models.medical_history.benign_lump_his
     BenignLumpHistoryItem,
 )
 
-from ..mixins import InProgressAppointmentMixin
+from ..mixins import MedicalInformationMixin
 
 logger = logging.getLogger(__name__)
 
 
-class BaseBenignLumpHistoryItemView(InProgressAppointmentMixin, FormView):
+class AddBenignLumpHistoryItemView(MedicalInformationMixin, AddWithAuditView):
     form_class = BenignLumpHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/benign_lump_history_item_form.jinja"
+    thing_name = "benign lumps"
 
-    def get_success_url(self):
-        return reverse(
-            "mammograms:record_medical_information", kwargs={"pk": self.appointment.pk}
-        )
+    def add_title(self, thing_name):
+        return f"Add details of {thing_name}"
 
-    def get_back_link_params(self):
-        return {
-            "href": reverse(
-                "mammograms:record_medical_information",
-                kwargs={"pk": self.appointment_pk},
-            ),
-            "text": "Back",
-        }
+    def added_message(self, thing_name):
+        return f"{sentence_case(thing_name)} added"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        participant = self.appointment.participant
-
-        context.update(
-            {
-                "back_link_params": self.get_back_link_params(),
-                "caption": participant.full_name,
-                "participant_first_name": participant.first_name,
-            },
-        )
-
-        return context
+    def get_create_kwargs(self):
+        return {"appointment": self.appointment}
 
 
-class AddBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
-    def form_valid(self, form):
-        form.create(appointment=self.appointment, request=self.request)
+class UpdateBenignLumpHistoryItemView(MedicalInformationMixin, UpdateWithAuditView):
+    form_class = BenignLumpHistoryItemForm
+    template_name = "mammograms/medical_information/medical_history/forms/benign_lump_history_item_form.jinja"
+    thing_name = "benign lumps"
 
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            "Benign lumps added",
-        )
+    def update_title(self, thing_name):
+        return f"Edit details of {thing_name}"
 
-        return super().form_valid(form)
+    def updated_message(self, thing_name):
+        return f"{sentence_case(thing_name)} updated"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "heading": "Add details of benign lumps",
-                "page_title": "Add details of benign lumps",
-            },
-        )
-        return context
-
-
-class UpdateBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
-    def get_instance(self):
+    def get_object(self):
         try:
             return BenignLumpHistoryItem.objects.get(
                 pk=self.kwargs["history_item_pk"],
@@ -86,41 +52,3 @@ class UpdateBenignLumpHistoryItemView(BaseBenignLumpHistoryItemView):
         except BenignLumpHistoryItem.DoesNotExist:
             logger.exception("History item does not exist for kwargs=%s", self.kwargs)
             return None
-
-    def get(self, request, *args, **kwargs):
-        self.instance = self.get_instance()
-        if self.instance is None:
-            return redirect(self.get_success_url())
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.instance = self.get_instance()
-        if self.instance is None:
-            raise Http404
-        return super().post(request, *args, **kwargs)
-
-    def get_form_kwargs(self) -> dict[str, Any]:
-        kwargs = super().get_form_kwargs()
-        kwargs["instance"] = self.instance
-        return kwargs
-
-    def form_valid(self, form):
-        form.update(request=self.request)
-
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            "Benign lumps updated",
-        )
-
-        return super().form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context.update(
-            {
-                "heading": "Change details of benign lumps",
-                "page_title": "Change details of benign lumps",
-            },
-        )
-        return context

@@ -1,7 +1,6 @@
 from django.db.models import TextChoices
 from django.forms import Textarea
 
-from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields.char_field import CharField
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     ChoiceField,
@@ -225,30 +224,24 @@ class BreastCancerHistoryItemForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details"),
         )
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
+    def create(self, appointment):
         field_values = self.model_values()
 
         instance = appointment.breast_cancer_history_items.create(
             **field_values,
         )
 
-        auditor.audit_create(instance)
-
         return instance
 
-    def update(self, request):
+    def update(self):
         if self.instance is None:
             raise ValueError("Form has no instance")
 
-        auditor = Auditor.from_request(request)
         field_values = self.model_values()
 
         for k, v in field_values.items():
             setattr(self.instance, k, v)
 
         self.instance.save()
-
-        auditor.audit_update(self.instance)
 
         return self.instance

@@ -3,9 +3,7 @@ from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
-from django.test import RequestFactory
 
-from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
@@ -17,13 +15,6 @@ from manage_breast_screening.participants.tests.factories import (
 from ....forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
     MastectomyOrLumpectomyHistoryItemForm,
 )
-
-
-@pytest.fixture
-def dummy_request(clinical_user):
-    request = RequestFactory().get("/test-form")
-    request.user = clinical_user
-    return request
 
 
 @pytest.mark.django_db
@@ -210,7 +201,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             "surgery_other_reason_details": ["Provide details of the surgery"],
         }
 
-    def test_other_reason_details_when_not_other_reason(self, dummy_request):
+    def test_other_reason_details_when_not_other_reason(self):
         appointment = AppointmentFactory()
 
         form = MastectomyOrLumpectomyHistoryItemForm(
@@ -235,7 +226,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=dummy_request)
+        obj = form.create(appointment=appointment)
         obj.refresh_from_db()
 
         assert obj.appointment == appointment
@@ -305,7 +296,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             },
         ],
     )
-    def test_valid_create(self, clinical_user, data, dummy_request):
+    def test_valid_create(self, clinical_user, data):
         appointment = AppointmentFactory()
 
         form = MastectomyOrLumpectomyHistoryItemForm(
@@ -314,15 +305,9 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
         assert form.is_valid()
 
-        existing_log_count = AuditLog.objects.count()
-        obj = form.create(appointment=appointment, request=dummy_request)
-        assert AuditLog.objects.count() == existing_log_count + 1
-        audit_log = AuditLog.objects.filter(
-            object_id=obj.pk, operation=AuditLog.Operations.CREATE
-        ).first()
-        assert audit_log.actor == clinical_user
-
+        obj = form.create(appointment=appointment)
         obj.refresh_from_db()
+
         assert obj.appointment == appointment
         assert obj.right_breast_procedure == data.get("right_breast_procedure")
         assert obj.left_breast_procedure == data.get("left_breast_procedure")
@@ -363,7 +348,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
             },
         ],
     )
-    def test_valid_update(self, instance, data, dummy_request):
+    def test_valid_update(self, instance, data):
         form = MastectomyOrLumpectomyHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
             instance=instance,
@@ -371,7 +356,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.update(request=dummy_request)
+        obj = form.update()
 
         obj.refresh_from_db()
         assert obj.appointment == instance.appointment

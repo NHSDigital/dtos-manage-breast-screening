@@ -163,7 +163,7 @@ class TestOtherProcedureHistoryForm:
         "data",
         success_test_cases,
     )
-    def test_create_success(self, data, dummy_request):
+    def test_create_success(self, data):
         appointment = AppointmentFactory()
         form = OtherProcedureHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
@@ -172,7 +172,7 @@ class TestOtherProcedureHistoryForm:
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=dummy_request)
+        obj = form.create(appointment=appointment)
 
         _assert_other_procedure_item(obj, appointment, data)
 
@@ -180,7 +180,7 @@ class TestOtherProcedureHistoryForm:
         "data",
         success_test_cases,
     )
-    def test_update_success(self, instance, data, dummy_request):
+    def test_update_success(self, instance, data):
         appointment = AppointmentFactory()
         form = OtherProcedureHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
@@ -190,7 +190,7 @@ class TestOtherProcedureHistoryForm:
 
         assert form.is_valid()
 
-        obj = form.update(request=dummy_request)
+        obj = form.update()
 
         _assert_other_procedure_item(obj, instance.appointment, data)
 

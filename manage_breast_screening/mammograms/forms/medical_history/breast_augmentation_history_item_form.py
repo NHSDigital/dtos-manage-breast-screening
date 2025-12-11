@@ -2,7 +2,6 @@ from django import forms
 from django.forms import Form
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import (
     BooleanField,
     CharField,
@@ -122,8 +121,7 @@ class BreastAugmentationHistoryItemForm(Form):
 
         return cleaned_data
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
+    def create(self, appointment):
         field_values = self.model_values()
         breast_augmentation_history = (
             appointment.breast_augmentation_history_items.create(
@@ -131,11 +129,10 @@ class BreastAugmentationHistoryItemForm(Form):
                 **field_values,
             )
         )
-        auditor.audit_create(breast_augmentation_history)
 
         return breast_augmentation_history
 
-    def update(self, request):
+    def update(self):
         if self.instance is None:
             raise ValueError("Form has no instance")
 
@@ -149,7 +146,5 @@ class BreastAugmentationHistoryItemForm(Form):
         # fmt: on
 
         self.instance.save()
-
-        Auditor.from_request(request).audit_update(self.instance)
 
         return self.instance
