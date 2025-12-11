@@ -78,3 +78,15 @@ class DeleteAppointmentNoteView(DeleteWithAuditView):
 
     def get_success_url(self):
         return reverse("mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]})
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except AppointmentNote.DoesNotExist:
+            return redirect(self.get_success_url())
+
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except AppointmentNote.DoesNotExist:
+            return redirect(self.get_success_url())

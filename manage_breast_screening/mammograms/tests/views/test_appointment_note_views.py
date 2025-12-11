@@ -85,3 +85,36 @@ class TestAppointmentNoteView:
         updated_note = AppointmentNote.objects.get(pk=note.pk)
         assert updated_note.content == updated_content
         assert AppointmentNote.objects.count() == 1
+
+
+@pytest.mark.django_db
+class TestDeleteAppointmentNoteView:
+    def test_get_redirects_when_note_does_not_exist(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:delete_appointment_note",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:appointment_note", kwargs={"pk": appointment.pk}),
+        )
+
+    def test_post_redirects_when_note_does_not_exist(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_appointment_note",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:appointment_note", kwargs={"pk": appointment.pk}),
+        )
