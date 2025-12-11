@@ -166,7 +166,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of mastectomy or lumpectomy added")
+        expect(alert).to_contain_text("Added mastectomy or lumpectomy")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change mastectomy or lumpectomy item").click()
@@ -196,4 +196,4 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of mastectomy or lumpectomy updated")
+        expect(alert).to_contain_text("Updated mastectomy or lumpectomy")

@@ -27,9 +27,6 @@ class AddOtherProcedureHistoryView(MedicalInformationMixin, AddWithAuditView):
     def add_title(self, thing_name):
         return f"Add details of {thing_name}"
 
-    def added_message(self, thing_name):
-        return "Details of other procedure added"
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
@@ -46,9 +43,6 @@ class UpdateOtherProcedureHistoryView(MedicalInformationMixin, UpdateWithAuditVi
 
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
-
-    def updated_message(self, thing_name):
-        return "Details of other procedure updated"
 
     def confirm_delete_link_text(self, thing_name):
         return "Delete this item"

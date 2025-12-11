@@ -51,7 +51,7 @@ class TestAddImplantedMedicalDeviceHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Implanted medical device added",
+                    message="Added implanted medical device",
                 )
             ],
         )
@@ -129,7 +129,7 @@ class TestChangeImplantedMedicalDeviceHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of implanted medical device updated",
+                    message="Updated implanted medical device",
                 )
             ],
         )

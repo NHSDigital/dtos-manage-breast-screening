@@ -57,7 +57,7 @@ class TestAddOtherProcedureView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of other procedure added",
+                    message="Added other procedures",
                 )
             ],
         )
@@ -137,7 +137,7 @@ class TestChangeOtherProcedureView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of other procedure updated",
+                    message="Updated other procedures",
                 )
             ],
         )

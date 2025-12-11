@@ -2,7 +2,6 @@ import logging
 
 from django.urls import reverse
 
-from manage_breast_screening.core.utils.string_formatting import sentence_case
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     DeleteWithAuditView,
@@ -28,9 +27,6 @@ class AddBreastCancerHistoryView(MedicalInformationMixin, AddWithAuditView):
     def add_title(self, thing_name):
         return f"Add details of {thing_name}"
 
-    def added_message(self, thing_name):
-        return f"{sentence_case(thing_name)} history added"
-
     def get_create_kwargs(self):
         return {"appointment": self.appointment}
 
@@ -42,9 +38,6 @@ class UpdateBreastCancerHistoryView(MedicalInformationMixin, UpdateWithAuditView
 
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
-
-    def updated_message(self, thing_name):
-        return f"{sentence_case(thing_name)} history updated"
 
     def confirm_delete_link_text(self, thing_name):
         return "Delete this item"

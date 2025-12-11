@@ -1,6 +1,5 @@
 import logging
 
-from manage_breast_screening.core.utils.string_formatting import sentence_case
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     UpdateWithAuditView,
@@ -25,9 +24,6 @@ class AddBenignLumpHistoryItemView(MedicalInformationMixin, AddWithAuditView):
     def add_title(self, thing_name):
         return f"Add details of {thing_name}"
 
-    def added_message(self, thing_name):
-        return f"{sentence_case(thing_name)} added"
-
     def get_create_kwargs(self):
         return {"appointment": self.appointment}
 
@@ -39,9 +35,6 @@ class UpdateBenignLumpHistoryItemView(MedicalInformationMixin, UpdateWithAuditVi
 
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
-
-    def updated_message(self, thing_name):
-        return f"{sentence_case(thing_name)} updated"
 
     def get_object(self):
         try:

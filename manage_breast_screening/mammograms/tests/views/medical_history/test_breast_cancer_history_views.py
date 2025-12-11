@@ -73,7 +73,7 @@ class TestBreastCancerHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Breast cancer history added",
+                    message="Added breast cancer",
                 )
             ],
         )
@@ -161,7 +161,7 @@ class TestBreastCancerHistoryUpdateView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Breast cancer history updated",
+                    message="Updated breast cancer",
                 )
             ],
         )

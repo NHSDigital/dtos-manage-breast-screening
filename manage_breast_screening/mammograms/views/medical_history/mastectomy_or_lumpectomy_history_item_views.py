@@ -27,9 +27,6 @@ class AddMastectomyOrLumpectomyHistoryView(MedicalInformationMixin, AddWithAudit
     def add_title(self, thing_name):
         return f"Add details of {thing_name}"
 
-    def added_message(self, thing_name):
-        return f"Details of {thing_name} added"
-
     def get_create_kwargs(self):
         return {"appointment": self.appointment}
 
@@ -48,9 +45,6 @@ class UpdateMastectomyOrLumpectomyHistoryView(
 
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
-
-    def updated_message(self, thing_name):
-        return f"Details of {thing_name} updated"
 
     def get_object(self):
         try:

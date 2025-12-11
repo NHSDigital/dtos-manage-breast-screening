@@ -84,7 +84,7 @@ class TestRecordingCyst(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of cysts added")
+        expect(alert).to_contain_text("Added cysts")
 
     def then_i_see_the_edit_cyst_form(self):
         expect(self.page.get_by_text("Edit details of cysts")).to_be_visible()
@@ -108,4 +108,4 @@ class TestRecordingCyst(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of cysts updated")
+        expect(alert).to_contain_text("Updated cysts")

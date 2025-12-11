@@ -57,7 +57,7 @@ class TestAddBenignLumpHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Benign lumps added",
+                    message="Added benign lumps",
                 )
             ],
         )
@@ -150,7 +150,7 @@ class TestChangeBenignLumpHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Benign lumps updated",
+                    message="Updated benign lumps",
                 )
             ],
         )

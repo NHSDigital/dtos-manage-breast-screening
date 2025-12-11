@@ -121,7 +121,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Implanted medical device added")
+        expect(alert).to_contain_text("Added implanted medical device")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change implanted medical device item").click()
@@ -149,4 +149,4 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of implanted medical device updated")
+        expect(alert).to_contain_text("Updated implanted medical device")

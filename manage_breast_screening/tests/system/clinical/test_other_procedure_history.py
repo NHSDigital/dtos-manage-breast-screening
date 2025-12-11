@@ -119,7 +119,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of other procedure added")
+        expect(alert).to_contain_text("Added other procedures")
 
     def then_i_see_the_edit_other_procedure_form(self):
         expect(self.page.get_by_text("Edit details of other procedure")).to_be_visible()
@@ -150,7 +150,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of other procedure updated")
+        expect(alert).to_contain_text("Updated other procedures")
 
     def and_i_click_delete_this_item(self):
         self.page.get_by_text("Delete this item").click()

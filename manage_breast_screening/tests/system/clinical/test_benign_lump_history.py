@@ -158,7 +158,7 @@ class TestBenignLumpHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Benign lumps added")
+        expect(alert).to_contain_text("Added benign lumps")
 
     def and_there_is_a_benign_lump_history_item(self):
         self.benign_lump_history_item = BenignLumpHistoryItemFactory(
@@ -217,4 +217,4 @@ class TestBenignLumpHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Benign lumps updated")
+        expect(alert).to_contain_text("Updated benign lumps")
