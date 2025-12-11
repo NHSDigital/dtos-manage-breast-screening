@@ -27,15 +27,6 @@ class AddCystHistoryView(MedicalInformationMixin, AddWithAuditView):
     def added_message(self, thing_name):
         return f"Details of {thing_name} added"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update(
-            {"page_title": "Details of the cysts"},
-        )
-
-        return context
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
@@ -53,7 +44,7 @@ class UpdateCystHistoryView(MedicalInformationMixin, UpdateWithAuditView):
     thing_name = "cysts"
 
     def update_title(self, thing_name):
-        return f"Add details of {thing_name}"
+        return f"Edit details of {thing_name}"
 
     def updated_message(self, thing_name):
         return f"Details of {thing_name} updated"
@@ -72,12 +63,3 @@ class UpdateCystHistoryView(MedicalInformationMixin, UpdateWithAuditView):
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
         return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update(
-            {"page_title": "Details of the cysts"},
-        )
-
-        return context

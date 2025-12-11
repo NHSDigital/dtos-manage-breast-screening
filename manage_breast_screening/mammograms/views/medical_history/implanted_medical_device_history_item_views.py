@@ -28,13 +28,6 @@ class AddImplantedMedicalDeviceHistoryView(MedicalInformationMixin, AddWithAudit
     def added_message(self, thing_name):
         return f"{sentence_case(thing_name)} added"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update({"page_title": "Details of the implanted medical device"})
-
-        return context
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
@@ -71,10 +64,3 @@ class UpdateImplantedMedicalDeviceHistoryView(
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
         return kwargs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update({"page_title": "Details of the implanted medical device"})
-
-        return context

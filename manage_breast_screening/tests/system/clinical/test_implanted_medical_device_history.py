@@ -71,7 +71,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         expect(
             self.page.get_by_text("Add details of implanted medical device")
         ).to_be_visible()
-        self.assert_page_title_contains("Details of the implanted medical device")
+        self.assert_page_title_contains("Add details of implanted medical device")
 
     def then_i_see_validation_errors_for_missing_implanted_medical_device_details(self):
         self.expect_validation_error(
@@ -130,7 +130,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         expect(
             self.page.get_by_text("Edit details of implanted medical device")
         ).to_be_visible()
-        self.assert_page_title_contains("Details of the implanted medical device")
+        self.assert_page_title_contains("Edit details of implanted medical device")
 
     def when_i_select_cardiac_device(self):
         self.page.get_by_label(

@@ -72,7 +72,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
 
     def then_i_see_the_add_other_procedure_form(self):
         expect(self.page.get_by_text("Add details of other procedures")).to_be_visible()
-        self.assert_page_title_contains("Details of the other procedure")
+        self.assert_page_title_contains("Add details of other procedures")
 
     def then_i_see_validation_error_for_missing_procedure(self):
         self.expect_validation_error(
@@ -123,7 +123,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
 
     def then_i_see_the_edit_other_procedure_form(self):
         expect(self.page.get_by_text("Edit details of other procedure")).to_be_visible()
-        self.assert_page_title_contains("Details of the other procedure")
+        self.assert_page_title_contains("Edit details of other procedures")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change other procedure item").click()

@@ -175,7 +175,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         expect(
             self.page.get_by_text("Edit details of mastectomy or lumpectomy")
         ).to_be_visible()
-        self.assert_page_title_contains("Details of the mastectomy or lumpectomy")
+        self.assert_page_title_contains("Edit details of mastectomy or lumpectomy")
 
     def when_i_update_additional_details(self):
         self.page.get_by_label("Additional details (optional)", exact=True).fill(

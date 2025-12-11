@@ -30,15 +30,6 @@ class AddOtherProcedureHistoryView(MedicalInformationMixin, AddWithAuditView):
     def added_message(self, thing_name):
         return "Details of other procedure added"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update(
-            {"page_title": "Details of the other procedure"},
-        )
-
-        return context
-
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
@@ -85,15 +76,6 @@ class UpdateOtherProcedureHistoryView(MedicalInformationMixin, UpdateWithAuditVi
                 "history_item_pk": self.kwargs["history_item_pk"],
             },
         )
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-
-        context.update(
-            {"page_title": "Details of the other procedure"},
-        )
-
-        return context
 
 
 class DeleteOtherProcedureHistoryView(DeleteWithAuditView):

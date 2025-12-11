@@ -61,7 +61,7 @@ class TestRecordingCyst(SystemTestCase):
 
     def then_i_see_the_add_cyst_form(self):
         expect(self.page.get_by_text("Add details of cysts")).to_be_visible()
-        self.assert_page_title_contains("Details of the cysts")
+        self.assert_page_title_contains("Add details of cysts")
 
     def when_i_select_no_treatment(self):
         self.page.get_by_label("No treatment", exact=True).click()
@@ -88,7 +88,7 @@ class TestRecordingCyst(SystemTestCase):
 
     def then_i_see_the_edit_cyst_form(self):
         expect(self.page.get_by_text("Edit details of cysts")).to_be_visible()
-        self.assert_page_title_contains("Details of the cysts")
+        self.assert_page_title_contains("Edit details of cysts")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change cyst item").click()

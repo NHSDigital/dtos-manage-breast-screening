@@ -65,11 +65,6 @@ class UpdateMastectomyOrLumpectomyHistoryView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
-        context.update(
-            {
-                "page_title": "Details of the mastectomy or lumpectomy",
-                "presenter": MedicalInformationPresenter(self.appointment),
-            },
-        )
+        context.update({"presenter": MedicalInformationPresenter(self.appointment)})
 
         return context
