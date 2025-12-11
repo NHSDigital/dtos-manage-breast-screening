@@ -248,6 +248,7 @@ class ChangeOtherSymptomView(ChangeSymptomView):
 
 class DeleteSymptomView(DeleteWithAuditView):
     template_name = "mammograms/medical_information/symptoms/confirm_delete_lump.jinja"
+    thing_name = "symptom"
 
     def get_success_url(self):
         return reverse(
