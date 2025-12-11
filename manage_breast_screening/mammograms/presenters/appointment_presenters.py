@@ -120,6 +120,32 @@ class AppointmentPresenter:
         except AppointmentNote.DoesNotExist:
             return None
 
+    @cached_property
+    def status_bar(self):
+        return StatusBarPresenter(self)
+
+
+class StatusBarPresenter:
+    def __init__(self, appointment):
+        self.appointment = appointment
+        self.clinic_slot = appointment.clinic_slot
+        self.participant = appointment.participant
+
+    def show_status_bar_for(self, user):
+        # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
+        current_status = self.appointment._appointment.current_status
+        return (
+            current_status.state == AppointmentStatus.IN_PROGRESS
+            and user.nhs_uid == current_status.created_by.nhs_uid
+        )
+
+    @property
+    def tag_properties(self):
+        return {
+            "classes": "nhsuk-tag--yellow nhsuk-u-margin-left-1",
+            "text": "Special appointment",
+        }
+
 
 class ClinicSlotPresenter:
     def __init__(self, clinic_slot):
@@ -142,6 +168,15 @@ class ClinicSlotPresenter:
         clinic = self._clinic
 
         return f"{format_time(clinic_slot.starts_at)} ({clinic_slot.duration_in_minutes} minutes) - {format_date(clinic.starts_at)} ({format_relative_date(clinic.starts_at)})"
+
+    @cached_property
+    def clinic_date_and_slot_time(self):
+        clinic_slot = self._clinic_slot
+        clinic = self._clinic
+
+        return (
+            f"{format_date(clinic.starts_at)} at {format_time(clinic_slot.starts_at)}"
+        )
 
     @cached_property
     def starts_at(self):

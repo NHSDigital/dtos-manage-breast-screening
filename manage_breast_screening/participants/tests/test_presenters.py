@@ -54,7 +54,7 @@ class TestParticipantPresenter:
         assert result.phone == "07700 900000"
         assert result.nhs_number == "999 009 00829"
         assert result.date_of_birth == "1 January 1955"
-        assert result.age == "70 years old"
+        assert result.age == "70 years"
         assert result.risk_level == ""
         assert result.url == f"/participants/{participant.pk}/"
 

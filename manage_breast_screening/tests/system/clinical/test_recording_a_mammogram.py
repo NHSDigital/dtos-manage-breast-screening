@@ -3,6 +3,7 @@ import re
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.core.utils.string_formatting import format_nhs_number
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -36,6 +37,7 @@ class TestRecordingAMammogram(SystemTestCase):
 
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
+        self.and_i_see_the_appointment_status_bar()
         self.and_i_should_see_the_participant_details()
 
         self.when_i_click_confirm_identity()
@@ -55,6 +57,7 @@ class TestRecordingAMammogram(SystemTestCase):
 
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
+        self.and_i_see_the_appointment_status_bar()
 
         self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_medical_information_page()
@@ -77,6 +80,7 @@ class TestRecordingAMammogram(SystemTestCase):
 
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
+        self.and_i_see_the_appointment_status_bar()
 
         self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_medical_information_page()
@@ -156,6 +160,13 @@ class TestRecordingAMammogram(SystemTestCase):
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Confirm identity")
+
+    def and_i_see_the_appointment_status_bar(self):
+        status_bar = self.page.locator("div.app-status-bar")
+        expect(status_bar).to_contain_text(
+            format_nhs_number(self.participant.nhs_number)
+        )
+        expect(status_bar).to_contain_text(self.participant.full_name)
 
     def then_i_should_be_on_the_medical_information_page(self):
         path = reverse(

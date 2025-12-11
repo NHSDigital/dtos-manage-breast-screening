@@ -168,16 +168,22 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
     template_name = "mammograms/confirm_identity.jinja"
 
     def get_context_data(self, pk, **kwargs):
+        context = super().get_context_data()
+
         participant = self.appointment.participant
 
-        return {
-            "heading": "Confirm identity",
-            "page_title": "Confirm identity",
-            "presented_participant": ParticipantPresenter(participant),
-            "appointment_cannot_proceed_href": reverse(
-                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": pk}
-            ),
-        }
+        context.update(
+            {
+                "heading": "Confirm identity",
+                "page_title": "Confirm identity",
+                "presented_participant": ParticipantPresenter(participant),
+                "appointment_cannot_proceed_href": reverse(
+                    "mammograms:appointment_cannot_go_ahead", kwargs={"pk": pk}
+                ),
+            },
+        )
+
+        return context
 
     def post(self, request, pk):
         return redirect("mammograms:ask_for_medical_information", pk=pk)

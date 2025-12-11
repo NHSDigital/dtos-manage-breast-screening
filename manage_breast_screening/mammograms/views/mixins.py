@@ -5,6 +5,9 @@ from django.shortcuts import redirect
 from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.mammograms.presenters.appointment_presenters import (
+    AppointmentPresenter,
+)
 from manage_breast_screening.participants.models import Appointment
 
 
@@ -32,6 +35,17 @@ class AppointmentMixin:
     @cached_property
     def participant(self):
         return self.appointment.participant
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context.update(
+            {
+                "presented_appointment": AppointmentPresenter(self.appointment),
+            },
+        )
+
+        return context
 
 
 class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):

@@ -40,9 +40,9 @@ def format_age(value: int) -> str:
     Format an age in years as a string
 
     >>> format_age(64)
-    '64 years old'
+    '64 years'
     """
-    return f"{value} years old"
+    return f"{value} years"
 
 
 def format_phone_number(value: str) -> str:

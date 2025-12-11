@@ -1,5 +1,6 @@
 {% from 'nhsuk/components/header/macro.jinja' import header %}
 {% from "notification-banner/macro.jinja" import notificationBanner %}
+{% from 'components/appointment-status-bar.jinja' import appointment_status_bar %}
 
 {% set assetPath = STATIC_URL ~ "/assets" %}
 {% extends "nhsuk/template.jinja" %}
@@ -33,6 +34,10 @@
       ]
     }
   }) }}
+
+  {{ 
+    appointment_status_bar(request.user, presented_appointment.status_bar)
+  }}
 {% endblock %}
 
 {% block content %}
@@ -71,4 +76,4 @@
 
 {% block bodyEnd %}
   <script type="module" src="{{ static('js/bundle.js' )}}"></script>
-{% endblock %}}
+{% endblock %}
