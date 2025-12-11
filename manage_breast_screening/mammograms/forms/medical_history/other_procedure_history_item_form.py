@@ -1,6 +1,5 @@
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.nhsuk_forms.fields.integer_field import YearField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
@@ -72,9 +71,7 @@ class OtherProcedureHistoryItemForm(FormWithConditionalFields):
 
         return initial
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
-
+    def create(self, appointment):
         other_procedure_history_item = OtherProcedureHistoryItem.objects.create(
             appointment=appointment,
             procedure=self.cleaned_data["procedure"],
@@ -83,18 +80,14 @@ class OtherProcedureHistoryItemForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-        auditor.audit_create(other_procedure_history_item)
-
         return other_procedure_history_item
 
-    def update(self, request):
+    def update(self):
         self.instance.procedure = self.cleaned_data["procedure"]
         self.instance.procedure_details = self._get_selected_procedure_details()
         self.instance.procedure_year = self.cleaned_data["procedure_year"]
         self.instance.additional_details = self.cleaned_data["additional_details"]
         self.instance.save()
-
-        Auditor.from_request(request).audit_update(self.instance)
 
         return self.instance
 

@@ -1,14 +1,10 @@
 {% extends "layout-form.jinja" %}
 {% from "nhsuk/components/button/macro.jinja" import button %}
-{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
-
 
 {% block form %}
   <p>
     This is designed to capture information on prophylactic or elective surgery.
-    <a href="{{ presenter.add_breast_cancer_history_button.href }}" class="nhsuk-link">
-      Add breast cancer details
-    </a>
+    <a href="{{ presenter.add_breast_cancer_history_button.href }}" class="nhsuk-link">Add breast cancer details</a>
     if that was the reason for this surgery.
   </p>
 

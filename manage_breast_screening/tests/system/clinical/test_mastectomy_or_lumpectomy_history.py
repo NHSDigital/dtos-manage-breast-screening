@@ -181,7 +181,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of mastectomy or lumpectomy added")
+        expect(alert).to_contain_text("Added mastectomy or lumpectomy")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change mastectomy or lumpectomy item").click()
@@ -190,7 +190,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         expect(
             self.page.get_by_text("Edit details of mastectomy or lumpectomy")
         ).to_be_visible()
-        self.assert_page_title_contains("Details of the mastectomy or lumpectomy")
+        self.assert_page_title_contains("Edit details of mastectomy or lumpectomy")
 
     def when_i_update_additional_details(self):
         self.page.get_by_label("Additional details (optional)", exact=True).fill(
@@ -211,4 +211,4 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of mastectomy or lumpectomy updated")
+        expect(alert).to_contain_text("Updated mastectomy or lumpectomy")

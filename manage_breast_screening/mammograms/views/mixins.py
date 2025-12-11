@@ -2,6 +2,7 @@ from functools import cached_property
 
 from django.http import Http404
 from django.shortcuts import redirect
+from django.urls import reverse
 from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
@@ -64,3 +65,40 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
                 pk=appointment.pk,
             )
         return super().dispatch(request, *args, **kwargs)  # type: ignore
+
+
+class MedicalInformationMixin(InProgressAppointmentMixin):
+    """
+    Mixin for views that hang off the medical information page.
+
+    These all follow a similar structure, and have the same onwards / back
+    navigation.
+    """
+
+    def get_success_url(self):
+        return reverse(
+            "mammograms:record_medical_information", kwargs={"pk": self.appointment.pk}
+        )
+
+    def get_back_link_params(self):
+        return {
+            "href": reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment_pk},
+            ),
+            "text": "Back",
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        participant = self.appointment.participant
+
+        context.update(
+            {
+                "back_link_params": self.get_back_link_params(),
+                "caption": participant.full_name,
+                "participant_first_name": participant.first_name,
+            },
+        )
+
+        return context

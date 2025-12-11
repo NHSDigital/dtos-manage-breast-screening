@@ -61,7 +61,7 @@ class TestAddMastectomyOrLumpectomyHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of mastectomy or lumpectomy added",
+                    message="Added mastectomy or lumpectomy",
                 )
             ],
         )
@@ -157,7 +157,7 @@ class TestUpdateMastectomyOrLumpectomyHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of mastectomy or lumpectomy updated",
+                    message="Updated mastectomy or lumpectomy",
                 )
             ],
         )

@@ -1,7 +1,6 @@
 from django.forms import widgets
 from django.forms.widgets import RadioSelect, Textarea
 
-from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField, YearField
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import MultipleChoiceField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
@@ -126,8 +125,7 @@ class MastectomyOrLumpectomyHistoryItemForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
+    def create(self, appointment):
         field_values = self.model_values()
 
         mastectomy_or_lumpectomy_history = (
@@ -137,11 +135,9 @@ class MastectomyOrLumpectomyHistoryItemForm(FormWithConditionalFields):
             )
         )
 
-        auditor.audit_create(mastectomy_or_lumpectomy_history)
-
         return mastectomy_or_lumpectomy_history
 
-    def update(self, request):
+    def update(self):
         self.instance.left_breast_procedure = self.cleaned_data["left_breast_procedure"]
         self.instance.right_breast_procedure = self.cleaned_data[
             "right_breast_procedure"
@@ -159,7 +155,5 @@ class MastectomyOrLumpectomyHistoryItemForm(FormWithConditionalFields):
         ]
         self.instance.additional_details = self.cleaned_data["additional_details"]
         self.instance.save()
-
-        Auditor.from_request(request).audit_update(self.instance)
 
         return self.instance

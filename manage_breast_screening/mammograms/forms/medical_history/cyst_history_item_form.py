@@ -1,7 +1,6 @@
 from django.forms import Form
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
     CystHistoryItem,
@@ -43,8 +42,7 @@ class CystHistoryItemForm(Form):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
+    def create(self, appointment):
         field_values = self.model_values()
 
         cyst_history = appointment.cyst_history_items.create(
@@ -52,18 +50,14 @@ class CystHistoryItemForm(Form):
             **field_values,
         )
 
-        auditor.audit_create(cyst_history)
-
         return cyst_history
 
-    def update(self, request):
+    def update(self):
         if self.instance is None:
             raise ValueError("Form has no instance")
 
         self.instance.treatment = self.cleaned_data["treatment"]
         self.instance.additional_details = self.cleaned_data["additional_details"]
         self.instance.save()
-
-        Auditor.from_request(request).audit_update(self.instance)
 
         return self.instance

@@ -42,7 +42,7 @@ class TestCystHistoryForm:
             },
         ],
     )
-    def test_valid_create(self, data, dummy_request):
+    def test_valid_create(self, data):
         appointment = AppointmentFactory()
         form = CystHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
@@ -51,7 +51,7 @@ class TestCystHistoryForm:
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=dummy_request)
+        obj = form.create(appointment=appointment)
 
         assert obj.appointment == appointment
         assert obj.treatment == data.get("treatment")
@@ -82,7 +82,7 @@ class TestCystHistoryForm:
             },
         ],
     )
-    def test_valid_update(self, instance, data, dummy_request):
+    def test_valid_update(self, instance, data):
         form = CystHistoryItemForm(
             instance=instance,
             participant=instance.appointment.participant,
@@ -91,7 +91,7 @@ class TestCystHistoryForm:
 
         assert form.is_valid()
 
-        obj = form.update(request=dummy_request)
+        obj = form.update()
         assert obj.appointment == instance.appointment
         assert obj.treatment == data.get("treatment")
         assert obj.additional_details == data.get("additional_details", "")

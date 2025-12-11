@@ -80,7 +80,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
 
     def then_i_see_the_add_other_procedure_form(self):
         expect(self.page.get_by_text("Add details of other procedures")).to_be_visible()
-        self.assert_page_title_contains("Details of the other procedure")
+        self.assert_page_title_contains("Add details of other procedures")
 
     def and_i_see_the_appointment_status_bar(self):
         status_bar = self.page.locator("div.app-status-bar")
@@ -134,11 +134,11 @@ class TestRecordingOtherProcedure(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of other procedure added")
+        expect(alert).to_contain_text("Added other procedures")
 
     def then_i_see_the_edit_other_procedure_form(self):
         expect(self.page.get_by_text("Edit details of other procedure")).to_be_visible()
-        self.assert_page_title_contains("Details of the other procedure")
+        self.assert_page_title_contains("Edit details of other procedures")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change other procedure item").click()
@@ -165,7 +165,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of other procedure updated")
+        expect(alert).to_contain_text("Updated other procedures")
 
     def and_i_click_delete_this_item(self):
         self.page.get_by_text("Delete this item").click()

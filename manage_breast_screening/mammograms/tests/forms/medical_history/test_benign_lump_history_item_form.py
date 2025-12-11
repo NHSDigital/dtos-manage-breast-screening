@@ -89,8 +89,6 @@ class TestBenignLumpHistoryItemForm:
 
     def test_create_persists_data(self, clinical_user):
         appointment = AppointmentFactory()
-        request = RequestFactory().post("/test-form")
-        request.user = clinical_user
 
         data = [
             (
@@ -112,7 +110,7 @@ class TestBenignLumpHistoryItemForm:
         form = BenignLumpHistoryItemForm(_form_data(data))
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=request)
+        obj = form.create(appointment=appointment)
 
         obj.refresh_from_db()
         assert obj.appointment == appointment
@@ -186,7 +184,7 @@ class TestBenignLumpHistoryItemForm:
         ]
         form = BenignLumpHistoryItemForm(_form_data(data), instance=instance)
         assert form.is_valid()
-        updated_obj = form.update(request=request)
+        updated_obj = form.update()
         assert updated_obj.pk == instance.pk
         assert updated_obj.left_breast_procedures == [
             BenignLumpHistoryItem.Procedure.LUMP_REMOVED

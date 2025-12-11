@@ -3,7 +3,6 @@ from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
-from django.test import RequestFactory
 
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
@@ -16,13 +15,6 @@ from manage_breast_screening.participants.tests.factories import (
 from ....forms.medical_history.implanted_medical_device_history_item_form import (
     ImplantedMedicalDeviceHistoryItemForm,
 )
-
-
-@pytest.fixture
-def dummy_request(clinical_user):
-    request = RequestFactory().get("/test-form")
-    request.user = clinical_user
-    return request
 
 
 @pytest.mark.django_db
@@ -201,7 +193,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
             "removal_year": ["Year removed cannot be before year of procedure"]
         }
 
-    def test_removal_year_when_not_removed(self, dummy_request):
+    def test_removal_year_when_not_removed(self):
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
@@ -228,7 +220,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=dummy_request)
+        obj = form.create(appointment=appointment)
 
         obj.refresh_from_db()
         assert obj.appointment == appointment
@@ -272,7 +264,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
             },
         ],
     )
-    def test_valid_create(self, data, dummy_request):
+    def test_valid_create(self, data):
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
@@ -282,7 +274,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=dummy_request)
+        obj = form.create(appointment=appointment)
 
         assert obj.appointment == appointment
         assert obj.device == data.get("device")
@@ -315,7 +307,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
             },
         ],
     )
-    def test_valid_update(self, instance, data, dummy_request):
+    def test_valid_update(self, instance, data):
         form = ImplantedMedicalDeviceHistoryItemForm(
             instance=instance,
             participant=instance.appointment.participant,
@@ -324,7 +316,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.update(request=dummy_request)
+        obj = form.update()
 
         assert obj.appointment == instance.appointment
         assert obj.device == data.get("device")

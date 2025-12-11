@@ -4,7 +4,6 @@ from urllib.parse import urlencode
 import pytest
 from django.forms import model_to_dict
 from django.http import QueryDict
-from django.test import RequestFactory
 
 from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_item_form import (
     BreastCancerHistoryItemForm,
@@ -21,13 +20,6 @@ from manage_breast_screening.participants.tests.factories import (
 @pytest.fixture
 def appointment():
     return AppointmentFactory()
-
-
-@pytest.fixture
-def incoming_request(clinical_user):
-    request = RequestFactory().get("/test-form")
-    request.user = clinical_user
-    return request
 
 
 class TestBreastCancerHistoryItemForm:
@@ -172,7 +164,7 @@ class TestBreastCancerHistoryItemForm:
         }
 
     @pytest.mark.django_db
-    def test_create(self, appointment, incoming_request):
+    def test_create(self, appointment):
         form = BreastCancerHistoryItemForm(
             data=QueryDict(
                 urlencode(
@@ -192,7 +184,7 @@ class TestBreastCancerHistoryItemForm:
             )
         )
         assert form.is_valid()
-        instance = form.create(appointment, incoming_request)
+        instance = form.create(appointment)
 
         assert model_to_dict(instance) == {
             "additional_details": "",
@@ -222,7 +214,7 @@ class TestBreastCancerHistoryItemForm:
         }
 
     @pytest.mark.django_db
-    def test_update(self, appointment, instance, incoming_request):
+    def test_update(self, appointment, instance):
         form = BreastCancerHistoryItemForm(
             instance=instance,
             data=QueryDict(
@@ -243,7 +235,7 @@ class TestBreastCancerHistoryItemForm:
             ),
         )
         assert form.is_valid()
-        instance = form.update(incoming_request)
+        instance = form.update()
 
         assert model_to_dict(instance) == {
             "additional_details": "",
