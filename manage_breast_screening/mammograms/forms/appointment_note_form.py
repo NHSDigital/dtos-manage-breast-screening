@@ -27,3 +27,7 @@ class AppointmentNoteForm(forms.Form):
         self.instance.content = self.cleaned_data["content"]
         self.instance.save()
         return self.instance
+
+    @property
+    def instance_is_saved(self):
+        return self.instance and not self.instance._state.adding

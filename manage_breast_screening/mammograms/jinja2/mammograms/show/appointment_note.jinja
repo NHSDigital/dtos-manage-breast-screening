@@ -77,8 +77,16 @@
         {{ button({
           "text": "Save note"
         }) }}
+        {% if form.instance_is_saved %}
+          <p>
+            <a href="{{ url('mammograms:delete_appointment_note', kwargs={'pk': presented_appointment.pk}) }}" class="nhsuk-link app-link--warning">
+              Delete appointment note
+            </a>
+          </p>
+        {% endif %}
       </div>
     </form>
+
   </div>
 </div>
 {% endblock %}
