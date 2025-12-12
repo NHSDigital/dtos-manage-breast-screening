@@ -82,9 +82,7 @@ class ClinicSlotFactory(DjangoModelFactory):
         model = models.ClinicSlot
 
     clinic = SubFactory(ClinicFactory)
-    starts_at = Sequence(
-        lambda n: datetime(2025, 1, 1, 9, tzinfo=timezone.utc) + timedelta(hours=n)
-    )
+    starts_at = Sequence(lambda n: datetime.strptime(f"{n}:00", "%H:%M").time())
     duration_in_minutes = 15
 
 

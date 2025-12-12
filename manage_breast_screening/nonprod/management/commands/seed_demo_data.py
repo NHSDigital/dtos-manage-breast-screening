@@ -136,10 +136,12 @@ class Command(BaseCommand):
                 self.create_slot(clinic, slot_key)
 
     def create_slot(self, clinic, slot_key):
-        starts_at = datetime.combine(
-            clinic.starts_at.date(),
-            datetime.strptime(slot_key["starts_at_time"], "%H:%M").time(),
-        )
+        # starts_at = datetime.combine(
+        #     clinic.starts_at.date(),
+        #     datetime.strptime(slot_key["starts_at_time"], "%H:%M").time(),
+        # )
+
+        starts_at = datetime.strptime(slot_key["starts_at_time"], "%H:%M").time()
 
         clinic_slot = ClinicSlotFactory(
             clinic=clinic,
