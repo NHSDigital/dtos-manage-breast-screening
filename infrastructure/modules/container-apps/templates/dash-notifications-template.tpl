@@ -634,7 +634,7 @@
               },
               {
                 "name": "Query",
-                "value": "ContainerAppConsoleLogs_CL\n| where ContainerGroupName_s startswith 'manbrs-cap'\n| project TimeGenerated, ContainerName_s, Log_s\n| where Log_s has \"finished successfully\"\n| summarize count()\n\n",
+                "value": "ContainerAppConsoleLogs_CL\n| where ContainerGroupName_s startswith 'manbrs-smm'\n| project TimeGenerated, ContainerName_s, Log_s\n| where Log_s has \"stored in blob storage\"\n| summarize count()\n\n",
                 "isOptional": true
               },
               {
