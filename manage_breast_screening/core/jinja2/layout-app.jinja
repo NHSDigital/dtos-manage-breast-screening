@@ -40,6 +40,12 @@
   }}
 {% endblock %}
 
+{% block beforeContent %}
+  {% if back_link_params %}
+  {{ backLink(back_link_params) }}
+  {% endif %}
+{% endblock beforeContent %}
+
 {% block content %}
   {% block flash_messages %}
     {% set info_notification_params = get_notification_banner_params(

@@ -1,0 +1,22 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+  <input type="hidden" name="return_url" value="{{ return_url }}"/>
+
+  {% do form.location_type.add_divider_after("OUTSIDE_UK", "or") %}
+  {{ form.location_type.as_field_group() }}
+
+  {{ form.when_taken.as_field_group() }}
+
+  {{ form.name_is_the_same.as_field_group() }}
+
+  {{ form.additional_information.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+{% endblock %}

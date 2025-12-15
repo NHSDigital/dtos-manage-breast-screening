@@ -2,12 +2,6 @@
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'django_form_helpers.jinja' import form_error_summary %}
 
-{% block beforeContent %}
-  {% if back_link_params %}
-  {{ backLink(back_link_params) }}
-  {% endif %}
-{% endblock beforeContent %}
-
 {% block page_content %}
 <div class="nhsuk-grid-row">
   <div class="nhsuk-grid-column-two-thirds">

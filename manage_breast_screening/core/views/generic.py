@@ -86,13 +86,17 @@ class AddWithAuditView(NamedThingMixin, FormView):
         auditor = Auditor.from_request(self.request)
         auditor.audit_create(created_object)
 
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            self.get_success_message_content(created_object),
-        )
+        if self.should_add_message(form):
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                self.get_success_message_content(created_object),
+            )
 
         return super().form_valid(form)
+
+    def should_add_message(self, form) -> bool:
+        return True
 
 
 class UpdateWithAuditView(NamedThingMixin, SingleObjectMixin, FormView):
@@ -159,13 +163,17 @@ class UpdateWithAuditView(NamedThingMixin, SingleObjectMixin, FormView):
         auditor = Auditor.from_request(self.request)
         auditor.audit_update(created_object)
 
-        messages.add_message(
-            self.request,
-            messages.SUCCESS,
-            self.get_success_message_content(created_object),
-        )
+        if self.should_add_message(form):
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                self.get_success_message_content(created_object),
+            )
 
         return super().form_valid(form)
+
+    def should_add_message(self, form) -> bool:
+        return True
 
 
 class DeleteWithAuditView(NamedThingMixin, DeleteView):
