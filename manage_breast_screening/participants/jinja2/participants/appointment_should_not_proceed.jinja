@@ -1,0 +1,40 @@
+{% extends 'layout-app.jinja' %}
+{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'django_form_helpers.jinja' import form_error_summary %}
+
+{% block beforeContent %}
+  {% if back_link_params %}
+  {{ backLink(back_link_params) }}
+  {% endif %}
+{% endblock beforeContent %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    {{ form_error_summary(form) }}
+
+    <h1 class="nhsuk-heading-l">
+      {% if caption %}
+      <span class="nhsuk-caption-l">
+        {{ caption }}
+      </span>
+      {% endif %}
+      {{ heading }}
+    </h1>
+
+    <p>The mammogram added took place 4 days ago. It is not recommended to take breast x-rays within 6 months of each other.</p>
+
+    <p>Advise the participant that they will be invited for their next scheduled mammogram based on the information provided.</p>
+
+    <form action="{{ url('participants:attended_not_screened', kwargs={'appointment_pk': appointment.pk}) }}" method="post">
+      <div class="nhsuk-button-group">
+        {{ csrf_input }}
+        {{ button({
+          "text": "End appointment and return to clinic"
+        }) }}
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

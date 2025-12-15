@@ -238,7 +238,7 @@ class MedicalInformationPresenter:
         url = (
             reverse(
                 "participants:add_previous_mammogram",
-                kwargs={"pk": self.appointment.participant.pk},
+                kwargs={"appointment_pk": self.appointment.pk},
             )
             + "?return_url="
             + quote(self.medical_information_url)

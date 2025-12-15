@@ -3,6 +3,7 @@ import re
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.core.utils.string_formatting import format_nhs_number
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -54,6 +55,30 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
         self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
 
+    def test_adding_a_mammogram_within_last_six_months(self):
+        """
+        If has had a mammogram within the last six months, they should be shown a page advising them not to proceed.
+        """
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_participant_details_page()
+        self.then_i_should_see_no_reported_mammograms()
+
+        self.when_i_click_on_add_mammogram()
+        self.then_i_should_be_on_the_add_previous_mammogram_form()
+
+        self.when_i_select_the_same_provider()
+        self.and_i_enter_an_exact_date(year="2025", month="12", day="1")
+        self.and_i_select_yes_same_name()
+        self.and_i_enter_additional_information()
+        self.and_i_click_continue()
+        self.then_i_should_be_on_the_appointment_should_not_proceed_page()
+
+        self.when_i_click_end_appointment()
+        self.and_i_am_on_the_clinic_show_page()
+        self.when_i_click_on_all()
+        self.then_the_appointment_is_did_not_attend()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -97,7 +122,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
             self.live_server_url
             + reverse(
                 "participants:add_previous_mammogram",
-                kwargs={"pk": self.participant.pk},
+                kwargs={"appointment_pk": self.appointment.pk},
             )
         )
 
@@ -110,7 +135,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
     def then_i_should_be_on_the_add_previous_mammogram_form(self):
         path = reverse(
             "participants:add_previous_mammogram",
-            kwargs={"pk": self.participant.pk},
+            kwargs={"appointment_pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Add details of a previous mammogram")
@@ -126,11 +151,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
         option = f"At {self.current_provider.name}"
         self.page.get_by_label(option).click()
 
-    def and_i_enter_an_exact_date(self):
+    def and_i_enter_an_exact_date(self, year="2023", month="12", day="1"):
         self.page.get_by_label("Enter an exact date").click()
-        self.page.get_by_label("Day").fill("1")
-        self.page.get_by_label("Month").fill("12")
-        self.page.get_by_label("Year").fill("2023")
+        self.page.get_by_label("Day").fill(day)
+        self.page.get_by_label("Month").fill(month)
+        self.page.get_by_label("Year").fill(year)
 
     def and_i_select_yes_same_name(self):
         self.page.get_by_label("Yes").click()
@@ -189,3 +214,38 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_back_on_the_medical_information_page(self):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
+
+    def then_i_should_be_on_the_appointment_should_not_proceed_page(self):
+        path = reverse(
+            "participants:appointment_should_not_proceed",
+            kwargs={"appointment_pk": self.appointment.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))
+
+    def when_i_click_end_appointment(self):
+        self.page.get_by_text("End appointment and return to clinic").click()
+
+    def and_i_am_on_the_clinic_show_page(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "clinics:show", kwargs={"pk": self.appointment.clinic_slot.clinic.pk}
+            )
+        )
+        self.assert_page_title_contains(
+            self.appointment.clinic_slot.clinic.get_risk_type_display()
+            + " screening clinic"
+        )
+
+    def when_i_click_on_all(self):
+        self.page.get_by_role("link", name=re.compile("All")).click()
+
+    def then_the_appointment_is_did_not_attend(self):
+        row = self.page.locator("tr").filter(
+            has_text=format_nhs_number(
+                self.appointment.screening_episode.participant.nhs_number
+            )
+        )
+        expect(
+            row.locator(".nhsuk-tag").filter(has_text="Did not attend")
+        ).to_be_visible()

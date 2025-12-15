@@ -9,9 +9,9 @@ from manage_breast_screening.core.utils.date_formatting import (
 
 
 class LastKnownMammogramPresenter:
-    def __init__(self, last_known_mammograms, participant_pk, current_url):
+    def __init__(self, last_known_mammograms, appointment_pk, current_url):
         self._last_known_mammograms = last_known_mammograms
-        self.participant_pk = participant_pk
+        self.appointment_pk = appointment_pk
         self.current_url = current_url
 
     @cached_property
@@ -67,7 +67,7 @@ class LastKnownMammogramPresenter:
         href = (
             reverse(
                 "participants:add_previous_mammogram",
-                kwargs={"pk": self.participant_pk},
+                kwargs={"appointment_pk": self.appointment_pk},
             )
             + f"?return_url={self.current_url}"
         )

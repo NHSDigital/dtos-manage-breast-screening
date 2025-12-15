@@ -35,7 +35,7 @@ class TestLastKnownMammogramPresenter:
     def test_no_last_known_mammograms(self, reported_today):
         result = LastKnownMammogramPresenter(
             [],
-            participant_pk=uuid4(),
+            appointment_pk=uuid4(),
             current_url="/mammograms/abc",
         )
 
@@ -45,7 +45,7 @@ class TestLastKnownMammogramPresenter:
     def test_last_known_mammograms_single(self, reported_today):
         result = LastKnownMammogramPresenter(
             [reported_today],
-            participant_pk=uuid4(),
+            appointment_pk=uuid4(),
             current_url="/mammograms/abc",
         )
 
@@ -67,7 +67,7 @@ class TestLastKnownMammogramPresenter:
     def test_last_known_mammograms_multiple(self, reported_today, reported_earlier):
         result = LastKnownMammogramPresenter(
             [reported_today, reported_earlier],
-            participant_pk=uuid4(),
+            appointment_pk=uuid4(),
             current_url="/mammograms/abc",
         )
 
@@ -95,17 +95,17 @@ class TestLastKnownMammogramPresenter:
         ]
 
     def test_add_link(self, reported_today):
-        participant_id = uuid4()
+        appointment_pk = uuid4()
         current_url = "/mammograms/abc"
 
         result = LastKnownMammogramPresenter(
             [reported_today],
-            participant_pk=participant_id,
+            appointment_pk=appointment_pk,
             current_url=current_url,
         )
 
         assert result.add_link == {
-            "href": f"/participants/{participant_id}/previous-mammograms/add?return_url={current_url}",
+            "href": f"/participants/{appointment_pk}/previous-mammograms/add?return_url={current_url}",
             "text": "Add another",
             "visually_hidden_text": "mammogram",
         }

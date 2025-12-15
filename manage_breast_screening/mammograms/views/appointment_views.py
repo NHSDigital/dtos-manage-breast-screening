@@ -54,7 +54,7 @@ class ShowAppointment(AppointmentMixin, View):
         )
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
             last_known_mammograms,
-            participant_pk=participant_pk,
+            appointment_pk=appointment.pk,
             current_url=self.request.path,
         )
 
@@ -90,7 +90,7 @@ class ParticipantDetails(AppointmentMixin, View):
         appointment_presenter = AppointmentPresenter(appointment)
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
             last_known_mammograms,
-            participant_pk=participant_pk,
+            appointment_pk=appointment.pk,
             current_url=self.request.path,
         )
 
@@ -190,7 +190,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
 
         presented_mammograms = LastKnownMammogramPresenter(
             last_known_mammograms,
-            participant_pk=participant.pk,
+            appointment_pk=self.appointment.pk,
             current_url=self.request.path,
         )
 
