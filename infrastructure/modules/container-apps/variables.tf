@@ -29,6 +29,11 @@ variable "container_app_environment_id" {
   type        = string
 }
 
+variable "min_replicas" {
+  description = "Minimum number of container replicas"
+  type        = number
+}
+
 variable "default_domain" {
   description = "The container app environment default domain"
   type        = string
