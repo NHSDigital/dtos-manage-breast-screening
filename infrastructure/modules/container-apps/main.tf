@@ -46,9 +46,10 @@ module "webapp" {
     { APPLICATIONINSIGHTS_CONNECTION_STRING = var.app_insights_connection_string },
     var.deploy_database_as_container ? { DATABASE_PASSWORD = resource.random_password.admin_password[0].result } : {}
   )
-  is_web_app = true
-  port       = 8000
-  probe_path = "/healthcheck"
+  is_web_app   = true
+  port         = 8000
+  probe_path   = "/healthcheck"
+  min_replicas = var.min_replicas
 
 }
 

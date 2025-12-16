@@ -16,6 +16,12 @@ variable "deploy_container_apps" {
   default     = true
 }
 
+variable "min_replicas" {
+  description = "Minimum number of container replicas"
+  type        = number
+  default     = 1
+}
+
 variable "app_short_name" {
   description = "Application short name (6 characters)"
   type        = string
