@@ -36,6 +36,9 @@ from manage_breast_screening.participants.models import (
     ParticipantReportedMammogram,
     ScreeningEpisode,
 )
+from manage_breast_screening.participants.models.medical_information_review import (
+    MedicalInformationReview,
+)
 from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
@@ -305,6 +308,7 @@ class Command(BaseCommand):
             return participant_mammogram
 
     def reset_db(self):
+        MedicalInformationReview.objects.all().delete()
         AppointmentNote.objects.all().delete()
         UserAssignment.objects.all().delete()
         Symptom.objects.all().delete()
