@@ -1,5 +1,7 @@
 from django.urls import path
 
+from manage_breast_screening.mammograms.views import mammogram_views
+
 from .views import (
     appointment_note_views,
     appointment_views,
@@ -218,5 +220,20 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete/",
         other_procedure_history_item_views.DeleteOtherProcedureHistoryView.as_view(),
         name="delete_other_procedure_history_item",
+    ),
+    path(
+        "<uuid:appointment_pk>/previous-mammograms/add",
+        mammogram_views.add_previous_mammogram,
+        name="add_previous_mammogram",
+    ),
+    path(
+        "<uuid:appointment_pk>/appointment-should-not-proceed/",
+        mammogram_views.appointment_should_not_proceed,
+        name="appointment_should_not_proceed",
+    ),
+    path(
+        "<uuid:appointment_pk>/attended-not-screened/",
+        mammogram_views.attended_not_screened,
+        name="attended_not_screened",
     ),
 ]

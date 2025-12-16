@@ -1,5 +1,7 @@
 import re
+from datetime import date
 
+from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -68,7 +70,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_should_be_on_the_add_previous_mammogram_form()
 
         self.when_i_select_the_same_provider()
-        self.and_i_enter_an_exact_date(year="2025", month="12", day="1")
+        self.and_i_enter_an_exact_date(date.today() - relativedelta(months=5))
         self.and_i_select_yes_same_name()
         self.and_i_enter_additional_information()
         self.and_i_click_continue()
@@ -77,7 +79,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.when_i_click_end_appointment()
         self.and_i_am_on_the_clinic_show_page()
         self.when_i_click_on_all()
-        self.then_the_appointment_is_did_not_attend()
+        self.then_the_appointment_is_attended_not_screened()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -121,7 +123,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "participants:add_previous_mammogram",
+                "mammograms:add_previous_mammogram",
                 kwargs={"appointment_pk": self.appointment.pk},
             )
         )
@@ -134,7 +136,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_on_the_add_previous_mammogram_form(self):
         path = reverse(
-            "participants:add_previous_mammogram",
+            "mammograms:add_previous_mammogram",
             kwargs={"appointment_pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
@@ -151,11 +153,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
         option = f"At {self.current_provider.name}"
         self.page.get_by_label(option).click()
 
-    def and_i_enter_an_exact_date(self, year="2023", month="12", day="1"):
+    def and_i_enter_an_exact_date(self, exact_date=date(2023, 12, 1)):
         self.page.get_by_label("Enter an exact date").click()
-        self.page.get_by_label("Day").fill(day)
-        self.page.get_by_label("Month").fill(month)
-        self.page.get_by_label("Year").fill(year)
+        self.page.get_by_label("Day").fill(str(exact_date.day))
+        self.page.get_by_label("Month").fill(str(exact_date.month))
+        self.page.get_by_label("Year").fill(str(exact_date.year))
 
     def and_i_select_yes_same_name(self):
         self.page.get_by_label("Yes").click()
@@ -217,7 +219,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_on_the_appointment_should_not_proceed_page(self):
         path = reverse(
-            "participants:appointment_should_not_proceed",
+            "mammograms:appointment_should_not_proceed",
             kwargs={"appointment_pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
@@ -240,12 +242,12 @@ class TestAddingPreviousMammograms(SystemTestCase):
     def when_i_click_on_all(self):
         self.page.get_by_role("link", name=re.compile("All")).click()
 
-    def then_the_appointment_is_did_not_attend(self):
+    def then_the_appointment_is_attended_not_screened(self):
         row = self.page.locator("tr").filter(
             has_text=format_nhs_number(
                 self.appointment.screening_episode.participant.nhs_number
             )
         )
         expect(
-            row.locator(".nhsuk-tag").filter(has_text="Did not attend")
+            row.locator(".nhsuk-tag").filter(has_text="Attended not screened")
         ).to_be_visible()

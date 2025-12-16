@@ -267,7 +267,7 @@ class TestRecordMedicalInformationPresenter:
 
         assert MedicalInformationPresenter(appointment).add_mammogram_button == {
             "href": (
-                f"/participants/{appointment.pk}/previous-mammograms/add"
+                f"/mammograms/{appointment.pk}/previous-mammograms/add"
                 + f"?return_url=/mammograms/{appointment.pk}/record-medical-information/"
             ),
             "text": "Add another mammogram",

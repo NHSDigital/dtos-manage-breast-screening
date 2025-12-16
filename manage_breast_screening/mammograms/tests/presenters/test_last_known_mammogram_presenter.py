@@ -105,7 +105,7 @@ class TestLastKnownMammogramPresenter:
         )
 
         assert result.add_link == {
-            "href": f"/participants/{appointment_pk}/previous-mammograms/add?return_url={current_url}",
+            "href": f"/mammograms/{appointment_pk}/previous-mammograms/add?return_url={current_url}",
             "text": "Add another",
             "visually_hidden_text": "mammogram",
         }

@@ -11,21 +11,6 @@ urlpatterns = [
         views.show,
         name="show",
     ),
-    path(
-        "<uuid:appointment_pk>/previous-mammograms/add",
-        views.add_previous_mammogram,
-        name="add_previous_mammogram",
-    ),
-    path(
-        "<uuid:appointment_pk>/appointment-should-not-proceed/",
-        views.appointment_should_not_proceed,
-        name="appointment_should_not_proceed",
-    ),
-    path(
-        "<uuid:appointment_pk>/attended-not-screened/",
-        views.attended_not_screened,
-        name="attended_not_screened",
-    ),
     path("<uuid:pk>/previous-mammograms/", RedirectView.as_view(pattern_name="show")),
     path("", RedirectView.as_view(pattern_name="home"), name="index"),
     path("<uuid:pk>/edit-ethnicity", views.edit_ethnicity, name="edit_ethnicity"),

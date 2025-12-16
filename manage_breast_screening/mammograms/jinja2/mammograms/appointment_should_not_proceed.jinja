@@ -23,11 +23,11 @@
       {{ heading }}
     </h1>
 
-    <p>The mammogram added took place 4 days ago. It is not recommended to take breast x-rays within 6 months of each other.</p>
+    <p>The mammogram added took place {{ time_since_previous_mammogram }}. It is not recommended to take breast x-rays within 6 months of each other.</p>
 
     <p>Advise the participant that they will be invited for their next scheduled mammogram based on the information provided.</p>
 
-    <form action="{{ url('participants:attended_not_screened', kwargs={'appointment_pk': appointment.pk}) }}" method="post">
+    <form action="{{ url('mammograms:attended_not_screened', kwargs={'appointment_pk': appointment.pk}) }}" method="post">
       <div class="nhsuk-button-group">
         {{ csrf_input }}
         {{ button({
