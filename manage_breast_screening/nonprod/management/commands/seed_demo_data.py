@@ -141,11 +141,14 @@ class Command(BaseCommand):
             datetime.strptime(slot_key["starts_at_time"], "%H:%M").time(),
         )
 
+        starts_at_time = datetime.strptime(slot_key["starts_at_time"], "%H:%M").time()
+
         clinic_slot = ClinicSlotFactory(
             clinic=clinic,
             id=slot_key["id"],
             duration_in_minutes=slot_key["duration_in_minutes"],
             starts_at=starts_at,
+            starts_at_time=starts_at_time,
         )
 
         if "appointment" in slot_key:

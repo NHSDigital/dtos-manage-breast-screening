@@ -175,6 +175,7 @@ class ClinicSlot(BaseModel):
         "clinics.Clinic", on_delete=models.PROTECT, related_name="clinic_slots"
     )
     starts_at = models.DateTimeField()
+    starts_at_time = models.TimeField()
     duration_in_minutes = models.IntegerField()
 
     @property

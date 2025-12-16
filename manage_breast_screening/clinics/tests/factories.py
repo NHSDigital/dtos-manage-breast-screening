@@ -85,6 +85,7 @@ class ClinicSlotFactory(DjangoModelFactory):
     starts_at = Sequence(
         lambda n: datetime(2025, 1, 1, 9, tzinfo=timezone.utc) + timedelta(hours=n)
     )
+    starts_at_time = LazyAttribute(lambda o: o.starts_at.time())
     duration_in_minutes = 15
 
 
