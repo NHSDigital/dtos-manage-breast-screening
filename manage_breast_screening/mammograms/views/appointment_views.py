@@ -204,6 +204,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "caption": participant.full_name,
                 "presenter": MedicalInformationPresenter(self.appointment),
                 "presented_mammograms": presented_mammograms,
+                "sections": MedicalInformationSection,
             }
         )
 

@@ -3,66 +3,102 @@
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
 {% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
 {% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
 
 {% block step_content %}
 
-{% call card({"heading": "Mammogram history"}) %}
-  <p>The last confirmed mammogram and any added manually since then</p>
+<div id="{{ presenter.get_anchor(sections.MAMMOGRAM_HISTORY) }}" class="app-reviewable-section">
+  {% call card({"heading": "Mammogram history"}) %}
+    <div class="app-reviewable-section__status">
+      {{ tag(presenter.get_section_tag_properties(sections.MAMMOGRAM_HISTORY)) }}
+    </div>
 
-  {{ summaryList({
-    "rows": [
-      {
-        "key": {
-          "text": "Last known mammograms"
+    <p>The last confirmed mammogram and any added manually since then</p>
+
+    {{ summaryList({
+      "rows": [
+        {
+          "key": {
+            "text": "Last known mammograms"
+          },
+          "value": {
+            "html": last_mammogram_html(presented_mammograms)
+          }
         },
-        "value": {
-          "html": last_mammogram_html(presented_mammograms)
-        }
-      },
-    ]
-  }) }}
-
-  {{ button({
-    "text": presenter.add_mammogram_button.text,
-    "href": presenter.add_mammogram_button.href,
-    "classes": "nhsuk-button--secondary nhsuk-button--small"
-  }) }}
-
-{% endcall %}
-
-{% call card({
-  "heading": "Symptoms",
-}) %}
-  <p {%- if not presenter.symptom_rows %} class="nhsuk-u-margin-bottom-3"{% endif %}>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
-  {% if presenter.symptom_rows %}
-     {{ summaryList({
-        "rows": presenter.symptom_rows
-      }) }}
-  {% else %}
-    {% set insetHtml %}
-      <p>No symptoms have been recorded for this participant.</p>
-    {% endset %}
-    {{ insetText({
-      "html": insetHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+      ]
     }) }}
-  {% endif %}
 
-  <hr>
-  <h3>Add symptoms</h3>
+    {{ button({
+      "text": presenter.add_mammogram_button.text,
+      "href": presenter.add_mammogram_button.href,
+      "classes": "nhsuk-button--secondary nhsuk-button--small"
+    }) }}
 
-  <div class="nhsuk-button-group app-button-group--small">
-    {% for button_info in presenter.symptom_buttons %}
-      {{ button({
-        "text": button_info.text,
-        "href": button_info.href,
-        "classes": "nhsuk-button--secondary nhsuk-button--small"
+    <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+
+    {% set action_button = presenter.get_section_action_button(sections.MAMMOGRAM_HISTORY) %}
+    {% if action_button.is_anchor %}
+      <a href="{{ action_button.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </a>
+    {% else %}
+      <form method="post" action="{{ action_button.href }}">
+        {{ csrf_input }}
+        <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </button>
+      </form>
+    {% endif %}
+  {% endcall %}
+</div>
+
+<div id="{{ presenter.get_anchor(sections.SYMPTOMS) }}" class="app-reviewable-section">
+  {% call card({
+    "heading": "Symptoms",
+  }) %}
+    <div class="app-reviewable-section__status">
+      {{ tag(presenter.get_section_tag_properties(sections.SYMPTOMS)) }}
+    </div>
+
+    <p {%- if not presenter.symptom_rows %} class="nhsuk-u-margin-bottom-3"{% endif %}>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
+    {% if presenter.symptom_rows %}
+       {{ summaryList({
+          "rows": presenter.symptom_rows
+        }) }}
+    {% else %}
+      {% set insetHtml %}
+        <p>No symptoms have been recorded for this participant.</p>
+      {% endset %}
+      {{ insetText({
+        "html": insetHtml,
+        "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
       }) }}
-    {% endfor %}
-  </div>
-{% endcall %}
+    {% endif %}
+
+    <hr>
+    <h3>Add symptoms</h3>
+
+    <div class="nhsuk-button-group app-button-group--small">
+      {% for button_info in presenter.symptom_buttons %}
+        {{ button({
+          "text": button_info.text,
+          "href": button_info.href,
+          "classes": "nhsuk-button--secondary nhsuk-button--small"
+        }) }}
+      {% endfor %}
+    </div>
+
+    <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+
+    {% set action_button = presenter.get_section_action_button(sections.SYMPTOMS) %}
+    {% if action_button.is_anchor %}
+      <a href="{{ action_button.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </a>
+    {% else %}
+      <form method="post" action="{{ action_button.href }}">
+        {{ csrf_input }}
+        <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </button>
+      </form>
+    {% endif %}
+  {% endcall %}
+</div>
 
 {% set medical_history_card_html %}
   {% set mastectomy_or_lumpectomy_history_html %}
@@ -200,11 +236,43 @@
     {% endfor %}
   </div>
 {% endset %}
+<<<<<<< HEAD
 
 {{ card({
   "heading": "Medical history",
   "descriptionHtml": medical_history_card_html
 }) }}
+||||||| parent of 49bb5131 (Add review UI to medical info page)
+{{ card({
+  "heading": "Medical history",
+  "descriptionHtml": medical_history_card_html
+}) }}
+=======
+
+<div id="{{ presenter.get_anchor(sections.MEDICAL_HISTORY) }}" class="app-reviewable-section">
+{% call card({
+    "heading": "Medical history"
+  }) %}
+    <div class="app-reviewable-section__status">
+      {{ tag(presenter.get_section_tag_properties(sections.MEDICAL_HISTORY)) }}
+    </div>
+
+    {{ medical_history_card_html }}
+
+    <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+
+    {% set action_button = presenter.get_section_action_button(sections.MEDICAL_HISTORY) %}
+    {% if action_button.is_anchor %}
+      <a href="{{ action_button.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </a>
+    {% else %}
+      <form method="post" action="{{ action_button.href }}">
+        {{ csrf_input }}
+        <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </button>
+      </form>
+    {% endif %}
+  {% endcall %}
+</div>
+>>>>>>> 49bb5131 (Add review UI to medical info page)
 
 {% set breast_features_card_html %}
     {% set breast_features_recorded = false %}
@@ -221,10 +289,30 @@
       <a href="#" class="nhsuk-link nhsuk-link--no-visited-state">{{ "Add another feature" if breast_features_recorded else "Add a feature" }}</a>
     </p>
 {% endset %}
-{{ card({
-  "heading": "Breast features",
-  "descriptionHtml": breast_features_card_html
-}) }}
+
+<div id="{{ presenter.get_anchor(sections.BREAST_FEATURES) }}" class="app-reviewable-section">
+{% call card({
+  "heading": "Breast features"
+}) %}
+    <div class="app-reviewable-section__status">
+      {{ tag(presenter.get_section_tag_properties(sections.BREAST_FEATURES)) }}
+    </div>
+
+  {{ breast_features_card_html }}
+
+    <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+
+    {% set action_button = presenter.get_section_action_button(sections.BREAST_FEATURES) %}
+    {% if action_button.is_anchor %}
+      <a href="{{ action_button.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </a>
+    {% else %}
+      <form method="post" action="{{ action_button.href }}">
+        {{ csrf_input }}
+        <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </button>
+      </form>
+    {% endif %}
+{% endcall %}
+</div>
 
 {% set other_information_card_html %}
   {% set hrt_link %}
@@ -234,9 +322,29 @@
   <a class="nhsuk-link" href="#">Enter pregnancy and breastfeeding</a>
   {% endset %}
 {% endset %}
-{{ card({
-  "heading": "Other information",
-  "descriptionHtml": other_information_card_html
-}) }}
+
+<div id="{{ presenter.get_anchor(sections.OTHER_INFORMATION) }}" class="app-reviewable-section">
+{% call card({
+  "heading": "Other information"
+}) %}
+    <div class="app-reviewable-section__status">
+      {{ tag(presenter.get_section_tag_properties(sections.OTHER_INFORMATION)) }}
+    </div>
+
+  {{ other_information_card_html }}
+
+  <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+
+  {% set action_button = presenter.get_section_action_button(sections.OTHER_INFORMATION) %}
+  {% if action_button.is_anchor %}
+    <a href="{{ action_button.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </a>
+  {% else %}
+    <form method="post" action="{{ action_button.href }}">
+      {{ csrf_input }}
+      <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button.text }} </button>
+    </form>
+  {% endif %}
+{% endcall %}
+</div>
 
 {% endblock %}
