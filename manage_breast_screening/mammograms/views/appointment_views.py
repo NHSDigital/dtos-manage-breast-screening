@@ -13,6 +13,8 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.participants.models import (
     Appointment,
+    MedicalInformationReview,
+    MedicalInformationSection,
     ParticipantReportedMammogram,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
@@ -282,3 +284,22 @@ def start_appointment(request, pk):
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
     return redirect("mammograms:confirm_identity", pk=pk)
+
+
+class MarkSectionReviewed(InProgressAppointmentMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        section = kwargs.get("section")
+
+        valid_sections = [choice[0] for choice in MedicalInformationSection.choices]
+        if section not in valid_sections:
+            raise Http404("Invalid section")
+
+        MedicalInformationReview.objects.get_or_create(
+            appointment=self.appointment,
+            section=section,
+            defaults={"reviewed_by": request.user},
+        )
+
+        return redirect("mammograms:record_medical_information", pk=self.appointment.pk)
