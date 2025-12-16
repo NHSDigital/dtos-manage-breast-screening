@@ -150,9 +150,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text(
-            "Details of breast implants or augmentation added"
-        )
+        expect(alert).to_contain_text("Added breast implants or augmentation")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change breast implants or augmentation item").click()
@@ -184,6 +182,4 @@ class TestBreastAugmentationHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text(
-            "Details of breast implants or augmentation updated"
-        )
+        expect(alert).to_contain_text("Updated breast implants or augmentation")

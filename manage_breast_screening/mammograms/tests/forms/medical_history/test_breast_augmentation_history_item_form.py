@@ -3,9 +3,7 @@ from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
-from django.test import RequestFactory
 
-from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
@@ -35,9 +33,6 @@ class TestBreastAugmentationHistoryItemForm:
         )
 
     def test_no_data(self, clinical_user):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         form = BreastAugmentationHistoryItemForm(QueryDict())
 
         assert not form.is_valid()
@@ -47,9 +42,6 @@ class TestBreastAugmentationHistoryItemForm:
         }
 
     def test_procedure_year_invalid_format(self, clinical_user):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
@@ -91,9 +83,6 @@ class TestBreastAugmentationHistoryItemForm:
     def test_no_procedures_and_other_options(
         self, clinical_user, selected_breast_procedures
     ):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
@@ -137,9 +126,6 @@ class TestBreastAugmentationHistoryItemForm:
         }
 
     def test_removal_year_invalid_format(self, clinical_user):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
@@ -176,9 +162,6 @@ class TestBreastAugmentationHistoryItemForm:
         ],
     )
     def test_procedure_year_outside_range(self, clinical_user, procedure_year):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         max_year = datetime.date.today().year
         min_year = max_year - 80
         year_outside_range_error_message = (
@@ -217,9 +200,6 @@ class TestBreastAugmentationHistoryItemForm:
         ],
     )
     def test_removal_year_outside_range(self, clinical_user, removal_year):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         max_year = datetime.date.today().year
         min_year = max_year - 80
         year_outside_range_error_message = (
@@ -263,9 +243,6 @@ class TestBreastAugmentationHistoryItemForm:
     def test_removal_year_before_procedure_year(
         self, clinical_user, procedure_year, removal_year
     ):
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
-
         form = BreastAugmentationHistoryItemForm(
             QueryDict(
                 urlencode(
@@ -292,8 +269,6 @@ class TestBreastAugmentationHistoryItemForm:
 
     def test_removal_year_when_not_removed(self, clinical_user):
         appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
 
         form = BreastAugmentationHistoryItemForm(
             QueryDict(
@@ -323,7 +298,7 @@ class TestBreastAugmentationHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.create(appointment=appointment, request=request)
+        obj = form.create(appointment=appointment)
 
         obj.refresh_from_db()
         assert obj.appointment == appointment
@@ -425,8 +400,6 @@ class TestBreastAugmentationHistoryItemForm:
     )
     def test_valid_create(self, clinical_user, data):
         appointment = AppointmentFactory()
-        request = RequestFactory().get("/test-form")
-        request.user = clinical_user
 
         form = BreastAugmentationHistoryItemForm(
             QueryDict(urlencode(data, doseq=True)),
@@ -434,15 +407,7 @@ class TestBreastAugmentationHistoryItemForm:
 
         assert form.is_valid()
 
-        existing_log_count = AuditLog.objects.count()
-
-        obj = form.create(appointment=appointment, request=request)
-
-        assert AuditLog.objects.count() == existing_log_count + 1
-        audit_log = AuditLog.objects.filter(
-            object_id=obj.pk, operation=AuditLog.Operations.CREATE
-        ).first()
-        assert audit_log.actor == clinical_user
+        obj = form.create(appointment=appointment)
 
         obj.refresh_from_db()
         assert obj.appointment == appointment
@@ -468,7 +433,7 @@ class TestBreastAugmentationHistoryItemForm:
             "additional_details": "",
         }
 
-    def test_success(self, instance, dummy_request):
+    def test_success(self, instance):
         form = BreastAugmentationHistoryItemForm(
             instance=instance,
             data=QueryDict(
@@ -491,7 +456,7 @@ class TestBreastAugmentationHistoryItemForm:
 
         assert form.is_valid()
 
-        obj = form.update(request=dummy_request)
+        obj = form.update()
         assert obj.right_breast_procedures == [
             BreastAugmentationHistoryItem.Procedure.OTHER_AUGMENTATION
         ]

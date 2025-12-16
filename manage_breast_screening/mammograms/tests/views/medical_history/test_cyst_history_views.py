@@ -51,7 +51,7 @@ class TestAddCystHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of cysts added",
+                    message="Added cysts",
                 )
             ],
         )
@@ -128,7 +128,7 @@ class TestChangeCystHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of cysts updated",
+                    message="Updated cysts",
                 )
             ],
         )

@@ -1,6 +1,5 @@
 from django.forms import Textarea
 
-from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.nhsuk_forms.fields.char_field import CharField
 from manage_breast_screening.nhsuk_forms.fields.choice_fields import (
     ChoiceField,
@@ -132,9 +131,7 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
 
         return initial
 
-    def create(self, appointment, request):
-        auditor = Auditor.from_request(request)
-
+    def create(self, appointment):
         benign_lump_history_item = BenignLumpHistoryItem.objects.create(
             appointment=appointment,
             left_breast_procedures=self.cleaned_data.get("left_breast_procedures", []),
@@ -147,15 +144,11 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
             additional_details=self.cleaned_data.get("additional_details", ""),
         )
 
-        auditor.audit_create(benign_lump_history_item)
-
         return benign_lump_history_item
 
-    def update(self, request):
+    def update(self):
         if self.instance is None:
             raise ValueError("Form has no instance")
-
-        auditor = Auditor.from_request(request)
 
         self.instance.left_breast_procedures = self.cleaned_data.get(
             "left_breast_procedures", []
@@ -171,7 +164,6 @@ class BenignLumpHistoryItemForm(FormWithConditionalFields):
         )
 
         self.instance.save()
-        auditor.audit_update(self.instance)
 
         return self.instance
 

@@ -79,7 +79,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         expect(
             self.page.get_by_text("Add details of implanted medical device")
         ).to_be_visible()
-        self.assert_page_title_contains("Details of the implanted medical device")
+        self.assert_page_title_contains("Add details of implanted medical device")
 
     def and_i_see_the_appointment_status_bar(self):
         status_bar = self.page.locator("div.app-status-bar")
@@ -136,7 +136,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Implanted medical device added")
+        expect(alert).to_contain_text("Added implanted medical device")
 
     def when_i_click_change(self):
         self.page.get_by_text("Change implanted medical device item").click()
@@ -145,7 +145,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         expect(
             self.page.get_by_text("Edit details of implanted medical device")
         ).to_be_visible()
-        self.assert_page_title_contains("Details of the implanted medical device")
+        self.assert_page_title_contains("Edit details of implanted medical device")
 
     def when_i_select_cardiac_device(self):
         self.page.get_by_label(
@@ -164,4 +164,4 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Details of implanted medical device updated")
+        expect(alert).to_contain_text("Updated implanted medical device")

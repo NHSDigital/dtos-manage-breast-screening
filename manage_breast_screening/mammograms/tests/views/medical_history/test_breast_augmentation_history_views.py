@@ -55,7 +55,7 @@ class TestAddBreastAugmentationHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of breast implants or augmentation added",
+                    message="Added breast implants or augmentation",
                 )
             ],
         )
@@ -144,7 +144,7 @@ class TestChangeBreastAugmentationHistoryView:
             [
                 messages.Message(
                     level=messages.SUCCESS,
-                    message="Details of breast implants or augmentation updated",
+                    message="Updated breast implants or augmentation",
                 )
             ],
         )

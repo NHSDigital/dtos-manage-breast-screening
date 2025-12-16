@@ -126,7 +126,7 @@ class TestBreastCancerHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Breast cancer history added")
+        expect(alert).to_contain_text("Added breast cancer")
 
     def and_i_select_lumpectomy_in_right_breast(self):
         fieldset = self.get_fieldset_by_legend(
@@ -214,7 +214,7 @@ class TestBreastCancerHistory(SystemTestCase):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Breast cancer history updated")
+        expect(alert).to_contain_text("Updated breast cancer")
 
     def and_i_click_delete_this_item(self):
         self.page.get_by_text("Delete this item").click()
