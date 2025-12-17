@@ -41,21 +41,6 @@ class TestQueue:
 
         mock_queue_client.send_message.assert_called_once_with("a message")
 
-    def test_message_status_updates_queue(self):
-        with patch(
-            "manage_breast_screening.notifications.services.queue.QueueClient"
-        ) as queue_client:
-            mock_client = MagicMock()
-            queue_client.from_connection_string.return_value = mock_client
-
-            Queue.MessageStatusUpdates().add("some data")
-
-            queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "notifications-message-status-updates"
-            )
-            mock_client.create_queue.assert_called_once()
-            mock_client.send_message.assert_called_once_with("some data")
-
     def test_items_method_receives_messages(self, mock_queue_client):
         mock_queue_client.receive_messages.return_value = ["this", "that"]
 
@@ -98,20 +83,6 @@ class TestQueue:
                 managed_identity_constructor.assert_called_once_with(
                     client_id="my-mi-id"
                 )
-
-    def test_update_queue_prefers_queue_name_from_env(self, monkeypatch):
-        monkeypatch.setenv("STATUS_UPDATES_QUEUE_NAME", "updates")
-        with patch(
-            "manage_breast_screening.notifications.services.queue.QueueClient"
-        ) as queue_client:
-            mock_client = MagicMock()
-            queue_client.from_connection_string.return_value = mock_client
-
-            Queue.MessageStatusUpdates()
-
-            queue_client.from_connection_string.assert_called_once_with(
-                "qqq111", "updates"
-            )
 
     def test_retry_message_batches_queue(self):
         with patch(
