@@ -84,21 +84,22 @@ a[href="#"] {
 }
 
 .app-status-bar {
-  background-color: $color_app-dark-blue;
-  color: $color_nhsuk-white;
+  background-color: nhsuk-shade($nhsuk-brand-colour, 40%);
+  color: $nhsuk-reverse-text-colour;
   padding: nhsuk-spacing(2) 0;
   border-bottom: 1px solid nhsuk-colour("grey-4");
 }
 
 .app-status-bar a {
-  color: $color_nhsuk-white;
-}
-.app-status-bar a:hover,
-.app-status-bar a:active {
-  color: $color_nhsuk-white;
-}
-.app-status-bar a:focus {
-  color: $color_nhsuk-black;
+  color: $nhsuk-reverse-text-colour;
+
+  &:hover,
+  &:active {
+    color: $nhsuk-reverse-text-colour;
+  }
+  &:focus {
+    color: $nhsuk-text-colour;
+  }
 }
 
 .app-status-bar__row {
@@ -121,6 +122,6 @@ a[href="#"] {
 }
 
 .app-status-bar__key {
-  @include nhsuk-typography-weight-bold(true);
+  @include nhsuk-typography-weight-bold($important: true);
   opacity: 0.9;
 }
