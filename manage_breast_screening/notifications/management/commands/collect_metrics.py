@@ -12,7 +12,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             queues = [
-                Queue.MessageStatusUpdates(),
                 Queue.RetryMessageBatches(),
             ]
 
