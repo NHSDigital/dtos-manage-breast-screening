@@ -8,4 +8,3 @@ postgres_geo_redundant_backup_enabled = false
 protect_keyvault                      = false
 vnet_address_space                    = "10.128.0.0/16"
 seed_demo_data                        = true
-nhs_notify_api_message_batch_url      = "https://int.api.service.nhs.uk/comms/v1/message-batches"

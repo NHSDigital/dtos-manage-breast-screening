@@ -38,10 +38,6 @@ workspace {
 
         jobs = container "Functions" "Process events asynchronously" {
           technology "Event driven container app jobs"
-          save_message_status = component "Save message status" {
-              technology "Event driven container app job"
-              tags job
-          }
           create_appointments = component "Create appointments" {
               technology "Event driven container app job"
               tags job
@@ -118,15 +114,12 @@ workspace {
     user -> cis2 "Authenticates via"
     cis2 -> webApplication "Provides authentication token to"
 
-    save_message_status -> queue "Gets updates to save"
     store_mesh_messages -> mesh "Fetches appointments from" {
       tags store_mesh
     }
     create_appointments -> mesh_blob_container "Gets MESH messages"
     store_mesh_messages -> mesh_blob_container "Stores MESH messages"
     create_report -> reports_blob_container "Stores message status reports"
-    notify -> webApplication "Sends status updates to"
-    webApplication -> queue "Save message status"
 
     # Commented to avoid cluttering - Grouped with send_message_batch
     # retry_failed_message_batch -> retry_queue "Gets failed batches"
@@ -134,7 +127,6 @@ workspace {
 
     # Commented to avoid cluttering - DB connection in view title
     # store_mesh_messages -> azurePostgres "Store messages to"
-    # save_message_status -> azurePostgres "Save message status"
     # send_message_batch -> azurePostgres "Gets appointments from"
     # create_appointments -> azurePostgres "Converts to appointments and clinic"
     # create_report -> azurePostgres "Gets message statuses from"
