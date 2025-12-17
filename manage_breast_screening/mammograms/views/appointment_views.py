@@ -13,7 +13,6 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.participants.models import (
     Appointment,
-    MedicalInformationReview,
     MedicalInformationSection,
     ParticipantReportedMammogram,
 )
@@ -297,8 +296,7 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
         if section not in valid_sections:
             raise Http404("Invalid section")
 
-        MedicalInformationReview.objects.get_or_create(
-            appointment=self.appointment,
+        self.appointment.medical_information_reviews.get_or_create(
             section=section,
             defaults={"reviewed_by": request.user},
         )
