@@ -173,11 +173,6 @@ variable "api_oauth_token_url" {
   type        = string
 }
 
-variable "nhs_notify_api_message_batch_url" {
-  description = "NHS Notify API endpoint URL for making message batch requests"
-  type        = string
-}
-
 variable "enable_notifications_jobs_schedule" {
   description = "Whether we apply the cron schedules for the notifications container app jobs"
   type        = bool

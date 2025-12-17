@@ -76,7 +76,6 @@ module "container-apps" {
   infra_key_vault_name                  = local.infra_key_vault_name
   infra_key_vault_rg                    = local.infra_key_vault_rg
   api_oauth_token_url                   = var.api_oauth_token_url
-  nhs_notify_api_message_batch_url      = var.nhs_notify_api_message_batch_url
   target_url                            = var.deploy_container_apps ? "${module.container-apps[0].external_url}healthcheck" : null
   resource_group_name_infra             = local.resource_group_name
   enable_notifications_jobs_schedule    = var.enable_notifications_jobs_schedule
