@@ -4,6 +4,7 @@
 {% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
+{% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
 
 {% block step_content %}
 
@@ -64,15 +65,6 @@
 {% endcall %}
 
 {% set medical_history_card_html %}
-  {% set breast_cancer_history_html %}
-    {% for presented_item in presenter.breast_cancer_history %}
-      <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href}}">
-        {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
-      </a><br>
-      {{ summaryList(presented_item.summary_list_params) }}
-    {% endfor %}
-  {% endset %}
-
   {% set mastectomy_or_lumpectomy_history_html %}
     {% for presented_item in presenter.mastectomy_or_lumpectomy_history %}
       <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href}}">
@@ -125,19 +117,10 @@
     {% endfor %}
   {% endset %}
 
+  {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
+
   {{ summaryList({
     "rows": [
-     {
-       "key": {
-         "text": "Breast cancer history"
-       },
-       "value": {
-         "html": breast_cancer_history_html
-       },
-       "actions": {
-          "items": []
-       }
-     },
      {
        "key": {
          "text": "Implanted medical device history"
@@ -216,8 +199,8 @@
       }) }}
     {% endfor %}
   </div>
-
 {% endset %}
+
 {{ card({
   "heading": "Medical history",
   "descriptionHtml": medical_history_card_html

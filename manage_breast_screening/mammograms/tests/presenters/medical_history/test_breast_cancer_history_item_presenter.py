@@ -1,3 +1,5 @@
+import pytest
+
 from manage_breast_screening.mammograms.presenters.medical_history.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
 )
@@ -10,8 +12,9 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 class TestBreastCancerHistoryItemPresenter:
-    def test_single(self):
-        item = BreastCancerHistoryItemFactory.build(
+    @pytest.fixture
+    def item(self):
+        return BreastCancerHistoryItemFactory.build(
             diagnosis_location=BreastCancerHistoryItem.DiagnosisLocationChoices.RIGHT_BREAST,
             right_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
             intervention_location=BreastCancerHistoryItem.InterventionLocation.NHS_HOSPITAL,
@@ -19,60 +22,20 @@ class TestBreastCancerHistoryItemPresenter:
             additional_details="some details",
         )
 
-        presenter = BreastCancerHistoryItemPresenter(item)
+    @pytest.fixture
+    def presenter(self, item):
+        return BreastCancerHistoryItemPresenter(item)
 
-        assert presenter.summary_list_params == {
-            "rows": [
-                {
-                    "key": {
-                        "text": "Cancer location",
-                    },
-                    "value": {
-                        "html": "Right breast",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Procedures",
-                    },
-                    "value": {
-                        "html": "Right breast: Lumpectomy<br>Left breast: No procedure",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Other surgery",
-                    },
-                    "value": {
-                        "html": "Right breast: No other surgery<br>Left breast: No other surgery",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Treatment",
-                    },
-                    "value": {
-                        "html": "Right breast: No radiotherapy<br>Left breast: No radiotherapy<br>Systemic treatements: No systemic treatments",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Treatment location",
-                    },
-                    "value": {
-                        "html": "At an NHS hospital: East Tester Hospital",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Additional details",
-                    },
-                    "value": {
-                        "html": "some details",
-                    },
-                },
-            ],
-        }
+    def test_attributes(self, presenter):
+        assert presenter.cancer_location == "Right breast"
+        assert presenter.right_breast_procedure == "Lumpectomy"
+        assert presenter.left_breast_procedure == "No procedure"
+        assert presenter.right_breast_other_surgery == ["No other surgery"]
+        assert presenter.left_breast_other_surgery == ["No other surgery"]
+        assert presenter.right_breast_treatments == ["No radiotherapy"]
+        assert presenter.left_breast_treatments == ["No radiotherapy"]
+        assert presenter.systemic_treatments == ["No systemic treatments"]
+        assert presenter.additional_details == "some details"
 
     def test_change_link(self):
         item = BreastCancerHistoryItemFactory.build()
