@@ -286,7 +286,7 @@ class MedicalInformationPresenter:
     def is_section_reviewed(self, section):
         return section in self._section_reviews
 
-    def get_section_tag_properties(self, section):
+    def review_status_tag_properties(self, section):
         if self.is_section_reviewed(section):
             return {
                 "text": "Reviewed",
@@ -298,7 +298,7 @@ class MedicalInformationPresenter:
                 "classes": "nhsuk-tag--blue app-section-review-tag",
             }
 
-    def get_section_action_button(self, section):
+    def review_action_button_properties(self, section):
         if self.is_section_reviewed(section):
             next_section = SECTION_ORDER.get(section)
             anchor = SECTION_ANCHORS.get(next_section)

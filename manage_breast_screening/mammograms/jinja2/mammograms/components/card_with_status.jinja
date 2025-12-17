@@ -1,0 +1,32 @@
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+
+{% macro card_with_status(section, anchor, status_tag_properties, action_button_properties=None, csrf_input=None) %}
+  {% set outer_caller = caller if caller is defined else none %}
+  <div id="{{ anchor }}" class="app-reviewable-section">
+    {% call card({
+      "heading": section.label
+    }) %}
+      <div class="app-reviewable-section__status">
+        {{ tag(status_tag_properties) }}
+      </div>
+
+      {% if outer_caller %}
+        {{ outer_caller() }}
+      {% endif %}
+
+      {% if action_button_properties %}
+        <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+
+        {% if action_button_properties.is_anchor %}
+          <a href="{{ action_button_properties.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button_properties.text }} </a>
+        {% else %}
+          <form method="post" action="{{ action_button_properties.href }}">
+            {{ csrf_input }}
+            <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button_properties.text }} </button>
+          </form>
+        {% endif %}
+      {% endif %}
+    {% endcall %}
+  </div>
+{% endmacro %}
