@@ -3,11 +3,11 @@
 
 {% macro card_with_status(section, anchor, status_tag_properties, action_button_properties=None, csrf_input=None) %}
   {% set outer_caller = caller if caller is defined else none %}
-  <div id="{{ anchor }}" class="app-reviewable-section">
+  <div id="{{ anchor }}" class="card-with-status">
     {% call card({
       "heading": section.label
     }) %}
-      <div class="app-reviewable-section__status">
+      <div class="card-with-status__tag">
         {{ tag(status_tag_properties) }}
       </div>
 
@@ -23,7 +23,7 @@
         {% else %}
           <form method="post" action="{{ action_button_properties.href }}">
             {{ csrf_input }}
-            <button type="submit" class="nhsuk-button nhsuk-button--secondary"> {{ action_button_properties.text }} </button>
+            <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ action_button_properties.text }} </button>
           </form>
         {% endif %}
       {% endif %}

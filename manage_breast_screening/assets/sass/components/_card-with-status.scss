@@ -1,0 +1,12 @@
+@use "../vendor/nhsuk-frontend/base" as *;
+
+.card-with-status {
+  position: relative;
+}
+
+.card-with-status__tag {
+  position: absolute;
+  top: nhsuk-spacing(3);
+  right: nhsuk-spacing(3);
+  z-index: 1;
+}
