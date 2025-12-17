@@ -6,6 +6,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertRedirects
 
 from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
+from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
@@ -19,7 +20,7 @@ class TestShowAppointment:
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={"pk": appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -31,31 +32,17 @@ class TestShowAppointment:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={"pk": appointment.pk},
             )
         )
         assert response.status_code == 200
         assertInHTML(
             """
-            <span id="id_where_taken-error" class="nhsuk-error-message">
-              <span class="nhsuk-u-visually-hidden">Error:</span> This field is required.
-            </span>
-            """,
-            response.text,
-        )
-        assertInHTML(
-            """
-            <span id="id_when_taken-error" class="nhsuk-error-message">
-              <span class="nhsuk-u-visually-hidden">Error:</span> This field is required.
-            </span>
-            """,
-            response.text,
-        )
-        assertInHTML(
-            """
-            <span id="id_name_is_the_same-error" class="nhsuk-error-message">
-              <span class="nhsuk-u-visually-hidden">Error:</span> This field is required.
-            </span>
+            <ul class="nhsuk-list nhsuk-error-summary__list">
+                <li><a href="#id_location_type">Select where the breast x-rays were taken</a></li>
+                <li><a href="#id_when_taken">Select when the x-rays were taken</a></li>
+                <li><a href="#id_name_is_the_same">Select if the x-rays were taken with the same name</a></li>
+            </ul>
             """,
             response.text,
         )
@@ -72,11 +59,11 @@ class TestShowAppointment:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={"pk": appointment.pk},
             ),
             {
                 "return_url": return_url,
-                "where_taken": ParticipantReportedMammogramForm.WhereTaken.SAME_UNIT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
                 "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
                 "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
@@ -96,11 +83,11 @@ class TestShowAppointment:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={"pk": appointment.pk},
             ),
             {
                 "return_url": return_url,
-                "where_taken": ParticipantReportedMammogramForm.WhereTaken.SAME_UNIT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
                 "when_taken": ParticipantReportedMammogramForm.WhenTaken.APPROX,
                 "approx_date": "last month",
                 "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
@@ -131,11 +118,11 @@ class TestShowAppointment:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={"pk": appointment.pk},
             ),
             {
                 "return_url": return_url,
-                "where_taken": ParticipantReportedMammogramForm.WhereTaken.SAME_UNIT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
                 "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
                 "exact_date_0": exact_date.day,
                 "exact_date_1": exact_date.month,
@@ -165,14 +152,21 @@ class TestShowAppointment:
             kwargs={"pk": appointment.pk},
         )
 
+        assert (
+            ParticipantReportedMammogram.objects.filter(
+                participant=appointment.participant
+            ).count()
+            == 0
+        )
+
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={"pk": appointment.pk},
             ),
             {
                 "return_url": return_url,
-                "where_taken": ParticipantReportedMammogramForm.WhereTaken.SAME_UNIT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
                 "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
                 "exact_date_0": exact_date.day,
                 "exact_date_1": exact_date.month,
@@ -180,13 +174,21 @@ class TestShowAppointment:
                 "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
+
+        mammogram = ParticipantReportedMammogram.objects.filter(
+            participant=appointment.participant
+        ).first()
+
         assertRedirects(
             response,
             reverse(
                 "mammograms:appointment_should_not_proceed",
-                kwargs={"appointment_pk": appointment.pk},
+                kwargs={
+                    "appointment_pk": appointment.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
             )
-            + f"?exact_date={exact_date.isoformat()}",
+            + f"?return_url={return_url}",
         )
         assert appointment.current_status.state == AppointmentStatus.CONFIRMED
 

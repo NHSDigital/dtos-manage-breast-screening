@@ -67,7 +67,7 @@ class LastKnownMammogramPresenter:
         href = (
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"appointment_pk": self.appointment_pk},
+                kwargs={"pk": self.appointment_pk},
             )
             + f"?return_url={self.current_url}"
         )

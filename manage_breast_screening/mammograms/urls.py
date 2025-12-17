@@ -3,6 +3,7 @@ from django.urls import path
 from manage_breast_screening.mammograms.views import mammogram_views
 
 from .views import (
+    add_mammogram_views,
     appointment_note_views,
     appointment_views,
     special_appointment_views,
@@ -222,12 +223,17 @@ urlpatterns = [
         name="delete_other_procedure_history_item",
     ),
     path(
-        "<uuid:appointment_pk>/previous-mammograms/add",
-        mammogram_views.add_previous_mammogram,
+        "<uuid:pk>/previous-mammograms/add",
+        add_mammogram_views.AddParticipantReportedMammogramView.as_view(),
         name="add_previous_mammogram",
     ),
     path(
-        "<uuid:appointment_pk>/appointment-should-not-proceed/",
+        "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>",
+        add_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
+        name="change_previous_mammogram",
+    ),
+    path(
+        "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>",
         mammogram_views.appointment_should_not_proceed,
         name="appointment_should_not_proceed",
     ),

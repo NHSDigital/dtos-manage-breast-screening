@@ -1,7 +1,5 @@
-from datetime import date, datetime
 from urllib.parse import urlparse
 
-from dateutil.relativedelta import relativedelta
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -11,73 +9,23 @@ from manage_breast_screening.core.utils.date_formatting import format_relative_d
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
 )
-from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
+from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
     Appointment,
     AppointmentStatus,
 )
-from manage_breast_screening.participants.models.participant import Participant
-from manage_breast_screening.participants.services import fetch_most_recent_provider
 
 
-def add_previous_mammogram(request, appointment_pk):
-    provider = request.user.current_provider
-    appointment = provider.appointments.select_related(
-        "clinic_slot__clinic",
-        "screening_episode__participant",
-        "screening_episode__participant__address",
-    ).get(pk=appointment_pk)
-    participant_pk = appointment.screening_episode.participant.pk
+def appointment_should_not_proceed(
+    request, appointment_pk, participant_reported_mammogram_pk
+):
     try:
-        participant = provider.participants.get(pk=participant_pk)
-    except Participant.DoesNotExist:
-        raise Http404("Participant not found")
-    most_recent_provider = fetch_most_recent_provider(participant_pk)
-    return_url = parse_return_url(
-        request, default=reverse("participants:show", kwargs={"pk": participant_pk})
-    )
-
-    if request.method == "POST":
-        form = ParticipantReportedMammogramForm(
-            data=request.POST,
-            participant=participant,
-            most_recent_provider=most_recent_provider,
+        mammogram = ParticipantReportedMammogram.objects.get(
+            pk=participant_reported_mammogram_pk
         )
-        if form.is_valid():
-            form.save()
-
-            exact_date = form.cleaned_data.get("exact_date")
-            if exact_date and exact_date > date.today() - relativedelta(months=6):
-                return redirect(
-                    reverse(
-                        "mammograms:appointment_should_not_proceed",
-                        kwargs={"appointment_pk": appointment_pk},
-                    )
-                    + f"?exact_date={exact_date.isoformat()}"
-                )
-
-            return redirect(return_url)
-    else:
-        form = ParticipantReportedMammogramForm(
-            participant=participant, most_recent_provider=most_recent_provider
-        )
-
-    return render(
-        request,
-        "mammograms/add_previous_mammogram.jinja",
-        {
-            "title": "Add details of a previous mammogram",
-            "caption": participant.full_name,
-            "page_title": "Add details of a previous mammogram",
-            "form": form,
-            "back_link_params": {"href": return_url, "text": "Go back"},
-            "return_url": return_url,
-        },
-    )
-
-
-def appointment_should_not_proceed(request, appointment_pk):
-    exact_date = datetime.strptime(request.GET.get("exact_date"), "%Y-%m-%d").date()
+    except ParticipantReportedMammogram.DoesNotExist:
+        raise Http404("Participant reported mammogram not found")
+    exact_date = mammogram.exact_date
 
     provider = request.user.current_provider
     try:
@@ -88,11 +36,22 @@ def appointment_should_not_proceed(request, appointment_pk):
         ).get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
+
     participant_pk = appointment.screening_episode.participant.pk
+    if participant_pk != mammogram.participant.pk:
+        raise Http404("Participant mismatch")
     participant = provider.participants.get(pk=participant_pk)
 
-    return_url = parse_return_url(
-        request, default=reverse("participants:show", kwargs={"pk": participant_pk})
+    return_url = parse_return_url(request, default="")
+    change_previous_mammogram_url = (
+        reverse(
+            "mammograms:change_previous_mammogram",
+            kwargs={
+                "pk": appointment_pk,
+                "participant_reported_mammogram_pk": participant_reported_mammogram_pk,
+            },
+        )
+        + f"?return_url={return_url}"
     )
 
     return render(
@@ -102,9 +61,14 @@ def appointment_should_not_proceed(request, appointment_pk):
             "caption": participant.full_name,
             "page_title": "This appointment should not proceed",
             "heading": "This appointment should not proceed",
-            "back_link_params": {"href": return_url, "text": "Go back"},
+            "back_link_params": {
+                "href": change_previous_mammogram_url,
+                "text": "Go back",
+            },
             "appointment": AppointmentPresenter(appointment),
             "time_since_previous_mammogram": format_relative_date(exact_date),
+            "change_previous_mammogram_url": change_previous_mammogram_url,
+            "return_url": return_url,
         },
     )
 
