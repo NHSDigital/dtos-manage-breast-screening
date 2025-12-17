@@ -3,6 +3,7 @@ from datetime import timezone as tz
 
 import pytest
 import time_machine
+from django.core.exceptions import ValidationError
 from pytest_django.asserts import assertQuerySetEqual
 
 from manage_breast_screening.auth.models import Role
@@ -10,6 +11,7 @@ from manage_breast_screening.clinics import models
 
 from .factories import (
     ClinicFactory,
+    ClinicSlotFactory,
     ProviderFactory,
     UserAssignmentFactory,
     UserFactory,
@@ -85,6 +87,18 @@ def test_completed_ordering_by_ends_at():
 
     completed = models.Clinic.objects.completed()
     assertQuerySetEqual(completed, [clinic1, clinic2, clinic3])
+
+
+@pytest.mark.django_db
+def test_clean_clinic_slots():
+    clinic = ClinicFactory.build(starts_at=datetime(2024, 12, 29, 9, tzinfo=tz.utc))
+    clinic_slot = ClinicSlotFactory.build(
+        starts_at=datetime(2024, 12, 26, 9, tzinfo=tz.utc),
+        duration_in_minutes=30,
+        clinic=clinic,
+    )
+    with pytest.raises(ValidationError):
+        clinic_slot.clean()
 
 
 class TestUserAssignment:

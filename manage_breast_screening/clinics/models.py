@@ -4,6 +4,7 @@ from enum import StrEnum
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import OuterRef, Subquery
@@ -185,6 +186,12 @@ class ClinicSlot(BaseModel):
         return (
             self.clinic.setting.name + " " + self.starts_at.strftime("%Y-%m-%d %H:%M")
         )
+
+    def clean(self):
+        if self.starts_at.date() != self.clinic.starts_at.date():
+            raise ValidationError(
+                "Clinic slot must start on the same date as the clinic"
+            )
 
 
 class ClinicStatus(models.Model):
