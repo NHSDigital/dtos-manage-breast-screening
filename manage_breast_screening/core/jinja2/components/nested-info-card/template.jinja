@@ -1,0 +1,32 @@
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% set headingLevel = params.headingLevel | default(2) %}
+{% call card(params.card) %}
+  <div class="app-nested-info">
+    {% for row in params.rows %}
+    {% if row %}
+    <div class="app-nested-info__row {% if loop.last %}app-nested-info__row--no-border{% endif %}">
+      <div class="app-nested-info__key">
+        <h{{headingLevel}} class="nhsuk-heading-xs">{{ row.key }}</h{{ headingLevel }}>
+      </div>
+      <div class="app-nested-info__value">
+        {% if row.value.rows %}
+        {% for inner_row in row.value.rows %}
+        <div class="nhsuk-grid-row app-nested-info__subvalue_row">
+        {% set column_width = "full" if inner_row.columns | length == 1 else "one-half" %}
+        {% for column in inner_row.columns %}
+          <div class="nhsuk-grid-column-{{ column_width }} app-nested-info__subvalue">
+            {% if column.heading %}<h{{ headingLevel + 1 }} class="nhsuk-heading-xs nhsuk-u-margin-bottom-1">{{ column.heading }}</h{{ headingLevel + 1 }}>{% endif %}
+            {{ column.html | safe }}
+          </div>
+        {% endfor %}
+        </div>
+        {% endfor %}
+        {% else %}
+        {{ row.value.html | safe }}
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+{% endcall %}
