@@ -1,0 +1,28 @@
+{# Present a plain list, or a default value if there are no items #}
+{% macro listWithDefault(items, default="None") %}
+  {% if items %}
+  <ul class="nhsuk-list">
+    {% for item in items %}
+      <li>{{ item }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    {{ default }}
+  {% endif %}
+{% endmacro %}
+
+{# Present an answer to a radio + details question #}
+{% macro itemWithDetails(item, default='Details not provided') %}
+  {{ item.type }}
+  {% if item.details %}
+    <br>
+    Details: {{ item.details }}
+  {% elif default %}
+    <br>
+    {{ default }}
+  {% endif %}
+{% endmacro %}
+
+{% macro paragraph(item) %}
+  <p>{{ item | nl2br }}</p>
+{% endmacro %}

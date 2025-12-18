@@ -115,11 +115,14 @@ class TestBreastCancerHistory(SystemTestCase):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
 
     def and_the_history_item_is_added(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Breast cancer history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        heading = self.page.get_by_role("heading").filter(has_text="Breast cancer")
+        expect(heading).to_be_attached()
+
+        section = self.page.locator("section").filter(has=heading)
+        expect(section).to_be_attached()
+
+        row = section.locator(".app-nested-info__row", has_text="Cancer location")
+
         expect(row).to_contain_text("Right breast")
 
     def and_the_message_says_device_added(self):
@@ -203,11 +206,10 @@ class TestBreastCancerHistory(SystemTestCase):
         fieldset.get_by_label("Breast radiotherapy").click()
 
     def and_the_history_item_shows_the_radiotherapy(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Breast cancer history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        heading = self.page.get_by_role("heading").filter(has_text="Breast cancer")
+        section = self.page.locator("section").filter(has=heading)
+        row = section.locator(".app-nested-info__row", has_text="Treatment").first
+
         expect(row).to_contain_text("Breast radiotherapy")
 
     def and_the_message_says_breast_cancer_history_updated(self):
@@ -223,10 +225,5 @@ class TestBreastCancerHistory(SystemTestCase):
         self.page.get_by_text("Delete item").click()
 
     def and_the_history_item_is_gone(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Breast cancer history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        expect(row).not_to_contain_text("Cancer location")
-        expect(row.get_by_text("Change")).not_to_be_attached()
+        heading = self.page.get_by_role("heading").filter(has_text="Breast cancer")
+        expect(heading).not_to_be_attached()
