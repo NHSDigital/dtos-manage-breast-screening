@@ -54,12 +54,28 @@ class LastKnownMammogramPresenter:
         else:
             date = {"value": "Date unknown"}
 
+        href = (
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": self.appointment_pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+            + f"?return_url={self.current_url}"
+        )
+
         return {
             "date_added": format_relative_date(mammogram.created_at),
             "location": location,
             "date": date,
             "different_name": mammogram.different_name,
             "additional_information": mammogram.additional_information,
+            "change_link": {
+                "href": href,
+                "text": "Change",
+                "visually_hidden_text": " mammogram",
+            },
         }
 
     @cached_property
