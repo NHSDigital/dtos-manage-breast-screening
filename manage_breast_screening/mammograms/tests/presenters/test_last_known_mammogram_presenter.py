@@ -64,7 +64,7 @@ class TestLastKnownMammogramPresenter:
                 "change_link": {
                     "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}?return_url=/mammograms/abc",
                     "text": "Change",
-                    "visually_hidden_text": " mammogram",
+                    "visually_hidden_text": " mammogram item",
                 },
             },
         ]
@@ -92,7 +92,7 @@ class TestLastKnownMammogramPresenter:
                 "change_link": {
                     "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}?return_url=/mammograms/abc",
                     "text": "Change",
-                    "visually_hidden_text": " mammogram",
+                    "visually_hidden_text": " mammogram item 1",
                 },
             },
             {
@@ -106,7 +106,7 @@ class TestLastKnownMammogramPresenter:
                 "change_link": {
                     "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_earlier.pk}?return_url=/mammograms/abc",
                     "text": "Change",
-                    "visually_hidden_text": " mammogram",
+                    "visually_hidden_text": " mammogram item 2",
                 },
             },
         ]

@@ -276,7 +276,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         ).to_be_visible()
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change mammogram").click()
+        self.page.get_by_text("Change mammogram item").click()
 
     def then_i_should_be_on_the_edit_previous_mammogram_form(self):
         expect(
