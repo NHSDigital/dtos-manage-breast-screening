@@ -51,6 +51,38 @@ class TestAddParticipantReportedMammogram:
             response.text,
         )
 
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_previous_mammogram",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message="Added a previous mammogram",
+                )
+            ],
+        )
+
     @pytest.mark.parametrize(
         "exact_date",
         [
@@ -59,9 +91,7 @@ class TestAddParticipantReportedMammogram:
             date.today() - relativedelta(years=50),
         ],
     )
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, exact_date
-    ):
+    def test_post_exact_date_six_months_or_more(self, clinical_user_client, exact_date):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
@@ -263,4 +293,133 @@ class TestChangeParticipantReportedMammogram:
                     message="Updated a previous mammogram",
                 )
             ],
+        )
+
+    @pytest.mark.parametrize(
+        "exact_date",
+        [
+            date.today() - relativedelta(months=6),
+            date.today() - relativedelta(months=6) - relativedelta(days=1),
+            date.today() - relativedelta(years=50),
+        ],
+    )
+    def test_post_exact_date_six_months_or_more(
+        self,
+        clinical_user_client,
+        appointment,
+        participant_reported_mammogram,
+        exact_date,
+    ):
+        return_url = reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": appointment.pk},
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            ),
+            {
+                "return_url": return_url,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
+                "exact_date_0": exact_date.day,
+                "exact_date_1": exact_date.month,
+                "exact_date_2": exact_date.year,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+            },
+        )
+
+        assertRedirects(response, return_url)
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message="Updated a previous mammogram",
+                )
+            ],
+        )
+
+    @pytest.mark.parametrize(
+        "exact_date",
+        [
+            date.today(),
+            date.today() - relativedelta(months=6) + relativedelta(days=1),
+            date.today() - relativedelta(months=6) + relativedelta(days=2),
+        ],
+    )
+    def test_post_exact_date_within_last_six_months(
+        self,
+        clinical_user_client,
+        appointment,
+        participant_reported_mammogram,
+        exact_date,
+    ):
+        return_url = reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": appointment.pk},
+        )
+
+        assert (
+            ParticipantReportedMammogram.objects.filter(
+                participant=appointment.participant
+            ).count()
+            == 1
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            ),
+            {
+                "return_url": return_url,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
+                "exact_date_0": exact_date.day,
+                "exact_date_1": exact_date.month,
+                "exact_date_2": exact_date.year,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+            },
+        )
+
+        mammogram = ParticipantReportedMammogram.objects.filter(
+            participant=appointment.participant
+        ).first()
+
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:appointment_should_not_proceed",
+                kwargs={
+                    "appointment_pk": appointment.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+            + f"?return_url={return_url}",
+        )
+        assert appointment.current_status.state == AppointmentStatus.CONFIRMED
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:attended_not_screened",
+                kwargs={"appointment_pk": appointment.pk},
+            ),
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "clinics:show",
+                kwargs={"pk": appointment.clinic_slot.clinic.pk},
+            ),
+        )
+        assert (
+            appointment.current_status.state == AppointmentStatus.ATTENDED_NOT_SCREENED
         )
