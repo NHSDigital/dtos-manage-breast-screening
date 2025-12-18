@@ -15,6 +15,14 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 
+@pytest.fixture
+def participant_reported_mammogram(appointment):
+    return ParticipantReportedMammogramFactory.create(
+        participant=appointment.participant,
+        location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+    )
+
+
 @pytest.mark.django_db
 class TestAddParticipantReportedMammogram:
     def test_renders_response(self, clinical_user_client):
@@ -206,19 +214,6 @@ class TestAddParticipantReportedMammogram:
 
 @pytest.mark.django_db
 class TestChangeParticipantReportedMammogram:
-    @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-
-    @pytest.fixture
-    def participant_reported_mammogram(self, appointment):
-        return ParticipantReportedMammogramFactory.create(
-            participant=appointment.participant,
-            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-        )
-
     def test_renders_response(
         self, clinical_user_client, appointment, participant_reported_mammogram
     ):
@@ -423,3 +418,30 @@ class TestChangeParticipantReportedMammogram:
         assert (
             appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
         )
+
+
+@pytest.mark.django_db
+class TestDeleteParticipantReportedMammogram:
+    def test_delete_previous_mammogram(
+        self,
+        clinical_user_client,
+        appointment,
+        participant_reported_mammogram,
+    ):
+        assert ParticipantReportedMammogram.objects.filter(
+            pk=participant_reported_mammogram.pk
+        ).exists()
+
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_previous_mammogram",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            )
+        )
+
+        assert not ParticipantReportedMammogram.objects.filter(
+            pk=participant_reported_mammogram.pk
+        ).exists()

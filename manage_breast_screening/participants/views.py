@@ -17,11 +17,7 @@ def parse_return_url(request, default: str) -> str:
     Parse the return_url from the request, with a fallback,
     and validating that the URL is not external to the service.
     """
-    return_url = (
-        request.POST.get("return_url")
-        if request.method == "POST"
-        else request.GET.get("return_url")
-    )
+    return_url = request.POST.get("return_url") or request.GET.get("return_url")
 
     if not return_url or urlparse(return_url).netloc:
         return default

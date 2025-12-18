@@ -238,6 +238,11 @@ urlpatterns = [
         name="change_previous_mammogram",
     ),
     path(
+        "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>/delete/",
+        participant_reported_mammogram_views.DeleteParticipantReportedMammogramView.as_view(),
+        name="delete_previous_mammogram",
+    ),
+    path(
         "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>",
         mammogram_views.appointment_should_not_proceed,
         name="appointment_should_not_proceed",
