@@ -237,8 +237,8 @@ class MedicalInformationPresenter:
     def add_mammogram_button(self):
         url = (
             reverse(
-                "participants:add_previous_mammogram",
-                kwargs={"pk": self.appointment.participant.pk},
+                "mammograms:add_previous_mammogram",
+                kwargs={"pk": self.appointment.pk},
             )
             + "?return_url="
             + quote(self.medical_information_url)

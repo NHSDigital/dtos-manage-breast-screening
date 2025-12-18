@@ -1,15 +1,15 @@
 from datetime import date
-from enum import StrEnum
 
 from django import forms
-from django.forms import ValidationError
+from django.db.models import TextChoices
 from django.forms.widgets import Textarea
 
 from manage_breast_screening.nhsuk_forms.fields import (
     CharField,
     ChoiceField,
-    SplitDateField,
 )
+from manage_breast_screening.nhsuk_forms.fields.split_date_field import SplitDateField
+from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 
 from .models import Ethnicity, ParticipantReportedMammogram
 
@@ -63,221 +63,216 @@ class EthnicityForm(forms.Form):
         self.participant.save()
 
 
-class ParticipantReportedMammogramForm(forms.Form):
-    class WhereTaken(StrEnum):
-        SAME_UNIT = "same_unit"
-        UK = ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value
-        OUTSIDE_UK = ParticipantReportedMammogram.LocationType.OUTSIDE_UK.value
-        PREFER_NOT_TO_SAY = (
-            ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY.value
+class ParticipantReportedMammogramForm(FormWithConditionalFields):
+    class WhenTaken(TextChoices):
+        EXACT = (
+            "EXACT",
+            "Enter an exact date",
         )
+        APPROX = "APPROX", "Enter an approximate date"
+        NOT_SURE = "NOT_SURE", "Not sure"
 
-    class WhenTaken(StrEnum):
-        EXACT = "exact"
-        APPROX = "approx"
-        NOT_SURE = "not_sure"
+    class NameIsTheSame(TextChoices):
+        YES = "YES", "Yes"
+        NO = "NO", "No, under a different name"
 
-    class NameIsTheSame(StrEnum):
-        YES = "yes"
-        NO = "no"
+    def __init__(
+        self,
+        *args,
+        participant,
+        most_recent_provider,
+        instance=None,
+        **kwargs,
+    ):
+        self.instance = instance
 
-    def __init__(self, participant, most_recent_provider, *args, **kwargs):
+        if instance:
+            kwargs["initial"] = {
+                "location_type": instance.location_type,
+                "somewhere_in_the_uk_details": instance.location_details,
+                "outside_the_uk_details": instance.location_details,
+                "when_taken": (
+                    self.WhenTaken.EXACT
+                    if instance.exact_date
+                    else self.WhenTaken.APPROX
+                    if instance.approx_date
+                    else self.WhenTaken.NOT_SURE
+                ),
+                "name_is_the_same": (
+                    self.NameIsTheSame.YES
+                    if not instance.different_name
+                    else self.NameIsTheSame.NO
+                ),
+                "exact_date": instance.exact_date,
+                "approx_date": instance.approx_date,
+                "different_name": instance.different_name,
+                "additional_information": instance.additional_information,
+            }
+
         super().__init__(*args, **kwargs)
 
         self.participant = participant
         self.most_recent_provider = most_recent_provider
-        self.where_taken_choices = {
-            self.WhereTaken.SAME_UNIT: f"At {most_recent_provider.name}",
-            self.WhereTaken.UK: "Somewhere in the UK",
-            self.WhereTaken.OUTSIDE_UK: "Outside the UK",
-            self.WhereTaken.PREFER_NOT_TO_SAY: "Prefer not to say",
-        }
 
-        self.when_taken_choices = {
-            self.WhenTaken.EXACT: "Enter an exact date",
-            self.WhenTaken.APPROX: "Enter an approximate date",
-            self.WhenTaken.NOT_SURE: "Not sure",
-        }
+        location_choices = []
+        for value, label in ParticipantReportedMammogram.LocationType.choices:
+            if (
+                value
+                == ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+            ):
+                label = f"At {most_recent_provider.name}"
+            elif value == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK:
+                label = "Somewhere in the UK"
+            location_choices.append((value, label))
 
-        self.name_is_the_same_legend = {
-            "isPageHeading": False,
-        }
-
-        self.name_is_the_same_choices = {
-            self.NameIsTheSame.YES: "Yes",
-            self.NameIsTheSame.NO: "No, under a different name",
-        }
-
-        # Main choice fields
-        self.fields["where_taken"] = ChoiceField(
+        self.fields["location_type"] = ChoiceField(
+            choices=location_choices,
             label="Where were the breast x-rays taken?",
-            choices=self.where_taken_choices,
+            error_messages={"required": "Select where the breast x-rays were taken"},
         )
-
-        self.fields["when_taken"] = ChoiceField(
-            label="When were the x-rays taken?",
-            choices=self.when_taken_choices,
-        )
-
-        self.fields["name_is_the_same"] = ChoiceField(
-            label=f"Were they taken with the name {participant.full_name}?",
-            choices=self.name_is_the_same_choices,
-        )
-
-        # Conditionally shown fields
         self.fields["somewhere_in_the_uk_details"] = CharField(
             required=False,
-            initial="",
-            widget=Textarea(attrs={"rows": "2"}),
             label="Location",
+            widget=Textarea(attrs={"rows": "2"}),
+            error_messages={
+                "required": "Enter the clinic or hospital name, or any location details"
+            },
         )
-
+        self.given_field_value(
+            "location_type", ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
+        ).require_field("somewhere_in_the_uk_details")
         self.fields["outside_the_uk_details"] = CharField(
             required=False,
-            initial="",
             label="Location",
             widget=Textarea(attrs={"rows": "2"}),
+            error_messages={
+                "required": "Enter the clinic or hospital name, or any location details"
+            },
         )
+        self.given_field_value(
+            "location_type", ParticipantReportedMammogram.LocationType.OUTSIDE_UK
+        ).require_field("outside_the_uk_details")
 
+        self.fields["when_taken"] = ChoiceField(
+            choices=self.WhenTaken,
+            label="When were the x-rays taken?",
+            error_messages={"required": "Select when the x-rays were taken"},
+        )
         self.fields["exact_date"] = SplitDateField(
-            max_value=date.today(),
             required=False,
+            max_value=date.today(),
             hint="For example, 15 3 2025",
             label="Date of mammogram",
             label_classes="nhsuk-u-visually-hidden",
+            error_messages={"required": "Enter the date when the x-rays were taken"},
         )
-
+        self.given_field_value("when_taken", self.WhenTaken.EXACT).require_field(
+            "exact_date"
+        )
         self.fields["approx_date"] = CharField(
             required=False,
-            initial="",
             label="Enter an approximate date",
             label_classes="nhsuk-u-visually-hidden",
             hint="For example, 9 months ago",
             classes="nhsuk-u-width-two-thirds",
+            error_messages={
+                "required": "Enter the approximate date when the x-rays were taken"
+            },
+        )
+        self.given_field_value("when_taken", self.WhenTaken.APPROX).require_field(
+            "approx_date"
         )
 
+        self.fields["name_is_the_same"] = ChoiceField(
+            label=f"Were they taken with the name {participant.full_name}?",
+            choices=self.NameIsTheSame,
+            error_messages={
+                "required": "Select if the x-rays were taken with the same name"
+            },
+        )
         self.fields["different_name"] = CharField(
             required=False,
-            initial="",
             label="Enter the previously used name",
             classes="nhsuk-u-width-two-thirds",
+            error_messages={"required": "Enter the name the x-rays were taken with"},
+        )
+        self.given_field_value("name_is_the_same", self.NameIsTheSame.NO).require_field(
+            "different_name"
         )
 
-        # Free form field at the end
         self.fields["additional_information"] = CharField(
+            hint="For example, the reason for the mammograms and the outcome of the assessment",
             required=False,
             label="Additional information (optional)",
             label_classes="nhsuk-label--m",
-            initial="",
-            hint="For example, the reason for the mammograms and the outcome of the assessment",
-            widget=Textarea(attrs={"rows": "2"}),
+            widget=Textarea(attrs={"rows": 4}),
+            max_words=500,
+            error_messages={
+                "max_words": "Additional information must be 500 words or less"
+            },
         )
 
-        # Explicitly order the films so that the error summary order
-        # matches the order fields are rendered in.
-        self.order_fields(
-            [
-                "where_taken",
-                "somewhere_in_the_uk_details",
-                "outside_the_uk_details",
-                "when_taken",
-                "exact_date",
-                "approx_date",
-                "name_is_the_same",
-                "different_name",
-                "additional_information",
-            ]
+    def model_values(self):
+        return dict(
+            exact_date=self.cleaned_data.get("exact_date"),
+            approx_date=self.cleaned_data.get("approx_date"),
+            different_name=self.cleaned_data.get("different_name"),
+            additional_information=self.cleaned_data.get("additional_information", ""),
         )
-
-    def clean(self):
-        cleaned_data = super().clean()
-
-        where_taken = cleaned_data.get("where_taken")
-        when_taken = cleaned_data.get("when_taken")
-        name_is_the_same = cleaned_data.get("name_is_the_same")
-
-        if where_taken == self.WhereTaken.UK and not cleaned_data.get(
-            "somewhere_in_the_uk_details"
-        ):
-            self.add_error(
-                "somewhere_in_the_uk_details",
-                ValidationError(
-                    "Enter the clinic or hospital name, or any location details",
-                    code="required",
-                ),
-            )
-        elif where_taken == self.WhereTaken.OUTSIDE_UK and not cleaned_data.get(
-            "outside_the_uk_details"
-        ):
-            self.add_error(
-                "outside_the_uk_details",
-                ValidationError(
-                    "Enter the clinic or hospital name, or any location details",
-                    code="required",
-                ),
-            )
-
-        if (
-            when_taken == "exact"
-            and not cleaned_data.get("exact_date")
-            and not self.errors.get("exact_date")
-        ):
-            self.add_error(
-                "exact_date",
-                ValidationError(
-                    "Enter the date when the x-rays were taken", code="required"
-                ),
-            )
-        elif when_taken == "approx" and not cleaned_data.get("approx_date"):
-            self.add_error(
-                "approx_date",
-                ValidationError(
-                    "Enter the approximate date when the x-rays were taken",
-                    code="required",
-                ),
-            )
-
-        if name_is_the_same == "no" and not cleaned_data.get("different_name"):
-            self.add_error(
-                "different_name",
-                ValidationError(
-                    "Enter the name the x-rays were taken with", code="required"
-                ),
-            )
 
     def set_location_fields(self, instance):
-        where_taken = self.cleaned_data["where_taken"]
+        instance.location_type = self.cleaned_data["location_type"]
 
-        if where_taken == self.WhereTaken.SAME_UNIT:
-            instance.location_type = (
-                ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
-            )
-        elif where_taken == self.WhereTaken.OUTSIDE_UK:
-            instance.location_type = (
-                ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
-            )
-        else:
-            instance.location_type = where_taken
-
-        if where_taken == self.WhereTaken.SAME_UNIT:
+        if (
+            instance.location_type
+            == ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+        ):
             instance.provider = self.most_recent_provider
-        if where_taken == self.WhereTaken.UK:
-            instance.location_details = self.cleaned_data["somewhere_in_the_uk_details"]
-        elif where_taken == self.WhereTaken.OUTSIDE_UK:
-            instance.location_details = self.cleaned_data["outside_the_uk_details"]
+        else:
+            instance.provider = None
 
-    def save(self, commit=True):
+        if (
+            instance.location_type
+            == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
+        ):
+            instance.location_details = self.cleaned_data["somewhere_in_the_uk_details"]
+        elif (
+            instance.location_type
+            == ParticipantReportedMammogram.LocationType.OUTSIDE_UK
+        ):
+            instance.location_details = self.cleaned_data["outside_the_uk_details"]
+        else:
+            instance.location_details = ""
+
+    def create(self, appointment):
+        field_values = self.model_values()
+
         instance = ParticipantReportedMammogram(
             participant=self.participant,
-            exact_date=self.cleaned_data["exact_date"],
-            approx_date=self.cleaned_data["approx_date"],
-            different_name=self.cleaned_data["different_name"],
-            additional_information=self.cleaned_data["additional_information"],
+            **field_values,
         )
 
         self.set_location_fields(instance)
 
-        if commit:
-            instance.save()
+        instance.save()
+
+        self.participant_reported_mammogram_pk = instance.pk
 
         return instance
+
+    def update(self):
+        if self.instance is None:
+            raise ValueError("Form has no instance")
+
+        self.set_location_fields(self.instance)
+        self.instance.exact_date = self.cleaned_data.get("exact_date")
+        self.instance.approx_date = self.cleaned_data.get("approx_date")
+        self.instance.different_name = self.cleaned_data.get("different_name")
+        self.instance.additional_information = self.cleaned_data.get(
+            "additional_information", ""
+        )
+        self.instance.save()
+
+        self.participant_reported_mammogram_pk = self.instance.pk
+
+        return self.instance

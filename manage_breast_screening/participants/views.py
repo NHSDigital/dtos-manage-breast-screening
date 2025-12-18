@@ -5,10 +5,8 @@ from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from manage_breast_screening.participants.models.appointment import Appointment
-from manage_breast_screening.participants.services import fetch_most_recent_provider
-
-from .forms import EthnicityForm, ParticipantReportedMammogramForm
+from ..participants.models import Appointment
+from .forms import EthnicityForm
 from .models import Participant
 
 logger = getLogger(__name__)
@@ -81,45 +79,5 @@ def edit_ethnicity(request, pk):
                 "href": return_url,
             },
             "page_title": "Ethnicity",
-        },
-    )
-
-
-def add_previous_mammogram(request, pk):
-    try:
-        provider = request.user.current_provider
-        participant = provider.participants.get(pk=pk)
-    except Participant.DoesNotExist:
-        raise Http404("Participant not found")
-    most_recent_provider = fetch_most_recent_provider(pk)
-    return_url = parse_return_url(
-        request, default=reverse("participants:show", kwargs={"pk": pk})
-    )
-
-    if request.method == "POST":
-        form = ParticipantReportedMammogramForm(
-            data=request.POST,
-            participant=participant,
-            most_recent_provider=most_recent_provider,
-        )
-        if form.is_valid():
-            form.save()
-
-            return redirect(return_url)
-    else:
-        form = ParticipantReportedMammogramForm(
-            participant=participant, most_recent_provider=most_recent_provider
-        )
-
-    return render(
-        request,
-        "participants/add_previous_mammogram.jinja",
-        {
-            "title": "Add details of a previous mammogram",
-            "caption": participant.full_name,
-            "page_title": "Add details of a previous mammogram",
-            "form": form,
-            "back_link_params": {"href": return_url, "text": "Go back"},
-            "return_url": return_url,
         },
     )

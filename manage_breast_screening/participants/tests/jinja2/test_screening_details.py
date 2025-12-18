@@ -20,7 +20,7 @@ class TestScreeningDetails:
             created_at=datetime(2025, 1, 1, tzinfo=timezone.utc),
         )
         return LastKnownMammogramPresenter(
-            [mammogram], participant_pk=uuid4(), current_url="/"
+            [mammogram], appointment_pk=uuid4(), current_url="/"
         )
 
     def test_screening_details(self, presented_mammograms, jinja_env, time_machine):
