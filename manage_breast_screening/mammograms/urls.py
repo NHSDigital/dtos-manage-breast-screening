@@ -3,9 +3,9 @@ from django.urls import path
 from manage_breast_screening.mammograms.views import mammogram_views
 
 from .views import (
-    add_mammogram_views,
     appointment_note_views,
     appointment_views,
+    participant_reported_mammogram_views,
     special_appointment_views,
     symptom_views,
 )
@@ -224,12 +224,12 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/previous-mammograms/add",
-        add_mammogram_views.AddParticipantReportedMammogramView.as_view(),
+        participant_reported_mammogram_views.AddParticipantReportedMammogramView.as_view(),
         name="add_previous_mammogram",
     ),
     path(
         "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>",
-        add_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
+        participant_reported_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
         name="change_previous_mammogram",
     ),
     path(
