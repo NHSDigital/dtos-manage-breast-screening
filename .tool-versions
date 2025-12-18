@@ -1,10 +1,8 @@
+nodejs 24.11.0
 pre-commit 3.6.0
 python 3.14.0
-nodejs 24.11.0
-uv 0.9.7
-# TODO: can we switch all these docker scripts to github actions instead? Or at least something that
-# will be maintained by Dependabot?
-# docker/ghcr.io/gitleaks/gitleaks v8.18.0@sha256:fd2b5cab12b563d2cc538b14631764a1c25577780e3b7dba71657d58da45d9d9 # SEE: https://github.com/gitleaks/gitleaks/pkgs/container/gitleaks
-# docker/ghcr.io/anchore/grype v0.87.0@sha256:7638bec6a2a2b570588bb96e5e9632ef37f5556e92d126eb1a9542a76f71471c # SEE: https://github.com/anchore/grype/pkgs/container/grype
-# docker/ghcr.io/anchore/syft v0.92.0@sha256:63c60f0a21efb13e80aa1359ab243e49213b6cc2d7e0f8179da38e6913b997e0 # SEE: https://github.com/anchore/syft/pkgs/container/syft
 terraform 1.7.0
+uv 0.9.7
+# docker/ghcr.io/gitleaks/gitleaks v8.30.0@sha256:691af3c7c5a48b16f187ce3446d5f194838f91238f27270ed36eef6359a574d9 # SEE: https://github.com/gitleaks/gitleaks/pkgs/container/gitleaks
+# docker/ghcr.io/anchore/grype v0.104.2@sha256:7416f2fada8bd8f99095d955a6fed700b714b51ceb8150f838920932954b04aa # SEE: https://github.com/anchore/grype/pkgs/container/grype
+# docker/ghcr.io/anchore/syft v1.38.2@sha256:63a159108794114992136692c92155c7694f259aca814a92c187a4e025754b00 # SEE: https://github.com/anchore/syft/pkgs/container/syft
