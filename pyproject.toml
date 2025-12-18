@@ -7,7 +7,7 @@ requires-python = ">=3.14,<4.0.0"
 readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
-  "django (>=5.1.7,<6.0.0)",
+  "django>=5.1.7,<7.0.0",
   "dotenv (>=0.9.9,<0.10.0)",
   "gunicorn (>=23.0.0,<24.0.0)",
   "jinja2 (>=3.1.6,<4.0.0)",
