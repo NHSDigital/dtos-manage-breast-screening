@@ -23,7 +23,7 @@ class OAuthError(Exception):
 class ApiClient:
     def send_message_batch(self, message_batch: MessageBatch) -> requests.Response:
         response = requests.post(
-            os.getenv("NHS_NOTIFY_API_MESSAGE_BATCH_URL"),
+            os.getenv("NHS_NOTIFY_API_MESSAGE_BATCH_URL", ""),
             headers=self.headers(),
             json=MessageBatchPresenter(message_batch).present(),
             timeout=10,

@@ -94,12 +94,6 @@ variable "deploy_database_as_container" {
   type        = bool
 }
 
-variable "nhs_notify_api_message_batch_url" {
-  description = "The API endpoint URL used to send message batches to NHS Notify"
-  type        = string
-  default     = null
-}
-
 variable "postgres_backup_retention_days" {
   description = "The number of days to retain backups for the PostgreSQL Flexible Server."
   type        = number
