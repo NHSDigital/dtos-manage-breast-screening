@@ -35,7 +35,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
-        self.axe = AxeAdapter(self.page)
+        self.axe = AxeAdapter()
         settings.BASE_URL = self.live_server_url
 
     def tearDown(self):
@@ -138,7 +138,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         any interactive elements that appear close together, and avoiding any non-specific
         links like "click here".
         """
-        results = self.axe.run()
+        results = self.axe.run(page=self.page)
         self.assertEqual(results.violations_count, 0, results.generate_report())
 
         if require_unique_link_text:

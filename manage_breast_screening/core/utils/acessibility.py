@@ -1,8 +1,5 @@
-import json
-
 from axe_playwright_python.base import AxeResults
-from django.conf import settings
-from playwright.sync_api import Page
+from axe_playwright_python.sync_playwright import Axe
 
 AXE_VIOLATIONS_EXCLUDE_LIST = [
     "region",  # 'Some page content is not contained by landmarks' https://github.com/alphagov/govuk-frontend/issues/1604
@@ -10,34 +7,14 @@ AXE_VIOLATIONS_EXCLUDE_LIST = [
 ]
 
 
-class AxeAdapter:
-    def __init__(
-        self,
-        page: Page,
-        script_path=settings.BASE_DIR.parent
-        / "node_modules"
-        / "axe-core"
-        / "axe.min.js",
-        options=None,
-    ):
-        self.script_path = script_path
-        self.options = options or {
+class AxeAdapter(Axe):
+    def __init__(self):
+        self.default_options = {
             "rules": {id: {"enabled": False} for id in AXE_VIOLATIONS_EXCLUDE_LIST}
         }
-        self.page = page
-        self._install(page)
+        super().__init__()
 
-    def _install(self, page: Page):
-        """
-        Add the axe script to a playwright Page.
-        The script will be re-executed any time the page or it's frames are navigated.
-        """
-        page.add_init_script(path=self.script_path)
-
-    def run(self) -> AxeResults:
-        """
-        Run axe on the whole document
-        """
-        options = json.dumps(self.options)
-        response = self.page.evaluate(rf"axe.run({options})")
-        return AxeResults(response)
+    def run(self, page, context=None, options=None) -> AxeResults:
+        return super().run(
+            page=page, context=context, options=options or self.default_options
+        )
