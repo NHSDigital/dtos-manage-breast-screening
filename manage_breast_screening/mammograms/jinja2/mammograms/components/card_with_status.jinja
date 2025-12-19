@@ -3,11 +3,11 @@
 
 {% macro card_with_status(section, anchor, status_tag_properties, action_button_properties=None, csrf_input=None) %}
   {% set outer_caller = caller if caller is defined else none %}
-  <div id="{{ anchor }}" class="card-with-status">
+  <div id="{{ anchor }}" class="app-card-with-status">
     {% call card({
       "heading": section.label
     }) %}
-      <div class="card-with-status__tag">
+      <div class="app-card-with-status__tag">
         {{ tag(status_tag_properties) }}
       </div>
 

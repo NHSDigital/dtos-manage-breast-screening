@@ -50,7 +50,7 @@ class TestReviewingMedicalInformation(SystemTestCase):
 
     def then_section_has_to_review_tag(self, section_heading: str):
         card = self._medical_information_card(section_heading)
-        expect(card.locator(".card-with-status__tag")).to_contain_text("To review")
+        expect(card.locator(".app-card-with-status__tag")).to_contain_text("To review")
 
     def when_i_mark_section_as_reviewed(self, section_heading: str):
         card = self._medical_information_card(section_heading)
@@ -58,7 +58,7 @@ class TestReviewingMedicalInformation(SystemTestCase):
 
     def then_section_has_reviewed_tag(self, section_heading: str):
         card = self._medical_information_card(section_heading)
-        expect(card.locator(".card-with-status__tag")).to_contain_text("Reviewed")
+        expect(card.locator(".app-card-with-status__tag")).to_contain_text("Reviewed")
 
     def when_i_click_next_section(self, section_heading: str):
         card = self._medical_information_card(section_heading)
@@ -88,5 +88,5 @@ class TestReviewingMedicalInformation(SystemTestCase):
     def _medical_information_card(self, heading: str):
         section_heading = self.page.get_by_role("heading", level=2, name=heading)
         return section_heading.locator(
-            "xpath=ancestor::div[contains(@class,'card-with-status')][1]"
+            "xpath=ancestor::div[contains(@class,'app-card-with-status')][1]"
         )
