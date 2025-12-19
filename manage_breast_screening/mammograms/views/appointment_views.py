@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -296,9 +297,23 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
         if section not in valid_sections:
             raise Http404("Invalid section")
 
-        self.appointment.medical_information_reviews.get_or_create(
+        existing_review = self.appointment.medical_information_reviews.filter(
+            section=section
+        ).first()
+
+        if existing_review:
+            messages.add_message(
+                request,
+                messages.WARNING,
+                f"This section has already been reviewed by {existing_review.reviewed_by.get_full_name()}",
+            )
+            return redirect(
+                "mammograms:record_medical_information", pk=self.appointment.pk
+            )
+
+        self.appointment.medical_information_reviews.create(
             section=section,
-            defaults={"reviewed_by": request.user},
+            reviewed_by=request.user,
         )
 
         return redirect("mammograms:record_medical_information", pk=self.appointment.pk)
