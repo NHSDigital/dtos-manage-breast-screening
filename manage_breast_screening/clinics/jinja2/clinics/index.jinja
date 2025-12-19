@@ -5,7 +5,14 @@
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 
 {% block page_content %}
-<h1>{{ presenter.heading }}</h1>
+<h1>
+<span class="nhsuk-caption-l">
+{{ provider_name }}
+</span>
+  {{ 
+  presenter.heading
+   }}
+</h1>
 
 {% set ns = namespace() %}
 {% set ns.secondaryNavItems = [] %}
