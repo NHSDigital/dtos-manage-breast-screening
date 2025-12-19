@@ -26,8 +26,27 @@ from manage_breast_screening.mammograms.presenters.medical_history.other_procedu
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
+from manage_breast_screening.participants.models import MedicalInformationSection
 
 from .appointment_presenters import AppointmentPresenter
+
+# Section order for "Next section" navigation
+SECTION_ORDER = {
+    MedicalInformationSection.MAMMOGRAM_HISTORY: MedicalInformationSection.SYMPTOMS,
+    MedicalInformationSection.SYMPTOMS: MedicalInformationSection.MEDICAL_HISTORY,
+    MedicalInformationSection.MEDICAL_HISTORY: MedicalInformationSection.BREAST_FEATURES,
+    MedicalInformationSection.BREAST_FEATURES: MedicalInformationSection.OTHER_INFORMATION,
+    MedicalInformationSection.OTHER_INFORMATION: MedicalInformationSection.OTHER_INFORMATION,
+}
+
+# Section IDs for anchor navigation
+SECTION_ANCHORS = {
+    MedicalInformationSection.MAMMOGRAM_HISTORY: "mammogram-history",
+    MedicalInformationSection.SYMPTOMS: "symptoms",
+    MedicalInformationSection.MEDICAL_HISTORY: "medical-history",
+    MedicalInformationSection.BREAST_FEATURES: "breast-features",
+    MedicalInformationSection.OTHER_INFORMATION: "other-information",
+}
 
 
 class MedicalInformationPresenter:
@@ -73,6 +92,11 @@ class MedicalInformationPresenter:
 
         self.existing_symptom_type_ids = {
             symptom.symptom_type_id for symptom in symptoms
+        }
+
+        self._section_reviews = {
+            review.section: review
+            for review in appointment.medical_information_reviews.all()
         }
 
     @property
@@ -255,3 +279,44 @@ class MedicalInformationPresenter:
                 presenter_class(item, counter=counter)
                 for counter, item in enumerate(items, 1)
             ]
+
+    def get_anchor(self, section):
+        return SECTION_ANCHORS.get(section)
+
+    def is_section_reviewed(self, section):
+        return section in self._section_reviews
+
+    def review_status_tag_properties(self, section):
+        if self.is_section_reviewed(section):
+            return {
+                "text": "Reviewed",
+                "classes": "nhsuk-tag--green app-section-review-tag",
+            }
+        else:
+            return {
+                "text": "To review",
+                "classes": "nhsuk-tag--blue app-section-review-tag",
+            }
+
+    def review_action_button_properties(self, section):
+        if self.is_section_reviewed(section):
+            next_section = SECTION_ORDER.get(section)
+            anchor = SECTION_ANCHORS.get(next_section)
+            return {
+                "href": f"#{anchor}",
+                "text": "Next section",
+                "is_anchor": True,
+            }
+        else:
+            url = reverse(
+                "mammograms:mark_section_reviewed",
+                kwargs={
+                    "pk": self.appointment.pk,
+                    "section": section,
+                },
+            )
+            return {
+                "href": url,
+                "text": "Mark as reviewed",
+                "is_anchor": False,
+            }

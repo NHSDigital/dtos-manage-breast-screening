@@ -68,6 +68,11 @@ urlpatterns = [
         name="record_medical_information",
     ),
     path(
+        "<uuid:pk>/record-medical-information/mark-reviewed/<str:section>/",
+        appointment_views.MarkSectionReviewed.as_view(),
+        name="mark_section_reviewed",
+    ),
+    path(
         "<uuid:pk>/awaiting-images/",
         appointment_views.AwaitingImages.as_view(),
         name="awaiting_images",

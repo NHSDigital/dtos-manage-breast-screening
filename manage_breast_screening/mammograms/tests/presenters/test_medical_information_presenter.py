@@ -3,6 +3,7 @@ import pytest
 from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
     MedicalInformationPresenter,
 )
+from manage_breast_screening.participants.models import MedicalInformationSection
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     SymptomAreas,
@@ -12,6 +13,7 @@ from manage_breast_screening.participants.tests.factories import (
     CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
+    MedicalInformationReviewFactory,
     OtherProcedureHistoryItemFactory,
     SymptomFactory,
 )
@@ -272,3 +274,32 @@ class TestRecordMedicalInformationPresenter:
             ),
             "text": "Add another mammogram",
         }
+
+    @pytest.mark.parametrize(
+        "section,expected_anchor",
+        [
+            (MedicalInformationSection.MAMMOGRAM_HISTORY, "mammogram-history"),
+            (MedicalInformationSection.SYMPTOMS, "symptoms"),
+            (MedicalInformationSection.MEDICAL_HISTORY, "medical-history"),
+            (MedicalInformationSection.BREAST_FEATURES, "breast-features"),
+            (MedicalInformationSection.OTHER_INFORMATION, "other-information"),
+        ],
+    )
+    def test_get_anchor_returns_correct_anchor(self, section, expected_anchor):
+        appointment = AppointmentFactory()
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.get_anchor(section) == expected_anchor
+
+    def test_is_section_reviewed_returns_true_when_reviewed(self):
+        appointment = AppointmentFactory()
+        MedicalInformationReviewFactory.create(
+            appointment=appointment, section=MedicalInformationSection.SYMPTOMS
+        )
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.is_section_reviewed(MedicalInformationSection.SYMPTOMS) is True
+        assert (
+            presenter.is_section_reviewed(MedicalInformationSection.BREAST_FEATURES)
+            is False
+        )

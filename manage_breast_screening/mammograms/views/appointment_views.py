@@ -1,5 +1,6 @@
 import logging
 
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -13,6 +14,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.participants.models import (
     Appointment,
+    MedicalInformationSection,
     ParticipantReportedMammogram,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
@@ -202,6 +204,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "caption": participant.full_name,
                 "presenter": MedicalInformationPresenter(self.appointment),
                 "presented_mammograms": presented_mammograms,
+                "sections": MedicalInformationSection,
             }
         )
 
@@ -282,3 +285,35 @@ def start_appointment(request, pk):
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
     return redirect("mammograms:confirm_identity", pk=pk)
+
+
+class MarkSectionReviewed(InProgressAppointmentMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        section = kwargs.get("section")
+
+        valid_sections = [choice[0] for choice in MedicalInformationSection.choices]
+        if section not in valid_sections:
+            raise Http404("Invalid section")
+
+        existing_review = self.appointment.medical_information_reviews.filter(
+            section=section
+        ).first()
+
+        if existing_review:
+            messages.add_message(
+                request,
+                messages.WARNING,
+                f"This section has already been reviewed by {existing_review.reviewed_by.get_full_name()}",
+            )
+            return redirect(
+                "mammograms:record_medical_information", pk=self.appointment.pk
+            )
+
+        self.appointment.medical_information_reviews.create(
+            section=section,
+            reviewed_by=request.user,
+        )
+
+        return redirect("mammograms:record_medical_information", pk=self.appointment.pk)

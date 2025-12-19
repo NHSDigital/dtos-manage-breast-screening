@@ -13,6 +13,10 @@ from .medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
 from .medical_history.other_procedure_history_item import OtherProcedureHistoryItem
+from .medical_information_review import (
+    MedicalInformationReview,
+    MedicalInformationSection,
+)
 from .participant import Participant, ParticipantAddress
 from .reported_mammograms import ParticipantReportedMammogram, SupportReasons
 from .screening_episode import ScreeningEpisode
@@ -28,6 +32,8 @@ __all__ = [
     "MastectomyOrLumpectomyHistoryItem",
     "CystHistoryItem",
     "ImplantedMedicalDeviceHistoryItem",
+    "MedicalInformationReview",
+    "MedicalInformationSection",
     "OtherProcedureHistoryItem",
     "Participant",
     "ParticipantAddress",

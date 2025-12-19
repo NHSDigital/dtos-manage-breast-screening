@@ -2,8 +2,13 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
+from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.core.models import AuditLog
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.models import MedicalInformationReview
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    MedicalInformationReviewFactory,
+)
 
 
 @pytest.mark.django_db
@@ -174,4 +179,60 @@ class TestAppointmentCannotGoAhead:
                 operation=AuditLog.Operations.UPDATE,
             ).count()
             == 1
+        )
+
+
+@pytest.mark.django_db
+class TestMarkSectionReviewed:
+    def test_creates_medical_information_review(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:mark_section_reviewed",
+                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+        assert MedicalInformationReview.objects.filter(
+            appointment=appointment, section="SYMPTOMS"
+        ).exists()
+        review = MedicalInformationReview.objects.get(
+            appointment=appointment, section="SYMPTOMS"
+        )
+        assert review.reviewed_by == clinical_user_client.user
+
+    def test_does_not_update_reviewed_by_if_already_reviewed(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        original_user = UserFactory.create(first_name="Jane", last_name="Doe")
+        MedicalInformationReviewFactory.create(
+            appointment=appointment, section="SYMPTOMS", reviewed_by=original_user
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:mark_section_reviewed",
+                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+            ),
+            follow=True,
+        )
+
+        review = MedicalInformationReview.objects.get(
+            appointment=appointment, section="SYMPTOMS"
+        )
+        assert review.reviewed_by == original_user
+        assertContains(
+            response,
+            "This section has already been reviewed by Jane Doe",
         )

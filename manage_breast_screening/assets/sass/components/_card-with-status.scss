@@ -1,0 +1,8 @@
+@use "../vendor/nhsuk-frontend/base" as *;
+
+.app-card-with-status__tag {
+  position: absolute;
+  top: nhsuk-spacing(3);
+  right: nhsuk-spacing(3);
+  z-index: 1;
+}

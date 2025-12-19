@@ -24,6 +24,7 @@ from manage_breast_screening.participants.models import (
     CystHistoryItem,
     ImplantedMedicalDeviceHistoryItem,
     MastectomyOrLumpectomyHistoryItem,
+    MedicalInformationSection,
     OtherProcedureHistoryItem,
 )
 from manage_breast_screening.participants.models.symptom import (
@@ -175,6 +176,15 @@ class AppointmentNoteFactory(DjangoModelFactory):
 
     appointment = SubFactory(AppointmentFactory)
     content = Faker("sentence")
+
+
+class MedicalInformationReviewFactory(DjangoModelFactory):
+    class Meta:
+        model = models.MedicalInformationReview
+
+    appointment = SubFactory(AppointmentFactory)
+    section = Iterator(MedicalInformationSection)
+    reviewed_by = SubFactory(UserFactory)
 
 
 class BreastCancerHistoryItemFactory(DjangoModelFactory):
