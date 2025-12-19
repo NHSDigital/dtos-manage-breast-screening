@@ -13,6 +13,8 @@ class MedicalInformationSection(models.TextChoices):
     The reviewable sections on the record medical information page.
     """
 
+    # Consider adding a data migration for the section field of existing
+    # MedicalInformationReview records if changing the upper case identifier
     MAMMOGRAM_HISTORY = "MAMMOGRAM_HISTORY", "Mammogram history"
     SYMPTOMS = "SYMPTOMS", "Symptoms"
     MEDICAL_HISTORY = "MEDICAL_HISTORY", "Medical history"
