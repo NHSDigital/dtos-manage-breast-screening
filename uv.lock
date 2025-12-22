@@ -400,16 +400,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.2.8"
+version = "6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/05/a2/933dbbb3dd9990494960f6e64aca2af4c0745b63b7113f59a822df92329e/django-5.2.8.tar.gz", hash = "sha256:23254866a5bb9a2cfa6004e8b809ec6246eba4b58a7589bc2772f1bcc8456c7f", size = 10849032, upload-time = "2025-11-05T14:07:32.778Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/75/19762bfc4ea556c303d9af8e36f0cd910ab17dff6c8774644314427a2120/django-6.0.tar.gz", hash = "sha256:7b0c1f50c0759bbe6331c6a39c89ae022a84672674aeda908784617ef47d8e26", size = 10932418, upload-time = "2025-12-03T16:26:21.878Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5e/3d/a035a4ee9b1d4d4beee2ae6e8e12fe6dee5514b21f62504e22efcbd9fb46/django-5.2.8-py3-none-any.whl", hash = "sha256:37e687f7bd73ddf043e2b6b97cfe02fcbb11f2dbb3adccc6a2b18c6daa054d7f", size = 8289692, upload-time = "2025-11-05T14:07:28.761Z" },
+    { url = "https://files.pythonhosted.org/packages/d7/ae/f19e24789a5ad852670d6885f5480f5e5895576945fcc01817dfd9bc002a/django-6.0-py3-none-any.whl", hash = "sha256:1cc2c7344303bbfb7ba5070487c17f7fc0b7174bbb0a38cebf03c675f5f19b6d", size = 8339181, upload-time = "2025-12-03T16:26:16.231Z" },
 ]
 
 [[package]]
@@ -460,6 +460,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b2/83/b1180c699754b9d21b68c168a72b596732805dc1186c6619758e35adc364/django_qsessions-2.1.0.tar.gz", hash = "sha256:b3da4dc3d47d3a43734663c2ca67bf275a92ce80e2e8a4bb85bedb68067034fa", size = 33533, upload-time = "2025-09-21T18:33:30.639Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/da/65/1cb57321118a54f832facd82d862a0bdfb910bc3b258d18a1a9eed44de07/django_qsessions-2.1.0-py3-none-any.whl", hash = "sha256:4be9a35a1a636ff9b2454b06eec84e655b443136097ad5570cc53d531b296bfe", size = 13960, upload-time = "2025-09-21T18:33:28.282Z" },
+]
+
+[[package]]
+name = "django-upgrade"
+version = "1.29.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "tokenize-rt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/9d/dc/8242d9fbf0ae64feccbdd781fa741db5cf0521127a26ed9361e5f2f31f1b/django_upgrade-1.29.1.tar.gz", hash = "sha256:8c53b6bcd326a638a5dc908a707f26d71593bad5789b33775c90a8dc8a76afd5", size = 39638, upload-time = "2025-10-23T16:34:57.003Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f0/b0/c9fe7b4dbfcacb2402169f8189d4f7fa1609237317d714f01143d167db1c/django_upgrade-1.29.1-py3-none-any.whl", hash = "sha256:39a4d71365189ce8a5ccab534b2d1f0ed69c71bea7f1ef4c46041918d5247e64", size = 68847, upload-time = "2025-10-23T16:34:55.511Z" },
 ]
 
 [[package]]
@@ -737,6 +749,7 @@ dependencies = [
     { name = "django-extensions" },
     { name = "django-linear-migrations" },
     { name = "django-qsessions" },
+    { name = "django-upgrade" },
     { name = "dotenv" },
     { name = "factory-boy" },
     { name = "gunicorn" },
@@ -775,10 +788,11 @@ requires-dist = [
     { name = "azure-storage-blob", specifier = ">=12.25.1,<13.0.0" },
     { name = "azure-storage-queue", specifier = ">=12.13.0,<13.0.0" },
     { name = "business-python", specifier = ">=2.1.0,<3.0.0" },
-    { name = "django", specifier = ">=5.1.7,<6.0.0" },
+    { name = "django", specifier = ">=5.1.7,<7.0.0" },
     { name = "django-extensions", specifier = ">=4.1,<5.0" },
     { name = "django-linear-migrations", specifier = ">=2.19.0" },
     { name = "django-qsessions", specifier = ">=2.0.0,<3.0.0" },
+    { name = "django-upgrade", specifier = ">=1.29.1" },
     { name = "dotenv", specifier = ">=0.9.9,<0.10.0" },
     { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "gunicorn", specifier = ">=23.0.0,<24.0.0" },
@@ -1778,6 +1792,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/67/24/bb20ff76ed4e8e09ab65910bf21a315dc7562c8be92250363b25f3ab1dd1/time_machine-3.1.0-cp314-cp314t-win32.whl", hash = "sha256:6c00758d155601d710fa036c8d24d5ad3fb28531933cf70343006cf2be93092a", size = 17674, upload-time = "2025-11-21T13:56:29.969Z" },
     { url = "https://files.pythonhosted.org/packages/2e/64/42573a6da9298efd68a831d4e9eabc8c9c0cac9305bc19bb24a4066bbba0/time_machine-3.1.0-cp314-cp314t-win_amd64.whl", hash = "sha256:e00239b54b05255862e0965e6ae67728e467727ca7dc23d9a6c5a51c7b5b01c8", size = 18792, upload-time = "2025-11-21T13:56:31.123Z" },
     { url = "https://files.pythonhosted.org/packages/35/10/09ad4e5ccc27224ed8377a6f3d191034242c404d0c1ad5f119d79fb18363/time_machine-3.1.0-cp314-cp314t-win_arm64.whl", hash = "sha256:8b47da89595dc3c7f0b52f1e3f3f8da8325037f3746e66d74bebac9f42f2a989", size = 16944, upload-time = "2025-11-21T13:56:32.254Z" },
+]
+
+[[package]]
+name = "tokenize-rt"
+version = "6.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/ed/8f07e893132d5051d86a553e749d5c89b2a4776eb3a579b72ed61f8559ca/tokenize_rt-6.2.0.tar.gz", hash = "sha256:8439c042b330c553fdbe1758e4a05c0ed460dbbbb24a606f11f0dee75da4cad6", size = 5476, upload-time = "2025-05-23T23:48:00.035Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/f0/3fe8c6e69135a845f4106f2ff8b6805638d4e85c264e70114e8126689587/tokenize_rt-6.2.0-py2.py3-none-any.whl", hash = "sha256:a152bf4f249c847a66497a4a95f63376ed68ac6abf092a2f7cfb29d044ecff44", size = 6004, upload-time = "2025-05-23T23:47:58.812Z" },
 ]
 
 [[package]]
