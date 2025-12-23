@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import date, timedelta
 from enum import StrEnum
 
 from django.conf import settings
@@ -60,7 +60,7 @@ class ClinicQuerySet(models.QuerySet):
             case ClinicFilter.COMPLETED:
                 return self.completed()
             case ClinicFilter.ALL:
-                return self
+                return self.last_seven_days()
             case _:
                 raise ValueError(filter)
 
@@ -76,6 +76,9 @@ class ClinicQuerySet(models.QuerySet):
         """
         return self.filter(starts_at__date__gt=date.today())
 
+    def last_seven_days(self):
+        return self.filter(starts_at__date__gte=(date.today() - timedelta(days=7)))
+
     def completed(self):
         """
         Completed clinics that started in the past
@@ -89,7 +92,8 @@ class ClinicQuerySet(models.QuerySet):
         )
 
         return (
-            self.filter(starts_at__date__lt=date.today())
+            self.last_seven_days()
+            .filter(starts_at__date__lt=date.today())
             .annotate(latest_status=Subquery(latest_status))
             .filter(latest_status__in=["CLOSED", "CANCELLED"])
             .order_by("-ends_at")
@@ -161,7 +165,7 @@ class Clinic(BaseModel):
         queryset = cls.objects.filter(setting__provider_id=provider_id)
 
         return {
-            ClinicFilter.ALL: queryset.count(),
+            ClinicFilter.ALL: queryset.last_seven_days().count(),
             ClinicFilter.TODAY: queryset.today().count(),
             ClinicFilter.UPCOMING: queryset.upcoming().count(),
             ClinicFilter.COMPLETED: queryset.completed().count(),
