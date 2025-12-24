@@ -63,13 +63,5 @@ class Queue:
         return self.client.get_queue_properties().approximate_message_count
 
     @classmethod
-    def MessageStatusUpdates(cls):
-        return cls(
-            os.getenv(
-                "STATUS_UPDATES_QUEUE_NAME", "notifications-message-status-updates"
-            )
-        )
-
-    @classmethod
     def RetryMessageBatches(cls):
         return cls(os.getenv("RETRY_QUEUE_NAME", "notifications-message-batch-retries"))
