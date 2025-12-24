@@ -130,6 +130,9 @@ def _user_name_and_role_item(user):
 
 def header_account_items(user):
     items = []
+    if user.is_authenticated:
+        if user.current_provider:
+            items.append({"text": user.current_provider.name, "icon": False})
 
     user_name_and_role = _user_name_and_role_item(user)
     if user_name_and_role:
