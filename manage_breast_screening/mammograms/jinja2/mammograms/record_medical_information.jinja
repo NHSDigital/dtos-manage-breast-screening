@@ -285,3 +285,13 @@
 {% endcall %}
 
 {% endblock %}
+
+{% block wizard_form %}
+  <form method="post">
+    {{ csrf_input }}
+    {{ button({
+      "text": "Complete all and continue",
+      "classes": "nhsuk-u-margin-bottom-4"
+    }) }}
+  </form>
+{% endblock %}

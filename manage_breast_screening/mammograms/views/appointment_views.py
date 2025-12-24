@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import messages
+from django.db import DatabaseError, IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
@@ -210,15 +211,26 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
 
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["appointment"] = self.appointment
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
-        form.save()
-
-        appointment = self.appointment
-
-        if form.cleaned_data["decision"] == "continue":
-            return redirect("mammograms:awaiting_images", pk=appointment.pk)
-        else:
-            return redirect("mammograms:appointment_cannot_go_ahead", pk=appointment.pk)
+        try:
+            with transaction.atomic():
+                form.save()
+            return redirect("mammograms:awaiting_images", pk=self.appointment.pk)
+        except (IntegrityError, DatabaseError):
+            messages.add_message(
+                self.request,
+                messages.WARNING,
+                "Unable to complete all sections. Please try again.",
+            )
+            return redirect(
+                "mammograms:record_medical_information", pk=self.appointment.pk
+            )
 
 
 class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
