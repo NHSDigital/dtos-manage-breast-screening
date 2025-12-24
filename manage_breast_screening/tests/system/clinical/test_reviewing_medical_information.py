@@ -27,6 +27,15 @@ class TestReviewingMedicalInformation(SystemTestCase):
             self.when_i_click_next_section(section)
             self.then_the_next_section_is_in_focus(next_section, anchor)
 
+    def test_complete_all_and_continue(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_record_medical_information_page()
+
+        self.when_i_click_complete_all_and_continue()
+        self.then_i_am_redirected_to_the_images_page()
+        self.and_all_sections_are_reviewed()
+
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory()
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
@@ -75,6 +84,24 @@ class TestReviewingMedicalInformation(SystemTestCase):
 
         heading = self.page.get_by_role("heading", level=2, name=section_heading)
         expect(heading).to_be_in_viewport()
+
+    def when_i_click_complete_all_and_continue(self):
+        button = self.page.get_by_role("button", name="Complete all and continue")
+        button.click()
+
+    def then_i_am_redirected_to_the_images_page(self):
+        self.expect_url("mammograms:awaiting_images", pk=self.appointment.pk)
+
+    def and_all_sections_are_reviewed(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+        for section_heading, _, _ in self._medical_information_sections():
+            self.then_section_has_reviewed_tag(section_heading)
 
     def _medical_information_sections(self):
         return [

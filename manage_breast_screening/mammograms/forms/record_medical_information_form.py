@@ -1,18 +1,25 @@
 from django import forms
 
-from manage_breast_screening.nhsuk_forms.fields import ChoiceField
+from manage_breast_screening.participants.models import MedicalInformationSection
 
 
 class RecordMedicalInformationForm(forms.Form):
-    decision = ChoiceField(
-        label="Can imaging go ahead?",
-        choices=(
-            ("continue", "Yes, mark incomplete sections as ‘none’ or ‘no’"),
-            ("dropout", "No, screening cannot proceed"),
-        ),
-        required=True,
-        widget=forms.RadioSelect(),
-    )
+    def __init__(self, *args, appointment, user, **kwargs):
+        self.appointment = appointment
+        self.user = user
+        super().__init__(*args, **kwargs)
 
     def save(self):
-        pass
+        all_sections = [choice[0] for choice in MedicalInformationSection.choices]
+        reviewed_sections = set(
+            self.appointment.medical_information_reviews.values_list(
+                "section", flat=True
+            )
+        )
+        missing_sections = set(all_sections) - reviewed_sections
+
+        for section in missing_sections:
+            self.appointment.medical_information_reviews.create(
+                section=section,
+                reviewed_by=self.user,
+            )
