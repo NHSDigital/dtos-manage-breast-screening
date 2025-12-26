@@ -17,12 +17,18 @@ class LastKnownMammogramPresenter:
     @cached_property
     def last_known_mammograms(self):
         result = []
-        for mammogram in self._last_known_mammograms:
-            result.append(self._present_mammogram(mammogram))
+
+        if len(self._last_known_mammograms) == 1:
+            result.append(self._present_mammogram(self._last_known_mammograms[0], None))
+        else:
+            for item_index, mammogram in enumerate(
+                self._last_known_mammograms, start=1
+            ):
+                result.append(self._present_mammogram(mammogram, item_index))
 
         return result
 
-    def _present_mammogram(self, mammogram):
+    def _present_mammogram(self, mammogram, item_index):
         location = (
             mammogram.provider.name
             if mammogram.provider
@@ -54,12 +60,30 @@ class LastKnownMammogramPresenter:
         else:
             date = {"value": "Date unknown"}
 
+        href = (
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": self.appointment_pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+            + f"?return_url={self.current_url}"
+        )
+
         return {
             "date_added": format_relative_date(mammogram.created_at),
             "location": location,
             "date": date,
             "different_name": mammogram.different_name,
             "additional_information": mammogram.additional_information,
+            "change_link": {
+                "href": href,
+                "text": "Change",
+                "visually_hidden_text": (
+                    f" mammogram item {item_index}" if item_index else " mammogram item"
+                ),
+            },
         }
 
     @cached_property

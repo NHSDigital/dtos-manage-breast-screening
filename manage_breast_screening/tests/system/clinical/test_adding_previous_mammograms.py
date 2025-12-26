@@ -16,7 +16,7 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestAddingPreviousMammograms(SystemTestCase):
-    def test_adding_a_mammogram_at_the_same_provider(self):
+    def test_adding_and_updating_a_mammogram_at_the_same_provider(self):
         """
         If a mammogram was taken at the same provider, but there is an error in the system, the participant can report that it was taken.
         """
@@ -36,7 +36,18 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
         self.and_i_should_see_the_mammogram_with_the_same_provider()
 
-    def test_adding_a_mammogram_taken_elsewhere_with_a_different_name(self):
+        self.when_i_click_change()
+        self.then_i_should_be_on_the_edit_previous_mammogram_form()
+
+        self.when_i_enter_another_location_in_the_uk()
+        self.and_i_enter_an_approximate_date()
+        self.and_i_enter_a_different_name()
+        self.and_i_enter_additional_information()
+        self.and_i_click_save()
+        self.then_i_should_be_back_on_the_appointment()
+        self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
+
+    def test_adding_and_deleting_mammogram_taken_elsewhere_with_a_different_name(self):
         """
         If a mammogram was taken at another BSU, or elsewhere in the UK, the participant can report that it was taken
         If the mammogram was taken under a different name, the mammographer can record that name.
@@ -56,6 +67,12 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_click_save()
         self.then_i_should_be_back_on_the_appointment()
         self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
+
+        self.when_i_click_change()
+        self.and_i_click_delete_this_item()
+        self.and_i_click_delete_item()
+        self.then_i_should_be_back_on_the_appointment()
+        self.and_the_previous_mammogram_is_gone()
 
     def test_adding_a_mammogram_within_last_six_months(self):
         """
@@ -146,12 +163,6 @@ class TestAddingPreviousMammograms(SystemTestCase):
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Add details of a previous mammogram")
-
-    def then_i_should_be_on_the_edit_previous_mammogram_form(self):
-        expect(
-            self.page.get_by_text("Edit details of a previous mammogram")
-        ).to_be_visible()
-        self.assert_page_title_contains("Edit details of a previous mammogram")
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(
@@ -263,3 +274,28 @@ class TestAddingPreviousMammograms(SystemTestCase):
         expect(
             row.locator(".nhsuk-tag").filter(has_text="Attended not screened")
         ).to_be_visible()
+
+    def when_i_click_change(self):
+        self.page.get_by_text("Change mammogram item").click()
+
+    def then_i_should_be_on_the_edit_previous_mammogram_form(self):
+        expect(
+            self.page.get_by_text("Edit details of a previous mammogram")
+        ).to_be_visible()
+        self.assert_page_title_contains("Edit details of a previous mammogram")
+
+    def and_i_click_delete_this_item(self):
+        self.page.get_by_text("Delete this item").click()
+
+    def and_i_click_delete_item(self):
+        self.page.get_by_text("Delete item").click()
+
+    def and_the_previous_mammogram_is_gone(self):
+        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
+            "Not known",
+            use_inner_text=True,
+        )
+        expect(self.page.get_by_test_id("mammograms")).not_to_contain_text(
+            "Added today",
+            use_inner_text=True,
+        )
