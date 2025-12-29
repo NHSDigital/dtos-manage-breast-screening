@@ -5,7 +5,10 @@
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 
 {% block page_content %}
-<h1>{{ presenter.heading }}</h1>
+<h1>
+  <span class="nhsuk-caption-l"> {{ provider_name }} </span>
+  {{ presenter.heading }}
+</h1>
 
 {% set ns = namespace() %}
 {% set ns.secondaryNavItems = [] %}
@@ -37,7 +40,6 @@
     <tr>
       <th scope="col">Location</th>
       <th scope="col">Date and time</th>
-      <th scope="col">Clinic type</th>
       <th scope="col" class="nhsuk-table__cell--numeric">Participants</th>
       <th scope="col">Status</th>
     </tr>
@@ -56,12 +58,6 @@
       <td>{{ presented_clinic.starts_at | no_wrap }}<br>
         {{presented_clinic.time_range | as_hint }}
       </td>
-      <td>
-        {{ presented_clinic.type }}
-        <br>
-        <span class="nhsuk-u-secondary-text-color">{{ presented_clinic.risk_type }}</span>
-      </td>
-
       <td class="nhsuk-table__cell--numeric">
         {{ presented_clinic.number_of_slots }}
       </td>

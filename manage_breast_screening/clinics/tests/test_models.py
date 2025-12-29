@@ -101,6 +101,29 @@ def test_clean_clinic_slots():
         clinic_slot.clean()
 
 
+@time_machine.travel(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
+@pytest.mark.django_db
+def test_last_seven_days_all_filtering():
+    _clinic1 = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 1, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 1, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+    _clinic2 = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 2, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 2, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+    clinic3 = ClinicFactory.create(
+        starts_at=datetime(2024, 12, 29, 9, tzinfo=tz.utc),
+        ends_at=datetime(2024, 12, 29, 17, tzinfo=tz.utc),
+        current_status=models.ClinicStatus.CLOSED,
+    )
+
+    last_seven_days_clinics = models.Clinic.objects.last_seven_days()
+    assertQuerySetEqual(last_seven_days_clinics, [clinic3])
+
+
 class TestUserAssignment:
     def test_str(self):
         user = UserFactory.build(first_name="John", last_name="Doe")
