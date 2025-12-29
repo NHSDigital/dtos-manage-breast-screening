@@ -31,25 +31,27 @@
 
   {% block step_content %}{% endblock %}
 
-  {% if form %}
-  <form action="{{request.path}}" method="POST">
-    <div class="nhsuk-grid-row">
-        <div class="nhsuk-grid-column-two-thirds">
-          {% block form %}{% endblock form %}
+  {% block wizard_form %}
+    {% if form %}
+    <form action="{{request.path}}" method="POST">
+      <div class="nhsuk-grid-row">
+          <div class="nhsuk-grid-column-two-thirds">
+            {% block form %}{% endblock form %}
 
-          {% if form.decision %}
-            {{ form.decision.as_field_group() }}
-          {% endif %}
+            {% if form.decision %}
+              {{ form.decision.as_field_group() }}
+            {% endif %}
 
-          {{ button({
-            "text": "Continue"
-          }) }}
+            {{ button({
+              "text": "Continue"
+            }) }}
 
-          {{csrf_input}}
-        </div>
-    </div>
-  </form>
-  {% endif %}
+            {{csrf_input}}
+          </div>
+      </div>
+    </form>
+    {% endif %}
+  {% endblock wizard_form %}
 
   {% if cannot_continue_link %}
     <p><a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ cannot_continue_link.href }}">{{ cannot_continue_link.text }}</a></p>

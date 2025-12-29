@@ -91,9 +91,6 @@ class TestRecordingAMammogram(SystemTestCase):
         self.when_i_mark_that_the_participant_shared_medical_information()
         self.then_i_should_be_on_the_record_medical_information_page()
 
-        self.when_i_submit_the_form()
-        self.then_i_am_prompted_to_confirm_whether_imaging_can_go_ahead()
-
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -205,10 +202,8 @@ class TestRecordingAMammogram(SystemTestCase):
         self.page.get_by_role("button", name="Continue").click()
 
     def when_i_mark_that_imaging_can_go_ahead(self):
-        self.page.get_by_label(
-            "Yes, mark incomplete sections as ‘none’ or ‘no’"
-        ).check()
-        self.page.get_by_role("button", name="Continue").click()
+        button = self.page.get_by_role("button", name="Complete all and continue")
+        button.click()
 
     def then_the_screen_should_show_that_it_is_awaiting_images_from_the_PACS(self):
         path = reverse(
