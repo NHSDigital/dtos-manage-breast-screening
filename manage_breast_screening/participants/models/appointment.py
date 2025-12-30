@@ -30,14 +30,14 @@ class AppointmentQuerySet(models.QuerySet):
         return self.in_status(
             AppointmentStatus.CONFIRMED,
             AppointmentStatus.CHECKED_IN,
-            AppointmentStatus.IN_PROGRESS,
+            AppointmentStatus.STARTED,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatus.CHECKED_IN)
 
     def in_progress(self):
-        return self.in_status(AppointmentStatus.IN_PROGRESS)
+        return self.in_status(AppointmentStatus.STARTED)
 
     def for_participant(self, participant_id):
         return self.filter(screening_episode__participant_id=participant_id)
@@ -144,7 +144,7 @@ class Appointment(BaseModel):
 class AppointmentStatus(models.Model):
     CONFIRMED = "CONFIRMED"
     CHECKED_IN = "CHECKED_IN"
-    IN_PROGRESS = "IN_PROGRESS"
+    STARTED = "STARTED"
     CANCELLED = "CANCELLED"
     DID_NOT_ATTEND = "DID_NOT_ATTEND"
     SCREENED = "SCREENED"
@@ -154,7 +154,7 @@ class AppointmentStatus(models.Model):
     STATUS_CHOICES = {
         CONFIRMED: "Confirmed",
         CHECKED_IN: "Checked in",
-        IN_PROGRESS: "In progress",
+        STARTED: "Started",
         CANCELLED: "Cancelled",
         DID_NOT_ATTEND: "Did not attend",
         SCREENED: "Screened",
@@ -182,7 +182,7 @@ class AppointmentStatus(models.Model):
         """
         Is this status one of the active, non-final statuses?
         """
-        return self.name in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
+        return self.name in [self.CONFIRMED, self.CHECKED_IN, self.STARTED]
 
     def is_final_status(self):
         return self.name in [
@@ -194,7 +194,7 @@ class AppointmentStatus(models.Model):
         ]
 
     def is_in_progress(self):
-        return self.name == self.IN_PROGRESS
+        return self.name == self.STARTED
 
     def __str__(self):
         return self.name

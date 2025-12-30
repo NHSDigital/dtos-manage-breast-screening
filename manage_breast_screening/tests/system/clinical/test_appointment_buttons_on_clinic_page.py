@@ -68,7 +68,7 @@ class TestAppointmentButtons(SystemTestCase):
         self.in_progress_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
-            current_status=AppointmentStatus.IN_PROGRESS,
+            current_status=AppointmentStatus.STARTED,
         )
 
     def and_i_am_on_the_clinic_show_page(self):
