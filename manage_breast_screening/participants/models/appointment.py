@@ -161,7 +161,7 @@ class AppointmentStatus(models.Model):
         PARTIALLY_SCREENED: "Partially screened",
         ATTENDED_NOT_SCREENED: "Attended not screened",
     }
-    state = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
+    name = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -175,17 +175,17 @@ class AppointmentStatus(models.Model):
 
         # Note: this is only valid as long as we can't undo a state transition.
         # https://nhsd-jira.digital.nhs.uk/browse/DTOSS-11522
-        unique_together = ("appointment", "state")
+        unique_together = ("appointment", "name")
 
     @property
     def active(self):
         """
-        Is this state one of the active, non-final states?
+        Is this status one of the active, non-final statuses?
         """
-        return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
+        return self.name in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
 
     def is_final_state(self):
-        return self.state in [
+        return self.name in [
             self.CANCELLED,
             self.DID_NOT_ATTEND,
             self.SCREENED,
@@ -194,10 +194,10 @@ class AppointmentStatus(models.Model):
         ]
 
     def is_in_progress(self):
-        return self.state == self.IN_PROGRESS
+        return self.name == self.IN_PROGRESS
 
     def __str__(self):
-        return self.state
+        return self.name
 
 
 class AppointmentNote(BaseModel):
