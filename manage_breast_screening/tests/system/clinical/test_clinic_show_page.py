@@ -66,10 +66,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def test_status_attribution_display(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_a_clinic_exists_that_is_run_by_my_provider()
+        self.and_i_have_an_appointment_in_progress()
         self.and_there_are_appointments_in_various_statuses_with_attributed_users()
         self.and_i_am_on_the_clinic_show_page()
         self.when_i_click_on_all()
-        self.then_i_can_see_status_attribution_for_relevant_appointments()
+        self.then_i_can_see_status_attribution_for_these_appointments()
 
     def and_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
@@ -266,7 +267,6 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
     def and_there_are_appointments_in_various_statuses_with_attributed_users(self):
         # Create users for attribution
-        user_in_progress = UserFactory(first_name="Alice", last_name="User")
         user_screened = UserFactory(first_name="Bob", last_name="User")
         user_cancelled = UserFactory(first_name="Charlie", last_name="User")
 
@@ -276,17 +276,6 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             current_status=AppointmentStatus.CONFIRMED,
             first_name="Participant",
             last_name="Confirmed",
-        )
-
-        # STARTED status
-        self.in_progress_appointment = AppointmentFactory(
-            clinic_slot__clinic=self.clinic,
-            first_name="Participant",
-            last_name="InProgress",
-        )
-        self.in_progress_appointment.statuses.create(
-            name=AppointmentStatus.STARTED,
-            created_by=user_in_progress,
         )
 
         # SCREENED status
@@ -311,7 +300,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             created_by=user_cancelled,
         )
 
-    def then_i_can_see_status_attribution_for_relevant_appointments(self):
+    def then_i_can_see_status_attribution_for_these_appointments(self):
         confirmed_row = self.page.locator("tr").filter(has_text="Participant Confirmed")
 
         expect(confirmed_row).not_to_contain_text("with")
@@ -320,10 +309,26 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         in_progress_row = self.page.locator("tr").filter(
             has_text="Participant InProgress"
         )
-        expect(in_progress_row).to_contain_text("with A. User")
+
+        expect(in_progress_row).to_contain_text(
+            f"with {self.current_user.get_short_name()} (you)"
+        )
 
         screened_row = self.page.locator("tr").filter(has_text="Participant Screened")
         expect(screened_row).to_contain_text("by B. User")
+        expect(screened_row).not_to_contain_text("(you)")
 
         cancelled_row = self.page.locator("tr").filter(has_text="Participant Cancelled")
         expect(cancelled_row).to_contain_text("by C. User")
+        expect(cancelled_row).not_to_contain_text("(you)")
+
+    def and_i_have_an_appointment_in_progress(self):
+        self.in_progress_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            first_name="Participant",
+            last_name="InProgress",
+        )
+        self.in_progress_appointment.statuses.create(
+            name=AppointmentStatus.STARTED,
+            created_by=self.current_user,
+        )
