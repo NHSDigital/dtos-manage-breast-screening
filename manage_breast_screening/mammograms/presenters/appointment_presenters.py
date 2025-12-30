@@ -89,14 +89,18 @@ class AppointmentPresenter:
     @cached_property
     def current_status(self):
         current_status = self._appointment.current_status
-
-        colour = status_colour(current_status.name)
+        colour = status_colour(current_status)
+        display_text = (
+            "In progress"
+            if current_status.is_in_progress()
+            else current_status.get_name_display()
+        )
 
         return {
             "classes": (
                 f"nhsuk-tag--{colour} app-u-nowrap" if colour else "app-u-nowrap"
             ),
-            "text": current_status.get_name_display(),
+            "text": display_text,
             "key": current_status.name,
             "is_confirmed": current_status.name == AppointmentStatus.CONFIRMED,
             "is_screened": current_status.name == AppointmentStatus.SCREENED,

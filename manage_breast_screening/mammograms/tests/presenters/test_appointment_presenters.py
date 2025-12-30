@@ -14,6 +14,9 @@ from manage_breast_screening.mammograms.presenters import (
     SpecialAppointmentPresenter,
 )
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentStatusFactory,
+)
 from manage_breast_screening.users.models import User
 
 
@@ -179,6 +182,124 @@ class TestAppointmentPresenter:
         mock_appointment.screening_episode.participant.extra_needs = extra_needs
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.is_special_appointment == expected_result
+
+    class TestCurrentStatus:
+        @pytest.mark.parametrize(
+            "status_name, expected_classes, expected_text, expected_key, is_confirmed, is_screened",
+            [
+                (
+                    AppointmentStatus.CHECKED_IN,
+                    "app-u-nowrap",
+                    "Checked in",
+                    "CHECKED_IN",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.CONFIRMED,
+                    "nhsuk-tag--blue app-u-nowrap",
+                    "Confirmed",
+                    "CONFIRMED",
+                    True,
+                    False,
+                ),
+                (
+                    AppointmentStatus.STARTED,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "STARTED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.IDENTITY_CONFIRMED,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "IDENTITY_CONFIRMED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.MEDICAL_INFORMATION_REVIEWED,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "MEDICAL_INFORMATION_REVIEWED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.IMAGES_TAKEN,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "IMAGES_TAKEN",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.CANCELLED,
+                    "nhsuk-tag--red app-u-nowrap",
+                    "Cancelled",
+                    "CANCELLED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.DID_NOT_ATTEND,
+                    "nhsuk-tag--red app-u-nowrap",
+                    "Did not attend",
+                    "DID_NOT_ATTEND",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.SCREENED,
+                    "nhsuk-tag--green app-u-nowrap",
+                    "Screened",
+                    "SCREENED",
+                    False,
+                    True,
+                ),
+                (
+                    AppointmentStatus.PARTIALLY_SCREENED,
+                    "nhsuk-tag--orange app-u-nowrap",
+                    "Partially screened",
+                    "PARTIALLY_SCREENED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.ATTENDED_NOT_SCREENED,
+                    "nhsuk-tag--orange app-u-nowrap",
+                    "Attended not screened",
+                    "ATTENDED_NOT_SCREENED",
+                    False,
+                    False,
+                ),
+            ],
+        )
+        def test_current_status_properties(
+            self,
+            mock_appointment,
+            status_name,
+            expected_classes,
+            expected_text,
+            expected_key,
+            is_confirmed,
+            is_screened,
+        ):
+            mock_appointment.current_status = AppointmentStatusFactory.build(
+                name=status_name
+            )
+            presenter = AppointmentPresenter(mock_appointment)
+
+            expected = {
+                "classes": expected_classes,
+                "text": expected_text,
+                "key": expected_key,
+                "is_confirmed": is_confirmed,
+                "is_screened": is_screened,
+            }
+            assert presenter.current_status == expected
 
     @pytest.mark.parametrize(
         "is_in_progress, is_final_status, expected_result",

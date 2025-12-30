@@ -1,1 +1,1 @@
-0051_rename_state_appointmentstatus_name_and_more
+0052_alter_appointmentstatus_name
