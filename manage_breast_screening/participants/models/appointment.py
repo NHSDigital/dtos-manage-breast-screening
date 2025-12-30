@@ -145,6 +145,9 @@ class AppointmentStatus(models.Model):
     CONFIRMED = "CONFIRMED"
     CHECKED_IN = "CHECKED_IN"
     STARTED = "STARTED"
+    IDENTITY_CONFIRMED = "IDENTITY_CONFIRMED"
+    MEDICAL_INFORMATION_REVIEWED = "MEDICAL_INFORMATION_REVIEWED"
+    IMAGES_TAKEN = "IMAGES_TAKEN"
     CANCELLED = "CANCELLED"
     DID_NOT_ATTEND = "DID_NOT_ATTEND"
     SCREENED = "SCREENED"
@@ -155,6 +158,9 @@ class AppointmentStatus(models.Model):
         CONFIRMED: "Confirmed",
         CHECKED_IN: "Checked in",
         STARTED: "Started",
+        IDENTITY_CONFIRMED: "Identity confirmed",
+        MEDICAL_INFORMATION_REVIEWED: "Medical information reviewed",
+        IMAGES_TAKEN: "Images taken",
         CANCELLED: "Cancelled",
         DID_NOT_ATTEND: "Did not attend",
         SCREENED: "Screened",
@@ -182,7 +188,7 @@ class AppointmentStatus(models.Model):
         """
         Is this status one of the active, non-final statuses?
         """
-        return self.name in [self.CONFIRMED, self.CHECKED_IN, self.STARTED]
+        return self.is_in_progress() or self.is_yet_to_begin()
 
     def is_final_status(self):
         return self.name in [
@@ -194,7 +200,15 @@ class AppointmentStatus(models.Model):
         ]
 
     def is_in_progress(self):
-        return self.name == self.STARTED
+        return self.name in [
+            self.STARTED,
+            self.IDENTITY_CONFIRMED,
+            self.MEDICAL_INFORMATION_REVIEWED,
+            self.IMAGES_TAKEN,
+        ]
+
+    def is_yet_to_begin(self):
+        return self.name in [self.CONFIRMED, self.CHECKED_IN]
 
     def __str__(self):
         return self.name

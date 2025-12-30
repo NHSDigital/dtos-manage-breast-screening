@@ -18,11 +18,11 @@ def status_colour(status):
     """
     Color to render the status tag
     """
-    match status:
+    if status.is_in_progress():
+        return "aqua-green"
+    match status.name:
         case AppointmentStatus.CHECKED_IN:
             return ""  # no colour will get solid dark blue
-        case AppointmentStatus.STARTED:
-            return "aqua-green"
         case AppointmentStatus.SCREENED:
             return "green"
         case AppointmentStatus.DID_NOT_ATTEND | AppointmentStatus.CANCELLED:
@@ -155,7 +155,7 @@ class ParticipantAppointmentsPresenter:
 
     def _present_status(self, appointment):
         current_status = appointment.current_status
-        colour = status_colour(current_status.name)
+        colour = status_colour(current_status)
 
         return {
             "classes": (

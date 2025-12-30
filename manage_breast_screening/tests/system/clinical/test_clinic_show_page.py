@@ -212,6 +212,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def _expect_rows_to_match_appointments(self, rows, appointments):
         assert len(rows) == len(appointments)
         for row, appointment in zip(rows, appointments):
+            expected_status_tag = (
+                "In progress"
+                if appointment.current_status.is_in_progress()
+                else appointment.current_status.get_name_display()
+            )
             expect(row.locator("td").nth(0)).to_have_text(
                 format_time(appointment.clinic_slot.starts_at)
             )
@@ -227,9 +232,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             expect(row.locator("td").nth(2)).to_contain_text(
                 format_age(appointment.screening_episode.participant.age())
             )
-            expect(row.locator("td").nth(3)).to_contain_text(
-                appointment.current_status.get_name_display()
-            )
+            expect(row.locator("td").nth(3)).to_contain_text(expected_status_tag)
 
     def and_an_appointment_has_extra_needs(self):
         self.extra_needs_appointment = AppointmentFactory(
