@@ -49,7 +49,7 @@
       <p class="nhsuk-u-margin-bottom-1 nhsuk-u-font-weight-bold">
         {{ presented_appointment.participant.full_name }}
       </p>
-      <p class="nhsuk-u-secondary-text-color nhsuk-u-margin-bottom-0">
+      <p class="nhsuk-u-secondary-text-colour">
         NHS:  {{ presented_appointment.participant.nhs_number }}
       </p>
     {% endset %}
@@ -69,7 +69,7 @@
         app_appointment_status(presented_appointment)
       }}
       {% if presented_appointment.status_attribution %}
-        <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-margin-bottom-0">{{ presented_appointment.status_attribution }} {{presented_appointment.attribution_user_check(request.user)}}</span>
+      <p class="nhsuk-u-secondary-text-colour">{{ presented_appointment.status_attribution }} {{presented_appointment.attribution_user_check(request.user)}}</p>
       {% endif %}
       <p class="nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0 app-u-nowrap">
         <a href="{{ url('mammograms:show_appointment', kwargs={"pk": presented_appointment.pk}) }}" class="nhsuk-link">
