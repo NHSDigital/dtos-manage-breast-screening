@@ -21,7 +21,7 @@ def status_colour(status):
     match status:
         case AppointmentStatus.CHECKED_IN:
             return ""  # no colour will get solid dark blue
-        case AppointmentStatus.IN_PROGRESS:
+        case AppointmentStatus.STARTED:
             return "aqua-green"
         case AppointmentStatus.SCREENED:
             return "green"

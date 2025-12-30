@@ -48,7 +48,7 @@ class TestAppointmentActionPermissions:
 
     @pytest.fixture
     def in_progress_appointment(self):
-        return AppointmentFactory.create(current_status=AppointmentStatus.IN_PROGRESS)
+        return AppointmentFactory.create(current_status=AppointmentStatus.STARTED)
 
     def test_can_start_if_user_is_clinical(self, clinical_user):
         assert clinical_user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)

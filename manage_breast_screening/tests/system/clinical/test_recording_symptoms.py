@@ -101,7 +101,7 @@ class TestRecordingSymptoms(SystemTestCase):
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status_params={
-                "name": AppointmentStatus.IN_PROGRESS,
+                "name": AppointmentStatus.STARTED,
                 "created_by": self.current_user,
             },
         )

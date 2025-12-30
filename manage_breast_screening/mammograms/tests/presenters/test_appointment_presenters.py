@@ -113,7 +113,7 @@ class TestAppointmentPresenter:
             (True, AppointmentStatus.CONFIRMED, True),
             (True, AppointmentStatus.CHECKED_IN, True),
             (False, AppointmentStatus.CONFIRMED, False),
-            (True, AppointmentStatus.IN_PROGRESS, False),
+            (True, AppointmentStatus.STARTED, False),
         ],
     )
     def test_can_be_started_by(
@@ -215,14 +215,14 @@ class TestStatusBarPresenter:
     def test_show_status_bar_when_in_progress_and_user_is_owner(
         self, mock_appointment, mock_user
     ):
-        mock_appointment.current_status.name = AppointmentStatus.IN_PROGRESS
+        mock_appointment.current_status.name = AppointmentStatus.STARTED
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_bar.show_status_bar_for(mock_user)
 
     def test_show_status_bar_when_user_is_not_owner(self, mock_appointment, mock_user):
-        mock_appointment.current_status.name = AppointmentStatus.IN_PROGRESS
+        mock_appointment.current_status.name = AppointmentStatus.STARTED
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-456"
         presenter = AppointmentPresenter(mock_appointment)
