@@ -169,7 +169,7 @@ class Command(BaseCommand):
         for status_key in appointment_key.get("statuses", []):
             AppointmentStatusFactory(
                 appointment=appointment,
-                state=status_key,
+                name=status_key,
             )
 
         for symptom in appointment_key.get("symptoms", []):

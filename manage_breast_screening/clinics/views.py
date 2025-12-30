@@ -58,7 +58,7 @@ def check_in(request, pk, appointment_pk):
         appointment = provider.appointments.get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
-    appointment.statuses.create(state=AppointmentStatus.CHECKED_IN)
+    appointment.statuses.create(name=AppointmentStatus.CHECKED_IN)
 
     return redirect("clinics:show", pk=pk)
 

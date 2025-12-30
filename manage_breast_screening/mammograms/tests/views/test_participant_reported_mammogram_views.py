@@ -184,7 +184,7 @@ class TestAddParticipantReportedMammogram:
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.state == AppointmentStatus.CONFIRMED
+        assert appointment.current_status.name == AppointmentStatus.CONFIRMED
 
         response = clinical_user_client.http.post(
             reverse(
@@ -200,7 +200,7 @@ class TestAddParticipantReportedMammogram:
             ),
         )
         assert (
-            appointment.current_status.state == AppointmentStatus.ATTENDED_NOT_SCREENED
+            appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
         )
 
 
@@ -405,7 +405,7 @@ class TestChangeParticipantReportedMammogram:
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.state == AppointmentStatus.CONFIRMED
+        assert appointment.current_status.name == AppointmentStatus.CONFIRMED
 
         response = clinical_user_client.http.post(
             reverse(
@@ -421,5 +421,5 @@ class TestChangeParticipantReportedMammogram:
             ),
         )
         assert (
-            appointment.current_status.state == AppointmentStatus.ATTENDED_NOT_SCREENED
+            appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
         )

@@ -128,13 +128,13 @@ class TestParticipantPresenter:
 
 
 class TestParticipantAppointmentPresenter:
-    def mock_appointment(self, starts_at, pk, state=AppointmentStatus.CONFIRMED):
+    def mock_appointment(self, starts_at, pk, status_name=AppointmentStatus.CONFIRMED):
         appointment = MagicMock(spec=Appointment)
         appointment.clinic_slot.starts_at = starts_at
         appointment.clinic_slot.clinic.get_type_display.return_value = "screening"
         appointment.clinic_slot.clinic.setting.name = "West of London BSS"
         appointment.pk = UUID(pk)
-        appointment.current_status = AppointmentStatus(state=state)
+        appointment.current_status = AppointmentStatus(name=status_name)
 
         return appointment
 
@@ -153,12 +153,12 @@ class TestParticipantAppointmentPresenter:
             self.mock_appointment(
                 starts_at=datetime(2023, 1, 1, 9, tzinfo=tz.utc),
                 pk="e76163c8-a594-4991-890d-a02097c67a2f",
-                state=AppointmentStatus.PARTIALLY_SCREENED,
+                status_name=AppointmentStatus.PARTIALLY_SCREENED,
             ),
             self.mock_appointment(
                 starts_at=datetime(2019, 1, 1, 9, tzinfo=tz.utc),
                 pk="6473a629-e7c4-43ca-87f3-ab9526aab07c",
-                state=AppointmentStatus.SCREENED,
+                status_name=AppointmentStatus.SCREENED,
             ),
         ]
 

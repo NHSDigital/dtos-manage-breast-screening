@@ -76,6 +76,6 @@ def attended_not_screened(request, appointment_pk):
         appointment = provider.appointments.get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
-    appointment.statuses.create(state=AppointmentStatus.ATTENDED_NOT_SCREENED)
+    appointment.statuses.create(name=AppointmentStatus.ATTENDED_NOT_SCREENED)
 
     return redirect("clinics:show", pk=appointment.clinic_slot.clinic.pk)
