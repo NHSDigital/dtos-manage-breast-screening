@@ -155,12 +155,12 @@ class ParticipantAppointmentsPresenter:
 
     def _present_status(self, appointment):
         current_status = appointment.current_status
-        colour = status_colour(current_status.state)
+        colour = status_colour(current_status.name)
 
         return {
             "classes": (
                 f"nhsuk-tag--{colour} app-u-nowrap" if colour else "app-u-nowrap"
             ),
-            "text": current_status.get_state_display(),
-            "key": current_status.state,
+            "text": current_status.get_name_display(),
+            "key": current_status.name,
         }

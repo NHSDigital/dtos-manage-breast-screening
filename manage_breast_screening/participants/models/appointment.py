@@ -19,7 +19,7 @@ class AppointmentQuerySet(models.QuerySet):
             statuses=Subquery(
                 AppointmentStatus.objects.filter(
                     appointment=OuterRef("pk"),
-                    state__in=statuses,
+                    name__in=statuses,
                 )
                 .values("pk")
                 .order_by("-created_at")[:1]
@@ -130,7 +130,7 @@ class Appointment(BaseModel):
         if not statuses:
             status = AppointmentStatus()
             logger.info(
-                f"Appointment {self.pk} has no statuses. Assuming {status.state}"
+                f"Appointment {self.pk} has no statuses. Assuming {status.name}"
             )
             return status
 
@@ -173,7 +173,7 @@ class AppointmentStatus(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-        # Note: this is only valid as long as we can't undo a state transition.
+        # Note: this is only valid as long as we can't undo a status transition.
         # https://nhsd-jira.digital.nhs.uk/browse/DTOSS-11522
         unique_together = ("appointment", "name")
 
@@ -184,7 +184,7 @@ class AppointmentStatus(models.Model):
         """
         return self.name in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
 
-    def is_final_state(self):
+    def is_final_status(self):
         return self.name in [
             self.CANCELLED,
             self.DID_NOT_ATTEND,

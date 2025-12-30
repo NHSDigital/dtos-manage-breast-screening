@@ -76,7 +76,7 @@ class TestAppointmentPresenter:
         expected_is_confirmed,
         expected_is_screened,
     ):
-        mock_appointment.current_status = AppointmentStatus(state=status)
+        mock_appointment.current_status = AppointmentStatus(name=status)
 
         result = AppointmentPresenter(mock_appointment).current_status
 
@@ -108,7 +108,7 @@ class TestAppointmentPresenter:
         )
 
     @pytest.mark.parametrize(
-        "has_permission, state, result",
+        "has_permission, status_name, result",
         [
             (True, AppointmentStatus.CONFIRMED, True),
             (True, AppointmentStatus.CHECKED_IN, True),
@@ -117,10 +117,10 @@ class TestAppointmentPresenter:
         ],
     )
     def test_can_be_started_by(
-        self, mock_appointment, mock_user, has_permission, state, result
+        self, mock_appointment, mock_user, has_permission, status_name, result
     ):
         mock_user.has_perm.return_value = has_permission
-        mock_appointment.current_status.state = state
+        mock_appointment.current_status.name = status_name
 
         assert (
             AppointmentPresenter(mock_appointment).can_be_started_by(mock_user)
@@ -181,7 +181,7 @@ class TestAppointmentPresenter:
         assert presenter.is_special_appointment == expected_result
 
     @pytest.mark.parametrize(
-        "is_in_progress, is_final_state, expected_result",
+        "is_in_progress, is_final_status, expected_result",
         [
             (True, False, "with A. Tester"),
             (False, True, "by A. Tester"),
@@ -189,13 +189,13 @@ class TestAppointmentPresenter:
         ],
     )
     def test_status_attribution(
-        self, mock_appointment, is_in_progress, is_final_state, expected_result
+        self, mock_appointment, is_in_progress, is_final_status, expected_result
     ):
         mock_appointment.current_status.created_by.get_short_name.return_value = (
             "A. Tester"
         )
         mock_appointment.current_status.is_in_progress.return_value = is_in_progress
-        mock_appointment.current_status.is_final_state.return_value = is_final_state
+        mock_appointment.current_status.is_final_status.return_value = is_final_status
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_attribution == expected_result
 
@@ -215,21 +215,21 @@ class TestStatusBarPresenter:
     def test_show_status_bar_when_in_progress_and_user_is_owner(
         self, mock_appointment, mock_user
     ):
-        mock_appointment.current_status.state = AppointmentStatus.IN_PROGRESS
+        mock_appointment.current_status.name = AppointmentStatus.IN_PROGRESS
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_bar.show_status_bar_for(mock_user)
 
     def test_show_status_bar_when_user_is_not_owner(self, mock_appointment, mock_user):
-        mock_appointment.current_status.state = AppointmentStatus.IN_PROGRESS
+        mock_appointment.current_status.name = AppointmentStatus.IN_PROGRESS
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-456"
         presenter = AppointmentPresenter(mock_appointment)
         assert not presenter.status_bar.show_status_bar_for(mock_user)
 
     @pytest.mark.parametrize(
-        "current_state",
+        "current_status",
         [
             AppointmentStatus.CONFIRMED,
             AppointmentStatus.CHECKED_IN,
@@ -240,9 +240,9 @@ class TestStatusBarPresenter:
         ],
     )
     def test_dont_show_status_bar_when_not_in_progress(
-        self, mock_appointment, mock_user, current_state
+        self, mock_appointment, mock_user, current_status
     ):
-        mock_appointment.current_status.state = current_state
+        mock_appointment.current_status.name = current_status
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)
