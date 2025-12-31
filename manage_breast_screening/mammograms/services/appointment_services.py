@@ -12,9 +12,9 @@ class ActionNotPermitted(Exception):
     """
 
 
-class InvalidState(Exception):
+class InvalidStatus(Exception):
     """
-    The appointment is not in a valid state to perform the action.
+    The appointment is not in a valid status to perform the action.
     """
 
 
@@ -26,8 +26,7 @@ class ActionPerformedByDifferentUser(Exception):
 
 class AppointmentStatusUpdater:
     """
-    Transition an appointment to another state.
-    Each state is logged in AppointmentStatusHistory and associated with a user.
+    Transition an appointment to another status.
     """
 
     def __init__(self, appointment, current_user):
@@ -36,13 +35,13 @@ class AppointmentStatusUpdater:
 
     def check_in(self):
         return self._transition(
-            to_state=AppointmentStatus.CHECKED_IN,
-            from_states=(AppointmentStatus.CONFIRMED,),
+            to_status=AppointmentStatus.CHECKED_IN,
+            from_statuses=(AppointmentStatus.CONFIRMED,),
         )
 
     @staticmethod
     def is_startable(appointment):
-        return appointment is not None and appointment.current_status.state in (
+        return appointment is not None and appointment.current_status.name in (
             AppointmentStatus.CONFIRMED,
             AppointmentStatus.CHECKED_IN,
         )
@@ -54,46 +53,46 @@ class AppointmentStatusUpdater:
             raise ActionNotPermitted(self.appointment.current_status)
 
         return self._transition(
-            to_state=AppointmentStatus.IN_PROGRESS,
-            from_states=(AppointmentStatus.CONFIRMED, AppointmentStatus.CHECKED_IN),
+            to_status=AppointmentStatus.STARTED,
+            from_statuses=(AppointmentStatus.CONFIRMED, AppointmentStatus.CHECKED_IN),
         )
 
     def cancel(self):
         return self._transition(
-            to_state=AppointmentStatus.CANCELLED,
-            from_states=(AppointmentStatus.CONFIRMED,),
+            to_status=AppointmentStatus.CANCELLED,
+            from_statuses=(AppointmentStatus.CONFIRMED,),
         )
 
     def mark_did_not_attend(self):
         return self._transition(
-            to_state=AppointmentStatus.DID_NOT_ATTEND,
-            from_states=(AppointmentStatus.CONFIRMED,),
+            to_status=AppointmentStatus.DID_NOT_ATTEND,
+            from_statuses=(AppointmentStatus.CONFIRMED,),
         )
 
     def screen(self, partial=False):
         return self._transition(
-            to_state=(
+            to_status=(
                 AppointmentStatus.PARTIALLY_SCREENED
                 if partial
                 else AppointmentStatus.SCREENED
             ),
-            from_states=(AppointmentStatus.IN_PROGRESS,),
+            from_statuses=(AppointmentStatus.STARTED,),
         )
 
-    def _transition(self, to_state, from_states):
-        current_state = self.appointment.current_status.state
-        if current_state != to_state and current_state not in from_states:
-            raise InvalidState(self.appointment.current_status)
+    def _transition(self, to_status, from_statuses):
+        current_status = self.appointment.current_status.name
+        if current_status != to_status and current_status not in from_statuses:
+            raise InvalidStatus(self.appointment.current_status)
 
-        return self._get_or_create(state=to_state)
+        return self._get_or_create(status=to_status)
 
-    def _get_or_create(self, state):
+    def _get_or_create(self, status):
         """
         Make operations idempotent, providing that we're not changing
         the created_by user.
         """
         new_status, created = self.appointment.statuses.get_or_create(
-            state=state,
+            name=status,
             defaults=dict(created_by=self.current_user),
         )
 
