@@ -40,6 +40,7 @@ clinic:
         statuses:
           - CONFIRMED
           - CHECKED_IN
+          - STARTED
         screening_episode:
           id: b33ce2c9-6b96-4975-9439-3beb60333d4e
           participant:
@@ -73,6 +74,8 @@ clinic:
         statuses:
           - CONFIRMED
           - CHECKED_IN
+          - STARTED
+          - IDENTITY_CONFIRMED
         screening_episode:
           id: 9bbdccba-ce84-4cc6-b980-da147c0d6d15
           participant:
@@ -107,6 +110,9 @@ clinic:
         statuses:
           - CONFIRMED
           - CHECKED_IN
+          - STARTED
+          - IDENTITY_CONFIRMED
+          - MEDICAL_INFORMATION_REVIEWED
         screening_episode:
           id: 3b6b2da9-9dda-415d-89d7-f4c5b5ec029a
           participant:
@@ -141,6 +147,10 @@ clinic:
         statuses:
           - CONFIRMED
           - CHECKED_IN
+          - STARTED
+          - IDENTITY_CONFIRMED
+          - MEDICAL_INFORMATION_REVIEWED
+          - IMAGES_TAKEN
         screening_episode:
           id: 0314777f-907c-4372-a137-e067f15a7662
           participant:
@@ -696,7 +706,7 @@ clinic:
       appointment:
         id: 0a382d89-0042-49b8-87ba-fa0d9c817fd3
         statuses:
-          - IN_PROGRESS
+          - STARTED
         screening_episode:
           id: 1ddfad46-b4de-47b9-b2ce-50a76e2d1a57
           participant:
