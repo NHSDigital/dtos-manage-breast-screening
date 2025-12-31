@@ -31,13 +31,21 @@ class AppointmentQuerySet(models.QuerySet):
             AppointmentStatus.CONFIRMED,
             AppointmentStatus.CHECKED_IN,
             AppointmentStatus.STARTED,
+            AppointmentStatus.IDENTITY_CONFIRMED,
+            AppointmentStatus.MEDICAL_INFORMATION_REVIEWED,
+            AppointmentStatus.IMAGES_TAKEN,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatus.CHECKED_IN)
 
     def in_progress(self):
-        return self.in_status(AppointmentStatus.STARTED)
+        return self.in_status(
+            AppointmentStatus.STARTED,
+            AppointmentStatus.IDENTITY_CONFIRMED,
+            AppointmentStatus.MEDICAL_INFORMATION_REVIEWED,
+            AppointmentStatus.IMAGES_TAKEN,
+        )
 
     def for_participant(self, participant_id):
         return self.filter(screening_episode__participant_id=participant_id)
