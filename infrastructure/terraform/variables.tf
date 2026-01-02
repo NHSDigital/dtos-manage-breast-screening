@@ -185,12 +185,6 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
-variable "queue_length_alert_threshold" {
-  description = "If alerting is enabled, alert if storage account queues are greater than this threshold."
-  type        = number
-  default     = 5
-}
-
 locals {
   region = "uksouth"
 
