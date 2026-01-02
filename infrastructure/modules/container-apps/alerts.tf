@@ -42,7 +42,6 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "failure_event" {
 # currently this feature is in preview.
 resource "azurerm_monitor_scheduled_query_rules_alert_v2" "queue_length_high" {
   for_each = var.enable_alerting ? toset([
-    "notifications-message-status-updates",
     "notifications-message-batch-retries"
   ]) : []
 

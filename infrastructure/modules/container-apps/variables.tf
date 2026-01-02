@@ -259,7 +259,7 @@ locals {
       container_access_type = "private"
     }
   }
-  storage_queues = ["notifications-message-status-updates", "notifications-message-batch-retries"]
+  storage_queues = ["notifications-message-batch-retries"]
 
   always_allowed_paths = ["/sha", "/healthcheck"]
   # If allowed_paths is not set, use the module default which allows any pattern

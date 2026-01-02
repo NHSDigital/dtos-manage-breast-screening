@@ -37,7 +37,6 @@ locals {
       cron_expression = "*/5 * * * *"
       environment_variables = {
         RETRY_QUEUE_NAME          = "notifications-message-batch-retries"
-        STATUS_UPDATES_QUEUE_NAME = "notifications-message-status-updates"
         ENVIRONMENT               = var.environment
       }
       job_short_name     = "clm"
