@@ -33,7 +33,6 @@ module "storage" {
     private_endpoint_resource_group_name = azurerm_resource_group.main.name
     private_service_connection_is_manual = false
   }
-  queues              = local.storage_queues
   resource_group_name = azurerm_resource_group.main.name
 }
 
