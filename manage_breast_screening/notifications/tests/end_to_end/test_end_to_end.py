@@ -31,7 +31,6 @@ class TestEndToEnd(TestCase):
         self.env.set("NBSS_MESH_PRIVATE_KEY", "mesh-private-key")
         self.env.set("NBSS_MESH_CA_CERT", "mesh-ca-cert")
         self.env.set("BLOB_STORAGE_CONNECTION_STRING", connection_string)
-        self.env.set("QUEUE_STORAGE_CONNECTION_STRING", connection_string)
         self.env.set("BLOB_CONTAINER_NAME", "nbss-appoinments-data")
 
         Helpers().add_file_to_mesh_mailbox(

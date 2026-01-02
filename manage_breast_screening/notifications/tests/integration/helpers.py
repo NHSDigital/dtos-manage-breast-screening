@@ -1,10 +1,6 @@
 import os
-import time
-from contextlib import contextmanager
 
 from mesh_client import MeshClient
-
-from manage_breast_screening.notifications.services.queue import Queue
 
 
 class Helpers:
@@ -36,17 +32,3 @@ class Helpers:
             "BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;"
             "QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;"
         )
-
-    @contextmanager
-    def queue_listener(self, queue: Queue, command: callable, delay=1.0):
-        def queue_count(q):
-            return sum(1 for i in q.peek())
-
-        count = queue_count(queue)
-
-        yield
-
-        while count == queue_count(queue):
-            time.sleep(delay)
-
-        command()
