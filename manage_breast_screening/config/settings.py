@@ -125,6 +125,9 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "environment": "manage_breast_screening.config.jinja2_env.environment",
+            "context_processors": [
+                "manage_breast_screening.core.context_processors.nav_active",
+            ],
             "undefined": ChainableUndefined,
         },
     },
