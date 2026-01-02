@@ -39,7 +39,6 @@ NBSS_MESH_INBOX_NAME="paste-mesh-inbox-name-here"
 NBSS_MESH_PASSWORD="paste-mesh-password-here"
 NBSS_MESH_CERT="paste-pem-mesh-cert-here"
 NBSS_MESH_PRIVATE_KEY="paste-pem-private-key-here"
-QUEUE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
 REPORTS_CONTAINER_NAME="notifications-reports"
 
 APPLICATIONINSIGHTS_CONNECTION_STRING=""
