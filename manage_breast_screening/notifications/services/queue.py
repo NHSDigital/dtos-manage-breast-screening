@@ -61,7 +61,3 @@ class Queue:
 
     def get_message_count(self):
         return self.client.get_queue_properties().approximate_message_count
-
-    @classmethod
-    def RetryMessageBatches(cls):
-        return cls(os.getenv("RETRY_QUEUE_NAME", "notifications-message-batch-retries"))
