@@ -36,7 +36,6 @@ locals {
     collect_metrics = {
       cron_expression = "*/5 * * * *"
       environment_variables = {
-        RETRY_QUEUE_NAME          = "notifications-message-batch-retries"
         ENVIRONMENT               = var.environment
       }
       job_short_name     = "clm"
