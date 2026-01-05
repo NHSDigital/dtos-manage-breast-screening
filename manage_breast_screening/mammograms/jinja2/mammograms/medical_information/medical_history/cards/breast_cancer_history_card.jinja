@@ -18,8 +18,9 @@
       nestedInfoCard({
         "card": {
           "heading": "Item " ~ presented_item.counter,
-          "headingLevel": 4
-        } if presented_item.counter else {},
+          "headingLevel": 4,
+          "classes": "nhsuk-u-margin-bottom-4"
+        } if presented_item.counter else {"classes": "nhsuk-u-margin-bottom-4"},
         "headingLevel": keyHeadingLevel,
         "rows": [
           {
