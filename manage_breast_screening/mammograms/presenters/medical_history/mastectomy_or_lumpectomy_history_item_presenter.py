@@ -54,8 +54,8 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
                     "value": {
                         "html": multiline_content(
                             [
-                                f"Right breast: {self.right_breast_other_surgery}",
-                                f"Left breast: {self.left_breast_other_surgery}",
+                                f"Right breast: {', '.join(self.right_breast_other_surgery)}",
+                                f"Left breast: {', '.join(self.left_breast_other_surgery)}",
                             ]
                         )
                     },
@@ -80,7 +80,7 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
         }
 
     def _format_multiple_choices(self, choices, ChoiceClass):
-        return ", ".join(ChoiceClass(choice).label for choice in choices)
+        return [ChoiceClass(choice).label for choice in choices]
 
     @property
     def change_link(self):

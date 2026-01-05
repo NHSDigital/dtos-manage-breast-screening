@@ -1,3 +1,5 @@
+import pytest
+
 from manage_breast_screening.mammograms.presenters.medical_history.mastectomy_or_lumpectomy_history_item_presenter import (
     MastectomyOrLumpectomyHistoryItemPresenter,
 )
@@ -10,8 +12,9 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 class TestMastectomyOrLumpectomyHistoryItemPresenter:
-    def test_single(self):
-        item = MastectomyOrLumpectomyHistoryItemFactory.build(
+    @pytest.fixture
+    def item(self):
+        return MastectomyOrLumpectomyHistoryItemFactory.build(
             right_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.MASTECTOMY_NO_TISSUE_REMAINING,
             left_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
             right_breast_other_surgery=[
@@ -25,8 +28,20 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
             additional_details="Right mastectomy with reconstruction",
         )
 
-        presenter = MastectomyOrLumpectomyHistoryItemPresenter(item)
+    @pytest.fixture
+    def presenter(self, item):
+        return MastectomyOrLumpectomyHistoryItemPresenter(item)
 
+    def test_attributes(self, presenter):
+        assert presenter.right_breast_procedure == "Mastectomy (no tissue remaining)"
+        assert presenter.left_breast_procedure == "No procedure"
+        assert presenter.right_breast_other_surgery == ["Reconstruction"]
+        assert presenter.left_breast_other_surgery == ["No other surgery"]
+        assert presenter.year_of_surgery == "2018"
+        assert presenter.surgery_reason == "Risk reduction"
+        assert presenter.additional_details == "Right mastectomy with reconstruction"
+
+    def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [
                 {
