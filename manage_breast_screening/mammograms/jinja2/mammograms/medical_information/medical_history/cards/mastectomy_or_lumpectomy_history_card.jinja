@@ -1,0 +1,91 @@
+{% from "components/nested-info-card/macro.jinja" import nestedInfoCard %}
+{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import listWithDefault, itemWithDetails,
+paragraph %}
+
+{% macro mastectomy_or_lumpectomy_history_card(presented_items) %}
+{% if presented_items %}
+<section>
+  <h3 class="nhsuk-u-margin-bottom-2">Mastectomy or lumpectomy</h3>
+  {% endif %}
+  {% for presented_item in presented_items %}
+  {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
+
+  <!-- This will be replaced with the card's actions param, once the card updates are released. -->
+  <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href }}">
+    {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{
+      presented_item.change_link.visually_hidden_text }}</span>
+  </a>
+
+  {{
+    nestedInfoCard({
+      "card": {
+        "heading": "Item " ~ presented_item.counter,
+        "headingLevel": 4,
+        "classes": "nhsuk-u-margin-bottom-4"
+      } if presented_item.counter else {"classes": "nhsuk-u-margin-bottom-4"},
+      "headingLevel": keyHeadingLevel,
+      "rows": [
+        {
+          "key": "Procedures",
+          "value": {
+            "rows": [
+              {
+                "columns": [
+                  {
+                    "heading": "Right breast",
+                    "html": paragraph(presented_item.right_breast_procedure)
+                  },
+                  {
+                    "heading": "Left breast",
+                    "html": paragraph(presented_item.left_breast_procedure)
+                  },
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "key": "Other surgery",
+          "value": {
+            "rows": [
+              {
+                "columns": [
+                  {
+                    "heading": "Right breast",
+                    "html": listWithDefault(presented_item.right_breast_other_surgery)
+                  },
+                  {
+                    "heading": "Left breast",
+                    "html": listWithDefault(presented_item.left_breast_other_surgery)
+                  },
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "key": "Surgery year",
+          "value": {
+            "html": paragraph(presented_item.year_of_surgery)
+          }
+        } if presented_item.year_of_surgery,
+        {
+          "key": "Surgery reason",
+          "value": {
+            "html": paragraph(presented_item.surgery_reason)
+          }
+        },
+        {
+          "key": "Additional details",
+          "value": {
+            "html": paragraph(presented_item.additional_details)
+          }
+        } if presented_item.additional_details
+      ]
+      })
+  }}
+  {% endfor %}
+  {% if presented_items %}
+</section>
+{% endif %}
+{% endmacro %}

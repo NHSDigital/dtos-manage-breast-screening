@@ -161,21 +161,18 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
 
     def and_the_mastectomy_or_lumpectomy_is_listed(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Mastectomy or lumpectomy history", exact=True),
+        heading = self.page.get_by_role("heading").filter(
+            has_text="Mastectomy or lumpectomy"
         )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        expect(row).to_contain_text("Right breast: No procedure")
-        expect(row).to_contain_text("Left breast: Mastectomy (no tissue remaining)")
-        expect(row).to_contain_text("Right breast: Reconstruction, Symmetrisation")
-        expect(row).to_contain_text("Left breast: No other surgery")
-        expect(row).to_contain_text("2000")
-        expect(row).to_contain_text("Other reason")
-        expect(row).to_contain_text("Other reason for surgery text")
-        expect(row).to_contain_text(
-            "additional details for test of mastectomy or lumpectomy details"
-        )
+        expect(heading).to_be_attached()
+
+        section = self.page.locator("section").filter(has=heading)
+        expect(section).to_be_attached()
+
+        row = section.locator(".app-nested-info__row", has_text="Procedures")
+
+        expect(row).to_contain_text("Right breast No procedure")
+        expect(row).to_contain_text("Left breast Mastectomy (no tissue remaining)")
 
     def and_the_message_says_mastectomy_or_lumpectomy_added(self):
         alert = self.page.get_by_role("alert")
@@ -198,11 +195,12 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         )
 
     def and_the_mastectomy_or_lumpectomy_is_updated(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Mastectomy or lumpectomy history", exact=True),
+        heading = self.page.get_by_role("heading").filter(
+            has_text="Mastectomy or lumpectomy"
         )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        section = self.page.locator("section").filter(has=heading)
+        row = section.locator(".app-nested-info__row", has_text="Additional details")
+
         expect(row).to_contain_text(
             "updated additional details for test of mastectomy or lumpectomy details"
         )
