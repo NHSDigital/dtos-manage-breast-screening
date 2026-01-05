@@ -41,6 +41,24 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
         assert presenter.surgery_reason == "Risk reduction"
         assert presenter.additional_details == "Right mastectomy with reconstruction"
 
+    def test_surgery_other_reason_details(self):
+        item = MastectomyOrLumpectomyHistoryItemFactory.build(
+            right_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.MASTECTOMY_NO_TISSUE_REMAINING,
+            left_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
+            right_breast_other_surgery=[
+                MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+            ],
+            left_breast_other_surgery=[
+                MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY
+            ],
+            year_of_surgery=2018,
+            surgery_reason=MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON,
+            surgery_other_reason_details="a reason",
+            additional_details="Right mastectomy with reconstruction",
+        )
+        presenter = MastectomyOrLumpectomyHistoryItemPresenter(item)
+        assert presenter.surgery_reason == "Other reason<br>Details: a reason"
+
     def test_change_link(self):
         item = MastectomyOrLumpectomyHistoryItemFactory.build(
             additional_details="Some additional details",

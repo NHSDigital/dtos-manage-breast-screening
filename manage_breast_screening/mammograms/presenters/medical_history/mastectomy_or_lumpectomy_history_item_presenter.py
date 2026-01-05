@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from manage_breast_screening.core.template_helpers import nl2br
+from manage_breast_screening.core.template_helpers import multiline_content, nl2br
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
@@ -30,9 +30,21 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
             if self._item.year_of_surgery
             else "Not specified"
         )
-        self.surgery_reason = self._item.get_surgery_reason_display()
-        self.surgery_other_reason_details = self._item.surgery_other_reason_details
         self.additional_details = nl2br(self._item.additional_details)
+
+    @property
+    def surgery_reason(self):
+        reason = self._item.get_surgery_reason_display()
+        details = self._item.surgery_other_reason_details
+
+        if (
+            self._item.surgery_reason
+            == MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON
+            and details
+        ):
+            return multiline_content([reason, f"Details: {details}"])
+        else:
+            return reason
 
     def _format_multiple_choices(self, choices, ChoiceClass):
         return [ChoiceClass(choice).label for choice in choices]
