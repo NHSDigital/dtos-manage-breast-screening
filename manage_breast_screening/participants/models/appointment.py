@@ -28,36 +28,21 @@ class AppointmentQuerySet(models.QuerySet):
 
     def remaining(self):
         return self.in_status(
-            AppointmentStatus.CONFIRMED,
-            AppointmentStatus.CHECKED_IN,
-            AppointmentStatus.STARTED,
-            AppointmentStatus.IDENTITY_CONFIRMED,
-            AppointmentStatus.MEDICAL_INFORMATION_REVIEWED,
-            AppointmentStatus.IMAGES_TAKEN,
+            *AppointmentStatus.YET_TO_BEGIN_STATUSES,
+            *AppointmentStatus.IN_PROGRESS_STATUSES,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatus.CHECKED_IN)
 
     def in_progress(self):
-        return self.in_status(
-            AppointmentStatus.STARTED,
-            AppointmentStatus.IDENTITY_CONFIRMED,
-            AppointmentStatus.MEDICAL_INFORMATION_REVIEWED,
-            AppointmentStatus.IMAGES_TAKEN,
-        )
+        return self.in_status(*AppointmentStatus.IN_PROGRESS_STATUSES)
 
     def for_participant(self, participant_id):
         return self.filter(screening_episode__participant_id=participant_id)
 
     def complete(self):
-        return self.in_status(
-            AppointmentStatus.CANCELLED,
-            AppointmentStatus.DID_NOT_ATTEND,
-            AppointmentStatus.SCREENED,
-            AppointmentStatus.PARTIALLY_SCREENED,
-            AppointmentStatus.ATTENDED_NOT_SCREENED,
-        )
+        return self.in_status(*AppointmentStatus.FINAL_STATUSES)
 
     def upcoming(self):
         return self.filter(clinic_slot__starts_at__date__gte=date.today())
@@ -175,6 +160,27 @@ class AppointmentStatus(models.Model):
         PARTIALLY_SCREENED: "Partially screened",
         ATTENDED_NOT_SCREENED: "Attended not screened",
     }
+
+    YET_TO_BEGIN_STATUSES = [
+        CONFIRMED,
+        CHECKED_IN,
+    ]
+
+    IN_PROGRESS_STATUSES = [
+        STARTED,
+        IDENTITY_CONFIRMED,
+        MEDICAL_INFORMATION_REVIEWED,
+        IMAGES_TAKEN,
+    ]
+
+    FINAL_STATUSES = [
+        CANCELLED,
+        DID_NOT_ATTEND,
+        SCREENED,
+        PARTIALLY_SCREENED,
+        ATTENDED_NOT_SCREENED,
+    ]
+
     name = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
@@ -198,25 +204,14 @@ class AppointmentStatus(models.Model):
         """
         return self.is_in_progress() or self.is_yet_to_begin()
 
-    def is_final_status(self):
-        return self.name in [
-            self.CANCELLED,
-            self.DID_NOT_ATTEND,
-            self.SCREENED,
-            self.PARTIALLY_SCREENED,
-            self.ATTENDED_NOT_SCREENED,
-        ]
+    def is_yet_to_begin(self):
+        return self.name in self.YET_TO_BEGIN_STATUSES
 
     def is_in_progress(self):
-        return self.name in [
-            self.STARTED,
-            self.IDENTITY_CONFIRMED,
-            self.MEDICAL_INFORMATION_REVIEWED,
-            self.IMAGES_TAKEN,
-        ]
+        return self.name in self.IN_PROGRESS_STATUSES
 
-    def is_yet_to_begin(self):
-        return self.name in [self.CONFIRMED, self.CHECKED_IN]
+    def is_final_status(self):
+        return self.name in self.FINAL_STATUSES
 
     def __str__(self):
         return self.name
