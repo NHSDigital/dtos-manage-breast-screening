@@ -336,34 +336,25 @@ class TestStatusBarPresenter:
     def test_show_status_bar_when_in_progress_and_user_is_owner(
         self, mock_appointment, mock_user
     ):
-        mock_appointment.current_status.name = AppointmentStatus.STARTED
+        mock_appointment.current_status.is_in_progress.return_value = True
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_bar.show_status_bar_for(mock_user)
 
-    def test_show_status_bar_when_user_is_not_owner(self, mock_appointment, mock_user):
-        mock_appointment.current_status.name = AppointmentStatus.STARTED
+    def test_dont_show_status_bar_when_user_is_not_owner(
+        self, mock_appointment, mock_user
+    ):
+        mock_appointment.current_status.is_in_progress.return_value = True
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-456"
         presenter = AppointmentPresenter(mock_appointment)
         assert not presenter.status_bar.show_status_bar_for(mock_user)
 
-    @pytest.mark.parametrize(
-        "current_status",
-        [
-            AppointmentStatus.CONFIRMED,
-            AppointmentStatus.CHECKED_IN,
-            AppointmentStatus.DID_NOT_ATTEND,
-            AppointmentStatus.SCREENED,
-            AppointmentStatus.PARTIALLY_SCREENED,
-            AppointmentStatus.ATTENDED_NOT_SCREENED,
-        ],
-    )
     def test_dont_show_status_bar_when_not_in_progress(
-        self, mock_appointment, mock_user, current_status
+        self, mock_appointment, mock_user
     ):
-        mock_appointment.current_status.name = current_status
+        mock_appointment.current_status.is_in_progress.return_value = False
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)

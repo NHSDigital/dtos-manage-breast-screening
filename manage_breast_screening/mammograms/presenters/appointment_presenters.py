@@ -139,7 +139,7 @@ class StatusBarPresenter:
         # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
         current_status = self.appointment._appointment.current_status
         return (
-            current_status.name == AppointmentStatus.STARTED
+            current_status.is_in_progress()
             and user.nhs_uid == current_status.created_by.nhs_uid
         )
 
