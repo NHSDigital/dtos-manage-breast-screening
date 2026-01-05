@@ -84,6 +84,7 @@ class LastKnownMammogramPresenter:
                     f" mammogram item {item_index}" if item_index else " mammogram item"
                 ),
             },
+            "reason_for_continuing": mammogram.reason_for_continuing,
         }
 
     @cached_property

@@ -445,3 +445,88 @@ class TestDeleteParticipantReportedMammogram:
         assert not ParticipantReportedMammogram.objects.filter(
             pk=participant_reported_mammogram.pk
         ).exists()
+
+
+@pytest.mark.django_db
+class TestAppointmentProceedAnywayView:
+    @pytest.fixture
+    def appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+
+    @pytest.fixture
+    def participant_reported_mammogram(self, appointment):
+        return ParticipantReportedMammogramFactory.create(
+            participant=appointment.participant,
+            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        )
+
+    def test_renders_response(
+        self, clinical_user_client, appointment, participant_reported_mammogram
+    ):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:proceed_anyway",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            )
+        )
+        assert response.status_code == 200
+
+    def test_invalid_post_displays_errors(
+        self, clinical_user_client, appointment, participant_reported_mammogram
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:proceed_anyway",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            ),
+            {},
+        )
+        assert response.status_code == 200
+        assertInHTML(
+            """
+            <ul class="nhsuk-list nhsuk-error-summary__list">
+                <li><a href="#id_reason_for_continuing">Provide a reason for continuing</a></li>
+            </ul>
+            """,
+            response.text,
+        )
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, appointment, participant_reported_mammogram
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:proceed_anyway",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            ),
+            {
+                "reason_for_continuing": "Because I said so",
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message="Updated a previous mammogram",
+                )
+            ],
+        )

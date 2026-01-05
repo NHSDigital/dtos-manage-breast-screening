@@ -74,9 +74,9 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
         self.and_the_previous_mammogram_is_gone()
 
-    def test_adding_a_mammogram_within_last_six_months(self):
+    def test_adding_a_mammogram_within_last_six_months_do_not_proceed(self):
         """
-        If has had a mammogram within the last six months, they should be shown a page advising them not to proceed.
+        If has had a mammogram within the last six months, they should be shown a page advising them not to proceed and have option to end the appointment.
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -102,6 +102,33 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_am_on_the_clinic_show_page()
         self.when_i_click_on_all()
         self.then_the_appointment_is_attended_not_screened()
+
+    def test_adding_a_mammogram_within_last_six_months_proceed_anyway(self):
+        """
+        If has had a mammogram within the last six months, they should be shown a page advising them not to proceed but have option to proceed anyway.
+        """
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_participant_details_page()
+        self.then_i_should_see_no_reported_mammograms()
+
+        self.when_i_click_on_add_mammogram()
+        self.then_i_should_be_on_the_add_previous_mammogram_form()
+
+        self.when_i_select_the_same_provider()
+        self.and_i_enter_an_exact_date(date.today() - relativedelta(months=5))
+        self.and_i_select_yes_same_name()
+        self.and_i_enter_additional_information()
+        self.and_i_click_save()
+        self.then_i_should_be_on_the_appointment_should_not_proceed_page()
+
+        self.when_i_click_proceed_anyway()
+        self.then_i_should_be_on_the_proceed_anyway_form()
+
+        self.when_i_enter_reason_for_continuing()
+        self.and_i_click_proceed()
+        self.then_i_should_be_back_on_the_appointment()
+        self.and_i_should_see_the_mammogram_with_the_reason_for_continuing()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -249,6 +276,34 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def when_i_click_end_appointment(self):
         self.page.get_by_text("End appointment and return to clinic").click()
+
+    def when_i_click_proceed_anyway(self):
+        self.page.get_by_text("Proceed with this appointment").click()
+
+    def then_i_should_be_on_the_proceed_anyway_form(self):
+        expect(
+            self.page.get_by_text("You are continuing despite a recent mammogram")
+        ).to_be_visible()
+        expect(
+            self.page.get_by_text(
+                "Taking breast x-rays within 6 months of a previous mammogram should only be done when clinically necessary"
+            )
+        ).to_be_visible()
+        self.assert_page_title_contains("You are continuing despite a recent mammogram")
+
+    def when_i_enter_reason_for_continuing(self):
+        self.page.get_by_label("Provide a reason for continuing").fill(
+            "A reason for continuing even though recent mammogram"
+        )
+
+    def and_i_click_proceed(self):
+        self.page.get_by_text("Proceed with this appointment").click()
+
+    def and_i_should_see_the_mammogram_with_the_reason_for_continuing(self):
+        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
+            "Reason for continuing: A reason for continuing even though recent mammogram",
+            use_inner_text=True,
+        )
 
     def then_i_am_on_the_clinic_show_page(self):
         self.page.goto(

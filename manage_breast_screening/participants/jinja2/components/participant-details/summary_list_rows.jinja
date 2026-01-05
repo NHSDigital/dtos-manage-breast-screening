@@ -54,6 +54,10 @@
       {% if mammogram.additional_information %}
         <br>Additional information: {{ mammogram.additional_information | nl2br }}
       {% endif %}
+
+      {% if mammogram.reason_for_continuing %}
+        <br>Reason for continuing: {{ mammogram.reason_for_continuing | nl2br }}
+      {% endif %}
       </p>
     {% endfor %}
   {% else %}
