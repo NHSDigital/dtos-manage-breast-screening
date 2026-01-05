@@ -55,8 +55,8 @@
     "jsdom": "^27.3.0",
     "outdent": "^0.8.0",
     "prettier": "^3.6.2",
-    "rollup": "^4.53.5",
-    "sass-embedded": "^1.97.0",
+    "rollup": "^4.54.0",
+    "sass-embedded": "^1.97.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0"
   },
