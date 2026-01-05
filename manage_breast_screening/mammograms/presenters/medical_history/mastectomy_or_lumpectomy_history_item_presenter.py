@@ -1,6 +1,6 @@
 from django.urls import reverse
 
-from manage_breast_screening.core.template_helpers import multiline_content, nl2br
+from manage_breast_screening.core.template_helpers import nl2br
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
@@ -33,51 +33,6 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
         self.surgery_reason = self._item.get_surgery_reason_display()
         self.surgery_other_reason_details = self._item.surgery_other_reason_details
         self.additional_details = nl2br(self._item.additional_details)
-
-    @property
-    def summary_list_params(self):
-        return {
-            "rows": [
-                {
-                    "key": {"text": "Procedures"},
-                    "value": {
-                        "html": multiline_content(
-                            [
-                                f"Right breast: {self.right_breast_procedure}",
-                                f"Left breast: {self.left_breast_procedure}",
-                            ]
-                        )
-                    },
-                },
-                {
-                    "key": {"text": "Other surgery"},
-                    "value": {
-                        "html": multiline_content(
-                            [
-                                f"Right breast: {', '.join(self.right_breast_other_surgery)}",
-                                f"Left breast: {', '.join(self.left_breast_other_surgery)}",
-                            ]
-                        )
-                    },
-                },
-                {
-                    "key": {"text": "Year of surgery"},
-                    "value": {"html": self.year_of_surgery},
-                },
-                {
-                    "key": {"text": "Surgery reason"},
-                    "value": {"html": self.surgery_reason},
-                },
-                {
-                    "key": {"text": "Surgery other reason details"},
-                    "value": {"text": self.surgery_other_reason_details},
-                },
-                {
-                    "key": {"text": "Additional details"},
-                    "value": {"html": self.additional_details},
-                },
-            ],
-        }
 
     def _format_multiple_choices(self, choices, ChoiceClass):
         return [ChoiceClass(choice).label for choice in choices]

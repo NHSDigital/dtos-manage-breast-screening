@@ -41,60 +41,6 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
         assert presenter.surgery_reason == "Risk reduction"
         assert presenter.additional_details == "Right mastectomy with reconstruction"
 
-    def test_single(self, presenter):
-        assert presenter.summary_list_params == {
-            "rows": [
-                {
-                    "key": {
-                        "text": "Procedures",
-                    },
-                    "value": {
-                        "html": "Right breast: Mastectomy (no tissue remaining)<br>Left breast: No procedure",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Other surgery",
-                    },
-                    "value": {
-                        "html": "Right breast: Reconstruction<br>Left breast: No other surgery",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Year of surgery",
-                    },
-                    "value": {
-                        "html": "2018",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Surgery reason",
-                    },
-                    "value": {
-                        "html": "Risk reduction",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Surgery other reason details",
-                    },
-                    "value": {
-                        "text": "",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Additional details",
-                    },
-                    "value": {
-                        "html": "Right mastectomy with reconstruction",
-                    },
-                },
-            ],
-        }
-
     def test_change_link(self):
         item = MastectomyOrLumpectomyHistoryItemFactory.build(
             additional_details="Some additional details",
