@@ -1,18 +1,20 @@
 {% from "components/nested-info-card/macro.jinja" import nestedInfoCard %}
-{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import listWithDefault, itemWithDetails, paragraph %}
+{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import listWithDefault, itemWithDetails,
+paragraph %}
 
-{% macro breast_cancer_history_card(breast_cancer_history) %}
-  {% if breast_cancer_history %}
+{% macro mastectomy_or_lumpectomy_history_card(presented_items) %}
+  {% if presented_items %}
   <section>
-    <h3 class="nhsuk-u-margin-bottom-2">Breast cancer</h3>
+    <h3 class="nhsuk-u-margin-bottom-2">Mastectomy or lumpectomy</h3>
   {% endif %}
 
-  {% for presented_item in breast_cancer_history %}
+  {% for presented_item in presented_items %}
     {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
 
     <!-- This will be replaced with the card's actions param, once the card updates are released. -->
     <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href }}">
-      {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
+      {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{
+        presented_item.change_link.visually_hidden_text }}</span>
     </a>
 
     {{ nestedInfoCard({
@@ -25,12 +27,6 @@
       },
       "headingLevel": keyHeadingLevel,
       "rows": [
-        {
-          "key": "Cancer location",
-          "value": {
-            "html": paragraph(presented_item.cancer_location)
-          }
-        },
         {
           "key": "Procedures",
           "value": {
@@ -70,36 +66,15 @@
           }
         },
         {
-          "key": "Treatment",
+          "key": "Surgery year",
           "value": {
-            "rows": [
-              {
-                "columns": [
-                  {
-                    "heading": "Right breast",
-                    "html": listWithDefault(presented_item.right_breast_treatments)
-                  },
-                  {
-                    "heading": "Left breast",
-                    "html": listWithDefault(presented_item.left_breast_treatments)
-                  },
-                ]
-              },
-              {
-                "columns": [
-                  {
-                    "heading": "Systemic treatments",
-                    "html": listWithDefault(presented_item.systemic_treatments)
-                  }
-                ]
-              }
-            ]
+            "html": paragraph(presented_item.year_of_surgery)
           }
-        },
+        } if presented_item.year_of_surgery,
         {
-          "key": "Treatment location",
+          "key": "Surgery reason",
           "value": {
-            "html": itemWithDetails(presented_item.intervention_location)
+            "html": paragraph(presented_item.surgery_reason)
           }
         },
         {
@@ -112,7 +87,7 @@
     }) }}
   {% endfor %}
 
-  {% if breast_cancer_history %}
+  {% if presented_items %}
   </section>
   {% endif %}
 {% endmacro %}
