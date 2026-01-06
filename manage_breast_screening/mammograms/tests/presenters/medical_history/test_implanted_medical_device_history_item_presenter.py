@@ -1,3 +1,8 @@
+from datetime import date
+
+import pytest
+import time_machine
+
 from manage_breast_screening.mammograms.presenters.medical_history.implanted_medical_device_history_item_presenter import (
     ImplantedMedicalDeviceHistoryItemPresenter,
 )
@@ -10,8 +15,9 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 class TestImplantedMedicalDeviceHistoryItemPresenter:
-    def test_single(self):
-        item = ImplantedMedicalDeviceHistoryItemFactory.build(
+    @pytest.fixture
+    def item(self):
+        return ImplantedMedicalDeviceHistoryItemFactory.build(
             device=ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
             other_medical_device_details="Test Device",
             procedure_year=2020,
@@ -20,7 +26,26 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
             additional_details="Some additional details",
         )
 
-        presenter = ImplantedMedicalDeviceHistoryItemPresenter(item)
+    @pytest.fixture
+    @time_machine.travel(date(2025, 1, 1))
+    def presenter(self, item):
+        return ImplantedMedicalDeviceHistoryItemPresenter(item)
+
+    @time_machine.travel(date(2025, 1, 1))
+    def test_attributes(self, presenter):
+        assert presenter.device == "Other medical device (or does not know)"
+        assert presenter.procedure_year == "2020 (5 years ago)"
+        assert presenter.removal_year == "2022 (3 years ago)"
+        assert presenter.additional_details == "Some additional details"
+
+    @time_machine.travel(date(2025, 1, 1))
+    def test_year_text(self, presenter):
+        assert presenter.procedure_year_with_removal == (
+            "Implanted in 2020 (5 years ago)<br>Device removed in 2022 (3 years ago)"
+        )
+
+    @time_machine.travel(date(2025, 1, 1))
+    def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [
                 {
@@ -44,7 +69,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
                         "text": "Procedure year",
                     },
                     "value": {
-                        "html": "2020",
+                        "html": "2020 (5 years ago)",
                     },
                 },
                 {

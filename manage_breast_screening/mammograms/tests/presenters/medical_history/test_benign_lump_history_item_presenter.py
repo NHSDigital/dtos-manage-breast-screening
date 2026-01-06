@@ -1,3 +1,8 @@
+from datetime import date
+
+import pytest
+import time_machine
+
 from manage_breast_screening.mammograms.presenters.medical_history.benign_lump_history_item_presenter import (
     BenignLumpHistoryItemPresenter,
 )
@@ -10,8 +15,9 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 class TestBenignLumpHistoryItemPresenter:
-    def test_summary_list_params(self):
-        item = BenignLumpHistoryItemFactory.build(
+    @pytest.fixture
+    def item(self):
+        return BenignLumpHistoryItemFactory.build(
             right_breast_procedures=[
                 BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY,
                 BenignLumpHistoryItem.Procedure.LUMP_REMOVED,
@@ -23,8 +29,24 @@ class TestBenignLumpHistoryItemPresenter:
             additional_details="First line\nSecond line",
         )
 
-        presenter = BenignLumpHistoryItemPresenter(item)
+    @pytest.fixture
+    @time_machine.travel(date(2025, 1, 1))
+    def presenter(self, item):
+        return BenignLumpHistoryItemPresenter(item)
 
+    @time_machine.travel(date(2025, 1, 1))
+    def test_attributes(self, presenter):
+        assert presenter.right_breast_procedures == ["Needle biopsy", "Lump removed"]
+        assert presenter.left_breast_procedures == ["No procedures"]
+        assert presenter.procedure_year == "2015 (10 years ago)"
+        assert presenter.treatment_location == {
+            "type": "At a private clinic in the UK",
+            "details": "Harley Street Clinic",
+        }
+        assert presenter.additional_details == "First line<br>Second line"
+
+    @time_machine.travel(date(2025, 1, 1))
+    def test_summary_list_params(self, presenter):
         result = presenter.summary_list_params
         assert result == {
             "rows": [
@@ -39,7 +61,7 @@ class TestBenignLumpHistoryItemPresenter:
                 },
                 {
                     "key": {"text": "Procedure year"},
-                    "value": {"html": "2015"},
+                    "value": {"html": "2015 (10 years ago)"},
                 },
                 {
                     "key": {"text": "Procedure location"},

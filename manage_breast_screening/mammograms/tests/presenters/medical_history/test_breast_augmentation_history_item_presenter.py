@@ -1,3 +1,8 @@
+from datetime import date
+
+import pytest
+import time_machine
+
 from manage_breast_screening.mammograms.presenters.medical_history.breast_augmentation_history_item_presenter import (
     BreastAugmentationHistoryItemPresenter,
 )
@@ -10,8 +15,9 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 class TestBreastAugmentationHistoryItemPresenter:
-    def test_single(self):
-        item = BreastAugmentationHistoryItemFactory.build(
+    @pytest.fixture
+    def item(self):
+        return BreastAugmentationHistoryItemFactory.build(
             right_breast_procedures=[
                 BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
             ],
@@ -21,8 +27,23 @@ class TestBreastAugmentationHistoryItemPresenter:
             additional_details="some details",
         )
 
-        presenter = BreastAugmentationHistoryItemPresenter(item)
+    @pytest.fixture
+    @time_machine.travel(date(2025, 1, 1))
+    def presenter(self, item):
+        return BreastAugmentationHistoryItemPresenter(item)
 
+    @time_machine.travel(date(2025, 1, 1))
+    def test_attributes(self, presenter):
+        assert presenter.right_breast_procedures == [
+            "Breast implants (silicone or saline)"
+        ]
+        assert presenter.left_breast_procedures == ["No procedures"]
+        assert presenter.procedure_year == "2000 (25 years ago)"
+        assert presenter.implants_have_been_removed == "Yes (2018)"
+        assert presenter.additional_details == "some details"
+
+    @time_machine.travel(date(2025, 1, 1))
+    def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [
                 {
@@ -38,7 +59,7 @@ class TestBreastAugmentationHistoryItemPresenter:
                         "text": "Procedure year",
                     },
                     "value": {
-                        "html": "2000",
+                        "html": "2000 (25 years ago)",
                     },
                 },
                 {

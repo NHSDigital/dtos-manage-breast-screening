@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
@@ -27,7 +28,7 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
         ]
 
         self.year_of_surgery = (
-            str(self._item.year_of_surgery)
+            format_year_with_relative(self._item.year_of_surgery)
             if self._item.year_of_surgery
             else "Not specified"
         )

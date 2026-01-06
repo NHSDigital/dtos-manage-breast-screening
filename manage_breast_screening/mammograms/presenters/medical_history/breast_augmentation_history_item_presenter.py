@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
@@ -20,7 +21,7 @@ class BreastAugmentationHistoryItemPresenter:
             for choice in self._item.left_breast_procedures
         ]
 
-        self.procedure_year = str(self._item.procedure_year)
+        self.procedure_year = format_year_with_relative(self._item.procedure_year)
         self.implants_have_been_removed = (
             "Yes" if self._item.implants_have_been_removed else "No"
         )

@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
     BenignLumpHistoryItem,
 )
@@ -20,7 +21,7 @@ class BenignLumpHistoryItemPresenter:
             for choice in self._item.left_breast_procedures
         ]
 
-        self.procedure_year = str(self._item.procedure_year)
+        self.procedure_year = format_year_with_relative(self._item.procedure_year)
         self.procedure_location = self._item.get_procedure_location_display()
         self.procedure_location_details = self._item.procedure_location_details
         self.additional_details = nl2br(self._item.additional_details)
@@ -55,6 +56,13 @@ class BenignLumpHistoryItemPresenter:
                     "value": {"html": self.additional_details},
                 },
             ]
+        }
+
+    @property
+    def treatment_location(self):
+        return {
+            "type": self._item.get_procedure_location_display(),
+            "details": self._item.procedure_location_details,
         }
 
     @property
