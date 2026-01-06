@@ -3,11 +3,11 @@
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'nhsuk/components/tables/macro.jinja' import table %}
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
-{% from 'components/count/macro.jinja' import appCount %}
+{% from 'components/count/macro.jinja' import app_count %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
-{% from 'components/appointment-status/macro.jinja' import appointment_status %}
-{% from 'components/check-in/macro.jinja' import check_in %}
-{% from 'components/start-appointment/macro.jinja' import start_appointment %}
+{% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
+{% from 'components/check-in/macro.jinja' import app_check_in %}
+{% from 'components/start-appointment/macro.jinja' import app_start_appointment %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -33,7 +33,7 @@
   {% set secondary_nav_items = [] %}
   {% for nav_data in presented_appointment_list.secondary_nav_data %}
     {% do secondary_nav_items.append({
-      "text": (nav_data.label + " " + appCount(nav_data.count)),
+      "text": (nav_data.label + " " + app_count(nav_data.count)),
       "href": nav_data.href,
       "current": nav_data.current
     }) %}
@@ -67,7 +67,7 @@
     {% endset %}
     {% set appointment_html %}
       {{
-        appointment_status(presented_appointment)
+        app_appointment_status(presented_appointment)
       }}
       {% if presented_appointment.status_attribution %}
         <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-margin-bottom-0">{{ presented_appointment.status_attribution }}</span>
@@ -79,7 +79,7 @@
       </p>
     {% endset %}
     {% set actions_html %}
-      {{ check_in(
+      {{ app_check_in(
         presented_appointment,
         check_in_url=url(
           'clinics:check_in',
@@ -90,7 +90,7 @@
         ),
         csrf_input=csrf_input
       ) }}
-      {{ start_appointment(
+      {{ app_start_appointment(
         request.user,
         presented_appointment,
         start_appointment_url=url(

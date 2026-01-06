@@ -2,8 +2,8 @@
 {% from 'nhsuk/components/card/macro.jinja' import card %}
 {% from 'nhsuk/components/warning-callout/macro.jinja' import warningCallout %}
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
-{% from 'components/appointment-status/macro.jinja' import appointment_status %}
-{% from 'components/appointment-header/macro.jinja' import appointment_header %}
+{% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
+{% from 'components/appointment-header/macro.jinja' import app_appointment_header %}
 {% from 'components/participant-details/participant_details.jinja' import participant_details %}
 {% from 'components/participant-details/contact_details.jinja' import contact_details %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
@@ -29,11 +29,11 @@
     </h1>
 
     <div class="app-header__status-tag">
-      {{ appointment_status(presented_appointment) }}
+      {{ app_appointment_status(presented_appointment) }}
     </div>
   </div>
 
-  {{ appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
+  {{ app_appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
 
   {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
 

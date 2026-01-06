@@ -1,7 +1,7 @@
 {% extends 'layout-app.jinja' %}
 
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
-{% from 'components/count/macro.jinja' import appCount %}
+{% from 'components/count/macro.jinja' import app_count %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 
 {% block page_content %}
@@ -21,7 +21,7 @@
 ] %}
 {% set href %}/clinics/{{ item.id }}{% endset %}
 {% set ns.secondaryNavItems = ns.secondaryNavItems + [{
-  "text": (item.label + " " + appCount(presenter.counts_by_filter[item.id])) | safe,
+  "text": (item.label + " " + app_count(presenter.counts_by_filter[item.id])) | safe,
   "href": href | trim,
   "current": true if item.id == presenter.filter
 }] %}

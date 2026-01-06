@@ -1,5 +1,5 @@
-{% from "components/nested-info-card/macro.jinja" import nestedInfoCard %}
-{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import listWithDefault, itemWithDetails,
+{% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
+{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, item_with_details,
 paragraph %}
 
 {% macro mastectomy_or_lumpectomy_history_card(presented_items) %}
@@ -17,7 +17,7 @@ paragraph %}
         presented_item.change_link.visually_hidden_text }}</span>
     </a>
 
-    {{ nestedInfoCard({
+    {{ app_nested_info_card({
       "card": {
         "heading": "Item " ~ presented_item.counter,
         "headingLevel": 4,
@@ -54,11 +54,11 @@ paragraph %}
                 "columns": [
                   {
                     "heading": "Right breast",
-                    "html": listWithDefault(presented_item.right_breast_other_surgery)
+                    "html": list_with_default(presented_item.right_breast_other_surgery)
                   },
                   {
                     "heading": "Left breast",
-                    "html": listWithDefault(presented_item.left_breast_other_surgery)
+                    "html": list_with_default(presented_item.left_breast_other_surgery)
                   },
                 ]
               }
