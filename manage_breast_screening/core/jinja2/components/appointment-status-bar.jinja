@@ -1,6 +1,6 @@
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
 
-{% macro appointment_status_bar(user, presented_status_bar) %}
+{% macro app_appointment_status_bar(user, presented_status_bar) %}
   {% if presented_status_bar and presented_status_bar.show_status_bar_for(user) %}
     <div class="app-status-bar app-status-bar--rows-2">
       <div class="nhsuk-width-container">

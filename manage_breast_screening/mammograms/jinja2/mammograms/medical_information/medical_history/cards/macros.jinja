@@ -1,5 +1,5 @@
 {# Present a plain list, or a default value if there are no items #}
-{% macro listWithDefault(items, default="None") %}
+{% macro list_with_default(items, default="None") %}
   {% if items %}
   <ul class="nhsuk-list">
     {% for item in items %}
@@ -12,7 +12,7 @@
 {% endmacro %}
 
 {# Present an answer to a radio + details question #}
-{% macro itemWithDetails(item, default='Details not provided') %}
+{% macro item_with_details(item, default='Details not provided') %}
   {{ item.type }}
   {% if item.details %}
     <br>
