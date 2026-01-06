@@ -255,6 +255,50 @@ class TestAppointment:
             ordered=False,
         )
 
+    def test_in_status_only_matches_latest_status_not_history(
+        self, django_assert_num_queries
+    ):
+        appointment = AppointmentFactory.create()
+        appointment_with_history = AppointmentFactory.create()
+
+        AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=models.AppointmentStatus.CHECKED_IN,
+            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+        )
+        AppointmentStatusFactory.create(
+            appointment=appointment_with_history,
+            name=models.AppointmentStatus.CHECKED_IN,
+            created_at=datetime(2025, 1, 2, 10, tzinfo=tz.utc),
+        )
+        AppointmentStatusFactory.create(
+            appointment=appointment_with_history,
+            name=models.AppointmentStatus.SCREENED,
+            created_at=datetime(2025, 1, 2, 11, tzinfo=tz.utc),
+        )
+
+        with django_assert_num_queries(3):
+            assertQuerySetEqual(
+                models.Appointment.objects.in_status(
+                    models.AppointmentStatus.CHECKED_IN
+                ),
+                [appointment],
+                ordered=False,
+            )
+            assertQuerySetEqual(
+                models.Appointment.objects.in_status(
+                    models.AppointmentStatus.CHECKED_IN,
+                    models.AppointmentStatus.SCREENED,
+                ),
+                [appointment, appointment_with_history],
+                ordered=False,
+            )
+            assertQuerySetEqual(
+                models.Appointment.objects.in_status(models.AppointmentStatus.SCREENED),
+                [appointment_with_history],
+                ordered=False,
+            )
+
     @pytest.mark.django_db
     class TestEagerLoadCurrentStatus:
         def test_eager_loads_most_recent_status_with_created_by(
