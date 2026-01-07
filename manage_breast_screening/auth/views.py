@@ -60,10 +60,16 @@ def cis2_callback(request):
     client = get_cis2_client()
     token = client.authorize_access_token(request)
 
+    id_token_userinfo = token.get("userinfo")
     userinfo = client.userinfo(token=token)
     sub = userinfo.get("sub")  # Unique identifier for the user in CIS2
     if not sub:
         return HttpResponseBadRequest("Missing subject in CIS2 response")
+    id_token_sub = id_token_userinfo.get("sub")
+    if not id_token_sub:
+        return HttpResponseBadRequest("Missing subject in CIS2 ID token")
+    if sub != id_token_sub:
+        return HttpResponseBadRequest("Subject mismatch in CIS2 response")
 
     user = authenticate(request, cis2_sub=sub, cis2_userinfo=userinfo)
     if not user:
