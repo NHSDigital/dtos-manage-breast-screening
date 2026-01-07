@@ -68,7 +68,7 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_checked_in(self):
-        return self._appointment.current_status.state == AppointmentStatus.CONFIRMED
+        return self._appointment.current_status.name == AppointmentStatus.CONFIRMED
 
     @cached_property
     def active(self):
@@ -89,17 +89,21 @@ class AppointmentPresenter:
     @cached_property
     def current_status(self):
         current_status = self._appointment.current_status
-
-        colour = status_colour(current_status.state)
+        colour = status_colour(current_status)
+        display_text = (
+            "In progress"
+            if current_status.is_in_progress()
+            else current_status.get_name_display()
+        )
 
         return {
             "classes": (
                 f"nhsuk-tag--{colour} app-u-nowrap" if colour else "app-u-nowrap"
             ),
-            "text": current_status.get_state_display(),
-            "key": current_status.state,
-            "is_confirmed": current_status.state == AppointmentStatus.CONFIRMED,
-            "is_screened": current_status.state == AppointmentStatus.SCREENED,
+            "text": display_text,
+            "key": current_status.name,
+            "is_confirmed": current_status.name == AppointmentStatus.CONFIRMED,
+            "is_screened": current_status.name == AppointmentStatus.SCREENED,
         }
 
     @cached_property
@@ -108,7 +112,7 @@ class AppointmentPresenter:
             return (
                 "with " + self._appointment.current_status.created_by.get_short_name()
             )
-        elif self._appointment.current_status.is_final_state():
+        elif self._appointment.current_status.is_final_status():
             return "by " + self._appointment.current_status.created_by.get_short_name()
         else:
             return None
@@ -135,7 +139,7 @@ class StatusBarPresenter:
         # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
         current_status = self.appointment._appointment.current_status
         return (
-            current_status.state == AppointmentStatus.IN_PROGRESS
+            current_status.is_in_progress()
             and user.nhs_uid == current_status.created_by.nhs_uid
         )
 

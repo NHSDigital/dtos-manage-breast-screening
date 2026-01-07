@@ -19,7 +19,7 @@ class AppointmentQuerySet(models.QuerySet):
             statuses=Subquery(
                 AppointmentStatus.objects.filter(
                     appointment=OuterRef("pk"),
-                    state__in=statuses,
+                    name__in=statuses,
                 )
                 .values("pk")
                 .order_by("-created_at")[:1]
@@ -28,28 +28,21 @@ class AppointmentQuerySet(models.QuerySet):
 
     def remaining(self):
         return self.in_status(
-            AppointmentStatus.CONFIRMED,
-            AppointmentStatus.CHECKED_IN,
-            AppointmentStatus.IN_PROGRESS,
+            *AppointmentStatus.YET_TO_BEGIN_STATUSES,
+            *AppointmentStatus.IN_PROGRESS_STATUSES,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatus.CHECKED_IN)
 
     def in_progress(self):
-        return self.in_status(AppointmentStatus.IN_PROGRESS)
+        return self.in_status(*AppointmentStatus.IN_PROGRESS_STATUSES)
 
     def for_participant(self, participant_id):
         return self.filter(screening_episode__participant_id=participant_id)
 
     def complete(self):
-        return self.in_status(
-            AppointmentStatus.CANCELLED,
-            AppointmentStatus.DID_NOT_ATTEND,
-            AppointmentStatus.SCREENED,
-            AppointmentStatus.PARTIALLY_SCREENED,
-            AppointmentStatus.ATTENDED_NOT_SCREENED,
-        )
+        return self.in_status(*AppointmentStatus.FINAL_STATUSES)
 
     def upcoming(self):
         return self.filter(clinic_slot__starts_at__date__gte=date.today())
@@ -130,7 +123,7 @@ class Appointment(BaseModel):
         if not statuses:
             status = AppointmentStatus()
             logger.info(
-                f"Appointment {self.pk} has no statuses. Assuming {status.state}"
+                f"Appointment {self.pk} has no statuses. Assuming {status.name}"
             )
             return status
 
@@ -144,7 +137,10 @@ class Appointment(BaseModel):
 class AppointmentStatus(models.Model):
     CONFIRMED = "CONFIRMED"
     CHECKED_IN = "CHECKED_IN"
-    IN_PROGRESS = "IN_PROGRESS"
+    STARTED = "STARTED"
+    IDENTITY_CONFIRMED = "IDENTITY_CONFIRMED"
+    MEDICAL_INFORMATION_REVIEWED = "MEDICAL_INFORMATION_REVIEWED"
+    IMAGES_TAKEN = "IMAGES_TAKEN"
     CANCELLED = "CANCELLED"
     DID_NOT_ATTEND = "DID_NOT_ATTEND"
     SCREENED = "SCREENED"
@@ -154,14 +150,38 @@ class AppointmentStatus(models.Model):
     STATUS_CHOICES = {
         CONFIRMED: "Confirmed",
         CHECKED_IN: "Checked in",
-        IN_PROGRESS: "In progress",
+        STARTED: "Started",
+        IDENTITY_CONFIRMED: "Identity confirmed",
+        MEDICAL_INFORMATION_REVIEWED: "Medical information reviewed",
+        IMAGES_TAKEN: "Images taken",
         CANCELLED: "Cancelled",
         DID_NOT_ATTEND: "Did not attend",
         SCREENED: "Screened",
         PARTIALLY_SCREENED: "Partially screened",
         ATTENDED_NOT_SCREENED: "Attended not screened",
     }
-    state = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
+
+    YET_TO_BEGIN_STATUSES = [
+        CONFIRMED,
+        CHECKED_IN,
+    ]
+
+    IN_PROGRESS_STATUSES = [
+        STARTED,
+        IDENTITY_CONFIRMED,
+        MEDICAL_INFORMATION_REVIEWED,
+        IMAGES_TAKEN,
+    ]
+
+    FINAL_STATUSES = [
+        CANCELLED,
+        DID_NOT_ATTEND,
+        SCREENED,
+        PARTIALLY_SCREENED,
+        ATTENDED_NOT_SCREENED,
+    ]
+
+    name = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -173,31 +193,28 @@ class AppointmentStatus(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-        # Note: this is only valid as long as we can't undo a state transition.
+        # Note: this is only valid as long as we can't undo a status transition.
         # https://nhsd-jira.digital.nhs.uk/browse/DTOSS-11522
-        unique_together = ("appointment", "state")
+        unique_together = ("appointment", "name")
 
     @property
     def active(self):
         """
-        Is this state one of the active, non-final states?
+        Is this status one of the active, non-final statuses?
         """
-        return self.state in [self.CONFIRMED, self.CHECKED_IN, self.IN_PROGRESS]
+        return self.is_in_progress() or self.is_yet_to_begin()
 
-    def is_final_state(self):
-        return self.state in [
-            self.CANCELLED,
-            self.DID_NOT_ATTEND,
-            self.SCREENED,
-            self.PARTIALLY_SCREENED,
-            self.ATTENDED_NOT_SCREENED,
-        ]
+    def is_yet_to_begin(self):
+        return self.name in self.YET_TO_BEGIN_STATUSES
 
     def is_in_progress(self):
-        return self.state == self.IN_PROGRESS
+        return self.name in self.IN_PROGRESS_STATUSES
+
+    def is_final_status(self):
+        return self.name in self.FINAL_STATUSES
 
     def __str__(self):
-        return self.state
+        return self.name
 
 
 class AppointmentNote(BaseModel):

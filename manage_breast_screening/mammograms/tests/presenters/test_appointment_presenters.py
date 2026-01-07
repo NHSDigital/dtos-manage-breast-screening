@@ -14,6 +14,9 @@ from manage_breast_screening.mammograms.presenters import (
     SpecialAppointmentPresenter,
 )
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentStatusFactory,
+)
 from manage_breast_screening.users.models import User
 
 
@@ -76,7 +79,7 @@ class TestAppointmentPresenter:
         expected_is_confirmed,
         expected_is_screened,
     ):
-        mock_appointment.current_status = AppointmentStatus(state=status)
+        mock_appointment.current_status = AppointmentStatus(name=status)
 
         result = AppointmentPresenter(mock_appointment).current_status
 
@@ -108,19 +111,19 @@ class TestAppointmentPresenter:
         )
 
     @pytest.mark.parametrize(
-        "has_permission, state, result",
+        "has_permission, status_name, result",
         [
             (True, AppointmentStatus.CONFIRMED, True),
             (True, AppointmentStatus.CHECKED_IN, True),
             (False, AppointmentStatus.CONFIRMED, False),
-            (True, AppointmentStatus.IN_PROGRESS, False),
+            (True, AppointmentStatus.STARTED, False),
         ],
     )
     def test_can_be_started_by(
-        self, mock_appointment, mock_user, has_permission, state, result
+        self, mock_appointment, mock_user, has_permission, status_name, result
     ):
         mock_user.has_perm.return_value = has_permission
-        mock_appointment.current_status.state = state
+        mock_appointment.current_status.name = status_name
 
         assert (
             AppointmentPresenter(mock_appointment).can_be_started_by(mock_user)
@@ -180,8 +183,126 @@ class TestAppointmentPresenter:
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.is_special_appointment == expected_result
 
+    class TestCurrentStatus:
+        @pytest.mark.parametrize(
+            "status_name, expected_classes, expected_text, expected_key, is_confirmed, is_screened",
+            [
+                (
+                    AppointmentStatus.CHECKED_IN,
+                    "app-u-nowrap",
+                    "Checked in",
+                    "CHECKED_IN",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.CONFIRMED,
+                    "nhsuk-tag--blue app-u-nowrap",
+                    "Confirmed",
+                    "CONFIRMED",
+                    True,
+                    False,
+                ),
+                (
+                    AppointmentStatus.STARTED,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "STARTED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.IDENTITY_CONFIRMED,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "IDENTITY_CONFIRMED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.MEDICAL_INFORMATION_REVIEWED,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "MEDICAL_INFORMATION_REVIEWED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.IMAGES_TAKEN,
+                    "nhsuk-tag--aqua-green app-u-nowrap",
+                    "In progress",
+                    "IMAGES_TAKEN",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.CANCELLED,
+                    "nhsuk-tag--red app-u-nowrap",
+                    "Cancelled",
+                    "CANCELLED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.DID_NOT_ATTEND,
+                    "nhsuk-tag--red app-u-nowrap",
+                    "Did not attend",
+                    "DID_NOT_ATTEND",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.SCREENED,
+                    "nhsuk-tag--green app-u-nowrap",
+                    "Screened",
+                    "SCREENED",
+                    False,
+                    True,
+                ),
+                (
+                    AppointmentStatus.PARTIALLY_SCREENED,
+                    "nhsuk-tag--orange app-u-nowrap",
+                    "Partially screened",
+                    "PARTIALLY_SCREENED",
+                    False,
+                    False,
+                ),
+                (
+                    AppointmentStatus.ATTENDED_NOT_SCREENED,
+                    "nhsuk-tag--orange app-u-nowrap",
+                    "Attended not screened",
+                    "ATTENDED_NOT_SCREENED",
+                    False,
+                    False,
+                ),
+            ],
+        )
+        def test_current_status_properties(
+            self,
+            mock_appointment,
+            status_name,
+            expected_classes,
+            expected_text,
+            expected_key,
+            is_confirmed,
+            is_screened,
+        ):
+            mock_appointment.current_status = AppointmentStatusFactory.build(
+                name=status_name
+            )
+            presenter = AppointmentPresenter(mock_appointment)
+
+            expected = {
+                "classes": expected_classes,
+                "text": expected_text,
+                "key": expected_key,
+                "is_confirmed": is_confirmed,
+                "is_screened": is_screened,
+            }
+            assert presenter.current_status == expected
+
     @pytest.mark.parametrize(
-        "is_in_progress, is_final_state, expected_result",
+        "is_in_progress, is_final_status, expected_result",
         [
             (True, False, "with A. Tester"),
             (False, True, "by A. Tester"),
@@ -189,13 +310,13 @@ class TestAppointmentPresenter:
         ],
     )
     def test_status_attribution(
-        self, mock_appointment, is_in_progress, is_final_state, expected_result
+        self, mock_appointment, is_in_progress, is_final_status, expected_result
     ):
         mock_appointment.current_status.created_by.get_short_name.return_value = (
             "A. Tester"
         )
         mock_appointment.current_status.is_in_progress.return_value = is_in_progress
-        mock_appointment.current_status.is_final_state.return_value = is_final_state
+        mock_appointment.current_status.is_final_status.return_value = is_final_status
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_attribution == expected_result
 
@@ -215,34 +336,25 @@ class TestStatusBarPresenter:
     def test_show_status_bar_when_in_progress_and_user_is_owner(
         self, mock_appointment, mock_user
     ):
-        mock_appointment.current_status.state = AppointmentStatus.IN_PROGRESS
+        mock_appointment.current_status.is_in_progress.return_value = True
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_bar.show_status_bar_for(mock_user)
 
-    def test_show_status_bar_when_user_is_not_owner(self, mock_appointment, mock_user):
-        mock_appointment.current_status.state = AppointmentStatus.IN_PROGRESS
+    def test_dont_show_status_bar_when_user_is_not_owner(
+        self, mock_appointment, mock_user
+    ):
+        mock_appointment.current_status.is_in_progress.return_value = True
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-456"
         presenter = AppointmentPresenter(mock_appointment)
         assert not presenter.status_bar.show_status_bar_for(mock_user)
 
-    @pytest.mark.parametrize(
-        "current_state",
-        [
-            AppointmentStatus.CONFIRMED,
-            AppointmentStatus.CHECKED_IN,
-            AppointmentStatus.DID_NOT_ATTEND,
-            AppointmentStatus.SCREENED,
-            AppointmentStatus.PARTIALLY_SCREENED,
-            AppointmentStatus.ATTENDED_NOT_SCREENED,
-        ],
-    )
     def test_dont_show_status_bar_when_not_in_progress(
-        self, mock_appointment, mock_user, current_state
+        self, mock_appointment, mock_user
     ):
-        mock_appointment.current_status.state = current_state
+        mock_appointment.current_status.is_in_progress.return_value = False
         mock_user.nhs_uid = "user-123"
         mock_appointment.current_status.created_by.nhs_uid = "user-123"
         presenter = AppointmentPresenter(mock_appointment)

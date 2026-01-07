@@ -66,7 +66,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def test_status_attribution_display(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_a_clinic_exists_that_is_run_by_my_provider()
-        self.and_there_are_appointments_in_various_states_with_attributed_users()
+        self.and_there_are_appointments_in_various_statuses_with_attributed_users()
         self.and_i_am_on_the_clinic_show_page()
         self.when_i_click_on_all()
         self.then_i_can_see_status_attribution_for_relevant_appointments()
@@ -109,7 +109,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.in_progress_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
-            current_status=AppointmentStatus.IN_PROGRESS,
+            current_status=AppointmentStatus.STARTED,
         )
 
     def and_i_am_on_the_clinic_list(self):
@@ -212,6 +212,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def _expect_rows_to_match_appointments(self, rows, appointments):
         assert len(rows) == len(appointments)
         for row, appointment in zip(rows, appointments):
+            expected_status_tag = (
+                "In progress"
+                if appointment.current_status.is_in_progress()
+                else appointment.current_status.get_name_display()
+            )
             expect(row.locator("td").nth(0)).to_have_text(
                 format_time(appointment.clinic_slot.starts_at)
             )
@@ -227,9 +232,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             expect(row.locator("td").nth(2)).to_contain_text(
                 format_age(appointment.screening_episode.participant.age())
             )
-            expect(row.locator("td").nth(3)).to_contain_text(
-                appointment.current_status.get_state_display()
-            )
+            expect(row.locator("td").nth(3)).to_contain_text(expected_status_tag)
 
     def and_an_appointment_has_extra_needs(self):
         self.extra_needs_appointment = AppointmentFactory(
@@ -261,7 +264,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text("Wheelchair user")
 
-    def and_there_are_appointments_in_various_states_with_attributed_users(self):
+    def and_there_are_appointments_in_various_statuses_with_attributed_users(self):
         # Create users for attribution
         user_in_progress = UserFactory(first_name="Alice", last_name="User")
         user_screened = UserFactory(first_name="Bob", last_name="User")
@@ -275,14 +278,14 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             last_name="Confirmed",
         )
 
-        # IN_PROGRESS status
+        # STARTED status
         self.in_progress_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             first_name="Participant",
             last_name="InProgress",
         )
         self.in_progress_appointment.statuses.create(
-            state=AppointmentStatus.IN_PROGRESS,
+            name=AppointmentStatus.STARTED,
             created_by=user_in_progress,
         )
 
@@ -293,7 +296,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             last_name="Screened",
         )
         self.screened_appointment.statuses.create(
-            state=AppointmentStatus.SCREENED,
+            name=AppointmentStatus.SCREENED,
             created_by=user_screened,
         )
 
@@ -304,7 +307,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             last_name="Cancelled",
         )
         self.cancelled_appointment.statuses.create(
-            state=AppointmentStatus.CANCELLED,
+            name=AppointmentStatus.CANCELLED,
             created_by=user_cancelled,
         )
 

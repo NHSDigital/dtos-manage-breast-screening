@@ -100,7 +100,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
     def and_the_appointment_is_updated(self):
         self.appointment.refresh_from_db()
         self.assertEqual(
-            self.appointment.current_status.state,
+            self.appointment.current_status.name,
             AppointmentStatus.ATTENDED_NOT_SCREENED,
         )
         self.assertEqual(self.appointment.reinvite, True)
