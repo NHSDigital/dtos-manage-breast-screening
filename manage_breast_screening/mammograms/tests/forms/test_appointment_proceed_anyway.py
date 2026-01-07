@@ -23,7 +23,7 @@ class TestAppointmentProceedAnywayForm:
     @pytest.fixture
     def participant_reported_mammogram(self, appointment):
         return ParticipantReportedMammogramFactory.create(
-            participant=appointment.participant,
+            appointment=appointment,
             location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
         )
 

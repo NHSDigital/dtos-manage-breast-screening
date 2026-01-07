@@ -38,10 +38,8 @@ def appointment_should_not_proceed(
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    participant = appointment.screening_episode.participant
-
     try:
-        mammogram = participant.reported_mammograms.get(
+        mammogram = appointment.reported_mammograms.get(
             pk=participant_reported_mammogram_pk
         )
     except ParticipantReportedMammogram.DoesNotExist:
@@ -73,7 +71,7 @@ def appointment_should_not_proceed(
         request,
         "mammograms/appointment_should_not_proceed.jinja",
         {
-            "caption": participant.full_name,
+            "caption": appointment.screening_episode.participant.full_name,
             "page_title": "This appointment should not proceed",
             "heading": "This appointment should not proceed",
             "back_link_params": {

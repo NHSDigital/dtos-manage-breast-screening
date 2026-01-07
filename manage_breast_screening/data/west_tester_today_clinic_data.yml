@@ -59,13 +59,13 @@ clinic:
               lines:
                 - 8 Joanna mill
               postcode: DN4 5PH
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-                  name: West Tester Hospital Trust
-                location_details: In the radiology department
-                exact_date: '2025-07-25'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+              name: West Tester Hospital Trust
+            location_details: In the radiology department
+            exact_date: '2025-07-25'
     - id: eacda9e2-1df6-4c28-879a-34e32383c929
       duration_in_minutes: 8
       starts_at_time: 09:16
@@ -95,13 +95,13 @@ clinic:
                 - Flat 27
                 - Stacey drive
               postcode: N4B 3AF
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-                  name: West Tester Hospital Trust
-                location_details: In the radiology department
-                exact_date: '2025-07-25'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+              name: West Tester Hospital Trust
+            location_details: In the radiology department
+            exact_date: '2025-07-25'
     - id: 8b2d4038-9169-434e-8300-f898f288d22b
       duration_in_minutes: 8
       starts_at_time: 09:24
@@ -131,14 +131,14 @@ clinic:
               lines:
                 - 8 Webb via
               postcode: E0 9ST
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 9150816a-1bd1-4bb3-abdd-3670016e0d2a
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-03-08'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 9150816a-1bd1-4bb3-abdd-3670016e0d2a
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-03-08'
     - id: 39d55eeb-d46a-474c-a368-0934168a40eb
       duration_in_minutes: 8
       starts_at_time: 09:32
@@ -169,14 +169,14 @@ clinic:
               lines:
                 - 620 Marshall spring
               postcode: W8 9GZ
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 071ae2e4-3750-46f6-88ae-f0f2ae828fa9
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-09-10'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 071ae2e4-3750-46f6-88ae-f0f2ae828fa9
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-09-10'
         medical_information:
           mastectomy_or_lumpectomy_history_items:
             - id: 8c3e50e9-7e49-4c2b-8c9c-9b1f7b3a1ab5
@@ -295,14 +295,14 @@ clinic:
                 - 958 Clinic Road
                 - Sheffield
               postcode: M5 4D4
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: e4c7dc12-0062-4ab0-8d93-247d012b20d1
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-01-23'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: e4c7dc12-0062-4ab0-8d93-247d012b20d1
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-01-23'
     - id: 9eb6d400-3895-4858-a7e1-bb24ce89b26a
       duration_in_minutes: 8
       starts_at_time: '10:12'
@@ -329,14 +329,14 @@ clinic:
                 - 723 Clinic Road
                 - Oxford
               postcode: N6 6R7
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 25828dd3-13ce-4099-afc8-68cb5f25ca97
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-08-26'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 25828dd3-13ce-4099-afc8-68cb5f25ca97
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-08-26'
     - id: afa1ff13-08fb-4f1a-9e35-bd7cd49ad143
       duration_in_minutes: 8
       starts_at_time: '10:20'
@@ -363,14 +363,14 @@ clinic:
                 - 4 Clinic Road
                 - Sheffield
               postcode: M5 9T3
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 462f5422-729c-46bd-acda-f1efbfef004f
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-09-02'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 462f5422-729c-46bd-acda-f1efbfef004f
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-09-02'
     - id: 28348d1a-ebd1-4609-8f56-1ff2732f26bb
       duration_in_minutes: 8
       starts_at_time: '10:28'
@@ -475,14 +475,14 @@ clinic:
                 - 38 Clinic Road
                 - Sheffield
               postcode: N5 2M9
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 05ce8efc-1bb5-41fe-8660-a466f7759dfb
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-11-05'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 05ce8efc-1bb5-41fe-8660-a466f7759dfb
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-11-05'
     - id: cdf895d7-6d26-417e-9bb8-d0243c00263f
       duration_in_minutes: 8
       starts_at_time: '11:00'
@@ -509,13 +509,13 @@ clinic:
                 - Flat 0
                 - Johnston light
               postcode: E4 6HL
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-                  name: West Tester Hospital Trust
-                location_details: In the radiology department
-                exact_date: '2025-07-25'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+              name: West Tester Hospital Trust
+            location_details: In the radiology department
+            exact_date: '2025-07-25'
     - id: 160b588b-6a73-47b0-8120-8844068c9c84
       duration_in_minutes: 8
       starts_at_time: '11:08'
@@ -542,14 +542,14 @@ clinic:
                 - 433 Clinic Road
                 - Oxford
               postcode: L1 5L2
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 44a51eb0-00a5-41a0-966f-7de17693065a
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-09-15'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 44a51eb0-00a5-41a0-966f-7de17693065a
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-09-15'
     - id: 61657add-7f91-43a7-b60a-7ed4228fbf79
       duration_in_minutes: 8
       starts_at_time: '11:16'
@@ -600,14 +600,14 @@ clinic:
               lines:
                 - 63 Christian mall
               postcode: GY7Y 5AP
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 5426770d-68b3-4208-bdb8-6e1f73fedc3f
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-04-03'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 5426770d-68b3-4208-bdb8-6e1f73fedc3f
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-04-03'
     - id: 989966b5-a4d8-4a31-8a38-7407d8df2e71
       duration_in_minutes: 8
       starts_at_time: '11:32'
@@ -659,13 +659,13 @@ clinic:
               lines:
                 - 96 Ann court
               postcode: G8 2LA
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-                  name: West Tester Hospital Trust
-                location_details: In the radiology department
-                exact_date: '2025-07-25'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+              name: West Tester Hospital Trust
+            location_details: In the radiology department
+            exact_date: '2025-07-25'
     - id: c09d8676-953d-4643-8cf7-ebb7328e4bae
       duration_in_minutes: 8
       starts_at_time: '11:48'
@@ -692,14 +692,14 @@ clinic:
                 - 588 Clinic Road
                 - Cardiff
               postcode: M1 3X1
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: f772c980-3ae8-4ce3-ad11-558dc1f9a43b
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-08-09'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: f772c980-3ae8-4ce3-ad11-558dc1f9a43b
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-08-09'
     - id: c021e085-1d86-4abd-92f8-da5b837f4f8c
       duration_in_minutes: 8
       starts_at_time: '11:56'

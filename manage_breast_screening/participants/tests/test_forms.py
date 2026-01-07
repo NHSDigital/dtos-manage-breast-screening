@@ -206,7 +206,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider == most_recent_provider
         assert instance.location_type == "NHS_BREAST_SCREENING_UNIT"
         assert instance.location_details == ""
@@ -232,7 +232,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "ELSEWHERE_UK"
         assert instance.location_details == "XYZ provider"
@@ -258,7 +258,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "OUTSIDE_UK"
         assert instance.location_details == "XYZ provider"
@@ -283,7 +283,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
@@ -322,7 +322,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
@@ -348,7 +348,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
@@ -374,7 +374,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
@@ -403,7 +403,7 @@ class TestParticipantReportedMammogramForm:
 
         instance = form.create(appointment)
 
-        assert instance.participant == appointment.screening_episode.participant
+        assert instance.appointment == appointment
         assert instance.provider is None
         assert instance.location_type == "OUTSIDE_UK"
         assert instance.location_details == "XYZ provider"
@@ -414,7 +414,7 @@ class TestParticipantReportedMammogramForm:
 
     def test_update_full_details(self, appointment, most_recent_provider):
         original_instance = ParticipantReportedMammogram.objects.create(
-            participant=appointment.screening_episode.participant,
+            appointment=appointment,
             location_type=ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY,
         )
         data = {
@@ -438,7 +438,7 @@ class TestParticipantReportedMammogramForm:
         updated_instance = form.update()
 
         assert updated_instance.pk == original_instance.pk
-        assert updated_instance.participant == appointment.screening_episode.participant
+        assert updated_instance.appointment == appointment
         assert updated_instance.provider is None
         assert updated_instance.location_type == "OUTSIDE_UK"
         assert updated_instance.location_details == "XYZ provider"
