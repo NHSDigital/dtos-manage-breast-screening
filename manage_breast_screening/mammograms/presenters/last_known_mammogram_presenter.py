@@ -65,7 +65,7 @@ class LastKnownMammogramPresenter:
                 "mammograms:change_previous_mammogram",
                 kwargs={
                     "pk": self.appointment_pk,
-                    "participant_reported_mammogram_pk": mammogram.pk,
+                    "appointment_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={self.current_url}"

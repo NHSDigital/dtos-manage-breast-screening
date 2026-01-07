@@ -15,8 +15,8 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.participants.models import (
     Appointment,
+    AppointmentReportedMammogram,
     MedicalInformationSection,
-    ParticipantReportedMammogram,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
@@ -48,9 +48,8 @@ class ShowAppointment(AppointmentMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        participant_pk = appointment.screening_episode.participant.pk
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant_pk
+        last_known_mammograms = AppointmentReportedMammogram.objects.filter(
+            appointment_id=appointment.pk
         ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(
             appointment, tab_description="Appointment details"
@@ -86,9 +85,8 @@ class ParticipantDetails(AppointmentMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        participant_pk = appointment.screening_episode.participant.pk
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant_pk
+        last_known_mammograms = AppointmentReportedMammogram.objects.filter(
+            appointment_id=appointment.pk
         ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(appointment)
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
@@ -187,8 +185,8 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         participant = self.participant
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant.pk
+        last_known_mammograms = AppointmentReportedMammogram.objects.filter(
+            appointment_id=self.appointment.pk
         ).order_by("-created_at")
 
         presented_mammograms = LastKnownMammogramPresenter(

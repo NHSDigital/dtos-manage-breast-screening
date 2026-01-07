@@ -23,6 +23,7 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentNote,
+    AppointmentReportedMammogram,
     AppointmentStatus,
     BenignLumpHistoryItem,
     BreastAugmentationHistoryItem,
@@ -33,7 +34,6 @@ from manage_breast_screening.participants.models import (
     OtherProcedureHistoryItem,
     Participant,
     ParticipantAddress,
-    ParticipantReportedMammogram,
     ScreeningEpisode,
 )
 from manage_breast_screening.participants.models.medical_information_review import (
@@ -42,6 +42,7 @@ from manage_breast_screening.participants.models.medical_information_review impo
 from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    AppointmentReportedMammogramFactory,
     AppointmentStatusFactory,
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
@@ -52,7 +53,6 @@ from manage_breast_screening.participants.tests.factories import (
     OtherProcedureHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
-    ParticipantReportedMammogramFactory,
     ScreeningEpisodeFactory,
     SymptomFactory,
 )
@@ -180,6 +180,11 @@ class Command(BaseCommand):
                 appointment, appointment_key["medical_information"]
             )
 
+        if "previous_mammograms" in appointment_key:
+            self.create_reported_mammograms(
+                appointment, appointment_key.get("previous_mammograms")
+            )
+
         return appointment
 
     def create_screening_episode(self, screening_episode_key):
@@ -277,19 +282,17 @@ class Command(BaseCommand):
 
     def create_participant(self, **participant_key):
         address_key = participant_key.pop("address", None)
-        previous_mammograms_key = participant_key.pop("previous_mammograms", [])
         participant = ParticipantFactory(**participant_key, address=None)
 
         if address_key is not None:
             ParticipantAddressFactory(**address_key, participant=participant)
 
-        self.create_reported_mammograms(participant, previous_mammograms_key)
         return participant
 
     def create_symptom(self, appointment, symptom):
         SymptomFactory(appointment=appointment, **symptom)
 
-    def create_reported_mammograms(self, participant, mammograms):
+    def create_reported_mammograms(self, appointment, mammograms):
         for mammogram in mammograms:
             created_at_date = mammogram.pop("created_at", None)
             if mammogram["provider"] is not None:
@@ -297,15 +300,15 @@ class Command(BaseCommand):
                     id=mammogram["provider"]["id"],
                     name=mammogram["provider"]["name"],
                 )
-            participant_mammogram = ParticipantReportedMammogramFactory(
-                participant=participant,
+            appointment_mammogram = AppointmentReportedMammogramFactory(
+                appointment=appointment,
                 **mammogram,
             )
             if created_at_date is not None:
-                participant_mammogram.created_at = created_at_date
-                participant_mammogram.save()
+                appointment_mammogram.created_at = created_at_date
+                appointment_mammogram.save()
 
-            return participant_mammogram
+            return appointment_mammogram
 
     def reset_db(self):
         MedicalInformationReview.objects.all().delete()
@@ -320,8 +323,8 @@ class Command(BaseCommand):
         OtherProcedureHistoryItem.objects.all().delete()
         BenignLumpHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
+        AppointmentReportedMammogram.objects.all().delete()
         Appointment.objects.all().delete()
-        ParticipantReportedMammogram.objects.all().delete()
         ScreeningEpisode.objects.all().delete()
         ParticipantAddress.objects.all().delete()
         Participant.objects.all().delete()

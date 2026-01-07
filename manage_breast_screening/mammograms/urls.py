@@ -229,26 +229,26 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/previous-mammograms/add",
-        participant_reported_mammogram_views.AddParticipantReportedMammogramView.as_view(),
+        participant_reported_mammogram_views.AddAppointmentReportedMammogramView.as_view(),
         name="add_previous_mammogram",
     ),
     path(
-        "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>",
-        participant_reported_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
+        "<uuid:pk>/previous-mammograms/<uuid:appointment_reported_mammogram_pk>",
+        participant_reported_mammogram_views.UpdateAppointmentReportedMammogramView.as_view(),
         name="change_previous_mammogram",
     ),
     path(
-        "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>/delete/",
-        participant_reported_mammogram_views.DeleteParticipantReportedMammogramView.as_view(),
+        "<uuid:pk>/previous-mammograms/<uuid:appointment_reported_mammogram_pk>/delete/",
+        participant_reported_mammogram_views.DeleteAppointmentReportedMammogramView.as_view(),
         name="delete_previous_mammogram",
     ),
     path(
-        "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>",
+        "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:appointment_reported_mammogram_pk>",
         mammogram_views.appointment_should_not_proceed,
         name="appointment_should_not_proceed",
     ),
     path(
-        "<uuid:pk>/proceed_anyway/<uuid:participant_reported_mammogram_pk>",
+        "<uuid:pk>/proceed_anyway/<uuid:appointment_reported_mammogram_pk>",
         mammogram_views.AppointmentProceedAnywayView.as_view(),
         name="proceed_anyway",
     ),

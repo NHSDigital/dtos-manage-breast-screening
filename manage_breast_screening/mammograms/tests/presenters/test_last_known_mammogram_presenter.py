@@ -7,25 +7,25 @@ import time_machine
 
 from manage_breast_screening.clinics.models import Provider
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
-from manage_breast_screening.participants.models import ParticipantReportedMammogram
+from manage_breast_screening.participants.models import AppointmentReportedMammogram
 
 
 class TestLastKnownMammogramPresenter:
     @pytest.fixture
     def reported_today(self):
-        return ParticipantReportedMammogram(
+        return AppointmentReportedMammogram(
             created_at=datetime(2025, 1, 1),
-            location_type=ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
+            location_type=AppointmentReportedMammogram.LocationType.ELSEWHERE_UK,
             location_details="Somewhere",
             exact_date=date(2022, 1, 1),
         )
 
     @pytest.fixture
     def reported_earlier(self):
-        return ParticipantReportedMammogram(
+        return AppointmentReportedMammogram(
             created_at=datetime(2022, 1, 1),
             provider=Provider(name="West of London BSS"),
-            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
             approx_date="3 years ago",
             additional_information="Abcd",
             different_name="Janet Williams",

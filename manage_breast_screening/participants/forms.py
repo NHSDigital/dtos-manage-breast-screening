@@ -11,7 +11,7 @@ from manage_breast_screening.nhsuk_forms.fields import (
 from manage_breast_screening.nhsuk_forms.fields.split_date_field import SplitDateField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 
-from .models import Ethnicity, ParticipantReportedMammogram
+from .models import AppointmentReportedMammogram, Ethnicity
 
 
 class EthnicityForm(forms.Form):
@@ -63,7 +63,7 @@ class EthnicityForm(forms.Form):
         self.participant.save()
 
 
-class ParticipantReportedMammogramForm(FormWithConditionalFields):
+class AppointmentReportedMammogramForm(FormWithConditionalFields):
     class WhenTaken(TextChoices):
         EXACT = (
             "EXACT",
@@ -115,13 +115,13 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         self.most_recent_provider = most_recent_provider
 
         location_choices = []
-        for value, label in ParticipantReportedMammogram.LocationType.choices:
+        for value, label in AppointmentReportedMammogram.LocationType.choices:
             if (
                 value
-                == ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+                == AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
             ):
                 label = f"At {most_recent_provider.name}"
-            elif value == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK:
+            elif value == AppointmentReportedMammogram.LocationType.ELSEWHERE_UK:
                 label = "Somewhere in the UK"
             location_choices.append((value, label))
 
@@ -139,7 +139,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             },
         )
         self.given_field_value(
-            "location_type", ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
+            "location_type", AppointmentReportedMammogram.LocationType.ELSEWHERE_UK
         ).require_field("somewhere_in_the_uk_details")
         self.fields["outside_the_uk_details"] = CharField(
             required=False,
@@ -150,7 +150,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             },
         )
         self.given_field_value(
-            "location_type", ParticipantReportedMammogram.LocationType.OUTSIDE_UK
+            "location_type", AppointmentReportedMammogram.LocationType.OUTSIDE_UK
         ).require_field("outside_the_uk_details")
 
         self.fields["when_taken"] = ChoiceField(
@@ -225,7 +225,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         if (
             instance.location_type
-            == ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+            == AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
         ):
             instance.provider = self.most_recent_provider
         else:
@@ -233,12 +233,12 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         if (
             instance.location_type
-            == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
+            == AppointmentReportedMammogram.LocationType.ELSEWHERE_UK
         ):
             instance.location_details = self.cleaned_data["somewhere_in_the_uk_details"]
         elif (
             instance.location_type
-            == ParticipantReportedMammogram.LocationType.OUTSIDE_UK
+            == AppointmentReportedMammogram.LocationType.OUTSIDE_UK
         ):
             instance.location_details = self.cleaned_data["outside_the_uk_details"]
         else:
@@ -247,8 +247,8 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
     def create(self, appointment):
         field_values = self.model_values()
 
-        instance = ParticipantReportedMammogram(
-            participant=self.participant,
+        instance = AppointmentReportedMammogram(
+            appointment=appointment,
             **field_values,
         )
 
@@ -256,7 +256,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         instance.save()
 
-        self.participant_reported_mammogram_pk = instance.pk
+        self.appointment_reported_mammogram_pk = instance.pk
 
         return instance
 
@@ -273,6 +273,6 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         )
         self.instance.save()
 
-        self.participant_reported_mammogram_pk = self.instance.pk
+        self.appointment_reported_mammogram_pk = self.instance.pk
 
         return self.instance

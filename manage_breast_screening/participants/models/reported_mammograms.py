@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import TextChoices
 
+from manage_breast_screening.participants.models.appointment import Appointment
+
 from ...core.models import BaseModel
 
 
@@ -19,7 +21,7 @@ class SupportReasons(TextChoices):
     OTHER = ("OTHER", "Other")
 
 
-class ParticipantReportedMammogram(BaseModel):
+class AppointmentReportedMammogram(BaseModel):
     class LocationType(models.TextChoices):
         NHS_BREAST_SCREENING_UNIT = (
             "NHS_BREAST_SCREENING_UNIT",
@@ -29,8 +31,8 @@ class ParticipantReportedMammogram(BaseModel):
         OUTSIDE_UK = "OUTSIDE_UK", "Outside the UK"
         PREFER_NOT_TO_SAY = "PREFER_NOT_TO_SAY", "Prefer not to say"
 
-    participant = models.ForeignKey(
-        "participants.Participant",
+    appointment = models.ForeignKey(
+        Appointment,
         on_delete=models.PROTECT,
         related_name="reported_mammograms",
     )

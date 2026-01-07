@@ -69,29 +69,6 @@ class ParticipantFactory(DjangoModelFactory):
     )
 
 
-class ParticipantReportedMammogramFactory(DjangoModelFactory):
-    class Meta:
-        model = models.ParticipantReportedMammogram
-
-    participant = SubFactory(ParticipantFactory)
-    location_type = (
-        models.ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
-    )
-    provider = SubFactory(ProviderFactory)
-
-    class Params:
-        outside_uk = Trait(
-            location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
-            location_details="france",
-            provider=None,
-        )
-        elsewhere_uk = Trait(
-            location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
-            location_details="private provider",
-            provider=None,
-        )
-
-
 class ScreeningEpisodeFactory(DjangoModelFactory):
     class Meta:
         model = models.ScreeningEpisode
@@ -176,6 +153,29 @@ class AppointmentNoteFactory(DjangoModelFactory):
 
     appointment = SubFactory(AppointmentFactory)
     content = Faker("sentence")
+
+
+class AppointmentReportedMammogramFactory(DjangoModelFactory):
+    class Meta:
+        model = models.AppointmentReportedMammogram
+
+    appointment = SubFactory(AppointmentFactory)
+    location_type = (
+        models.AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+    )
+    provider = SubFactory(ProviderFactory)
+
+    class Params:
+        outside_uk = Trait(
+            location_type=models.AppointmentReportedMammogram.LocationType.OUTSIDE_UK,
+            location_details="france",
+            provider=None,
+        )
+        elsewhere_uk = Trait(
+            location_type=models.AppointmentReportedMammogram.LocationType.ELSEWHERE_UK,
+            location_details="private provider",
+            provider=None,
+        )
 
 
 class MedicalInformationReviewFactory(DjangoModelFactory):

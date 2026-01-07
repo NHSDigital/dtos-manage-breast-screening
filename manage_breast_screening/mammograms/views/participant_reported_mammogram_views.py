@@ -9,8 +9,8 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
-from manage_breast_screening.participants.models import ParticipantReportedMammogram
+from manage_breast_screening.participants.forms import AppointmentReportedMammogramForm
+from manage_breast_screening.participants.models import AppointmentReportedMammogram
 from manage_breast_screening.participants.services import fetch_most_recent_provider
 from manage_breast_screening.participants.views import parse_return_url
 
@@ -19,8 +19,8 @@ from .mixins import InProgressAppointmentMixin
 logger = logging.getLogger(__name__)
 
 
-class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
-    form_class = ParticipantReportedMammogramForm
+class AppointmentReportedMammogramMixin(InProgressAppointmentMixin):
+    form_class = AppointmentReportedMammogramForm
     template_name = "mammograms/add_previous_mammogram.jinja"
     thing_name = "a previous mammogram"
     within_six_months = False
@@ -74,7 +74,7 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
                     "mammograms:appointment_should_not_proceed",
                     kwargs={
                         "appointment_pk": self.appointment.pk,
-                        "participant_reported_mammogram_pk": self.form.participant_reported_mammogram_pk,
+                        "appointment_reported_mammogram_pk": self.form.appointment_reported_mammogram_pk,
                     },
                 )
                 + f"?return_url={return_url}"
@@ -83,8 +83,8 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
             return return_url
 
 
-class AddParticipantReportedMammogramView(
-    ParticipantReportedMammogramMixin, AddWithAuditView
+class AddAppointmentReportedMammogramView(
+    AppointmentReportedMammogramMixin, AddWithAuditView
 ):
     def add_title(self, thing_name):
         return f"Add details of {thing_name}"
@@ -93,8 +93,8 @@ class AddParticipantReportedMammogramView(
         return {"appointment": self.appointment}
 
 
-class UpdateParticipantReportedMammogramView(
-    ParticipantReportedMammogramMixin, UpdateWithAuditView
+class UpdateAppointmentReportedMammogramView(
+    AppointmentReportedMammogramMixin, UpdateWithAuditView
 ):
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
@@ -104,10 +104,10 @@ class UpdateParticipantReportedMammogramView(
 
     def get_object(self):
         try:
-            return ParticipantReportedMammogram.objects.get(
-                pk=self.kwargs["participant_reported_mammogram_pk"],
+            return AppointmentReportedMammogram.objects.get(
+                pk=self.kwargs["appointment_reported_mammogram_pk"],
             )
-        except ParticipantReportedMammogram.DoesNotExist:
+        except AppointmentReportedMammogram.DoesNotExist:
             logger.exception(
                 "Participant reported mammogram does not exist for kwargs=%s",
                 self.kwargs,
@@ -120,8 +120,8 @@ class UpdateParticipantReportedMammogramView(
                 "mammograms:delete_previous_mammogram",
                 kwargs={
                     "pk": self.kwargs["pk"],
-                    "participant_reported_mammogram_pk": self.kwargs[
-                        "participant_reported_mammogram_pk"
+                    "appointment_reported_mammogram_pk": self.kwargs[
+                        "appointment_reported_mammogram_pk"
                     ],
                 },
             )
@@ -129,7 +129,7 @@ class UpdateParticipantReportedMammogramView(
         )
 
 
-class DeleteParticipantReportedMammogramView(
+class DeleteAppointmentReportedMammogramView(
     InProgressAppointmentMixin, DeleteWithAuditView
 ):
     def get_thing_name(self, object):
@@ -141,8 +141,8 @@ class DeleteParticipantReportedMammogramView(
     def get_object(self):
         provider = self.request.user.current_provider
         appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.participant.reported_mammograms.get(
-            pk=self.kwargs["participant_reported_mammogram_pk"]
+        return appointment.reported_mammograms.get(
+            pk=self.kwargs["appointment_reported_mammogram_pk"]
         )
 
     def get_success_url(self) -> str:

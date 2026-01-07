@@ -275,14 +275,14 @@ clinic:
                 - 480 Clinic Road
                 - Birmingham
               postcode: B7 1R6
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: c5887132-f2a3-4f27-85a8-0b47f79715bf
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-09-27'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: c5887132-f2a3-4f27-85a8-0b47f79715bf
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-09-27'
     - id: d1a81c62-a236-4d2b-af04-f3ca24a4500d
       duration_in_minutes: 8
       starts_at_time: '10:04'
@@ -361,14 +361,14 @@ clinic:
                 - 333 Clinic Road
                 - Birmingham
               postcode: M9 5P2
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 4289c3bc-4348-4602-8d09-9e06714d331e
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-02-14'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 4289c3bc-4348-4602-8d09-9e06714d331e
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-02-14'
     - id: 13b6af01-8d02-4b30-a32a-060432bcfeae
       duration_in_minutes: 8
       starts_at_time: '10:28'
@@ -395,14 +395,14 @@ clinic:
                 - 917 Clinic Road
                 - Leeds
               postcode: M7 3E5
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: dd4bff21-e7bd-42ac-921a-ced9c6606aea
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-03-17'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: dd4bff21-e7bd-42ac-921a-ced9c6606aea
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-03-17'
     - id: 7e434f3e-b325-4ae0-b023-30ee32e1ebef
       duration_in_minutes: 8
       starts_at_time: '10:36'
@@ -455,14 +455,14 @@ clinic:
                 - 793 Clinic Road
                 - Leeds
               postcode: L8 3S4
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: dca57987-2a6c-44b8-b60f-ea1031722c65
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-01-18'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: dca57987-2a6c-44b8-b60f-ea1031722c65
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-01-18'
     - id: 47089669-e102-44c4-bcaa-8b541756bcfb
       duration_in_minutes: 8
       starts_at_time: '10:52'
@@ -489,14 +489,14 @@ clinic:
                 - 296 Clinic Road
                 - Brighton
               postcode: M4 4G9
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 7563b743-f038-4000-8a5f-f55e9ce42842
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2019-11-24'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 7563b743-f038-4000-8a5f-f55e9ce42842
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2019-11-24'
     - id: 5c1aeebd-8256-49e5-9c28-a94a145afacf
       duration_in_minutes: 8
       starts_at_time: '11:00'
@@ -549,14 +549,14 @@ clinic:
                 - 12 Clinic Road
                 - Birmingham
               postcode: L3 7G9
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 349e09f9-e3c8-4341-87cc-8a1386f2d842
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-03-17'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 349e09f9-e3c8-4341-87cc-8a1386f2d842
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-03-17'
     - id: f181a6b9-2067-450f-bd0b-f8e7cd61d719
       duration_in_minutes: 8
       starts_at_time: '11:16'
@@ -661,14 +661,14 @@ clinic:
                 - 689 Clinic Road
                 - Brighton
               postcode: N7 9S8
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 9b9c5095-108a-440a-ab4d-9304f0778c78
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-01-01'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 9b9c5095-108a-440a-ab4d-9304f0778c78
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-01-01'
     - id: 7fbb98de-7dbd-4f9c-9126-b9cf07e73579
       duration_in_minutes: 8
       starts_at_time: '11:48'
@@ -773,14 +773,14 @@ clinic:
                 - 425 Clinic Road
                 - Brighton
               postcode: N9 4H1
-            previous_mammograms:
-              - location_type: NHS_BREAST_SCREENING_UNIT
-                provider:
-                  id: 76e81dd9-534f-478e-aafd-0c87b9fd2c45
-                  name: West Tester Hospital Trust
-                location_details: Radiology department
-                exact_date: '2025-01-17'
-                created_at: '2020-07-03'
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 76e81dd9-534f-478e-aafd-0c87b9fd2c45
+              name: West Tester Hospital Trust
+            location_details: Radiology department
+            exact_date: '2025-01-17'
+            created_at: '2020-07-03'
     - id: 8b2476ad-f3d5-44c4-a95f-87d4acef32dc
       duration_in_minutes: 8
       starts_at_time: '12:20'
