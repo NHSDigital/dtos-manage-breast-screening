@@ -146,6 +146,9 @@ class TestLogin(SystemTestCase):
                     "access_token": "fake-access-token",
                     "token_type": "Bearer",
                     "id_token": "fake-id-token",
+                    "userinfo": {
+                        "sub": "cis2-user-1",
+                    },
                 }
 
             def userinfo(self, token=None):

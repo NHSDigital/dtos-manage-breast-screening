@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
@@ -50,3 +52,24 @@ def test_post_persona_login(client):
     )
     assert response.status_code == 302
     assert response.headers["location"] == "/clinics/select-provider/?next=%2Fsome-url"
+
+
+@pytest.mark.django_db
+def test_cis2_callback_rejects_mismatched_sub(client, monkeypatch):
+    """Test that cis2_callback returns 400 when sub from userinfo doesn't match sub from ID token."""
+    mock_client = Mock()
+    mock_client.authorize_access_token.return_value = {
+        "userinfo": {"sub": "user-123"},
+        "access_token": "fake-token",
+    }
+    mock_client.userinfo.return_value = {"sub": "user-456"}
+
+    monkeypatch.setattr(
+        "manage_breast_screening.auth.views.get_cis2_client",
+        lambda: mock_client,
+    )
+
+    response = client.get(reverse("auth:cis2_callback"))
+
+    assert response.status_code == 400
+    assert b"Subject mismatch in CIS2 response" in response.content
