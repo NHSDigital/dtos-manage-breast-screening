@@ -11,9 +11,9 @@ from django.urls import reverse
 from playwright.sync_api import expect, sync_playwright
 
 from manage_breast_screening.auth.models import Role
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.core.utils.accessibility import AxeAdapter
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 @pytest.mark.system

@@ -7,13 +7,13 @@ from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     UpdateWithAuditView,
 )
 from manage_breast_screening.users.models import User
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 def apply_middleware(request):
@@ -26,6 +26,7 @@ def apply_middleware(request):
 class DummyForm(forms.Form):
     first_name = forms.CharField()
     last_name = forms.CharField()
+    email = forms.CharField()
 
     def __init__(self, *args, instance=None, **kwargs):
         self.instance = instance
@@ -36,6 +37,7 @@ class DummyForm(forms.Form):
             first_name=self.cleaned_data["first_name"],
             last_name=self.cleaned_data["last_name"],
             nhs_uid="create_uid",
+            email=self.cleaned_data["email"],
         )
 
     def update(self):
@@ -43,6 +45,7 @@ class DummyForm(forms.Form):
             first_name=self.cleaned_data["first_name"],
             last_name=self.cleaned_data["last_name"],
             nhs_uid="update_uid",
+            email=self.cleaned_data["email"],
         )
 
 
@@ -75,7 +78,9 @@ class TestAddWithAuditView:
     def test_audits_if_form_valid(self):
         request = apply_middleware(RequestFactory().post("/"))
         request.user = UserFactory()
-        form = DummyForm({"first_name": "abc", "last_name": "def"})
+        form = DummyForm(
+            {"first_name": "abc", "last_name": "def", "email": "test@example.com"}
+        )
 
         assert form.is_valid()
         AddView(request=request).form_valid(form)
@@ -86,7 +91,7 @@ class TestAddWithAuditView:
         assert last_audit.actor == request.user
         assert last_audit.operation == AuditLog.Operations.CREATE
         assert last_audit.snapshot == {
-            "email": "",
+            "email": "test@example.com",
             "first_name": "abc",
             "last_name": "def",
             "is_staff": False,
@@ -118,7 +123,9 @@ class TestUpdateWithAuditView:
     def test_audits_if_form_valid(self):
         request = apply_middleware(RequestFactory().post("/"))
         request.user = UserFactory()
-        form = DummyForm({"first_name": "new", "last_name": "name"})
+        form = DummyForm(
+            {"first_name": "new", "last_name": "name", "email": "test@example.com"}
+        )
 
         assert form.is_valid()
         UpdateView(request=request).form_valid(form)
@@ -129,7 +136,7 @@ class TestUpdateWithAuditView:
         assert last_audit.actor == request.user
         assert last_audit.operation == AuditLog.Operations.UPDATE
         assert last_audit.snapshot == {
-            "email": "",
+            "email": "test@example.com",
             "first_name": "new",
             "last_name": "name",
             "is_staff": False,

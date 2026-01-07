@@ -2,8 +2,8 @@ from django.urls import reverse
 from playwright.sync_api import expect
 
 from manage_breast_screening.auth.models import CLINICAL_PERSONA
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
+from manage_breast_screening.users.tests.factories import UserFactory
 
 from ..system_test_setup import SystemTestCase
 

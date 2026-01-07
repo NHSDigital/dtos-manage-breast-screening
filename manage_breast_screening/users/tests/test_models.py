@@ -1,5 +1,5 @@
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import ProviderFactory
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 class TestUser:
