@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
 )
@@ -15,6 +16,8 @@ class BreastCancerHistoryItemPresenter:
 
         self.right_breast_procedure = self._item.get_right_breast_procedure_display()
         self.left_breast_procedure = self._item.get_left_breast_procedure_display()
+
+        self.diagnosis_year = format_year_with_relative(self._item.diagnosis_year)
 
         self.right_breast_other_surgery = [
             BreastCancerHistoryItem.Surgery(choice).label
