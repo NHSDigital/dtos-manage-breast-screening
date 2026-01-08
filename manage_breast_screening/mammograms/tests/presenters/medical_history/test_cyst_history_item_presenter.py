@@ -1,3 +1,5 @@
+import pytest
+
 from manage_breast_screening.mammograms.presenters.medical_history.cyst_history_item_presenter import (
     CystHistoryItemPresenter,
 )
@@ -8,13 +10,22 @@ from manage_breast_screening.participants.tests.factories import CystHistoryItem
 
 
 class TestCystHistoryItemPresenter:
-    def test_single(self):
-        item = CystHistoryItemFactory.build(
+    @pytest.fixture
+    def item(self):
+        return CystHistoryItemFactory.build(
             treatment=CystHistoryItem.Treatment.NO_TREATMENT,
             additional_details="Some additional details",
         )
 
-        presenter = CystHistoryItemPresenter(item)
+    @pytest.fixture
+    def presenter(self, item):
+        return CystHistoryItemPresenter(item)
+
+    def test_attributes(self, presenter):
+        assert presenter.treatment == "No treatment"
+        assert presenter.additional_details == "Some additional details"
+
+    def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [
                 {

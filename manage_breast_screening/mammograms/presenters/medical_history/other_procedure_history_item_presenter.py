@@ -1,6 +1,9 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import nl2br
+from manage_breast_screening.core.utils.date_formatting import (
+    format_year_with_relative,
+)
 
 
 class OtherProcedureHistoryItemPresenter:
@@ -10,8 +13,12 @@ class OtherProcedureHistoryItemPresenter:
 
         self.procedure = self._item.get_procedure_display()
         self.procedure_details = self._item.procedure_details or "N/A"
-        self.procedure_year = str(self._item.procedure_year)
+        self.procedure_year = format_year_with_relative(self._item.procedure_year)
         self.additional_details = nl2br(self._item.additional_details)
+
+    @property
+    def procedure_with_details(self):
+        return f"{self.procedure}: {self.procedure_details}"
 
     @property
     def summary_list_params(self):

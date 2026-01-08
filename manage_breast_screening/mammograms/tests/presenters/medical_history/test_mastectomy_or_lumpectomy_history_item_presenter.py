@@ -1,4 +1,7 @@
+from datetime import date
+
 import pytest
+import time_machine
 
 from manage_breast_screening.mammograms.presenters.medical_history.mastectomy_or_lumpectomy_history_item_presenter import (
     MastectomyOrLumpectomyHistoryItemPresenter,
@@ -29,6 +32,7 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
         )
 
     @pytest.fixture
+    @time_machine.travel(date(2025, 1, 1))
     def presenter(self, item):
         return MastectomyOrLumpectomyHistoryItemPresenter(item)
 
@@ -37,7 +41,7 @@ class TestMastectomyOrLumpectomyHistoryItemPresenter:
         assert presenter.left_breast_procedure == "No procedure"
         assert presenter.right_breast_other_surgery == ["Reconstruction"]
         assert presenter.left_breast_other_surgery == ["No other surgery"]
-        assert presenter.year_of_surgery == "2018"
+        assert presenter.year_of_surgery == "2018 (7 years ago)"
         assert presenter.surgery_reason == "Risk reduction"
         assert presenter.additional_details == "Right mastectomy with reconstruction"
 

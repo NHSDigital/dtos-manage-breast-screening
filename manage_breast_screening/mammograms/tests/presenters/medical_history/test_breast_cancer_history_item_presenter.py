@@ -1,4 +1,7 @@
+from datetime import date
+
 import pytest
+import time_machine
 
 from manage_breast_screening.mammograms.presenters.medical_history.breast_cancer_history_item_presenter import (
     BreastCancerHistoryItemPresenter,
@@ -16,6 +19,7 @@ class TestBreastCancerHistoryItemPresenter:
     def item(self):
         return BreastCancerHistoryItemFactory.build(
             diagnosis_location=BreastCancerHistoryItem.DiagnosisLocationChoices.RIGHT_BREAST,
+            diagnosis_year=2000,
             right_breast_procedure=BreastCancerHistoryItem.Procedure.LUMPECTOMY,
             intervention_location=BreastCancerHistoryItem.InterventionLocation.NHS_HOSPITAL,
             intervention_location_details="East Tester Hospital",
@@ -23,9 +27,11 @@ class TestBreastCancerHistoryItemPresenter:
         )
 
     @pytest.fixture
+    @time_machine.travel(date(2025, 1, 1))
     def presenter(self, item):
         return BreastCancerHistoryItemPresenter(item)
 
+    @time_machine.travel(date(2025, 1, 1))
     def test_attributes(self, presenter):
         assert presenter.cancer_location == "Right breast"
         assert presenter.right_breast_procedure == "Lumpectomy"
@@ -36,6 +42,7 @@ class TestBreastCancerHistoryItemPresenter:
         assert presenter.left_breast_treatments == ["No radiotherapy"]
         assert presenter.systemic_treatments == ["No systemic treatments"]
         assert presenter.additional_details == "some details"
+        assert presenter.diagnosis_year == "2000 (25 years ago)"
 
     def test_change_link(self):
         item = BreastCancerHistoryItemFactory.build()

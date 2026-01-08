@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
@@ -11,13 +12,16 @@ class BreastAugmentationHistoryItemPresenter:
         self._item = breast_augmentation_history_item
         self.counter = counter
 
-        self.right_breast_procedures = self._format_multiple_choices(
-            self._item.right_breast_procedures, BreastAugmentationHistoryItem.Procedure
-        )
-        self.left_breast_procedures = self._format_multiple_choices(
-            self._item.left_breast_procedures, BreastAugmentationHistoryItem.Procedure
-        )
-        self.procedure_year = str(self._item.procedure_year)
+        self.right_breast_procedures = [
+            BreastAugmentationHistoryItem.Procedure(choice).label
+            for choice in self._item.right_breast_procedures
+        ]
+        self.left_breast_procedures = [
+            BreastAugmentationHistoryItem.Procedure(choice).label
+            for choice in self._item.left_breast_procedures
+        ]
+
+        self.procedure_year = format_year_with_relative(self._item.procedure_year)
         self.implants_have_been_removed = (
             "Yes" if self._item.implants_have_been_removed else "No"
         )
@@ -31,8 +35,8 @@ class BreastAugmentationHistoryItemPresenter:
         # This is a placeholder until we have a properly formatted table.
 
         procedures = [
-            f"Right breast: {self.right_breast_procedures}",
-            f"Left breast: {self.left_breast_procedures}",
+            f"Right breast: {', '.join(self.right_breast_procedures)}",
+            f"Left breast: {', '.join(self.left_breast_procedures)}",
         ]
 
         return {
@@ -57,9 +61,6 @@ class BreastAugmentationHistoryItemPresenter:
                 },
             ],
         }
-
-    def _format_multiple_choices(self, choices, ChoiceClass):
-        return ", ".join(ChoiceClass(choice).label for choice in choices)
 
     @property
     def change_link(self):

@@ -44,6 +44,42 @@ def format_relative_date(value: datetime | date):
         return f"in {amount}"
 
 
+def format_relative_year(value: int | None):
+    """
+    Format a year value relative to the current year.
+
+    Use it for approximate dates where only the year is known.
+    """
+    if value is None or not 1900 < value < 2100:
+        return ""
+
+    year_diff = date.today().year - value
+    if year_diff == 0:
+        return "this year"
+    elif year_diff == 1:
+        return "last year"
+    elif year_diff == -1:
+        return "next year"
+    elif year_diff > 1:
+        return f"{year_diff} years ago"
+    elif year_diff < 1:
+        return f"in {abs(year_diff)} years"
+
+
+def format_year_with_relative(value: int | None):
+    """
+    Format a year with the relative number of years in brackets
+    """
+    if value is None:
+        return ""
+
+    relative = format_relative_year(value)
+    if relative:
+        return f"{value} ({relative})"
+    else:
+        return str(value)
+
+
 def _format_date_difference(date1, date2):
     diff = relativedelta(date1, date2) if date1 > date2 else relativedelta(date2, date1)
 

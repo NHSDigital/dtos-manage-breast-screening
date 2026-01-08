@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
@@ -17,16 +18,17 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
         self.right_breast_procedure = self._item.get_right_breast_procedure_display()
         self.left_breast_procedure = self._item.get_left_breast_procedure_display()
 
-        self.right_breast_other_surgery = self._format_multiple_choices(
-            self._item.right_breast_other_surgery,
-            MastectomyOrLumpectomyHistoryItem.Surgery,
-        )
-        self.left_breast_other_surgery = self._format_multiple_choices(
-            self._item.left_breast_other_surgery,
-            MastectomyOrLumpectomyHistoryItem.Surgery,
-        )
+        self.right_breast_other_surgery = [
+            MastectomyOrLumpectomyHistoryItem.Surgery(choice).label
+            for choice in self._item.right_breast_other_surgery
+        ]
+        self.left_breast_other_surgery = [
+            MastectomyOrLumpectomyHistoryItem.Surgery(choice).label
+            for choice in self._item.left_breast_other_surgery
+        ]
+
         self.year_of_surgery = (
-            str(self._item.year_of_surgery)
+            format_year_with_relative(self._item.year_of_surgery)
             if self._item.year_of_surgery
             else "Not specified"
         )
@@ -45,9 +47,6 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
             return multiline_content([reason, f"Details: {details}"])
         else:
             return reason
-
-    def _format_multiple_choices(self, choices, ChoiceClass):
-        return [ChoiceClass(choice).label for choice in choices]
 
     @property
     def change_link(self):

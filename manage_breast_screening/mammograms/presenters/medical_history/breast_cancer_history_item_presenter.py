@@ -1,6 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import nl2br
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
     BreastCancerHistoryItem,
 )
@@ -16,26 +17,32 @@ class BreastCancerHistoryItemPresenter:
         self.right_breast_procedure = self._item.get_right_breast_procedure_display()
         self.left_breast_procedure = self._item.get_left_breast_procedure_display()
 
-        self.right_breast_other_surgery = self._format_multiple_choices(
-            self._item.right_breast_other_surgery, BreastCancerHistoryItem.Surgery
-        )
-        self.left_breast_other_surgery = self._format_multiple_choices(
-            self._item.left_breast_other_surgery, BreastCancerHistoryItem.Surgery
-        )
-        self.right_breast_treatments = self._format_multiple_choices(
-            self._item.right_breast_treatment, BreastCancerHistoryItem.Treatment
-        )
-        self.left_breast_treatments = self._format_multiple_choices(
-            self._item.left_breast_treatment, BreastCancerHistoryItem.Treatment
-        )
-        self.systemic_treatments = self._format_multiple_choices(
-            self._item.systemic_treatments,
-            BreastCancerHistoryItem.SystemicTreatment,
-        )
-        self.additional_details = nl2br(self._item.additional_details)
+        self.diagnosis_year = format_year_with_relative(self._item.diagnosis_year)
 
-    def _format_multiple_choices(self, choices, ChoiceClass):
-        return [ChoiceClass(choice).label for choice in choices]
+        self.right_breast_other_surgery = [
+            BreastCancerHistoryItem.Surgery(choice).label
+            for choice in self._item.right_breast_other_surgery
+        ]
+        self.left_breast_other_surgery = [
+            BreastCancerHistoryItem.Surgery(choice).label
+            for choice in self._item.left_breast_other_surgery
+        ]
+
+        self.right_breast_treatments = [
+            BreastCancerHistoryItem.Treatment(choice).label
+            for choice in self._item.right_breast_treatment
+        ]
+        self.left_breast_treatments = [
+            BreastCancerHistoryItem.Treatment(choice).label
+            for choice in self._item.left_breast_treatment
+        ]
+
+        self.systemic_treatments = [
+            BreastCancerHistoryItem.SystemicTreatment(choice).label
+            for choice in self._item.systemic_treatments
+        ]
+
+        self.additional_details = nl2br(self._item.additional_details)
 
     @property
     def change_link(self):
