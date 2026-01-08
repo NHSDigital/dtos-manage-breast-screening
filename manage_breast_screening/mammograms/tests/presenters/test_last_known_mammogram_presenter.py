@@ -43,9 +43,10 @@ class TestLastKnownMammogramPresenter:
 
     @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
     def test_last_known_mammograms_single(self, reported_today):
+        appointment_pk = uuid4()
         result = LastKnownMammogramPresenter(
             [reported_today],
-            appointment_pk=uuid4(),
+            appointment_pk=appointment_pk,
             current_url="/mammograms/abc",
         )
 
@@ -60,14 +61,20 @@ class TestLastKnownMammogramPresenter:
                 },
                 "different_name": "",
                 "location": "In the UK: Somewhere",
+                "change_link": {
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}?return_url=/mammograms/abc",
+                    "text": "Change",
+                    "visually_hidden_text": " mammogram item",
+                },
             },
         ]
 
     @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
     def test_last_known_mammograms_multiple(self, reported_today, reported_earlier):
+        appointment_pk = uuid4()
         result = LastKnownMammogramPresenter(
             [reported_today, reported_earlier],
-            appointment_pk=uuid4(),
+            appointment_pk=appointment_pk,
             current_url="/mammograms/abc",
         )
 
@@ -82,6 +89,11 @@ class TestLastKnownMammogramPresenter:
                 },
                 "different_name": "",
                 "location": "In the UK: Somewhere",
+                "change_link": {
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}?return_url=/mammograms/abc",
+                    "text": "Change",
+                    "visually_hidden_text": " mammogram item 1",
+                },
             },
             {
                 "date_added": "3 years ago",
@@ -91,6 +103,11 @@ class TestLastKnownMammogramPresenter:
                 },
                 "different_name": "Janet Williams",
                 "location": "West of London BSS",
+                "change_link": {
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_earlier.pk}?return_url=/mammograms/abc",
+                    "text": "Change",
+                    "visually_hidden_text": " mammogram item 2",
+                },
             },
         ]
 

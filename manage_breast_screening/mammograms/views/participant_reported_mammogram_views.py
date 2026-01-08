@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
+    DeleteWithAuditView,
     UpdateWithAuditView,
 )
 from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
@@ -99,6 +100,9 @@ class UpdateParticipantReportedMammogramView(
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
 
+    def confirm_delete_link_text(self, thing_name):
+        return "Delete this item"
+
     def get_object(self):
         try:
             return ParticipantReportedMammogram.objects.get(
@@ -110,3 +114,43 @@ class UpdateParticipantReportedMammogramView(
                 self.kwargs,
             )
             return None
+
+    def get_delete_url(self):
+        return (
+            reverse(
+                "mammograms:delete_previous_mammogram",
+                kwargs={
+                    "pk": self.kwargs["pk"],
+                    "participant_reported_mammogram_pk": self.kwargs[
+                        "participant_reported_mammogram_pk"
+                    ],
+                },
+            )
+            + f"?return_url={self.request.GET.get('return_url', '')}"
+        )
+
+
+class DeleteParticipantReportedMammogramView(
+    InProgressAppointmentMixin, DeleteWithAuditView
+):
+    def get_thing_name(self, object):
+        return "item"
+
+    def get_success_message_content(self, object):
+        return "Deleted other procedure"
+
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.participant.reported_mammograms.get(
+            pk=self.kwargs["participant_reported_mammogram_pk"]
+        )
+
+    def get_success_url(self) -> str:
+        return parse_return_url(
+            self.request,
+            default=reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment.pk},
+            ),
+        )

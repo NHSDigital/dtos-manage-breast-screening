@@ -5,8 +5,10 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 
 
 @pytest.fixture
-def appointment():
-    return AppointmentFactory.create()
+def appointment(clinical_user_client):
+    return AppointmentFactory.create(
+        clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    )
 
 
 @pytest.fixture
