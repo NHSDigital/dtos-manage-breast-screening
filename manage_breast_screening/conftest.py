@@ -4,8 +4,8 @@ from unittest import TestCase
 import pytest
 from django.test.client import Client
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
+from manage_breast_screening.users.tests.factories import UserFactory
 
 # Show long diffs in failed test output
 TestCase.maxDiff = None

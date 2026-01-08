@@ -6,7 +6,6 @@ import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.models import Clinic
 from manage_breast_screening.clinics.tests.factories import ClinicFactory
 from manage_breast_screening.core.utils.date_formatting import format_date, format_time
@@ -16,6 +15,7 @@ from manage_breast_screening.core.utils.string_formatting import (
 )
 from manage_breast_screening.participants.models import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.users.tests.factories import UserFactory
 
 from ..system_test_setup import SystemTestCase
 

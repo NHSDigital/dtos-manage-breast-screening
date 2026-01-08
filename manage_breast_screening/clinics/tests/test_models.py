@@ -8,13 +8,13 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics import models
+from manage_breast_screening.users.tests.factories import UserFactory
 
 from .factories import (
     ClinicFactory,
     ClinicSlotFactory,
     ProviderFactory,
     UserAssignmentFactory,
-    UserFactory,
 )
 
 

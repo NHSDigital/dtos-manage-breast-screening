@@ -1,7 +1,9 @@
 import pytest
 from django.urls import reverse
 
-from .factories import ProviderFactory, UserAssignmentFactory, UserFactory
+from manage_breast_screening.users.tests.factories import UserFactory
+
+from .factories import ProviderFactory, UserAssignmentFactory
 
 
 class TestSelectProvider:

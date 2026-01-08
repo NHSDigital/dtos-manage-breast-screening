@@ -13,7 +13,6 @@ from factory.declarations import (
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
@@ -31,6 +30,7 @@ from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 from .. import models
 

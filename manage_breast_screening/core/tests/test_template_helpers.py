@@ -7,13 +7,13 @@ from django.utils.safestring import mark_safe
 from markupsafe import Markup
 from pytest_django.asserts import assertHTMLEqual
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.core.template_helpers import (
     get_notification_banner_params,
     header_account_items,
     message_with_heading,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db

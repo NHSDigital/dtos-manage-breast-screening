@@ -2,13 +2,13 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models import MedicalInformationReview
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     MedicalInformationReviewFactory,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db

@@ -9,11 +9,11 @@ from django.urls import reverse
 from django.utils import timezone
 from playwright.sync_api import expect
 
-from manage_breast_screening.auth.tests.factories import UserFactory
 from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
     UserAssignmentFactory,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 from ..system_test_setup import SystemTestCase
 
