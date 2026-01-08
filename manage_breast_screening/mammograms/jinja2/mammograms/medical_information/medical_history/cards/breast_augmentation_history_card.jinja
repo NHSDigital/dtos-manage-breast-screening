@@ -1,0 +1,66 @@
+{% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
+{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, item_with_details, paragraph %}
+
+{% macro breast_augmentation_history_card(breast_augmentation_history) %}
+  {% if breast_augmentation_history %}
+  <section>
+    <h3 class="nhsuk-u-margin-bottom-2">Breast implants or augmentation</h3>
+  {% endif %}
+
+  {% for presented_item in breast_augmentation_history %}
+    {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
+
+    <!-- This will be replaced with the card's actions param, once the card updates are released. -->
+    <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href }}">
+      {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
+    </a>
+
+    {{ app_nested_info_card({
+      "card": {
+        "heading": "Item " ~ presented_item.counter,
+        "headingLevel": 4,
+        "classes": "nhsuk-u-margin-bottom-4"
+      } if presented_item.counter else {
+        "classes": "nhsuk-u-margin-bottom-4"
+      },
+      "headingLevel": keyHeadingLevel,
+      "rows": [
+        {
+          "key": "Procedures",
+          "value": {
+            "rows": [
+              {
+                "columns": [
+                  {
+                    "heading": "Right breast",
+                    "html": list_with_default(presented_item.right_breast_procedures)
+                  },
+                  {
+                    "heading": "Left breast",
+                    "html": list_with_default(presented_item.left_breast_procedures)
+                  },
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "key": "Procedure year",
+          "value": {
+            "html": paragraph(presented_item.procedure_year_with_removal)
+          }
+        } if presented_item.procedure_year_with_removal,
+        {
+          "key": "Additional details",
+          "value": {
+            "html": paragraph(presented_item.additional_details)
+          }
+        } if presented_item.additional_details
+      ]
+    }) }}
+  {% endfor %}
+
+  {% if breast_augmentation_history %}
+  </section>
+  {% endif %}
+{% endmacro %}
