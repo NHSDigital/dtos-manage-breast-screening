@@ -1,3 +1,6 @@
+from datetime import date
+
+import time_machine
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -12,6 +15,7 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@time_machine.travel(date(2025, 1, 1))
 class TestImplantedMedicalDeviceHistory(SystemTestCase):
     def test_adding_and_changing_device(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -120,14 +124,18 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
 
     def and_the_device_is_listed(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Implanted medical device history", exact=True),
+        heading = self.page.get_by_role("heading").filter(
+            has_text="Implanted medical device"
         )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        section = self.page.locator("section").filter(has=heading)
+
+        row = section.locator(".app-nested-info__row", has_text="Type")
         expect(row).to_contain_text("Hickman line")
-        expect(row).to_contain_text("2000")
-        expect(row).to_contain_text("Yes (2025)")
+
+        row = section.locator(".app-nested-info__row", has_text="Procedure year")
+        expect(row).to_contain_text("Implanted in 2000 (25 years ago)")
+
+        row = section.locator(".app-nested-info__row", has_text="Additional details")
         expect(row).to_contain_text(
             "additional details for test of implanted medical device history"
         )
@@ -153,11 +161,12 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         ).click()
 
     def and_the_implanted_medical_device_is_updated(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Implanted medical device history", exact=True),
+        heading = self.page.get_by_role("heading").filter(
+            has_text="Implanted medical device"
         )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        section = self.page.locator("section").filter(has=heading)
+
+        row = section.locator(".app-nested-info__row", has_text="Type")
         expect(row).to_contain_text("Cardiac device (such as a pacemaker or ICD)")
 
     def and_the_message_says_implanted_medical_device_updated(self):

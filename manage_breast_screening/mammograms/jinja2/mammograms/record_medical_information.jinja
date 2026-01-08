@@ -4,6 +4,7 @@
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "mammograms/medical_information/medical_history/cards/breast_augmentation_history_card.jinja" import breast_augmentation_history_card %}{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
 {% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/implanted_medical_device_history_card.jinja" import implanted_medical_device_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/benign_lump_history_card.jinja" import benign_lump_history_card %}
 {% from "mammograms/components/card_with_status.jinja" import card_with_status %}
@@ -82,16 +83,6 @@
   action_button_properties=presenter.review_action_button_properties(sections.MEDICAL_HISTORY),
   csrf_input=csrf_input,
   ) %}
-
-  {% set implanted_medical_device_history_html %}
-    {% for presented_item in presenter.implanted_medical_device_history %}
-      <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href}}">
-        {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
-      </a><br>
-      {{ summaryList(presented_item.summary_list_params) }}
-    {% endfor %}
-  {% endset %}
-
   {% set other_procedure_history_html %}
     {% for presented_item in presenter.other_procedure_history %}
       <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href}}">
@@ -112,19 +103,12 @@
 
   {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
   {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
+  {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
   {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
   {{ benign_lump_history_card(presenter.benign_lump_history) }}
 
   {{ summaryList({
     "rows": [
-     {
-       "key": {
-         "text": "Implanted medical device history"
-       },
-       "value": {
-         "html": implanted_medical_device_history_html
-       }
-     },
      {
        "key": {
          "text": "Cyst history"
