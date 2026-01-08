@@ -11,5 +11,5 @@ vnet_address_space                    = "10.11.0.0/16"
 enable_alerting                       = true
 use_apex_domain                       = true
 cae_zone_redundancy_enabled           = true
-enable_notifications_jobs_schedule    = true
+enable_notifications_jobs_schedule    = false
 min_replicas                          = 2
