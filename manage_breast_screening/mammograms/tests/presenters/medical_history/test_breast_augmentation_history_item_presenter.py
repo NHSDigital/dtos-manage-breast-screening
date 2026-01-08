@@ -45,7 +45,7 @@ class TestBreastAugmentationHistoryItemPresenter:
     @time_machine.travel(date(2025, 1, 1))
     def test_procedure_year_with_removal(self, presenter):
         assert presenter.procedure_year_with_removal == (
-            "Implanted in 2000 (25 years ago)<br>Device removed in 2018 (7 years ago)"
+            "Implanted in 2000 (25 years ago)<br>Implants removed in 2018 (7 years ago)"
         )
 
     @time_machine.travel(date(2025, 1, 1))

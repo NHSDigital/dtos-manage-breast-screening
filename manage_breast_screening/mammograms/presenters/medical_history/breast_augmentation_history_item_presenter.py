@@ -41,9 +41,9 @@ class BreastAugmentationHistoryItemPresenter:
     def procedure_year_with_removal(self):
         lines = [f"Implanted in {self.procedure_year}"]
         if self._item.removal_year:
-            lines.append(f"Device removed in {self.removal_year}")
+            lines.append(f"Implants removed in {self.removal_year}")
         elif self._item.device_has_been_removed:
-            lines.append("Device removed")
+            lines.append("Implants removed")
 
         return multiline_content(lines)
 
