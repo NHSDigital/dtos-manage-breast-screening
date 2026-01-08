@@ -43,6 +43,12 @@ class TestBreastAugmentationHistoryItemPresenter:
         assert presenter.additional_details == "some details"
 
     @time_machine.travel(date(2025, 1, 1))
+    def test_procedure_year_with_removal(self, presenter):
+        assert presenter.procedure_year_with_removal == (
+            "Implanted in 2000 (25 years ago)<br>Device removed in 2018 (7 years ago)"
+        )
+
+    @time_machine.travel(date(2025, 1, 1))
     def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [

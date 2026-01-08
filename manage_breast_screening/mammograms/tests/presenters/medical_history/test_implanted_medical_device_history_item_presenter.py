@@ -39,7 +39,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
         assert presenter.additional_details == "Some additional details"
 
     @time_machine.travel(date(2025, 1, 1))
-    def test_year_text(self, presenter):
+    def test_procedure_year_with_removal(self, presenter):
         assert presenter.procedure_year_with_removal == (
             "Implanted in 2020 (5 years ago)<br>Device removed in 2022 (3 years ago)"
         )
