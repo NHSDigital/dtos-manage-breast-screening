@@ -40,7 +40,15 @@
                     "html": list_with_default(presented_item.left_breast_procedures)
                   },
                 ]
-              }
+              },
+              {
+                "columns": [
+                  {
+                    "html": paragraph("Implants have been removed")
+                  }
+                ]
+
+              } if presented_item.implants_have_been_removed
             ]
           }
         },
