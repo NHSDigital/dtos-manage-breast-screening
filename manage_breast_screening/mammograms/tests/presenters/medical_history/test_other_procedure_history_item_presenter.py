@@ -31,10 +31,10 @@ class TestOtherProcedureHistoryItemPresenter:
 
     @time_machine.travel(date(2025, 1, 1))
     def test_attributes(self, presenter):
-        assert (
-            presenter.procedure_with_details
-            == "Breast reduction: Lorem ipsum dolor sit amet"
-        )
+        assert presenter.type == {
+            "type": "Breast reduction",
+            "details": "Lorem ipsum dolor sit amet",
+        }
         assert presenter.procedure_year == "2020 (5 years ago)"
         assert presenter.additional_details == "Some additional details"
 
