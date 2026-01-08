@@ -1,0 +1,62 @@
+{% extends 'layout-app.jinja' %}
+{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
+{% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
+{% from 'components/appointment-header/macro.jinja' import app_appointment_header %}
+{% from 'components/check-in/macro.jinja' import app_check_in %}
+{% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
+{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
+{% from 'django_form_helpers.jinja' import form_error_summary %}
+
+{% block beforeContent %}
+{{ backLink({
+  "href": presented_appointment.clinic_url,
+  "text": "Back to clinic"
+}) }}
+
+{% endblock beforeContent %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-full">
+
+    {{ form_error_summary(form) }}
+
+    <div class="app-header">
+        <h1 class="nhsuk-heading-l">
+        <span class="nhsuk-caption-l">
+            {{ caption }}
+        </span>
+        {{ heading }}
+        </h1>
+
+        <div class="app-header__status-tag">
+        {{ app_appointment_status(presented_appointment) }}
+        <p class="nhsuk-u-margin-bottom-2">
+            {{ app_check_in(
+            presented_appointment,
+            check_in_url=url(
+                'mammograms:check_in',
+                kwargs={
+                'pk': presented_appointment.pk,
+                }
+            ),
+            csrf_input=csrf_input
+            ) }}
+        </p>
+        </div>
+    </div>
+
+    {{ app_appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
+
+    {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
+
+    {{ app_secondary_navigation({
+        "visuallyHiddenTitle": "Secondary menu",
+        "items": secondary_nav_items
+    }) }}
+
+    {% block tab_content %}
+    {% endblock tab_content %}
+  </div>
+</div>
+{% endblock %}

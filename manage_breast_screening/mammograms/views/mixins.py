@@ -1,5 +1,6 @@
 from functools import cached_property
 
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -47,6 +48,26 @@ class AppointmentMixin:
         )
 
         return context
+
+
+class AppointmentTabMixin(AppointmentMixin):
+    """
+    A view that by the tabs on the appointment page.
+    If the appointment is in progress with another user then display a message.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        current_status = self.appointment.current_status
+        if (
+            current_status.is_in_progress()
+            and self.request.user.nhs_uid != current_status.created_by.nhs_uid
+        ):
+            messages.add_message(
+                request,
+                messages.INFO,
+                f"This appointment is currently being run by {current_status.created_by.get_short_name()}.",
+            )
+        return super().dispatch(request, *args, **kwargs)
 
 
 class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
