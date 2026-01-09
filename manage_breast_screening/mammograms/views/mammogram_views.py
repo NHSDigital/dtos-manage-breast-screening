@@ -59,7 +59,6 @@ def appointment_should_not_proceed(
             "heading": "This appointment should not proceed",
             "back_link_params": {
                 "href": change_previous_mammogram_url,
-                "text": "Go back",
             },
             "appointment": AppointmentPresenter(appointment),
             "time_since_previous_mammogram": format_relative_date(exact_date),

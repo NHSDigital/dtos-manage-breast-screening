@@ -39,7 +39,6 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
             {
                 "back_link_params": {
                     "href": self.get_success_url(),
-                    "text": "Back",
                 },
                 "caption": participant.full_name,
                 "return_url": self.request.GET.get("return_url", ""),
