@@ -69,7 +69,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
 
         self.when_i_click_change()
-        self.and_i_click_delete_this_item()
+        self.and_i_click_delete_this_mammogram()
         self.and_i_click_delete_item()
         self.then_i_should_be_back_on_the_appointment()
         self.and_the_previous_mammogram_is_gone()
@@ -284,8 +284,8 @@ class TestAddingPreviousMammograms(SystemTestCase):
         ).to_be_visible()
         self.assert_page_title_contains("Edit details of a previous mammogram")
 
-    def and_i_click_delete_this_item(self):
-        self.page.get_by_text("Delete this item").click()
+    def and_i_click_delete_this_mammogram(self):
+        self.page.get_by_text("Delete this mammogram").click()
 
     def and_i_click_delete_item(self):
         self.page.get_by_text("Delete item").click()
