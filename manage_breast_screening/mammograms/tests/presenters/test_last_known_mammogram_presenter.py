@@ -29,6 +29,7 @@ class TestLastKnownMammogramPresenter:
             approx_date="3 years ago",
             additional_information="Abcd",
             different_name="Janet Williams",
+            reason_for_continuing="A reason",
         )
 
     @time_machine.travel(datetime(2025, 1, 1, tzinfo=tz.utc))
@@ -66,6 +67,7 @@ class TestLastKnownMammogramPresenter:
                     "text": "Change",
                     "visually_hidden_text": " mammogram item",
                 },
+                "reason_for_continuing": "",
             },
         ]
 
@@ -94,6 +96,7 @@ class TestLastKnownMammogramPresenter:
                     "text": "Change",
                     "visually_hidden_text": " mammogram item 1",
                 },
+                "reason_for_continuing": "",
             },
             {
                 "date_added": "3 years ago",
@@ -108,6 +111,7 @@ class TestLastKnownMammogramPresenter:
                     "text": "Change",
                     "visually_hidden_text": " mammogram item 2",
                 },
+                "reason_for_continuing": "A reason",
             },
         ]
 

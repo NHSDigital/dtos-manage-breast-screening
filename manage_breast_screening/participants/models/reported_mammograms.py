@@ -43,3 +43,4 @@ class ParticipantReportedMammogram(BaseModel):
     approx_date = models.CharField(null=False, default="", blank=True)
     different_name = models.CharField(null=False, default="", blank=True)
     additional_information = models.TextField(null=False, default="", blank=True)
+    reason_for_continuing = models.TextField(null=False, default="", blank=True)

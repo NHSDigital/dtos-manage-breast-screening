@@ -248,6 +248,11 @@ urlpatterns = [
         name="appointment_should_not_proceed",
     ),
     path(
+        "<uuid:pk>/proceed_anyway/<uuid:participant_reported_mammogram_pk>",
+        mammogram_views.AppointmentProceedAnywayView.as_view(),
+        name="proceed_anyway",
+    ),
+    path(
         "<uuid:appointment_pk>/attended-not-screened/",
         mammogram_views.attended_not_screened,
         name="attended_not_screened",
