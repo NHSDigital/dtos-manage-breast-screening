@@ -100,7 +100,7 @@ class UpdateParticipantReportedMammogramView(
         return f"Edit details of {thing_name}"
 
     def confirm_delete_link_text(self, thing_name):
-        return "Delete this item"
+        return "Delete this mammogram"
 
     def get_object(self):
         try:
