@@ -73,6 +73,22 @@ Examples of configuration values handled by the connection manager:
 }
 ```
 
+### User Assignments
+
+Once correct setup values are in place as per the two sections above, you should be able to authenticate via CIS2 and be redirected back to the MBS service.
+In order to complete the log in process, Users need to be assigned to at least one Provider.
+
+The process for this in production environments is TBD.
+
+For local development (and testing environments), we can do the following:
+
+- Click the "Log in" link in the nav to authenticate against CIS2 at least once (this will create the user record)
+- Run `uv run ./manage.py create_assignment`
+- This will prompt you to select a user, provider, and role, then create the `UserAssignment` record
+- Click "Log in" again (or refresh the "Select provider" screen) to choose a Provider and continue
+
+This will ensure that only records associated with the chosen Provider are accessible in the service.
+
 ## JWKS Endpoint
 
 We implement a JSON Web Key Set (JWKS) endpoint at `/auth/cis2/jwks_uri` that publishes our public key. This allows CIS2 to verify the JWT signatures we send during authentication.
