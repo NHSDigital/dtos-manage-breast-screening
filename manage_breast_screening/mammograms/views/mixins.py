@@ -86,7 +86,6 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
                 "mammograms:record_medical_information",
                 kwargs={"pk": self.appointment_pk},
             ),
-            "text": "Back",
         }
 
     def get_context_data(self, **kwargs):

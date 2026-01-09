@@ -80,7 +80,6 @@ class MarkReasonsTemporary(AppointmentMixin, FormView):
                         "mammograms:provide_special_appointment_details",
                         kwargs={"pk": self.appointment_pk},
                     ),
-                    "text": "Back",
                 },
                 "caption": self.participant.full_name,
                 "page_title": "Which of these reasons are temporary?",
