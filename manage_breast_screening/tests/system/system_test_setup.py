@@ -46,6 +46,9 @@ class SystemTestCase(StaticLiveServerTestCase):
         Emulate logging in as a particular user, without needing
         to visit a login page.
         """
+
+        self.current_user = user
+
         # Fake a login
         client = Client()
         client.force_login(user)
@@ -75,9 +78,9 @@ class SystemTestCase(StaticLiveServerTestCase):
         without needing to visit a login page.
         """
         user = UserFactory.create()
+
         UserAssignmentFactory.create(user=user, roles=[role.value])
 
-        self.current_user = user
         self.current_provider = user.assignments.first().provider
         self.login_as_user(user)
 

@@ -117,6 +117,12 @@ class AppointmentPresenter:
         else:
             return None
 
+    def attribution_user_check(self, user):
+        if user.pk == self._appointment.current_status.created_by.pk:
+            return " (you)"
+        else:
+            return ""
+
     @cached_property
     def note(self):
         try:
