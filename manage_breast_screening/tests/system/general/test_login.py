@@ -81,7 +81,7 @@ class TestLogin(SystemTestCase):
         self.page.goto(self.live_server_url + reverse("auth:login"))
 
     def when_i_log_in_via_cis2(self):
-        self.page.get_by_text("Log in with CIS2").click()
+        self.page.get_by_role("button", name="Log in with my Care Identity").click()
 
     def then_i_am_redirected_to_home(self):
         expect(self.page).to_have_url(re.compile(reverse("clinics:index")))
