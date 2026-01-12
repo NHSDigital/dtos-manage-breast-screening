@@ -128,7 +128,7 @@ class TestParticipantPresenter:
 
 
 class TestParticipantAppointmentPresenter:
-    def mock_appointment(self, starts_at, pk, status_name=AppointmentStatus.CONFIRMED):
+    def mock_appointment(self, starts_at, pk, status_name=AppointmentStatus.SCHEDULED):
         appointment = MagicMock(spec=Appointment)
         appointment.clinic_slot.starts_at = starts_at
         appointment.clinic_slot.clinic.get_type_display.return_value = "screening"
@@ -176,8 +176,8 @@ class TestParticipantAppointmentPresenter:
                 "West of London BSS",
                 {
                     "classes": "nhsuk-tag--blue app-u-nowrap",
-                    "key": "CONFIRMED",
-                    "text": "Confirmed",
+                    "key": "SCHEDULED",
+                    "text": "Scheduled",
                 },
                 "/mammograms/e3d475a6-c405-44d6-bbd7-bcb5cd4d4996/",
             )

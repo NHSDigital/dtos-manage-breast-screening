@@ -217,7 +217,7 @@ class TestAddParticipantReportedMammogram:
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.name == AppointmentStatus.CONFIRMED
+        assert appointment.current_status.name == AppointmentStatus.SCHEDULED
 
         assert_attended_not_screened_flow(clinical_user_client, appointment)
 
@@ -354,7 +354,7 @@ class TestChangeParticipantReportedMammogram:
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.name == AppointmentStatus.CONFIRMED
+        assert appointment.current_status.name == AppointmentStatus.SCHEDULED
 
         assert_attended_not_screened_flow(clinical_user_client, appointment)
 

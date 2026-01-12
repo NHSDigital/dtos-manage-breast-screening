@@ -136,7 +136,7 @@ class Appointment(BaseModel):
 
 
 class AppointmentStatus(models.Model):
-    CONFIRMED = "CONFIRMED"
+    SCHEDULED = "SCHEDULED"
     CHECKED_IN = "CHECKED_IN"
     STARTED = "STARTED"
     IDENTITY_CONFIRMED = "IDENTITY_CONFIRMED"
@@ -149,7 +149,7 @@ class AppointmentStatus(models.Model):
     ATTENDED_NOT_SCREENED = "ATTENDED_NOT_SCREENED"
 
     STATUS_CHOICES = {
-        CONFIRMED: "Confirmed",
+        SCHEDULED: "Scheduled",
         CHECKED_IN: "Checked in",
         STARTED: "Started",
         IDENTITY_CONFIRMED: "Identity confirmed",
@@ -163,7 +163,7 @@ class AppointmentStatus(models.Model):
     }
 
     YET_TO_BEGIN_STATUSES = [
-        CONFIRMED,
+        SCHEDULED,
         CHECKED_IN,
     ]
 
@@ -182,7 +182,7 @@ class AppointmentStatus(models.Model):
         ATTENDED_NOT_SCREENED,
     ]
 
-    name = models.CharField(choices=STATUS_CHOICES, max_length=50, default=CONFIRMED)
+    name = models.CharField(choices=STATUS_CHOICES, max_length=50, default=SCHEDULED)
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)

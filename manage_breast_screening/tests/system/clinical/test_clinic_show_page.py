@@ -83,19 +83,19 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
     def and_there_are_appointments(self):
         tzinfo = ZoneInfo("Europe/London")
-        self.confirmed_appointment = AppointmentFactory(
+        self.scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=0, tzinfo=tzinfo),
-            current_status=AppointmentStatus.CONFIRMED,
+            current_status=AppointmentStatus.SCHEDULED,
             first_name="Janet",
-            last_name="Confirmed",
+            last_name="Scheduled",
         )
-        self.another_confirmed_appointment = AppointmentFactory(
+        self.another_scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=15, tzinfo=tzinfo),
             first_name="Also",
-            last_name="Confirmed",
-            current_status=AppointmentStatus.CONFIRMED,
+            last_name="Scheduled",
+            current_status=AppointmentStatus.SCHEDULED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
@@ -143,8 +143,8 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self._expect_rows_to_match_appointments(
             rows,
             [
-                self.confirmed_appointment,
-                self.another_confirmed_appointment,
+                self.scheduled_appointment,
+                self.another_scheduled_appointment,
                 self.checked_in_appointment,
                 self.in_progress_appointment,
             ],
@@ -181,8 +181,8 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self._expect_rows_to_match_appointments(
             rows,
             [
-                self.confirmed_appointment,
-                self.another_confirmed_appointment,
+                self.scheduled_appointment,
+                self.another_scheduled_appointment,
                 self.checked_in_appointment,
                 self.screened_appointment,
                 self.in_progress_appointment,
@@ -191,19 +191,19 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
     def when_i_check_in_an_appointment(self):
         self.page.get_by_role(
-            "button", name=re.compile("Check in Janet Confirmed")
+            "button", name=re.compile("Check in Janet Scheduled")
         ).click()
 
     def then_the_appointment_is_checked_in(self):
-        row = self.page.locator("tr").filter(has_text="Janet Confirmed")
+        row = self.page.locator("tr").filter(has_text="Janet Scheduled")
         expect(row.locator(".nhsuk-tag").filter(has_text="Checked in")).to_be_visible()
 
     def and_the_appointments_remain_in_the_same_order(self):
         self.when_i_click_on_all()
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         expected_times = [
-            format_time(self.confirmed_appointment.clinic_slot.starts_at),
-            format_time(self.another_confirmed_appointment.clinic_slot.starts_at),
+            format_time(self.scheduled_appointment.clinic_slot.starts_at),
+            format_time(self.another_scheduled_appointment.clinic_slot.starts_at),
             format_time(self.checked_in_appointment.clinic_slot.starts_at),
             format_time(self.screened_appointment.clinic_slot.starts_at),
         ]
@@ -241,7 +241,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(
                 hour=11, minute=10
             ),
-            current_status=AppointmentStatus.CONFIRMED,
+            current_status=AppointmentStatus.SCHEDULED,
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Special Appointment",
             screening_episode__participant__extra_needs={
@@ -270,12 +270,12 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         user_screened = UserFactory(first_name="Bob", last_name="User")
         user_cancelled = UserFactory(first_name="Charlie", last_name="User")
 
-        # CONFIRMED status
-        self.confirmed_appointment = AppointmentFactory(
+        # SCHEDULED status
+        self.scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            current_status=AppointmentStatus.CONFIRMED,
+            current_status=AppointmentStatus.SCHEDULED,
             first_name="Participant",
-            last_name="Confirmed",
+            last_name="Scheduled",
         )
 
         # SCREENED status
@@ -301,10 +301,10 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         )
 
     def then_i_can_see_status_attribution_for_these_appointments(self):
-        confirmed_row = self.page.locator("tr").filter(has_text="Participant Confirmed")
+        scheduled_row = self.page.locator("tr").filter(has_text="Participant Scheduled")
 
-        expect(confirmed_row).not_to_contain_text("with")
-        expect(confirmed_row).not_to_contain_text("by")
+        expect(scheduled_row).not_to_contain_text("with")
+        expect(scheduled_row).not_to_contain_text("by")
 
         in_progress_row = self.page.locator("tr").filter(
             has_text="Participant InProgress"

@@ -90,7 +90,7 @@ class TestAppointmentTabs(SystemTestCase):
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status_params={
-                "name": AppointmentStatus.CONFIRMED,
+                "name": AppointmentStatus.SCHEDULED,
                 "created_by": another_user,
             },
         )

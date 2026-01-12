@@ -36,13 +36,13 @@ class AppointmentStatusUpdater:
     def check_in(self):
         return self._transition(
             to_status=AppointmentStatus.CHECKED_IN,
-            from_statuses=(AppointmentStatus.CONFIRMED,),
+            from_statuses=(AppointmentStatus.SCHEDULED,),
         )
 
     @staticmethod
     def is_startable(appointment):
         return appointment is not None and appointment.current_status.name in (
-            AppointmentStatus.CONFIRMED,
+            AppointmentStatus.SCHEDULED,
             AppointmentStatus.CHECKED_IN,
         )
 
@@ -54,19 +54,19 @@ class AppointmentStatusUpdater:
 
         return self._transition(
             to_status=AppointmentStatus.STARTED,
-            from_statuses=(AppointmentStatus.CONFIRMED, AppointmentStatus.CHECKED_IN),
+            from_statuses=(AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN),
         )
 
     def cancel(self):
         return self._transition(
             to_status=AppointmentStatus.CANCELLED,
-            from_statuses=(AppointmentStatus.CONFIRMED,),
+            from_statuses=(AppointmentStatus.SCHEDULED,),
         )
 
     def mark_did_not_attend(self):
         return self._transition(
             to_status=AppointmentStatus.DID_NOT_ATTEND,
-            from_statuses=(AppointmentStatus.CONFIRMED,),
+            from_statuses=(AppointmentStatus.SCHEDULED,),
         )
 
     def screen(self, partial=False):

@@ -35,8 +35,8 @@ class TestViewMammogramAppointmentPermission:
 @pytest.mark.django_db
 class TestAppointmentActionPermissions:
     @pytest.fixture
-    def confirmed_appointment(self):
-        return AppointmentFactory.create(current_status=AppointmentStatus.CONFIRMED)
+    def scheduled_appointment(self):
+        return AppointmentFactory.create(current_status=AppointmentStatus.SCHEDULED)
 
     @pytest.fixture
     def checked_in_appointment(self):

@@ -41,19 +41,19 @@ class TestAppointmentButtons(SystemTestCase):
 
     def and_there_are_appointments(self):
         tzinfo = ZoneInfo("Europe/London")
-        self.confirmed_appointment = AppointmentFactory(
+        self.scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=0, tzinfo=tzinfo),
-            current_status=AppointmentStatus.CONFIRMED,
+            current_status=AppointmentStatus.SCHEDULED,
             first_name="Janet",
-            last_name="Confirmed",
+            last_name="Scheduled",
         )
-        self.another_confirmed_appointment = AppointmentFactory(
+        self.another_scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=15, tzinfo=tzinfo),
             first_name="Also",
-            last_name="Confirmed",
-            current_status=AppointmentStatus.CONFIRMED,
+            last_name="Scheduled",
+            current_status=AppointmentStatus.SCHEDULED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
@@ -100,7 +100,7 @@ class TestAppointmentButtons(SystemTestCase):
     def then_i_should_be_on_the_confirm_identity_page(self):
         path = reverse(
             "mammograms:confirm_identity",
-            kwargs={"pk": self.confirmed_appointment.pk},
+            kwargs={"pk": self.scheduled_appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Confirm identity")

@@ -68,7 +68,7 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_checked_in(self):
-        return self._appointment.current_status.name == AppointmentStatus.CONFIRMED
+        return self._appointment.current_status.name == AppointmentStatus.SCHEDULED
 
     @cached_property
     def active(self):
@@ -102,7 +102,7 @@ class AppointmentPresenter:
             ),
             "text": display_text,
             "key": current_status.name,
-            "is_confirmed": current_status.name == AppointmentStatus.CONFIRMED,
+            "is_confirmed": current_status.name == AppointmentStatus.SCHEDULED,
             "is_screened": current_status.name == AppointmentStatus.SCREENED,
         }
 
