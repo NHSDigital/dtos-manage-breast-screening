@@ -23,7 +23,6 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentNote,
-    AppointmentReportedMammogram,
     AppointmentStatus,
     BenignLumpHistoryItem,
     BreastAugmentationHistoryItem,
@@ -34,6 +33,7 @@ from manage_breast_screening.participants.models import (
     OtherProcedureHistoryItem,
     Participant,
     ParticipantAddress,
+    ParticipantReportedMammogram,
     ScreeningEpisode,
 )
 from manage_breast_screening.participants.models.medical_information_review import (
@@ -42,7 +42,6 @@ from manage_breast_screening.participants.models.medical_information_review impo
 from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
-    AppointmentReportedMammogramFactory,
     AppointmentStatusFactory,
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
@@ -53,6 +52,7 @@ from manage_breast_screening.participants.tests.factories import (
     OtherProcedureHistoryItemFactory,
     ParticipantAddressFactory,
     ParticipantFactory,
+    ParticipantReportedMammogramFactory,
     ScreeningEpisodeFactory,
     SymptomFactory,
 )
@@ -300,7 +300,7 @@ class Command(BaseCommand):
                     id=mammogram["provider"]["id"],
                     name=mammogram["provider"]["name"],
                 )
-            appointment_mammogram = AppointmentReportedMammogramFactory(
+            appointment_mammogram = ParticipantReportedMammogramFactory(
                 appointment=appointment,
                 **mammogram,
             )
@@ -323,7 +323,7 @@ class Command(BaseCommand):
         OtherProcedureHistoryItem.objects.all().delete()
         BenignLumpHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
-        AppointmentReportedMammogram.objects.all().delete()
+        ParticipantReportedMammogram.objects.all().delete()
         Appointment.objects.all().delete()
         ScreeningEpisode.objects.all().delete()
         ParticipantAddress.objects.all().delete()

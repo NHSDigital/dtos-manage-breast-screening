@@ -3,10 +3,10 @@ from urllib.parse import urlencode
 import pytest
 from django.http import QueryDict
 
-from manage_breast_screening.participants.models import AppointmentReportedMammogram
+from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
-    AppointmentReportedMammogramFactory,
+    ParticipantReportedMammogramFactory,
 )
 
 from ...forms import AppointmentProceedAnywayForm
@@ -21,30 +21,30 @@ class TestAppointmentProceedAnywayForm:
         )
 
     @pytest.fixture
-    def appointment_reported_mammogram(self, appointment):
-        return AppointmentReportedMammogramFactory.create(
+    def participant_reported_mammogram(self, appointment):
+        return ParticipantReportedMammogramFactory.create(
             appointment=appointment,
-            location_type=AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
         )
 
     def test_missing_reason_for_continuing(
-        self, appointment, appointment_reported_mammogram
+        self, appointment, participant_reported_mammogram
     ):
         form_data = {}
         form = AppointmentProceedAnywayForm(
             form_data,
-            instance=appointment_reported_mammogram,
+            instance=participant_reported_mammogram,
             participant=appointment.participant,
         )
         assert not form.is_valid()
         assert form.errors == {
             "reason_for_continuing": ["Provide a reason for continuing"]
         }
-        appointment_reported_mammogram.refresh_from_db()
-        assert not appointment_reported_mammogram.reason_for_continuing
+        participant_reported_mammogram.refresh_from_db()
+        assert not participant_reported_mammogram.reason_for_continuing
 
     def test_update_mammogram_with_reason_for_continuing(
-        self, appointment, appointment_reported_mammogram
+        self, appointment, participant_reported_mammogram
     ):
         form_data = QueryDict(
             urlencode(
@@ -56,10 +56,10 @@ class TestAppointmentProceedAnywayForm:
         )
         form = AppointmentProceedAnywayForm(
             form_data,
-            instance=appointment_reported_mammogram,
+            instance=participant_reported_mammogram,
             participant=appointment.participant,
         )
         assert form.is_valid()
         form.update()
-        appointment_reported_mammogram.refresh_from_db()
-        assert appointment_reported_mammogram.reason_for_continuing == "a reason"
+        participant_reported_mammogram.refresh_from_db()
+        assert participant_reported_mammogram.reason_for_continuing == "a reason"

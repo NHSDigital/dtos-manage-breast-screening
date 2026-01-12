@@ -18,7 +18,7 @@ ALLOWLISTED_MODELS = (
     "ImplantedMedicalDeviceHistoryItem",  # Temporarily allowed
     "MastectomyOrLumpectomyHistoryItem",  # Temporarily allowed
     "OtherProcedureHistoryItem",  # Temporarily allowed
-    "AppointmentReportedMammogram",  # Temporarily allowed
+    "ParticipantReportedMammogram",  # Temporarily allowed
 )
 
 TARGETS = {

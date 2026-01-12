@@ -13,7 +13,7 @@ from manage_breast_screening.mammograms.presenters.appointment_presenters import
     AppointmentPresenter,
 )
 from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
-from manage_breast_screening.participants.models import AppointmentReportedMammogram
+from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
     Appointment,
     AppointmentStatus,
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 def appointment_should_not_proceed(
-    request, appointment_pk, appointment_reported_mammogram_pk
+    request, appointment_pk, participant_reported_mammogram_pk
 ):
     provider = request.user.current_provider
     try:
@@ -40,9 +40,9 @@ def appointment_should_not_proceed(
 
     try:
         mammogram = appointment.reported_mammograms.get(
-            pk=appointment_reported_mammogram_pk
+            pk=participant_reported_mammogram_pk
         )
-    except AppointmentReportedMammogram.DoesNotExist:
+    except ParticipantReportedMammogram.DoesNotExist:
         raise Http404("Participant reported mammogram not found")
     exact_date = mammogram.exact_date
 
@@ -52,7 +52,7 @@ def appointment_should_not_proceed(
             "mammograms:change_previous_mammogram",
             kwargs={
                 "pk": appointment_pk,
-                "appointment_reported_mammogram_pk": appointment_reported_mammogram_pk,
+                "participant_reported_mammogram_pk": participant_reported_mammogram_pk,
             },
         )
         + f"?return_url={return_url}"
@@ -62,7 +62,7 @@ def appointment_should_not_proceed(
             "mammograms:proceed_anyway",
             kwargs={
                 "pk": appointment_pk,
-                "appointment_reported_mammogram_pk": appointment_reported_mammogram_pk,
+                "participant_reported_mammogram_pk": participant_reported_mammogram_pk,
             },
         )
         + f"?return_url={return_url}"
@@ -108,12 +108,12 @@ class AppointmentProceedAnywayView(AppointmentMixin, UpdateWithAuditView):
 
     def get_object(self):
         try:
-            return AppointmentReportedMammogram.objects.get(
-                pk=self.kwargs["appointment_reported_mammogram_pk"],
+            return ParticipantReportedMammogram.objects.get(
+                pk=self.kwargs["participant_reported_mammogram_pk"],
             )
-        except AppointmentReportedMammogram.DoesNotExist:
+        except ParticipantReportedMammogram.DoesNotExist:
             logger.exception(
-                "AppointmentReportedMammogram does not exist for kwargs=%s", self.kwargs
+                "ParticipantReportedMammogram does not exist for kwargs=%s", self.kwargs
             )
             return None
 
@@ -139,8 +139,8 @@ class AppointmentProceedAnywayView(AppointmentMixin, UpdateWithAuditView):
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
                     "appointment_pk": self.appointment.pk,
-                    "appointment_reported_mammogram_pk": self.kwargs[
-                        "appointment_reported_mammogram_pk"
+                    "participant_reported_mammogram_pk": self.kwargs[
+                        "participant_reported_mammogram_pk"
                     ],
                 },
             )

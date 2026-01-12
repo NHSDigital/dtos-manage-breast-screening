@@ -18,7 +18,7 @@ from .medical_information_review import (
     MedicalInformationSection,
 )
 from .participant import Participant, ParticipantAddress
-from .reported_mammograms import AppointmentReportedMammogram, SupportReasons
+from .reported_mammograms import ParticipantReportedMammogram, SupportReasons
 from .screening_episode import ScreeningEpisode
 from .symptom import Symptom, SymptomAreas, SymptomSubType, SymptomType
 
@@ -38,7 +38,7 @@ __all__ = [
     "Participant",
     "ParticipantAddress",
     "Ethnicity",
-    "AppointmentReportedMammogram",
+    "ParticipantReportedMammogram",
     "ScreeningEpisode",
     "SupportReasons",
     "Symptom",

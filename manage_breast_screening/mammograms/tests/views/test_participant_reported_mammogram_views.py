@@ -6,25 +6,25 @@ from django.contrib import messages
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
-from manage_breast_screening.participants.forms import AppointmentReportedMammogramForm
-from manage_breast_screening.participants.models import AppointmentReportedMammogram
+from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
+from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import AppointmentStatus
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
-    AppointmentReportedMammogramFactory,
+    ParticipantReportedMammogramFactory,
 )
 
 
 @pytest.fixture
-def appointment_reported_mammogram(appointment):
-    return AppointmentReportedMammogramFactory.create(
+def participant_reported_mammogram(appointment):
+    return ParticipantReportedMammogramFactory.create(
         appointment=appointment,
-        location_type=AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
     )
 
 
 @pytest.mark.django_db
-class TestAddAppointmentReportedMammogram:
+class TestAddParticipantReportedMammogram:
     def test_renders_response(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
@@ -69,9 +69,9 @@ class TestAddAppointmentReportedMammogram:
                 kwargs={"pk": appointment.pk},
             ),
             {
-                "location_type": AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": AppointmentReportedMammogramForm.WhenTaken.NOT_SURE,
-                "name_is_the_same": AppointmentReportedMammogramForm.NameIsTheSame.YES,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
         assertRedirects(
@@ -115,12 +115,12 @@ class TestAddAppointmentReportedMammogram:
             ),
             {
                 "return_url": return_url,
-                "location_type": AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": AppointmentReportedMammogramForm.WhenTaken.EXACT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
                 "exact_date_0": exact_date.day,
                 "exact_date_1": exact_date.month,
                 "exact_date_2": exact_date.year,
-                "name_is_the_same": AppointmentReportedMammogramForm.NameIsTheSame.YES,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
 
@@ -155,7 +155,7 @@ class TestAddAppointmentReportedMammogram:
         )
 
         assert (
-            AppointmentReportedMammogram.objects.filter(appointment=appointment).count()
+            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
             == 0
         )
 
@@ -166,16 +166,16 @@ class TestAddAppointmentReportedMammogram:
             ),
             {
                 "return_url": return_url,
-                "location_type": AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": AppointmentReportedMammogramForm.WhenTaken.EXACT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
                 "exact_date_0": exact_date.day,
                 "exact_date_1": exact_date.month,
                 "exact_date_2": exact_date.year,
-                "name_is_the_same": AppointmentReportedMammogramForm.NameIsTheSame.YES,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
 
-        mammogram = AppointmentReportedMammogram.objects.filter(
+        mammogram = ParticipantReportedMammogram.objects.filter(
             appointment=appointment
         ).first()
 
@@ -185,7 +185,7 @@ class TestAddAppointmentReportedMammogram:
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
                     "appointment_pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": mammogram.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={return_url}",
@@ -211,7 +211,7 @@ class TestAddAppointmentReportedMammogram:
 
 
 @pytest.mark.django_db
-class TestChangeAppointmentReportedMammogram:
+class TestChangeParticipantReportedMammogram:
     @pytest.fixture
     def appointment(self, clinical_user_client):
         return AppointmentFactory.create(
@@ -219,35 +219,35 @@ class TestChangeAppointmentReportedMammogram:
         )
 
     @pytest.fixture
-    def appointment_reported_mammogram(self, appointment):
-        return AppointmentReportedMammogramFactory.create(
+    def participant_reported_mammogram(self, appointment):
+        return ParticipantReportedMammogramFactory.create(
             appointment=appointment,
-            location_type=AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
         )
 
     def test_renders_response(
-        self, clinical_user_client, appointment, appointment_reported_mammogram
+        self, clinical_user_client, appointment, participant_reported_mammogram
     ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             )
         )
         assert response.status_code == 200
 
     def test_invalid_post_displays_errors(
-        self, clinical_user_client, appointment, appointment_reported_mammogram
+        self, clinical_user_client, appointment, participant_reported_mammogram
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
             {},
@@ -265,20 +265,20 @@ class TestChangeAppointmentReportedMammogram:
         )
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, appointment_reported_mammogram
+        self, clinical_user_client, appointment, participant_reported_mammogram
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
             {
-                "location_type": AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": AppointmentReportedMammogramForm.WhenTaken.NOT_SURE,
-                "name_is_the_same": AppointmentReportedMammogramForm.NameIsTheSame.YES,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
         assertRedirects(
@@ -310,7 +310,7 @@ class TestChangeAppointmentReportedMammogram:
         self,
         clinical_user_client,
         appointment,
-        appointment_reported_mammogram,
+        participant_reported_mammogram,
         exact_date,
     ):
         return_url = reverse(
@@ -322,17 +322,17 @@ class TestChangeAppointmentReportedMammogram:
                 "mammograms:change_previous_mammogram",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
             {
                 "return_url": return_url,
-                "location_type": AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": AppointmentReportedMammogramForm.WhenTaken.EXACT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
                 "exact_date_0": exact_date.day,
                 "exact_date_1": exact_date.month,
                 "exact_date_2": exact_date.year,
-                "name_is_the_same": AppointmentReportedMammogramForm.NameIsTheSame.YES,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
 
@@ -359,7 +359,7 @@ class TestChangeAppointmentReportedMammogram:
         self,
         clinical_user_client,
         appointment,
-        appointment_reported_mammogram,
+        participant_reported_mammogram,
         exact_date,
     ):
         return_url = reverse(
@@ -368,7 +368,7 @@ class TestChangeAppointmentReportedMammogram:
         )
 
         assert (
-            AppointmentReportedMammogram.objects.filter(appointment=appointment).count()
+            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
             == 1
         )
 
@@ -377,21 +377,21 @@ class TestChangeAppointmentReportedMammogram:
                 "mammograms:change_previous_mammogram",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
             {
                 "return_url": return_url,
-                "location_type": AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": AppointmentReportedMammogramForm.WhenTaken.EXACT,
+                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
                 "exact_date_0": exact_date.day,
                 "exact_date_1": exact_date.month,
                 "exact_date_2": exact_date.year,
-                "name_is_the_same": AppointmentReportedMammogramForm.NameIsTheSame.YES,
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
             },
         )
 
-        mammogram = AppointmentReportedMammogram.objects.filter(
+        mammogram = ParticipantReportedMammogram.objects.filter(
             appointment=appointment
         ).first()
 
@@ -401,7 +401,7 @@ class TestChangeAppointmentReportedMammogram:
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
                     "appointment_pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": mammogram.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={return_url}",
@@ -427,15 +427,15 @@ class TestChangeAppointmentReportedMammogram:
 
 
 @pytest.mark.django_db
-class TestDeleteAppointmentReportedMammogram:
+class TestDeleteParticipantReportedMammogram:
     def test_delete_previous_mammogram(
         self,
         clinical_user_client,
         appointment,
-        appointment_reported_mammogram,
+        participant_reported_mammogram,
     ):
-        assert AppointmentReportedMammogram.objects.filter(
-            pk=appointment_reported_mammogram.pk
+        assert ParticipantReportedMammogram.objects.filter(
+            pk=participant_reported_mammogram.pk
         ).exists()
 
         clinical_user_client.http.post(
@@ -443,13 +443,13 @@ class TestDeleteAppointmentReportedMammogram:
                 "mammograms:delete_previous_mammogram",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             )
         )
 
-        assert not AppointmentReportedMammogram.objects.filter(
-            pk=appointment_reported_mammogram.pk
+        assert not ParticipantReportedMammogram.objects.filter(
+            pk=participant_reported_mammogram.pk
         ).exists()
 
 
@@ -462,35 +462,35 @@ class TestAppointmentProceedAnywayView:
         )
 
     @pytest.fixture
-    def appointment_reported_mammogram(self, appointment):
-        return AppointmentReportedMammogramFactory.create(
+    def participant_reported_mammogram(self, appointment):
+        return ParticipantReportedMammogramFactory.create(
             appointment=appointment,
-            location_type=AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
         )
 
     def test_renders_response(
-        self, clinical_user_client, appointment, appointment_reported_mammogram
+        self, clinical_user_client, appointment, participant_reported_mammogram
     ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:proceed_anyway",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             )
         )
         assert response.status_code == 200
 
     def test_invalid_post_displays_errors(
-        self, clinical_user_client, appointment, appointment_reported_mammogram
+        self, clinical_user_client, appointment, participant_reported_mammogram
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:proceed_anyway",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
             {},
@@ -506,14 +506,14 @@ class TestAppointmentProceedAnywayView:
         )
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, appointment_reported_mammogram
+        self, clinical_user_client, appointment, participant_reported_mammogram
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:proceed_anyway",
                 kwargs={
                     "pk": appointment.pk,
-                    "appointment_reported_mammogram_pk": appointment_reported_mammogram.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
             {

@@ -21,7 +21,7 @@ class SupportReasons(TextChoices):
     OTHER = ("OTHER", "Other")
 
 
-class AppointmentReportedMammogram(BaseModel):
+class ParticipantReportedMammogram(BaseModel):
     class LocationType(models.TextChoices):
         NHS_BREAST_SCREENING_UNIT = (
             "NHS_BREAST_SCREENING_UNIT",

@@ -155,24 +155,24 @@ class AppointmentNoteFactory(DjangoModelFactory):
     content = Faker("sentence")
 
 
-class AppointmentReportedMammogramFactory(DjangoModelFactory):
+class ParticipantReportedMammogramFactory(DjangoModelFactory):
     class Meta:
-        model = models.AppointmentReportedMammogram
+        model = models.ParticipantReportedMammogram
 
     appointment = SubFactory(AppointmentFactory)
     location_type = (
-        models.AppointmentReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+        models.ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
     )
     provider = SubFactory(ProviderFactory)
 
     class Params:
         outside_uk = Trait(
-            location_type=models.AppointmentReportedMammogram.LocationType.OUTSIDE_UK,
+            location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
             location_details="france",
             provider=None,
         )
         elsewhere_uk = Trait(
-            location_type=models.AppointmentReportedMammogram.LocationType.ELSEWHERE_UK,
+            location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             location_details="private provider",
             provider=None,
         )

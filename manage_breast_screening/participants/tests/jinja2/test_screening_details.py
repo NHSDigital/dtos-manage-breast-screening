@@ -7,13 +7,13 @@ from pytest_django.asserts import assertInHTML
 
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
 
-from ..factories import AppointmentReportedMammogramFactory
+from ..factories import ParticipantReportedMammogramFactory
 
 
 class TestScreeningDetails:
     @pytest.fixture
     def presented_mammograms(self):
-        mammogram = AppointmentReportedMammogramFactory.build(
+        mammogram = ParticipantReportedMammogramFactory.build(
             outside_uk=True,
             location_details="france",
             approx_date="2021",
