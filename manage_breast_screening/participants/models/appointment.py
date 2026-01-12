@@ -15,15 +15,16 @@ logger = getLogger(__name__)
 
 class AppointmentQuerySet(models.QuerySet):
     def in_status(self, *statuses):
-        return self.filter(
-            statuses=Subquery(
-                AppointmentStatus.objects.filter(
-                    appointment=OuterRef("pk"),
-                    name__in=statuses,
-                )
-                .values("pk")
-                .order_by("-created_at")[:1]
-            )
+        # Get the most recent status name for each appointment
+        most_recent_status = (
+            AppointmentStatus.objects.filter(appointment=OuterRef("pk"))
+            .order_by("-created_at")
+            .values("name")[:1]
+        )
+
+        # Filter appointments where the most recent status name is in the provided list
+        return self.annotate(current_status_name=Subquery(most_recent_status)).filter(
+            current_status_name__in=statuses
         )
 
     def remaining(self):
