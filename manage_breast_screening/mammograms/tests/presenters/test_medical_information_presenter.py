@@ -303,3 +303,10 @@ class TestRecordMedicalInformationPresenter:
             presenter.is_section_reviewed(MedicalInformationSection.BREAST_FEATURES)
             is False
         )
+
+    def test_any_medical_history(self):
+        appointment = AppointmentFactory()
+        assert not MedicalInformationPresenter(appointment).any_medical_history
+
+        OtherProcedureHistoryItemFactory.create(appointment=appointment)
+        assert MedicalInformationPresenter(appointment).any_medical_history

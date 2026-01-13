@@ -87,13 +87,26 @@
   ) %}
   <p>Including breast cancer, implants, prior procedures and treatments</p>
 
-  {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
-  {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
-  {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
-  {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
-  {{ cyst_history_card(presenter.cyst_history) }}
-  {{ benign_lump_history_card(presenter.benign_lump_history) }}
-  {{ other_procedure_history_card(presenter.other_procedure_history) }}
+  {% if presenter.any_medical_history %}
+    {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
+    {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
+    {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
+    {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
+    {{ cyst_history_card(presenter.cyst_history) }}
+    {{ benign_lump_history_card(presenter.benign_lump_history) }}
+    {{ other_procedure_history_card(presenter.other_procedure_history) }}
+  {% else %}
+    {% set insetTextHtml %}
+      <p>
+        No medical history has been added yet.
+      </p>
+    {% endset %}
+
+    {{ insetText({
+      "html": insetTextHtml,
+      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+    }) }}
+  {% endif %}
 
   <hr>
   <h3>Add medical history</h3>
