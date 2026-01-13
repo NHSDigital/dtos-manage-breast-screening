@@ -28,7 +28,7 @@ class TestLogin(SystemTestCase):
 
     def test_log_in_and_log_out_via_cis2(self):
         self.given_a_user_with_multiple_providers()
-        self.given_i_am_on_the_login_page()
+        self.given_i_am_on_the_home_page()
         self.then_header_shows_log_in()
         self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_provider_selection()
@@ -40,20 +40,20 @@ class TestLogin(SystemTestCase):
 
     def test_log_in_with_single_provider_assigned(self):
         self.given_a_user_with_single_provider()
-        self.given_i_am_on_the_login_page()
+        self.given_i_am_on_the_home_page()
         self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_home()
         self.then_header_shows_log_out()
 
     def test_log_in_with_no_providers_assigned(self):
         self.given_a_user_with_no_providers()
-        self.given_i_am_on_the_login_page()
+        self.given_i_am_on_the_home_page()
         self.when_i_log_in_via_cis2()
         self.then_header_shows_log_out()
         self.then_i_see_no_providers_message()
 
     def test_session_expires_after_one_hour(self):
-        self.given_i_am_on_the_login_page()
+        self.given_i_am_on_the_home_page()
         self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_home()
         self.then_header_shows_log_out()
@@ -77,11 +77,12 @@ class TestLogin(SystemTestCase):
             user=self.user, provider=self.provider2, administrative=True
         )
 
-    def given_i_am_on_the_login_page(self):
-        self.page.goto(self.live_server_url + reverse("auth:login"))
+    def given_i_am_on_the_home_page(self):
+        self.page.goto(self.live_server_url)
 
     def when_i_log_in_via_cis2(self):
-        self.page.get_by_text("Log in with CIS2").click()
+        self.page.get_by_role("link", name="Log in").click()
+        self.page.get_by_role("button", name="Log in with my Care Identity").click()
 
     def then_i_am_redirected_to_home(self):
         expect(self.page).to_have_url(re.compile(reverse("clinics:index")))
