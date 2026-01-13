@@ -88,11 +88,9 @@ class TestRecordingCyst(SystemTestCase):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
 
     def and_the_cyst_is_listed(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Cyst history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        heading = self.page.get_by_role("heading").filter(has_text="Cysts")
+        section = self.page.locator("section").filter(has=heading)
+        row = section.locator(".app-nested-info__row", has_text="Treatment")
         expect(row).to_contain_text("No treatment")
 
     def and_the_message_says_cyst_added(self):
@@ -112,11 +110,9 @@ class TestRecordingCyst(SystemTestCase):
         self.page.get_by_label("Drainage or removal").click()
 
     def and_the_cyst_is_updated(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Cyst history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        heading = self.page.get_by_role("heading").filter(has_text="Cysts")
+        section = self.page.locator("section").filter(has=heading)
+        row = section.locator(".app-nested-info__row", has_text="Treatment")
         expect(row).to_contain_text("Drainage or removal")
 
     def and_the_message_says_cyst_updated(self):

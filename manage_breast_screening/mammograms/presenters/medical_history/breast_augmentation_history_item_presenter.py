@@ -21,7 +21,6 @@ class BreastAugmentationHistoryItemPresenter:
             for choice in self._item.left_breast_procedures
         ]
 
-        self.procedure_year = format_year_with_relative(self._item.procedure_year)
         self.implants_have_been_removed = (
             "Yes" if self._item.implants_have_been_removed else "No"
         )
@@ -29,6 +28,24 @@ class BreastAugmentationHistoryItemPresenter:
             self.implants_have_been_removed += f" ({self._item.removal_year})"
 
         self.additional_details = nl2br(self._item.additional_details)
+
+    @property
+    def procedure_year(self):
+        return format_year_with_relative(self._item.procedure_year)
+
+    @property
+    def removal_year(self):
+        return format_year_with_relative(self._item.removal_year)
+
+    @property
+    def procedure_year_with_removal(self):
+        lines = [f"Implanted in {self.procedure_year}"]
+        if self._item.removal_year:
+            lines.append(f"Implants removed in {self.removal_year}")
+        elif self._item.device_has_been_removed:
+            lines.append("Implants removed")
+
+        return multiline_content(lines)
 
     @property
     def summary_list_params(self):

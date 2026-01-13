@@ -1,3 +1,6 @@
+from datetime import date
+
+import time_machine
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -12,6 +15,7 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@time_machine.travel(date(2025, 1, 1))
 class TestRecordingOtherProcedure(SystemTestCase):
     def test_adding_and_changing_other_procedure(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -119,15 +123,16 @@ class TestRecordingOtherProcedure(SystemTestCase):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
 
     def and_the_other_procedure_is_listed(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Other procedure history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        expect(row).to_contain_text("Procedure details")
+        heading = self.page.get_by_role("heading").filter(has_text="Other procedures")
+        section = self.page.locator("section").filter(has=heading)
+
+        row = section.locator(".app-nested-info__row", has_text="Type")
         expect(row).to_contain_text("Breast reduction")
-        expect(row).to_contain_text("Reason for breast reduction surgery")
-        expect(row).to_contain_text("2000")
+
+        row = section.locator(".app-nested-info__row", has_text="Procedure year")
+        expect(row).to_contain_text("2000 (25 years ago)")
+
+        row = section.locator(".app-nested-info__row", has_text="Additional details")
         expect(row).to_contain_text("additional details for test of other procedure")
 
     def and_the_message_says_other_procedure_added(self):
@@ -150,15 +155,13 @@ class TestRecordingOtherProcedure(SystemTestCase):
         )
 
     def and_the_other_procedure_is_updated(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Other procedure history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        expect(row).to_contain_text("Procedure details")
+        heading = self.page.get_by_role("heading").filter(has_text="Other procedures")
+        section = self.page.locator("section").filter(has=heading)
+
+        row = section.locator(".app-nested-info__row", has_text="Type")
         expect(row).to_contain_text("Nipple correction")
-        expect(row).to_contain_text("Reason for nipple correction surgery")
-        expect(row).to_contain_text("2000")
+
+        row = section.locator(".app-nested-info__row", has_text="Additional details")
         expect(row).to_contain_text("additional details for test of other procedure")
 
     def and_the_message_says_other_procedure_updated(self):
@@ -174,10 +177,5 @@ class TestRecordingOtherProcedure(SystemTestCase):
         self.page.get_by_text("Delete item").click()
 
     def and_the_history_item_is_gone(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Other procedure history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        expect(row).not_to_contain_text("Procedure details")
-        expect(row.get_by_text("Change")).not_to_be_attached()
+        heading = self.page.get_by_role("heading").filter(has_text="Other procedures")
+        expect(heading).not_to_be_attached()

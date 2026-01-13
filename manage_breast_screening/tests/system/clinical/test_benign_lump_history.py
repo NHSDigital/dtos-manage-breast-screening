@@ -1,3 +1,6 @@
+from datetime import date
+
+import time_machine
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -16,6 +19,7 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@time_machine.travel(date(2025, 1, 1))
 class TestBenignLumpHistory(SystemTestCase):
     def test_adding_a_benign_lump_history_item(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -154,16 +158,22 @@ class TestBenignLumpHistory(SystemTestCase):
         self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
 
     def and_the_benign_lump_history_item_is_listed(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Benign lump history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
+        heading = self.page.get_by_role("heading").filter(has_text="Benign lumps")
+        section = self.page.locator("section").filter(has=heading)
 
-        expect(row).to_contain_text("Right breast: Needle biopsy, Lump removed")
-        expect(row).to_contain_text("Left breast: Lump removed")
-        expect(row).to_contain_text("2022")
-        expect(row).to_contain_text("At an NHS hospital: St Thomas' Hospital, London")
+        row = section.locator(".app-nested-info__row", has_text="Procedures").first
+        expect(row).to_contain_text("Right breast Needle biopsy")
+        expect(row).to_contain_text("Left breast Lump removed")
+
+        row = section.locator(".app-nested-info__row", has_text="Procedure year")
+        expect(row).to_contain_text("2022 (3 years ago)")
+
+        row = section.locator(".app-nested-info__row", has_text="Treatment location")
+        expect(row).to_contain_text(
+            "At an NHS hospital Details: St Thomas' Hospital, London"
+        )
+
+        row = section.locator(".app-nested-info__row", has_text="Additional details")
         expect(row).to_contain_text(
             "Participant described no complications following any of the procedures."
         )
@@ -186,21 +196,10 @@ class TestBenignLumpHistory(SystemTestCase):
         )
 
     def then_i_see_a_change_link_for_the_benign_lump_history_item(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Benign lump history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-
-        expect(row).to_contain_text("Change")
+        expect(self.page.get_by_text("Change benign lump item")).to_be_attached()
 
     def when_i_click_on_the_change_link_for_the_benign_lump_history_item(self):
-        key = self.page.locator(
-            ".nhsuk-summary-list__key",
-            has=self.page.get_by_text("Benign lump history", exact=True),
-        )
-        row = self.page.locator(".nhsuk-summary-list__row").filter(has=key)
-        row.get_by_role("link", name="Change").click()
+        self.page.get_by_text("Change benign lump item").click()
 
     def when_i_update_the_form_details(self):
         # Update to match the expected values in and_the_benign_lump_history_item_is_listed

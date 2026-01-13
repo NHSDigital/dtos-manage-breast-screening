@@ -96,6 +96,10 @@ the summaryList component does.
   margin-bottom: 0;
 }
 
+.app-nested-info__value > p {
+  margin-bottom: 12px;
+}
+
 // Remove the usual margin from paragraphs and lists, where it touches the border of the grid
 // leaving only the spacing from the .app-nested-info__value
 .app-nested-info__subvalue_row:last-child > .app-nested-info__subvalue > ul:last-child,
