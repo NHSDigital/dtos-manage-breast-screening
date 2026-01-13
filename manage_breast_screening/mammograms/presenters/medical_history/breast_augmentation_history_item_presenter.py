@@ -50,38 +50,6 @@ class BreastAugmentationHistoryItemPresenter:
         return multiline_content(lines)
 
     @property
-    def summary_list_params(self):
-        # This is a placeholder until we have a properly formatted table.
-
-        procedures = [
-            f"Right breast: {', '.join(self.right_breast_procedures)}",
-            f"Left breast: {', '.join(self.left_breast_procedures)}",
-        ]
-
-        return {
-            "rows": [
-                {
-                    "key": {"text": "Procedures"},
-                    "value": {"html": multiline_content(procedures)},
-                },
-                {
-                    "key": {"text": "Procedure year"},
-                    "value": {"html": self.procedure_year},
-                },
-                {
-                    "key": {"text": "Implants have been removed"},
-                    "value": {
-                        "html": self.implants_have_been_removed,
-                    },
-                },
-                {
-                    "key": {"text": "Additional details"},
-                    "value": {"html": self.additional_details},
-                },
-            ],
-        }
-
-    @property
     def change_link(self):
         return {
             "href": reverse(

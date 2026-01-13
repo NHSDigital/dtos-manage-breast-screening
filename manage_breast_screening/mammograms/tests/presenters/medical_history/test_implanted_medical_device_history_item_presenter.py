@@ -73,53 +73,6 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
         )
         assert presenter.procedure_year_with_removal == ""
 
-    @time_machine.travel(date(2025, 1, 1))
-    def test_single(self, presenter):
-        assert presenter.summary_list_params == {
-            "rows": [
-                {
-                    "key": {
-                        "text": "Device",
-                    },
-                    "value": {
-                        "html": "Other medical device",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Other medical device details",
-                    },
-                    "value": {
-                        "html": "Test Device",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Procedure year",
-                    },
-                    "value": {
-                        "html": "2020 (5 years ago)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Device has been removed",
-                    },
-                    "value": {
-                        "html": "Yes (2022)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Additional details",
-                    },
-                    "value": {
-                        "html": "Some additional details",
-                    },
-                },
-            ],
-        }
-
     def test_change_link(self):
         item = ImplantedMedicalDeviceHistoryItemFactory.build(
             device=ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,

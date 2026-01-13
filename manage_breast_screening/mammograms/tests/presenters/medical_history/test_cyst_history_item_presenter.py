@@ -25,28 +25,6 @@ class TestCystHistoryItemPresenter:
         assert presenter.treatment == "No treatment"
         assert presenter.additional_details == "Some additional details"
 
-    def test_single(self, presenter):
-        assert presenter.summary_list_params == {
-            "rows": [
-                {
-                    "key": {
-                        "text": "Treatment",
-                    },
-                    "value": {
-                        "html": "No treatment",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Additional details",
-                    },
-                    "value": {
-                        "html": "Some additional details",
-                    },
-                },
-            ],
-        }
-
     def test_change_link(self):
         item = CystHistoryItemFactory.build(
             treatment=CystHistoryItem.Treatment.NO_TREATMENT,

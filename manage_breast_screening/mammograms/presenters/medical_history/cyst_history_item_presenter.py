@@ -15,22 +15,6 @@ class CystHistoryItemPresenter:
         self.additional_details = nl2br(self._item.additional_details)
 
     @property
-    def summary_list_params(self):
-        # This is a placeholder until we have a properly formatted table.
-        return {
-            "rows": [
-                {
-                    "key": {"text": "Treatment"},
-                    "value": {"html": self.treatment},
-                },
-                {
-                    "key": {"text": "Additional details"},
-                    "value": {"html": self.additional_details},
-                },
-            ],
-        }
-
-    @property
     def change_link(self):
         return {
             "href": reverse(
