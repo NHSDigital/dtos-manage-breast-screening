@@ -136,7 +136,7 @@ class DeleteParticipantReportedMammogramView(
         return "item"
 
     def get_success_message_content(self, object):
-        return "Deleted other procedure"
+        return "Deleted a previous mammogram"
 
     def get_object(self):
         provider = self.request.user.current_provider

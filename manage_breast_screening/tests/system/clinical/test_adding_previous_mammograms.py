@@ -72,6 +72,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_click_delete_this_mammogram()
         self.and_i_click_delete_item()
         self.then_i_should_be_back_on_the_appointment()
+        self.and_the_message_says_mammogram_deleted()
         self.and_the_previous_mammogram_is_gone()
 
     def test_adding_a_mammogram_within_last_six_months_do_not_proceed(self):
@@ -354,3 +355,9 @@ class TestAddingPreviousMammograms(SystemTestCase):
             "Added today",
             use_inner_text=True,
         )
+
+    def and_the_message_says_mammogram_deleted(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Deleted a previous mammogram")

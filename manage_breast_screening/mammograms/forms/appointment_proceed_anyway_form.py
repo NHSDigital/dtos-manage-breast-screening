@@ -9,7 +9,7 @@ class AppointmentProceedAnywayForm(Form):
         required=True,
         label="Provide a reason for continuing",
         label_classes="nhsuk-label--m",
-        widget=Textarea(attrs={"rows": 4}),
+        widget=Textarea(attrs={"rows": 3}),
         max_words=500,
         error_messages={
             "max_words": "Reason for continuing must be 500 words or less",
@@ -19,6 +19,10 @@ class AppointmentProceedAnywayForm(Form):
 
     def __init__(self, *args, participant, **kwargs):
         self.instance = kwargs.pop("instance", None)
+
+        kwargs["initial"] = {
+            "reason_for_continuing": self.instance.reason_for_continuing
+        }
 
         super().__init__(*args, **kwargs)
 
