@@ -85,6 +85,8 @@
   action_button_properties=presenter.review_action_button_properties(sections.MEDICAL_HISTORY),
   csrf_input=csrf_input,
   ) %}
+  <p>Including breast cancer, implants, prior procedures and treatments</p>
+
   {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
   {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
   {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
