@@ -1,0 +1,12 @@
+{% if resume_appointment_url is undefined %}
+  {{ raise('resume_appointment_url is required') }}
+{% endif %}
+
+<div data-module="app-resume-appointment" data-appointment-id="{{ presented_appointment.pk }}">
+  <form action="{{ resume_appointment_url }}" method="post" novalidate>
+    <p>
+      <button class="app-button app-button--link">Resume appointment<span class="nhsuk-u-visually-hidden"> for {{ presented_appointment.participant.full_name }}</span></button>
+    </p>
+    {{ csrf_input }}
+  </form>
+</div>
