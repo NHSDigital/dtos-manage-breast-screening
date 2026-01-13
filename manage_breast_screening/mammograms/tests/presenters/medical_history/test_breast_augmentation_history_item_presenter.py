@@ -34,9 +34,7 @@ class TestBreastAugmentationHistoryItemPresenter:
 
     @time_machine.travel(date(2025, 1, 1))
     def test_attributes(self, presenter):
-        assert presenter.right_breast_procedures == [
-            "Breast implants (silicone or saline)"
-        ]
+        assert presenter.right_breast_procedures == ["Breast implants"]
         assert presenter.left_breast_procedures == ["No procedures"]
         assert presenter.procedure_year == "2000 (25 years ago)"
         assert presenter.implants_have_been_removed == "Yes (2018)"
@@ -69,7 +67,7 @@ class TestBreastAugmentationHistoryItemPresenter:
                         "text": "Procedures",
                     },
                     "value": {
-                        "html": "Right breast: Breast implants (silicone or saline)<br>Left breast: No procedures",
+                        "html": "Right breast: Breast implants<br>Left breast: No procedures",
                     },
                 },
                 {

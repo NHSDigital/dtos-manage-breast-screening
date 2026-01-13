@@ -33,10 +33,28 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
 
     @time_machine.travel(date(2025, 1, 1))
     def test_attributes(self, presenter):
-        assert presenter.device == "Other medical device (or does not know)"
+        assert presenter.device == "Other medical device"
         assert presenter.procedure_year == "2020 (5 years ago)"
         assert presenter.removal_year == "2022 (3 years ago)"
         assert presenter.additional_details == "Some additional details"
+
+    @pytest.mark.parametrize(
+        "device, expected",
+        [
+            (ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE, "Cardiac device"),
+            (ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE, "Hickman line"),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                "Other medical device",
+            ),
+        ],
+    )
+    @time_machine.travel(date(2025, 1, 1))
+    def test_device_removes_parenthetical_text(self, device, expected):
+        item = ImplantedMedicalDeviceHistoryItemFactory.build(device=device)
+        presenter = ImplantedMedicalDeviceHistoryItemPresenter(item)
+
+        assert presenter.device == expected
 
     @time_machine.travel(date(2025, 1, 1))
     def test_procedure_year_with_removal(self, presenter):
@@ -64,7 +82,7 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
                         "text": "Device",
                     },
                     "value": {
-                        "html": "Other medical device (or does not know)",
+                        "html": "Other medical device",
                     },
                 },
                 {

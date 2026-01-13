@@ -15,7 +15,6 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
         # visually hidden text
         self.counter = counter
 
-        self.device = self._item.get_device_display()
         self.other_medical_device_details = (
             self._item.other_medical_device_details or "N/A"
         )
@@ -34,6 +33,14 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
     @property
     def removal_year(self):
         return format_year_with_relative(self._item.removal_year)
+
+    @property
+    def device(self):
+        mapping = {
+            ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE: "Cardiac device",
+            ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE: "Other medical device",
+        }
+        return mapping.get(self._item.device, self._item.get_device_display())
 
     @property
     def procedure_year_with_removal(self):
@@ -80,7 +87,7 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
 
     @property
     def type(self):
-        device = self._item.get_device_display()
+        device = self.device
         details = self._item.other_medical_device_details
         if (
             self._item.device

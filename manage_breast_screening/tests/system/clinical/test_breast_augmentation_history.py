@@ -140,7 +140,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
         )
         section = self.page.locator("section").filter(has=heading)
         row = section.locator(".app-nested-info__row", has_text="Procedures")
-        expect(row).to_contain_text("Right breast Breast implants (silicone or saline)")
+        expect(row).to_contain_text("Right breast Breast implants")
         expect(row).to_contain_text("Left breast Other augmentation")
 
     def and_the_message_says_augmentation_added(self):

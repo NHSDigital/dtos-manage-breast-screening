@@ -13,12 +13,11 @@ class BreastAugmentationHistoryItemPresenter:
         self.counter = counter
 
         self.right_breast_procedures = [
-            BreastAugmentationHistoryItem.Procedure(choice).label
+            self._procedure_text(choice)
             for choice in self._item.right_breast_procedures
         ]
         self.left_breast_procedures = [
-            BreastAugmentationHistoryItem.Procedure(choice).label
-            for choice in self._item.left_breast_procedures
+            self._procedure_text(choice) for choice in self._item.left_breast_procedures
         ]
 
         self.implants_have_been_removed = (
@@ -99,3 +98,9 @@ class BreastAugmentationHistoryItemPresenter:
                 else " breast implants or augmentation item"
             ),
         }
+
+    def _procedure_text(self, procedure):
+        if procedure == BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS:
+            return "Breast implants"
+        else:
+            return BreastAugmentationHistoryItem.Procedure(procedure).label
