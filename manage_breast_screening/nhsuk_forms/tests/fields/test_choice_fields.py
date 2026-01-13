@@ -101,7 +101,7 @@ class TestChoiceField:
                         <label class="nhsuk-label nhsuk-radios__label" for="id_predicate">A</label>
                     </div>
                     <div class="nhsuk-radios__item">
-                        <input aria-controls="conditional-id_predicate-2" class="nhsuk-radios__input" id="id_predicate-2" name="predicate" type="radio" value="b">
+                        <input data-aria-controls="conditional-id_predicate-2" class="nhsuk-radios__input" id="id_predicate-2" name="predicate" type="radio" value="b">
                         <label class="nhsuk-label nhsuk-radios__label" for="id_predicate-2">B</label>
                     </div>
                     <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_predicate-2">
@@ -136,7 +136,7 @@ class TestChoiceField:
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
                         </div>
                         <div class="nhsuk-radios__item">
-                            <input aria-controls="conditional-id_field-2" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                            <input data-aria-controls="conditional-id_field-2" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
                         </div>
                         <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
@@ -301,7 +301,7 @@ class TestMultipleChoiceField:
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
                         </div>
                         <div class="nhsuk-checkboxes__item">
-                            <input aria-controls="conditional-id_checkbox_field-2" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
+                            <input data-aria-controls="conditional-id_checkbox_field-2" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
                         </div>
                         <div class="nhsuk-checkboxes__conditional nhsuk-checkboxes__conditional--hidden" id="conditional-id_checkbox_field-2">
