@@ -45,6 +45,17 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
         )
 
     @time_machine.travel(date(2025, 1, 1))
+    def test_missing_procedure_year(self):
+        presenter = ImplantedMedicalDeviceHistoryItemPresenter(
+            ImplantedMedicalDeviceHistoryItemFactory.build(
+                device=ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                other_medical_device_details="Test Device",
+                additional_details="Some additional details",
+            )
+        )
+        assert presenter.procedure_year_with_removal == ""
+
+    @time_machine.travel(date(2025, 1, 1))
     def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [

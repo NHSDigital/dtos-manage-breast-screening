@@ -49,6 +49,18 @@ class TestBreastAugmentationHistoryItemPresenter:
         )
 
     @time_machine.travel(date(2025, 1, 1))
+    def test_missing_procedure_year(self):
+        presenter = BreastAugmentationHistoryItemPresenter(
+            BreastAugmentationHistoryItemFactory.build(
+                right_breast_procedures=[
+                    BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                ],
+                additional_details="some details",
+            )
+        )
+        assert presenter.procedure_year_with_removal == ""
+
+    @time_machine.travel(date(2025, 1, 1))
     def test_single(self, presenter):
         assert presenter.summary_list_params == {
             "rows": [
