@@ -14,6 +14,79 @@ from manage_breast_screening.participants.tests.factories import (
     ParticipantReportedMammogramFactory,
 )
 
+DATES_SIX_MONTHS_OR_MORE = [
+    date.today() - relativedelta(months=6),
+    date.today() - relativedelta(months=6) - relativedelta(days=1),
+    date.today() - relativedelta(years=50),
+]
+
+DATES_WITHIN_LAST_SIX_MONTHS = [
+    date.today(),
+    date.today() - relativedelta(months=6) + relativedelta(days=1),
+    date.today() - relativedelta(months=6) + relativedelta(days=2),
+]
+
+
+def build_exact_date_form_data(exact_date, return_url=None):
+    """Build form data for submitting an exact mammogram date."""
+    data = {
+        "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
+        "exact_date_0": exact_date.day,
+        "exact_date_1": exact_date.month,
+        "exact_date_2": exact_date.year,
+        "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+    }
+    if return_url:
+        data["return_url"] = return_url
+    return data
+
+
+def assert_mammogram_validation_errors(response):
+    """Assert that the standard mammogram validation errors are displayed."""
+    assert response.status_code == 200
+    assertInHTML(
+        """
+        <ul class="nhsuk-list nhsuk-error-summary__list">
+            <li><a href="#id_location_type">Select where the breast x-rays were taken</a></li>
+            <li><a href="#id_when_taken">Select when the x-rays were taken</a></li>
+            <li><a href="#id_name_is_the_same">Select if the x-rays were taken with the same name</a></li>
+        </ul>
+        """,
+        response.text,
+    )
+
+
+def assert_attended_not_screened_flow(client, appointment):
+    """Assert the attended not screened flow completes correctly."""
+    response = client.http.post(
+        reverse(
+            "mammograms:attended_not_screened",
+            kwargs={"appointment_pk": appointment.pk},
+        ),
+    )
+    assertRedirects(
+        response,
+        reverse(
+            "clinics:show",
+            kwargs={"pk": appointment.clinic_slot.clinic.pk},
+        ),
+    )
+    assert appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
+
+
+def assert_success_message(response, message_text):
+    """Assert that a success message is displayed."""
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                level=messages.SUCCESS,
+                message=message_text,
+            )
+        ],
+    )
+
 
 @pytest.fixture
 def participant_reported_mammogram(appointment):
@@ -21,6 +94,16 @@ def participant_reported_mammogram(appointment):
         participant=appointment.participant,
         location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
     )
+
+
+@pytest.fixture
+def valid_mammogram_form_data():
+    """Basic valid form data for mammogram submission."""
+    return {
+        "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
+        "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+    }
 
 
 @pytest.mark.django_db
@@ -47,19 +130,11 @@ class TestAddParticipantReportedMammogram:
                 kwargs={"pk": appointment.pk},
             )
         )
-        assert response.status_code == 200
-        assertInHTML(
-            """
-            <ul class="nhsuk-list nhsuk-error-summary__list">
-                <li><a href="#id_location_type">Select where the breast x-rays were taken</a></li>
-                <li><a href="#id_when_taken">Select when the x-rays were taken</a></li>
-                <li><a href="#id_name_is_the_same">Select if the x-rays were taken with the same name</a></li>
-            </ul>
-            """,
-            response.text,
-        )
+        assert_mammogram_validation_errors(response)
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, valid_mammogram_form_data
+    ):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
@@ -68,11 +143,7 @@ class TestAddParticipantReportedMammogram:
                 "mammograms:add_previous_mammogram",
                 kwargs={"pk": appointment.pk},
             ),
-            {
-                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
-                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
-            },
+            valid_mammogram_form_data,
         )
         assertRedirects(
             response,
@@ -81,24 +152,9 @@ class TestAddParticipantReportedMammogram:
                 kwargs={"pk": appointment.pk},
             ),
         )
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    level=messages.SUCCESS,
-                    message="Added a previous mammogram",
-                )
-            ],
-        )
+        assert_success_message(response, "Added a previous mammogram")
 
-    @pytest.mark.parametrize(
-        "exact_date",
-        [
-            date.today() - relativedelta(months=6),
-            date.today() - relativedelta(months=6) - relativedelta(days=1),
-            date.today() - relativedelta(years=50),
-        ],
-    )
+    @pytest.mark.parametrize("exact_date", DATES_SIX_MONTHS_OR_MORE)
     def test_post_exact_date_six_months_or_more(self, clinical_user_client, exact_date):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
@@ -113,36 +169,13 @@ class TestAddParticipantReportedMammogram:
                 "mammograms:add_previous_mammogram",
                 kwargs={"pk": appointment.pk},
             ),
-            {
-                "return_url": return_url,
-                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
-                "exact_date_0": exact_date.day,
-                "exact_date_1": exact_date.month,
-                "exact_date_2": exact_date.year,
-                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
-            },
+            build_exact_date_form_data(exact_date, return_url),
         )
 
         assertRedirects(response, return_url)
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    level=messages.SUCCESS,
-                    message="Added a previous mammogram",
-                )
-            ],
-        )
+        assert_success_message(response, "Added a previous mammogram")
 
-    @pytest.mark.parametrize(
-        "exact_date",
-        [
-            date.today(),
-            date.today() - relativedelta(months=6) + relativedelta(days=1),
-            date.today() - relativedelta(months=6) + relativedelta(days=2),
-        ],
-    )
+    @pytest.mark.parametrize("exact_date", DATES_WITHIN_LAST_SIX_MONTHS)
     def test_post_exact_date_within_last_six_months(
         self, clinical_user_client, exact_date
     ):
@@ -166,15 +199,7 @@ class TestAddParticipantReportedMammogram:
                 "mammograms:add_previous_mammogram",
                 kwargs={"pk": appointment.pk},
             ),
-            {
-                "return_url": return_url,
-                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
-                "exact_date_0": exact_date.day,
-                "exact_date_1": exact_date.month,
-                "exact_date_2": exact_date.year,
-                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
-            },
+            build_exact_date_form_data(exact_date, return_url),
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
@@ -194,22 +219,7 @@ class TestAddParticipantReportedMammogram:
         )
         assert appointment.current_status.name == AppointmentStatus.CONFIRMED
 
-        response = clinical_user_client.http.post(
-            reverse(
-                "mammograms:attended_not_screened",
-                kwargs={"appointment_pk": appointment.pk},
-            ),
-        )
-        assertRedirects(
-            response,
-            reverse(
-                "clinics:show",
-                kwargs={"pk": appointment.clinic_slot.clinic.pk},
-            ),
-        )
-        assert (
-            appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
-        )
+        assert_attended_not_screened_flow(clinical_user_client, appointment)
 
 
 @pytest.mark.django_db
@@ -244,20 +254,14 @@ class TestChangeParticipantReportedMammogram:
             ),
             {},
         )
-        assert response.status_code == 200
-        assertInHTML(
-            """
-            <ul class="nhsuk-list nhsuk-error-summary__list">
-                <li><a href="#id_location_type">Select where the breast x-rays were taken</a></li>
-                <li><a href="#id_when_taken">Select when the x-rays were taken</a></li>
-                <li><a href="#id_name_is_the_same">Select if the x-rays were taken with the same name</a></li>
-            </ul>
-            """,
-            response.text,
-        )
+        assert_mammogram_validation_errors(response)
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, participant_reported_mammogram
+        self,
+        clinical_user_client,
+        appointment,
+        participant_reported_mammogram,
+        valid_mammogram_form_data,
     ):
         response = clinical_user_client.http.post(
             reverse(
@@ -267,11 +271,7 @@ class TestChangeParticipantReportedMammogram:
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
-            {
-                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
-                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
-            },
+            valid_mammogram_form_data,
         )
         assertRedirects(
             response,
@@ -280,24 +280,9 @@ class TestChangeParticipantReportedMammogram:
                 kwargs={"pk": appointment.pk},
             ),
         )
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    level=messages.SUCCESS,
-                    message="Updated a previous mammogram",
-                )
-            ],
-        )
+        assert_success_message(response, "Updated a previous mammogram")
 
-    @pytest.mark.parametrize(
-        "exact_date",
-        [
-            date.today() - relativedelta(months=6),
-            date.today() - relativedelta(months=6) - relativedelta(days=1),
-            date.today() - relativedelta(years=50),
-        ],
-    )
+    @pytest.mark.parametrize("exact_date", DATES_SIX_MONTHS_OR_MORE)
     def test_post_exact_date_six_months_or_more(
         self,
         clinical_user_client,
@@ -317,36 +302,13 @@ class TestChangeParticipantReportedMammogram:
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
-            {
-                "return_url": return_url,
-                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
-                "exact_date_0": exact_date.day,
-                "exact_date_1": exact_date.month,
-                "exact_date_2": exact_date.year,
-                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
-            },
+            build_exact_date_form_data(exact_date, return_url),
         )
 
         assertRedirects(response, return_url)
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    level=messages.SUCCESS,
-                    message="Updated a previous mammogram",
-                )
-            ],
-        )
+        assert_success_message(response, "Updated a previous mammogram")
 
-    @pytest.mark.parametrize(
-        "exact_date",
-        [
-            date.today(),
-            date.today() - relativedelta(months=6) + relativedelta(days=1),
-            date.today() - relativedelta(months=6) + relativedelta(days=2),
-        ],
-    )
+    @pytest.mark.parametrize("exact_date", DATES_WITHIN_LAST_SIX_MONTHS)
     def test_post_exact_date_within_last_six_months(
         self,
         clinical_user_client,
@@ -374,15 +336,7 @@ class TestChangeParticipantReportedMammogram:
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
-            {
-                "return_url": return_url,
-                "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-                "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
-                "exact_date_0": exact_date.day,
-                "exact_date_1": exact_date.month,
-                "exact_date_2": exact_date.year,
-                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
-            },
+            build_exact_date_form_data(exact_date, return_url),
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
@@ -402,22 +356,7 @@ class TestChangeParticipantReportedMammogram:
         )
         assert appointment.current_status.name == AppointmentStatus.CONFIRMED
 
-        response = clinical_user_client.http.post(
-            reverse(
-                "mammograms:attended_not_screened",
-                kwargs={"appointment_pk": appointment.pk},
-            ),
-        )
-        assertRedirects(
-            response,
-            reverse(
-                "clinics:show",
-                kwargs={"pk": appointment.clinic_slot.clinic.pk},
-            ),
-        )
-        assert (
-            appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
-        )
+        assert_attended_not_screened_flow(clinical_user_client, appointment)
 
 
 @pytest.mark.django_db
@@ -521,12 +460,4 @@ class TestAppointmentProceedAnywayView:
                 kwargs={"pk": appointment.pk},
             ),
         )
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    level=messages.SUCCESS,
-                    message="Updated a previous mammogram",
-                )
-            ],
-        )
+        assert_success_message(response, "Updated a previous mammogram")
