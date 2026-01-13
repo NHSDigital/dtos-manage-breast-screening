@@ -31,14 +31,14 @@ from ..presenters import (
     present_secondary_nav,
 )
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
-from .mixins import AppointmentMixin, InProgressAppointmentMixin
+from .mixins import AppointmentTabMixin, InProgressAppointmentMixin
 
 APPOINTMENT_CANNOT_PROCEED = "Appointment cannot proceed"
 
 logger = logging.getLogger(__name__)
 
 
-class ShowAppointment(AppointmentMixin, View):
+class ShowAppointment(AppointmentTabMixin, View):
     """
     Show a completed appointment. Redirects to the start screening form
     if the apppointment is in progress.
@@ -81,7 +81,7 @@ class ShowAppointment(AppointmentMixin, View):
         )
 
 
-class ParticipantDetails(AppointmentMixin, View):
+class ParticipantDetails(AppointmentTabMixin, View):
     template_name = "mammograms/show.jinja"
 
     def get(self, request, *args, **kwargs):

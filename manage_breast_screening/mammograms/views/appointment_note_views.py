@@ -11,12 +11,12 @@ from manage_breast_screening.participants.models import AppointmentNote
 
 from ..forms import AppointmentNoteForm
 from ..presenters import AppointmentPresenter, present_secondary_nav
-from .mixins import AppointmentMixin
+from .mixins import AppointmentTabMixin
 
 logger = logging.getLogger(__name__)
 
 
-class AppointmentNoteView(AppointmentMixin, FormView):
+class AppointmentNoteView(AppointmentTabMixin, FormView):
     template_name = "mammograms/show/appointment_note.jinja"
     form_class = AppointmentNoteForm
 

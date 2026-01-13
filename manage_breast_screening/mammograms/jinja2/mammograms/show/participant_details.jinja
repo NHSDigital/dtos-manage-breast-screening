@@ -1,47 +1,9 @@
-{% extends 'layout-app.jinja' %}
+{% extends 'layout-appointment.jinja' %}
 {% from 'nhsuk/components/card/macro.jinja' import card %}
-{% from 'nhsuk/components/warning-callout/macro.jinja' import warningCallout %}
-{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
-{% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
-{% from 'components/appointment-header/macro.jinja' import app_appointment_header %}
 {% from 'components/participant-details/participant_details.jinja' import participant_details %}
 {% from 'components/participant-details/contact_details.jinja' import contact_details %}
-{% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
-{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 
-{% block beforeContent %}
-{{ backLink({
-  "href": presented_appointment.clinic_url,
-  "text": "Back to clinic"
-}) }}
-{% endblock beforeContent %}
-
-{% block page_content %}
-<div class="nhsuk-grid-row">
-  <div class="nhsuk-grid-column-full">
-
-  <div class="app-header">
-    <h1 class="nhsuk-heading-l">
-      <span class="nhsuk-caption-l">
-        {{ caption }}
-      </span>
-      {{ heading }}
-    </h1>
-
-    <div class="app-header__status-tag">
-      {{ app_appointment_status(presented_appointment) }}
-    </div>
-  </div>
-
-  {{ app_appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
-
-  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
-
-  {{ app_secondary_navigation({
-    "visuallyHiddenTitle": "Secondary menu",
-    "items": secondary_nav_items
-  }) }}
-
+{% block tab_content %}
   {{ card({
     "heading": "Participant details",
     "descriptionHtml": participant_details(
@@ -53,6 +15,4 @@
   }) }}
 
   {{ contact_details(presented_participant) }}
-  </div>
-</div>
 {% endblock %}
