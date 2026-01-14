@@ -60,11 +60,6 @@ class BreastAugmentationHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" breast implants or augmentation item {self.counter}"
-                if self.counter
-                else " breast implants or augmentation item"
-            ),
         }
 
     def _procedure_text(self, procedure):

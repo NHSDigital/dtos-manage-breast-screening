@@ -181,7 +181,7 @@ class TestRecordingMastectomyOrLumpectomy(SystemTestCase):
         expect(alert).to_contain_text("Added mastectomy or lumpectomy")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change mastectomy or lumpectomy item").click()
+        self.page.get_by_text("Change (mastectomy or lumpectomy)").click()
 
     def then_i_see_the_edit_mastectomy_or_lumpectomy_form(self):
         expect(

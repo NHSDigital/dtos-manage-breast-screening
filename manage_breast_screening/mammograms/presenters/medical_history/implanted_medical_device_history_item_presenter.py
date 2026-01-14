@@ -79,9 +79,4 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" item {self.counter}"
-                if self.counter
-                else " implanted medical device item"
-            ),
         }

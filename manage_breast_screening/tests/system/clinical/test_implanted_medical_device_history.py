@@ -147,7 +147,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         expect(alert).to_contain_text("Added implanted medical device")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change implanted medical device item").click()
+        self.page.get_by_text("Change (implanted medical device)").click()
 
     def then_i_see_the_edit_implanted_medical_device_form(self):
         expect(

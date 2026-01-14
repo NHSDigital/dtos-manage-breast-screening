@@ -59,9 +59,4 @@ class MastectomyOrLumpectomyHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" mastectomy or lumpectomy item {self.counter}"
-                if self.counter
-                else " mastectomy or lumpectomy item"
-            ),
         }

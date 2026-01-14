@@ -33,9 +33,4 @@ class OtherProcedureHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" other procedure item {self.counter}"
-                if self.counter
-                else " other procedure item"
-            ),
         }

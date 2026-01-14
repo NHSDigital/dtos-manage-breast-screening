@@ -5,28 +5,24 @@ paragraph %}
 {% macro mastectomy_or_lumpectomy_history_card(presented_items) %}
   {% if presented_items %}
   <section>
-    <h3 class="nhsuk-u-margin-bottom-2">Mastectomy or lumpectomy</h3>
   {% endif %}
 
   {% for presented_item in presented_items %}
-    {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
-
     {{ app_nested_info_card({
       "card": {
-        "heading": "Item " ~ presented_item.counter if presented_item.counter,
-        "headingLevel": 4 if presented_item.counter,
+        "heading": "Mastectomy or lumpectomy" ~ (": item " ~ presented_item.counter if presented_item.counter),
+        "headingLevel": 3,
         "classes": "nhsuk-u-margin-bottom-4",
         "actions": {
           "items": [
             {
               "text": presented_item.change_link.text,
-              "visuallyHiddenText": presented_item.change_link.visually_hidden_text,
               "href": presented_item.change_link.href
             }
           ]
         }
       },
-      "headingLevel": keyHeadingLevel,
+      "headingLevel": 4,
       "rows": [
         {
           "key": "Procedures",

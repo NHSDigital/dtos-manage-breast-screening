@@ -53,15 +53,4 @@ class TestBenignLumpHistoryItemPresenter:
         assert result == {
             "href": f"/mammograms/{item.appointment_id}/record-medical-information/benign-lump-history/{item.id}/",
             "text": "Change",
-            "visually_hidden_text": " benign lump item",
-        }
-
-    def test_change_link_with_counter(self):
-        item = BenignLumpHistoryItemFactory.build()
-
-        presenter = BenignLumpHistoryItemPresenter(item, counter=2)
-        assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/benign-lump-history/{item.pk}/",
-            "text": "Change",
-            "visually_hidden_text": " benign lump item 2",
         }

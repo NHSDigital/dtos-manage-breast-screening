@@ -25,7 +25,4 @@ class CystHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" cyst item {self.counter}" if self.counter else " cyst item"
-            ),
         }

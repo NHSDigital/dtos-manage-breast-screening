@@ -35,18 +35,4 @@ class TestCystHistoryItemPresenter:
         assert presenter.change_link == {
             "href": f"/mammograms/{item.appointment_id}/record-medical-information/cyst-history/{item.pk}/",
             "text": "Change",
-            "visually_hidden_text": " cyst item",
-        }
-
-    def test_change_link_with_counter(self):
-        item = CystHistoryItemFactory.build(
-            treatment=CystHistoryItem.Treatment.NO_TREATMENT,
-            additional_details="Some additional details",
-        )
-
-        presenter = CystHistoryItemPresenter(item, counter=2)
-        assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/cyst-history/{item.pk}/",
-            "text": "Change",
-            "visually_hidden_text": " cyst item 2",
         }

@@ -4,28 +4,24 @@
 {% macro breast_augmentation_history_card(breast_augmentation_history) %}
   {% if breast_augmentation_history %}
   <section>
-    <h3 class="nhsuk-u-margin-bottom-2">Breast implants or augmentation</h3>
   {% endif %}
 
   {% for presented_item in breast_augmentation_history %}
-    {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
-
     {{ app_nested_info_card({
       "card": {
-        "heading": "Item " ~ presented_item.counter if presented_item.counter,
-        "headingLevel": 4 if presented_item.counter,
+        "heading": "Breast implants or augmentation" ~ (": item " ~ presented_item.counter if presented_item.counter),
+        "headingLevel": 3,
         "classes": "nhsuk-u-margin-bottom-4",
         "actions": {
           "items": [
             {
               "text": presented_item.change_link.text,
-              "visuallyHiddenText": presented_item.change_link.visually_hidden_text,
               "href": presented_item.change_link.href
             }
           ]
         }
       },
-      "headingLevel": keyHeadingLevel,
+      "headingLevel": 4,
       "rows": [
         {
           "key": "Procedures",

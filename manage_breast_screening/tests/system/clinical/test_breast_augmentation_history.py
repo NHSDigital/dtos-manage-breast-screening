@@ -150,7 +150,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
         expect(alert).to_contain_text("Added breast implants or augmentation")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change breast implants or augmentation item").click()
+        self.page.get_by_text("Change (breast implants or augmentation)").click()
 
     def then_i_see_the_edit_breast_augmentation_history_form(self):
         expect(

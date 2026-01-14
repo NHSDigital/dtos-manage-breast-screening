@@ -44,9 +44,4 @@ class BenignLumpHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" benign lump item {self.counter}"
-                if self.counter
-                else " benign lump item"
-            ),
         }
