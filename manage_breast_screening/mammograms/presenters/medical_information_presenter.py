@@ -207,6 +207,9 @@ class MedicalInformationPresenter:
 
     @property
     def add_cyst_history_button(self):
+        if self.cyst_history:
+            return None
+
         url = reverse(
             "mammograms:add_cyst_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -219,6 +222,9 @@ class MedicalInformationPresenter:
 
     @property
     def add_breast_augmentation_history_button(self):
+        if self.breast_augmentation_history:
+            return None
+
         url = reverse(
             "mammograms:add_breast_augmentation_history_item",
             kwargs={"pk": self.appointment.pk},

@@ -113,11 +113,13 @@
 
   <div class="nhsuk-button-group app-button-group--small">
     {% for button_info in presenter.medical_history_buttons %}
-      {{ button({
-        "text": button_info.text,
-        "href": button_info.href,
-        "classes": "nhsuk-button--secondary nhsuk-button--small"
-      }) }}
+      {% if button_info %}
+        {{ button({
+          "text": button_info.text,
+          "href": button_info.href,
+          "classes": "nhsuk-button--secondary nhsuk-button--small"
+        }) }}
+      {% endif %}
     {% endfor %}
   </div>
 {% endcall %}

@@ -10,6 +10,7 @@ from manage_breast_screening.participants.models.symptom import (
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    BreastAugmentationHistoryItemFactory,
     CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
@@ -173,6 +174,19 @@ class TestRecordMedicalInformationPresenter:
             "href": f"/mammograms/{appointment.pk}/record-medical-information/cyst-history/",
             "text": "Cysts",
         }
+
+    def test_certain_items_can_only_be_added_once(self):
+        appointment = AppointmentFactory()
+        CystHistoryItemFactory.create(appointment=appointment)
+        BreastAugmentationHistoryItemFactory.create(appointment=appointment)
+
+        assert MedicalInformationPresenter(appointment).add_cyst_history_button is None
+        assert (
+            MedicalInformationPresenter(
+                appointment
+            ).add_breast_augmentation_history_button
+            is None
+        )
 
     def test_breast_augmentation_history_button(self):
         appointment = AppointmentFactory()

@@ -1,5 +1,7 @@
 import logging
 
+from django.shortcuts import redirect
+
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     UpdateWithAuditView,
@@ -20,6 +22,14 @@ class AddBreastAugmentationHistoryView(MedicalInformationMixin, AddWithAuditView
     form_class = BreastAugmentationHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/breast_augmentation_history.jinja"
     thing_name = "breast implants or augmentation"
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.appointment.breast_augmentation_history_items.exists():
+            return redirect(
+                "mammograms:record_medical_information",
+                pk=self.appointment.pk,
+            )
+        return super().dispatch(request, *args, **kwargs)
 
     def add_title(self, thing_name):
         return f"Add details of {thing_name}"
