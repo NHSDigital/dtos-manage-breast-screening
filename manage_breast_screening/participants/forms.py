@@ -248,7 +248,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         field_values = self.model_values()
 
         instance = ParticipantReportedMammogram(
-            participant=self.participant,
+            appointment=appointment,
             **field_values,
         )
 

@@ -141,7 +141,7 @@ class DeleteParticipantReportedMammogramView(
     def get_object(self):
         provider = self.request.user.current_provider
         appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.participant.reported_mammograms.get(
+        return appointment.reported_mammograms.get(
             pk=self.kwargs["participant_reported_mammogram_pk"]
         )
 

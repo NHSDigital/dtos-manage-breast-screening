@@ -48,9 +48,8 @@ class ShowAppointment(AppointmentTabMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        participant_pk = appointment.screening_episode.participant.pk
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant_pk
+            appointment_id=appointment.pk
         ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(
             appointment, tab_description="Appointment details"
@@ -86,9 +85,8 @@ class ParticipantDetails(AppointmentTabMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        participant_pk = appointment.screening_episode.participant.pk
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant_pk
+            appointment_id=appointment.pk
         ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(appointment)
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
@@ -188,7 +186,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         context = super().get_context_data(**kwargs)
         participant = self.participant
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            participant_id=participant.pk
+            appointment_id=self.appointment.pk
         ).order_by("-created_at")
 
         presented_mammograms = LastKnownMammogramPresenter(

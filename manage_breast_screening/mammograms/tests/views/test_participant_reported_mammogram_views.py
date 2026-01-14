@@ -91,7 +91,7 @@ def assert_success_message(response, message_text):
 @pytest.fixture
 def participant_reported_mammogram(appointment):
     return ParticipantReportedMammogramFactory.create(
-        participant=appointment.participant,
+        appointment=appointment,
         location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
     )
 
@@ -188,9 +188,7 @@ class TestAddParticipantReportedMammogram:
         )
 
         assert (
-            ParticipantReportedMammogram.objects.filter(
-                participant=appointment.participant
-            ).count()
+            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
             == 0
         )
 
@@ -203,7 +201,7 @@ class TestAddParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            participant=appointment.participant
+            appointment=appointment
         ).first()
 
         assertRedirects(
@@ -224,6 +222,19 @@ class TestAddParticipantReportedMammogram:
 
 @pytest.mark.django_db
 class TestChangeParticipantReportedMammogram:
+    @pytest.fixture
+    def appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+
+    @pytest.fixture
+    def participant_reported_mammogram(self, appointment):
+        return ParticipantReportedMammogramFactory.create(
+            appointment=appointment,
+            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        )
+
     def test_renders_response(
         self, clinical_user_client, appointment, participant_reported_mammogram
     ):
@@ -241,9 +252,6 @@ class TestChangeParticipantReportedMammogram:
     def test_invalid_post_displays_errors(
         self, clinical_user_client, appointment, participant_reported_mammogram
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_previous_mammogram",
@@ -322,9 +330,7 @@ class TestChangeParticipantReportedMammogram:
         )
 
         assert (
-            ParticipantReportedMammogram.objects.filter(
-                participant=appointment.participant
-            ).count()
+            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
             == 1
         )
 
@@ -340,7 +346,7 @@ class TestChangeParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            participant=appointment.participant
+            appointment=appointment
         ).first()
 
         assertRedirects(
@@ -397,7 +403,7 @@ class TestAppointmentProceedAnywayView:
     @pytest.fixture
     def participant_reported_mammogram(self, appointment):
         return ParticipantReportedMammogramFactory.create(
-            participant=appointment.participant,
+            appointment=appointment,
             location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
         )
 
