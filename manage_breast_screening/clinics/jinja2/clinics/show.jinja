@@ -64,6 +64,10 @@
         <br>
         {{ tag(presented_appointment.special_appointment_tag_properties) }}
       {% endif %}
+      {% if presented_appointment.has_appointment_note %}
+        <br>
+        {{ tag(presented_appointment.appointment_note_tag_properties) }}
+      {% endif %}
     {% endset %}
     {% set appointment_html %}
       {{

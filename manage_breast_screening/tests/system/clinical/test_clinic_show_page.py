@@ -14,7 +14,10 @@ from manage_breast_screening.core.utils.string_formatting import (
     format_nhs_number,
 )
 from manage_breast_screening.participants.models import AppointmentStatus
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    AppointmentNoteFactory,
+)
 from manage_breast_screening.users.tests.factories import UserFactory
 
 from ..system_test_setup import SystemTestCase
@@ -46,13 +49,16 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.then_the_appointment_is_checked_in()
         self.and_the_appointments_remain_in_the_same_order()
 
-    def test_user_views_clinic_show_page_with_special_appointments(self):
+    def test_user_views_clinic_show_page_with_tagged_appointments(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_a_clinic_exists_that_is_run_by_my_provider()
+        self.and_an_appointment_has_a_note()
         self.and_an_appointment_has_extra_needs()
+
         self.and_i_am_on_the_clinic_list()
         self.when_i_click_on_the_clinic()
-        self.then_i_can_see_the_appointment_tagged_as_special()
+        self.then_i_can_see_the_appointment_tagged_as_having_note()
+        self.and_i_can_see_the_appointment_tagged_as_special()
         self.when_i_click_on_the_special_appointment()
         self.then_i_can_see_the_special_appointment_banner()
 
@@ -235,6 +241,18 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             )
             expect(row.locator("td").nth(3)).to_contain_text(expected_status_tag)
 
+    def and_an_appointment_has_a_note(self):
+        appointment_with_note = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=timezone.utc),
+            first_name="Someone",
+            last_name="Withnote",
+            current_status=AppointmentStatus.STARTED,
+        )
+        AppointmentNoteFactory(
+            appointment=appointment_with_note, content="This is a note."
+        )
+
     def and_an_appointment_has_extra_needs(self):
         self.extra_needs_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
@@ -249,7 +267,13 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             },
         )
 
-    def then_i_can_see_the_appointment_tagged_as_special(self):
+    def then_i_can_see_the_appointment_tagged_as_having_note(self):
+        row = self.page.locator("tr").filter(has_text="Someone Withnote")
+        expect(
+            row.locator(".nhsuk-tag").filter(has_text="Appointment note")
+        ).to_be_visible()
+
+    def and_i_can_see_the_appointment_tagged_as_special(self):
         row = self.page.locator("tr").filter(has_text="Janet Special Appointment")
         expect(
             row.locator(".nhsuk-tag").filter(has_text="Special appointment")
