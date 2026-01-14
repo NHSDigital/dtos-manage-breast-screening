@@ -4,7 +4,6 @@
 {% from 'components/appointment-header/macro.jinja' import app_appointment_header %}
 {% from 'components/check-in/macro.jinja' import app_check_in %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
-{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 {% from 'django_form_helpers.jinja' import form_error_summary %}
 
 {% block beforeContent %}
@@ -47,8 +46,6 @@
     </div>
 
     {{ app_appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
-
-    {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
 
     {{ app_secondary_navigation({
         "visuallyHiddenTitle": "Secondary menu",

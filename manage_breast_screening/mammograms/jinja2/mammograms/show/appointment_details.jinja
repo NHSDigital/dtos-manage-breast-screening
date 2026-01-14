@@ -2,8 +2,11 @@
 {% from 'nhsuk/components/card/macro.jinja' import card %}
 {% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
 {% from 'mammograms/appointment_notes/appointment_note_banner.jinja' import appointment_note_banner %}
+{% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 
 {% block tab_content %}
+  {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
+
   {{ appointment_note_banner(
     appointment_note,
     change_url=url('mammograms:appointment_note', kwargs={'pk': presented_appointment.pk})
