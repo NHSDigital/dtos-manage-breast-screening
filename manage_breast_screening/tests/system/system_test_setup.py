@@ -141,6 +141,7 @@ class SystemTestCase(StaticLiveServerTestCase):
         any interactive elements that appear close together, and avoiding any non-specific
         links like "click here".
         """
+        self.page.wait_for_selector("main")
         results = self.axe.run(page=self.page)
         self.assertEqual(results.violations_count, 0, results.generate_report())
 
