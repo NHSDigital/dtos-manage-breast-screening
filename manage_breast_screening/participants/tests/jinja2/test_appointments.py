@@ -19,8 +19,8 @@ class TestAppointments:
                 "West of London BSS",
                 {
                     "classes": "nhsuk-tag--blue app-u-nowrap",
-                    "key": "CONFIRMED",
-                    "text": "Confirmed",
+                    "key": "SCHEDULED",
+                    "text": "Scheduled",
                 },
                 "/mammograms/e3d475a6-c405-44d6-bbd7-bcb5cd4d4996/",
             )
@@ -79,7 +79,7 @@ class TestAppointments:
                             <td>1 January 2025</td>
                             <td>Screening</td>
                             <td>West of London BSS</td>
-                            <td><strong class="app-u-nowrap nhsuk-tag nhsuk-tag--blue">Confirmed</strong></td>
+                            <td><strong class="app-u-nowrap nhsuk-tag nhsuk-tag--blue">Scheduled</strong></td>
                             <td><a href="/mammograms/e3d475a6-c405-44d6-bbd7-bcb5cd4d4996/">View details</a></td>
         """,
             response,

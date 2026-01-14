@@ -36,10 +36,10 @@ class TestAppointmentPresenter:
         "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
         [
             (
-                AppointmentStatus.CONFIRMED,
+                AppointmentStatus.SCHEDULED,
                 "nhsuk-tag--blue app-u-nowrap",
-                "Confirmed",
-                "CONFIRMED",
+                "Scheduled",
+                "SCHEDULED",
                 True,
                 False,
             ),
@@ -113,9 +113,9 @@ class TestAppointmentPresenter:
     @pytest.mark.parametrize(
         "has_permission, status_name, result",
         [
-            (True, AppointmentStatus.CONFIRMED, True),
+            (True, AppointmentStatus.SCHEDULED, True),
             (True, AppointmentStatus.CHECKED_IN, True),
-            (False, AppointmentStatus.CONFIRMED, False),
+            (False, AppointmentStatus.SCHEDULED, False),
             (True, AppointmentStatus.STARTED, False),
         ],
     )
@@ -196,10 +196,10 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.CONFIRMED,
+                    AppointmentStatus.SCHEDULED,
                     "nhsuk-tag--blue app-u-nowrap",
-                    "Confirmed",
-                    "CONFIRMED",
+                    "Scheduled",
+                    "SCHEDULED",
                     True,
                     False,
                 ),

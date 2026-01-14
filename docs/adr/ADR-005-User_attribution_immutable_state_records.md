@@ -15,13 +15,13 @@ This leaves us with a question: how do we handle user attribution for functional
 Within our application, we have two types of data:
 
 1. **Mutable records**: Records that can be updated over time (e.g., a `Participant` record where or some attributes may be updated on the same record)
-2. **Immutable state records**: Records that represent a point-in-time state transition and are never modified once created (e.g., `AppointmentStatus` records that track the progression of an appointment through states like CONFIRMED, CHECKED_IN, SCREENED)
+2. **Immutable state records**: Records that represent a point-in-time state transition and are never modified once created (e.g., `AppointmentStatus` records that track the progression of an appointment through states like SCHEDULED, CHECKED_IN, SCREENED)
 
 For mutable records, simply adding a `user_id` field would be problematic. The field would only show the last user who modified the record, losing all historical context about who made which changes.
 
 For immutable state records, the situation is different. These records naturally preserve history because they are never modified. Each status transition creates a new record, building a complete timeline. Adding a `user_id` field to these records provides exactly what we need for functional attribution without additional complexity.
 
-Currently, we have `AppointmentStatus` as our first immutable state record model (We also have `ClinicStatus` but no understanding of attribution requirements of that as yet). An appointment progresses through states (CONFIRMED, CHECKED_IN, SCREENED, etc.), and each transition creates a new `AppointmentStatus` record. In the future, we anticipate similar patterns for other workflows e.g.:
+Currently, we have `AppointmentStatus` as our first immutable state record model (We also have `ClinicStatus` but no understanding of attribution requirements of that as yet). An appointment progresses through states (SCHEDULED, CHECKED_IN, SCREENED, etc.), and each transition creates a new `AppointmentStatus` record. In the future, we anticipate similar patterns for other workflows e.g.:
 
 - Image reading workflow: States like AwaitingFirstRead, FirstReadCompleted, AwaitingSecondRead, SecondReadCompleted
 - Results workflow: States tracking the progression of screening results

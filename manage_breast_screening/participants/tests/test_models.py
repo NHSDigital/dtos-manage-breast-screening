@@ -81,7 +81,7 @@ class TestScreeningEvent:
 class TestAppointment:
     def test_status_filtering(self):
         confirmed = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CONFIRMED
+            current_status=models.AppointmentStatus.SCHEDULED
         )
         checked_in = AppointmentFactory.create(
             current_status=models.AppointmentStatus.CHECKED_IN
@@ -152,7 +152,7 @@ class TestAppointment:
 
     def test_for_filter(self):
         confirmed = AppointmentFactory.create(
-            current_status=models.AppointmentStatus.CONFIRMED
+            current_status=models.AppointmentStatus.SCHEDULED
         )
         checked_in = AppointmentFactory.create(
             current_status=models.AppointmentStatus.CHECKED_IN
@@ -190,10 +190,10 @@ class TestAppointment:
 
         # Create appointments with different statuses
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.SCHEDULED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=clinic_slot2, current_status=models.AppointmentStatus.SCHEDULED
         )
         AppointmentFactory.create(
             clinic_slot=clinic_slot1, current_status=models.AppointmentStatus.CHECKED_IN
@@ -209,7 +209,7 @@ class TestAppointment:
         other_clinic = ClinicFactory.create()
         other_slot = ClinicSlotFactory.create(clinic=other_clinic)
         AppointmentFactory.create(
-            clinic_slot=other_slot, current_status=models.AppointmentStatus.CONFIRMED
+            clinic_slot=other_slot, current_status=models.AppointmentStatus.SCHEDULED
         )
 
         counts = models.Appointment.filter_counts_for_clinic(clinic)
@@ -320,7 +320,7 @@ class TestAppointment:
 
             AppointmentStatusFactory.create(
                 appointment=appointment,
-                name=models.AppointmentStatus.CONFIRMED,
+                name=models.AppointmentStatus.SCHEDULED,
                 created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
             )
 
@@ -383,13 +383,13 @@ class TestAppointment:
 
         def test_returns_default_status_if_no_statuses(self, django_assert_num_queries):
             appointment = AppointmentFactory.create()
-            assert appointment.current_status.name == models.AppointmentStatus.CONFIRMED
+            assert appointment.current_status.name == models.AppointmentStatus.SCHEDULED
 
 
 class TestAppointmentStatus:
     class TestActive:
         def test_active_statuses_return_true(self):
-            assert AppointmentStatus(name=AppointmentStatus.CONFIRMED).active
+            assert AppointmentStatus(name=AppointmentStatus.SCHEDULED).active
             assert AppointmentStatus(name=AppointmentStatus.CHECKED_IN).active
             assert AppointmentStatus(name=AppointmentStatus.STARTED).active
             assert not AppointmentStatus(name=AppointmentStatus.CANCELLED).active

@@ -27,7 +27,7 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_check_in(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CONFIRMED
+            current_status=AppointmentStatus.SCHEDULED
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -48,7 +48,7 @@ class TestAppointmentStatusUpdater:
             service.start()
 
     @pytest.mark.parametrize(
-        "current_status", [AppointmentStatus.CONFIRMED, AppointmentStatus.CHECKED_IN]
+        "current_status", [AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN]
     )
     def test_valid_start(self, clinical_user, current_status):
         appointment = AppointmentFactory.create(current_status=current_status)
@@ -72,7 +72,7 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_cancel(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CONFIRMED
+            current_status=AppointmentStatus.SCHEDULED
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -94,7 +94,7 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_mark_did_not_attend(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CONFIRMED
+            current_status=AppointmentStatus.SCHEDULED
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -141,7 +141,7 @@ class TestAppointmentStatusUpdater:
 
     def test_check_in_is_idempotent(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CONFIRMED
+            current_status=AppointmentStatus.SCHEDULED
         )
         AppointmentStatusFactory.create(
             name=AppointmentStatus.CHECKED_IN,

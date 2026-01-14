@@ -69,7 +69,7 @@ clinic:
       appointment:
         id: 70c4ceab-46cf-479e-abaf-7e0f32d9802f
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - ATTENDED_NOT_SCREENED
         screening_episode:
@@ -96,7 +96,7 @@ clinic:
       appointment:
         id: d46e894b-47d2-49de-82be-0e2e706c085c
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -131,7 +131,7 @@ clinic:
       appointment:
         id: 3b1d37c9-2b81-4fc2-86bf-dd605b6b9af4
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -165,7 +165,7 @@ clinic:
       appointment:
         id: 1a36a1a8-59bb-469f-b316-66fc02a6a127
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -196,7 +196,7 @@ clinic:
       appointment:
         id: 63faf8b1-9f20-4b8e-9b7a-afef93e20fd7
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -230,7 +230,7 @@ clinic:
       appointment:
         id: 22bd113a-74f7-423c-bb66-c3190720591c
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -265,7 +265,7 @@ clinic:
       appointment:
         id: 5d4c0283-f176-45bf-ab1d-d51d8c857fbe
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -299,7 +299,7 @@ clinic:
       appointment:
         id: e52c0600-3dfa-4994-a2e5-c1edcfc6c7db
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -327,7 +327,7 @@ clinic:
       appointment:
         id: 47634948-5e56-4f1e-bb16-969a4036e0f2
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -354,7 +354,7 @@ clinic:
       appointment:
         id: 81d219f2-b3f0-4e72-9802-95125367378d
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -389,7 +389,7 @@ clinic:
       appointment:
         id: 160a3d3d-ce84-43f1-8192-7cbc7aa3098a
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -420,7 +420,7 @@ clinic:
       appointment:
         id: b5f63d5a-8d64-4842-ad39-b19e56ce788f
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -454,7 +454,7 @@ clinic:
       appointment:
         id: e3a32aa8-a1e5-41d4-93c7-b9f61be70b52
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -481,7 +481,7 @@ clinic:
       appointment:
         id: 7c2fc055-171e-485b-80e8-d77ebb059bcb
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -508,7 +508,7 @@ clinic:
       appointment:
         id: a55eb7a8-037c-45ec-815a-3cae553e2044
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -536,7 +536,7 @@ clinic:
       appointment:
         id: 4a9ef634-e65f-490e-b32b-b2525be4da1c
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -563,7 +563,7 @@ clinic:
       appointment:
         id: 048fdfde-f8a1-4f6d-822c-20ab84a143b6
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
@@ -598,7 +598,7 @@ clinic:
       appointment:
         id: 82991692-d0f1-49af-97a0-203f73de2b07
         statuses:
-          - CONFIRMED
+          - SCHEDULED
           - CHECKED_IN
           - SCREENED
         screening_episode:
