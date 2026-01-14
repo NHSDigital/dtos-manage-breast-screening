@@ -173,6 +173,11 @@ urlpatterns = [
         name="change_implanted_medical_device_history_item",
     ),
     path(
+        "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>/delete/",
+        implanted_medical_device_history_item_views.DeleteImplantedMedicalDeviceHistoryView.as_view(),
+        name="delete_implanted_medical_device_history_item",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/cyst-history/",
         cyst_history_item_views.AddCystHistoryView.as_view(),
         name="add_cyst_history_item",
@@ -181,6 +186,11 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>/",
         cyst_history_item_views.UpdateCystHistoryView.as_view(),
         name="change_cyst_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>/delete/",
+        cyst_history_item_views.DeleteCystHistoryView.as_view(),
+        name="delete_cyst_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/",
@@ -193,6 +203,11 @@ urlpatterns = [
         name="change_breast_augmentation_history_item",
     ),
     path(
+        "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>/delete/",
+        breast_augmentation_history_item_views.DeleteBreastAugmentationHistoryView.as_view(),
+        name="delete_breast_augmentation_history_item",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/benign-lump-history/",
         benign_lump_history_item_views.AddBenignLumpHistoryItemView.as_view(),
         name="add_benign_lump_history_item",
@@ -203,6 +218,11 @@ urlpatterns = [
         name="change_benign_lump_history_item",
     ),
     path(
+        "<uuid:pk>/record-medical-information/benign-lump-history/<uuid:history_item_pk>/delete/",
+        benign_lump_history_item_views.DeleteBenignLumpHistoryItemView.as_view(),
+        name="delete_benign_lump_history_item",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/",
         mastectomy_or_lumpectomy_history_item_views.AddMastectomyOrLumpectomyHistoryView.as_view(),
         name="add_mastectomy_or_lumpectomy_history_item",
@@ -211,6 +231,11 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>/",
         mastectomy_or_lumpectomy_history_item_views.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
         name="change_mastectomy_or_lumpectomy_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>/delete/",
+        mastectomy_or_lumpectomy_history_item_views.DeleteMastectomyOrLumpectomyHistoryView.as_view(),
+        name="delete_mastectomy_or_lumpectomy_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/",
