@@ -30,6 +30,8 @@ dependencies = [
   "azure-monitor-opentelemetry (>=1.8.1,<2.0.0)",
   "django-linear-migrations>=2.19.0",
   "python-statemachine>=2.5.0",
+  "pydicom>=3.0.1",
+  "pynetdicom>=3.0.4",
 ]
 
 [dependency-groups]
