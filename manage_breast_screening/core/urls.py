@@ -19,24 +19,40 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
 from django.urls import include, path
+from django.views.decorators.http import require_GET
 from django.views.generic.base import RedirectView
 
 from manage_breast_screening.core.decorators import basic_auth_exempt
 
 
+@require_GET
 @basic_auth_exempt
 @login_not_required
 def sha_view(request):
     return HttpResponse(settings.COMMIT_SHA)
 
 
+@require_GET
 @basic_auth_exempt
 @login_not_required
 def health_check(request):
     return HttpResponse("OK")
 
 
+ROBOTS_TXT = """User-agent: *
+Disallow: /
+"""
+
+
+@require_GET
+@basic_auth_exempt
+@login_not_required
+def robots_txt(request):
+    return HttpResponse(ROBOTS_TXT, content_type="text/plain")
+
+
 urlpatterns = [
+    path("robots.txt", robots_txt),
     path(
         "auth/",
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
