@@ -1,0 +1,45 @@
+from pydicom.dataset import Dataset
+
+from .models import Image, Series, Study
+
+
+class DicomRecorder:
+    @staticmethod
+    def create_records(
+        source_message_id: str, ds: Dataset
+    ) -> tuple[Study, Series, Image] | None:
+        study_uid = ds.StudyInstanceUID
+        series_uid = ds.SeriesInstanceUID
+        sop_uid = ds.SOPInstanceUID
+
+        study, _ = Study.objects.get_or_create(
+            study_instance_uid=study_uid,
+            defaults={
+                "patient_id": getattr(ds, "PatientID", ""),
+                "date": getattr(ds, "StudyDate", ""),
+                "time": getattr(ds, "StudyTime", ""),
+                "description": getattr(ds, "StudyDescription", ""),
+                "source_message_id": source_message_id,
+            },
+        )
+
+        series, _ = Series.objects.get_or_create(
+            series_instance_uid=series_uid,
+            study=study,
+            defaults={
+                "modality": getattr(ds, "Modality", ""),
+                "series_number": getattr(ds, "SeriesNumber", None),
+            },
+        )
+
+        image, created = Image.objects.get_or_create(
+            sop_instance_uid=sop_uid,
+            series=series,
+            defaults={
+                "instance_number": getattr(ds, "InstanceNumber", None),
+            },
+        )
+        if created:
+            # TODO: Save the DICOM file to blob storage
+
+            return study, series, image
