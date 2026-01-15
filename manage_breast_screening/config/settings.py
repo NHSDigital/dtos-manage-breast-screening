@@ -84,6 +84,7 @@ if getenv("DJANGO_ENV", "production") != "production":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "manage_breast_screening.core.middleware.robots.RobotsTagMiddleware",
     "manage_breast_screening.core.middleware.basic_auth.BasicAuthMiddleware",
     "qsessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",

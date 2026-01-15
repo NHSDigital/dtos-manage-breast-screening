@@ -1,0 +1,36 @@
+{
+  "name": "Manage breast screening",
+  "short_name": "Manage breast screening",
+  "description": "A service for managing breast screening delivery as part of the national breast screening programme.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#005eb8",
+  "lang": "en-GB",
+  "icons": [
+    {
+      "src": "favicons/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "48x48"
+    },
+    {
+      "src": "favicons/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "150x150",
+      "purpose": "any"
+    },
+    {
+      "src": "favicons/apple-touch-icon-180x180.png",
+      "type": "image/png",
+      "sizes": "180x180",
+      "purpose": "maskable"
+    },
+    {
+      "src": "favicons/favicon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    }
+  ]
+}
