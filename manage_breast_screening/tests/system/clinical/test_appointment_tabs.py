@@ -68,6 +68,21 @@ class TestAppointmentTabs(SystemTestCase):
         self.then_i_should_see_the_participant_details()
         self.and_no_message_says_in_progress_with_someone_else()
 
+    def test_accessibility(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment_in_progress_with_someone_else()
+        self.and_i_am_on_the_appointment_show_page()
+        self.then_the_accessibility_baseline_is_met()
+
+        self.when_i_change_to_the_participant_details_tab()
+        self.then_the_accessibility_baseline_is_met()
+
+        self.when_i_change_to_the_note_details_tab()
+        self.then_the_accessibility_baseline_is_met()
+
+        self.when_i_change_to_the_appointment_details_tab()
+        self.then_the_accessibility_baseline_is_met()
+
     def and_there_is_an_appointment_in_progress_with_current_user(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
