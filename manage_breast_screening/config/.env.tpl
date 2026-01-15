@@ -23,6 +23,9 @@ CIS2_CLIENT_PRIVATE_KEY="paste-pem-private-key-here"
 CIS2_CLIENT_PUBLIC_KEY="paste-pem-public-key-here"
 # Toggle debug logging for CIS2
 CIS2_DEBUG=False
+# ACR values - determines which authentication options are available to users
+# See https://digital.nhs.uk/services/care-identity-service/applications-and-services/cis2-authentication/guidance-for-developers/detailed-guidance/acr-values
+CIS2_ACR_VALUES=AAL2_OR_AAL3_ANY
 
 BASIC_AUTH_ENABLED=False
 BASIC_AUTH_USERNAME=changeme

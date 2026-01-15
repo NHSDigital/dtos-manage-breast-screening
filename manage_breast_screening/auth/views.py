@@ -1,10 +1,16 @@
 import logging
 
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_not_required
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseServerError,
+    JsonResponse,
+)
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -19,6 +25,8 @@ from .oauth import cis2_redirect_uri, get_cis2_client, jwk_from_public_key
 from .services import InvalidLogoutToken, decode_logout_token
 
 logger = logging.getLogger(__name__)
+
+REQUIRED_ID_ASSURANCE_LEVEL = 3
 
 
 @current_provider_exempt
@@ -49,7 +57,7 @@ def cis2_login(request):
     # The acr_values param determines which authentication options are available to the user
     # See https://digital.nhs.uk/services/care-identity-service/applications-and-services/cis2-authentication/guidance-for-developers/detailed-guidance/acr-values#acr-values
     return client.authorize_redirect(
-        request, redirect_uri, acr_values="AAL2_OR_AAL3_ANY"
+        request, redirect_uri, acr_values=settings.CIS2_ACR_VALUES
     )
 
 
@@ -62,18 +70,28 @@ def cis2_callback(request):
 
     id_token_userinfo = token.get("userinfo")
     userinfo = client.userinfo(token=token)
-    sub = userinfo.get("sub")  # Unique identifier for the user in CIS2
-    if not sub:
-        return HttpResponseBadRequest("Missing subject in CIS2 response")
-    id_token_sub = id_token_userinfo.get("sub")
-    if not id_token_sub:
-        return HttpResponseBadRequest("Missing subject in CIS2 ID token")
-    if sub != id_token_sub:
-        return HttpResponseBadRequest("Subject mismatch in CIS2 response")
 
+    # Validate sub claim in ID token matches sub claim at userinfo endpoint
+    sub = userinfo.get("sub")
+    if error := _validate_subject_claims(id_token_userinfo.get("sub"), sub):
+        return HttpResponseBadRequest(error)
+
+    # Validate assurance levels
+    if error := _validate_id_assurance_level(
+        id_token_userinfo.get("id_assurance_level")
+    ):
+        return HttpResponseForbidden(error)
+    if error := _validate_authentication_assurance_level(
+        id_token_userinfo.get("authentication_assurance_level")
+    ):
+        return HttpResponseForbidden(error)
+
+    # Create/update the authenticated user
     user = authenticate(request, cis2_sub=sub, cis2_userinfo=userinfo)
     if not user:
-        return HttpResponseBadRequest("Failed to create/update authenticated CIS2 user")
+        return HttpResponseServerError(
+            "Failed to create/update authenticated CIS2 user"
+        )
 
     auth_login(request, user)
 
@@ -141,3 +159,48 @@ def cis2_back_channel_logout(request):
     user.session_set.all().delete()
 
     return JsonResponse({"status": "ok"})
+
+
+def _validate_id_assurance_level(level: int | str | None) -> str | None:
+    if level is not None:
+        level = int(level)
+
+    if level != REQUIRED_ID_ASSURANCE_LEVEL:
+        logger.warning(
+            f"CIS2 authentication rejected: id_assurance_level={level}, expected {REQUIRED_ID_ASSURANCE_LEVEL}"
+        )
+        return "Insufficient identity assurance level"
+    return None
+
+
+def _validate_authentication_assurance_level(level: int | str | None) -> str | None:
+    if level is not None:
+        level = int(level)
+
+    if settings.CIS2_ACR_VALUES == "AAL2_OR_AAL3_ANY":
+        minimum_level = 2
+        if level is None or level < minimum_level:
+            logger.warning(
+                f"CIS2 authentication rejected: authentication_assurance_level={level}, expected >= {minimum_level}"
+            )
+            return "Insufficient authentication assurance level"
+    else:
+        required_level = 3
+        if level != required_level:
+            logger.warning(
+                f"CIS2 authentication rejected: authentication_assurance_level={level}, expected {required_level}"
+            )
+            return "Insufficient authentication assurance level"
+    return None
+
+
+def _validate_subject_claims(
+    id_token_sub: str | None, userinfo_sub: str | None
+) -> str | None:
+    if not userinfo_sub:
+        return "Missing subject in CIS2 response"
+    if not id_token_sub:
+        return "Missing subject in CIS2 ID token"
+    if userinfo_sub != id_token_sub:
+        return "Subject mismatch in CIS2 response"
+    return None
