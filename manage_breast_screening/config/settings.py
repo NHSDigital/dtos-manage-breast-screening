@@ -14,6 +14,7 @@ import sys
 from os import environ, getenv
 from pathlib import Path
 
+from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from jinja2 import ChainableUndefined
 
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.auth",
     "manage_breast_screening.users",
     "manage_breast_screening.clinics",
+    "manage_breast_screening.dicom",
     "manage_breast_screening.nhsuk_forms",
     "manage_breast_screening.notifications",
     "manage_breast_screening.participants",
@@ -169,10 +171,38 @@ DATABASES = {
     }
 }
 
+
+if environ.get("DJANGO_ENV", "production") != "production":
+    if environ.get("AZURE_STORAGE_CONNECTION_STRING"):
+        # Use connection string if provided (e.g., in local development using Azurite)
+        dicom_storage_options = {
+            "BACKEND": "storages.backends.azure_storage.AzureStorage",
+            "OPTIONS": {
+                "connection_string": environ.get("AZURE_STORAGE_CONNECTION_STRING"),
+                "azure_container": "dicom",
+            },
+        }
+    else:
+        # In non-production environments without a connection string, use local file storage
+        dicom_storage_options = {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        }
+else:
+    # In production, use DefaultAzureCredential for authentication
+    dicom_storage_options = {
+        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "OPTIONS": {
+            "token_credential": DefaultAzureCredential(),
+            "account_name": environ.get("AZURE_STORAGE_ACCOUNT_NAME"),
+            "azure_container": "dicom",
+        },
+    }
+
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
+    "dicom": dicom_storage_options,
 }
 
 # Password validation

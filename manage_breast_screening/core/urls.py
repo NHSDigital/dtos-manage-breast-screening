@@ -65,6 +65,10 @@ urlpatterns = [
         health_check,
     ),
     path(
+        "api/dicom/",
+        include("manage_breast_screening.dicom.urls", namespace="dicom"),
+    ),
+    path(
         "mammograms/",
         include(
             "manage_breast_screening.mammograms.urls",

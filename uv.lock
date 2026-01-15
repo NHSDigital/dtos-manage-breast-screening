@@ -463,6 +463,24 @@ wheels = [
 ]
 
 [[package]]
+name = "django-storages"
+version = "1.14.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ff/d6/2e50e378fff0408d558f36c4acffc090f9a641fd6e084af9e54d45307efa/django_storages-1.14.6.tar.gz", hash = "sha256:7a25ce8f4214f69ac9c7ce87e2603887f7ae99326c316bc8d2d75375e09341c9", size = 87587, upload-time = "2025-04-02T02:34:55.103Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1f/21/3cedee63417bc5553eed0c204be478071c9ab208e5e259e97287590194f1/django_storages-1.14.6-py3-none-any.whl", hash = "sha256:11b7b6200e1cb5ffcd9962bd3673a39c7d6a6109e8096f0e03d46fab3d3aabd9", size = 33095, upload-time = "2025-04-02T02:34:53.291Z" },
+]
+
+[package.optional-dependencies]
+azure = [
+    { name = "azure-core" },
+    { name = "azure-storage-blob" },
+]
+
+[[package]]
 name = "djlint"
 version = "1.36.4"
 source = { registry = "https://pypi.org/simple" }
@@ -737,6 +755,7 @@ dependencies = [
     { name = "django-extensions" },
     { name = "django-linear-migrations" },
     { name = "django-qsessions" },
+    { name = "django-storages", extra = ["azure"] },
     { name = "dotenv" },
     { name = "factory-boy" },
     { name = "gunicorn" },
@@ -745,6 +764,8 @@ dependencies = [
     { name = "nhsuk-frontend-jinja" },
     { name = "pandas" },
     { name = "psycopg", extra = ["binary"] },
+    { name = "pydicom" },
+    { name = "pynetdicom" },
     { name = "python-dateutil" },
     { name = "pyyaml" },
     { name = "rules" },
@@ -779,6 +800,7 @@ requires-dist = [
     { name = "django-extensions", specifier = ">=4.1,<5.0" },
     { name = "django-linear-migrations", specifier = ">=2.19.0" },
     { name = "django-qsessions", specifier = ">=2.0.0,<3.0.0" },
+    { name = "django-storages", extras = ["azure"], specifier = ">=1.14.6" },
     { name = "dotenv", specifier = ">=0.9.9,<0.10.0" },
     { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "gunicorn", specifier = ">=23.0.0,<24.0.0" },
@@ -787,6 +809,8 @@ requires-dist = [
     { name = "nhsuk-frontend-jinja", specifier = "==0.6.1" },
     { name = "pandas", specifier = ">=2.3.0,<3.0.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.7,<4.0.0" },
+    { name = "pydicom", specifier = ">=3.0.1" },
+    { name = "pynetdicom", specifier = ">=3.0.4" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0,<3.0.0" },
     { name = "pyyaml", specifier = ">=6.0.2,<7.0.0" },
     { name = "rules", specifier = ">=3.5,<4.0" },
@@ -1376,6 +1400,15 @@ wheels = [
 ]
 
 [[package]]
+name = "pydicom"
+version = "3.0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/6f/55ea163b344c91df2e03c007bebf94781f0817656e2c037d7c5bf86c3bfc/pydicom-3.0.1.tar.gz", hash = "sha256:7b8be344b5b62493c9452ba6f5a299f78f8a6ab79786c729b0613698209603ec", size = 2884731, upload-time = "2024-09-22T02:02:43.202Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/27/a6/98651e752a49f341aa99aa3f6c8ba361728dfc064242884355419df63669/pydicom-3.0.1-py3-none-any.whl", hash = "sha256:db32f78b2641bd7972096b8289111ddab01fb221610de8d7afa835eb938adb41", size = 2376126, upload-time = "2024-09-22T02:02:41.616Z" },
+]
+
+[[package]]
 name = "pyee"
 version = "13.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1408,6 +1441,18 @@ wheels = [
 [package.optional-dependencies]
 crypto = [
     { name = "cryptography" },
+]
+
+[[package]]
+name = "pynetdicom"
+version = "3.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydicom" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7f/f5/5a811322d57788b3e98b363ec99f90125c842c18bf891e8def95096fc4d8/pynetdicom-3.0.4.tar.gz", hash = "sha256:567ef761d73b34a380a4350e0d10ae549d749c66da4f1bdf8793cab9a6a326e4", size = 1816295, upload-time = "2025-08-02T02:12:27.176Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/63/77/9741d8bb92a44fefd080ee54017707609690cb848fca5fe89f6608e4df99/pynetdicom-3.0.4-py3-none-any.whl", hash = "sha256:bc3f8869db4c90634336dfb02d7b6c249771e8b167e841254997a315d8e16f72", size = 1650540, upload-time = "2025-08-02T02:12:24.936Z" },
 ]
 
 [[package]]
