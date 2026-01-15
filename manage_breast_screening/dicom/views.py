@@ -27,8 +27,7 @@ def upload_dicom(request):
 
     try:
         ds = pydicom.dcmread(dicom_file)
-        # TODO: Store the DICOM file in blob storage
-        records = DicomRecorder.create_records(source_message_id, ds)
+        records = DicomRecorder.create_records(source_message_id, ds, dicom_file)
 
     except pydicom.errors.InvalidDicomError:
         return JsonResponse({"error": "Invalid DICOM file"}, status=400)
