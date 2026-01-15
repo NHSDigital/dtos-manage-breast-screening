@@ -6,7 +6,7 @@ from .models import Image, Series, Study
 class DicomRecorder:
     @staticmethod
     def create_records(
-        source_message_id: str, ds: Dataset
+        source_message_id: str, ds: Dataset, dicom_file: bytes
     ) -> tuple[Study, Series, Image] | None:
         study_uid = ds.StudyInstanceUID
         series_uid = ds.SeriesInstanceUID
@@ -40,6 +40,6 @@ class DicomRecorder:
             },
         )
         if created:
-            # TODO: Save the DICOM file to blob storage
+            image.dicom_file.save(f"{sop_uid}.dcm", dicom_file)
 
             return study, series, image
