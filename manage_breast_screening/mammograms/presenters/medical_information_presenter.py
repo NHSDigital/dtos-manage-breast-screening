@@ -130,12 +130,12 @@ class MedicalInformationPresenter:
     @property
     def medical_history_buttons(self):
         return [
-            self.add_benign_lump_history_button,
-            self.add_breast_augmentation_history_button,
             self.add_breast_cancer_history_button,
-            self.add_cyst_history_button,
             self.add_implanted_medical_device_history_button,
+            self.add_breast_augmentation_history_button,
             self.add_mastectomy_or_lumpectomy_history_button,
+            self.add_cyst_history_button,
+            self.add_benign_lump_history_button,
             self.add_other_procedure_history_button,
         ]
 

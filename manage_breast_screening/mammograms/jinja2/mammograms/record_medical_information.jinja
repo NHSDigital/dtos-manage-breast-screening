@@ -89,8 +89,8 @@
 
   {% if presenter.any_medical_history %}
     {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
-    {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
     {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
+    {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
     {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
     {{ cyst_history_card(presenter.cyst_history) }}
     {{ benign_lump_history_card(presenter.benign_lump_history) }}
