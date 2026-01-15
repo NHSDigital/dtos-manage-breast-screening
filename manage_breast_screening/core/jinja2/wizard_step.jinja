@@ -32,7 +32,7 @@
 
   {% block wizard_form %}
     {% if form %}
-    <form action="{{request.path}}" method="POST">
+    <form action="{{ request.path }}" method="post" novalidate>
       <div class="nhsuk-grid-row">
           <div class="nhsuk-grid-column-two-thirds">
             {% block form %}{% endblock form %}

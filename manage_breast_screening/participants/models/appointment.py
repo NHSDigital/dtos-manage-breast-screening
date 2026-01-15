@@ -138,6 +138,9 @@ class Appointment(BaseModel):
 
         return statuses[0]
 
+    def has_status(self, required_status: str) -> bool:
+        return self.statuses.filter(name=required_status).exists()
+
     @property
     def active(self):
         return self.current_status.active

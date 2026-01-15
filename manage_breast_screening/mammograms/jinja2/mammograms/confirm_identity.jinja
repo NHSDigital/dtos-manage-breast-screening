@@ -1,9 +1,11 @@
-{% extends "wizard_step.jinja" %}
+{% extends "workflow_step.jinja" %}
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
 {% from "components/participant-details/summary_list_rows.jinja" import address_html, date_of_birth_and_age_html, ethnicity_html %}
+
+{% set active_workflow_step = 'CONFIRM_IDENTITY' %}
 
 {% block step_content %}
   {% set confirm_button %}
@@ -100,4 +102,3 @@
   </p>
 
 {% endblock %}
-

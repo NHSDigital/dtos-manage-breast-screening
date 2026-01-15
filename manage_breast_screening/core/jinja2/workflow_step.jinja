@@ -1,0 +1,109 @@
+{% extends 'layout-app.jinja' %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
+{% from 'django_form_helpers.jinja' import form_error_summary %}
+{% from 'components/workflow_steps_navigation.jinja' import workflow_steps %}
+
+{% set containerClasses = "nhsuk-width-container--wide" %}
+
+{% block skipLink %}
+  {{ skipLink({
+    "href": "#workflow_content",
+    "text": "Skip to main content"
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+{# Using javascript temporarily - this should be replaced with proper URLs #}
+{{ backLink({
+  "href": "javascript:history.back()",
+}) }}
+{% endblock beforeContent %}
+
+{% block content %}
+<div class="app-workflow-container">
+  <div class="nhsuk-grid-row app-workflow-container__row">
+    <div class="nhsuk-grid-column-one-quarter app-workflow-container__sidebar">
+      {{ workflow_steps(presented_appointment, active_workflow_step) }}
+    </div>
+    <div class="nhsuk-grid-column-three-quarters app-workflow-container__main" id="workflow_content">
+      {% set info_notification_params = get_notification_banner_params(
+          request, message_type='info',
+          disable_auto_focus=disable_auto_focus|default(true)
+        ) %}
+
+      {% set success_notification_params = get_notification_banner_params(
+          request, message_type='success',
+          disable_auto_focus=disable_auto_focus|default(true)
+        ) %}
+
+      {% set warning_notification_params = get_notification_banner_params(
+          request, message_type='warning',
+          disable_auto_focus=disable_auto_focus|default(true)
+        ) %}
+
+      {% if success_notification_params %}
+        {{ notificationBanner(success_notification_params) }}
+      {% endif %}
+
+      {% if info_notification_params %}
+        {{ notificationBanner(info_notification_params) }}
+      {% endif %}
+
+      {% if warning_notification_params %}
+        {{ notificationBanner(warning_notification_params) }}
+      {% endif %}
+
+      <div class="nhsuk-grid-row">
+        <div class="nhsuk-grid-column-two-thirds">
+          {{ form_error_summary(form) }}
+        </div>
+      </div>
+      <div class="nhsuk-grid-row">
+        <div class="nhsuk-grid-column-full">
+
+        {% block heading %}
+        <h1 class="nhsuk-heading-l">
+          {% if caption %}
+            <span class="nhsuk-caption-l">{{ caption }}</span>
+          {% endif %}
+          {{ heading }}
+        </h1>
+        {% endblock heading %}
+
+        {% block step_content %}{% endblock %}
+
+        {% block wizard_form %}
+          {% if form %}
+            <form action="{{ request.path }}" method="post" novalidate>
+              <div class="nhsuk-grid-row">
+                  <div class="nhsuk-grid-column-two-thirds">
+                    {% block form %}{% endblock form %}
+
+                    {% if form.decision %}
+                      {{ form.decision.as_field_group() }}
+                    {% endif %}
+
+                    {{ button({
+                      "text": "Continue"
+                    }) }}
+
+                    {{csrf_input}}
+                  </div>
+              </div>
+            </form>
+          {% endif %}
+        {% endblock wizard_form %}
+
+        {% if cannot_continue_link %}
+          <p><a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ cannot_continue_link.href }}">{{ cannot_continue_link.text }}</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% block footer %}
+  {{ footer({"containerClasses": containerClasses}) }}
+{% endblock %}

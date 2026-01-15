@@ -1,31 +1,31 @@
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
 
-{% macro app_appointment_status_bar(user, presented_status_bar) %}
-  {% if presented_status_bar and presented_status_bar.show_status_bar_for(user) %}
+{% macro app_appointment_status_bar(params) %}
+  {% if params.status_bar and params.status_bar.show_status_bar_for(params.user) %}
     <div class="app-status-bar app-status-bar--rows-2">
-      <div class="nhsuk-width-container">
+      <div class="nhsuk-width-container {%- if params.containerClasses %} {{ params.containerClasses }}{% endif %}">
           <div class="app-status-bar__row">
               <div class="app-status-bar__item">
                 <span class="app-status-bar__key">Appointment:</span>
                 <span>
-                  {{ presented_status_bar.clinic_slot.clinic_date_and_slot_time }}
-                  {% if presented_status_bar.appointment.is_special_appointment %}
-                    {{ tag(presented_status_bar.tag_properties) }}
+                  {{ params.status_bar.clinic_slot.clinic_date_and_slot_time }}
+                  {% if params.status_bar.appointment.is_special_appointment %}
+                    {{ tag(params.status_bar.tag_properties) }}
                   {% endif %}
                 </span>
               </div>
           </div>
           <div class="app-status-bar__row">
               <div class="app-status-bar__item">
-                <strong>{{ presented_status_bar.participant.full_name }}</strong>
+                <strong>{{ params.status_bar.participant.full_name }}</strong>
               </div>
               <div class="app-status-bar__item">
                 <span class="app-status-bar__key" aria-label="Date of birth">DOB:</span>
-                <span>{{ presented_status_bar.participant.date_of_birth }} ({{ presented_status_bar.participant.age }})</span>
+                <span>{{ params.status_bar.participant.date_of_birth }} ({{ params.status_bar.participant.age }})</span>
               </div>
               <div class="app-status-bar__item">
                 <span class="app-status-bar__key">NHS:</span>
-                <span>{{ presented_status_bar.participant.nhs_number }}</span>
+                <span>{{ params.status_bar.participant.nhs_number }}</span>
               </div>
           </div>
       </div>
