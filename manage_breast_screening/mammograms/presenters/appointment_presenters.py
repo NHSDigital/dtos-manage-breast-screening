@@ -59,6 +59,10 @@ class AppointmentPresenter:
         return self.clinic_slot.starts_at
 
     @cached_property
+    def has_appointment_note(self):
+        return hasattr(self._appointment, "note")
+
+    @cached_property
     def is_special_appointment(self):
         return bool(self.participant.extra_needs)
 
@@ -84,6 +88,13 @@ class AppointmentPresenter:
         return {
             "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2",
             "text": "Special appointment",
+        }
+
+    @cached_property
+    def appointment_note_tag_properties(self):
+        return {
+            "classes": "nhsuk-tag--yellow nhsuk-u-margin-top-2",
+            "text": "Appointment note",
         }
 
     @cached_property
