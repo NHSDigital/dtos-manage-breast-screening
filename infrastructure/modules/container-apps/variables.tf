@@ -211,6 +211,12 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
+variable "auth_excluded_paths" {
+  description = "List of paths to exclude from authentication (e.g., [\"/healthcheck\", \"/sha\"]). These paths will respond without requiring authentication."
+  type        = list(string)
+  default     = ["/sha", "/healthcheck"]
+}
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 
