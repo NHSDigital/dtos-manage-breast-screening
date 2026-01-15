@@ -1,4 +1,9 @@
+from django.core.files.storage import storages
 from django.db import models
+
+
+def dicom_storage():
+    return storages["dicom"]
 
 
 class Study(models.Model):
@@ -27,7 +32,7 @@ class Image(models.Model):
     sop_instance_uid = models.CharField(max_length=128, unique=True)
     series = models.ForeignKey(Series, on_delete=models.CASCADE, related_name="images")
     instance_number = models.IntegerField(null=True, blank=True)
-    dicom_file = models.FileField(upload_to="dicom_files/")
+    dicom_file = models.FileField(storage=dicom_storage)
 
     def __str__(self):
         return self.sop_instance_uid
