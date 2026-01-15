@@ -1,0 +1,117 @@
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
+
+{% macro workflow_steps() %}
+
+<div class="app-workflow-side-nav-wrapper">
+  <nav class="app-workflow-side-nav" aria-label="Workflow steps">
+
+    <h2 class="app-workflow-side-nav__heading">
+      <span class="nhsuk-caption-m">
+        Screening appointment
+      </span>
+      Workflow steps
+    </h2>
+
+    <ol class="app-workflow-side-nav__list">
+      
+        
+        
+        
+        
+
+        
+        
+
+        <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
+          
+            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="/clinics/wtrl7jud/events/rcddme93/confirm-identity">
+              <span class="app-workflow-side-nav__number">
+                
+                  
+  <svg class="app-icon app-icon--tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" d="M18.4 7.8l-8.5 8.4L5.6 12"></path>
+  </svg>
+
+                
+              </span>
+              <span class="app-workflow-side-nav__label">Confirm identity</span>
+            </a>
+          
+        </li>
+      
+        
+        
+        
+        
+
+        
+        
+
+        <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
+          
+            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="/clinics/wtrl7jud/events/rcddme93/review-medical-information">
+              <span class="app-workflow-side-nav__number">
+                
+                  
+  <svg class="app-icon app-icon--tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" d="M18.4 7.8l-8.5 8.4L5.6 12"></path>
+  </svg>
+
+                
+              </span>
+              <span class="app-workflow-side-nav__label">Review medical information</span>
+            </a>
+          
+        </li>
+      
+        
+        
+        
+        
+
+        
+        
+
+        <li class="app-workflow-side-nav__item app-workflow-side-nav__item--current  ">
+          
+            <span class="app-workflow-side-nav__link" aria-current="page">
+              <span class="app-workflow-side-nav__number">
+                
+                  3
+                
+              </span>
+              <span class="app-workflow-side-nav__label">Take images</span>
+            </span>
+          
+        </li>
+      
+        
+        
+        
+        
+
+        
+        
+          
+          
+          
+
+          
+            
+          
+        
+
+        <li class="app-workflow-side-nav__item   app-workflow-side-nav__item--disabled">
+          
+            <span class="app-workflow-side-nav__link app-workflow-side-nav__link--disabled">
+              <span class="app-workflow-side-nav__number">4</span>
+              <span class="app-workflow-side-nav__label">Check information</span>
+            </span>
+          
+        </li>
+      
+    </ol>
+  </nav>
+</div>
+
+{% endmacro %}

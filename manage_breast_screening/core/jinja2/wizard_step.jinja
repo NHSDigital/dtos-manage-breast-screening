@@ -2,6 +2,8 @@
 {% from 'nhsuk/components/button/macro.jinja' import button %}
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'django_form_helpers.jinja' import form_error_summary %}
+{% from 'components/appointment-status-bar.jinja' import app_appointment_status_bar %}
+{% from 'components/workflow_steps.jinja' import workflow_steps %}
 
 {% block beforeContent %}
 {# Using javascript temporarily - this should be replaced with proper URLs #}
@@ -11,6 +13,15 @@
 {% endblock beforeContent %}
 
 {% block page_content %}
+
+<div class="app-workflow-container">
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-quarter">
+{{workflow_steps()}}
+    </div>
+  </div>
+</div>
+
 <div class="nhsuk-grid-row">
   <div class="nhsuk-grid-column-two-thirds">
     {{ form_error_summary(form) }}
