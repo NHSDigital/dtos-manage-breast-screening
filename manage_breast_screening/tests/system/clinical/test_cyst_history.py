@@ -104,7 +104,7 @@ class TestRecordingCyst(SystemTestCase):
         self.assert_page_title_contains("Edit details of cysts")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change cyst item").click()
+        self.page.get_by_text("Change (cysts)").click()
 
     def when_i_select_drainage_or_removal(self):
         self.page.get_by_label("Drainage or removal").click()

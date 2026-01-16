@@ -34,9 +34,7 @@ class TestBreastAugmentationHistoryItemPresenter:
 
     @time_machine.travel(date(2025, 1, 1))
     def test_attributes(self, presenter):
-        assert presenter.right_breast_procedures == [
-            "Breast implants (silicone or saline)"
-        ]
+        assert presenter.right_breast_procedures == ["Breast implants"]
         assert presenter.left_breast_procedures == ["No procedures"]
         assert presenter.procedure_year == "2000 (25 years ago)"
         assert presenter.implants_have_been_removed == "Yes (2018)"
@@ -49,43 +47,16 @@ class TestBreastAugmentationHistoryItemPresenter:
         )
 
     @time_machine.travel(date(2025, 1, 1))
-    def test_single(self, presenter):
-        assert presenter.summary_list_params == {
-            "rows": [
-                {
-                    "key": {
-                        "text": "Procedures",
-                    },
-                    "value": {
-                        "html": "Right breast: Breast implants (silicone or saline)<br>Left breast: No procedures",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Procedure year",
-                    },
-                    "value": {
-                        "html": "2000 (25 years ago)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Implants have been removed",
-                    },
-                    "value": {
-                        "html": "Yes (2018)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Additional details",
-                    },
-                    "value": {
-                        "html": "some details",
-                    },
-                },
-            ],
-        }
+    def test_missing_procedure_year(self):
+        presenter = BreastAugmentationHistoryItemPresenter(
+            BreastAugmentationHistoryItemFactory.build(
+                right_breast_procedures=[
+                    BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                ],
+                additional_details="some details",
+            )
+        )
+        assert presenter.procedure_year_with_removal == ""
 
     def test_change_link(self):
         item = BreastAugmentationHistoryItemFactory.build()
@@ -94,15 +65,4 @@ class TestBreastAugmentationHistoryItemPresenter:
         assert presenter.change_link == {
             "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}/",
             "text": "Change",
-            "visually_hidden_text": " breast implants or augmentation item",
-        }
-
-    def test_change_link_with_counter(self):
-        item = BreastAugmentationHistoryItemFactory.build()
-
-        presenter = BreastAugmentationHistoryItemPresenter(item, counter=2)
-        assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/breast-augmentation-history/{item.pk}/",
-            "text": "Change",
-            "visually_hidden_text": " breast implants or augmentation item 2",
         }

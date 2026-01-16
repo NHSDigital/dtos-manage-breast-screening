@@ -91,14 +91,14 @@ class TestAppointmentNote(SystemTestCase):
         appointment_details_tab.click()
 
         note_container = self.page.locator(
-            ".nhsuk-warning-callout", has_text="Appointment note"
+            ".nhsuk-card--warning", has_text="Appointment note"
         )
         expect(note_container).to_be_visible()
         expect(note_container).to_contain_text(text)
 
     def when_i_click_the_note_change_link(self):
         note_container = self.page.locator(
-            ".nhsuk-warning-callout", has_text="Appointment note"
+            ".nhsuk-card--warning", has_text="Appointment note"
         )
         expect(note_container).to_be_visible()
         change_link = note_container.get_by_role("link", name="Change")

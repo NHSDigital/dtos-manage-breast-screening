@@ -45,37 +45,6 @@ class TestBenignLumpHistoryItemPresenter:
         }
         assert presenter.additional_details == "First line<br>Second line"
 
-    @time_machine.travel(date(2025, 1, 1))
-    def test_summary_list_params(self, presenter):
-        result = presenter.summary_list_params
-        assert result == {
-            "rows": [
-                {
-                    "key": {"text": "Procedures"},
-                    "value": {
-                        "html": (
-                            "Right breast: Needle biopsy, Lump removed<br>"
-                            "Left breast: No procedures"
-                        )
-                    },
-                },
-                {
-                    "key": {"text": "Procedure year"},
-                    "value": {"html": "2015 (10 years ago)"},
-                },
-                {
-                    "key": {"text": "Procedure location"},
-                    "value": {
-                        "html": ("At a private clinic in the UK: Harley Street Clinic")
-                    },
-                },
-                {
-                    "key": {"text": "Additional details"},
-                    "value": {"html": "First line<br>Second line"},
-                },
-            ],
-        }
-
     def test_change_link(self):
         item = BenignLumpHistoryItemFactory.build()
         presenter = BenignLumpHistoryItemPresenter(item)
@@ -84,15 +53,4 @@ class TestBenignLumpHistoryItemPresenter:
         assert result == {
             "href": f"/mammograms/{item.appointment_id}/record-medical-information/benign-lump-history/{item.id}/",
             "text": "Change",
-            "visually_hidden_text": " benign lump item",
-        }
-
-    def test_change_link_with_counter(self):
-        item = BenignLumpHistoryItemFactory.build()
-
-        presenter = BenignLumpHistoryItemPresenter(item, counter=2)
-        assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/benign-lump-history/{item.pk}/",
-            "text": "Change",
-            "visually_hidden_text": " benign lump item 2",
         }

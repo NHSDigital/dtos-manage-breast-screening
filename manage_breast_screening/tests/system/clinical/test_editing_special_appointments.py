@@ -123,7 +123,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
     and_i_am_on_the_appointment_show_page = and_i_am_on_the_appointment_show_page
 
     def then_i_see_the_special_appointment_banner(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         expect(banner).to_be_visible()
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text(
@@ -131,20 +131,20 @@ class TestEditingSpecialAppointments(SystemTestCase):
         )
 
     def and_i_see_the_created_special_appointment(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         expect(banner).to_be_visible()
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text("Deaf in one ear")
 
     def and_i_see_the_created_special_appointment_with_both_reasons(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         expect(banner).to_be_visible()
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text("Deaf in one ear")
         expect(banner).to_contain_text("Non-binary")
 
     def and_i_see_the_updated_special_appointment(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         expect(banner).to_be_visible()
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text(
@@ -153,14 +153,14 @@ class TestEditingSpecialAppointments(SystemTestCase):
         expect(banner).to_contain_text("Deaf in one ear")
 
     def and_i_do_not_see_the_special_appointment_banner(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         expect(banner).not_to_be_attached()
 
     def then_i_am_back_on_the_appointment(self):
         expect(self.page).to_have_url(re.compile(f"/mammograms/{self.appointment.pk}/"))
 
     def when_i_click_on_the_change_link(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         banner.get_by_text("Change").click()
 
     def then_i_am_on_the_special_appointment_form(self):

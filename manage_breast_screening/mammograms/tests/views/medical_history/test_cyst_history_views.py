@@ -26,6 +26,25 @@ class TestAddCystHistoryView:
         )
         assert response.status_code == 200
 
+    def test_redirects_if_already_exists(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        CystHistoryItemFactory.create(appointment=appointment)
+
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:add_cyst_history_item",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information", kwargs={"pk": appointment.pk}
+            ),
+        )
+
     def test_valid_post_redirects_to_appointment(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider

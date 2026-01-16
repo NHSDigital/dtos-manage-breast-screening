@@ -196,10 +196,10 @@ class TestBenignLumpHistory(SystemTestCase):
         )
 
     def then_i_see_a_change_link_for_the_benign_lump_history_item(self):
-        expect(self.page.get_by_text("Change benign lump item")).to_be_attached()
+        expect(self.page.get_by_text("Change (benign lumps)")).to_be_attached()
 
     def when_i_click_on_the_change_link_for_the_benign_lump_history_item(self):
-        self.page.get_by_text("Change benign lump item").click()
+        self.page.get_by_text("Change (benign lumps)").click()
 
     def when_i_update_the_form_details(self):
         # Update to match the expected values in and_the_benign_lump_history_item_is_listed
