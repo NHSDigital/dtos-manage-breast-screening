@@ -5,6 +5,8 @@
 {% from 'components/appointment-status-bar.jinja' import app_appointment_status_bar %}
 {% from 'components/workflow_steps.jinja' import workflow_steps %}
 
+{% set bodyClasses = (bodyClasses or "") ~ " app-workflow-mode" %}
+
 {% block beforeContent %}
 {# Using javascript temporarily - this should be replaced with proper URLs #}
 {{ backLink({
