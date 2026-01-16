@@ -8,6 +8,7 @@
 {% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
 {% from 'components/check-in/macro.jinja' import app_check_in %}
 {% from 'components/start-appointment/macro.jinja' import app_start_appointment %}
+{% from 'components/resume-appointment/macro.jinja' import app_resume_appointment %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -105,6 +106,19 @@
         ),
         csrf_input=csrf_input
       ) }}
+      {% if presented_appointment.can_be_resumed_by(request.user) %}
+        {{ app_resume_appointment(
+          request.user,
+          presented_appointment,
+          resume_appointment_url=url(
+            "mammograms:start_appointment",
+            kwargs={
+              'pk': presented_appointment.pk,
+            }
+          ),
+          csrf_input=csrf_input
+        ) }}
+      {% endif %}
     {% endset %}
 
     {% do table_rows.append([

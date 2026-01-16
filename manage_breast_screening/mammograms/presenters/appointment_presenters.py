@@ -83,6 +83,12 @@ class AppointmentPresenter:
             Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
         ) and AppointmentStatusUpdater.is_startable(self._appointment)
 
+    def can_be_resumed_by(self, user):
+        return (
+            self._appointment.current_status.is_in_progress()
+            and user.pk == self._appointment.current_status.created_by.pk
+        )
+
     @cached_property
     def special_appointment_tag_properties(self):
         return {
