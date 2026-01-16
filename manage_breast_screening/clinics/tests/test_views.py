@@ -69,7 +69,4 @@ class TestSelectProvider:
         response = client.get(reverse("clinics:select_provider"))
 
         assert response.status_code == 200
-        assert (
-            "No providers found. Check that you've been assigned a role with at least one provider."
-            in response.text
-        )
+        assert "Your account is not recognised" in response.text
