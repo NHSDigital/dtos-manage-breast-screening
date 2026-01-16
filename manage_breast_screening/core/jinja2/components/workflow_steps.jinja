@@ -1,6 +1,6 @@
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
 
-{% macro workflow_steps() %}
+{% macro workflow_steps(presented_appointment) %}
 
 <div class="app-workflow-side-nav-wrapper">
   <nav class="app-workflow-side-nav" aria-label="Workflow steps">
@@ -24,7 +24,7 @@
 
         <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
           
-            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="/clinics/wtrl7jud/events/rcddme93/confirm-identity">
+            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="{{ url('mammograms:confirm_identity', kwargs={"pk": presented_appointment.pk}) }}">
               <span class="app-workflow-side-nav__number">
                 
                   
@@ -49,7 +49,7 @@
 
         <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
           
-            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="/clinics/wtrl7jud/events/rcddme93/review-medical-information">
+            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="{{ url('mammograms:record_medical_information', kwargs={"pk": presented_appointment.pk}) }}">
               <span class="app-workflow-side-nav__number">
                 
                   
