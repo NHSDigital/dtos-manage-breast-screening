@@ -20,7 +20,9 @@ from jinja2 import ChainableUndefined
 
 def boolean_env(key, default=None):
     value = environ.get(key)
-    return default if value is None else value in ("True", "true", "1")
+    if value is None:
+        return default
+    return value.strip() in ("True", "true", "1")
 
 
 def list_env(key):
