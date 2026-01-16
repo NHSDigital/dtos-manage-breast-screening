@@ -58,7 +58,7 @@ class BasicAuthMiddleware:
         expected_username = getattr(settings, "BASIC_AUTH_USERNAME", None)
         expected_password = getattr(settings, "BASIC_AUTH_PASSWORD", None)
 
-        if expected_username is None or expected_password is None:
+        if not expected_username or not expected_password:
             return self._unauthorized_response()
 
         if hmac.compare_digest(username, expected_username) and hmac.compare_digest(

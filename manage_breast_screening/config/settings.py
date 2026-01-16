@@ -20,7 +20,9 @@ from jinja2 import ChainableUndefined
 
 def boolean_env(key, default=None):
     value = environ.get(key)
-    return default if value is None else value in ("True", "true", "1")
+    if value is None:
+        return default
+    return value.strip() in ("True", "true", "1")
 
 
 def list_env(key):
@@ -297,6 +299,6 @@ BASE_URL = environ.get("BASE_URL")
 
 # HTTP Basic Auth (optional; off by default)
 BASIC_AUTH_ENABLED = boolean_env("BASIC_AUTH_ENABLED", default=False)
-BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME")
-BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
-BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
+BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME", "").strip()
+BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD", "").strip()
+BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted").strip()

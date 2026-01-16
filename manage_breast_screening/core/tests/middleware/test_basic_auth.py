@@ -86,3 +86,14 @@ class TestBasicAuthMiddleware:
         )
         mw = _make_middleware()
         assert mw.process_view(request, lambda r: None, (), {}) is None
+
+    def test_empty_credentials_unauthorized(self, settings):
+        settings.BASIC_AUTH_ENABLED = True
+        settings.BASIC_AUTH_USERNAME = ""
+        settings.BASIC_AUTH_PASSWORD = ""
+
+        request = RequestFactory().get("/", HTTP_AUTHORIZATION=_auth_header("", ""))
+        mw = _make_middleware()
+        resp = mw.process_view(request, lambda r: None, (), {})
+        assert resp is not None
+        assert resp.status_code == 401
