@@ -1,0 +1,70 @@
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
+
+{% macro workflow_steps(presented_appointment, active_workflow_step) %}
+
+{# SVG for completed items #}
+{% set tickSvg %}
+  <svg class="app-icon app-icon--tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" d="M18.4 7.8l-8.5 8.4L5.6 12"></path>
+  </svg>
+{% endset %}
+
+{% set workflowSteps = [
+    {'type': 'confirm_identity', 'label': 'Confirm identity', 'completed': false},
+    {'type': 'record_medical_information', 'label': 'Review medical information', 'completed': false},
+    {'type': 'confirm_identity', 'label': 'Take images', 'completed': false},
+    {'type': 'confirm_identity', 'label': 'Check information', 'completed': false},
+] %}
+
+<div class="app-workflow-side-nav-wrapper">
+  <nav class="app-workflow-side-nav" aria-label="Workflow steps">
+
+    <h2 class="app-workflow-side-nav__heading">
+      <span class="nhsuk-caption-m">
+        Screening appointment
+      </span>
+      Workflow steps
+    </h2>
+
+    <ol class="app-workflow-side-nav__list">
+      {% for item in workflowSteps %}
+        {% set isCompleted = item.completed %}
+        {% set isCurrent = loop.index == active_workflow_step %}
+        {% set isDisabled = loop.index > active_workflow_step and not (loop.index == active_workflow_step+1 and workflowSteps[active_workflow_step-1].completed) %}
+
+        <li class="app-workflow-side-nav__item {{ 'app-workflow-side-nav__item--current' if isCurrent }} {{ 'app-workflow-side-nav__item--completed' if isCompleted }} {{ 'app-workflow-side-nav__item--disabled' if isDisabled }}">
+          {% if isDisabled %}
+            <span class="app-workflow-side-nav__link app-workflow-side-nav__link--disabled">
+              <span class="app-workflow-side-nav__number">{{ loop.index }}</span>
+              <span class="app-workflow-side-nav__label">{{ item.label }}</span>
+            </span>
+          {% elif isCurrent %}
+            <span class="app-workflow-side-nav__link" aria-current="page">
+              <span class="app-workflow-side-nav__number">
+                {% if isCompleted %}
+                  {{ tickSvg | safe }}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </span>
+              <span class="app-workflow-side-nav__label">{{ item.label }}</span>
+            </span>
+          {% else %}
+            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="{{ url('mammograms:' ~ item.type, kwargs={"pk": presented_appointment.pk}) }}">
+              <span class="app-workflow-side-nav__number">
+                {% if isCompleted %}
+                  {{ tickSvg | safe }}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </span>
+              <span class="app-workflow-side-nav__label">{{ item.label }}</span>
+            </a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+</div>
+
+{% endmacro %}
