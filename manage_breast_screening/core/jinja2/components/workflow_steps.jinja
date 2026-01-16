@@ -13,103 +13,43 @@
     </h2>
 
     <ol class="app-workflow-side-nav__list">
-      
-        
-        
-        
-        
 
-        
-        
+{% set items = [
+    {'type': 'confirm_identity', 'name': 'Confirm identity'},
+    {'type': 'record_medical_information', 'name': 'Review medical information'},
+    {'type': 'take_images', 'name': 'Take images'},
+    {'type': 'check_information', 'name': 'Check information'},
+] %}
 
-        <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
-          
-            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="{{ url('mammograms:confirm_identity', kwargs={"pk": presented_appointment.pk}) }}">
-              <span class="app-workflow-side-nav__number">
-                
-                  
-  <svg class="app-icon app-icon--tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
-    <path stroke-linecap="round" d="M18.4 7.8l-8.5 8.4L5.6 12"></path>
-  </svg>
+{% for item in items %}
+  {% if item.type == 'confirm_identity' %}
+    <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
+        <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="{{ url('mammograms:' ~ item.type, kwargs={"pk": presented_appointment.pk}) }}">
+          <span class="app-workflow-side-nav__number">
+            <svg class="app-icon app-icon--tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" d="M18.4 7.8l-8.5 8.4L5.6 12"></path>
+            </svg>
+          </span>
+          <span class="app-workflow-side-nav__label">{{ item.name }}</span>
+        </a>
+    </li>
+  {% elif item.type == 'record_medical_information' %}
+    <li class="app-workflow-side-nav__item app-workflow-side-nav__item--current">
+      <span class="app-workflow-side-nav__link" aria-current="page">
+        <span class="app-workflow-side-nav__number">{{ loop.index }}</span>
+        <span class="app-workflow-side-nav__label">{{ item.name }}</span>
+      </span>
+    </li>
+  {% else %}
+    <li class="app-workflow-side-nav__item   app-workflow-side-nav__item--disabled">
+      <span class="app-workflow-side-nav__link app-workflow-side-nav__link--disabled">
+        <span class="app-workflow-side-nav__number">{{ loop.index }}</span>
+        <span class="app-workflow-side-nav__label">{{ item.name }}</span>
+      </span>
+    </li>
+  {% endif %}
+{% endfor %}
 
-                
-              </span>
-              <span class="app-workflow-side-nav__label">Confirm identity</span>
-            </a>
-          
-        </li>
-      
-        
-        
-        
-        
-
-        
-        
-
-        <li class="app-workflow-side-nav__item  app-workflow-side-nav__item--completed ">
-          
-            <a class="app-workflow-side-nav__link app-workflow-side-nav__link--clickable" href="{{ url('mammograms:record_medical_information', kwargs={"pk": presented_appointment.pk}) }}">
-              <span class="app-workflow-side-nav__number">
-                
-                  
-  <svg class="app-icon app-icon--tick" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
-    <path stroke-linecap="round" d="M18.4 7.8l-8.5 8.4L5.6 12"></path>
-  </svg>
-
-                
-              </span>
-              <span class="app-workflow-side-nav__label">Review medical information</span>
-            </a>
-          
-        </li>
-      
-        
-        
-        
-        
-
-        
-        
-
-        <li class="app-workflow-side-nav__item app-workflow-side-nav__item--current  ">
-          
-            <span class="app-workflow-side-nav__link" aria-current="page">
-              <span class="app-workflow-side-nav__number">
-                
-                  3
-                
-              </span>
-              <span class="app-workflow-side-nav__label">Take images</span>
-            </span>
-          
-        </li>
-      
-        
-        
-        
-        
-
-        
-        
-          
-          
-          
-
-          
-            
-          
-        
-
-        <li class="app-workflow-side-nav__item   app-workflow-side-nav__item--disabled">
-          
-            <span class="app-workflow-side-nav__link app-workflow-side-nav__link--disabled">
-              <span class="app-workflow-side-nav__number">4</span>
-              <span class="app-workflow-side-nav__label">Check information</span>
-            </span>
-          
-        </li>
-      
     </ol>
   </nav>
 </div>
