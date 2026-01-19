@@ -81,7 +81,7 @@ class AppointmentPresenter:
     def can_be_started_by(self, user):
         return user.has_perm(
             Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
-        ) and AppointmentStatusUpdater.is_startable(self._appointment)
+        ) and AppointmentStatusUpdater.can_be_started(self._appointment)
 
     @cached_property
     def special_appointment_tag_properties(self):

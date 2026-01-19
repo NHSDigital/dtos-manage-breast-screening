@@ -40,7 +40,7 @@ class AppointmentStatusUpdater:
         )
 
     @staticmethod
-    def is_startable(appointment):
+    def can_be_started(appointment):
         return appointment is not None and appointment.current_status.name in (
             AppointmentStatus.SCHEDULED,
             AppointmentStatus.CHECKED_IN,
