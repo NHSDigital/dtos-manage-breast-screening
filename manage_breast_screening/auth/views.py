@@ -174,23 +174,14 @@ def _validate_id_assurance_level(level: int | str | None) -> str | None:
 
 
 def _validate_authentication_assurance_level(level: int | str | None) -> str | None:
-    if level is not None:
-        level = int(level)
+    level = int(level) if level is not None else level
+    minimum_level = 2 if settings.CIS2_ACR_VALUES == "AAL2_OR_AAL3_ANY" else 3
 
-    if settings.CIS2_ACR_VALUES == "AAL2_OR_AAL3_ANY":
-        minimum_level = 2
-        if level is None or level < minimum_level:
-            logger.warning(
-                f"CIS2 authentication rejected: authentication_assurance_level={level}, expected >= {minimum_level}"
-            )
-            return "Insufficient authentication assurance level"
-    else:
-        required_level = 3
-        if level != required_level:
-            logger.warning(
-                f"CIS2 authentication rejected: authentication_assurance_level={level}, expected {required_level}"
-            )
-            return "Insufficient authentication assurance level"
+    if level is None or level < minimum_level:
+        logger.warning(
+            f"CIS2 authentication rejected: authentication_assurance_level={level}, expected >= {minimum_level}"
+        )
+        return "Insufficient authentication assurance level"
     return None
 
 
