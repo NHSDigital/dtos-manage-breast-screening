@@ -11,6 +11,8 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "manage_breast_screening.settings")
+os.environ.setdefault(
+    "DJANGO_SETTINGS_MODULE", "manage_breast_screening.config.settings"
+)
 
 application = get_asgi_application()
