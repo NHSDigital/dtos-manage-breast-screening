@@ -26,8 +26,7 @@ def upload_dicom(request):
         return JsonResponse({"error": "No DICOM file provided"}, status=400)
 
     try:
-        ds = pydicom.dcmread(dicom_file)
-        records = DicomRecorder.create_records(source_message_id, ds, dicom_file)
+        records = DicomRecorder.create_records(source_message_id, dicom_file)
 
     except pydicom.errors.InvalidDicomError:
         return JsonResponse({"error": "Invalid DICOM file"}, status=400)
