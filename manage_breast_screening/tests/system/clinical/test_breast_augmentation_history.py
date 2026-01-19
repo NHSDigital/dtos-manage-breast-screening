@@ -140,7 +140,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
         )
         section = self.page.locator("section").filter(has=heading)
         row = section.locator(".app-nested-info__row", has_text="Procedures")
-        expect(row).to_contain_text("Right breast Breast implants (silicone or saline)")
+        expect(row).to_contain_text("Right breast Breast implants")
         expect(row).to_contain_text("Left breast Other augmentation")
 
     def and_the_message_says_augmentation_added(self):
@@ -150,7 +150,7 @@ class TestBreastAugmentationHistory(SystemTestCase):
         expect(alert).to_contain_text("Added breast implants or augmentation")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change breast implants or augmentation item").click()
+        self.page.get_by_text("Change (breast implants or augmentation)").click()
 
     def then_i_see_the_edit_breast_augmentation_history_form(self):
         expect(

@@ -146,7 +146,7 @@ class TestRecordingOtherProcedure(SystemTestCase):
         self.assert_page_title_contains("Edit details of other procedures")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change other procedure item").click()
+        self.page.get_by_text("Change (other procedures)").click()
 
     def when_i_select_nipple_correction(self):
         self.page.get_by_label("Nipple correction", exact=True).click()

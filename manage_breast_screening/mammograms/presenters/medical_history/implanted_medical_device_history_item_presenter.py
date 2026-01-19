@@ -1,9 +1,7 @@
 from django.urls import reverse
 
 from manage_breast_screening.core.template_helpers import multiline_content, nl2br
-from manage_breast_screening.core.utils.date_formatting import (
-    format_year_with_relative,
-)
+from manage_breast_screening.core.utils.date_formatting import format_year_with_relative
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
 )
@@ -17,7 +15,6 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
         # visually hidden text
         self.counter = counter
 
-        self.device = self._item.get_device_display()
         self.other_medical_device_details = (
             self._item.other_medical_device_details or "N/A"
         )
@@ -38,8 +35,19 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
         return format_year_with_relative(self._item.removal_year)
 
     @property
+    def device(self):
+        mapping = {
+            ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE: "Cardiac device",
+            ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE: "Other medical device",
+        }
+        return mapping.get(self._item.device, self._item.get_device_display())
+
+    @property
     def procedure_year_with_removal(self):
-        lines = [f"Implanted in {self.procedure_year}"]
+        lines = []
+        if self.procedure_year:
+            lines.append(f"Implanted in {self.procedure_year}")
+
         if self._item.removal_year:
             lines.append(f"Device removed in {self.removal_year}")
         elif self._item.device_has_been_removed:
@@ -48,38 +56,8 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
         return multiline_content(lines)
 
     @property
-    def summary_list_params(self):
-        # This is a placeholder until we have a properly formatted table.
-        return {
-            "rows": [
-                {
-                    "key": {"text": "Device"},
-                    "value": {"html": self.device},
-                },
-                {
-                    "key": {"text": "Other medical device details"},
-                    "value": {"html": self.other_medical_device_details},
-                },
-                {
-                    "key": {"text": "Procedure year"},
-                    "value": {"html": self.procedure_year},
-                },
-                {
-                    "key": {"text": "Device has been removed"},
-                    "value": {
-                        "html": self.device_has_been_removed,
-                    },
-                },
-                {
-                    "key": {"text": "Additional details"},
-                    "value": {"html": self.additional_details},
-                },
-            ],
-        }
-
-    @property
     def type(self):
-        device = self._item.get_device_display()
+        device = self.device
         details = self._item.other_medical_device_details
         if (
             self._item.device
@@ -101,9 +79,4 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" item {self.counter}"
-                if self.counter
-                else " implanted medical device item"
-            ),
         }

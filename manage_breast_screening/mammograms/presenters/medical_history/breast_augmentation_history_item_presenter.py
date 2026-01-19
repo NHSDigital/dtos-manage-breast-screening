@@ -13,12 +13,11 @@ class BreastAugmentationHistoryItemPresenter:
         self.counter = counter
 
         self.right_breast_procedures = [
-            BreastAugmentationHistoryItem.Procedure(choice).label
+            self._procedure_text(choice)
             for choice in self._item.right_breast_procedures
         ]
         self.left_breast_procedures = [
-            BreastAugmentationHistoryItem.Procedure(choice).label
-            for choice in self._item.left_breast_procedures
+            self._procedure_text(choice) for choice in self._item.left_breast_procedures
         ]
 
         self.implants_have_been_removed = (
@@ -39,45 +38,16 @@ class BreastAugmentationHistoryItemPresenter:
 
     @property
     def procedure_year_with_removal(self):
-        lines = [f"Implanted in {self.procedure_year}"]
+        lines = []
+        if self.procedure_year:
+            lines.append(f"Implanted in {self.procedure_year}")
+
         if self._item.removal_year:
             lines.append(f"Implants removed in {self.removal_year}")
-        elif self._item.device_has_been_removed:
+        elif self._item.implants_have_been_removed:
             lines.append("Implants removed")
 
         return multiline_content(lines)
-
-    @property
-    def summary_list_params(self):
-        # This is a placeholder until we have a properly formatted table.
-
-        procedures = [
-            f"Right breast: {', '.join(self.right_breast_procedures)}",
-            f"Left breast: {', '.join(self.left_breast_procedures)}",
-        ]
-
-        return {
-            "rows": [
-                {
-                    "key": {"text": "Procedures"},
-                    "value": {"html": multiline_content(procedures)},
-                },
-                {
-                    "key": {"text": "Procedure year"},
-                    "value": {"html": self.procedure_year},
-                },
-                {
-                    "key": {"text": "Implants have been removed"},
-                    "value": {
-                        "html": self.implants_have_been_removed,
-                    },
-                },
-                {
-                    "key": {"text": "Additional details"},
-                    "value": {"html": self.additional_details},
-                },
-            ],
-        }
 
     @property
     def change_link(self):
@@ -90,9 +60,10 @@ class BreastAugmentationHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" breast implants or augmentation item {self.counter}"
-                if self.counter
-                else " breast implants or augmentation item"
-            ),
         }
+
+    def _procedure_text(self, procedure):
+        if procedure == BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS:
+            return "Breast implants"
+        else:
+            return BreastAugmentationHistoryItem.Procedure(procedure).label

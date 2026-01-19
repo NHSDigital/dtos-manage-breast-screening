@@ -32,32 +32,34 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
     assertHTMLEqual(
         response,
         """
-        <div class="nhsuk-warning-callout">
-            <h3 class="nhsuk-warning-callout__label">    <span role="text">
+        <div class="nhsuk-card nhsuk-card--warning">
+            <div class="nhsuk-card__content">
+                <h3 class="nhsuk-card__heading"><span role="text">
                 <span class="nhsuk-u-visually-hidden">Important: </span>
                 Special appointment
-            </span></h3>
+                </span></h3>
 
-            <dl class="nhsuk-summary-list app-special-appointment-banner">
-                <div class="nhsuk-summary-list__row">
-                    <dt class="nhsuk-summary-list__key">
-                    Physical restriction
-                    </dt>
-                    <dd class="nhsuk-summary-list__value">
-                    broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
-                    </dd>
+                <dl class="nhsuk-summary-list app-special-appointment-banner">
+                    <div class="nhsuk-summary-list__row">
+                        <dt class="nhsuk-summary-list__key">
+                        Physical restriction
+                        </dt>
+                        <dd class="nhsuk-summary-list__value">
+                        broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
+                        </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row">
+                        <dt class="nhsuk-summary-list__key">
+                        Social, emotional, and mental health
+                        </dt>
+                        <dd class="nhsuk-summary-list__value">
+                        <span class="nhsuk-u-secondary-text-color">No details provided</span>
+                        </dd>
+                    </div>
+                </dl>
+                <div class="app-special-appointment-banner__action">
+                    <a href="/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/" style="font-size: 19px;">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements</span></a>
                 </div>
-                <div class="nhsuk-summary-list__row">
-                    <dt class="nhsuk-summary-list__key">
-                    Social, emotional, and mental health
-                    </dt>
-                    <dd class="nhsuk-summary-list__value">
-                    <span class="nhsuk-u-secondary-text-color">No details provided</span>
-                    </dd>
-                </div>
-            </dl>
-            <div class="app-special-appointment-banner__action">
-                <a href="/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/" style="font-size: 19px;">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements</span></a>
             </div>
         </div>
     """,
@@ -79,30 +81,32 @@ def test_special_appointment_banner_without_change_link(jinja_env, presenter):
     assertHTMLEqual(
         response,
         """
-        <div class="nhsuk-warning-callout">
-            <h3 class="nhsuk-warning-callout__label">    <span role="text">
+        <div class="nhsuk-card nhsuk-card--warning">
+            <div class="nhsuk-card__content">
+                <h3 class="nhsuk-card__heading"><span role="text">
                 <span class="nhsuk-u-visually-hidden">Important: </span>
                 Special appointment
-            </span></h3>
+                </span></h3>
 
-            <dl class="nhsuk-summary-list app-special-appointment-banner">
-                <div class="nhsuk-summary-list__row">
-                    <dt class="nhsuk-summary-list__key">
-                    Physical restriction
-                    </dt>
-                    <dd class="nhsuk-summary-list__value">
-                    broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
-                    </dd>
-                </div>
-                <div class="nhsuk-summary-list__row">
-                    <dt class="nhsuk-summary-list__key">
-                    Social, emotional, and mental health
-                    </dt>
-                    <dd class="nhsuk-summary-list__value">
-                    <span class="nhsuk-u-secondary-text-color">No details provided</span>
-                    </dd>
-                </div>
-            </dl>
+                <dl class="nhsuk-summary-list app-special-appointment-banner">
+                    <div class="nhsuk-summary-list__row">
+                        <dt class="nhsuk-summary-list__key">
+                        Physical restriction
+                        </dt>
+                        <dd class="nhsuk-summary-list__value">
+                        broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
+                        </dd>
+                    </div>
+                    <div class="nhsuk-summary-list__row">
+                        <dt class="nhsuk-summary-list__key">
+                        Social, emotional, and mental health
+                        </dt>
+                        <dd class="nhsuk-summary-list__value">
+                        <span class="nhsuk-u-secondary-text-color">No details provided</span>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
         </div>
     """,
     )

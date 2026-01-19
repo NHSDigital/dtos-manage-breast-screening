@@ -82,6 +82,25 @@ class TestAddBreastAugmentationHistoryView:
             response.text,
         )
 
+    def test_redirects_if_already_exists(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        BreastAugmentationHistoryItemFactory.create(appointment=appointment)
+
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:add_breast_augmentation_history_item",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information", kwargs={"pk": appointment.pk}
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeBreastAugmentationHistoryView:

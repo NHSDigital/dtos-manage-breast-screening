@@ -284,7 +284,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         row.locator("a", has_text="View appointment").click()
 
     def then_i_can_see_the_special_appointment_banner(self):
-        banner = self.page.locator(".nhsuk-warning-callout")
+        banner = self.page.locator(".nhsuk-card--warning")
         expect(banner).to_be_visible()
         expect(banner).to_contain_text("Special appointment")
         expect(banner).to_contain_text("Wheelchair user")

@@ -197,7 +197,7 @@ class TestBreastCancerHistory(SystemTestCase):
         )
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change breast cancer item").click()
+        self.page.get_by_text("Change (breast cancer)").click()
 
     def when_i_select_breast_radiotherapy_in_right_breast(self):
         fieldset = self.get_fieldset_by_legend(

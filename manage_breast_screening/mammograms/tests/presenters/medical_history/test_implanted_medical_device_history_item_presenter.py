@@ -33,10 +33,28 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
 
     @time_machine.travel(date(2025, 1, 1))
     def test_attributes(self, presenter):
-        assert presenter.device == "Other medical device (or does not know)"
+        assert presenter.device == "Other medical device"
         assert presenter.procedure_year == "2020 (5 years ago)"
         assert presenter.removal_year == "2022 (3 years ago)"
         assert presenter.additional_details == "Some additional details"
+
+    @pytest.mark.parametrize(
+        "device, expected",
+        [
+            (ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE, "Cardiac device"),
+            (ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE, "Hickman line"),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                "Other medical device",
+            ),
+        ],
+    )
+    @time_machine.travel(date(2025, 1, 1))
+    def test_device_removes_parenthetical_text(self, device, expected):
+        item = ImplantedMedicalDeviceHistoryItemFactory.build(device=device)
+        presenter = ImplantedMedicalDeviceHistoryItemPresenter(item)
+
+        assert presenter.device == expected
 
     @time_machine.travel(date(2025, 1, 1))
     def test_procedure_year_with_removal(self, presenter):
@@ -45,51 +63,15 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
         )
 
     @time_machine.travel(date(2025, 1, 1))
-    def test_single(self, presenter):
-        assert presenter.summary_list_params == {
-            "rows": [
-                {
-                    "key": {
-                        "text": "Device",
-                    },
-                    "value": {
-                        "html": "Other medical device (or does not know)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Other medical device details",
-                    },
-                    "value": {
-                        "html": "Test Device",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Procedure year",
-                    },
-                    "value": {
-                        "html": "2020 (5 years ago)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Device has been removed",
-                    },
-                    "value": {
-                        "html": "Yes (2022)",
-                    },
-                },
-                {
-                    "key": {
-                        "text": "Additional details",
-                    },
-                    "value": {
-                        "html": "Some additional details",
-                    },
-                },
-            ],
-        }
+    def test_missing_procedure_year(self):
+        presenter = ImplantedMedicalDeviceHistoryItemPresenter(
+            ImplantedMedicalDeviceHistoryItemFactory.build(
+                device=ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                other_medical_device_details="Test Device",
+                additional_details="Some additional details",
+            )
+        )
+        assert presenter.procedure_year_with_removal == ""
 
     def test_change_link(self):
         item = ImplantedMedicalDeviceHistoryItemFactory.build(
@@ -101,18 +83,4 @@ class TestImplantedMedicalDeviceHistoryItemPresenter:
         assert presenter.change_link == {
             "href": f"/mammograms/{item.appointment_id}/record-medical-information/implanted-medical-device-history/{item.pk}/",
             "text": "Change",
-            "visually_hidden_text": " implanted medical device item",
-        }
-
-    def test_change_link_with_counter(self):
-        item = ImplantedMedicalDeviceHistoryItemFactory.build(
-            device=ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
-            additional_details="Some additional details",
-        )
-
-        presenter = ImplantedMedicalDeviceHistoryItemPresenter(item, counter=2)
-        assert presenter.change_link == {
-            "href": f"/mammograms/{item.appointment_id}/record-medical-information/implanted-medical-device-history/{item.pk}/",
-            "text": "Change",
-            "visually_hidden_text": " item 2",
         }

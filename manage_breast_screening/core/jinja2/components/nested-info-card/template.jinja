@@ -2,7 +2,8 @@
 {% set headingLevel = params.headingLevel | default(2) %}
 {% call card(params.card) %}
   <div class="app-nested-info">
-    {% for row in params.rows %}
+    {% set rows = params.rows | select("mapping") %}
+    {% for row in rows %}
     {% if row %}
     <div class="app-nested-info__row {% if loop.last %}app-nested-info__row--no-border{% endif %}">
       <div class="app-nested-info__key">

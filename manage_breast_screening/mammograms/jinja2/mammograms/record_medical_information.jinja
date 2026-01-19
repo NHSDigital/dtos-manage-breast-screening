@@ -85,24 +85,41 @@
   action_button_properties=presenter.review_action_button_properties(sections.MEDICAL_HISTORY),
   csrf_input=csrf_input,
   ) %}
-  {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
-  {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
-  {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
-  {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
-  {{ cyst_history_card(presenter.cyst_history) }}
-  {{ benign_lump_history_card(presenter.benign_lump_history) }}
-  {{ other_procedure_history_card(presenter.other_procedure_history) }}
+  <p>Including breast cancer, implants, prior procedures and treatments</p>
+
+  {% if presenter.any_medical_history %}
+    {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
+    {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
+    {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
+    {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
+    {{ cyst_history_card(presenter.cyst_history) }}
+    {{ benign_lump_history_card(presenter.benign_lump_history) }}
+    {{ other_procedure_history_card(presenter.other_procedure_history) }}
+  {% else %}
+    {% set insetTextHtml %}
+      <p>
+        No medical history has been added yet.
+      </p>
+    {% endset %}
+
+    {{ insetText({
+      "html": insetTextHtml,
+      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+    }) }}
+  {% endif %}
 
   <hr>
   <h3>Add medical history</h3>
 
   <div class="nhsuk-button-group app-button-group--small">
     {% for button_info in presenter.medical_history_buttons %}
-      {{ button({
-        "text": button_info.text,
-        "href": button_info.href,
-        "classes": "nhsuk-button--secondary nhsuk-button--small"
-      }) }}
+      {% if button_info %}
+        {{ button({
+          "text": button_info.text,
+          "href": button_info.href,
+          "classes": "nhsuk-button--secondary nhsuk-button--small"
+        }) }}
+      {% endif %}
     {% endfor %}
   </div>
 {% endcall %}

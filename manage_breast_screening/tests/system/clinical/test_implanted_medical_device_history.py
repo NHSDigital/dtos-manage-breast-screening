@@ -147,7 +147,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         expect(alert).to_contain_text("Added implanted medical device")
 
     def when_i_click_change(self):
-        self.page.get_by_text("Change implanted medical device item").click()
+        self.page.get_by_text("Change (implanted medical device)").click()
 
     def then_i_see_the_edit_implanted_medical_device_form(self):
         expect(
@@ -167,7 +167,7 @@ class TestImplantedMedicalDeviceHistory(SystemTestCase):
         section = self.page.locator("section").filter(has=heading)
 
         row = section.locator(".app-nested-info__row", has_text="Type")
-        expect(row).to_contain_text("Cardiac device (such as a pacemaker or ICD)")
+        expect(row).to_contain_text("Cardiac device")
 
     def and_the_message_says_implanted_medical_device_updated(self):
         alert = self.page.get_by_role("alert")

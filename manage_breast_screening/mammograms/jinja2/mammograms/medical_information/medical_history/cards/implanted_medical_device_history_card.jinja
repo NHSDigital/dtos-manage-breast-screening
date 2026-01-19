@@ -4,35 +4,33 @@
 {% macro implanted_medical_device_history_card(implanted_medical_device_history) %}
   {% if implanted_medical_device_history %}
   <section>
-    <h3 class="nhsuk-u-margin-bottom-2">Implanted medical device</h3>
   {% endif %}
 
   {% for presented_item in implanted_medical_device_history %}
-    {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
-
-    <!-- This will be replaced with the card's actions param, once the card updates are released. -->
-    <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href }}">
-      {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
-    </a>
-
     {% set type_html %}
       <p>{{ presented_item.type }}</p>
       {% if presented_item.device_has_been_removed %}
         <p>
-          Device has been removed
+          Implanted device has been removed
         </p>
       {% endif %}
     {% endset %}
 
     {{ app_nested_info_card({
       "card": {
-        "heading": "Item " ~ presented_item.counter,
-        "headingLevel": 4,
-        "classes": "nhsuk-u-margin-bottom-4"
-      } if presented_item.counter else {
-        "classes": "nhsuk-u-margin-bottom-4"
+        "heading": "Implanted medical device" ~ (": item " ~ presented_item.counter if presented_item.counter),
+        "headingLevel": 3,
+        "classes": "nhsuk-u-margin-bottom-4",
+        "actions": {
+          "items": [
+            {
+              "text": presented_item.change_link.text,
+              "href": presented_item.change_link.href
+            }
+          ]
+        }
       },
-      "headingLevel": keyHeadingLevel,
+      "headingLevel": 4,
       "rows": [
         {
           "key": "Type",

@@ -10,6 +10,7 @@ from manage_breast_screening.participants.models.symptom import (
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    BreastAugmentationHistoryItemFactory,
     CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
@@ -174,6 +175,19 @@ class TestRecordMedicalInformationPresenter:
             "text": "Cysts",
         }
 
+    def test_certain_items_can_only_be_added_once(self):
+        appointment = AppointmentFactory()
+        CystHistoryItemFactory.create(appointment=appointment)
+        BreastAugmentationHistoryItemFactory.create(appointment=appointment)
+
+        assert MedicalInformationPresenter(appointment).add_cyst_history_button is None
+        assert (
+            MedicalInformationPresenter(
+                appointment
+            ).add_breast_augmentation_history_button
+            is None
+        )
+
     def test_breast_augmentation_history_button(self):
         appointment = AppointmentFactory()
 
@@ -303,3 +317,10 @@ class TestRecordMedicalInformationPresenter:
             presenter.is_section_reviewed(MedicalInformationSection.BREAST_FEATURES)
             is False
         )
+
+    def test_any_medical_history(self):
+        appointment = AppointmentFactory()
+        assert not MedicalInformationPresenter(appointment).any_medical_history
+
+        OtherProcedureHistoryItemFactory.create(appointment=appointment)
+        assert MedicalInformationPresenter(appointment).any_medical_history

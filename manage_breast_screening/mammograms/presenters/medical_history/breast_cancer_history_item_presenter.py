@@ -55,11 +55,6 @@ class BreastCancerHistoryItemPresenter:
                 },
             ),
             "text": "Change",
-            "visually_hidden_text": (
-                f" breast cancer item {self.counter}"
-                if self.counter
-                else " breast cancer item"
-            ),
         }
 
     @property

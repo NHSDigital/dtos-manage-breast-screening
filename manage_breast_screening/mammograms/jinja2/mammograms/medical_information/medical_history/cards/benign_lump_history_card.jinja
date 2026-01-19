@@ -4,26 +4,24 @@
 {% macro benign_lump_history_card(benign_lump_history) %}
   {% if benign_lump_history %}
   <section>
-    <h3 class="nhsuk-u-margin-bottom-2">Benign lumps</h3>
   {% endif %}
 
   {% for presented_item in benign_lump_history %}
-    {% set keyHeadingLevel = 5 if presented_item.counter else 4 %}
-
-    <!-- This will be replaced with the card's actions param, once the card updates are released. -->
-    <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ presented_item.change_link.href }}">
-      {{ presented_item.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ presented_item.change_link.visually_hidden_text }}</span>
-    </a>
-
     {{ app_nested_info_card({
       "card": {
-        "heading": "Item " ~ presented_item.counter,
-        "headingLevel": 4,
-        "classes": "nhsuk-u-margin-bottom-4"
-      } if presented_item.counter else {
-        "classes": "nhsuk-u-margin-bottom-4"
+        "heading": "Benign lumps" ~ (": item " ~ presented_item.counter if presented_item.counter),
+        "headingLevel": 3,
+        "classes": "nhsuk-u-margin-bottom-4",
+        "actions": {
+          "items": [
+            {
+              "text": presented_item.change_link.text,
+              "href": presented_item.change_link.href
+            }
+          ]
+        }
       },
-      "headingLevel": keyHeadingLevel,
+      "headingLevel": 4,
       "rows": [
         {
           "key": "Procedures",

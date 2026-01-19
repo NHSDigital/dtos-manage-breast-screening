@@ -114,6 +114,20 @@ class MedicalInformationPresenter:
         ]
 
     @property
+    def any_medical_history(self):
+        return any(
+            (
+                self.benign_lump_history,
+                self.breast_augmentation_history,
+                self.breast_cancer_history,
+                self.cyst_history,
+                self.implanted_medical_device_history,
+                self.mastectomy_or_lumpectomy_history,
+                self.other_procedure_history,
+            )
+        )
+
+    @property
     def medical_history_buttons(self):
         return [
             self.add_breast_cancer_history_button,
@@ -193,6 +207,9 @@ class MedicalInformationPresenter:
 
     @property
     def add_cyst_history_button(self):
+        if self.cyst_history:
+            return None
+
         url = reverse(
             "mammograms:add_cyst_history_item",
             kwargs={"pk": self.appointment.pk},
@@ -205,6 +222,9 @@ class MedicalInformationPresenter:
 
     @property
     def add_breast_augmentation_history_button(self):
+        if self.breast_augmentation_history:
+            return None
+
         url = reverse(
             "mammograms:add_breast_augmentation_history_item",
             kwargs={"pk": self.appointment.pk},
