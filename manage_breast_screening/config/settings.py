@@ -63,6 +63,7 @@ PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.postgres",
     "django.forms",
     "qsessions",
     "django.contrib.messages",
@@ -220,7 +221,6 @@ STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR / "assets" / "compiled"]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOG_QUERIES = boolean_env("LOG_QUERIES")
 LOGGING = {
