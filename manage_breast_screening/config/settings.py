@@ -63,6 +63,7 @@ PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
+    "django.contrib.postgres",
     "django.forms",
     "qsessions",
     "django.contrib.messages",
