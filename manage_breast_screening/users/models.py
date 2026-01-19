@@ -5,10 +5,10 @@ from django.utils.crypto import salted_hmac
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, nhs_uid, email=None, **extra_fields):
+    def create_user(self, nhs_uid, email="", **extra_fields):
         if not nhs_uid:
             raise ValueError("The NHS UID must be set")
-        user = self.model(nhs_uid=nhs_uid, email=email, **extra_fields)
+        user = self.model(nhs_uid=nhs_uid, email=email or "", **extra_fields)
         user.set_unusable_password()
         user.save(using=self._db)
         return user
