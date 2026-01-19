@@ -45,6 +45,7 @@ dev = [
   "pytest-cov>=7.0.0,<8",
   "djlint>=1.36.4,<2",
   "jsonschema>=4.25.1,<5",
+  "django-upgrade>=1.29.1",
 ]
 
 [tool.uv]

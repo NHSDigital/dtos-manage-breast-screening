@@ -45,7 +45,7 @@ class BasicAuthMiddleware:
             return None
 
         # Validate Authorization header
-        header = request.META.get("HTTP_AUTHORIZATION", "")
+        header = request.headers.get("authorization", "")
         if not header.startswith("Basic "):
             return self._unauthorized_response()
         try:
