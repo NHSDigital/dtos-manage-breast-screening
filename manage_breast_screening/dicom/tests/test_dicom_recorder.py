@@ -19,9 +19,7 @@ class TestDicomRecorder:
                 temp_file.name, dataset, write_like_original=False
             )
             with open(temp_file.name, "rb") as dicom_file:
-                records = DicomRecorder.create_records(
-                    source_message_id, dataset, dicom_file
-                )
+                records = DicomRecorder.create_records(source_message_id, dicom_file)
 
         assert records is not None
         study, series, image = records
@@ -47,20 +45,26 @@ class TestDicomRecorder:
                 temp_file.name, dataset, write_like_original=False
             )
             with open(temp_file.name, "rb") as dicom_file:
-                DicomRecorder.create_records(source_message_id, dataset, dicom_file)
+                DicomRecorder.create_records(source_message_id, dicom_file)
 
-        assert (
-            DicomRecorder.create_records(source_message_id, dataset, dicom_file) is None
-        )
+            with open(temp_file.name, "rb") as dicom_file:
+                assert (
+                    DicomRecorder.create_records(source_message_id, dicom_file) is None
+                )
 
-    def test_create_records_invalid_dicom(self, source_message_id, dataset):
+    def test_create_records_invalid_dicom(self, source_message_id):
         with tempfile.NamedTemporaryFile() as temp_file:
             invalid_ds = pydicom.Dataset()
+            invalid_ds.transfer_syntax_uid = pydicom.uid.ExplicitVRLittleEndian
+            invalid_file_meta = pydicom.Dataset()
+            invalid_file_meta.TransferSyntaxUID = invalid_ds.transfer_syntax_uid
+            invalid_file_meta.MediaStorageSOPClassUID = pydicom.uid.generate_uid()
+            invalid_file_meta.MediaStorageSOPInstanceUID = pydicom.uid.generate_uid()
+            invalid_ds.file_meta = invalid_file_meta
+
             pydicom.filewriter.dcmwrite(
-                temp_file.name, dataset, write_like_original=False
+                temp_file.name, invalid_ds, write_like_original=False
             )
             with open(temp_file.name, "rb") as dicom_file:
                 with pytest.raises(AttributeError):
-                    DicomRecorder.create_records(
-                        source_message_id, invalid_ds, dicom_file
-                    )
+                    DicomRecorder.create_records(source_message_id, dicom_file)
