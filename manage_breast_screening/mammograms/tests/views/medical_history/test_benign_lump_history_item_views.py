@@ -154,3 +154,70 @@ class TestChangeBenignLumpHistoryView:
                 )
             ],
         )
+
+
+@pytest.mark.django_db
+class TestDeleteBenignLumpHistoryView:
+    @pytest.fixture
+    def appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+
+    @pytest.fixture
+    def history_item(self, appointment):
+        return BenignLumpHistoryItemFactory.create(appointment=appointment)
+
+    def test_get_renders_response(self, clinical_user_client, history_item):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:delete_benign_lump_history_item",
+                kwargs={
+                    "pk": history_item.appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assert response.status_code == 200
+
+    def test_post_redirects_to_record_medical_information(
+        self, clinical_user_client, history_item
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_benign_lump_history_item",
+                kwargs={
+                    "pk": history_item.appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": history_item.appointment.pk},
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message="Deleted benign lump",
+                )
+            ],
+        )
+
+    def test_the_history_item_is_deleted(self, clinical_user_client, history_item):
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_benign_lump_history_item",
+                kwargs={
+                    "pk": history_item.appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+
+        assert not BenignLumpHistoryItem.objects.filter(pk=history_item.pk).exists()

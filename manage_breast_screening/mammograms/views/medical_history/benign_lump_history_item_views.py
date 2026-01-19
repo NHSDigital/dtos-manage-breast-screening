@@ -1,7 +1,10 @@
 import logging
 
+from django.urls import reverse
+
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
+    DeleteWithAuditView,
     UpdateWithAuditView,
 )
 from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
@@ -36,6 +39,9 @@ class UpdateBenignLumpHistoryItemView(MedicalInformationMixin, UpdateWithAuditVi
     def update_title(self, thing_name):
         return f"Edit details of {thing_name}"
 
+    def confirm_delete_link_text(self, thing_name):
+        return "Delete this item"
+
     def get_object(self):
         try:
             return BenignLumpHistoryItem.objects.get(
@@ -45,3 +51,32 @@ class UpdateBenignLumpHistoryItemView(MedicalInformationMixin, UpdateWithAuditVi
         except BenignLumpHistoryItem.DoesNotExist:
             logger.exception("History item does not exist for kwargs=%s", self.kwargs)
             return None
+
+    def get_delete_url(self):
+        return reverse(
+            "mammograms:delete_benign_lump_history_item",
+            kwargs={
+                "pk": self.kwargs["pk"],
+                "history_item_pk": self.kwargs["history_item_pk"],
+            },
+        )
+
+
+class DeleteBenignLumpHistoryItemView(DeleteWithAuditView):
+    thing_name = "item"
+
+    def get_success_message_content(self, object):
+        return "Deleted benign lump"
+
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.benign_lump_history_items.get(
+            pk=self.kwargs["history_item_pk"]
+        )
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.kwargs["pk"]},
+        )
