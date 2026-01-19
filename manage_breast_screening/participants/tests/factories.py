@@ -135,7 +135,7 @@ class AppointmentFactory(DjangoModelFactory):
             return
 
         obj.statuses.add(
-            AppointmentStatusFactory.create(name=extracted, appointment=obj)
+            AppointmentStatusFactory.create(name=extracted, appointment=obj, **kwargs)
         )
 
     # Allow passing an explicit status and created_by user

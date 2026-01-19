@@ -3,6 +3,8 @@ import pytest
 from manage_breast_screening.mammograms.services.appointment_services import (
     ActionPerformedByDifferentUser,
     AppointmentStatusUpdater,
+)
+from manage_breast_screening.mammograms.services.appointment_state_machine import (
     InvalidStatus,
 )
 from manage_breast_screening.participants.models.appointment import AppointmentStatus
@@ -16,7 +18,8 @@ from manage_breast_screening.participants.tests.factories import (
 class TestAppointmentStatusUpdater:
     def test_invalid_check_in(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CANCELLED
+            current_status=AppointmentStatus.CANCELLED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -27,7 +30,8 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_check_in(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.SCHEDULED
+            current_status=AppointmentStatus.SCHEDULED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -38,7 +42,8 @@ class TestAppointmentStatusUpdater:
 
     def test_invalid_start(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CANCELLED
+            current_status=AppointmentStatus.CANCELLED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -61,7 +66,8 @@ class TestAppointmentStatusUpdater:
 
     def test_invalid_cancel(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.SCREENED
+            current_status=AppointmentStatus.SCREENED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -72,7 +78,8 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_cancel(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.SCHEDULED
+            current_status=AppointmentStatus.SCHEDULED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -83,7 +90,8 @@ class TestAppointmentStatusUpdater:
 
     def test_invalid_mark_did_not_attend(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CANCELLED
+            current_status=AppointmentStatus.CANCELLED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -94,7 +102,8 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_mark_did_not_attend(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.SCHEDULED
+            current_status=AppointmentStatus.SCHEDULED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -105,7 +114,8 @@ class TestAppointmentStatusUpdater:
 
     def test_invalid_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.CANCELLED
+            current_status=AppointmentStatus.CANCELLED,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -119,7 +129,8 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.STARTED
+            current_status=AppointmentStatus.IMAGES_TAKEN,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -130,7 +141,8 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_partial_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.STARTED
+            current_status=AppointmentStatus.IMAGES_TAKEN,
+            current_status__created_by=clinical_user,
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -141,7 +153,8 @@ class TestAppointmentStatusUpdater:
 
     def test_check_in_is_idempotent(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.SCHEDULED
+            current_status=AppointmentStatus.SCHEDULED,
+            current_status__created_by=clinical_user,
         )
         AppointmentStatusFactory.create(
             name=AppointmentStatus.CHECKED_IN,
