@@ -129,11 +129,15 @@ class TestCis2Callback:
             ("AAL2_OR_AAL3_ANY", 2, 2, b"Insufficient identity assurance level"),
             ("AAL2_OR_AAL3_ANY", 3, 1, b"Insufficient authentication assurance level"),
             ("AAL3_ANY", 3, 2, b"Insufficient authentication assurance level"),
+            ("AAL3_ANY", None, 3, b"Insufficient identity assurance level"),
+            ("AAL3_ANY", 3, None, b"Insufficient authentication assurance level"),
         ],
         ids=[
             "id_assurance_level_too_low",
             "auth_assurance_level_too_low_for_aal2",
             "auth_assurance_level_too_low_for_aal3",
+            "id_assurance_level_none",
+            "auth_assurance_level_none",
         ],
     )
     def test_rejects_insufficient_assurance_levels(

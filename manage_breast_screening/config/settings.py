@@ -299,6 +299,8 @@ CIS2_DEBUG = boolean_env("CIS2_DEBUG", default=False)
 # Determines the authentication options available to the user (authenticator app, smart card, etc.)
 # Use either "AAL3_ANY" or "AAL2_OR_AAL3_ANY"
 CIS2_ACR_VALUES = environ.get("CIS2_ACR_VALUES", default="AAL3_ANY")
+# Minimum identity assurance level required for CIS2 authentication
+CIS2_REQUIRED_ID_ASSURANCE_LEVEL = 3
 
 BASE_URL = environ.get("BASE_URL")
 

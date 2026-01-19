@@ -26,8 +26,6 @@ from .services import InvalidLogoutToken, decode_logout_token
 
 logger = logging.getLogger(__name__)
 
-REQUIRED_ID_ASSURANCE_LEVEL = 3
-
 
 @current_provider_exempt
 @login_not_required
@@ -165,9 +163,9 @@ def _validate_id_assurance_level(level: int | str | None) -> str | None:
     if level is not None:
         level = int(level)
 
-    if level != REQUIRED_ID_ASSURANCE_LEVEL:
+    if level is None or level < settings.CIS2_REQUIRED_ID_ASSURANCE_LEVEL:
         logger.warning(
-            f"CIS2 authentication rejected: id_assurance_level={level}, expected {REQUIRED_ID_ASSURANCE_LEVEL}"
+            f"CIS2 authentication rejected: id_assurance_level={level}, expected >= {settings.CIS2_REQUIRED_ID_ASSURANCE_LEVEL}"
         )
         return "Insufficient identity assurance level"
     return None
