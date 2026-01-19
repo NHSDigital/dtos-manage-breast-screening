@@ -5,6 +5,11 @@ import pytest
 from django.test import Client
 
 
+@pytest.fixture(autouse=True)
+def enable_dicom_api_settings(monkeypatch):
+    monkeypatch.setenv("DICOM_API_ENABLED", "true")
+
+
 @pytest.mark.django_db
 def test_upload_dicom(dataset):
     client = Client(HTTP_X_SOURCE_MESSAGE_ID="test-source-message-id")
@@ -113,3 +118,17 @@ def test_upload_dicom_unexpected_error(monkeypatch, dataset):
             )
     assert response.status_code == 500
     assert "An error occurred: Unexpected error" in response.json()["error"]
+
+
+@pytest.mark.django_db
+def test_upload_dicom_api_disabled(monkeypatch, dataset):
+    monkeypatch.setenv("DICOM_API_ENABLED", "false")
+    client = Client(HTTP_X_SOURCE_MESSAGE_ID="test-source-message-id")
+    with tempfile.NamedTemporaryFile() as temp_file:
+        pydicom.filewriter.dcmwrite(temp_file.name, dataset, write_like_original=False)
+        with open(temp_file.name, "rb") as dicom_file:
+            response = client.post(
+                "/api/dicom/upload/",
+                {"file": dicom_file},
+            )
+    assert response.status_code == 403

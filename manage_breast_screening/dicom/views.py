@@ -1,3 +1,5 @@
+import os
+
 import pydicom
 from django.contrib.auth.decorators import login_not_required
 from django.http import JsonResponse
@@ -17,6 +19,9 @@ def upload_dicom(request):
     """
     Accepts POST with a single DICOM file in form field 'file'
     """
+    if not os.getenv("DICOM_API_ENABLED", "true").lower() == "true":
+        return JsonResponse({"error": "DICOM API is disabled"}, status=403)
+
     source_message_id = request.META.get("HTTP_X_SOURCE_MESSAGE_ID")
     if not source_message_id:
         return JsonResponse({"error": "Missing X-Source-Message-ID header"}, status=400)
