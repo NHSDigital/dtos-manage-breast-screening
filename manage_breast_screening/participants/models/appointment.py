@@ -139,6 +139,9 @@ class AppointmentStatus(models.Model):
     SCHEDULED = "SCHEDULED"
     CHECKED_IN = "CHECKED_IN"
     STARTED = "STARTED"
+    PAUSED = "PAUSED"
+    RESUMED = "RESUMED"
+    TAKEN_OVER = "TAKEN_OVER"
     IDENTITY_CONFIRMED = "IDENTITY_CONFIRMED"
     MEDICAL_INFORMATION_REVIEWED = "MEDICAL_INFORMATION_REVIEWED"
     IMAGES_TAKEN = "IMAGES_TAKEN"
@@ -160,18 +163,20 @@ class AppointmentStatus(models.Model):
         SCREENED: "Screened",
         PARTIALLY_SCREENED: "Partially screened",
         ATTENDED_NOT_SCREENED: "Attended not screened",
+        PAUSED: "Paused",
+        RESUMED: "Resumed",
+        TAKEN_OVER: "Taken over",
     }
 
-    YET_TO_BEGIN_STATUSES = [
-        SCHEDULED,
-        CHECKED_IN,
-    ]
+    YET_TO_BEGIN_STATUSES = [SCHEDULED, CHECKED_IN, PAUSED]
 
     IN_PROGRESS_STATUSES = [
         STARTED,
         IDENTITY_CONFIRMED,
         MEDICAL_INFORMATION_REVIEWED,
         IMAGES_TAKEN,
+        RESUMED,
+        TAKEN_OVER,
     ]
 
     FINAL_STATUSES = [

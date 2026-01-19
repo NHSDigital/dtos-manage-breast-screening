@@ -24,6 +24,115 @@ class ActionPerformedByDifferentUser(Exception):
     """
 
 
+class AppointmentStateMachine:
+    """
+    State machine for appointment statuses.
+    This ignores persistance, which must be handled separately.
+    """
+
+    @classmethod
+    def from_appointment(cls, appointment):
+        if appointment is None:
+            raise ValueError
+
+        return cls(appointment.current_status)
+
+    def __init__(self, current_status):
+        self.status = current_status
+
+    def can_check_in(self):
+        return self.status.name == AppointmentStatus.SCHEDULED
+
+    def can_cancel(self):
+        return self.status.name == AppointmentStatus.SCHEDULED
+
+    def can_mark_did_not_attend(self):
+        return self.status.name == AppointmentStatus.SCHEDULED
+
+    def can_start(self):
+        return self.status.name in (
+            AppointmentStatus.SCHEDULED,
+            AppointmentStatus.CHECKED_IN,
+        )
+
+    def can_confirm_identity(self, user):
+        return (self.status.name == AppointmentStatus.STARTED) or (
+            self.status.name == AppointmentStatus.PAUSED
+            and self.status.created_by != user
+        )
+
+    def can_review_medical_information(self, user):
+        return (
+            self.status.created_by == user
+            and self.status.name == AppointmentStatus.IDENTITY_CONFIRMED
+        )
+
+    def can_take_images(self, user):
+        return (
+            self.status.created_by == user
+            and self.status.name == AppointmentStatus.MEDICAL_INFORMATION_REVIEWED
+        )
+
+    def can_screen(self, user):
+        return (
+            self.status.created_by == user
+            and self.status.name == AppointmentStatus.IMAGES_TAKEN
+        )
+
+    def can_pause(self, user):
+        return (
+            self.status.created_by == user
+            and self.status.name in AppointmentStatus.IN_PROGRESS_STATUSES
+        )
+
+    def can_mark_attended_not_screened(self, user):
+        return (
+            self.status.created_by == user
+            and self.status.name in AppointmentStatus.IN_PROGRESS_STATUSES
+        )
+
+    def check_in(self, user):
+        if not self.can_check_in():
+            raise ActionNotPermitted(AppointmentStatus.CHECKED_IN)
+
+        self.status = AppointmentStatus(
+            name=AppointmentStatus.CHECKED_IN, created_by=user
+        )
+
+    def start(self, user):
+        if not self.can_start():
+            raise ActionNotPermitted(AppointmentStatus.STARTED)
+
+        self.status = AppointmentStatus(name=AppointmentStatus.STARTED, created_by=user)
+
+    def cancel(self, user):
+        if not self.can_cancel():
+            raise ActionNotPermitted(AppointmentStatus.CANCELLED)
+
+        self.status = AppointmentStatus(
+            name=AppointmentStatus.CHECKED_IN, created_by=user
+        )
+
+    def mark_did_not_attend(self, user):
+        if not self.can_mark_did_not_attend():
+            raise ActionNotPermitted(AppointmentStatus.DID_NOT_ATTEND)
+
+        self.status = AppointmentStatus(
+            name=AppointmentStatus.DID_NOT_ATTEND, created_by=user
+        )
+
+    def screen(self, user, partial=False):
+        name = (
+            AppointmentStatus.PARTIALLY_SCREENED
+            if partial
+            else AppointmentStatus.SCREENED
+        )
+        if not self.can_screen(user):
+            raise ActionNotPermitted(name)
+
+        self.status = AppointmentStatus(name=name, created_by=user)
+
+
 class AppointmentStatusUpdater:
     """
     Transition an appointment to another status.
