@@ -145,6 +145,8 @@ class TestLogin(SystemTestCase):
                     "id_token": "fake-id-token",
                     "userinfo": {
                         "sub": "cis2-user-1",
+                        "id_assurance_level": 3,
+                        "authentication_assurance_level": 3,
                     },
                 }
 
