@@ -111,11 +111,7 @@ class TestLogin(SystemTestCase):
         expect(header.get_by_text("Log in")).to_be_visible()
 
     def then_i_see_no_providers_message(self):
-        expect(
-            self.page.get_by_text(
-                "No providers found. Check that you've been assigned a role with at least one provider."
-            )
-        ).to_be_visible()
+        expect(self.page.get_by_text("Your account is not recognised")).to_be_visible()
 
     def and_i_am_logged_out_when_the_max_session_time_has_passed_even_if_i_have_been_active(
         self,
