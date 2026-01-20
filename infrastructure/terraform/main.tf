@@ -20,6 +20,7 @@ module "infra" {
   cae_zone_redundancy_enabled = var.cae_zone_redundancy_enabled
   enable_alerting             = var.enable_alerting
   action_group_id             = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
+  enable_arc_servers          = var.enable_arc_servers
 }
 
 module "shared_config" {
