@@ -24,7 +24,7 @@
     "nhsuk-frontend": "^10.3.0"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.28.5",
+    "@babel/preset-env": "^7.28.6",
     "@eslint/compat": "^1.4.0",
     "@eslint/js": "^9.39.1",
     "@eslint/markdown": "^7.5.0",
