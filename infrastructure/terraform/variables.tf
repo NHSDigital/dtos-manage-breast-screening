@@ -185,6 +185,12 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
+variable "enable_arc_servers" {
+  description = "Whether to create the resources for Azure Arc-enabled servers."
+  type        = bool
+  default     = false
+}
+
 locals {
   region = "uksouth"
 

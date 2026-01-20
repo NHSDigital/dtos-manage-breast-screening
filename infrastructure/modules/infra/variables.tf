@@ -58,6 +58,11 @@ variable "action_group_id" {
   description = "ID of the action group to notify."
 }
 
+variable "enable_arc_servers" {
+  description = "Whether to create the resources for Azure Arc-enabled servers."
+  type        = bool
+}
+
 locals {
   hub_vnet_rg_name = "rg-hub-${var.hub}-uks-hub-networking"
 }
