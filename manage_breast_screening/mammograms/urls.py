@@ -282,4 +282,9 @@ urlpatterns = [
         mammogram_views.attended_not_screened,
         name="attended_not_screened",
     ),
+    path(
+        "<uuid:pk>/check-information/",
+        mammogram_views.check_information,
+        name="check_information",
+    ),
 ]
