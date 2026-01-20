@@ -107,11 +107,7 @@ class AppointmentPresenter:
     def current_status(self):
         current_status = self._appointment.current_status
         colour = status_colour(current_status)
-        display_text = (
-            "In progress"
-            if current_status.is_in_progress()
-            else current_status.get_name_display()
-        )
+        display_text = current_status.get_name_display()
 
         return {
             "classes": (

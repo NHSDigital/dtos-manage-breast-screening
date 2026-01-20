@@ -57,7 +57,7 @@ class TestAppointmentStatusUpdater:
         )
 
         new_status = service.start()
-        assert new_status.name == AppointmentStatus.STARTED
+        assert new_status.name == AppointmentStatus.IN_PROGRESS
 
     def test_invalid_cancel(self, clinical_user):
         appointment = AppointmentFactory.create(
@@ -119,7 +119,7 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.STARTED
+            current_status=AppointmentStatus.IN_PROGRESS
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -130,7 +130,7 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_partial_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.STARTED
+            current_status=AppointmentStatus.IN_PROGRESS
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
@@ -159,7 +159,7 @@ class TestAppointmentStatusUpdater:
 
     def test_cannot_start_appointment_started_by_someone_else(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatus.STARTED
+            current_status=AppointmentStatus.IN_PROGRESS
         )
 
         service = AppointmentStatusUpdater(

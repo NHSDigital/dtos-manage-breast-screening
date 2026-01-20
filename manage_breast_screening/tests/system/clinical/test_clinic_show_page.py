@@ -116,7 +116,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.in_progress_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
-            current_status=AppointmentStatus.STARTED,
+            current_status=AppointmentStatus.IN_PROGRESS,
         )
 
     def and_i_am_on_the_clinic_list(self):
@@ -247,7 +247,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=timezone.utc),
             first_name="Someone",
             last_name="Withnote",
-            current_status=AppointmentStatus.STARTED,
+            current_status=AppointmentStatus.IN_PROGRESS,
         )
         AppointmentNoteFactory(
             appointment=appointment_with_note, content="This is a note."
@@ -353,6 +353,6 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             last_name="InProgress",
         )
         self.in_progress_appointment.statuses.create(
-            name=AppointmentStatus.STARTED,
+            name=AppointmentStatus.IN_PROGRESS,
             created_by=self.current_user,
         )

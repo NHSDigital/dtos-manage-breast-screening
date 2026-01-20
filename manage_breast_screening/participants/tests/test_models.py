@@ -308,7 +308,7 @@ class TestAppointment:
 
             latest_status = AppointmentStatusFactory.create(
                 appointment=appointment,
-                name=models.AppointmentStatus.STARTED,
+                name=models.AppointmentStatus.IN_PROGRESS,
                 created_at=datetime(2025, 1, 1, 10, tzinfo=tz.utc),
             )
 
@@ -345,7 +345,7 @@ class TestAppointment:
             appointment = AppointmentFactory.create()
             latest_status = AppointmentStatusFactory.create(
                 appointment=appointment,
-                name=models.AppointmentStatus.STARTED,
+                name=models.AppointmentStatus.IN_PROGRESS,
                 created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
             )
             AppointmentStatusFactory.create(
@@ -367,7 +367,7 @@ class TestAppointment:
             appointment = AppointmentFactory.create()
             latest_status = AppointmentStatusFactory.create(
                 appointment=appointment,
-                name=models.AppointmentStatus.STARTED,
+                name=models.AppointmentStatus.IN_PROGRESS,
                 created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
             )
             AppointmentStatusFactory.create(
@@ -391,7 +391,7 @@ class TestAppointmentStatus:
         def test_active_statuses_return_true(self):
             assert AppointmentStatus(name=AppointmentStatus.SCHEDULED).active
             assert AppointmentStatus(name=AppointmentStatus.CHECKED_IN).active
-            assert AppointmentStatus(name=AppointmentStatus.STARTED).active
+            assert AppointmentStatus(name=AppointmentStatus.IN_PROGRESS).active
             assert not AppointmentStatus(name=AppointmentStatus.CANCELLED).active
             assert not AppointmentStatus(name=AppointmentStatus.DID_NOT_ATTEND).active
             assert not AppointmentStatus(

@@ -1,1 +1,1 @@
-0055_rename_confirmed_to_scheduled
+0056_alter_appointmentstatus_name_and_more

@@ -53,7 +53,7 @@ class AppointmentStatusUpdater:
             raise ActionNotPermitted(self.appointment.current_status)
 
         return self._transition(
-            to_status=AppointmentStatus.STARTED,
+            to_status=AppointmentStatus.IN_PROGRESS,
             from_statuses=(AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN),
         )
 
@@ -76,7 +76,7 @@ class AppointmentStatusUpdater:
                 if partial
                 else AppointmentStatus.SCREENED
             ),
-            from_statuses=(AppointmentStatus.STARTED,),
+            from_statuses=(AppointmentStatus.IN_PROGRESS,),
         )
 
     def _transition(self, to_status, from_statuses):
