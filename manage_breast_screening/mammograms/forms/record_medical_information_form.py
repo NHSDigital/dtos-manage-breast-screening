@@ -1,6 +1,9 @@
 from django import forms
 
 from manage_breast_screening.participants.models import MedicalInformationSection
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 
 class RecordMedicalInformationForm(forms.Form):
@@ -23,3 +26,8 @@ class RecordMedicalInformationForm(forms.Form):
                 section=section,
                 reviewed_by=self.user,
             )
+
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.user,
+        )

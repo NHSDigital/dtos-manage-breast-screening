@@ -18,6 +18,9 @@ from manage_breast_screening.participants.models import (
     MedicalInformationSection,
     ParticipantReportedMammogram,
 )
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
 from ..forms import (
@@ -136,6 +139,11 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
         return context
 
     def post(self, request, pk):
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=request.user,
+        )
+
         return redirect("mammograms:ask_for_medical_information", pk=pk)
 
 

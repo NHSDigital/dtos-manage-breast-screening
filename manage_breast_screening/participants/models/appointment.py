@@ -206,6 +206,10 @@ class AppointmentStatus(models.Model):
 
 
 class AppointmentWorkflowStepCompletion(models.Model):
+    """
+    Tracks progress through the mammography appointment workflow.
+    """
+
     class StepNames(models.TextChoices):
         CONFIRM_IDENTITY = "CONFIRM_IDENTITY", "Confirm identity"
         REVIEW_MEDICAL_INFORMATION = (
