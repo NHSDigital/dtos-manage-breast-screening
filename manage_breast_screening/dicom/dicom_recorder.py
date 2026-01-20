@@ -1,3 +1,5 @@
+import io
+
 import pydicom
 
 from .models import Image, Series, Study
@@ -8,7 +10,7 @@ class DicomRecorder:
     def create_records(
         source_message_id: str, dicom_file: bytes
     ) -> tuple[Study, Series, Image] | None:
-        ds = pydicom.dcmread(dicom_file)
+        ds = pydicom.dcmread(io.BytesIO(dicom_file))
         study_uid = ds.StudyInstanceUID
         series_uid = ds.SeriesInstanceUID
         sop_uid = ds.SOPInstanceUID

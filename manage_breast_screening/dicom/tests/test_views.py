@@ -1,3 +1,4 @@
+import io
 import tempfile
 
 import pydicom
@@ -13,13 +14,15 @@ def enable_dicom_api_settings(monkeypatch):
 @pytest.mark.django_db
 def test_upload_dicom(dataset):
     client = Client(HTTP_X_SOURCE_MESSAGE_ID="test-source-message-id")
-    with tempfile.NamedTemporaryFile() as temp_file:
-        pydicom.filewriter.dcmwrite(temp_file.name, dataset, write_like_original=False)
-        with open(temp_file.name, "rb") as dicom_file:
-            response = client.post(
-                "/api/dicom/upload/",
-                {"file": dicom_file},
-            )
+    buffer = io.BytesIO()
+    memory_file = pydicom.filebase.DicomFileLike(buffer)
+    pydicom.dcmwrite(memory_file, dataset)
+    memory_file.seek(0)
+    response = client.post(
+        "/api/dicom/upload/",
+        content_type="application/dicom",
+        data=memory_file,
+    )
     assert response.status_code == 201
     assert response.json()["study_instance_uid"] == dataset.StudyInstanceUID
     assert response.json()["series_instance_uid"] == dataset.SeriesInstanceUID

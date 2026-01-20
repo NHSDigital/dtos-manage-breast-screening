@@ -26,12 +26,12 @@ def upload_dicom(request):
     if not source_message_id:
         return JsonResponse({"error": "Missing X-Source-Message-ID header"}, status=400)
 
-    dicom_file = request.FILES.get("file")
-    if dicom_file is None:
+    raw_dicom_file = request.body
+    if raw_dicom_file is None:
         return JsonResponse({"error": "No DICOM file provided"}, status=400)
 
     try:
-        records = DicomRecorder.create_records(source_message_id, dicom_file)
+        records = DicomRecorder.create_records(source_message_id, raw_dicom_file)
 
     except pydicom.errors.InvalidDicomError:
         return JsonResponse({"error": "Invalid DICOM file"}, status=400)
