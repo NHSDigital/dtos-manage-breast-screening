@@ -23,6 +23,8 @@ from django.views.generic.base import RedirectView
 
 from manage_breast_screening.core.decorators import basic_auth_exempt
 
+from .api import api
+
 
 @basic_auth_exempt
 @login_not_required
@@ -37,6 +39,7 @@ def health_check(request):
 
 
 urlpatterns = [
+    path("api/v1/", api.urls),
     path(
         "auth/",
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
@@ -47,10 +50,6 @@ urlpatterns = [
     path(
         "healthcheck",
         health_check,
-    ),
-    path(
-        "api/dicom/",
-        include("manage_breast_screening.dicom.urls", namespace="dicom"),
     ),
     path(
         "mammograms/",

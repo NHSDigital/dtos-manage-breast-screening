@@ -1,3 +1,4 @@
+from functools import partial
 from typing import Callable
 
 _basic_auth_exempt_views = set()
@@ -15,6 +16,9 @@ def basic_auth_exempt(view_func: Callable) -> Callable:
 
 def is_basic_auth_exempt(view_func: Callable) -> bool:
     """Check if a view function is exempt from BasicAuthMiddleware."""
+    print(
+        f"Checking exemption for {view_func_identifier(view_func)} in {_basic_auth_exempt_views}"
+    )
     return view_func_identifier(view_func) in _basic_auth_exempt_views
 
 
@@ -33,4 +37,7 @@ def is_current_provider_exempt(view_func: Callable) -> bool:
 
 
 def view_func_identifier(view_func: Callable) -> str:
+    if isinstance(view_func, partial):
+        view_func = view_func.func
+
     return f"{view_func.__module__}.{view_func.__qualname__}"
