@@ -73,9 +73,9 @@ module "dashboard" {
   resource_group_name = local.resource_group_name
 
   dashboard_properties = templatefile("${path.module}/../../modules/container-apps/templates/dash-notifications-template.tpl",
-      {
-        environment = var.environment
-        sub_id      = data.azurerm_subscription.current.subscription_id
-      }
-    )
+    {
+      environment = var.environment
+      sub_id      = data.azurerm_subscription.current.subscription_id
+    }
+  )
 }
