@@ -53,14 +53,19 @@ class AppointmentStatusUpdater:
             self.machine.current_state_value, created_by=self.current_user
         )
 
-    def screen(self, partial=False):
+    def partial_screen(self):
         if (
-            partial
-            and self.machine.current_state_value
+            self.machine.current_state_value
             != AppointmentStatusNames.PARTIALLY_SCREENED
         ):
             self.machine.partial_screen()
-        elif self.machine.current_state_value != AppointmentStatusNames.SCREENED:
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
+        )
+
+    def screen(self):
+        if self.machine.current_state_value != AppointmentStatusNames.SCREENED:
             self.machine.screen()
 
         return self.appointment.set_status(

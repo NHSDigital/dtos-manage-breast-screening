@@ -118,7 +118,7 @@ class TestAppointmentStatusUpdater:
             service.screen()
 
         with pytest.raises(TransitionNotAllowed):
-            service.screen(partial=True)
+            service.partial_screen()
 
     def test_valid_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
@@ -139,7 +139,7 @@ class TestAppointmentStatusUpdater:
             appointment=appointment, current_user=clinical_user
         )
 
-        new_status = service.screen(partial=True)
+        new_status = service.partial_screen()
         assert new_status.name == AppointmentStatusNames.PARTIALLY_SCREENED
 
     def test_check_in_is_idempotent(self, clinical_user):
