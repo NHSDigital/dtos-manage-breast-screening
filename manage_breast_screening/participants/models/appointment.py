@@ -30,14 +30,14 @@ class AppointmentQuerySet(models.QuerySet):
     def remaining(self):
         return self.in_status(
             *AppointmentStatus.YET_TO_BEGIN_STATUSES,
-            *AppointmentStatus.IN_PROGRESS_STATUSES,
+            AppointmentStatus.IN_PROGRESS,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatus.CHECKED_IN)
 
     def in_progress(self):
-        return self.in_status(*AppointmentStatus.IN_PROGRESS_STATUSES)
+        return self.in_status(AppointmentStatus.IN_PROGRESS)
 
     def for_participant(self, participant_id):
         return self.filter(screening_episode__participant_id=participant_id)
@@ -138,10 +138,7 @@ class Appointment(BaseModel):
 class AppointmentStatus(models.Model):
     SCHEDULED = "SCHEDULED"
     CHECKED_IN = "CHECKED_IN"
-    STARTED = "STARTED"
-    IDENTITY_CONFIRMED = "IDENTITY_CONFIRMED"
-    MEDICAL_INFORMATION_REVIEWED = "MEDICAL_INFORMATION_REVIEWED"
-    IMAGES_TAKEN = "IMAGES_TAKEN"
+    IN_PROGRESS = "IN_PROGRESS"
     CANCELLED = "CANCELLED"
     DID_NOT_ATTEND = "DID_NOT_ATTEND"
     SCREENED = "SCREENED"
@@ -151,10 +148,7 @@ class AppointmentStatus(models.Model):
     STATUS_CHOICES = {
         SCHEDULED: "Scheduled",
         CHECKED_IN: "Checked in",
-        STARTED: "Started",
-        IDENTITY_CONFIRMED: "Identity confirmed",
-        MEDICAL_INFORMATION_REVIEWED: "Medical information reviewed",
-        IMAGES_TAKEN: "Images taken",
+        IN_PROGRESS: "In progress",
         CANCELLED: "Cancelled",
         DID_NOT_ATTEND: "Did not attend",
         SCREENED: "Screened",
@@ -165,13 +159,6 @@ class AppointmentStatus(models.Model):
     YET_TO_BEGIN_STATUSES = [
         SCHEDULED,
         CHECKED_IN,
-    ]
-
-    IN_PROGRESS_STATUSES = [
-        STARTED,
-        IDENTITY_CONFIRMED,
-        MEDICAL_INFORMATION_REVIEWED,
-        IMAGES_TAKEN,
     ]
 
     FINAL_STATUSES = [
@@ -187,7 +174,7 @@ class AppointmentStatus(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     appointment = models.ForeignKey(
-        "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
+        Appointment, on_delete=models.PROTECT, related_name="statuses"
     )
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
@@ -209,7 +196,7 @@ class AppointmentStatus(models.Model):
         return self.name in self.YET_TO_BEGIN_STATUSES
 
     def is_in_progress(self):
-        return self.name in self.IN_PROGRESS_STATUSES
+        return self.name == self.IN_PROGRESS
 
     def is_final_status(self):
         return self.name in self.FINAL_STATUSES
@@ -218,9 +205,34 @@ class AppointmentStatus(models.Model):
         return self.name
 
 
+class AppointmentWorkflowStepCompletion(models.Model):
+    """
+    Tracks progress through the mammography appointment workflow.
+    """
+
+    class StepNames(models.TextChoices):
+        CONFIRM_IDENTITY = "CONFIRM_IDENTITY", "Confirm identity"
+        REVIEW_MEDICAL_INFORMATION = (
+            "REVIEW_MEDICAL_INFORMATION",
+            "Review medical information",
+        )
+        TAKE_IMAGES = "TAKE_IMAGES", "Take images"
+        CHECK_INFORMATION = "CHECK_INFORMATION", "Check information"
+
+    step_name = models.CharField(choices=StepNames, max_length=50)
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    appointment = models.ForeignKey(
+        Appointment,
+        on_delete=models.PROTECT,
+        related_name="completed_workflow_steps",
+    )
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
+
+
 class AppointmentNote(BaseModel):
     appointment = models.OneToOneField(
-        "participants.Appointment",
+        Appointment,
         on_delete=models.PROTECT,
         related_name="note",
     )

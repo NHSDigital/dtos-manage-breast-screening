@@ -1,15 +1,8 @@
 import logging
 
-from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.participants.models.appointment import AppointmentStatus
 
 logger = logging.getLogger(__name__)
-
-
-class ActionNotPermitted(Exception):
-    """
-    The user doesn't have permission to perform the action.
-    """
 
 
 class InvalidStatus(Exception):
@@ -26,7 +19,8 @@ class ActionPerformedByDifferentUser(Exception):
 
 class AppointmentStatusUpdater:
     """
-    Transition an appointment to another status.
+    Transition an appointment to another status, assuming the user
+    is permitted to perform the action.
     """
 
     def __init__(self, appointment, current_user):
@@ -47,13 +41,8 @@ class AppointmentStatusUpdater:
         )
 
     def start(self):
-        if not self.current_user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, obj=self.appointment
-        ):
-            raise ActionNotPermitted(self.appointment.current_status)
-
         return self._transition(
-            to_status=AppointmentStatus.STARTED,
+            to_status=AppointmentStatus.IN_PROGRESS,
             from_statuses=(AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN),
         )
 
@@ -76,7 +65,7 @@ class AppointmentStatusUpdater:
                 if partial
                 else AppointmentStatus.SCREENED
             ),
-            from_statuses=(AppointmentStatus.STARTED,),
+            from_statuses=(AppointmentStatus.IN_PROGRESS,),
         )
 
     def _transition(self, to_status, from_statuses):

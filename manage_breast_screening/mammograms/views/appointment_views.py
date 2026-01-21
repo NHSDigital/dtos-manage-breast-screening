@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from django.db import DatabaseError, IntegrityError, transaction
 from django.http import Http404
 from django.shortcuts import redirect, render
@@ -9,6 +10,7 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
 
+from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
@@ -17,6 +19,9 @@ from manage_breast_screening.participants.models import (
     Appointment,
     MedicalInformationSection,
     ParticipantReportedMammogram,
+)
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
@@ -136,6 +141,11 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
         return context
 
     def post(self, request, pk):
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=request.user,
+        )
+
         return redirect("mammograms:ask_for_medical_information", pk=pk)
 
 
@@ -285,6 +295,7 @@ def check_in(request, pk):
 
 
 @require_http_methods(["POST"])
+@permission_required(Permission.START_MAMMOGRAM_APPOINTMENT)
 def start_appointment(request, pk):
     try:
         provider = request.user.current_provider

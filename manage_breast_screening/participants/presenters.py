@@ -18,9 +18,9 @@ def status_colour(status):
     """
     Color to render the status tag
     """
-    if status.is_in_progress():
-        return "aqua-green"
     match status.name:
+        case AppointmentStatus.IN_PROGRESS:
+            return "aqua-green"
         case AppointmentStatus.CHECKED_IN:
             return ""  # no colour will get solid dark blue
         case AppointmentStatus.SCREENED:
