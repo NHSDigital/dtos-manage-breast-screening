@@ -36,6 +36,9 @@ from manage_breast_screening.participants.models import (
     ParticipantReportedMammogram,
     ScreeningEpisode,
 )
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 from manage_breast_screening.participants.models.medical_information_review import (
     MedicalInformationReview,
 )
@@ -311,6 +314,7 @@ class Command(BaseCommand):
             return appointment_mammogram
 
     def reset_db(self):
+        AppointmentWorkflowStepCompletion.objects.all().delete()
         MedicalInformationReview.objects.all().delete()
         AppointmentNote.objects.all().delete()
         UserAssignment.objects.all().delete()
