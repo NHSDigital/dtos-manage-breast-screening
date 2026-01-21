@@ -8,7 +8,9 @@ from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
 from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
-from manage_breast_screening.participants.models.appointment import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantReportedMammogramFactory,
@@ -72,7 +74,9 @@ def assert_attended_not_screened_flow(client, appointment):
             kwargs={"pk": appointment.clinic_slot.clinic.pk},
         ),
     )
-    assert appointment.current_status.name == AppointmentStatus.ATTENDED_NOT_SCREENED
+    assert (
+        appointment.current_status.name == AppointmentStatusNames.ATTENDED_NOT_SCREENED
+    )
 
 
 def assert_success_message(response, message_text):
@@ -215,7 +219,7 @@ class TestAddParticipantReportedMammogram:
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.name == AppointmentStatus.SCHEDULED
+        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
         assert_attended_not_screened_flow(clinical_user_client, appointment)
 
@@ -360,7 +364,7 @@ class TestChangeParticipantReportedMammogram:
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.name == AppointmentStatus.SCHEDULED
+        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
         assert_attended_not_screened_flow(clinical_user_client, appointment)
 

@@ -5,6 +5,9 @@ from uuid import UUID, uuid4
 
 import pytest
 
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.presenters import (
     ParticipantAppointmentsPresenter,
     ParticipantPresenter,
@@ -128,7 +131,9 @@ class TestParticipantPresenter:
 
 
 class TestParticipantAppointmentPresenter:
-    def mock_appointment(self, starts_at, pk, status_name=AppointmentStatus.SCHEDULED):
+    def mock_appointment(
+        self, starts_at, pk, status_name=AppointmentStatusNames.SCHEDULED
+    ):
         appointment = MagicMock(spec=Appointment)
         appointment.clinic_slot.starts_at = starts_at
         appointment.clinic_slot.clinic.get_type_display.return_value = "screening"
@@ -153,12 +158,12 @@ class TestParticipantAppointmentPresenter:
             self.mock_appointment(
                 starts_at=datetime(2023, 1, 1, 9, tzinfo=tz.utc),
                 pk="e76163c8-a594-4991-890d-a02097c67a2f",
-                status_name=AppointmentStatus.PARTIALLY_SCREENED,
+                status_name=AppointmentStatusNames.PARTIALLY_SCREENED,
             ),
             self.mock_appointment(
                 starts_at=datetime(2019, 1, 1, 9, tzinfo=tz.utc),
                 pk="6473a629-e7c4-43ca-87f3-ab9526aab07c",
-                status_name=AppointmentStatus.SCREENED,
+                status_name=AppointmentStatusNames.SCREENED,
             ),
         ]
 

@@ -4,7 +4,9 @@ from zoneinfo import ZoneInfo
 from django.urls import reverse
 
 from manage_breast_screening.clinics.tests.factories import ClinicFactory
-from manage_breast_screening.participants.models import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 from ..system_test_setup import SystemTestCase
@@ -29,7 +31,7 @@ class TestJavascriptLoadsInSystemTests(SystemTestCase):
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(
                 hour=9, minute=0, tzinfo=tzinfo
             ),
-            current_status=AppointmentStatus.SCHEDULED,
+            current_status=AppointmentStatusNames.SCHEDULED,
         )
 
     def when_i_visit_the_clinic_page(self):

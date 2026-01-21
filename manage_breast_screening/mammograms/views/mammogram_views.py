@@ -6,9 +6,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from manage_breast_screening.core.utils.date_formatting import format_relative_date
-from manage_breast_screening.core.views.generic import (
-    UpdateWithAuditView,
-)
+from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
 )
@@ -16,7 +14,7 @@ from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
     Appointment,
-    AppointmentStatus,
+    AppointmentStatusNames,
 )
 from manage_breast_screening.participants.views import parse_return_url
 
@@ -93,7 +91,7 @@ def attended_not_screened(request, appointment_pk):
         appointment = provider.appointments.get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
-    appointment.statuses.create(name=AppointmentStatus.ATTENDED_NOT_SCREENED)
+    appointment.statuses.create(name=AppointmentStatusNames.ATTENDED_NOT_SCREENED)
 
     return redirect("clinics:show", pk=appointment.clinic_slot.clinic.pk)
 

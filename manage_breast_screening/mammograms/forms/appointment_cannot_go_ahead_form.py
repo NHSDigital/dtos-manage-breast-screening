@@ -5,7 +5,9 @@ from manage_breast_screening.nhsuk_forms.fields import (
     ChoiceField,
     MultipleChoiceField,
 )
-from manage_breast_screening.participants.models import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 
 
 class AppointmentCannotGoAheadForm(forms.Form):
@@ -88,6 +90,6 @@ class AppointmentCannotGoAheadForm(forms.Form):
         self.instance.stopped_reasons = reasons_json
         self.instance.reinvite = self.cleaned_data["decision"]
         self.instance.save()
-        self.instance.statuses.create(name=AppointmentStatus.ATTENDED_NOT_SCREENED)
+        self.instance.statuses.create(name=AppointmentStatusNames.ATTENDED_NOT_SCREENED)
 
         return self.instance

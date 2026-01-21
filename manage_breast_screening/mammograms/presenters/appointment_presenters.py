@@ -6,6 +6,9 @@ from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 
 from ...core.utils.date_formatting import format_date, format_relative_date, format_time
 from ...participants.models import AppointmentNote, AppointmentStatus, SupportReasons
@@ -72,7 +75,7 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_checked_in(self):
-        return self._appointment.current_status.name == AppointmentStatus.SCHEDULED
+        return self._appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
     @cached_property
     def active(self):
@@ -115,8 +118,8 @@ class AppointmentPresenter:
             ),
             "text": display_text,
             "key": current_status.name,
-            "is_confirmed": current_status.name == AppointmentStatus.SCHEDULED,
-            "is_screened": current_status.name == AppointmentStatus.SCREENED,
+            "is_confirmed": current_status.name == AppointmentStatusNames.SCHEDULED,
+            "is_screened": current_status.name == AppointmentStatusNames.SCREENED,
         }
 
     @cached_property

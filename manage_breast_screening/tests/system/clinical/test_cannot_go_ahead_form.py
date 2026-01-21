@@ -3,7 +3,9 @@ import re
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.participants.models import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -101,7 +103,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.appointment.refresh_from_db()
         self.assertEqual(
             self.appointment.current_status.name,
-            AppointmentStatus.ATTENDED_NOT_SCREENED,
+            AppointmentStatusNames.ATTENDED_NOT_SCREENED,
         )
         self.assertEqual(self.appointment.reinvite, True)
         self.assertEqual(
