@@ -1,12 +1,12 @@
 from django import forms
 
+from manage_breast_screening.mammograms.services.appointment_services import (
+    AppointmentStatusUpdater,
+)
 from manage_breast_screening.nhsuk_forms.fields import (
     CharField,
     ChoiceField,
     MultipleChoiceField,
-)
-from manage_breast_screening.participants.models.appointment import (
-    AppointmentStatusNames,
 )
 
 
@@ -81,7 +81,11 @@ class AppointmentCannotGoAheadForm(forms.Form):
 
         return cleaned_data
 
-    def save(self):
+    def save(self, current_user):
+        AppointmentStatusUpdater(
+            self.instance, current_user=current_user
+        ).mark_attended_not_screened()
+
         reasons_json = {}
         reasons_json["stopped_reasons"] = self.cleaned_data["stopped_reasons"]
         for field_name, value in self.cleaned_data.items():
@@ -90,6 +94,5 @@ class AppointmentCannotGoAheadForm(forms.Form):
         self.instance.stopped_reasons = reasons_json
         self.instance.reinvite = self.cleaned_data["decision"]
         self.instance.save()
-        self.instance.statuses.create(name=AppointmentStatusNames.ATTENDED_NOT_SCREENED)
 
         return self.instance

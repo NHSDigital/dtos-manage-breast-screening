@@ -267,8 +267,9 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        instance = form.save()
+        instance = form.save(current_user=self.request.user)
         Auditor.from_request(self.request).audit_update(instance)
+
         return super().form_valid(form)
 
 
