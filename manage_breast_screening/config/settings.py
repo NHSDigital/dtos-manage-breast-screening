@@ -22,7 +22,7 @@ def boolean_env(key, default=None):
     value = environ.get(key)
     if value is None:
         return default
-    return value.strip() in ("True", "true", "1")
+    return value in ("True", "true", "1")
 
 
 def list_env(key):
@@ -35,6 +35,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # loads the configs from .env in local development
 load_dotenv(BASE_DIR / "config" / ".env")
+
+# Strip whitespace from all env vars to avoid issues with stray \r\n from Key Vault
+for key in environ:
+    environ[key] = environ[key].strip()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -306,6 +310,6 @@ BASE_URL = environ.get("BASE_URL")
 
 # HTTP Basic Auth (optional; off by default)
 BASIC_AUTH_ENABLED = boolean_env("BASIC_AUTH_ENABLED", default=False)
-BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME", "").strip()
-BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD", "").strip()
-BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted").strip()
+BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME")
+BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
+BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
