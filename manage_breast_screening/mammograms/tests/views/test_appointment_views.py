@@ -2,6 +2,7 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
+from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models import MedicalInformationReview
 from manage_breast_screening.participants.models.appointment import (
@@ -198,6 +199,14 @@ class TestStartAppointment:
             response,
             reverse("mammograms:confirm_identity", kwargs={"pk": appointment.pk}),
         )
+
+    def test_user_not_permitted(self, administrative_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=administrative_user_client.current_provider
+        )
+        url = reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
+        response = administrative_user_client.http.post(url)
+        assertRedirects(response, reverse(LOGIN_URL, query={"next": url}))
 
 
 @pytest.mark.django_db
