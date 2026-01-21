@@ -164,6 +164,27 @@ clinic:
                 - 523 Clinic Road
                 - Birmingham
               postcode: N4 6L8
+        study:
+          id: 35794286-8bf5-4a15-bf4a-a6b8e8c08676
+          additional_details: 'This is an additional_details reason'
+          series:
+            - id: 0C7150DC-58DA-4041-9B9C-96A8EE3C33B8
+              view_position: CC
+              laterality: R
+              count: 1
+            - id: d14b3f70-1ee9-4421-bc32-9c30c8655027
+              view_position: CC
+              laterality: L
+              count: 1
+            - id: 2dfe4341-8385-4a46-9215-2d99599c068d
+              view_position: MLO
+              laterality: R
+              count: 1
+            - id: f4641566-e964-4e1d-be77-65f05ee36621
+              view_position: MLO
+              laterality: L
+              count: 1
+
     - id: 059ee27a-8d59-45e7-b3c6-e64af1a6eeac
       duration_in_minutes: 8
       starts_at_time: 09:40
