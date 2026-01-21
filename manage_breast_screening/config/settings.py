@@ -171,7 +171,7 @@ DATABASES = {
 }
 
 
-if environ.get("DJANGO_ENV", "production") != "production":
+if environ.get("DJANGO_ENV", "development") != "production":
     if environ.get("AZURE_STORAGE_CONNECTION_STRING"):
         # Use connection string if provided (e.g., in local development using Azurite)
         dicom_storage_options = {

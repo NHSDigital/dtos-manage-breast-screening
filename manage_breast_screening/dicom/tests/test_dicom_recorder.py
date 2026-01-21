@@ -1,4 +1,5 @@
 import tempfile
+from unittest.mock import patch
 
 import pydicom
 import pytest
@@ -52,6 +53,7 @@ class TestDicomRecorder:
                     DicomRecorder.create_records(source_message_id, dicom_file) is None
                 )
 
+    @pytest.mark.django_db
     def test_create_records_invalid_dicom(self, source_message_id):
         with tempfile.NamedTemporaryFile() as temp_file:
             invalid_ds = pydicom.Dataset()
@@ -68,3 +70,18 @@ class TestDicomRecorder:
             with open(temp_file.name, "rb") as dicom_file:
                 with pytest.raises(AttributeError):
                     DicomRecorder.create_records(source_message_id, dicom_file)
+
+    @pytest.mark.django_db
+    def test_create_records_transaction_rollback(self, source_message_id, dataset):
+        with tempfile.NamedTemporaryFile() as temp_file:
+            pydicom.filewriter.dcmwrite(
+                temp_file.name, dataset, write_like_original=False
+            )
+            with patch.object(Image, "save", side_effect=Exception("Noooo!")):
+                with open(temp_file.name, "rb") as dicom_file:
+                    with pytest.raises(Exception):
+                        DicomRecorder.create_records(source_message_id, dicom_file)
+
+            assert Study.objects.count() == 0
+            assert Series.objects.count() == 0
+            assert Image.objects.count() == 0

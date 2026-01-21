@@ -1,9 +1,11 @@
 import pydicom
+from django.db import transaction
 
 from .models import Image, Series, Study
 
 
 class DicomRecorder:
+    @transaction.atomic
     @staticmethod
     def create_records(
         source_message_id: str, dicom_file: bytes

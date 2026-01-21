@@ -53,6 +53,7 @@ def test_upload_dicom_invalid_method():
     assert response.status_code == 405
 
 
+@pytest.mark.django_db
 def test_upload_dicom_invalid_file():
     client = Client(HTTP_X_SOURCE_MESSAGE_ID="test-source-message-id")
     response = client.post(
@@ -63,6 +64,7 @@ def test_upload_dicom_invalid_file():
     assert response.json()["error"] == "Invalid DICOM file"
 
 
+@pytest.mark.django_db
 def test_upload_dicom_missing_uids(dataset):
     client = Client(HTTP_X_SOURCE_MESSAGE_ID="test-source-message-id")
     del dataset.StudyInstanceUID
@@ -101,6 +103,7 @@ def test_upload_dicom_duplicate(dataset):
     assert response2.json()["error"] == "DICOM instance already exists"
 
 
+@pytest.mark.django_db
 def test_upload_dicom_unexpected_error(monkeypatch, dataset):
     client = Client(HTTP_X_SOURCE_MESSAGE_ID="test-source-message-id")
 
