@@ -174,7 +174,7 @@ class AppointmentStatus(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     appointment = models.ForeignKey(
-        "participants.Appointment", on_delete=models.PROTECT, related_name="statuses"
+        Appointment, on_delete=models.PROTECT, related_name="statuses"
     )
     created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
 
@@ -223,7 +223,7 @@ class AppointmentWorkflowStepCompletion(models.Model):
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     appointment = models.ForeignKey(
-        "participants.Appointment",
+        Appointment,
         on_delete=models.PROTECT,
         related_name="completed_workflow_steps",
     )
@@ -232,7 +232,7 @@ class AppointmentWorkflowStepCompletion(models.Model):
 
 class AppointmentNote(BaseModel):
     appointment = models.OneToOneField(
-        "participants.Appointment",
+        Appointment,
         on_delete=models.PROTECT,
         related_name="note",
     )
