@@ -98,6 +98,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "manage_breast_screening.core.middleware.session_timeout.SessionTimeoutMiddleware",
     "manage_breast_screening.core.middleware.current_provider.CurrentProviderMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -157,8 +158,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "manage_breast_screening.config.wsgi.application"
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+
 SESSION_ENGINE = "qsessions.backends.db"
 SESSION_COOKIE_AGE = 43200  # 12 hours
+SESSION_INACTIVITY_TIMEOUT = 900  # 15 minutes - logout after inactivity
+SESSION_ACTIVITY_UPDATE_THRESHOLD = (
+    60  # Update last_activity every 60s to reduce DB writes
+)
+SESSION_HARD_TIMEOUT = 43200  # 12 hours - absolute session limit
+
 COMMIT_SHA = environ.get("COMMIT_SHA", "")
 
 # Database
