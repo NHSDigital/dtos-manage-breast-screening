@@ -162,3 +162,14 @@ class AppointmentProceedAnywayView(AppointmentMixin, UpdateWithAuditView):
         )
 
         return context
+
+
+@require_http_methods(["GET"])
+def check_information(request, pk):
+    return render(
+        request,
+        "mammograms/check_information.jinja",
+        context={
+            "page_title": "Check Information",
+        },
+    )
