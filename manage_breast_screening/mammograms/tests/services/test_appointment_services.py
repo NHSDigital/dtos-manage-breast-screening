@@ -6,6 +6,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.participants.models.appointment import (
     ActionPerformedByDifferentUser,
+    AppointmentMachine,
     AppointmentStatusNames,
 )
 from manage_breast_screening.participants.tests.factories import (
@@ -106,6 +107,28 @@ class TestAppointmentStatusUpdater:
         new_status = service.mark_did_not_attend()
         assert new_status.name == AppointmentStatusNames.DID_NOT_ATTEND
 
+    def test_valid_mark_attended_not_screened(self, clinical_user):
+        appointment = AppointmentFactory.create(
+            current_status=AppointmentStatusNames.IN_PROGRESS
+        )
+        service = AppointmentStatusUpdater(
+            appointment=appointment, current_user=clinical_user
+        )
+
+        new_status = service.mark_attended_not_screened()
+        assert new_status.name == AppointmentStatusNames.ATTENDED_NOT_SCREENED
+
+    def test_invalid_mark_attended_not_screened(self, clinical_user):
+        appointment = AppointmentFactory.create(
+            current_status=AppointmentStatusNames.SCREENED
+        )
+        service = AppointmentStatusUpdater(
+            appointment=appointment, current_user=clinical_user
+        )
+
+        with pytest.raises(TransitionNotAllowed):
+            service.mark_attended_not_screened()
+
     def test_invalid_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
             current_status=AppointmentStatusNames.CANCELLED
@@ -171,3 +194,7 @@ class TestAppointmentStatusUpdater:
 
         with pytest.raises(ActionPerformedByDifferentUser):
             service.start()
+
+    def test_class_has_methods_for_each_event(self):
+        for event in AppointmentMachine().events:
+            assert hasattr(AppointmentStatusUpdater, event), f"missing {event}() method"

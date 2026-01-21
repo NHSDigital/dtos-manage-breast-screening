@@ -53,6 +53,17 @@ class AppointmentStatusUpdater:
             self.machine.current_state_value, created_by=self.current_user
         )
 
+    def mark_attended_not_screened(self):
+        if (
+            self.machine.current_state_value
+            != AppointmentStatusNames.ATTENDED_NOT_SCREENED
+        ):
+            self.machine.mark_attended_not_screened()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
+        )
+
     def partial_screen(self):
         if (
             self.machine.current_state_value
