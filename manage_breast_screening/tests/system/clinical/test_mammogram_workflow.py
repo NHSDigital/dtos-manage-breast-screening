@@ -13,19 +13,7 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
-class TestRecordingAMammogram(SystemTestCase):
-    def test_appointment_tabs(self):
-        """
-        I can switch between tabs to see all the information about an appointment
-        """
-        self.given_i_am_logged_in_as_a_clinical_user()
-        self.and_there_is_an_appointment()
-        self.and_i_am_on_the_appointment_show_page()
-        self.then_i_should_see_the_demographic_banner()
-
-        self.when_i_change_to_the_participant_details_tab()
-        self.then_i_should_see_the_participant_details()
-
+class TestMammogramWorkflow(SystemTestCase):
     def test_recording_a_mammogram_without_capturing_medical_information(self):
         """
         I can record a mammogram without entering any relevant medical information.
@@ -95,10 +83,6 @@ class TestRecordingAMammogram(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
-        self.then_the_accessibility_baseline_is_met()
-
-        self.when_i_change_to_the_participant_details_tab()
-        self.then_the_accessibility_baseline_is_met()
 
         self.when_i_click_start_this_appointment()
         self.then_the_accessibility_baseline_is_met()

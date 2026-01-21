@@ -177,10 +177,10 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self._expect_rows_to_match_appointments(rows, [self.screened_appointment])
 
     def when_i_click_on_all(self):
-        self.page.get_by_role("link", name=re.compile("All")).click()
+        self.page.get_by_role("link", name=re.compile(r"All\s+")).click()
 
     def then_i_can_see_all_appointments(self):
-        all_link = self.page.get_by_role("link", name=re.compile("All"))
+        all_link = self.page.get_by_role("link", name=re.compile(r"All\s+"))
         count_span = all_link.locator(".app-count")
         expect(count_span).to_contain_text("5")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
