@@ -21,13 +21,6 @@ class AppointmentStatusUpdater:
             start_value=self.appointment.current_status.name
         )
 
-    @staticmethod
-    def is_startable(appointment):
-        return appointment is not None and appointment.current_status.name in (
-            AppointmentStatusNames.SCHEDULED,
-            AppointmentStatusNames.CHECKED_IN,
-        )
-
     def check_in(self):
         if self.machine.current_state_value != AppointmentStatusNames.CHECKED_IN:
             self.machine.check_in()

@@ -241,6 +241,13 @@ class AppointmentMachine(StateMachine):
     screen = Event(_.IN_PROGRESS.to(_.SCREENED))
     partial_screen = Event(_.IN_PROGRESS.to(_.PARTIALLY_SCREENED))
 
+    def can(self, action) -> bool:
+        return action in self.allowed_events
+
+    @classmethod
+    def from_appointment(cls, appointment):
+        return cls(start_value=appointment.current_status.name)
+
 
 class AppointmentWorkflowStepCompletion(models.Model):
     """

@@ -3,10 +3,8 @@ from functools import cached_property
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
-from manage_breast_screening.mammograms.services.appointment_services import (
-    AppointmentStatusUpdater,
-)
 from manage_breast_screening.participants.models.appointment import (
+    AppointmentMachine,
     AppointmentStatusNames,
 )
 
@@ -75,7 +73,7 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_checked_in(self):
-        return self._appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+        return AppointmentMachine.from_appointment(self._appointment).can("check_in")
 
     @cached_property
     def active(self):
@@ -84,7 +82,7 @@ class AppointmentPresenter:
     def can_be_started_by(self, user):
         return user.has_perm(
             Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
-        ) and AppointmentStatusUpdater.is_startable(self._appointment)
+        ) and AppointmentMachine.from_appointment(self._appointment).can("start")
 
     def can_be_resumed_by(self, user):
         return (
