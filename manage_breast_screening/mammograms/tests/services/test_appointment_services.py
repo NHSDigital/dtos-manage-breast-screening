@@ -2,10 +2,10 @@ import pytest
 from statemachine.exceptions import TransitionNotAllowed
 
 from manage_breast_screening.mammograms.services.appointment_services import (
-    ActionPerformedByDifferentUser,
     AppointmentStatusUpdater,
 )
 from manage_breast_screening.participants.models.appointment import (
+    ActionPerformedByDifferentUser,
     AppointmentStatusNames,
 )
 from manage_breast_screening.participants.tests.factories import (

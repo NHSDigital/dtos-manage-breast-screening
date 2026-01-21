@@ -15,6 +15,12 @@ from .screening_episode import ScreeningEpisode
 logger = getLogger(__name__)
 
 
+class ActionPerformedByDifferentUser(Exception):
+    """
+    The action has already been performed, but by a different user.
+    """
+
+
 class AppointmentQuerySet(models.QuerySet):
     def in_status(self, *statuses):
         # Get the most recent status name for each appointment
@@ -135,6 +141,20 @@ class Appointment(BaseModel):
     @property
     def active(self):
         return self.current_status.active
+
+    def set_status(self, status_name, created_by):
+        new_status, created = self.statuses.get_or_create(
+            name=status_name,
+            defaults={"created_by": created_by},
+        )
+
+        if not created and new_status.created_by != created_by:
+            logger.warning(
+                f"Current status is already {new_status}, and was set by a different user"
+            )
+            raise ActionPerformedByDifferentUser(new_status)
+
+        return new_status
 
 
 class AppointmentStatusNames(models.TextChoices):
