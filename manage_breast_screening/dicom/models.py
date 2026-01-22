@@ -10,8 +10,7 @@ class Study(models.Model):
     study_instance_uid = models.CharField(max_length=128, unique=True)
     source_message_id = models.CharField(max_length=128)
     patient_id = models.CharField(max_length=10, blank=True)
-    date = models.CharField(max_length=16, null=True, blank=True)
-    time = models.CharField(max_length=16, null=True, blank=True)
+    date_and_time = models.DateTimeField(null=True, blank=True)
     description = models.CharField(max_length=255, blank=True)
 
     def __str__(self):

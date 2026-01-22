@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pydicom
 
 from .models import Image, Series, Study
@@ -17,8 +19,7 @@ class DicomRecorder:
             study_instance_uid=study_uid,
             defaults={
                 "patient_id": getattr(ds, "PatientID", ""),
-                "date": getattr(ds, "StudyDate", ""),
-                "time": getattr(ds, "StudyTime", ""),
+                "date_and_time": __class__.study_date_and_time(ds),
                 "description": getattr(ds, "StudyDescription", ""),
                 "source_message_id": source_message_id,
             },
@@ -44,3 +45,13 @@ class DicomRecorder:
             image.dicom_file.save(f"{sop_uid}.dcm", dicom_file)
 
             return study, series, image
+
+    @staticmethod
+    def study_date_and_time(ds) -> datetime | None:
+        study_date = getattr(ds, "StudyDate", "")
+        study_time = getattr(ds, "StudyTime", "")
+        if study_date and study_time:
+            return datetime.strptime(
+                study_date + study_time.split(".")[0], "%Y%m%d%H%M%S"
+            )
+        return None

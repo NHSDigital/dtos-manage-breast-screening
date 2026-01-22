@@ -1,4 +1,5 @@
 import tempfile
+from datetime import datetime
 
 import pydicom
 import pytest
@@ -31,8 +32,7 @@ class TestDicomRecorder:
         assert series.series_instance_uid == dataset.SeriesInstanceUID
         assert image.sop_instance_uid == dataset.SOPInstanceUID
         assert study.patient_id == dataset.PatientID
-        assert study.date == dataset.StudyDate
-        assert study.time == dataset.StudyTime
+        assert study.date_and_time == datetime(2024, 1, 1, 12, 0, 0)
         assert study.description == dataset.StudyDescription
         assert series.modality == dataset.Modality
         assert series.series_number == dataset.SeriesNumber
