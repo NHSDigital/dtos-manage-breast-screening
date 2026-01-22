@@ -3,7 +3,9 @@ import re
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.participants.models import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -43,7 +45,7 @@ class TestReviewingMedicalInformation(SystemTestCase):
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status_params={
-                "name": AppointmentStatus.IN_PROGRESS,
+                "name": AppointmentStatusNames.IN_PROGRESS,
                 "created_by": self.current_user,
             },
         )

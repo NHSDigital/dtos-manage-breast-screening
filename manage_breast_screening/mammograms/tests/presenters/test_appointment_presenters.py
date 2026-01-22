@@ -14,6 +14,9 @@ from manage_breast_screening.mammograms.presenters import (
     SpecialAppointmentPresenter,
 )
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentStatusFactory,
 )
@@ -36,7 +39,7 @@ class TestAppointmentPresenter:
         "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
         [
             (
-                AppointmentStatus.SCHEDULED,
+                AppointmentStatusNames.SCHEDULED,
                 "nhsuk-tag--blue app-u-nowrap",
                 "Scheduled",
                 "SCHEDULED",
@@ -44,7 +47,7 @@ class TestAppointmentPresenter:
                 False,
             ),
             (
-                AppointmentStatus.CHECKED_IN,
+                AppointmentStatusNames.CHECKED_IN,
                 "app-u-nowrap",
                 "Checked in",
                 "CHECKED_IN",
@@ -52,7 +55,7 @@ class TestAppointmentPresenter:
                 False,
             ),
             (
-                AppointmentStatus.ATTENDED_NOT_SCREENED,
+                AppointmentStatusNames.ATTENDED_NOT_SCREENED,
                 "nhsuk-tag--orange app-u-nowrap",
                 "Attended not screened",
                 "ATTENDED_NOT_SCREENED",
@@ -60,7 +63,7 @@ class TestAppointmentPresenter:
                 False,
             ),
             (
-                AppointmentStatus.SCREENED,
+                AppointmentStatusNames.SCREENED,
                 "nhsuk-tag--green app-u-nowrap",
                 "Screened",
                 "SCREENED",
@@ -113,10 +116,10 @@ class TestAppointmentPresenter:
     @pytest.mark.parametrize(
         "has_permission, status_name, result",
         [
-            (True, AppointmentStatus.SCHEDULED, True),
-            (True, AppointmentStatus.CHECKED_IN, True),
-            (False, AppointmentStatus.SCHEDULED, False),
-            (True, AppointmentStatus.IN_PROGRESS, False),
+            (True, AppointmentStatusNames.SCHEDULED, True),
+            (True, AppointmentStatusNames.CHECKED_IN, True),
+            (False, AppointmentStatusNames.SCHEDULED, False),
+            (True, AppointmentStatusNames.IN_PROGRESS, False),
         ],
     )
     def test_can_be_started_by(
@@ -131,7 +134,7 @@ class TestAppointmentPresenter:
         )
 
         mock_user.has_perm.assert_called_once_with(
-            Permission.START_MAMMOGRAM_APPOINTMENT, mock_appointment
+            Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
         )
 
     def test_clinic_url(self, mock_appointment):
@@ -188,7 +191,7 @@ class TestAppointmentPresenter:
             "status_name, expected_classes, expected_text, expected_key, is_confirmed, is_screened",
             [
                 (
-                    AppointmentStatus.CHECKED_IN,
+                    AppointmentStatusNames.CHECKED_IN,
                     "app-u-nowrap",
                     "Checked in",
                     "CHECKED_IN",
@@ -196,7 +199,7 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.SCHEDULED,
+                    AppointmentStatusNames.SCHEDULED,
                     "nhsuk-tag--blue app-u-nowrap",
                     "Scheduled",
                     "SCHEDULED",
@@ -204,7 +207,7 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.IN_PROGRESS,
+                    AppointmentStatusNames.IN_PROGRESS,
                     "nhsuk-tag--aqua-green app-u-nowrap",
                     "In progress",
                     "IN_PROGRESS",
@@ -212,7 +215,7 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.CANCELLED,
+                    AppointmentStatusNames.CANCELLED,
                     "nhsuk-tag--red app-u-nowrap",
                     "Cancelled",
                     "CANCELLED",
@@ -220,7 +223,7 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.DID_NOT_ATTEND,
+                    AppointmentStatusNames.DID_NOT_ATTEND,
                     "nhsuk-tag--red app-u-nowrap",
                     "Did not attend",
                     "DID_NOT_ATTEND",
@@ -228,7 +231,7 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.SCREENED,
+                    AppointmentStatusNames.SCREENED,
                     "nhsuk-tag--green app-u-nowrap",
                     "Screened",
                     "SCREENED",
@@ -236,7 +239,7 @@ class TestAppointmentPresenter:
                     True,
                 ),
                 (
-                    AppointmentStatus.PARTIALLY_SCREENED,
+                    AppointmentStatusNames.PARTIALLY_SCREENED,
                     "nhsuk-tag--orange app-u-nowrap",
                     "Partially screened",
                     "PARTIALLY_SCREENED",
@@ -244,7 +247,7 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
-                    AppointmentStatus.ATTENDED_NOT_SCREENED,
+                    AppointmentStatusNames.ATTENDED_NOT_SCREENED,
                     "nhsuk-tag--orange app-u-nowrap",
                     "Attended not screened",
                     "ATTENDED_NOT_SCREENED",

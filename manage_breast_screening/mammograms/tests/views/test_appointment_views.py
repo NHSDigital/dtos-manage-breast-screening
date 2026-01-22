@@ -211,7 +211,7 @@ class TestStartAppointment:
 
 @pytest.mark.django_db
 class TestAppointmentCannotGoAhead:
-    def test_audit(self, clinical_user_client):
+    def test_status_and_audit_created(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )

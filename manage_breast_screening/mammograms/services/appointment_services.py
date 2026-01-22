@@ -1,20 +1,11 @@
 import logging
 
-from manage_breast_screening.participants.models.appointment import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentMachine,
+    AppointmentStatusNames,
+)
 
 logger = logging.getLogger(__name__)
-
-
-class InvalidStatus(Exception):
-    """
-    The appointment is not in a valid status to perform the action.
-    """
-
-
-class ActionPerformedByDifferentUser(Exception):
-    """
-    The action has already been performed, but by a different user.
-    """
 
 
 class AppointmentStatusUpdater:
@@ -26,69 +17,68 @@ class AppointmentStatusUpdater:
     def __init__(self, appointment, current_user):
         self.appointment = appointment
         self.current_user = current_user
-
-    def check_in(self):
-        return self._transition(
-            to_status=AppointmentStatus.CHECKED_IN,
-            from_statuses=(AppointmentStatus.SCHEDULED,),
+        self.machine = AppointmentMachine(
+            start_value=self.appointment.current_status.name
         )
 
-    @staticmethod
-    def is_startable(appointment):
-        return appointment is not None and appointment.current_status.name in (
-            AppointmentStatus.SCHEDULED,
-            AppointmentStatus.CHECKED_IN,
+    def check_in(self):
+        if self.machine.current_state_value != AppointmentStatusNames.CHECKED_IN:
+            self.machine.check_in()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
         )
 
     def start(self):
-        return self._transition(
-            to_status=AppointmentStatus.IN_PROGRESS,
-            from_statuses=(AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN),
+        if self.machine.current_state_value != AppointmentStatusNames.IN_PROGRESS:
+            self.machine.start()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
         )
 
     def cancel(self):
-        return self._transition(
-            to_status=AppointmentStatus.CANCELLED,
-            from_statuses=(AppointmentStatus.SCHEDULED,),
+        if self.machine.current_state_value != AppointmentStatusNames.CANCELLED:
+            self.machine.cancel()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
         )
 
     def mark_did_not_attend(self):
-        return self._transition(
-            to_status=AppointmentStatus.DID_NOT_ATTEND,
-            from_statuses=(AppointmentStatus.SCHEDULED,),
+        if self.machine.current_state_value != AppointmentStatusNames.DID_NOT_ATTEND:
+            self.machine.mark_did_not_attend()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
         )
 
-    def screen(self, partial=False):
-        return self._transition(
-            to_status=(
-                AppointmentStatus.PARTIALLY_SCREENED
-                if partial
-                else AppointmentStatus.SCREENED
-            ),
-            from_statuses=(AppointmentStatus.IN_PROGRESS,),
+    def mark_attended_not_screened(self):
+        if (
+            self.machine.current_state_value
+            != AppointmentStatusNames.ATTENDED_NOT_SCREENED
+        ):
+            self.machine.mark_attended_not_screened()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
         )
 
-    def _transition(self, to_status, from_statuses):
-        current_status = self.appointment.current_status.name
-        if current_status != to_status and current_status not in from_statuses:
-            raise InvalidStatus(self.appointment.current_status)
+    def partial_screen(self):
+        if (
+            self.machine.current_state_value
+            != AppointmentStatusNames.PARTIALLY_SCREENED
+        ):
+            self.machine.partial_screen()
 
-        return self._get_or_create(status=to_status)
-
-    def _get_or_create(self, status):
-        """
-        Make operations idempotent, providing that we're not changing
-        the created_by user.
-        """
-        new_status, created = self.appointment.statuses.get_or_create(
-            name=status,
-            defaults=dict(created_by=self.current_user),
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
         )
 
-        if not created and new_status.created_by != self.current_user:
-            logger.warning(
-                f"Current status is already {new_status}, and was set by a different user"
-            )
-            raise ActionPerformedByDifferentUser(new_status)
+    def screen(self):
+        if self.machine.current_state_value != AppointmentStatusNames.SCREENED:
+            self.machine.screen()
 
-        return new_status
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
+        )

@@ -4,6 +4,10 @@ from urllib.parse import quote
 
 from django.urls import reverse
 
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
+
 from ..core.utils.date_formatting import format_date, format_relative_date
 from ..core.utils.string_formatting import (
     format_age,
@@ -11,7 +15,7 @@ from ..core.utils.string_formatting import (
     format_phone_number,
     sentence_case,
 )
-from .models import AppointmentStatus, Ethnicity
+from .models import Ethnicity
 
 
 def status_colour(status):
@@ -19,17 +23,17 @@ def status_colour(status):
     Color to render the status tag
     """
     match status.name:
-        case AppointmentStatus.IN_PROGRESS:
+        case AppointmentStatusNames.IN_PROGRESS:
             return "aqua-green"
-        case AppointmentStatus.CHECKED_IN:
+        case AppointmentStatusNames.CHECKED_IN:
             return ""  # no colour will get solid dark blue
-        case AppointmentStatus.SCREENED:
+        case AppointmentStatusNames.SCREENED:
             return "green"
-        case AppointmentStatus.DID_NOT_ATTEND | AppointmentStatus.CANCELLED:
+        case AppointmentStatusNames.DID_NOT_ATTEND | AppointmentStatusNames.CANCELLED:
             return "red"
         case (
-            AppointmentStatus.ATTENDED_NOT_SCREENED
-            | AppointmentStatus.PARTIALLY_SCREENED
+            AppointmentStatusNames.ATTENDED_NOT_SCREENED
+            | AppointmentStatusNames.PARTIALLY_SCREENED
         ):
             return "orange"
         case _:

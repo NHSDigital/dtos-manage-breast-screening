@@ -1,6 +1,8 @@
 import pytest
 
-from manage_breast_screening.participants.models import AppointmentStatus
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
@@ -13,4 +15,4 @@ def appointment(clinical_user_client):
 
 @pytest.fixture
 def completed_appointment():
-    return AppointmentFactory.create(current_status=AppointmentStatus.SCREENED)
+    return AppointmentFactory.create(current_status=AppointmentStatusNames.SCREENED)

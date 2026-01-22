@@ -10,7 +10,7 @@ class Role(StrEnum):
 class Permission(StrEnum):
     VIEW_PARTICIPANT_DATA = "participants.view_participant_data"
     VIEW_MAMMOGRAM_APPOINTMENT = "mammograms.view_mammogram_appointment"
-    START_MAMMOGRAM_APPOINTMENT = "mammograms.start_mammogram_appointment"
+    DO_MAMMOGRAM_APPOINTMENT = "mammograms.do_mammogram_appointment"
 
 
 @dataclass

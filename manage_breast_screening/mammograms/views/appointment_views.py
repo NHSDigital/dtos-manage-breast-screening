@@ -267,8 +267,9 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return kwargs
 
     def form_valid(self, form):
-        instance = form.save()
+        instance = form.save(current_user=self.request.user)
         Auditor.from_request(self.request).audit_update(instance)
+
         return super().form_valid(form)
 
 
@@ -295,7 +296,7 @@ def check_in(request, pk):
 
 
 @require_http_methods(["POST"])
-@permission_required(Permission.START_MAMMOGRAM_APPOINTMENT)
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
 def start_appointment(request, pk):
     try:
         provider = request.user.current_provider
