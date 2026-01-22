@@ -79,6 +79,7 @@ class ScreeningEpisodeFactory(DjangoModelFactory):
 class AppointmentStatusFactory(DjangoModelFactory):
     class Meta:
         model = models.AppointmentStatus
+        skip_postgeneration_save = True
 
     appointment = None
     created_by = SubFactory(UserFactory)
