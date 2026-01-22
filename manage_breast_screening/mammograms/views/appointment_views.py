@@ -296,7 +296,7 @@ def check_in(request, pk):
 
 
 @require_http_methods(["POST"])
-@permission_required(Permission.START_MAMMOGRAM_APPOINTMENT)
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
 def start_appointment(request, pk):
     try:
         provider = request.user.current_provider

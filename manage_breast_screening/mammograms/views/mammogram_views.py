@@ -1,10 +1,13 @@
 import logging
 
+from django.contrib.auth.decorators import permission_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+from rules.contrib.views import PermissionRequiredMixin
 
+from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.utils.date_formatting import format_relative_date
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
@@ -23,6 +26,7 @@ from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 logger = logging.getLogger(__name__)
 
 
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
 def appointment_should_not_proceed(
     request, appointment_pk, participant_reported_mammogram_pk
 ):
@@ -85,6 +89,7 @@ def appointment_should_not_proceed(
 
 
 @require_http_methods(["POST"])
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
 def attended_not_screened(request, appointment_pk):
     provider = request.user.current_provider
     try:
@@ -99,10 +104,13 @@ def attended_not_screened(request, appointment_pk):
     return redirect("clinics:show", pk=appointment.clinic_slot.clinic.pk)
 
 
-class AppointmentProceedAnywayView(AppointmentMixin, UpdateWithAuditView):
+class AppointmentProceedAnywayView(
+    AppointmentMixin, UpdateWithAuditView, PermissionRequiredMixin
+):
     form_class = AppointmentProceedAnywayForm
     template_name = "mammograms/proceed_anyway.jinja"
     thing_name = "a previous mammogram"
+    permission_required = Permission.DO_MAMMOGRAM_APPOINTMENT
 
     def update_title(self, thing_name):
         return "You are continuing despite a recent mammogram"

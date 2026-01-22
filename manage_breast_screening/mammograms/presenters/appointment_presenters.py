@@ -81,7 +81,7 @@ class AppointmentPresenter:
 
     def can_be_started_by(self, user):
         return user.has_perm(
-            Permission.START_MAMMOGRAM_APPOINTMENT, self._appointment
+            Permission.DO_MAMMOGRAM_APPOINTMENT, self._appointment
         ) and AppointmentMachine.from_appointment(self._appointment).can("start")
 
     def can_be_resumed_by(self, user):

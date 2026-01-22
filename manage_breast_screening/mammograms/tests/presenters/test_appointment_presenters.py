@@ -134,7 +134,7 @@ class TestAppointmentPresenter:
         )
 
         mock_user.has_perm.assert_called_once_with(
-            Permission.START_MAMMOGRAM_APPOINTMENT, mock_appointment
+            Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
         )
 
     def test_clinic_url(self, mock_appointment):

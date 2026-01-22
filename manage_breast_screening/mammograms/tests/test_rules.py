@@ -59,18 +59,18 @@ class TestAppointmentActionPermissions:
         )
 
     def test_can_start_if_user_is_clinical(self, clinical_user):
-        assert clinical_user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
+        assert clinical_user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT)
 
     def test_cannot_start_for_administrative_user(self, administrative_user):
-        assert not administrative_user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
+        assert not administrative_user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT)
 
     def test_cannot_start_for_user_without_roles(self):
         user_assignment = UserAssignmentFactory.create()
         user_assignment.make_current()
 
-        assert not user_assignment.user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
+        assert not user_assignment.user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT)
 
     def test_cannot_start_if_no_current_provider(self):
         user_assignment = UserAssignmentFactory.create()
 
-        assert not user_assignment.user.has_perm(Permission.START_MAMMOGRAM_APPOINTMENT)
+        assert not user_assignment.user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT)
