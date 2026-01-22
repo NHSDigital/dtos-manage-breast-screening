@@ -85,10 +85,15 @@ class AppointmentPresenter:
         ) and AppointmentMachine.from_appointment(self._appointment).can("start")
 
     def can_be_resumed_by(self, user):
-        return (
-            self._appointment.current_status.is_in_progress()
-            and user.pk == self._appointment.current_status.created_by.pk
-        )
+        if not user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT, self._appointment):
+            return False
+
+        # Allow the same user to return to an appointment they have in progress
+        # This will only happen if there is a technical problem and the
+        # user loses their browsing context.
+        return AppointmentMachine.from_appointment(self._appointment).can(
+            "resume"
+        ) or self._appointment.current_status.is_in_progress_with(user)
 
     @cached_property
     def special_appointment_tag_properties(self):

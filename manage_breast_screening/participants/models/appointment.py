@@ -209,6 +209,9 @@ class AppointmentStatus(models.Model):
     def is_in_progress(self):
         return self.name == AppointmentStatusNames.IN_PROGRESS
 
+    def is_in_progress_with(self, user):
+        return self.is_in_progress() and self.created_by == user
+
     def is_final_status(self):
         return self.name in self.FINAL_STATUSES
 

@@ -137,6 +137,43 @@ class TestAppointmentPresenter:
             Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
         )
 
+    @pytest.mark.parametrize(
+        "has_permission, status_name, result",
+        [
+            (True, AppointmentStatusNames.PAUSED, True),
+            (False, AppointmentStatusNames.PAUSED, False),
+            (True, AppointmentStatusNames.SCREENED, False),
+        ],
+    )
+    def test_can_be_resumed(
+        self, mock_appointment, mock_user, has_permission, status_name, result
+    ):
+        mock_user.has_perm.return_value = has_permission
+        mock_appointment.current_status.name = status_name
+        mock_appointment.current_status.is_in_progress_with.return_value = False
+
+        assert (
+            AppointmentPresenter(mock_appointment).can_be_resumed_by(mock_user)
+            == result
+        )
+
+        mock_user.has_perm.assert_called_once_with(
+            Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
+        )
+
+    def test_can_be_resumed_by_the_same_user_when_in_progress(
+        self, mock_appointment, mock_user
+    ):
+        mock_user.has_perm.return_value = True
+        mock_appointment.current_status.name = AppointmentStatusNames.PAUSED
+        mock_appointment.current_status.is_in_progress_with.return_value = True
+
+        assert AppointmentPresenter(mock_appointment).can_be_resumed_by(mock_user)
+
+        mock_user.has_perm.assert_called_once_with(
+            Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
+        )
+
     def test_clinic_url(self, mock_appointment):
         mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
         assert (
