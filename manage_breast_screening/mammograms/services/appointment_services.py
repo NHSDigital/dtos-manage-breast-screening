@@ -82,3 +82,18 @@ class AppointmentStatusUpdater:
         return self.appointment.set_status(
             self.machine.current_state_value, created_by=self.current_user
         )
+
+    def pause(self):
+        if self.machine.current_state_value != AppointmentStatusNames.SCREENED:
+            self.machine.pause()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
+        )
+
+    def resume(self):
+        self.machine.resume()
+
+        return self.appointment.set_status(
+            self.machine.current_state_value, created_by=self.current_user
+        )
