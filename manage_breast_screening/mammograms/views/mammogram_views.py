@@ -10,12 +10,12 @@ from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
 )
+from manage_breast_screening.mammograms.services.appointment_services import (
+    AppointmentStatusUpdater,
+)
 from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
-from manage_breast_screening.participants.models.appointment import (
-    Appointment,
-    AppointmentStatusNames,
-)
+from manage_breast_screening.participants.models.appointment import Appointment
 from manage_breast_screening.participants.views import parse_return_url
 
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
@@ -91,7 +91,10 @@ def attended_not_screened(request, appointment_pk):
         appointment = provider.appointments.get(pk=appointment_pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
-    appointment.statuses.create(name=AppointmentStatusNames.ATTENDED_NOT_SCREENED)
+
+    AppointmentStatusUpdater(
+        appointment, current_user=request.user
+    ).mark_attended_not_screened()
 
     return redirect("clinics:show", pk=appointment.clinic_slot.clinic.pk)
 
