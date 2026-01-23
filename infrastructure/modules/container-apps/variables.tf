@@ -211,6 +211,12 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
+variable "relay_namespace_name" {
+  description = "The name of the Azure Relay namespace. If null, hybrid connection resources will not be created."
+  type        = string
+  default     = null
+}
+
 locals {
   resource_group_name = "rg-${var.app_short_name}-${var.environment}-container-app-uks"
 

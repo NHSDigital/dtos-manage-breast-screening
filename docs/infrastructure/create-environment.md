@@ -21,11 +21,11 @@ The environment requires a shared Azure front door profile created in the hub. T
 - Ask CCOE to assign role:
   - [Form for PIM](https://nhsdigitallive.service-now.com/nhs_digital?id=sc_cat_item&sys_id=28f3ab4f1bf3ca1078ac4337b04bcb78&sysparm_category=114fced51bdae1502eee65b9bd4bcbdc)
   - Approver: Add someone from the infrastructure team
-  - Role Name: `Group.Read.All`
+  - Role Names: `Group.Read.All` and `Directory Readers`
   - Application Name: `mi-manbrs-[environment]-adotoaz-uks`
   - Application ID: [client.id] (would be of `mi-manbrs-[environment]-ghtoado-uks`)
   - Managed identity: `mi-manbrs-[environment]-adotoaz-uks`
-  - Description: - Managed identity: `mi-manbrs-[environment]-adotoaz-uks` - Role: permanent on Directory
+  - Description: - Managed identity: `mi-manbrs-[environment]-adotoaz-uks` - Roles: permanent on Directory. `Directory Readers` is required to resolve the Service Principal for Azure Arc onboarding.
 
 ## Bicep
 
