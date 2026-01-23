@@ -24,6 +24,8 @@ from django.views.generic.base import RedirectView
 
 from manage_breast_screening.core.decorators import basic_auth_exempt
 
+from .api import api
+
 
 @require_GET
 @basic_auth_exempt
@@ -53,6 +55,7 @@ def robots_txt(request):
 
 urlpatterns = [
     path("robots.txt", robots_txt),
+    path("api/v1/", api.urls),
     path(
         "auth/",
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
@@ -63,10 +66,6 @@ urlpatterns = [
     path(
         "healthcheck",
         health_check,
-    ),
-    path(
-        "api/dicom/",
-        include("manage_breast_screening.dicom.urls", namespace="dicom"),
     ),
     path(
         "mammograms/",
