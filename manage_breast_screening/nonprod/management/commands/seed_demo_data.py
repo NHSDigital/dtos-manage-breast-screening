@@ -20,6 +20,11 @@ from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
     SettingFactory,
 )
+from manage_breast_screening.manual_images.models import Series, Study
+from manage_breast_screening.manual_images.tests.factories import (
+    SeriesFactory,
+    StudyFactory,
+)
 from manage_breast_screening.participants.models import (
     Appointment,
     AppointmentNote,
@@ -188,6 +193,9 @@ class Command(BaseCommand):
                 appointment, appointment_key.get("previous_mammograms")
             )
 
+        if "study" in appointment_key:
+            self.create_study(appointment, appointment_key["study"])
+
         return appointment
 
     def create_screening_episode(self, screening_episode_key):
@@ -313,8 +321,25 @@ class Command(BaseCommand):
 
             return appointment_mammogram
 
+    def create_study(self, appointment, study_key):
+        study = StudyFactory(
+            id=study_key["id"],
+            appointment=appointment,
+            additional_details=study_key.get("additional_details", ""),
+        )
+        for series_key in study_key.get("series", []):
+            SeriesFactory(
+                id=series_key["id"],
+                study=study,
+                view_position=series_key["view_position"],
+                laterality=series_key["laterality"],
+                count=series_key.get("count", 1),
+            )
+
     def reset_db(self):
         AppointmentWorkflowStepCompletion.objects.all().delete()
+        Series.objects.all().delete()
+        Study.objects.all().delete()
         MedicalInformationReview.objects.all().delete()
         AppointmentNote.objects.all().delete()
         UserAssignment.objects.all().delete()
