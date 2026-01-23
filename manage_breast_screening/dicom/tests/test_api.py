@@ -1,4 +1,5 @@
 import io
+import os
 
 import pydicom
 import pytest
@@ -7,6 +8,8 @@ from ninja.testing import TestClient
 
 from manage_breast_screening.core.api import api
 from manage_breast_screening.dicom.models import Study
+
+os.environ["NINJA_SKIP_REGISTRY"] = "yes"
 
 client = TestClient(api)
 
