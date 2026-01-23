@@ -6,13 +6,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from ninja.testing import TestClient
 
 from manage_breast_screening.core.api import api
+from manage_breast_screening.dicom.models import Study
 
 client = TestClient(api)
-
-
-@pytest.fixture
-def headers():
-    return {"X-Source-Message-ID": "source-123"}
 
 
 @pytest.fixture
@@ -44,13 +40,12 @@ def test_status_endpoint_api_disabled(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_upload_success(dataset, headers, dicom_file, monkeypatch):
+def test_upload_success(dataset, dicom_file, monkeypatch):
     monkeypatch.setenv("DICOM_API_ENABLED", "true")
 
     response = client.put(
-        "/dicom/upload",
+        "/dicom/abc123",
         FILES={"file": dicom_file},
-        headers=headers,
     )
 
     assert response.status_code == 201
@@ -60,35 +55,21 @@ def test_upload_success(dataset, headers, dicom_file, monkeypatch):
         "sop_instance_uid": dataset.SOPInstanceUID,
         "instance_id": 1,
     }
+    assert Study.objects.last().source_message_id == "abc123"
 
 
-def test_upload_missing_header(dicom_file, monkeypatch):
+def test_upload_no_file(monkeypatch):
     monkeypatch.setenv("DICOM_API_ENABLED", "true")
 
     response = client.put(
-        "/dicom/upload",
-        FILES={"file": dicom_file},
-    )
-
-    assert response.status_code == 400
-    assert response.json()["title"] == "Missing X-Source-Message-ID header"
-    assert response.json()["detail"] == "The X-Source-Message-ID header is required."
-    assert response.json()["status"] == 400
-
-
-def test_upload_no_file(headers, monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "true")
-
-    response = client.put(
-        "/dicom/upload",
+        "/dicom/abc123",
         FILES={"file": None},
-        headers=headers,
     )
 
     assert response.status_code == 422
 
 
-def test_upload_invalid_file(headers, monkeypatch):
+def test_upload_invalid_file(monkeypatch):
     monkeypatch.setenv("DICOM_API_ENABLED", "true")
 
     invalid_file = SimpleUploadedFile(
@@ -96,9 +77,8 @@ def test_upload_invalid_file(headers, monkeypatch):
     )
 
     response = client.put(
-        "/dicom/upload",
+        "/dicom/abc123",
         FILES={"file": invalid_file},
-        headers=headers,
     )
 
     assert response.status_code == 400
@@ -107,7 +87,7 @@ def test_upload_invalid_file(headers, monkeypatch):
     assert response.json()["detail"] == "The uploaded file is not a valid DICOM file."
 
 
-def test_upload_missing_uids(dataset, headers, monkeypatch):
+def test_upload_missing_uids(dataset, monkeypatch):
     monkeypatch.setenv("DICOM_API_ENABLED", "true")
 
     del dataset.StudyInstanceUID
@@ -122,9 +102,8 @@ def test_upload_missing_uids(dataset, headers, monkeypatch):
         )
 
     response = client.put(
-        "/dicom/upload",
+        "/dicom/abc123",
         FILES={"file": dicom_file},
-        headers=headers,
     )
 
     assert response.status_code == 400
@@ -137,13 +116,12 @@ def test_upload_missing_uids(dataset, headers, monkeypatch):
 
 
 @pytest.mark.django_db
-def test_upload_when_api_disabled(headers, dicom_file, monkeypatch):
+def test_upload_when_api_disabled(dicom_file, monkeypatch):
     monkeypatch.setenv("DICOM_API_ENABLED", "false")
 
     response = client.put(
-        "/dicom/upload",
+        "/dicom/abc123",
         FILES={"file": dicom_file},
-        headers=headers,
     )
 
     assert response.status_code == 403

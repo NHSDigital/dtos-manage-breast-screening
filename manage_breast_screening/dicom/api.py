@@ -53,7 +53,7 @@ def status(request):
 
 
 @router.put(
-    "/upload",
+    "/{source_message_id}",
     response={
         201: SuccessResponse,
         400: ErrorResponse,
@@ -61,18 +61,10 @@ def status(request):
         500: ErrorResponse,
     },
 )
-def upload(request, file: File[UploadedFile]):
+def upload(request, source_message_id: str, file: File[UploadedFile]):
     """
     Accepts PUT with a single DICOM file in form field 'file'
     """
-    source_message_id = request.META.get("HTTP_X_Source_Message_ID")
-    if not source_message_id:
-        return 400, {
-            "title": "Missing X-Source-Message-ID header",
-            "status": 400,
-            "detail": "The X-Source-Message-ID header is required.",
-        }
-
     dicom_file = request.FILES.get("file")
     if dicom_file is None:
         return 400, {
