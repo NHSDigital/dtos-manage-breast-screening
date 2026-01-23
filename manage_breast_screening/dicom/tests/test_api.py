@@ -71,7 +71,9 @@ def test_upload_missing_header(dicom_file, monkeypatch):
     )
 
     assert response.status_code == 400
-    assert response.json()["error"] == "Missing X-Source-Message-ID header"
+    assert response.json()["title"] == "Missing X-Source-Message-ID header"
+    assert response.json()["detail"] == "The X-Source-Message-ID header is required."
+    assert response.json()["status"] == 400
 
 
 def test_upload_no_file(headers, monkeypatch):
@@ -100,7 +102,9 @@ def test_upload_invalid_file(headers, monkeypatch):
     )
 
     assert response.status_code == 400
-    assert response.json()["error"] == "Invalid DICOM file"
+    assert response.json()["title"] == "Invalid DICOM file"
+    assert response.json()["status"] == 400
+    assert response.json()["detail"] == "The uploaded file is not a valid DICOM file."
 
 
 def test_upload_missing_uids(dataset, headers, monkeypatch):
@@ -124,7 +128,12 @@ def test_upload_missing_uids(dataset, headers, monkeypatch):
     )
 
     assert response.status_code == 400
-    assert response.json()["error"] == "Missing required DICOM UIDs"
+    assert response.json()["title"] == "Missing DICOM attributes"
+    assert response.json()["status"] == 400
+    assert (
+        response.json()["detail"]
+        == "The DICOM file is missing required UID attributes."
+    )
 
 
 @pytest.mark.django_db
