@@ -99,11 +99,12 @@ MIDDLEWARE = [
     "qsessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "manage_breast_screening.core.middleware.auth.ManageAuthenticationMiddleware",
     "manage_breast_screening.core.middleware.session_timeout.SessionTimeoutMiddleware",
     "manage_breast_screening.core.middleware.current_provider.CurrentProviderMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "ninja.compatibility.files.fix_request_files_middleware",
 ]
 
 # TODO: remove the check once we've implemented CIS2 auth. For now,
@@ -112,9 +113,15 @@ MIDDLEWARE = [
 if PERSONAS_ENABLED:
     # Enforce auth globally only in PERSONAS_ENABLED mode
     idx = (
-        MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware") + 1
+        MIDDLEWARE.index(
+            "manage_breast_screening.core.middleware.auth.ManageAuthenticationMiddleware"
+        )
+        + 1
     )
-    MIDDLEWARE.insert(idx, "django.contrib.auth.middleware.LoginRequiredMiddleware")
+    MIDDLEWARE.insert(
+        idx,
+        "manage_breast_screening.core.middleware.auth.ManageLoginRequiredMiddleware",
+    )
 
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]
@@ -189,12 +196,12 @@ DATABASES = {
 
 
 if environ.get("DJANGO_ENV", "production") != "production":
-    if environ.get("AZURE_STORAGE_CONNECTION_STRING"):
+    if environ.get("BLOB_STORAGE_CONNECTION_STRING"):
         # Use connection string if provided (e.g., in local development using Azurite)
         dicom_storage_options = {
             "BACKEND": "storages.backends.azure_storage.AzureStorage",
             "OPTIONS": {
-                "connection_string": environ.get("AZURE_STORAGE_CONNECTION_STRING"),
+                "connection_string": environ.get("BLOB_STORAGE_CONNECTION_STRING"),
                 "azure_container": "dicom",
             },
         }
@@ -352,3 +359,5 @@ BASIC_AUTH_ENABLED = boolean_env("BASIC_AUTH_ENABLED", default=False)
 BASIC_AUTH_USERNAME = environ.get("BASIC_AUTH_USERNAME")
 BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
 BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
+
+API_PATH_PREFIX = "/api/"

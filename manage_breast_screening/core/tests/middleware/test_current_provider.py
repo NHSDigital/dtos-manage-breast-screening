@@ -81,3 +81,15 @@ class TestCurrentProviderMiddleware:
         mw(request)
 
         assert request.user.current_provider is None
+
+    def test_skips_api_path_in_call(self):
+        request = RequestFactory().get("/api/test/")
+        request.session = {}
+        request.user = Mock(is_authenticated=True)
+
+        def view(_request):
+            return HttpResponse("OK")
+
+        mw = _make_middleware()
+
+        assert mw.process_view(request, view, (), {}) is None

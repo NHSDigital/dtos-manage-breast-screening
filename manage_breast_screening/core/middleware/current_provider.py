@@ -1,6 +1,7 @@
 import logging
 from typing import Callable, Optional
 
+from django.conf import settings
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -24,12 +25,17 @@ class CurrentProviderMiddleware:
         self.get_response = get_response
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
-        self._add_current_provider_property(request)
+        if not request.path.startswith(settings.API_PATH_PREFIX):
+            self._add_current_provider_property(request)
+
         return self.get_response(request)
 
     def process_view(
         self, request: HttpRequest, view_func, _view_args, _view_kwargs
     ) -> Optional[HttpResponse]:
+        if request.path.startswith(settings.API_PATH_PREFIX):
+            return None
+
         if not request.user.is_authenticated:
             return None
 
