@@ -27,7 +27,6 @@ from manage_breast_screening.participants.presenters import ParticipantPresenter
 
 from ..forms import (
     AppointmentCannotGoAheadForm,
-    AskForMedicalInformationForm,
     RecordMedicalInformationForm,
 )
 from ..presenters import (
@@ -38,7 +37,7 @@ from ..presenters import (
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
 from .mixins import AppointmentTabMixin, InProgressAppointmentMixin
 
-APPOINTMENT_CANNOT_PROCEED = "Appointment cannot proceed"
+MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME = "mammograms:record_medical_information"
 
 logger = logging.getLogger(__name__)
 
@@ -146,46 +145,7 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
             created_by=request.user,
         )
 
-        return redirect("mammograms:ask_for_medical_information", pk=pk)
-
-
-class AskForMedicalInformation(InProgressAppointmentMixin, FormView):
-    template_name = "mammograms/ask_for_medical_information.jinja"
-    form_class = AskForMedicalInformationForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        pk = self.kwargs["pk"]
-        provider = self.request.user.current_provider
-        participant = provider.participants.get(screeningepisode__appointment__pk=pk)
-
-        context.update(
-            {
-                "participant": participant,
-                "caption": participant.full_name,
-                "heading": "Medical information",
-                "page_title": "Medical information",
-                "cannot_continue_link": {
-                    "href": reverse(
-                        "mammograms:appointment_cannot_go_ahead",
-                        kwargs={"pk": pk},
-                    ),
-                    "text": APPOINTMENT_CANNOT_PROCEED,
-                },
-            }
-        )
-
-        return context
-
-    def form_valid(self, form):
-        form.save()
-
-        appointment = self.appointment
-
-        if form.cleaned_data["decision"] == "yes":
-            return redirect("mammograms:record_medical_information", pk=appointment.pk)
-        else:
-            return redirect("mammograms:awaiting_images", pk=appointment.pk)
+        return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
 
 
 class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
@@ -237,7 +197,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "Unable to complete all sections. Please try again.",
             )
             return redirect(
-                "mammograms:record_medical_information", pk=self.appointment.pk
+                MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
             )
 
 
@@ -329,13 +289,12 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
                 messages.WARNING,
                 f"This section has already been reviewed by {existing_review.reviewed_by.get_full_name()}",
             )
-            return redirect(
-                "mammograms:record_medical_information", pk=self.appointment.pk
+        else:
+            self.appointment.medical_information_reviews.create(
+                section=section,
+                reviewed_by=request.user,
             )
 
-        self.appointment.medical_information_reviews.create(
-            section=section,
-            reviewed_by=request.user,
+        return redirect(
+            MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
         )
-
-        return redirect("mammograms:record_medical_information", pk=self.appointment.pk)

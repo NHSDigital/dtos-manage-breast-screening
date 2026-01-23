@@ -1,7 +1,6 @@
 from .appointment_cannot_go_ahead_form import AppointmentCannotGoAheadForm
 from .appointment_note_form import AppointmentNoteForm
 from .appointment_proceed_anyway_form import AppointmentProceedAnywayForm
-from .ask_for_medical_information_form import AskForMedicalInformationForm
 from .medical_history.breast_augmentation_history_item_form import (
     BreastAugmentationHistoryItemForm,
 )
@@ -25,7 +24,6 @@ from .special_appointment_forms import (
 __all__ = [
     "AppointmentCannotGoAheadForm",
     "AppointmentProceedAnywayForm",
-    "AskForMedicalInformationForm",
     "AppointmentNoteForm",
     "BreastAugmentationHistoryItemForm",
     "CystHistoryItemForm",

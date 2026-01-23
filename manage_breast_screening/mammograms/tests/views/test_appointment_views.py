@@ -57,7 +57,7 @@ class TestConfirmIdentity:
         assertRedirects(
             response,
             reverse(
-                "mammograms:ask_for_medical_information",
+                "mammograms:record_medical_information",
                 kwargs={"pk": appointment.pk},
             ),
         )
@@ -81,60 +81,6 @@ class TestConfirmIdentity:
             .distinct(),
             [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
         )
-
-
-@pytest.mark.django_db
-class TestAskForMedicalInformation:
-    def test_continue_to_record(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        response = clinical_user_client.http.post(
-            reverse(
-                "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
-            ),
-            {"decision": "yes"},
-        )
-        assertRedirects(
-            response,
-            reverse(
-                "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
-            ),
-        )
-
-    def test_continue_to_imaging(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        response = clinical_user_client.http.post(
-            reverse(
-                "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
-            ),
-            {"decision": "no"},
-        )
-        assertRedirects(
-            response,
-            reverse(
-                "mammograms:awaiting_images",
-                kwargs={"pk": appointment.pk},
-            ),
-        )
-
-    def test_renders_invalid_form(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        response = clinical_user_client.http.post(
-            reverse(
-                "mammograms:ask_for_medical_information",
-                kwargs={"pk": appointment.pk},
-            ),
-            {},
-        )
-        assertContains(response, "There is a problem")
 
 
 @pytest.mark.django_db
