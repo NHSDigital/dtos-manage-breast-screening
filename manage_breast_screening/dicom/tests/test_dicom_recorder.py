@@ -14,13 +14,15 @@ class TestDicomRecorder:
         return "test-source-message-id"
 
     @pytest.mark.django_db
-    def test_create_records(self, source_message_id, dataset):
+    def test_get_or_create_records(self, source_message_id, dataset):
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
                 temp_file.name, dataset, write_like_original=False
             )
             with open(temp_file.name, "rb") as dicom_file:
-                records = DicomRecorder.create_records(source_message_id, dicom_file)
+                records = DicomRecorder.get_or_create_records(
+                    source_message_id, dicom_file
+                )
 
         assert records is not None
         study, series, image = records
@@ -39,20 +41,26 @@ class TestDicomRecorder:
         assert image.instance_number == dataset.InstanceNumber
 
     @pytest.mark.django_db
-    def test_create_records_duplicate(self, source_message_id, dataset):
+    def test_get_or_create_records_duplicate(self, source_message_id, dataset):
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
                 temp_file.name, dataset, write_like_original=False
             )
             with open(temp_file.name, "rb") as dicom_file:
-                DicomRecorder.create_records(source_message_id, dicom_file)
-
-            with open(temp_file.name, "rb") as dicom_file:
-                assert (
-                    DicomRecorder.create_records(source_message_id, dicom_file) is None
+                study, series, image = DicomRecorder.get_or_create_records(
+                    source_message_id, dicom_file
                 )
 
-    def test_create_records_invalid_dicom(self, source_message_id):
+            with open(temp_file.name, "rb") as dicom_file:
+                assert DicomRecorder.get_or_create_records(
+                    source_message_id, dicom_file
+                ) == (
+                    study,
+                    series,
+                    image,
+                )
+
+    def test_get_or_create_records_invalid_dicom(self, source_message_id):
         with tempfile.NamedTemporaryFile() as temp_file:
             invalid_ds = pydicom.Dataset()
             invalid_ds.transfer_syntax_uid = pydicom.uid.ExplicitVRLittleEndian
@@ -67,4 +75,4 @@ class TestDicomRecorder:
             )
             with open(temp_file.name, "rb") as dicom_file:
                 with pytest.raises(AttributeError):
-                    DicomRecorder.create_records(source_message_id, dicom_file)
+                    DicomRecorder.get_or_create_records(source_message_id, dicom_file)

@@ -7,9 +7,9 @@ from .models import Image, Series, Study
 
 class DicomRecorder:
     @staticmethod
-    def create_records(
+    def get_or_create_records(
         source_message_id: str, dicom_file: bytes
-    ) -> tuple[Study, Series, Image] | None:
+    ) -> tuple[Study, Series, Image]:
         ds = pydicom.dcmread(dicom_file)
         study_uid = ds.StudyInstanceUID
         series_uid = ds.SeriesInstanceUID
@@ -44,7 +44,7 @@ class DicomRecorder:
         if created:
             image.dicom_file.save(f"{sop_uid}.dcm", dicom_file)
 
-            return study, series, image
+        return study, series, image
 
     @staticmethod
     def study_date_and_time(ds) -> datetime | None:
