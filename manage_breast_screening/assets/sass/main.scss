@@ -128,3 +128,11 @@ a[href="#"] {
   @include nhsuk-typography-weight-bold($important: true);
   opacity: 0.9;
 }
+
+.app-js-only {
+  display: none;
+}
+
+body.js-enabled .app-js-only {
+  display: block;
+}
