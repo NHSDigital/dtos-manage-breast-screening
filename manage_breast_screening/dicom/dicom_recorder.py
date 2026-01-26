@@ -1,6 +1,8 @@
+import io
 from datetime import datetime
 
 import pydicom
+from PIL import Image as PILImage
 
 from .models import Image, Series, Study
 
@@ -43,6 +45,10 @@ class DicomRecorder:
         )
         if created:
             image.dicom_file.save(f"{sop_uid}.dcm", dicom_file)
+            image.image_file.save(
+                f"{sop_uid}.jpeg",
+                io.BytesIO(PILImage.fromarray(ds.pixel_array).tobytes()),
+            )
 
         return study, series, image
 

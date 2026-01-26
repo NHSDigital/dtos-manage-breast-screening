@@ -61,6 +61,7 @@ class Image(models.Model):
     series = models.ForeignKey(Series, on_delete=models.CASCADE, related_name="images")
     instance_number = models.IntegerField(null=True, blank=True)
     dicom_file = models.FileField(storage=dicom_storage)
+    image_file = models.FileField(storage=dicom_storage, null=True, blank=True)
 
     def __str__(self):
         return self.sop_instance_uid

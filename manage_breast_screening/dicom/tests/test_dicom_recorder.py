@@ -40,6 +40,14 @@ class TestDicomRecorder:
         assert series.series_number == dataset.SeriesNumber
         assert image.instance_number == dataset.InstanceNumber
 
+        assert image.dicom_file.name.endswith(f"{dataset.SOPInstanceUID}.dcm")
+        assert image.dicom_file.size > 0
+        assert image.dicom_file.storage.exists(image.dicom_file.name)
+
+        assert image.image_file.name.endswith(f"{dataset.SOPInstanceUID}.jpeg")
+        assert image.image_file.size > 0
+        assert image.image_file.storage.exists(image.image_file.name)
+
     @pytest.mark.django_db
     def test_get_or_create_records_duplicate(self, source_message_id, dataset):
         with tempfile.NamedTemporaryFile() as temp_file:
