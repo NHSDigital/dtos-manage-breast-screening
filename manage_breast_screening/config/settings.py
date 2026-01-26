@@ -215,8 +215,10 @@ else:
     dicom_storage_options = {
         "BACKEND": "storages.backends.azure_storage.AzureStorage",
         "OPTIONS": {
-            "token_credential": DefaultAzureCredential(),
-            "account_name": environ.get("AZURE_STORAGE_ACCOUNT_NAME"),
+            "token_credential": DefaultAzureCredential(
+                managed_identity_client_id=environ.get("BLOB_MI_CLIENT_ID")
+            ),
+            "account_name": environ.get("STORAGE_ACCOUNT_NAME"),
             "azure_container": "dicom",
         },
     }
