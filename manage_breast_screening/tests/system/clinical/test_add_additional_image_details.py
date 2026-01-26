@@ -13,8 +13,51 @@ class TestAddAdditionalImageDetails(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_for_my_provider()
         self.and_i_am_on_the_add_additional_image_details_page()
+        self.then_images_taken_count_is(0)
+        self.and_repeat_images_message_is_hidden()
 
-        self.when_i_enter_the_number_of_images_taken()
+        self.when_i_enter_the_number_of_images_taken("RMLO", 2)
+        self.then_images_taken_count_is(2)
+        self.and_repeat_images_message_is_visible()
+        self.when_i_enter_the_number_of_images_taken("RMLO", 1)
+        self.then_images_taken_count_is(1)
+        self.and_repeat_images_message_is_hidden()
+
+        self.when_i_enter_the_number_of_images_taken("RCC", 20)
+        self.then_images_taken_count_is(21)
+        self.and_repeat_images_message_is_visible()
+        self.when_i_enter_the_number_of_images_taken("RCC", 1)
+        self.then_images_taken_count_is(2)
+        self.and_repeat_images_message_is_hidden()
+
+        self.when_i_enter_the_number_of_images_taken("Right Eklund", 7)
+        self.then_images_taken_count_is(9)
+        self.and_repeat_images_message_is_visible()
+        self.when_i_enter_the_number_of_images_taken("Right Eklund", 0)
+        self.then_images_taken_count_is(2)
+        self.and_repeat_images_message_is_hidden()
+
+        self.when_i_enter_the_number_of_images_taken("LMLO", 5)
+        self.then_images_taken_count_is(7)
+        self.and_repeat_images_message_is_visible()
+        self.when_i_enter_the_number_of_images_taken("LMLO", 1)
+        self.then_images_taken_count_is(3)
+        self.and_repeat_images_message_is_hidden()
+
+        self.when_i_enter_the_number_of_images_taken("LCC", 2)
+        self.then_images_taken_count_is(5)
+        self.and_repeat_images_message_is_visible()
+        self.when_i_enter_the_number_of_images_taken("LCC", 1)
+        self.then_images_taken_count_is(4)
+        self.and_repeat_images_message_is_hidden()
+
+        self.when_i_enter_the_number_of_images_taken("Left Eklund", 19)
+        self.then_images_taken_count_is(23)
+        self.and_repeat_images_message_is_visible()
+        self.when_i_enter_the_number_of_images_taken("Left Eklund", 0)
+        self.then_images_taken_count_is(4)
+        self.and_repeat_images_message_is_hidden()
+
         self.and_i_click_on_continue()
         self.then_i_should_be_on_the_check_information_page()
         self.and_the_message_says_image_details_added()
@@ -42,13 +85,25 @@ class TestAddAdditionalImageDetails(SystemTestCase):
             "mammograms:add_additional_image_details", pk=self.appointment.pk
         )
 
-    def when_i_enter_the_number_of_images_taken(self):
-        self.page.get_by_label("RMLO").fill("1")
-        self.page.get_by_label("RCC").fill("0")
-        self.page.get_by_label("Right Eklund").fill("0")
-        self.page.get_by_label("LMLO").fill("0")
-        self.page.get_by_label("LCC").fill("0")
-        self.page.get_by_label("Left Eklund").fill("0")
+    def when_i_enter_the_number_of_images_taken(self, image_type, count):
+        self.page.get_by_label(image_type).fill(str(count))
+
+    def then_images_taken_count_is(self, expected_count):
+        expect(self.page.get_by_text(f"Images taken: {expected_count}")).to_be_visible()
+
+    def and_repeat_images_message_is_hidden(self):
+        expect(
+            self.page.get_by_text(
+                "Repeat or extra image details captured on the next screen"
+            )
+        ).to_be_hidden()
+
+    def and_repeat_images_message_is_visible(self):
+        expect(
+            self.page.get_by_text(
+                "Repeat or extra image details captured on the next screen"
+            )
+        ).to_be_visible()
 
     def and_i_click_on_continue(self):
         self.page.get_by_text("Continue").click()
