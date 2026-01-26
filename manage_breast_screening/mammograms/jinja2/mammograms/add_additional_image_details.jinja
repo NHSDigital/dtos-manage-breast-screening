@@ -1,0 +1,48 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+  <h2>How many images were taken?</h2>
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% call fieldset({
+        "legend": {
+          "text": "<span class=\"nhsuk-u-visually-hidden\">How many images were taken for the </span>Right breast",
+          "classes": "nhsuk-fieldset__legend--s"
+        }
+      }) %}
+          {{ form.rmlo_count.as_field_group() }}
+          {{ form.rcc_count.as_field_group() }}
+          {{ form.right_eklund_count.as_field_group() }}
+      {% endcall %}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {% call fieldset({
+        "legend": {
+          "text": "<span class=\"nhsuk-u-visually-hidden\">How many images were taken for the </span>Left breast",
+          "classes": "nhsuk-fieldset__legend--s"
+        }
+      }) %}
+          {{ form.lmlo_count.as_field_group() }}
+          {{ form.lcc_count.as_field_group() }}
+          {{ form.left_eklund_count.as_field_group() }}
+      {% endcall %}
+    </div>
+  </div>
+
+  {% call fieldset({
+    "legend": {
+      "text": "Additional details",
+      "classes": "nhsuk-fieldset__legend--m"
+    }
+  }) %}
+    {{ form.additional_details.as_field_group() }}
+  {% endcall %}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Continue"
+    }) }}
+  </div>
+{% endblock %}
