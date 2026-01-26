@@ -58,11 +58,6 @@ urlpatterns = [
         name="confirm_identity",
     ),
     path(
-        "<uuid:pk>/ask-for-medical-information/",
-        appointment_views.AskForMedicalInformation.as_view(),
-        name="ask_for_medical_information",
-    ),
-    path(
         "<uuid:pk>/record-medical-information/",
         appointment_views.RecordMedicalInformation.as_view(),
         name="record_medical_information",
