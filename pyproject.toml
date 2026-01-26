@@ -35,6 +35,7 @@ dependencies = [
   "django-storages[azure]>=1.14.6",
   "django-ninja>=1.5.3",
   "ninja-put-patch-file-upload-middleware>=0.1.4",
+  "pillow>=12.1.0",
 ]
 
 [dependency-groups]
