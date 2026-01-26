@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from manage_breast_screening.mammograms.views import mammogram_views
 
 from .views import (
+    add_additional_image_details_view,
     appointment_note_views,
     appointment_views,
     participant_reported_mammogram_views,
@@ -298,5 +299,10 @@ urlpatterns = [
         "<uuid:pk>/complete-screening/",
         mammogram_views.complete_screening,
         name="complete_screening",
+    ),
+    path(
+        "<uuid:pk>/add-additional-image-details/",
+        add_additional_image_details_view.AddAdditionalImageDetailsView.as_view(),
+        name="add_additional_image_details",
     ),
 ]
