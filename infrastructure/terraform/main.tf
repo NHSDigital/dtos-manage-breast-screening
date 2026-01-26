@@ -81,4 +81,5 @@ module "container-apps" {
   resource_group_name_infra             = local.resource_group_name
   enable_notifications_jobs_schedule    = var.enable_notifications_jobs_schedule
   min_replicas                          = var.min_replicas
+  relay_namespace_name                  = var.deploy_infra ? module.infra[0].relay_namespace_name : null
 }
