@@ -31,6 +31,15 @@
     </div>
   </div>
 
+  <p class="_nhsuk-u-font-weight-bold app-js-only app-text-grey nhsuk-u-margin-bottom-4 nhsuk-u-font-size-22" id="total-images-count">
+    Images taken: <span data-total-count>4</span>
+  </p>
+
+  <div class="nhsuk-inset-text" id="repeat-images-inset" data-module="repeat-images-notice" style="display: none;">
+    <span class="nhsuk-u-visually-hidden">Information: </span>
+    <p>Repeat or extra image details captured on the next screen</p>  
+  </div>
+
   {% call fieldset({
     "legend": {
       "text": "Additional details",
@@ -45,4 +54,87 @@
       "text": "Continue"
     }) }}
   </div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const insetText = document.querySelector('[data-module="repeat-images-notice"]')
+      const totalCountElement = document.querySelector('[data-total-count]')
+
+      // Function to get all currently visible count inputs
+      const getCountInputs = () => {
+        return [
+          document.getElementById('id_rmlo_count'),
+          document.getElementById('id_rcc_count'),
+          document.getElementById('id_right_eklund_count'),
+          document.getElementById('id_lmlo_count'),
+          document.getElementById('id_lcc_count'),
+          document.getElementById('id_left_eklund_count')
+        ].filter(Boolean) // Remove any null values
+      }
+
+      // Function to calculate total image count
+      const getTotalCount = () => {
+        const inputs = getCountInputs()
+        return inputs.reduce((total, input) => {
+          const value = parseInt(input.value, 10)
+          return total + (isNaN(value) ? 0 : value)
+        }, 0)
+      }
+
+      // Function to check if any count is greater than 1
+      const hasRepeats = () => {
+        const inputs = getCountInputs()
+        return inputs.some(input => {
+          const value = parseInt(input.value, 10)
+          return !isNaN(value) && value > 1
+        })
+      }
+
+      // Function to update total count display
+      const updateTotalCount = () => {
+        if (totalCountElement) {
+          const total = getTotalCount()
+          totalCountElement.textContent = total
+        }
+      }
+
+      // Function to update visibility
+      const updateVisibility = () => {
+        if (hasRepeats()) {
+          insetText.style.display = ''
+        } else {
+          insetText.style.display = 'none'
+        }
+      }
+
+      // Function to update everything
+      const updateAll = () => {
+        updateTotalCount()
+        updateVisibility()
+      }
+
+      // Set initial state after a short delay to allow conditional reveals to initialize
+      setTimeout(updateAll, 100)
+
+      // Add event listeners using delegation on the form
+      document.addEventListener('input', (event) => {
+        const target = event.target
+        if (target.id && target.id.endsWith('_count')) {
+          updateAll()
+        }
+      })
+
+      document.addEventListener('change', (event) => {
+        const target = event.target
+        // Handle count input changes
+        if (target.id && target.id.endsWith('_count')) {
+          updateAll()
+        }
+      })
+    })
+  </script>
 {% endblock %}
