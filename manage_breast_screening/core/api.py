@@ -2,6 +2,7 @@ import os
 from functools import wraps
 
 from ninja import NinjaAPI
+from ninja.security import HttpBearer
 
 from manage_breast_screening.dicom.api import router as dicom_router
 
@@ -21,7 +22,13 @@ def check_availability():
     return decorator
 
 
-api = NinjaAPI(title="Manage Breast Screening API", version="1.0.0")
+class GlobalAuth(HttpBearer):
+    def authenticate(self, request, token):
+        if token == os.getenv("API_AUTH_TOKEN", ""):
+            return token
+
+
+api = NinjaAPI(auth=GlobalAuth(), title="Manage Breast Screening API", version="1.0.0")
 api.add_router("/dicom/", dicom_router, tags=["DICOM"])
 api.add_decorator(check_availability())
 dicom_router.add_decorator(check_availability())

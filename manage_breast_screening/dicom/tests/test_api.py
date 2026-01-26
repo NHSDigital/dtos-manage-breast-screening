@@ -27,10 +27,12 @@ def dicom_file(dataset) -> bytes:
 @pytest.mark.django_db
 def test_upload_success(dataset, dicom_file, monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
     response = client.put(
         "/dicom/abc123",
         FILES={"file": dicom_file},
+        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
     )
 
     assert response.status_code == 201
@@ -45,10 +47,12 @@ def test_upload_success(dataset, dicom_file, monkeypatch):
 
 def test_upload_no_file(monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
     response = client.put(
         "/dicom/abc123",
         FILES={"file": None},
+        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
     )
 
     assert response.status_code == 422
@@ -56,6 +60,7 @@ def test_upload_no_file(monkeypatch):
 
 def test_upload_invalid_file(monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
     invalid_file = SimpleUploadedFile(
         "invalid.dcm", b"not a dicom file", content_type="application/dicom"
@@ -64,6 +69,7 @@ def test_upload_invalid_file(monkeypatch):
     response = client.put(
         "/dicom/abc123",
         FILES={"file": invalid_file},
+        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
     )
 
     assert response.status_code == 400
@@ -74,6 +80,7 @@ def test_upload_invalid_file(monkeypatch):
 
 def test_upload_missing_uids(dataset, monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
     del dataset.StudyInstanceUID
     del dataset.SeriesInstanceUID
@@ -89,6 +96,7 @@ def test_upload_missing_uids(dataset, monkeypatch):
     response = client.put(
         "/dicom/abc123",
         FILES={"file": dicom_file},
+        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
     )
 
     assert response.status_code == 400
@@ -103,11 +111,26 @@ def test_upload_missing_uids(dataset, monkeypatch):
 @pytest.mark.django_db
 def test_upload_when_api_disabled(dicom_file, monkeypatch):
     monkeypatch.setenv("API_ENABLED", "false")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
+    response = client.put(
+        "/dicom/abc123",
+        FILES={"file": dicom_file},
+        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
+    )
+
+    assert response.status_code == 403
+    assert response.json()["status"] == "API is not available"
+
+
+@pytest.mark.django_db
+def test_upload_no_auth(dicom_file):
     response = client.put(
         "/dicom/abc123",
         FILES={"file": dicom_file},
     )
 
-    assert response.status_code == 403
-    assert response.json()["status"] == "API is not available"
+    assert response.status_code == 401
+    assert response.json() == {
+        "detail": "Unauthorized",
+    }

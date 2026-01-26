@@ -9,7 +9,7 @@ from manage_breast_screening.core.api_schema import ErrorResponse, StatusRespons
 
 from .dicom_recorder import DicomRecorder
 
-router = Router(auth=None)
+router = Router()
 
 
 class SuccessResponse(ninja.Schema):
