@@ -3,6 +3,7 @@ from unittest import TestCase
 
 import pytest
 from django.test.client import Client
+from django.utils import timezone
 
 from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
@@ -12,6 +13,14 @@ from manage_breast_screening.users.tests.factories import UserFactory
 
 # Show long diffs in failed test output
 TestCase.maxDiff = None
+
+
+def force_mbs_login(client, user):
+    """Log in a user and set login_time to satisfy SessionTimeoutMiddleware."""
+    client.force_login(user)
+    session = client.session
+    session["login_time"] = timezone.now().isoformat()
+    session.save()
 
 
 @pytest.fixture
@@ -47,7 +56,7 @@ def clinical_user(current_provider):
 @pytest.fixture
 def clinical_user_client(clinical_user, current_provider):
     client = Client()
-    client.force_login(clinical_user)
+    force_mbs_login(client, clinical_user)
     session = client.session
     session["current_provider"] = str(current_provider.pk)
     session.save()
@@ -59,7 +68,7 @@ def clinical_user_client(clinical_user, current_provider):
 @pytest.fixture
 def administrative_user_client(administrative_user, current_provider):
     client = Client()
-    client.force_login(administrative_user)
+    force_mbs_login(client, administrative_user)
     session = client.session
     session["current_provider"] = str(current_provider.pk)
     session.save()

@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.client import Client
 from django.urls import reverse
+from django.utils import timezone
 from playwright.sync_api import expect, sync_playwright
 
 from manage_breast_screening.auth.models import Role
@@ -53,11 +54,14 @@ class SystemTestCase(StaticLiveServerTestCase):
         client = Client()
         client.force_login(user)
 
+        session = client.session
+        session["login_time"] = timezone.now().isoformat()
+
         assignment = user.assignments.first()
         if assignment:
-            session = client.session
             session["current_provider"] = str(assignment.provider_id)
-            session.save()
+
+        session.save()
 
         # Transfer the session cookie to the playwright browser
         sessionid = client.cookies["sessionid"].value

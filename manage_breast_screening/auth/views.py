@@ -13,6 +13,7 @@ from django.http import (
 )
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
@@ -92,6 +93,11 @@ def cis2_callback(request):
         )
 
     auth_login(request, user)
+
+    # Initialize session timeout tracking
+    now = timezone.now()
+    request.session["login_time"] = now.isoformat()
+    request.session["last_activity"] = now.isoformat()
 
     return redirect(reverse("clinics:select_provider"))
 

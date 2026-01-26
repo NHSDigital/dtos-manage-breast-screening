@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
 from playwright.sync_api import expect
+from qsessions.backends.db import SessionStore
 
 from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
@@ -52,12 +53,19 @@ class TestLogin(SystemTestCase):
         self.then_header_shows_log_out()
         self.then_i_see_no_providers_message()
 
-    def test_session_expires_after_one_hour(self):
+    def test_session_expires_after_max_session_time(self):
         self.given_i_am_on_the_home_page()
         self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_home()
         self.then_header_shows_log_out()
         self.and_i_am_logged_out_when_the_max_session_time_has_passed_even_if_i_have_been_active()
+
+    def test_session_expires_after_inactivity_timeout_reached(self):
+        self.given_i_am_on_the_home_page()
+        self.when_i_log_in_via_cis2()
+        self.then_i_am_redirected_to_home()
+        self.then_header_shows_log_out()
+        self.and_i_am_logged_out_after_inactivity_timeout()
 
     def given_a_user_with_no_providers(self):
         self.user = UserFactory(nhs_uid="cis2-user-1")
@@ -113,20 +121,47 @@ class TestLogin(SystemTestCase):
     def then_i_see_no_providers_message(self):
         expect(self.page.get_by_text("Your account is not recognised")).to_be_visible()
 
+    def then_i_am_on_the_login_page(self):
+        expect(self.page).to_have_url(re.compile(reverse("auth:login")))
+
     def and_i_am_logged_out_when_the_max_session_time_has_passed_even_if_i_have_been_active(
         self,
     ):
         User = get_user_model()
         user = User.objects.get(nhs_uid="cis2-user-1")
-        assert user.session_set.filter(expire_date__gt=timezone.now()).count() == 1
-        plus_six_hours = timezone.now() + timedelta(seconds=21600)
-        plus_twelve_hours = timezone.now() + timedelta(seconds=43200)
+        session = user.session_set.filter(expire_date__gt=timezone.now()).first()
+        assert session is not None
+
+        plus_six_hours = timezone.now() + timedelta(hours=6)
+        plus_twelve_hours = timezone.now() + timedelta(hours=12)
+
+        # Simulate activity at +6 hours to avoid inactivity timeout
+        self._update_session_activity(session, plus_six_hours)
         with time_machine.travel(plus_six_hours, tick=False):
             self.page.reload()
             self.then_header_shows_log_out()
+
+        # Simulate activity just before +12 hours
+        self._update_session_activity(session, plus_twelve_hours - timedelta(minutes=1))
         with time_machine.travel(plus_twelve_hours, tick=False):
             self.page.reload()
-            self.then_header_shows_log_in()
+            self.then_i_am_on_the_login_page()
+
+    def _update_session_activity(self, session, activity_time):
+        store = SessionStore(session_key=session.session_key)
+        store["last_activity"] = activity_time.isoformat()
+        store.save()
+
+    def and_i_am_logged_out_after_inactivity_timeout(self):
+        before_timeout = timezone.now() + timedelta(minutes=14)
+        with time_machine.travel(before_timeout, tick=False):
+            self.page.reload()
+            self.then_header_shows_log_out()  # Not logged out
+            # Account for the 15-minute inactivity timeout plus the 1 minute update threshold
+            after_timeout = timezone.now() + timedelta(minutes=16)
+            with time_machine.travel(after_timeout, tick=False):
+                self.page.reload()
+                self.then_i_am_on_the_login_page()
 
     @pytest.fixture(autouse=True)
     def setup_oauth_stub(self, settings, monkeypatch):

@@ -1,6 +1,7 @@
 import pytest
 from django.urls import reverse
 
+from manage_breast_screening.conftest import force_mbs_login
 from manage_breast_screening.users.tests.factories import UserFactory
 
 from .factories import ProviderFactory, UserAssignmentFactory
@@ -13,7 +14,7 @@ class TestSelectProvider:
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider, clinical=True)
 
-        client.force_login(user)
+        force_mbs_login(client, user)
 
         response = client.get(
             reverse("clinics:select_provider"), {"next": "/clinics/some-target/"}
@@ -31,7 +32,7 @@ class TestSelectProvider:
         UserAssignmentFactory(user=user, provider=provider1, clinical=True)
         UserAssignmentFactory(user=user, provider=provider2, clinical=True)
 
-        client.force_login(user)
+        force_mbs_login(client, user)
 
         response = client.post(
             reverse("clinics:select_provider"),
@@ -48,7 +49,7 @@ class TestSelectProvider:
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider, clinical=True)
 
-        client.force_login(user)
+        force_mbs_login(client, user)
 
         response = client.post(
             reverse("clinics:select_provider"),
@@ -64,7 +65,7 @@ class TestSelectProvider:
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider)
 
-        client.force_login(user)
+        force_mbs_login(client, user)
 
         response = client.get(reverse("clinics:select_provider"))
 

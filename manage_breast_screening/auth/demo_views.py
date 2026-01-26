@@ -6,6 +6,7 @@ from django.db.models import Case, Q, When
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from manage_breast_screening.core.utils.urls import extract_next_path_from_params
@@ -27,6 +28,9 @@ def persona_login(request):
         login(
             request, user, backend="manage_breast_screening.auth.backends.CIS2Backend"
         )
+
+        now = timezone.now()
+        request.session["login_time"] = now.isoformat()
 
         redirect_url = reverse("clinics:select_provider")
         if next_path:
