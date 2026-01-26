@@ -1,5 +1,3 @@
-import os
-from functools import wraps
 from typing import Any
 
 import ninja
@@ -7,17 +5,11 @@ import pydicom
 from ninja import File, Router
 from ninja.files import UploadedFile
 
+from manage_breast_screening.core.api_schema import ErrorResponse, StatusResponse
+
 from .dicom_recorder import DicomRecorder
 
 router = Router(auth=None)
-
-
-class ErrorResponse(ninja.Schema):
-    type: str = "about:blank"
-    title: str
-    status: int
-    detail: str
-    instance: str | None = None
 
 
 class SuccessResponse(ninja.Schema):
@@ -25,31 +17,6 @@ class SuccessResponse(ninja.Schema):
     series_instance_uid: str
     sop_instance_uid: str
     instance_id: Any
-
-
-class StatusResponse(ninja.Schema):
-    status: str
-
-
-def check_availability():
-    def decorator(func):
-        @wraps(func)
-        def wrapper(request, *args, **kwargs):
-            if not os.getenv("DICOM_API_ENABLED", "true").lower() == "true":
-                return 403, {"status": "DICOM API is not available"}
-            return func(request, *args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-router.add_decorator(check_availability())
-
-
-@router.get("/status", response={200: StatusResponse, 403: StatusResponse})
-def status(request):
-    return 200, {"status": "DICOM API is available"}
 
 
 @router.put(

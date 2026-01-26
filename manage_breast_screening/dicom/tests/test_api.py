@@ -24,27 +24,9 @@ def dicom_file(dataset) -> bytes:
         )
 
 
-def test_status_endpoint(monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "true")
-
-    response = client.get("/dicom/status")
-
-    assert response.status_code == 200
-    assert response.json() == {"status": "DICOM API is available"}
-
-
-def test_status_endpoint_api_disabled(monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "false")
-
-    response = client.get("/dicom/status")
-
-    assert response.status_code == 403
-    assert response.json() == {"status": "DICOM API is not available"}
-
-
 @pytest.mark.django_db
 def test_upload_success(dataset, dicom_file, monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "true")
+    monkeypatch.setenv("API_ENABLED", "true")
 
     response = client.put(
         "/dicom/abc123",
@@ -62,7 +44,7 @@ def test_upload_success(dataset, dicom_file, monkeypatch):
 
 
 def test_upload_no_file(monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "true")
+    monkeypatch.setenv("API_ENABLED", "true")
 
     response = client.put(
         "/dicom/abc123",
@@ -73,7 +55,7 @@ def test_upload_no_file(monkeypatch):
 
 
 def test_upload_invalid_file(monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "true")
+    monkeypatch.setenv("API_ENABLED", "true")
 
     invalid_file = SimpleUploadedFile(
         "invalid.dcm", b"not a dicom file", content_type="application/dicom"
@@ -91,7 +73,7 @@ def test_upload_invalid_file(monkeypatch):
 
 
 def test_upload_missing_uids(dataset, monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "true")
+    monkeypatch.setenv("API_ENABLED", "true")
 
     del dataset.StudyInstanceUID
     del dataset.SeriesInstanceUID
@@ -120,7 +102,7 @@ def test_upload_missing_uids(dataset, monkeypatch):
 
 @pytest.mark.django_db
 def test_upload_when_api_disabled(dicom_file, monkeypatch):
-    monkeypatch.setenv("DICOM_API_ENABLED", "false")
+    monkeypatch.setenv("API_ENABLED", "false")
 
     response = client.put(
         "/dicom/abc123",
@@ -128,4 +110,4 @@ def test_upload_when_api_disabled(dicom_file, monkeypatch):
     )
 
     assert response.status_code == 403
-    assert response.json()["status"] == "DICOM API is not available"
+    assert response.json()["status"] == "API is not available"

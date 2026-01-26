@@ -34,6 +34,9 @@ BASIC_AUTH_ENABLED=False
 BASIC_AUTH_USERNAME=changeme
 BASIC_AUTH_PASSWORD=changeme
 
+# Django Ninja API
+API_ENABLED=True
+
 # Notifications specific env vars
 API_OAUTH_API_KEY=""
 API_OAUTH_API_KID=""
