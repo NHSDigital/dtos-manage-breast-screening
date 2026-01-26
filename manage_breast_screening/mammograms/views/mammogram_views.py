@@ -187,10 +187,12 @@ def check_information(request, pk):
     provider = request.user.current_provider
     try:
         appointment = provider.appointments.select_related(
+            "clinic_slot__clinic",
             "screening_episode__participant",
+            "screening_episode__participant__address",
         ).get(pk=pk)
     except Appointment.DoesNotExist:
-        raise Http404(APPOINTMENT_NOT_FOUND)
+        raise Http404("Appointment not found")
 
     return render(
         request,
