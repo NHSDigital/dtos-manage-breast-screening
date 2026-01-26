@@ -3,6 +3,7 @@ from django.urls import path
 from manage_breast_screening.mammograms.views import mammogram_views
 
 from .views import (
+    add_additional_image_details_view,
     appointment_note_views,
     appointment_views,
     participant_reported_mammogram_views,
@@ -286,5 +287,10 @@ urlpatterns = [
         "<uuid:pk>/check-information/",
         mammogram_views.check_information,
         name="check_information",
+    ),
+    path(
+        "<uuid:pk>/add-additional-image-details/",
+        add_additional_image_details_view.AddAdditionalImageDetailsView.as_view(),
+        name="add_additional_image_details",
     ),
 ]

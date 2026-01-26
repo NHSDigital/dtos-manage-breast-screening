@@ -9,8 +9,8 @@
           {% set ns.errors = ns.errors + [{"text": field.errors[0], "href": "#" ~ field.auto_id}] %}
         {% endif %}
       {% endfor %}
-      {% for error_list in form.non_field_errors() %}
-        {% set ns.errors = ns.errors + [{"text": ",".join(error_list)}] %}
+      {% for error in form.non_field_errors() %}
+        {% set ns.errors = ns.errors + [{"text": error}] %}
       {% endfor %}
 
       {{ errorSummary({
