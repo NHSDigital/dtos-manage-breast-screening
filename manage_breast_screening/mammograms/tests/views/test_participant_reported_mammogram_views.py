@@ -4,15 +4,22 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.urls import reverse
-from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
+from pytest_django.asserts import (
+    assertInHTML,
+    assertMessages,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
 from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    ParticipantFactory,
     ParticipantReportedMammogramFactory,
 )
 
@@ -471,3 +478,70 @@ class TestAppointmentProceedAnywayView:
             ),
         )
         assert_success_message(response, "Updated a previous mammogram")
+
+
+@pytest.mark.django_db
+class TestCompleteScreening:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:check_information",
+                kwargs={
+                    "pk": appointment.pk,
+                },
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_transition(self, clinical_user_client):
+        participant = ParticipantFactory.create(
+            first_name="<b>J</b>ane", last_name="S<i>m</>i&th"
+        )
+        appointment = AppointmentFactory.create(
+            screening_episode__participant=participant,
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:complete_screening",
+                kwargs={
+                    "pk": appointment.pk,
+                },
+            ),
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "clinics:show",
+                kwargs={"pk": appointment.clinic_slot.clinic.pk},
+            ),
+        )
+        view_appointment_url = reverse(
+            "mammograms:show_appointment",
+            kwargs={
+                "pk": appointment.pk,
+            },
+        )
+        assert_success_message(
+            response,
+            f"""
+            <p class=\"nhsuk-notification-banner__heading\">
+                &lt;b&gt;J&lt;/b&gt;ane S&lt;i&gt;m&lt;/&gt;i&amp;th has been screened.
+                <a href=\"{view_appointment_url}\" class=\"app-u-nowrap\">
+                    View their appointment
+                </a>
+            </p>
+            """,
+        )
+
+        assert appointment.current_status.name == AppointmentStatusNames.SCREENED
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(
+                created_by=clinical_user_client.user
+            )
+            .values_list("step_name", flat=True)
+            .distinct(),
+            [AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION],
+        )

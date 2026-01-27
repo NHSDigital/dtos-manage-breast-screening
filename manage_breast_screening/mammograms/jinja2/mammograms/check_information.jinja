@@ -3,5 +3,15 @@
 {% set active_workflow_step = 'CHECK_INFORMATION' %}
 
 {% block step_content %}
+  <p>Before concluding this appointment, confirm that the information recorded is correct.</p>
+{% endblock %}
 
+{% block wizard_form %}
+  <form action="{{ url('mammograms:complete_screening', kwargs={'pk': presented_appointment.pk}) }}" method="post" novalidate>
+    {{ csrf_input }}
+    {{ button({
+      "text": "Complete screening and return to clinic",
+      "classes": "nhsuk-u-margin-bottom-4"
+    }) }}
+  </form>
 {% endblock %}
