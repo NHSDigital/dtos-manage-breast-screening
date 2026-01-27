@@ -9,16 +9,16 @@ from manage_breast_screening.mammograms.views.mixins import (
     InProgressAppointmentMixin,
 )
 
-from ..forms.add_additional_image_details_form import (
-    AddAdditionalImageDetailsForm,
+from ..forms.add_image_details_form import (
+    AddImageDetailsForm,
 )
 
 logger = logging.getLogger(__name__)
 
 
-class AddAdditionalImageDetailsView(InProgressAppointmentMixin, AddWithAuditView):
-    form_class = AddAdditionalImageDetailsForm
-    template_name = "mammograms/add_additional_image_details.jinja"
+class AddImageDetailsView(InProgressAppointmentMixin, AddWithAuditView):
+    form_class = AddImageDetailsForm
+    template_name = "mammograms/add_image_details.jinja"
     thing_name = "image details"
 
     def add_title(self, thing_name):

@@ -9,14 +9,14 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 @pytest.mark.django_db
-class TestAddAdditionalImageDetailsView:
+class TestAddImageDetailsView:
     def test_renders_response(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:add_additional_image_details",
+                "mammograms:add_image_details",
                 kwargs={"pk": appointment.pk},
             )
         )
@@ -28,7 +28,7 @@ class TestAddAdditionalImageDetailsView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_additional_image_details",
+                "mammograms:add_image_details",
                 kwargs={"pk": appointment.pk},
             ),
             {
@@ -64,7 +64,7 @@ class TestAddAdditionalImageDetailsView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_additional_image_details",
+                "mammograms:add_image_details",
                 kwargs={"pk": appointment.pk},
             ),
             {
@@ -100,7 +100,7 @@ class TestAddAdditionalImageDetailsView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_additional_image_details",
+                "mammograms:add_image_details",
                 kwargs={"pk": appointment.pk},
             ),
             {

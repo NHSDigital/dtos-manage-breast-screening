@@ -1,4 +1,4 @@
-from .add_additional_image_details_form import AddAdditionalImageDetailsForm
+from .add_image_details_form import AddImageDetailsForm
 from .appointment_cannot_go_ahead_form import AppointmentCannotGoAheadForm
 from .appointment_note_form import AppointmentNoteForm
 from .appointment_proceed_anyway_form import AppointmentProceedAnywayForm
@@ -23,7 +23,7 @@ from .special_appointment_forms import (
 )
 
 __all__ = [
-    "AddAdditionalImageDetailsForm",
+    "AddImageDetailsForm",
     "AppointmentCannotGoAheadForm",
     "AppointmentProceedAnywayForm",
     "AppointmentNoteForm",

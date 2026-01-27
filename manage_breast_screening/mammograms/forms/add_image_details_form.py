@@ -5,7 +5,7 @@ from manage_breast_screening.nhsuk_forms.fields import CharField, IntegerField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 
 
-class AddAdditionalImageDetailsForm(FormWithConditionalFields):
+class AddImageDetailsForm(FormWithConditionalFields):
     rmlo_count = IntegerField(
         label="RMLO",
         classes="nhsuk-input--width-4",
