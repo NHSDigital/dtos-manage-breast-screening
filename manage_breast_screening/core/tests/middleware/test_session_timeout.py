@@ -148,3 +148,10 @@ class TestSessionTimeoutMiddleware:
 
         mock_logout.assert_called_once_with(request)
         assert response.status_code == 302
+
+    def test_api_path_bypasses_middleware(self, middleware):
+        request = RequestFactory().get("/api/some-endpoint/")
+
+        response = middleware(request)
+
+        assert response.status_code == 200

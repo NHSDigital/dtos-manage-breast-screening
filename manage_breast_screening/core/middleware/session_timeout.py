@@ -36,6 +36,9 @@ class SessionTimeoutMiddleware:
         return redirect(reverse("auth:login"))
 
     def __call__(self, request):
+        if request.path.startswith(settings.API_PATH_PREFIX):
+            return self.get_response(request)
+
         if not request.user.is_authenticated:
             return self.get_response(request)
 

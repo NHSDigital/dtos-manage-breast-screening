@@ -1,4 +1,4 @@
-from functools import wraps
+from functools import partial, wraps
 
 from manage_breast_screening.core.decorators import (
     _basic_auth_exempt_views,
@@ -101,5 +101,18 @@ class TestBasicAuthExempt:
 
         assert (
             view_func_identifier(view_func)
+            == f"{view_func.__module__}.{view_func.__qualname__}"
+        )
+
+    def test_partial_functions(self):
+        def view_func():
+            pass
+
+        partial_view = partial(view_func)
+
+        basic_auth_exempt(partial_view)
+
+        assert (
+            view_func_identifier(partial_view)
             == f"{view_func.__module__}.{view_func.__qualname__}"
         )

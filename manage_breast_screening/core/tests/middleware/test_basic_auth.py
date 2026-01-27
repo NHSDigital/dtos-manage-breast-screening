@@ -97,3 +97,11 @@ class TestBasicAuthMiddleware:
         resp = mw.process_view(request, lambda r: None, (), {})
         assert resp is not None
         assert resp.status_code == 401
+
+    def test_api_path_allows_request(self, settings):
+        settings.BASIC_AUTH_ENABLED = True
+
+        request = RequestFactory().get("/api/v1/resource")
+        mw = _make_middleware()
+        # API paths should bypass basic auth
+        assert mw.process_view(request, lambda r: None, (), {}) is None
