@@ -114,7 +114,7 @@ class TestAddAdditionalImageDetails(SystemTestCase):
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
-        self.assert_page_title_contains("Check Information")
+        self.assert_page_title_contains("Check information")
 
     def and_the_message_says_image_details_added(self):
         alert = self.page.get_by_role("alert")
