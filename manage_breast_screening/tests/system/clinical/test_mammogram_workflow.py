@@ -30,7 +30,7 @@ class TestMammogramWorkflow(SystemTestCase):
         self.and_the_review_medical_information_step_is_active()
 
         self.when_i_mark_that_imaging_can_go_ahead()
-        self.then_the_screen_should_show_that_it_is_awaiting_images_from_the_PACS()
+        self.then_i_should_be_on_the_record_images_page()
         self.and_the_take_images_step_is_active()
 
     def test_accessibility(self):
@@ -117,13 +117,13 @@ class TestMammogramWorkflow(SystemTestCase):
         button = self.page.get_by_role("button", name="Complete all and continue")
         button.click()
 
-    def then_the_screen_should_show_that_it_is_awaiting_images_from_the_PACS(self):
+    def then_i_should_be_on_the_record_images_page(self):
         path = reverse(
-            "mammograms:awaiting_images",
+            "mammograms:take_images",
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
-        self.assert_page_title_contains("Awaiting images")
+        self.assert_page_title_contains("Record images taken")
 
     def then_i_am_prompted_to_answer_can_the_screening_go_ahead(self):
         self.expect_validation_error(

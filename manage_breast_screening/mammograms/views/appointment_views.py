@@ -12,6 +12,9 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
+    RecordImagesTakenForm,
+)
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
@@ -25,10 +28,7 @@ from manage_breast_screening.participants.models.appointment import (
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
-from ..forms import (
-    AppointmentCannotGoAheadForm,
-    RecordMedicalInformationForm,
-)
+from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
 from ..presenters import (
     AppointmentPresenter,
     LastKnownMammogramPresenter,
@@ -189,7 +189,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         try:
             with transaction.atomic():
                 form.save()
-            return redirect("mammograms:awaiting_images", pk=self.appointment.pk)
+            return redirect("mammograms:take_images", pk=self.appointment.pk)
         except (IntegrityError, DatabaseError):
             messages.add_message(
                 self.request,
@@ -233,23 +233,22 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class AwaitingImages(InProgressAppointmentMixin, TemplateView):
-    template_name = "mammograms/awaiting_images.jinja"
+class TakeImages(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/take_images.jinja"
+    form_class = RecordImagesTakenForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        provider = self.request.user.current_provider
-        participant = provider.participants.get(
-            screeningepisode__appointment__pk=self.appointment.pk
-        )
         context.update(
             {
-                "heading": "Awaiting images",
-                "caption": participant.full_name,
-                "page_title": "Awaiting images",
+                "heading": "Record images taken",
+                "page_title": "Record images taken",
             }
         )
         return context
+
+    def form_valid(self, form):
+        return super().form_valid(form)
 
 
 @require_http_methods(["POST"])
