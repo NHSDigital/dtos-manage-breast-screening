@@ -143,18 +143,15 @@ class Appointment(BaseModel):
         return self.current_status.active
 
     def set_status(self, status_name, created_by):
-        new_status, created = self.statuses.get_or_create(
-            name=status_name,
-            defaults={"created_by": created_by},
-        )
+        current_status = self.current_status
 
-        if not created and new_status.created_by != created_by:
-            logger.warning(
-                f"Current status is already {new_status}, and was set by a different user"
-            )
-            raise ActionPerformedByDifferentUser(new_status)
+        if status_name == current_status.name:
+            if current_status.created_by != created_by:
+                raise ActionPerformedByDifferentUser(status_name)
+            else:
+                return current_status
 
-        return new_status
+        return self.statuses.create(name=status_name, created_by=created_by)
 
 
 class AppointmentStatusNames(models.TextChoices):
@@ -166,6 +163,7 @@ class AppointmentStatusNames(models.TextChoices):
     SCREENED = "SCREENED", "Screened"
     PARTIALLY_SCREENED = "PARTIALLY_SCREENED", "Partially screened"
     ATTENDED_NOT_SCREENED = "ATTENDED_NOT_SCREENED", "Attended not screened"
+    PAUSED = "PAUSED", "Paused"
 
 
 class AppointmentStatus(models.Model):
@@ -198,10 +196,6 @@ class AppointmentStatus(models.Model):
     class Meta:
         ordering = ["-created_at"]
 
-        # Note: this is only valid as long as we can't undo a status transition.
-        # https://nhsd-jira.digital.nhs.uk/browse/DTOSS-11522
-        unique_together = ("appointment", "name")
-
     @property
     def active(self):
         """
@@ -214,6 +208,9 @@ class AppointmentStatus(models.Model):
 
     def is_in_progress(self):
         return self.name == AppointmentStatusNames.IN_PROGRESS
+
+    def is_in_progress_with(self, user):
+        return self.is_in_progress() and self.created_by == user
 
     def is_final_status(self):
         return self.name in self.FINAL_STATUSES
@@ -240,6 +237,8 @@ class AppointmentMachine(StateMachine):
     )
     screen = Event(_.IN_PROGRESS.to(_.SCREENED))
     partial_screen = Event(_.IN_PROGRESS.to(_.PARTIALLY_SCREENED))
+    pause = Event(_.IN_PROGRESS.to(_.PAUSED))
+    resume = Event(_.PAUSED.to(_.IN_PROGRESS))
 
     def can(self, action) -> bool:
         return action in self.allowed_events

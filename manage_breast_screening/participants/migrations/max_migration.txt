@@ -1,1 +1,1 @@
-0056_alter_appointmentstatus_name_and_more
+0057_alter_appointmentstatus_unique_together_and_more

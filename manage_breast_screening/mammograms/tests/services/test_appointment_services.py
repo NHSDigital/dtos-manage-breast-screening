@@ -195,6 +195,53 @@ class TestAppointmentStatusUpdater:
         with pytest.raises(ActionPerformedByDifferentUser):
             service.start()
 
+    def test_can_resume_an_appointment_paused_by_someone_else(self, clinical_user):
+        appointment = AppointmentFactory.create(
+            current_status=AppointmentStatusNames.IN_PROGRESS
+        )
+
+        AppointmentStatusFactory.create(
+            name=AppointmentStatusNames.PAUSED,
+            created_by=clinical_user,
+            appointment=appointment,
+        )
+
+        service = AppointmentStatusUpdater(
+            appointment=appointment, current_user=clinical_user
+        )
+
+        new_status = service.resume()
+        assert new_status.name == AppointmentStatusNames.IN_PROGRESS
+
+    def test_can_pause_an_appointment(self, clinical_user):
+        appointment = AppointmentFactory.create(
+            current_status=AppointmentStatusNames.IN_PROGRESS
+        )
+
+        service = AppointmentStatusUpdater(
+            appointment=appointment, current_user=clinical_user
+        )
+
+        new_status = service.pause()
+        assert new_status.name == AppointmentStatusNames.PAUSED
+
+    def test_invalid_pause(self, clinical_user):
+        appointment = AppointmentFactory.create(
+            current_status=AppointmentStatusNames.SCHEDULED
+        )
+        AppointmentStatusFactory.create(
+            name=AppointmentStatusNames.CANCELLED,
+            created_by=clinical_user,
+            appointment=appointment,
+        )
+
+        service = AppointmentStatusUpdater(
+            appointment=appointment, current_user=clinical_user
+        )
+
+        with pytest.raises(TransitionNotAllowed):
+            service.pause()
+
     def test_class_has_methods_for_each_event(self):
         for event in AppointmentMachine().events:
             assert hasattr(AppointmentStatusUpdater, event), f"missing {event}() method"
