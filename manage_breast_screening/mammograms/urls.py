@@ -6,6 +6,7 @@ from .views import (
     appointment_note_views,
     appointment_views,
     participant_reported_mammogram_views,
+    repeat_image_information_view,
     special_appointment_views,
     symptom_views,
 )
@@ -281,5 +282,10 @@ urlpatterns = [
         "<uuid:pk>/check-information/",
         mammogram_views.check_information,
         name="check_information",
+    ),
+    path(
+        "<uuid:pk>/repeat-image-information/",
+        repeat_image_information_view.RepeatImageInformationView.as_view(),
+        name="repeat_image_information",
     ),
 ]
