@@ -1,0 +1,8 @@
+{% extends "workflow_step.jinja" %}
+
+{% set active_workflow_step = 'TAKE_IMAGES' %}
+
+{% block form %}
+{% do form.standard_images.add_divider_after("NO_ADD_ADDITIONAL", "or") %}
+{{ form.standard_images.as_field_group() }}
+{% endblock %}

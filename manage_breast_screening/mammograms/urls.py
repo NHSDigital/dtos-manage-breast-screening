@@ -68,9 +68,9 @@ urlpatterns = [
         name="mark_section_reviewed",
     ),
     path(
-        "<uuid:pk>/awaiting-images/",
-        appointment_views.AwaitingImages.as_view(),
-        name="awaiting_images",
+        "<uuid:pk>/take-images/",
+        appointment_views.TakeImages.as_view(),
+        name="take_images",
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
