@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.http import require_http_methods
 
 from manage_breast_screening.mammograms.views import mammogram_views
 
@@ -20,6 +21,12 @@ from .views.medical_history import (
 )
 
 app_name = "mammograms"
+
+
+@require_http_methods(["GET"])
+def not_implemented_view(request, pk):
+    raise NotImplementedError()
+
 
 urlpatterns = [
     path(
@@ -281,6 +288,11 @@ urlpatterns = [
         "<uuid:pk>/check-information/",
         mammogram_views.check_information,
         name="check_information",
+    ),
+    path(
+        "<uuid:pk>/image-details/new",
+        not_implemented_view,
+        name="new_image_details",
     ),
     path(
         "<uuid:pk>/complete-screening/",
