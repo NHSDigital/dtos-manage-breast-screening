@@ -5,7 +5,7 @@ from manage_breast_screening.core.models import BaseModel
 
 
 class Study(BaseModel):
-    appointment = models.ForeignKey(
+    appointment = models.OneToOneField(
         "participants.Appointment", on_delete=models.PROTECT
     )
 
