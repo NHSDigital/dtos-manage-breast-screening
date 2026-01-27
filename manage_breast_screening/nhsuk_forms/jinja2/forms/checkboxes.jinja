@@ -15,7 +15,10 @@
     "exclusive": unbound_field.is_exclusive(value),
     "conditional": {
       "html": conditional_html
-    } if conditional_html else undefined
+    } if conditional_html else undefined,
+    "hint": {
+      "text": unbound_field.choice_hints.get(value)
+    } if value in unbound_field.choice_hints else undefined
   }] %}
   {% set divider = field.get_divider_after(value) %}
   {% if divider %}

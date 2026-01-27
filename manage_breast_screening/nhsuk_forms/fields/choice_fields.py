@@ -72,6 +72,7 @@ class ChoiceField(forms.ChoiceField):
         visually_hidden_label_prefix=None,
         visually_hidden_label_suffix=None,
         classes=None,
+        choice_hints=None,
         **kwargs,
     ):
         kwargs["template_name"] = ChoiceField._template_name(
@@ -83,6 +84,7 @@ class ChoiceField(forms.ChoiceField):
         self.label_classes = label_classes
         self.visually_hidden_label_prefix = visually_hidden_label_prefix
         self.visually_hidden_label_suffix = visually_hidden_label_suffix
+        self.choice_hints = choice_hints or {}
 
         super().__init__(*args, **kwargs)
 
@@ -119,6 +121,7 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         visually_hidden_label_suffix=None,
         exclusive_choices=(),
         classes=None,
+        choice_hints=None,
         **kwargs,
     ):
         kwargs["template_name"] = "forms/checkboxes.jinja"
@@ -129,6 +132,7 @@ class MultipleChoiceField(forms.MultipleChoiceField):
         self.visually_hidden_label_prefix = visually_hidden_label_prefix
         self.visually_hidden_label_suffix = visually_hidden_label_suffix
         self.exclusive_choices = exclusive_choices
+        self.choice_hints = choice_hints or {}
 
         super().__init__(*args, **kwargs)
 
