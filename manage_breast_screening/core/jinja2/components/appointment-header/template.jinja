@@ -3,7 +3,7 @@
 {% set clinic_slot = appointment.clinic_slot %}
 {% set participant = appointment.participant %}
 
-<p class="nhsuk-u-secondary-text-color"><span>NHS Number: {{ participant.nhs_number }}</span></p>
+<p class="nhsuk-u-secondary-text-colour"><span>NHS Number: {{ participant.nhs_number }}</span></p>
 
 <p>{{ clinic_slot.slot_time_and_clinic_date }}{% if not appointment.current_status.is_screened %}<span class="nhsuk-u-margin-left-3"><a href="#">Reschedule appointment</a></span>{% endif %}</p>
 
