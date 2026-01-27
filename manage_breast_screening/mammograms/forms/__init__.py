@@ -15,6 +15,7 @@ from .medical_history.other_procedure_history_item_form import (
     OtherProcedureHistoryItemForm,
 )
 from .record_medical_information_form import RecordMedicalInformationForm
+from .repeat_image_information_form import RepeatImageInformationForm
 from .screening_appointment_form import ScreeningAppointmentForm
 from .special_appointment_forms import (
     MarkReasonsTemporaryForm,
@@ -28,6 +29,7 @@ __all__ = [
     "BreastAugmentationHistoryItemForm",
     "CystHistoryItemForm",
     "RecordMedicalInformationForm",
+    "RepeatImageInformationForm",
     "ScreeningAppointmentForm",
     "ProvideSpecialAppointmentDetailsForm",
     "MarkReasonsTemporaryForm",
