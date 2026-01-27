@@ -18,6 +18,7 @@ from manage_breast_screening.mammograms.forms.images.record_images_taken_form im
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models import (
     Appointment,
     MedicalInformationSection,
@@ -248,7 +249,31 @@ class TakeImages(InProgressAppointmentMixin, FormView):
         return context
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        form.save(
+            StudyService(appointment=self.appointment, current_user=self.request.user)
+        )
+
+        match form.cleaned_data["standard_images"]:
+            case form.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO:
+                self.mark_workflow_step_complete()
+
+                return redirect("mammograms:check_information", pk=self.appointment_pk)
+            case form.StandardImagesChoices.NO_ADD_ADDITIONAL:
+                return redirect(
+                    "mammograms:additional_image_details",
+                    pk=self.appointment_pk,
+                )
+            case _:
+                return redirect(
+                    "mammograms:appointment_cannot_go_ahead",
+                    pk=self.appointment_pk,
+                )
+
+    def mark_workflow_step_complete(self):
+        self.appointment.completed_workflow_steps.get_or_create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            defaults={"created_by": self.request.user},
+        )
 
 
 @require_http_methods(["POST"])
