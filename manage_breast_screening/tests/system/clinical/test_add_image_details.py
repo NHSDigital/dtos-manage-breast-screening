@@ -8,11 +8,12 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
-class TestAddAdditionalImageDetails(SystemTestCase):
-    def test_add_additional_image_details(self):
+class TestAddImageDetails(SystemTestCase):
+    def test_add_image_details(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_for_my_provider()
-        self.and_i_am_on_the_add_additional_image_details_page()
+        self.and_i_am_on_the_add_image_details_page()
+        self.and_the_take_images_step_is_active()
         self.then_images_taken_count_is(0)
         self.and_repeat_images_message_is_hidden()
 
@@ -65,7 +66,7 @@ class TestAddAdditionalImageDetails(SystemTestCase):
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_for_my_provider()
-        self.and_i_am_on_the_add_additional_image_details_page()
+        self.and_i_am_on_the_add_image_details_page()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment_for_my_provider(self):
@@ -73,17 +74,24 @@ class TestAddAdditionalImageDetails(SystemTestCase):
             clinic_slot__clinic__setting__provider=self.current_provider
         )
 
-    def and_i_am_on_the_add_additional_image_details_page(self):
+    def and_i_am_on_the_add_image_details_page(self):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:add_additional_image_details",
+                "mammograms:add_image_details",
                 kwargs={"pk": self.appointment.pk},
             )
         )
-        self.expect_url(
-            "mammograms:add_additional_image_details", pk=self.appointment.pk
+        self.expect_url("mammograms:add_image_details", pk=self.appointment.pk)
+
+    def and_the_take_images_step_is_active(self):
+        nav = self.page.locator("nav.app-workflow-side-nav")
+        expect(nav).to_be_visible()
+        current_step = nav.locator(
+            ".app-workflow-side-nav__item--current .app-workflow-side-nav__label"
         )
+        expect(current_step).to_have_count(1)
+        expect(current_step).to_have_text("Take images")
 
     def when_i_enter_the_number_of_images_taken(self, image_type, count):
         self.page.get_by_label(image_type).fill(str(count))

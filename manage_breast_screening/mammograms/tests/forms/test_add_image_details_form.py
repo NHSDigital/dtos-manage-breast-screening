@@ -3,8 +3,8 @@ from urllib.parse import urlencode
 import pytest
 from django.http import QueryDict
 
-from manage_breast_screening.mammograms.forms.add_additional_image_details_form import (
-    AddAdditionalImageDetailsForm,
+from manage_breast_screening.mammograms.forms.add_image_details_form import (
+    AddImageDetailsForm,
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
@@ -12,12 +12,10 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 @pytest.mark.django_db
-class TestAddAdditionalImageDetailsForm:
+class TestAddImageDetailsForm:
     def test_no_data(self):
         appointment = AppointmentFactory()
-        form = AddAdditionalImageDetailsForm(
-            QueryDict(), participant=appointment.participant
-        )
+        form = AddImageDetailsForm(QueryDict(), participant=appointment.participant)
 
         assert not form.is_valid()
         assert form.errors == {
@@ -31,7 +29,7 @@ class TestAddAdditionalImageDetailsForm:
 
     def test_zero_images(self):
         appointment = AppointmentFactory()
-        form = AddAdditionalImageDetailsForm(
+        form = AddImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -63,7 +61,7 @@ class TestAddAdditionalImageDetailsForm:
         lcc_count = 1
         left_eklund_count = 19
         additional_details = "Some additional details"
-        form = AddAdditionalImageDetailsForm(
+        form = AddImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -100,7 +98,7 @@ class TestAddAdditionalImageDetailsForm:
     def test_counts_provided_for_only_one_image_type(self):
         appointment = AppointmentFactory()
         lmlo_count = 1
-        form = AddAdditionalImageDetailsForm(
+        form = AddImageDetailsForm(
             QueryDict(
                 urlencode(
                     {

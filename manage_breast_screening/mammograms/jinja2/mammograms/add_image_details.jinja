@@ -1,6 +1,8 @@
-{% extends "layout-form.jinja" %}
+{% extends "workflow_step.jinja" %}
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% set active_workflow_step = 'TAKE_IMAGES' %}
 
 {% block form %}
   <h2>How many images were taken?</h2>
@@ -48,12 +50,6 @@
   }) %}
     {{ form.additional_details.as_field_group() }}
   {% endcall %}
-
-  <div class="nhsuk-button-group">
-    {{ button({
-      "text": "Continue"
-    }) }}
-  </div>
 {% endblock %}
 
 {% block bodyEnd %}
@@ -64,45 +60,42 @@
       const insetText = document.querySelector('[data-module="repeat-images-notice"]')
       const totalCountElement = document.querySelector('[data-total-count]')
 
-      // Function to get all currently visible count inputs
-      const getCountInputs = () => {
-        return [
-          document.getElementById('id_rmlo_count'),
-          document.getElementById('id_rcc_count'),
-          document.getElementById('id_right_eklund_count'),
-          document.getElementById('id_lmlo_count'),
-          document.getElementById('id_lcc_count'),
-          document.getElementById('id_left_eklund_count')
-        ].filter(Boolean) // Remove any null values
-      }
-
-      // Function to calculate total image count
-      const getTotalCount = () => {
-        const inputs = getCountInputs()
-        return inputs.reduce((total, input) => {
-          const value = parseInt(input.value, 10)
-          return total + (isNaN(value) ? 0 : value)
-        }, 0)
-      }
-
-      // Function to check if any count is greater than 1
-      const hasRepeats = () => {
-        const inputs = getCountInputs()
-        return inputs.some(input => {
-          const value = parseInt(input.value, 10)
-          return !isNaN(value) && value > 1
-        })
-      }
-
-      // Function to update total count display
-      const updateTotalCount = () => {
-        if (totalCountElement) {
-          const total = getTotalCount()
-          totalCountElement.textContent = total
+      const getCounts = () => {
+        const countInputs = document.querySelectorAll('input[id$="_count"]')
+        const counts = []
+        for (const input of countInputs) {
+          let count = input.value === '' ? 0 : parseInt(input.value, 10)
+          counts.push(count)
         }
+        return counts
       }
 
-      // Function to update visibility
+      const getTotalCount = () => {
+        let total = 0
+        for (const count of getCounts()) {
+          // if any count is not a number then display no total count, rather than a misleading one
+          if (isNaN(count)) {
+            return ''
+          }
+
+          total += count
+        }
+        return total
+      }
+
+      const hasRepeats = () => {
+        for (const count of getCounts()) {
+          if (!isNaN(count) && count > 1) {
+            return true
+          }
+        }
+        return false
+      }
+
+      const updateTotalCount = () => {
+        totalCountElement.textContent = getTotalCount()
+      }
+
       const updateVisibility = () => {
         if (hasRepeats()) {
           insetText.style.display = ''
@@ -111,7 +104,6 @@
         }
       }
 
-      // Function to update everything
       const updateAll = () => {
         updateTotalCount()
         updateVisibility()
@@ -120,21 +112,14 @@
       // Set initial state after a short delay to allow conditional reveals to initialize
       setTimeout(updateAll, 100)
 
-      // Add event listeners using delegation on the form
-      document.addEventListener('input', (event) => {
+      const eventListener = (event) => {
         const target = event.target
         if (target.id && target.id.endsWith('_count')) {
           updateAll()
         }
-      })
-
-      document.addEventListener('change', (event) => {
-        const target = event.target
-        // Handle count input changes
-        if (target.id && target.id.endsWith('_count')) {
-          updateAll()
-        }
-      })
+      }
+      document.addEventListener('input', eventListener)
+      document.addEventListener('change', eventListener)
     })
   </script>
 {% endblock %}
