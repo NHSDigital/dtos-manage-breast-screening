@@ -1,0 +1,57 @@
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+{% from "nhsuk/macros/icon.jinja" import nhsukIcon %}
+{% macro workflow_steps(presented_appointment, active_workflow_step) %}
+
+<div class="app-workflow-side-nav-wrapper">
+  <nav class="app-workflow-side-nav">
+
+    <h2 class="app-workflow-side-nav__heading">
+      <span class="nhsuk-caption-m">
+        Screening appointment
+      </span>
+      Workflow steps
+    </h2>
+
+    <ol class="app-workflow-side-nav__list">
+      {% for item in presented_appointment.workflow_steps(active_workflow_step) %}
+        <li {{ nhsukAttributes({"class": item.classes}) }}>
+          {% if item.disabled %}
+            <span class="app-workflow-side-nav__step app-workflow-side-nav__step--disabled">
+              <span class="app-workflow-side-nav__number">{{ loop.index }}</span>
+              <span class="app-workflow-side-nav__label">{{ item.label }}</span>
+            </span>
+          {% elif item.current %}
+            <span class="app-workflow-side-nav__step" aria-current="page">
+              <span class="app-workflow-side-nav__number">
+                {% if item.completed %}
+                  {{ nhsukIcon("tick", {
+                    "classes": "app-icon--tick"
+                  }) }}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </span>
+              <span class="app-workflow-side-nav__label">{{ item.label }}</span>
+            </span>
+          {% else %}
+            <a class="app-workflow-side-nav__step app-workflow-side-nav__step--clickable" href="{{ item.url }}">
+              <span class="app-workflow-side-nav__number">
+                {% if item.completed %}
+                  {{ nhsukIcon("tick", {
+                    "classes": "app-icon--tick"
+                  }) }}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </span>
+              <span class="app-workflow-side-nav__label">{{ item.label }}</span>
+            </a>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ol>
+  </nav>
+</div>
+
+{% endmacro %}

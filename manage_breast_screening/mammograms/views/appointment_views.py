@@ -237,7 +237,19 @@ class AwaitingImages(InProgressAppointmentMixin, TemplateView):
     template_name = "mammograms/awaiting_images.jinja"
 
     def get_context_data(self, **kwargs):
-        return {"heading": "Awaiting images", "page_title": "Awaiting images"}
+        context = super().get_context_data(**kwargs)
+        provider = self.request.user.current_provider
+        participant = provider.participants.get(
+            screeningepisode__appointment__pk=self.appointment.pk
+        )
+        context.update(
+            {
+                "heading": "Awaiting images",
+                "caption": participant.full_name,
+                "page_title": "Awaiting images",
+            }
+        )
+        return context
 
 
 @require_http_methods(["POST"])

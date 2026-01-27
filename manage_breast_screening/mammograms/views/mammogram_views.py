@@ -175,10 +175,18 @@ class AppointmentProceedAnywayView(
 
 @require_http_methods(["GET"])
 def check_information(request, pk):
+    provider = request.user.current_provider
+    appointment = provider.appointments.select_related(
+        "screening_episode__participant",
+    ).get(pk=pk)
+
     return render(
         request,
         "mammograms/check_information.jinja",
         context={
-            "page_title": "Check Information",
+            "caption": appointment.screening_episode.participant.full_name,
+            "page_title": "Check information",
+            "heading": "Check information",
+            "presented_appointment": AppointmentPresenter(appointment),
         },
     )

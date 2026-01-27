@@ -34,11 +34,16 @@
           'current': true if navActive == "clinics"
         }
       ]
-    }
+    },
+    "containerClasses": containerClasses
   }) }}
 
   {{
-    app_appointment_status_bar(request.user, presented_appointment.status_bar)
+    app_appointment_status_bar({
+      "user": request.user,
+      "status_bar": presented_appointment.status_bar,
+      "containerClasses": containerClasses
+    })
   }}
 {% endblock %}
 

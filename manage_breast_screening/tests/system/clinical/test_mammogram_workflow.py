@@ -22,13 +22,16 @@ class TestMammogramWorkflow(SystemTestCase):
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
         self.and_i_see_the_appointment_status_bar()
+        self.and_the_confirm_identity_step_is_active()
 
         self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_record_medical_information_page()
         self.and_i_see_the_appointment_status_bar()
+        self.and_the_review_medical_information_step_is_active()
 
         self.when_i_mark_that_imaging_can_go_ahead()
         self.then_the_screen_should_show_that_it_is_awaiting_images_from_the_PACS()
+        self.and_the_take_images_step_is_active()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -121,3 +124,64 @@ class TestMammogramWorkflow(SystemTestCase):
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Awaiting images")
+
+    def then_i_am_prompted_to_answer_can_the_screening_go_ahead(self):
+        self.expect_validation_error(
+            error_text="This field is required.",
+            fieldset_legend="Can the appointment go ahead?",
+            field_label="Yes, go to medical information",
+        )
+
+    def then_i_am_prompted_to_answer_has_the_participant_shared_medical_info(self):
+        self.expect_validation_error(
+            error_text="This field is required.",
+            fieldset_legend="Has the participant shared any relevant medical information?",
+            field_label="Yes",
+        )
+
+    def then_i_am_prompted_to_confirm_whether_imaging_can_go_ahead(self):
+        self.expect_validation_error(
+            error_text="This field is required.",
+            fieldset_legend="Can imaging go ahead?",
+            field_label="Yes, mark incomplete sections as ‘none’ or ‘no’",
+        )
+
+    def and_the_confirm_identity_step_is_active(self):
+        self.assert_active_step("Confirm identity")
+
+        expect(self.clickable_steps()).to_have_count(0)
+
+    def and_the_review_medical_information_step_is_active(self):
+        self.assert_active_step("Review medical information")
+
+        clickable_steps = self.clickable_steps()
+        expect(clickable_steps).to_have_count(1)
+        expect(clickable_steps.locator(".app-workflow-side-nav__label")).to_have_text(
+            "Confirm identity"
+        )
+
+    def and_the_take_images_step_is_active(self):
+        self.assert_active_step("Take images")
+
+        clickable_steps = self.clickable_steps()
+        expect(clickable_steps).to_have_count(2)
+        expect(
+            clickable_steps.nth(0).locator(".app-workflow-side-nav__label")
+        ).to_have_text("Confirm identity")
+        expect(
+            clickable_steps.nth(1).locator(".app-workflow-side-nav__label")
+        ).to_have_text("Review medical information")
+
+    def assert_active_step(self, expected_active_step_name):
+        nav = self.page.locator("nav.app-workflow-side-nav")
+        expect(nav).to_be_visible()
+        current_step = nav.locator(
+            ".app-workflow-side-nav__item--current .app-workflow-side-nav__label"
+        )
+        expect(current_step).to_have_count(1)
+        expect(current_step).to_have_text(expected_active_step_name)
+
+    def clickable_steps(self):
+        return self.page.locator(
+            "nav.app-workflow-side-nav .app-workflow-side-nav__step--clickable"
+        )
