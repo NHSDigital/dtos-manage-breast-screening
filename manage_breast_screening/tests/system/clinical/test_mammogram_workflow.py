@@ -1,6 +1,7 @@
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.clinics.models import Clinic
 from manage_breast_screening.core.utils.string_formatting import format_nhs_number
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
@@ -35,6 +36,9 @@ class TestMammogramWorkflow(SystemTestCase):
         self.and_i_click_continue()
         self.then_i_should_be_on_the_check_information_page()
 
+        self.when_i_click_complete_screening()
+        self.then_i_should_be_back_on_the_clinic()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -59,6 +63,7 @@ class TestMammogramWorkflow(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
+            clinic_slot__clinic__risk_type=Clinic.RiskType.ROUTINE_RISK,
         )
 
     def and_i_am_on_the_appointment_show_page(self):
@@ -189,3 +194,10 @@ class TestMammogramWorkflow(SystemTestCase):
     def then_i_should_be_on_the_check_information_page(self):
         self.expect_url("mammograms:check_information", pk=self.appointment.pk)
         self.assert_page_title_contains("Check information")
+
+    def when_i_click_complete_screening(self):
+        self.page.get_by_text("Complete screening and return to clinic").click()
+
+    def then_i_should_be_back_on_the_clinic(self):
+        self.expect_url("clinics:show", pk=self.appointment.clinic_slot.clinic.pk)
+        self.assert_page_title_contains("Routine risk screening clinic")
