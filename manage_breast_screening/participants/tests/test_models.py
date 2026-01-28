@@ -12,6 +12,9 @@ from manage_breast_screening.clinics.tests.factories import (
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
 )
+from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
+    ImplantedMedicalDeviceHistoryItem,
+)
 
 from .. import models
 from ..models import AppointmentStatus, Ethnicity
@@ -404,3 +407,51 @@ class TestAppointmentStatus:
                 name=AppointmentStatusNames.PARTIALLY_SCREENED
             ).active
             assert not AppointmentStatus(name=AppointmentStatusNames.SCREENED).active
+
+
+class TestImplantedMedicalDeviceHistoryItem:
+    @pytest.mark.parametrize(
+        "name,lower,expected",
+        [
+            ("CARDIAC_DEVICE", False, "Cardiac device"),
+            ("CARDIAC_DEVICE", True, "cardiac device"),
+            ("HICKMAN_LINE", False, "Hickman line"),
+            ("HICKMAN_LINE", True, "Hickman line"),
+            ("OTHER_MEDICAL_DEVICE", False, "Other medical device"),
+            ("OTHER_MEDICAL_DEVICE", True, "other medical device"),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
+                False,
+                "Cardiac device",
+            ),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
+                True,
+                "cardiac device",
+            ),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                False,
+                "Hickman line",
+            ),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                True,
+                "Hickman line",
+            ),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                False,
+                "Other medical device",
+            ),
+            (
+                ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                True,
+                "other medical device",
+            ),
+        ],
+    )
+    def test_short_name(self, name, lower, expected):
+        assert expected == ImplantedMedicalDeviceHistoryItem.Device.short_name(
+            name, lower=lower
+        )

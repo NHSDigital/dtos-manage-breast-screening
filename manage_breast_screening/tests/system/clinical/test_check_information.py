@@ -11,7 +11,13 @@ from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
 )
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
+from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
+    ImplantedMedicalDeviceHistoryItem,
+)
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    ImplantedMedicalDeviceHistoryItemFactory,
+)
 
 from ..system_test_setup import SystemTestCase
 
@@ -26,9 +32,11 @@ class TestCheckInformation(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
         self.and_there_is_an_appointment_for_the_clinic()
+        self.and_there_is_medical_information_for_the_appointment()
         self.and_the_appointment_has_images()
         self.and_i_am_on_the_check_information_page()
         self.and_the_personal_details_are_listed()
+        self.and_the_medical_information_is_listed()
         self.and_the_image_details_are_listed()
 
         self.and_i_click_on_complete_screening()
@@ -58,6 +66,15 @@ class TestCheckInformation(SystemTestCase):
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status=AppointmentStatusNames.IN_PROGRESS,
             screening_episode__participant__ethnic_background_id="any_other_ethnic_background",
+        )
+
+    def and_there_is_medical_information_for_the_appointment(self):
+        ImplantedMedicalDeviceHistoryItemFactory.create(
+            appointment=self.appointment,
+            device=ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+            procedure_year=2018,
+            device_has_been_removed=True,
+            removal_year=2022,
         )
 
     def and_the_appointment_has_images(self):
@@ -100,6 +117,30 @@ class TestCheckInformation(SystemTestCase):
         row = section.locator(".nhsuk-summary-list__row", has_text="Ethnicity")
         value = row.locator(".nhsuk-summary-list__value")
         expect(value).to_contain_text("Other ethnic group (any other ethnic group)")
+
+    def and_the_medical_information_is_listed(self):
+        heading = self.page.get_by_role("heading").filter(
+            has_text="Medical Information"
+        )
+        section = self.page.locator(".nhsuk-card").filter(has=heading)
+        expect(section).to_be_visible()
+
+        row = section.locator(
+            ".nhsuk-summary-list__row", has_text="Previous mammograms"
+        )
+        value = row.locator(".nhsuk-summary-list__value")
+        expect(value).to_contain_text("No additional mammograms added")
+
+        row = section.locator(
+            ".nhsuk-summary-list__row",
+            has_text="Medical history",
+        )
+        value = row.locator(".nhsuk-summary-list__value")
+        expect(value).to_contain_text("Hickman line (2018, removed 2022)")
+
+        row = section.locator(".nhsuk-summary-list__row", has_text="Symptoms")
+        value = row.locator(".nhsuk-summary-list__value")
+        expect(value).to_contain_text("No symptoms recorded")
 
     def and_the_image_details_are_listed(self):
         heading = self.page.get_by_role("heading").filter(has_text="21 images taken")
