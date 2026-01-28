@@ -1,5 +1,3 @@
-import re
-
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -14,7 +12,7 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestMammogramWorkflow(SystemTestCase):
-    def test_capturing_medical_information(self):
+    def test_completing_workflow(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_appointment_show_page()
@@ -33,6 +31,10 @@ class TestMammogramWorkflow(SystemTestCase):
         self.then_i_should_be_on_the_record_images_page()
         self.and_the_take_images_step_is_active()
 
+        self.when_i_select_yes_2_cc_and_2_mlo()
+        self.and_i_click_continue()
+        self.then_i_should_be_on_the_check_information_page()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -45,6 +47,10 @@ class TestMammogramWorkflow(SystemTestCase):
         self.then_the_accessibility_baseline_is_met()
 
         self.when_i_mark_that_imaging_can_go_ahead()
+        self.then_the_accessibility_baseline_is_met()
+
+        self.when_i_select_yes_2_cc_and_2_mlo()
+        self.and_i_click_continue()
         self.then_the_accessibility_baseline_is_met()
 
     def and_there_is_an_appointment(self):
@@ -86,11 +92,7 @@ class TestMammogramWorkflow(SystemTestCase):
         self.page.get_by_role("button", name="Continue").click()
 
     def then_i_should_be_on_the_confirm_identity_page(self):
-        path = reverse(
-            "mammograms:confirm_identity",
-            kwargs={"pk": self.appointment.pk},
-        )
-        expect(self.page).to_have_url(re.compile(path))
+        self.expect_url("mammograms:confirm_identity", pk=self.appointment.pk)
         self.assert_page_title_contains("Confirm identity")
 
     def and_i_see_the_appointment_status_bar(self):
@@ -101,11 +103,7 @@ class TestMammogramWorkflow(SystemTestCase):
         expect(status_bar).to_contain_text(self.participant.full_name)
 
     def then_i_should_be_on_the_record_medical_information_page(self):
-        path = reverse(
-            "mammograms:record_medical_information",
-            kwargs={"pk": self.appointment.pk},
-        )
-        expect(self.page).to_have_url(re.compile(path))
+        self.expect_url("mammograms:record_medical_information", pk=self.appointment.pk)
         self.assert_page_title_contains("Record medical information")
 
     def when_i_click_confirm_identity(self):
@@ -118,11 +116,7 @@ class TestMammogramWorkflow(SystemTestCase):
         button.click()
 
     def then_i_should_be_on_the_record_images_page(self):
-        path = reverse(
-            "mammograms:take_images",
-            kwargs={"pk": self.appointment.pk},
-        )
-        expect(self.page).to_have_url(re.compile(path))
+        self.expect_url("mammograms:take_images", pk=self.appointment.pk)
         self.assert_page_title_contains("Record images taken")
 
     def then_i_am_prompted_to_answer_can_the_screening_go_ahead(self):
@@ -185,3 +179,13 @@ class TestMammogramWorkflow(SystemTestCase):
         return self.page.locator(
             "nav.app-workflow-side-nav .app-workflow-side-nav__step--clickable"
         )
+
+    def when_i_select_yes_2_cc_and_2_mlo(self):
+        self.page.get_by_label("Yes, 2 CC and 2 MLO").click()
+
+    def and_i_click_continue(self):
+        self.page.get_by_text("Continue").click()
+
+    def then_i_should_be_on_the_check_information_page(self):
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+        self.assert_page_title_contains("Check information")
