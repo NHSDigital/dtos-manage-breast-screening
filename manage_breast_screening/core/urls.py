@@ -98,3 +98,14 @@ if settings.DEBUG_TOOLBAR:
     urlpatterns = [
         *urlpatterns,
     ] + debug_toolbar_urls()
+
+if settings.DEBUG:
+    urlpatterns.append(
+        path(
+            "debug/",
+            include(
+                "manage_breast_screening.nonprod.urls",
+                namespace="nonprod",
+            ),
+        )
+    )

@@ -1,0 +1,72 @@
+{% from "components/count/macro.jinja" import app_count %}
+{% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
+{% from "components/secondary-navigation/macro.jinja" import app_secondary_navigation %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, paragraph %}
+{% set page_title = 'App component examples' %}
+{% extends "layout-app.jinja" %}
+
+{% block page_content %}
+<h1>App component examples</h1>
+{% call card({"heading": "app_count"}) %}
+  {{ app_count(123) }}
+{% endcall %}
+
+{% call card({"heading": "app_nested_info"}) %}
+  {{ app_nested_info_card({
+    "card": {
+      "heading": "Card title",
+      "headingLevel": 3,
+    },
+    "headingLevel": 4,
+    "rows": [
+      {
+        "key": "Procedures",
+        "value": {
+          "rows": [
+            {
+              "columns": [
+                {
+                  "heading": "Right breast",
+                  "html": list_with_default(["Procedure 1", "Procedure 2"])
+                },
+                {
+                  "heading": "Left breast",
+                  "html": list_with_default(["Procedure 1", "Procedure 2"])
+                },
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "key": "Additional information",
+        "value": {
+          "html": paragraph("Not provided.")
+        }
+      }
+    ]
+  }) }}
+{% endcall %}
+
+{% call card({"heading": "app_secondary_navigation"}) %}
+  {{ app_secondary_navigation({
+    "items": [
+      {
+        "text": "First",
+        "href": "#",
+        "current": true
+      },
+      {
+        "text": "Second",
+        "href": "#"
+      },
+      {
+        "text": "Third",
+        "href": "#"
+      },
+    ]
+  }) }}
+{% endcall %}
+
+{% endblock %}
