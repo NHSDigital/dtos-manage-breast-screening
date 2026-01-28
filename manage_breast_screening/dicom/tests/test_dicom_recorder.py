@@ -1,6 +1,8 @@
 import tempfile
 from datetime import datetime
+from unittest.mock import patch
 
+import numpy as np
 import pydicom
 import pytest
 
@@ -84,3 +86,18 @@ class TestDicomRecorder:
             with open(temp_file.name, "rb") as dicom_file:
                 with pytest.raises(AttributeError):
                     DicomRecorder.get_or_create_records(source_message_id, dicom_file)
+
+    def test_dataset_to_jpeg(self, dataset):
+        converted_pixel_array = dataset.pixel_array.astype(np.float32)
+        converted_pixel_array -= converted_pixel_array.min()
+        converted_pixel_array /= converted_pixel_array.max()
+        converted_pixel_array *= 255.0
+        converted_pixel_array = converted_pixel_array.astype(np.uint8)
+
+        with patch(f"{DicomRecorder.__module__}.PILImage.fromarray") as mock_fromarray:
+            DicomRecorder.dataset_to_jpeg(dataset.SOPInstanceUID, dataset)
+
+            assert mock_fromarray.call_count == 1
+            assert mock_fromarray.call_args[0][0].shape == converted_pixel_array.shape
+            assert np.array_equal(mock_fromarray.call_args[0][0], converted_pixel_array)
+            assert mock_fromarray.call_args[1]["mode"] == "L"

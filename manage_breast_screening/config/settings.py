@@ -209,6 +209,9 @@ if environ.get("DJANGO_ENV", "production") != "production":
         # In non-production environments without a connection string, use local file storage
         dicom_storage_options = {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": BASE_DIR / "data" / "dicom",
+            },
         }
 else:
     # In production, use DefaultAzureCredential for authentication

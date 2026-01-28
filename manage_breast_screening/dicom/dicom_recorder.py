@@ -1,7 +1,9 @@
 import io
 from datetime import datetime
 
+import numpy as np
 import pydicom
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image as PILImage
 
 from .models import Image, Series, Study
@@ -46,8 +48,7 @@ class DicomRecorder:
         if created:
             image.dicom_file.save(f"{sop_uid}.dcm", dicom_file)
             image.image_file.save(
-                f"{sop_uid}.jpeg",
-                io.BytesIO(PILImage.fromarray(ds.pixel_array).tobytes()),
+                f"{sop_uid}.jpeg", __class__.dataset_to_jpeg(sop_uid, ds)
             )
 
         return study, series, image
@@ -61,3 +62,27 @@ class DicomRecorder:
                 study_date + study_time.split(".")[0], "%Y%m%d%H%M%S"
             )
         return None
+
+    @staticmethod
+    def dataset_to_jpeg(sop_uid: str, ds: pydicom.Dataset) -> InMemoryUploadedFile:
+        """Convert a DICOM dataset to a JPEG image and return it as an InMemoryUploadedFile."""
+        # Normalize pixel data to 0-255 and convert to uint8
+        pixel_array = ds.pixel_array
+        pixel_array = pixel_array.astype(np.float32)
+        pixel_array -= pixel_array.min()
+        pixel_array /= pixel_array.max()
+        pixel_array *= 255.0
+        pixel_array = pixel_array.astype(np.uint8)
+        # Create a PIL image from the pixel array
+        image = PILImage.fromarray(pixel_array, mode="L")
+        in_memory_file = io.BytesIO()
+        image.save(in_memory_file, format="JPEG")
+
+        return InMemoryUploadedFile(
+            in_memory_file,
+            name=f"{sop_uid}.jpeg",
+            field_name="file",
+            content_type="image/jpeg",
+            size=in_memory_file.getbuffer().nbytes,
+            charset=None,
+        )

@@ -39,3 +39,6 @@ coverage
 .structurizr
 workspace.json
 pyrightconfig.json
+
+# API local file uploads containing DICOM data
+manage_breast_screening/data/dicom
