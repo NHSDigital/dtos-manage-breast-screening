@@ -5,11 +5,7 @@
 
 <p class="nhsuk-u-secondary-text-colour"><span>NHS Number: {{ participant.nhs_number }}</span></p>
 
-<p>{{ clinic_slot.slot_time_and_clinic_date }}{% if not appointment.current_status.is_screened %}<span class="nhsuk-u-margin-left-3"><a href="#">Reschedule appointment</a></span>{% endif %}</p>
-
-{% if appointment.can_be_made_special %}
-<p><a href="{{ appointment.special_appointment_url }}">Make special appointment</a></p>
-{% endif %}
+<p>{{ clinic_slot.slot_time_and_clinic_date }}</p>
 
 {% if appointment.can_be_started_by(user) %}
   <form action="{{ url('mammograms:start_appointment', kwargs={'pk': appointment.pk}) }}" method="post">
