@@ -1,18 +1,44 @@
 {% from "components/count/macro.jinja" import app_count %}
 {% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
 {% from "components/secondary-navigation/macro.jinja" import app_secondary_navigation %}
+{% from "macros/icon.jinja" import app_icon %}
 {% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/tables/macro.jinja" import table %}
 {% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, paragraph %}
 {% set page_title = 'App component examples' %}
 {% extends "layout-app.jinja" %}
 
 {% block page_content %}
-<h1>App component examples</h1>
-{% call card({"heading": "app_count"}) %}
+<h1>App component and macro examples</h1>
+{% call card({"heading": "app_count(params)"}) %}
   {{ app_count(123) }}
 {% endcall %}
 
-{% call card({"heading": "app_nested_info"}) %}
+{% call card({"heading": "app_icon(name, params)"}) %}
+  {{ table({
+    "head": [
+      {
+        "text": "Name"
+      },
+      {
+        "text": "Result"
+      }
+    ],
+    "rows": [
+      [
+        {"text": "plus"},
+        {"html": app_icon("plus")}
+      ],
+      [
+        {"text": "minus"},
+        {"html": app_icon("minus")}
+      ],
+    ]
+  }) }}
+{% endcall %}
+
+{% call card({"heading": "app_nested_info_card(params)"}) %}
+  <p>This is based on the summary list component.</p>
   {{ app_nested_info_card({
     "card": {
       "heading": "Card title",
@@ -49,7 +75,7 @@
   }) }}
 {% endcall %}
 
-{% call card({"heading": "app_secondary_navigation"}) %}
+{% call card({"heading": "app_secondary_navigation(params)"}) %}
   {{ app_secondary_navigation({
     "items": [
       {
