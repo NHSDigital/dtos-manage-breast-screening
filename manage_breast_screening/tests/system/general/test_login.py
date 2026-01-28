@@ -3,6 +3,7 @@ from datetime import timedelta
 
 import pytest
 import time_machine
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -122,7 +123,7 @@ class TestLogin(SystemTestCase):
         expect(self.page.get_by_text("Your account is not recognised")).to_be_visible()
 
     def then_i_am_on_the_login_page(self):
-        expect(self.page).to_have_url(re.compile(reverse("auth:login")))
+        expect(self.page).to_have_url(re.compile(reverse(settings.LOGIN_URL)))
 
     def and_i_am_logged_out_when_the_max_session_time_has_passed_even_if_i_have_been_active(
         self,
