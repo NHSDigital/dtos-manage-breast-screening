@@ -4,6 +4,9 @@ from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRed
 
 from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
+from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
+    RecordImagesTakenForm,
+)
 from manage_breast_screening.participants.models import MedicalInformationReview
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
@@ -114,6 +117,100 @@ class TestRecordMedicalInformation:
             .values_list("step_name", flat=True)
             .distinct(),
             [AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION],
+        )
+
+
+@pytest.mark.django_db
+class TestTakeImages:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:take_images",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_no_images_redirects_to_cannot_continue(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:take_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "standard_images": RecordImagesTakenForm.StandardImagesChoices.NO_IMAGES_TAKEN
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+            ),
+        )
+
+    @pytest.mark.xfail(reason="The additional details view is not implemented yet")
+    def test_additional_info_redirects_to_additional_details(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:take_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "standard_images": RecordImagesTakenForm.StandardImagesChoices.NO_ADD_ADDITIONAL
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:additional_image_details", kwargs={"pk": appointment.pk}
+            ),
+        )
+
+    def test_yes_marks_the_step_complete_and_redirects_to_check_info(
+        self, clinical_user_client, appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:take_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "standard_images": RecordImagesTakenForm.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO
+            },
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:check_information", kwargs={"pk": appointment.pk}),
+        )
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(
+                created_by=clinical_user_client.user
+            )
+            .values_list("step_name", flat=True)
+            .distinct(),
+            [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
+        )
+
+    def test_yes_creates_the_study(self, clinical_user_client, appointment):
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:take_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "standard_images": RecordImagesTakenForm.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO
+            },
+        )
+        assertQuerySetEqual(
+            appointment.study.series_set.values_list(
+                "view_position", "laterality", "count"
+            ),
+            {("CC", "L", 1), ("CC", "R", 1), ("MLO", "L", 1), ("MLO", "R", 1)},
+            ordered=False,
         )
 
 

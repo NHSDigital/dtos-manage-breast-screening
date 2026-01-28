@@ -368,7 +368,7 @@ class TestAppointmentPresenter:
                 "current": False,
                 "disabled": True,
                 "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/awaiting-images/",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",
@@ -412,7 +412,7 @@ class TestAppointmentPresenter:
                 "current": False,
                 "disabled": True,
                 "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/awaiting-images/",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",
@@ -455,7 +455,7 @@ class TestAppointmentPresenter:
                 "current": True,
                 "disabled": False,
                 "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/awaiting-images/",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",
@@ -501,7 +501,7 @@ class TestAppointmentPresenter:
                 "current": False,
                 "disabled": False,
                 "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/awaiting-images/",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",
@@ -549,7 +549,7 @@ class TestAppointmentPresenter:
                 "current": False,
                 "disabled": False,
                 "classes": "app-workflow-side-nav__item",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/awaiting-images/",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",
@@ -597,7 +597,7 @@ class TestAppointmentPresenter:
                 "current": False,
                 "disabled": False,
                 "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/awaiting-images/",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",

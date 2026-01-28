@@ -22,6 +22,7 @@ class TestChoiceField:
                 label_classes="app-abc",
                 choices=(("a", "A"), ("b", "B")),
                 hint="Pick either one",
+                choice_hints={"b": "But this is the correct one"},
             )
             select_field = ChoiceField(
                 label="Select",
@@ -76,8 +77,11 @@ class TestChoiceField:
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
                         </div>
                         <div class="nhsuk-radios__item">
-                            <input class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                            <input aria-describedby="id_field-2-item-hint" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
+                            <div class="nhsuk-hint nhsuk-radios__hint" id="id_field-2-item-hint">
+                                But this is the correct one
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -136,8 +140,11 @@ class TestChoiceField:
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field">A</label>
                         </div>
                         <div class="nhsuk-radios__item">
-                            <input data-aria-controls="conditional-id_field-2" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
+                            <input aria-describedby="id_field-2-item-hint" data-aria-controls="conditional-id_field-2" class="nhsuk-radios__input" id="id_field-2" name="field" type="radio" value="b">
                             <label class="nhsuk-label nhsuk-radios__label" for="id_field-2">B</label>
+                            <div class="nhsuk-hint nhsuk-radios__hint" id="id_field-2-item-hint">
+                                But this is the correct one
+                            </div>
                         </div>
                         <div class="nhsuk-radios__conditional nhsuk-radios__conditional--hidden" id="conditional-id_field-2">
                             <p>Hello</p>
@@ -245,6 +252,7 @@ class TestMultipleChoiceField:
                 choices=(("a", "A"), ("b", "B")),
                 hint="Pick any number",
                 widget=CheckboxSelectMultiple,
+                choice_hints={"b": "Check this one"},
             )
             checkbox_field_with_exclusive_option = MultipleChoiceField(
                 label="Abc", choices=(("a", "A"), ("b", "B")), exclusive_choices={"b"}
@@ -271,8 +279,11 @@ class TestMultipleChoiceField:
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
                         </div>
                         <div class="nhsuk-checkboxes__item">
-                            <input class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
+                            <input aria-describedby="id_checkbox_field-2-item-hint" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
+                            <div class="nhsuk-checkboxes__hint nhsuk-hint" id="id_checkbox_field-2-item-hint">
+                                Check this one
+                            </div>
                         </div>
                     </div>
                 </fieldset>
@@ -301,8 +312,9 @@ class TestMultipleChoiceField:
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field">A</label>
                         </div>
                         <div class="nhsuk-checkboxes__item">
-                            <input data-aria-controls="conditional-id_checkbox_field-2" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
+                            <input aria-describedby="id_checkbox_field-2-item-hint" data-aria-controls="conditional-id_checkbox_field-2" class="nhsuk-checkboxes__input" id="id_checkbox_field-2" name="checkbox_field" type="checkbox" value="b">
                             <label class="nhsuk-label nhsuk-checkboxes__label" for="id_checkbox_field-2">B</label>
+                            <div class="nhsuk-checkboxes__hint nhsuk-hint" id="id_checkbox_field-2-item-hint">Check this one</div>
                         </div>
                         <div class="nhsuk-checkboxes__conditional nhsuk-checkboxes__conditional--hidden" id="conditional-id_checkbox_field-2">
                             <p>Hello</p>
