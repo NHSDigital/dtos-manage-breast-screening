@@ -33,7 +33,7 @@ class SessionTimeoutMiddleware:
 
     def _logout_and_redirect(self, request):
         auth_logout(request)
-        return redirect(reverse("auth:login"))
+        return redirect(reverse(settings.LOGIN_URL))
 
     def __call__(self, request):
         if request.path.startswith(settings.API_PATH_PREFIX):
