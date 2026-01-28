@@ -1,0 +1,12 @@
+@use "../vendor/nhsuk-frontend/base" as *;
+
+.app-icon {
+  width: nhsuk-px-to-rem($nhsuk-icon-size);
+  height: nhsuk-px-to-rem($nhsuk-icon-size);
+  fill: currentcolor;
+
+  @include nhsuk-media-query($from: tablet) {
+    width: nhsuk-px-to-rem($nhsuk-icon-size-large);
+    height: nhsuk-px-to-rem($nhsuk-icon-size-large);
+  }
+}
