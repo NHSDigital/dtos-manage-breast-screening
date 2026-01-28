@@ -2,35 +2,37 @@
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "components/participant-details/summary_list_rows.jinja" import ethnicity_html %}
+{% from "mammograms/check_information/images_taken_card.jinja" import images_taken_card %}
 
 {% set active_workflow_step = 'CHECK_INFORMATION' %}
 
 {% block step_content %}
   <p>Before concluding this appointment, confirm that the information recorded is correct.</p>
+
+  {% call card({
+  "heading": "Personal Information"
+  }) %}
+
+  {{ summaryList({
+      "rows": [
+      {
+          "key": {
+              "text": "Ethnicity"
+          },
+          "value" : {
+              "text": ethnicity_html(presented_appointment.participant) | default("Not provided", true) 
+          }
+      }
+      ]
+  }) }}
+
+  {% endcall %}
+
+  {{ images_taken_card(presented_images) }}
 {% endblock %}
 
 
 {% block wizard_form %}
-    {% block page_content %}
-        {% call card({
-        "heading": "Personal Information"
-        }) %}
-
-        {{ summaryList({
-            "rows": [
-            {
-                "key": {
-                    "text": "Ethnicity"
-                },
-                "value" : {
-                    "text": ethnicity_html(presented_appointment.participant) | default("Not provided", true) 
-                }
-            }
-            ]
-        }) }}
-
-        {% endcall %}
-    {% endblock %}
   <form action="{{ url('mammograms:complete_screening', kwargs={'pk': presented_appointment.pk}) }}" method="post" novalidate>
     {{ csrf_input }}
     {{ button({
