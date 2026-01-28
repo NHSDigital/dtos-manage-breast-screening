@@ -43,13 +43,13 @@ def multiline_content(lines: list[str]) -> Markup:
 
 def as_hint(value: str) -> Markup:
     """
-    Wrap a string in a span with class nhsuk-u-secondary-text-color
+    Wrap a string in a span with class nhsuk-u-secondary-text-colour
 
     >>> as_hint('Not provided')
-    Markup('<span class=nhsuk-u-secondary-text-color">Not provided</span>')
+    Markup('<span class=nhsuk-u-secondary-text-colour">Not provided</span>')
     """
     return Markup(
-        f'<span class=nhsuk-u-secondary-text-color">{value}</span>' if value else ""
+        f'<span class=nhsuk-u-secondary-text-colour">{value}</span>' if value else ""
     )
 
 
