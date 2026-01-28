@@ -110,7 +110,6 @@ class Clinic(BaseModel):
         MOBILE = "MOBILE"
 
     class Type:
-        ASSESSMENT = "ASSESSMENT"
         SCREENING = "SCREENING"
 
     class TimeOfDay:
@@ -124,7 +123,7 @@ class Clinic(BaseModel):
         RiskType.MOBILE: "Mobile screening",
     }
 
-    TYPE_CHOICES = {Type.ASSESSMENT: "Assessment", Type.SCREENING: "Screening"}
+    TYPE_CHOICES = {Type.SCREENING: "Screening"}
 
     setting = models.ForeignKey("clinics.Setting", on_delete=models.PROTECT)
     starts_at = models.DateTimeField()

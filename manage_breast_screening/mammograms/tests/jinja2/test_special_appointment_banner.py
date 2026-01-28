@@ -53,7 +53,7 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
                         Social, emotional, and mental health
                         </dt>
                         <dd class="nhsuk-summary-list__value">
-                        <span class="nhsuk-u-secondary-text-color">No details provided</span>
+                        <span class="nhsuk-u-secondary-text-colour">No details provided</span>
                         </dd>
                     </div>
                 </dl>
@@ -102,7 +102,7 @@ def test_special_appointment_banner_without_change_link(jinja_env, presenter):
                         Social, emotional, and mental health
                         </dt>
                         <dd class="nhsuk-summary-list__value">
-                        <span class="nhsuk-u-secondary-text-color">No details provided</span>
+                        <span class="nhsuk-u-secondary-text-colour">No details provided</span>
                         </dd>
                     </div>
                 </dl>

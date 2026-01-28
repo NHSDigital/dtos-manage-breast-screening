@@ -9,7 +9,7 @@
       {% for mammogram in mammograms_by_date_added %}
         <p>
         <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
-        <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-color">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
+        <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-colour">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
         <br>{{ mammogram.location }}
 
         {% if mammogram.different_name %}
