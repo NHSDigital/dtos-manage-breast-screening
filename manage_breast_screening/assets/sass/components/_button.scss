@@ -21,3 +21,62 @@
 .nhsuk-form-group .app-button--link {
   display: block;
 }
+
+.app-button--icon {
+  display: flex;
+
+  // Align icon in center of button
+  align-items: center;
+  justify-content: center;
+
+  // Reduce padding to better fit icon
+  padding-top: 0;
+  padding-bottom: 0;
+
+  // Prevent users from selecting icon button text
+  // e.g. When double clicking a stepper button
+  user-select: none;
+
+  .app-icon {
+    margin: 0 nhsuk-spacing(1);
+
+    @include nhsuk-media-query($from: tablet) {
+      width: nhsuk-px-to-rem($nhsuk-icon-size-large);
+      height: nhsuk-px-to-rem($nhsuk-icon-size-large);
+    }
+  }
+
+  .app-icon:first-child {
+    margin-left: 0;
+  }
+
+  .app-icon:last-child {
+    margin-right: 0;
+  }
+
+  &:has(.app-icon:first-child) {
+    padding-left: nhsuk-spacing(3) - $nhsuk-border-width-form-element;
+  }
+
+  &:has(.app-icon:last-child) {
+    padding-right: nhsuk-spacing(3) - $nhsuk-border-width-form-element;
+  }
+
+  &.nhsuk-button--small {
+    &:has(.app-icon:first-child) {
+      padding-left: nhsuk-spacing(2) - $nhsuk-border-width-form-element;
+    }
+
+    &:has(.app-icon:last-child) {
+      padding-right: nhsuk-spacing(2) - $nhsuk-border-width-form-element;
+    }
+  }
+
+  // Prevent large icon size in small buttons
+  &.nhsuk-button--small .app-icon {
+    @include nhsuk-media-query($from: tablet) {
+      width: nhsuk-px-to-rem($nhsuk-icon-size);
+      height: nhsuk-px-to-rem($nhsuk-icon-size);
+    }
+  }
+}

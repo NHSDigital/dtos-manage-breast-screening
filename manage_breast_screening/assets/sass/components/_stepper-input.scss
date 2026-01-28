@@ -1,0 +1,13 @@
+@use "../vendor/nhsuk-frontend/base" as *;
+
+// Hide the buttons by default, JS removes this attribute
+.app-stepper-input__step-down[hidden],
+.app-stepper-input__step-up[hidden] {
+  display: none;
+}
+
+@include nhsuk-media-query($from: mobile) {
+  .app-stepper-input__input {
+    text-align: center;
+  }
+}
