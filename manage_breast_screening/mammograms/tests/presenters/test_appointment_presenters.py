@@ -13,6 +13,10 @@ from manage_breast_screening.mammograms.presenters import (
     ClinicSlotPresenter,
     SpecialAppointmentPresenter,
 )
+from manage_breast_screening.mammograms.presenters.appointment_presenters import (
+    ImagesTakenPresenter,
+)
+from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
@@ -734,3 +738,88 @@ class TestSpecialAppointmentPresenter:
                 "temporary": None,
             },
         ]
+
+
+class TestImagesTakenPresenter:
+    def test_additional_details(self):
+        appointment = MagicMock(spec=Appointment)
+        appointment.study = MagicMock(spec=Study)
+        appointment.study.additional_details = (
+            "Some additional details about the images taken."
+        )
+
+        assert (
+            ImagesTakenPresenter(appointment).additional_details
+            == "Some additional details about the images taken."
+        )
+
+    def test_no_images(self):
+        appointment = MagicMock(spec=Appointment)
+        appointment.study = MagicMock(spec=Study)
+
+        result = ImagesTakenPresenter(appointment)
+
+        assert result.title == "No images taken"
+        assert result.total_count == 0
+        assert result.views_taken == {}
+
+    def test_standard_image_types(self):
+        appointment = MagicMock(spec=Appointment)
+        appointment.study = MagicMock(spec=Study)
+        appointment.study.series_set.all.return_value = [
+            Series(view_position="CC", laterality="R", count=1),
+            Series(view_position="CC", laterality="L", count=1),
+            Series(view_position="MLO", laterality="R", count=1),
+            Series(view_position="MLO", laterality="L", count=1),
+        ]
+
+        result = ImagesTakenPresenter(appointment)
+
+        assert result.title == "4 images taken"
+        assert result.total_count == 4
+        assert result.views_taken == {
+            "RCC": 1,
+            "LCC": 1,
+            "RMLO": 1,
+            "LMLO": 1,
+        }
+
+    def test_all_image_types(self):
+        appointment = MagicMock(spec=Appointment)
+        appointment.study = MagicMock(spec=Study)
+        appointment.study.series_set.all.return_value = [
+            Series(view_position="CC", laterality="R", count=20),
+            Series(view_position="CC", laterality="L", count=1),
+            Series(view_position="MLO", laterality="R", count=7),
+            Series(view_position="MLO", laterality="L", count=2),
+            Series(view_position="EKLUND", laterality="R", count=19),
+            Series(view_position="EKLUND", laterality="L", count=10),
+        ]
+
+        result = ImagesTakenPresenter(appointment)
+
+        assert result.title == "59 images taken"
+        assert result.total_count == 59
+        assert result.views_taken == {
+            "RCC": 20,
+            "LCC": 1,
+            "RMLO": 7,
+            "LMLO": 2,
+            "Right Eklund": 19,
+            "Left Eklund": 10,
+        }
+
+    def test_one_image_types(self):
+        appointment = MagicMock(spec=Appointment)
+        appointment.study = MagicMock(spec=Study)
+        appointment.study.series_set.all.return_value = [
+            Series(view_position="MLO", laterality="L", count=1),
+        ]
+
+        result = ImagesTakenPresenter(appointment)
+
+        assert result.title == "1 image taken"
+        assert result.total_count == 1
+        assert result.views_taken == {
+            "LMLO": 1,
+        }

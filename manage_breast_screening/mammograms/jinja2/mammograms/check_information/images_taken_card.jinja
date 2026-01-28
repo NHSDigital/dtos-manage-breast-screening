@@ -1,0 +1,33 @@
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+
+{% macro views_taken(presented_images) %}
+  {% if presented_images.total_count > 0 %}
+    {% for type, count in presented_images.views_taken.items() %}
+      <p class="nhsuk-u-margin-bottom-2">
+        <strong>{{ count }}× {{ type }}</strong>
+      </p>
+    {% endfor %}
+  {% else -%}
+    Not provided
+  {%- endif %}
+{% endmacro %}
+
+{% macro images_taken_card(presented_images) %}
+  {% call card({
+    "heading": presented_images.title
+  }) %}
+    {{ summaryList({
+      "rows": [
+        {
+          "key": { "text": "Views taken" },
+          "value": { "html": views_taken(presented_images) }
+        },
+        {
+          "key": { "text": "Notes for reader" },
+          "value": { "text": presented_images.additional_details }
+        }
+      ]
+    }) }}
+  {% endcall %}
+{% endmacro %}

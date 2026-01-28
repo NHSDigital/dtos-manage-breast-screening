@@ -291,3 +291,25 @@ class SpecialAppointmentPresenter:
             "mammograms:provide_special_appointment_details",
             kwargs={"pk": self._appointment_pk},
         )
+
+
+class ImagesTakenPresenter:
+    def __init__(self, appointment):
+        study = appointment.study
+        self.additional_details = study.additional_details
+
+        self.total_count = 0
+        self.views_taken = {}
+        for series in study.series_set.all():
+            image_name = str(series)
+            self.views_taken[image_name] = series.count
+            self.total_count += series.count
+
+    @property
+    def title(self):
+        if self.total_count == 0:
+            return "No images taken"
+        elif self.total_count == 1:
+            return "1 image taken"
+        else:
+            return f"{self.total_count} images taken"
