@@ -295,12 +295,9 @@ class SpecialAppointmentPresenter:
 
 class ImagesTakenPresenter:
     def __init__(self, appointment):
-        studies = appointment.study_set.all()
-        if len(studies) != 1:
-            raise ValueError(
-                f"Expected exactly 1 study for appointment, got {len(studies)}"
-            )
-        self.study = studies[0]
+        self.study = appointment.study
+        if not self.study:
+            raise ValueError("No study for appointment")
         self.additional_details = self.study.additional_details
 
         self.total_count = 0

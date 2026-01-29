@@ -1,0 +1,51 @@
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+
+{% macro medical_history(medical_history) %}
+  {% if medical_history %}
+    {% for item in medical_history %}
+    <p class="nhsuk-u-margin-bottom-2">
+        {{item}}
+    </p>
+    {% endfor %}
+  {% else -%}
+  No medical history added
+  {%- endif %}
+{% endmacro %}
+
+{% macro medical_information_card(presented_medical_information) %}
+  {% call card({
+  "heading": "Medical information"
+  }) %}
+
+  {{ summaryList({
+      "rows": [
+      {
+          "key": {
+              "text": "Previous mammograms"
+          },
+          "value" : {
+              "text": presented_medical_information.previous_mammograms,
+          }
+      },
+      {
+          "key": {
+              "text": "Medical history"
+          },
+          "value" : {
+              "html": medical_history(presented_medical_information.medical_history)
+          }
+      },
+      {
+          "key": {
+              "text": "Symptoms"
+          },
+          "value" : {
+              "html": medical_history(presented_medical_information.symptoms)
+          }
+      }
+      ]
+  }) }}
+
+  {% endcall %}
+{% endmacro %}
