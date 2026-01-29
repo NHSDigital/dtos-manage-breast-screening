@@ -1,8 +1,9 @@
 import pytest
 from django.forms import Form
+from django.template.loader import render_to_string
 from pytest_django.asserts import assertHTMLEqual
 
-from ...fields import IntegerField, YearField
+from ...fields import IntegerField, StepperInput, YearField
 
 
 class TestIntegerField:
@@ -16,20 +17,51 @@ class TestIntegerField:
                 visually_hidden_label_prefix="prefix: ",
                 visually_hidden_label_suffix=" - suffix",
             )
+            stepper_field = IntegerField(
+                label="Stepper",
+                initial=1,
+                min_value=0,
+                max_value=10,
+                widget=StepperInput,
+            )
 
         return TestForm
 
     def test_renders_nhs_input(self, form_class):
-        assertHTMLEqual(
-            form_class()["field"].as_field_group(),
-            """
-            <div class="nhsuk-form-group">
-                <label class="nhsuk-label" for="id_field">
-                    <span class="nhsuk-u-visually-hidden">prefix: </span>Abc<span class="nhsuk-u-visually-hidden"> - suffix</span>
-                </label><input class="nhsuk-input" id="id_field" name="field" type="number" value="1" inputmode="numeric">
-            </div>
-            """,
+        actual = form_class()["field"].as_field_group()
+        expected = render_to_string(
+            "nhsuk/components/input/template.jinja",
+            {
+                "params": {
+                    "label": {
+                        "html": '<span class="nhsuk-u-visually-hidden">prefix: </span>Abc<span class="nhsuk-u-visually-hidden"> - suffix</span>'
+                    },
+                    "id": "id_field",
+                    "name": "field",
+                    "inputmode": "numeric",
+                    "type": "number",
+                    "value": 1,
+                }
+            },
         )
+        assertHTMLEqual(actual, expected)
+
+    def test_renders_stepper_input(self, form_class):
+        actual = form_class()["stepper_field"].as_field_group()
+        expected = render_to_string(
+            "components/stepper-input/template.jinja",
+            {
+                "params": {
+                    "label": {"text": "Stepper"},
+                    "id": "id_stepper_field",
+                    "name": "stepper_field",
+                    "value": 1,
+                    "min": 0,
+                    "max": 10,
+                }
+            },
+        )
+        assertHTMLEqual(actual, expected)
 
 
 class TestYearField:
