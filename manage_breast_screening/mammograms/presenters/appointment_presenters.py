@@ -92,7 +92,7 @@ class AppointmentPresenter:
                 case AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION:
                     view_name = "record_medical_information"
                 case AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES:
-                    view_name = "awaiting_images"
+                    view_name = "take_images"
                 case AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION:
                     view_name = "check_information"
 

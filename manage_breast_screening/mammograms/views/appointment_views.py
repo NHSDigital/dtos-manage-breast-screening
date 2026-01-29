@@ -12,9 +12,13 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
+    RecordImagesTakenForm,
+)
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models import (
     Appointment,
     MedicalInformationSection,
@@ -25,10 +29,7 @@ from manage_breast_screening.participants.models.appointment import (
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
-from ..forms import (
-    AppointmentCannotGoAheadForm,
-    RecordMedicalInformationForm,
-)
+from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
 from ..presenters import (
     AppointmentPresenter,
     LastKnownMammogramPresenter,
@@ -189,7 +190,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         try:
             with transaction.atomic():
                 form.save()
-            return redirect("mammograms:awaiting_images", pk=self.appointment.pk)
+            return redirect("mammograms:take_images", pk=self.appointment.pk)
         except (IntegrityError, DatabaseError):
             messages.add_message(
                 self.request,
@@ -233,23 +234,47 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class AwaitingImages(InProgressAppointmentMixin, TemplateView):
-    template_name = "mammograms/awaiting_images.jinja"
+class TakeImages(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/take_images.jinja"
+    form_class = RecordImagesTakenForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        provider = self.request.user.current_provider
-        participant = provider.participants.get(
-            screeningepisode__appointment__pk=self.appointment.pk
-        )
         context.update(
             {
-                "heading": "Awaiting images",
-                "caption": participant.full_name,
-                "page_title": "Awaiting images",
+                "heading": "Record images taken",
+                "page_title": "Record images taken",
             }
         )
         return context
+
+    @transaction.atomic
+    def form_valid(self, form):
+        form.save(
+            StudyService(appointment=self.appointment, current_user=self.request.user)
+        )
+
+        match form.cleaned_data["standard_images"]:
+            case form.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO:
+                self.mark_workflow_step_complete()
+
+                return redirect("mammograms:check_information", pk=self.appointment_pk)
+            case form.StandardImagesChoices.NO_ADD_ADDITIONAL:
+                return redirect(
+                    "mammograms:additional_image_details",
+                    pk=self.appointment_pk,
+                )
+            case _:
+                return redirect(
+                    "mammograms:appointment_cannot_go_ahead",
+                    pk=self.appointment_pk,
+                )
+
+    def mark_workflow_step_complete(self):
+        self.appointment.completed_workflow_steps.get_or_create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            defaults={"created_by": self.request.user},
+        )
 
 
 @require_http_methods(["POST"])
