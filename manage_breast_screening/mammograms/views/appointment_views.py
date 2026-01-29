@@ -248,6 +248,7 @@ class TakeImages(InProgressAppointmentMixin, FormView):
         )
         return context
 
+    @transaction.atomic
     def form_valid(self, form):
         form.save(
             StudyService(appointment=self.appointment, current_user=self.request.user)
