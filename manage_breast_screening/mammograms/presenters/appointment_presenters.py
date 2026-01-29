@@ -251,7 +251,7 @@ class ClinicSlotPresenter:
         clinic_slot = self._clinic_slot
         clinic = self._clinic
 
-        return f"{format_time(clinic_slot.starts_at)} ({clinic_slot.duration_in_minutes} minutes) - {format_date(clinic.starts_at)} ({format_relative_date(clinic.starts_at)})"
+        return f"{format_date(clinic.starts_at)} ({format_relative_date(clinic.starts_at)}) \n {format_time(clinic_slot.starts_at)} ({clinic_slot.duration_in_minutes} minutes)"
 
     @cached_property
     def clinic_date_and_slot_time(self):
