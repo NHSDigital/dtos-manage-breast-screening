@@ -1,0 +1,30 @@
+{% from "components/stepper-input/macro.jinja" import app_stepper_input %}
+{% from "forms/label.jinja" import label_html %}
+{% set unbound_field = field.field %}
+{% set widget = unbound_field.widget %}
+{% set input_params = {
+  "label": {
+    "html": label_html(field),
+    "classes": unbound_field.label_classes if unbound_field.label_classes
+  },
+  "hint": {
+    "text": unbound_field.hint
+  } if unbound_field.hint,
+  "id": field.auto_id,
+  "name": field.html_name,
+  "value": field.value() or "",
+  "classes": unbound_field.classes if unbound_field.classes,
+  "attributes": widget.attrs,
+  "min": unbound_field.min_value,
+  "max": unbound_field.max_value
+} %}
+{% if field.errors %}
+  {% set error_params = {
+    "errorMessage": {
+      "text": field.errors | first
+    }
+  } %}
+  {% set input_params = dict(input_params, **error_params) %}
+{% endif %}
+
+{{ app_stepper_input(input_params) }}
