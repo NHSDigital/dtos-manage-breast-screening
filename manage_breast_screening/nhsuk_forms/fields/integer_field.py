@@ -3,6 +3,10 @@ from datetime import date
 from django import forms
 
 
+class StepperInput(forms.TextInput):
+    pass
+
+
 class IntegerField(forms.IntegerField):
     def __init__(
         self,
@@ -15,7 +19,9 @@ class IntegerField(forms.IntegerField):
         inputmode="numeric",
         **kwargs,
     ):
-        kwargs["template_name"] = "forms/input.jinja"
+        kwargs["template_name"] = IntegerField._template_name(
+            kwargs.get("widget", self.widget)
+        )
 
         self.hint = hint
         self.classes = classes
@@ -29,12 +35,23 @@ class IntegerField(forms.IntegerField):
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)
 
-        # Don't use min/max/step attributes.
+        # Don't use min/max/step attributes. These are controlled
+        # by the stepper-input component, so that we can opt-out of
+        # user-unfriendly scroll behaviour.
         attrs.pop("min", None)
         attrs.pop("max", None)
         attrs.pop("step", None)
 
         return attrs
+
+    @staticmethod
+    def _template_name(widget):
+        if (
+            isinstance(widget, type) and issubclass(widget, StepperInput)
+        ) or isinstance(widget, StepperInput):
+            return "forms/stepper-input.jinja"
+        else:
+            return "forms/input.jinja"
 
 
 class YearField(IntegerField):

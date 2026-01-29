@@ -1,0 +1,11 @@
+from django.urls import path
+from django.views.generic import TemplateView
+
+app_name = "nonprod"
+
+urlpatterns = [
+    path(
+        "components/",
+        TemplateView.as_view(template_name="nonprod/components.jinja"),
+    )
+]
