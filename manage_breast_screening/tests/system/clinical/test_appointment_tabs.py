@@ -150,7 +150,7 @@ class TestAppointmentTabs(SystemTestCase):
         expect(self.page.get_by_role("region")).not_to_be_attached()
 
     def when_i_change_to_the_participant_details_tab(self):
-        self.when_i_change_to_an_appointment_tab("Participant details")
+        self.when_i_change_to_an_appointment_tab("Participant")
 
     def then_i_should_see_the_participant_details(self):
         expect(
@@ -164,10 +164,10 @@ class TestAppointmentTabs(SystemTestCase):
         expect(self.page.get_by_text("Save note")).to_be_attached()
 
     def when_i_change_to_the_appointment_details_tab(self):
-        self.when_i_change_to_an_appointment_tab("Appointment details")
+        self.when_i_change_to_an_appointment_tab("Appointment")
 
     def then_i_should_see_the_appointment_details(self):
-        expect(self.page.get_by_text("Appointment time")).to_be_attached()
+        expect(self.page.get_by_text("Scheduled date and time")).to_be_attached()
 
     def when_i_change_to_an_appointment_tab(self, tab_name):
         secondary_nav = self.page.locator(".app-secondary-navigation")

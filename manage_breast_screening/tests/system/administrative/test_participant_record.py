@@ -89,7 +89,7 @@ class TestParticipantRecord(SystemTestCase):
         )
 
     def when_i_click_on_participant_details(self):
-        self.page.get_by_role("link", name="Participant details").click()
+        self.page.get_by_role("link", name="Participant", exact=True).click()
 
     def then_i_should_be_on_the_participant_record_page(self):
         path = reverse(
@@ -104,7 +104,7 @@ class TestParticipantRecord(SystemTestCase):
         expect(main).to_contain_text("Participant details")
 
     def when_i_click_on_the_back_link(self):
-        self.page.get_by_role("link", name="Appointment details").click()
+        self.page.get_by_role("link", name="Appointment", exact=True).click()
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(

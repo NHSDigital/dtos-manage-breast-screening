@@ -3,6 +3,8 @@
 {% from 'nhsuk/components/summary-list/macro.jinja' import summaryList %}
 {% from 'mammograms/appointment_notes/appointment_note_banner.jinja' import appointment_note_banner %}
 {% from 'mammograms/special_appointments/special_appointment_banner.jinja' import special_appointment_banner %}
+{% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
 
 {% block tab_content %}
   {{ special_appointment_banner(presented_appointment.special_appointment, show_change_link=presented_appointment.active) }}
@@ -17,15 +19,15 @@
       "rows": [
        {
          "key": {
-           "text": "Appointment time"
+           "text": "Scheduled date and time"
          },
          "value": {
-           "text": presented_appointment.clinic_slot.slot_time_and_clinic_date
+           "text": presented_appointment.clinic_slot.slot_time_and_clinic_date| nl2br
          }
        },
        {
          "key": {
-           "text": "Appointment type"
+           "text": "Clinic type"
          },
          "value": {
            "text": presented_appointment.clinic_slot.clinic_type
@@ -33,19 +35,27 @@
        },
        {
          "key": {
-           "text": "Screening protocol"
+           "text": "Appointment status"
          },
          "value": {
-           "text": presented_appointment.screening_protocol
-         }
+           "html": app_appointment_status(presented_appointment)
+         },
        },
        {
-         "key": {
-           "text": "Status"
+          "key": {
+            "text": "Special appointment"
+          },
+          "value": {
+            "html": tag(presented_appointment.special_appointment_tag_properties) if presented_appointment.is_special_appointment else "Not a special appointment"
+          },
+          "actions": {
+           "items": [
+             {
+               "text": "Change",
+               "href": presented_appointment.special_appointment_url
+             }
+           ]
          },
-         "value": {
-           "text": presented_appointment.current_status.text
-         }
        }
       ]
     }) }}
