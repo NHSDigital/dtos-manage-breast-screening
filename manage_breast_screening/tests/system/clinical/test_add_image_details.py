@@ -61,7 +61,6 @@ class TestAddImageDetails(SystemTestCase):
 
         self.and_i_click_on_continue()
         self.then_i_should_be_on_the_check_information_page()
-        self.and_the_message_says_image_details_added()
 
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -123,8 +122,3 @@ class TestAddImageDetails(SystemTestCase):
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Check information")
-
-    def and_the_message_says_image_details_added(self):
-        alert = self.page.get_by_role("alert")
-        expect(alert).to_contain_text("Success")
-        expect(alert).to_contain_text("Added image details")

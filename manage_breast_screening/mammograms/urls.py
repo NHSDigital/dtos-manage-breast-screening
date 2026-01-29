@@ -291,11 +291,6 @@ urlpatterns = [
         name="check_information",
     ),
     path(
-        "<uuid:pk>/image-details/new",
-        not_implemented_view,
-        name="new_image_details",
-    ),
-    path(
         "<uuid:pk>/complete-screening/",
         mammogram_views.complete_screening,
         name="complete_screening",

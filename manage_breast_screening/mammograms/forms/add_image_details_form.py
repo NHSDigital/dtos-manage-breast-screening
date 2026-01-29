@@ -1,8 +1,11 @@
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.manual_images.models import Series, Study
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.nhsuk_forms.fields import CharField, IntegerField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 
 class AddImageDetailsForm(FormWithConditionalFields):
@@ -97,7 +100,7 @@ class AddImageDetailsForm(FormWithConditionalFields):
         error_messages={"max_words": "Notes for reader must be 500 words or less"},
     )
 
-    def __init__(self, *args, participant, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -115,29 +118,28 @@ class AddImageDetailsForm(FormWithConditionalFields):
 
         return cleaned_data
 
-    def create(self, appointment):
-        study = Study.objects.create(
-            appointment=appointment,
+    def save(self, study_service: StudyService):
+        return study_service.create(
             additional_details=self.cleaned_data.get("additional_details", ""),
+            series_data=[
+                self.build_series_dict("MLO", "R", "rmlo_count"),
+                self.build_series_dict("CC", "R", "rcc_count"),
+                self.build_series_dict("EKLUND", "R", "right_eklund_count"),
+                self.build_series_dict("MLO", "L", "lmlo_count"),
+                self.build_series_dict("CC", "L", "lcc_count"),
+                self.build_series_dict("EKLUND", "L", "left_eklund_count"),
+            ],
         )
 
-        self._add_series_if_provided(study, "MLO", "R", "rmlo_count")
-        self._add_series_if_provided(study, "CC", "R", "rcc_count")
-        self._add_series_if_provided(study, "EKLUND", "R", "right_eklund_count")
-        self._add_series_if_provided(study, "MLO", "L", "lmlo_count")
-        self._add_series_if_provided(study, "CC", "L", "lcc_count")
-        self._add_series_if_provided(study, "EKLUND", "L", "left_eklund_count")
+    def build_series_dict(self, view_position, laterality, count_field_name):
+        return {
+            "view_position": view_position,
+            "laterality": laterality,
+            "count": self.cleaned_data.get(count_field_name),
+        }
 
-        return study
-
-    def _add_series_if_provided(
-        self, study, view_position, laterality, count_field_name
-    ):
-        count = self.cleaned_data.get(count_field_name)
-        if count != 0:
-            Series.objects.create(
-                study=study,
-                view_position=view_position,
-                laterality=laterality,
-                count=count,
-            )
+    def mark_workflow_step_complete(self):
+        self.appointment.completed_workflow_steps.get_or_create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            defaults={"created_by": self.request.user},
+        )

@@ -1,8 +1,10 @@
 import pytest
-from django.contrib import messages
 from django.urls import reverse
-from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
+from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
 )
@@ -22,7 +24,7 @@ class TestAddImageDetailsView:
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+    def test_valid_post_with_counts_for_all_images(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
@@ -33,11 +35,11 @@ class TestAddImageDetailsView:
             ),
             {
                 "rmlo_count": "1",
-                "rcc_count": "1",
-                "right_eklund_count": "0",
-                "lmlo_count": "1",
-                "lcc_count": "1",
-                "left_eklund_count": "0",
+                "rcc_count": "2",
+                "right_eklund_count": "3",
+                "lmlo_count": "4",
+                "lcc_count": "5",
+                "left_eklund_count": "6",
                 "additional_details": "Some additional details",
             },
         )
@@ -48,15 +50,54 @@ class TestAddImageDetailsView:
                 kwargs={"pk": appointment.pk},
             ),
         )
-        assertMessages(
-            response,
-            [
-                messages.Message(
-                    level=messages.SUCCESS,
-                    message="Added image details",
-                )
-            ],
+
+        study = appointment.study
+        assert study.additional_details == "Some additional details"
+
+        series_list = study.series_set.all()
+        assert len(series_list) == 6
+        self._assert_series(series_list[0], "MLO", "R", 1)
+        self._assert_series(series_list[1], "CC", "R", 2)
+        self._assert_series(series_list[2], "EKLUND", "R", 3)
+        self._assert_series(series_list[3], "MLO", "L", 4)
+        self._assert_series(series_list[4], "CC", "L", 5)
+        self._assert_series(series_list[5], "EKLUND", "L", 6)
+        self._assert_take_images_step_completed(appointment, clinical_user_client.user)
+
+    def test_valid_post_with_counts_for_one_image(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_image_details",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rmlo_count": "0",
+                "rcc_count": "0",
+                "right_eklund_count": "0",
+                "lmlo_count": "0",
+                "lcc_count": "20",
+                "left_eklund_count": "0",
+                "additional_details": "",
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+        study = appointment.study
+        assert study.additional_details == ""
+
+        series_list = study.series_set.all()
+        assert len(series_list) == 1
+        self._assert_series(series_list[0], "CC", "L", 20)
+        self._assert_take_images_step_completed(appointment, clinical_user_client.user)
 
     def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
         appointment = AppointmentFactory.create(
@@ -120,4 +161,19 @@ class TestAddImageDetailsView:
             </ul>
             """,
             response.text,
+        )
+
+    def _assert_series(
+        self, series, expected_view_position, expected_laterality, expected_count
+    ):
+        assert series.view_position == expected_view_position
+        assert series.laterality == expected_laterality
+        assert series.count == expected_count
+
+    def _assert_take_images_step_completed(self, appointment, user):
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(created_by=user)
+            .values_list("step_name", flat=True)
+            .distinct(),
+            [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
         )

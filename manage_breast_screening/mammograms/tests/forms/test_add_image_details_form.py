@@ -6,6 +6,7 @@ from django.http import QueryDict
 from manage_breast_screening.mammograms.forms.add_image_details_form import (
     AddImageDetailsForm,
 )
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
 )
@@ -14,8 +15,7 @@ from manage_breast_screening.participants.tests.factories import (
 @pytest.mark.django_db
 class TestAddImageDetailsForm:
     def test_no_data(self):
-        appointment = AppointmentFactory()
-        form = AddImageDetailsForm(QueryDict(), participant=appointment.participant)
+        form = AddImageDetailsForm(QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -28,7 +28,6 @@ class TestAddImageDetailsForm:
         }
 
     def test_zero_images(self):
-        appointment = AppointmentFactory()
         form = AddImageDetailsForm(
             QueryDict(
                 urlencode(
@@ -44,7 +43,6 @@ class TestAddImageDetailsForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert not form.is_valid()
@@ -76,12 +74,11 @@ class TestAddImageDetailsForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert form.is_valid()
 
-        study = form.create(appointment=appointment)
+        study = form.save(StudyService(appointment=appointment, current_user=None))
 
         assert study.appointment == appointment
         assert study.additional_details == additional_details
@@ -112,12 +109,11 @@ class TestAddImageDetailsForm:
                     doseq=True,
                 )
             ),
-            participant=appointment.participant,
         )
 
         assert form.is_valid()
 
-        study = form.create(appointment=appointment)
+        study = form.save(StudyService(appointment=appointment, current_user=None))
 
         assert study.appointment == appointment
         assert not study.additional_details
