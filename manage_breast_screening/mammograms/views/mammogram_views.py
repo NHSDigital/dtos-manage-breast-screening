@@ -15,6 +15,7 @@ from manage_breast_screening.core.utils.date_formatting import format_relative_d
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
+    ImagesTakenPresenter,
 )
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
@@ -201,6 +202,7 @@ def check_information(request, pk):
             "page_title": "Check information",
             "heading": "Check information",
             "presented_appointment": AppointmentPresenter(appointment),
+            "presented_images": ImagesTakenPresenter(appointment),
         },
     )
 

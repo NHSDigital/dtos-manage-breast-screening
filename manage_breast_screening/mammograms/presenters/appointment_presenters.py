@@ -291,3 +291,42 @@ class SpecialAppointmentPresenter:
             "mammograms:provide_special_appointment_details",
             kwargs={"pk": self._appointment_pk},
         )
+
+
+class ImagesTakenPresenter:
+    def __init__(self, appointment):
+        study = appointment.study
+        self.additional_details = study.additional_details
+
+        self.total_count = 0
+        self.views_taken = {}
+        for series in study.series_set.all():
+            image_name = ImagesTakenPresenter._get_image_name(series)
+            self.views_taken[image_name] = series.count
+            self.total_count += series.count
+
+        if self.total_count == 0:
+            self.title = "No images taken"
+        elif self.total_count == 1:
+            self.title = "1 image taken"
+        else:
+            self.title = f"{self.total_count} images taken"
+
+    @staticmethod
+    def _get_image_name(series):
+        if series.view_position == "CC" and series.laterality == "R":
+            return "RCC"
+        elif series.view_position == "MLO" and series.laterality == "R":
+            return "RMLO"
+        elif series.view_position == "EKLUND" and series.laterality == "R":
+            return "Right Eklund"
+        elif series.view_position == "CC" and series.laterality == "L":
+            return "LCC"
+        elif series.view_position == "MLO" and series.laterality == "L":
+            return "LMLO"
+        elif series.view_position == "EKLUND" and series.laterality == "L":
+            return "Left Eklund"
+        else:
+            raise ValueError(
+                f"Unknown series view position and laterality combination, {series.view_position}, {series.laterality}"
+            )
