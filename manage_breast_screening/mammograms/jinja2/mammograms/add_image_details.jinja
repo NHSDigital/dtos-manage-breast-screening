@@ -1,0 +1,125 @@
+{% extends "workflow_step.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% set active_workflow_step = 'TAKE_IMAGES' %}
+
+{% block form %}
+  <h2>How many images were taken?</h2>
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% call fieldset({
+        "legend": {
+          "text": "<span class=\"nhsuk-u-visually-hidden\">How many images were taken for the </span>Right breast",
+          "classes": "nhsuk-fieldset__legend--s"
+        }
+      }) %}
+          {{ form.rmlo_count.as_field_group() }}
+          {{ form.rcc_count.as_field_group() }}
+          {{ form.right_eklund_count.as_field_group() }}
+      {% endcall %}
+    </div>
+    <div class="nhsuk-grid-column-one-half">
+      {% call fieldset({
+        "legend": {
+          "text": "<span class=\"nhsuk-u-visually-hidden\">How many images were taken for the </span>Left breast",
+          "classes": "nhsuk-fieldset__legend--s"
+        }
+      }) %}
+          {{ form.lmlo_count.as_field_group() }}
+          {{ form.lcc_count.as_field_group() }}
+          {{ form.left_eklund_count.as_field_group() }}
+      {% endcall %}
+    </div>
+  </div>
+
+  <p class="app-js-only nhsuk-hint nhsuk-u-margin-bottom-4 nhsuk-u-font-size-22" id="total-images-count">
+    Images taken: <span data-total-count></span>
+  </p>
+
+  <div class="nhsuk-inset-text" id="repeat-images-inset" data-module="repeat-images-notice" style="display: none;">
+    <span class="nhsuk-u-visually-hidden">Information: </span>
+    <p>Repeat or extra image details captured on the next screen</p>  
+  </div>
+
+  {% call fieldset({
+    "legend": {
+      "text": "Additional details",
+      "classes": "nhsuk-fieldset__legend--m"
+    }
+  }) %}
+    {{ form.additional_details.as_field_group() }}
+  {% endcall %}
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const insetText = document.querySelector('[data-module="repeat-images-notice"]')
+      const totalCountElement = document.querySelector('[data-total-count]')
+
+      const getCounts = () => {
+        const countInputs = document.querySelectorAll('input[id$="_count"]')
+        const counts = []
+        for (const input of countInputs) {
+          let count = input.value === '' ? 0 : parseInt(input.value, 10)
+          counts.push(count)
+        }
+        return counts
+      }
+
+      const getTotalCount = () => {
+        let total = 0
+        for (const count of getCounts()) {
+          // if any count is not a number then display no total count, rather than a misleading one
+          if (isNaN(count)) {
+            return ''
+          }
+
+          total += count
+        }
+        return total
+      }
+
+      const hasRepeats = () => {
+        for (const count of getCounts()) {
+          if (!isNaN(count) && count > 1) {
+            return true
+          }
+        }
+        return false
+      }
+
+      const updateTotalCount = () => {
+        totalCountElement.textContent = getTotalCount()
+      }
+
+      const updateVisibility = () => {
+        if (hasRepeats()) {
+          insetText.style.display = ''
+        } else {
+          insetText.style.display = 'none'
+        }
+      }
+
+      const updateAll = () => {
+        updateTotalCount()
+        updateVisibility()
+      }
+
+      // Set initial state after a short delay to allow conditional reveals to initialize
+      setTimeout(updateAll, 100)
+
+      const eventListener = (event) => {
+        const target = event.target
+        if (target.id && target.id.endsWith('_count')) {
+          updateAll()
+        }
+      }
+      document.addEventListener('input', eventListener)
+      document.addEventListener('change', eventListener)
+    })
+  </script>
+{% endblock %}

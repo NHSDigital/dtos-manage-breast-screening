@@ -165,9 +165,7 @@ class TestTakeImages:
         )
         assertRedirects(
             response,
-            reverse(
-                "mammograms:additional_image_details", kwargs={"pk": appointment.pk}
-            ),
+            reverse("mammograms:add_image_details", kwargs={"pk": appointment.pk}),
         )
 
     def test_yes_marks_the_step_complete_and_redirects_to_check_info(
