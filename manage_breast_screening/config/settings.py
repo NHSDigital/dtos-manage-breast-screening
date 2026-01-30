@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.participants",
     "manage_breast_screening.mammograms",
     "manage_breast_screening.manual_images",
+    "manage_breast_screening.gateway",
     "rules.apps.AutodiscoverRulesConfig",
 ]
 
