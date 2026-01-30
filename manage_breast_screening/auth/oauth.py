@@ -40,6 +40,7 @@ def get_cis2_client():
         server_metadata_url=settings.CIS2_SERVER_METADATA_URL,
         client_kwargs={
             "scope": settings.CIS2_SCOPES,
+            "prompt": "login",
             "token_endpoint_auth_method": "private_key_jwt",
             # Add a CIS2_DEBUG-only hook to log OIDC requests and responses
             "hooks": {"response": [_log_response]},
