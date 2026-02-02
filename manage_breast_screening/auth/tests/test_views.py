@@ -7,30 +7,23 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML
 
-from manage_breast_screening.auth.models import ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA
+from manage_breast_screening.auth.models import PERSONAS, Role
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 
 
 @pytest.fixture(autouse=True)
-def anna():
-    user = get_user_model().objects.create(
-        nhs_uid=ADMINISTRATIVE_PERSONA.username,
-        first_name=ADMINISTRATIVE_PERSONA.first_name,
-        last_name=ADMINISTRATIVE_PERSONA.last_name,
-    )
-    UserAssignmentFactory(user=user, administrative=True)
-    return user
-
-
-@pytest.fixture(autouse=True)
-def chloe():
-    user = get_user_model().objects.create(
-        nhs_uid=CLINICAL_PERSONA.username,
-        first_name=CLINICAL_PERSONA.first_name,
-        last_name=CLINICAL_PERSONA.last_name,
-    )
-    UserAssignmentFactory(user=user, clinical=True)
-    return user
+def personas():
+    for persona in PERSONAS:
+        user = get_user_model().objects.create(
+            nhs_uid=persona.username,
+            first_name=persona.first_name,
+            last_name=persona.last_name,
+        )
+        UserAssignmentFactory(
+            user=user,
+            administrative=persona.role == Role.ADMINISTRATIVE,
+            clinical=persona.role == Role.CLINICAL,
+        )
 
 
 @pytest.mark.django_db
@@ -43,6 +36,8 @@ def test_get_persona_login(client):
 
     assertInHTML("Anna Davies", response.text)
     assertInHTML("Chloë Robinson", response.text)
+    assertInHTML("Olivia Morgan", response.text)
+    assertInHTML("Ella Foster", response.text)
     assertInHTML('<input type="hidden" name="next" value="/some-url">', response.text)
 
 

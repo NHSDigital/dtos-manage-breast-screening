@@ -26,4 +26,9 @@ class Persona:
 
 ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
 CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
-PERSONAS = [ADMINISTRATIVE_PERSONA, CLINICAL_PERSONA]
+PERSONAS = [
+    ADMINISTRATIVE_PERSONA,
+    CLINICAL_PERSONA,
+    Persona("Olivia", "Morgan", Role.ADMINISTRATIVE),
+    Persona("Ella", "Foster", Role.CLINICAL),
+]
