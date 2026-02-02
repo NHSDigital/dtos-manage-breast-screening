@@ -24,6 +24,13 @@ class TestIntegerField:
                 max_value=10,
                 widget=StepperInput,
             )
+            stepper_field_at_min = IntegerField(
+                label="Stepper",
+                initial=0,
+                min_value=0,
+                max_value=10,
+                widget=StepperInput,
+            )
 
         return TestForm
 
@@ -56,6 +63,23 @@ class TestIntegerField:
                     "id": "id_stepper_field",
                     "name": "stepper_field",
                     "value": 1,
+                    "min": 0,
+                    "max": 10,
+                }
+            },
+        )
+        assertHTMLEqual(actual, expected)
+
+    def test_stepper_field_at_min(self, form_class):
+        actual = form_class()["stepper_field_at_min"].as_field_group()
+        expected = render_to_string(
+            "components/stepper-input/template.jinja",
+            {
+                "params": {
+                    "label": {"text": "Stepper"},
+                    "id": "id_stepper_field_at_min",
+                    "name": "stepper_field_at_min",
+                    "value": 0,
                     "min": 0,
                     "max": 10,
                 }

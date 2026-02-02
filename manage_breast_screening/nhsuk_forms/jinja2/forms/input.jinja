@@ -12,7 +12,7 @@
     } if unbound_field.hint,
     "id": field.auto_id,
     "name": field.html_name,
-    "value": field.value() or "",
+    "value": "" if field.value() is none else field.value(),
     "classes": unbound_field.classes if unbound_field.classes,
     "attributes": widget.attrs,
     "type": widget.input_type,

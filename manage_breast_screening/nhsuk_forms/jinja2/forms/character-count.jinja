@@ -15,7 +15,7 @@
     "maxwords": unbound_field.max_words,
     "id": field.auto_id,
     "name": field.html_name,
-    "value": field.value() or "",
+    "value": "" if field.value() is none else field.value(),
     "classes": unbound_field.classes if unbound_field.classes,
     "rows": widget.attrs.pop("rows", none),
     "cols": widget.attrs.pop("cols", none),
