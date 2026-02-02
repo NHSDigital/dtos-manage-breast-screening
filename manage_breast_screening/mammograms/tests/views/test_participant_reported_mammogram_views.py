@@ -11,6 +11,7 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
+from manage_breast_screening.manual_images.models import Study
 from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
@@ -483,6 +484,8 @@ class TestAppointmentProceedAnywayView:
 @pytest.mark.django_db
 class TestCompleteScreening:
     def test_renders_response(self, clinical_user_client, appointment):
+        # check_information expects appointment to have a Study
+        Study.objects.create(appointment=appointment)
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:check_information",

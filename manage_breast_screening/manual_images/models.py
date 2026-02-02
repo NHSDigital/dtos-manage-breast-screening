@@ -33,3 +33,20 @@ class Series(BaseModel):
 
     class Meta:
         unique_together = ["study", "view_position", "laterality"]
+
+    def __str__(self):
+        match (self.view_position, self.laterality):
+            case ("CC", "R"):
+                return "RCC"
+            case ("MLO", "R"):
+                return "RMLO"
+            case ("EKLUND", "R"):
+                return "Right Eklund"
+            case ("CC", "L"):
+                return "LCC"
+            case ("MLO", "L"):
+                return "LMLO"
+            case ("EKLUND", "L"):
+                return "Left Eklund"
+            case _:
+                return f"{self.view_position} {self.laterality}"
