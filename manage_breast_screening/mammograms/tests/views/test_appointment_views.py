@@ -4,6 +4,7 @@ from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRed
 
 from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
+from manage_breast_screening.gateway.models import GatewayAction, GatewayActionType
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
 )
@@ -117,6 +118,23 @@ class TestRecordMedicalInformation:
             .values_list("step_name", flat=True)
             .distinct(),
             [AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION],
+        )
+
+    def test_creates_gateway_action(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        action = GatewayAction.objects.get(appointment=appointment)
+        assert action.type == GatewayActionType.WORKLIST_CREATE
+        assert (
+            action.payload["parameters"]["worklist_item"]["participant"]["nhs_number"]
+            == appointment.participant.nhs_number
         )
 
 
