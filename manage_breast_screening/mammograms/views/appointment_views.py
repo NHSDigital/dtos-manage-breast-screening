@@ -261,7 +261,7 @@ class TakeImages(InProgressAppointmentMixin, FormView):
                 return redirect("mammograms:check_information", pk=self.appointment_pk)
             case form.StandardImagesChoices.NO_ADD_ADDITIONAL:
                 return redirect(
-                    "mammograms:additional_image_details",
+                    "mammograms:add_image_details",
                     pk=self.appointment_pk,
                 )
             case _:

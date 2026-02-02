@@ -30,6 +30,23 @@ class StudyService:
         return study
 
     @transaction.atomic
+    def create(self, additional_details: str, series_data: list[dict]):
+        self.remove_existing_study_and_series()
+
+        study = Study.objects.create(
+            appointment=self.appointment, additional_details=additional_details
+        )
+        self.auditor.audit_create(study)
+
+        series_set = [
+            Series(study=study, **data) for data in series_data if data["count"] != 0
+        ]
+        study.series_set.bulk_create(series_set)
+        self.auditor.audit_bulk_create(series_set)
+
+        return study
+
+    @transaction.atomic
     def remove_existing_study_and_series(self):
         if hasattr(self.appointment, "study"):
             study = self.appointment.study
