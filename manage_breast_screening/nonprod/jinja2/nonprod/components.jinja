@@ -1,0 +1,129 @@
+{% extends "layout-app.jinja" %}
+
+{% from "components/count/macro.jinja" import app_count %}
+{% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
+{% from "components/secondary-navigation/macro.jinja" import app_secondary_navigation %}
+{% from "components/stepper-input/macro.jinja" import app_stepper_input %}
+{% from "macros/icon.jinja" import app_icon %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/input/macro.jinja" import input %}
+{% from "nhsuk/components/tables/macro.jinja" import table %}
+{% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, paragraph %}
+
+{% set page_title = "App component examples" %}
+
+{% block page_content %}
+<h1>App component and macro examples</h1>
+{% call card({"heading": "app_count(params)"}) %}
+  {{ app_count(123) }}
+{% endcall %}
+
+{% call card({"heading": "app_icon(name, params)"}) %}
+  {{ table({
+    "head": [
+      {
+        "text": "Name"
+      },
+      {
+        "text": "Result"
+      }
+    ],
+    "rows": [
+      [
+        {"text": "plus"},
+        {"html": app_icon("plus")}
+      ],
+      [
+        {"text": "minus"},
+        {"html": app_icon("minus")}
+      ],
+    ]
+  }) }}
+
+  <h3>Buttons with icons</h3>
+  <div class="nhsuk-button-group">
+  {{ button({
+    "html": app_icon("plus", { "title": "More" }),
+    "classes": "app-button--icon nhsuk-button--small"
+  }) }}
+  {{ button({
+    "html": app_icon("minus", { "title": "Less" }),
+    "classes": "app-button--icon nhsuk-button--small"
+  }) }}
+  </div>
+{% endcall %}
+
+{% call card({"heading": "app_nested_info_card(params)"}) %}
+  <p>This is based on the summary list component.</p>
+  {{ app_nested_info_card({
+    "card": {
+      "heading": "Card title",
+      "headingLevel": 3,
+    },
+    "headingLevel": 4,
+    "rows": [
+      {
+        "key": "Procedures",
+        "value": {
+          "rows": [
+            {
+              "columns": [
+                {
+                  "heading": "Right breast",
+                  "html": list_with_default(["Procedure 1", "Procedure 2"])
+                },
+                {
+                  "heading": "Left breast",
+                  "html": list_with_default(["Procedure 1", "Procedure 2"])
+                },
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "key": "Additional information",
+        "value": {
+          "html": paragraph("Not provided.")
+        }
+      }
+    ]
+  }) }}
+{% endcall %}
+
+{% call card({"heading": "app_secondary_navigation(params)"}) %}
+  {{ app_secondary_navigation({
+    "items": [
+      {
+        "text": "First",
+        "href": "#",
+        "current": true
+      },
+      {
+        "text": "Second",
+        "href": "#"
+      },
+      {
+        "text": "Third",
+        "href": "#"
+      },
+    ]
+  }) }}
+{% endcall %}
+
+{% call card({
+  "heading": "app_stepper_input(params)"
+}) %}
+  {{ app_stepper_input({
+    "value": 2,
+    "min": 0,
+    "max": 20,
+    "name": "number_of_capybaras",
+    "label": {
+      "text": "Number of capybaras"
+    }
+  }) }}
+{% endcall %}
+
+{% endblock %}

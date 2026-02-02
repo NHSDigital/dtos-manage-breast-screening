@@ -1,0 +1,108 @@
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
+{% from "nhsuk/components/button/macro.jinja" import button -%}
+{% from "nhsuk/components/input/macro.jinja" import input -%}
+{% from "macros/icon.jinja" import app_icon -%}
+
+{%- set id = params.id if params.id else params.name -%}
+{%- set value = params.value | default(0) -%}
+{% set width = 3 %}
+
+{% set attributes_html -%}
+  {{- nhsukAttributes({
+    "data-module": "app-stepper-input",
+    "data-min": {
+      "value": params.min,
+      "optional": true
+    },
+    "data-max": {
+      "value": params.max,
+      "optional": true
+    },
+    "data-step": {
+      "value": params.step,
+      "optional": true
+    }
+  }) -}}
+{%- endset -%}
+
+{%- set step_down_button %}
+{{ button({
+  "type": "button",
+  "classes": "nhsuk-button--secondary app-button--icon nhsuk-button--small app-stepper-input__step-down app-js-stepper-input-step-down",
+  "html": app_icon("minus", {
+    "title": params.step_down_button.visually_hidden_text | default("Decrease", true)
+  }) | trim | indent(2),
+  "attributes": {
+    "aria-controls": id,
+    "aria-describedby": id ~ "-label",
+    "disabled": {
+      "value": params.min is defined and value <= params.min,
+      "optional": true
+    },
+    "hidden": {
+      "value": true,
+      "optional": true
+    }
+  }
+}) | trim }}
+{% endset -%}
+
+{%- set step_up_button %}
+{{ button({
+  "type": "button",
+  "classes": "nhsuk-button--secondary app-button--icon nhsuk-button--small app-stepper-input__step-up app-js-stepper-input-step-up",
+  "html": app_icon("plus", {
+  "title": params.step_up_button.visually_hidden_text | default("Increase", true)
+}) | trim | indent(2),
+  "attributes": {
+    "aria-controls": id,
+    "aria-describedby": id ~ "-label",
+    "disabled": {
+      "value": params.max is defined and value >= params.max,
+      "optional": true
+    },
+    "hidden": {
+      "value": true,
+      "optional": true
+    }
+  }
+}) | trim }}
+{% endset -%}
+
+{{ input({
+  "formGroup": {
+    "classes": "app-stepper-input",
+    "attributes": attributes_html,
+    "beforeInput": {
+      "html": step_down_button
+    },
+    "afterInput": {
+      "html": step_up_button
+    }
+  },
+  "label": {
+    "html": params.label.html,
+    "text": params.label.text,
+    "id": id ~ "-label",
+    "classes": params.label.classes,
+    "size": params.label.size,
+    "isPageHeading": params.label.isPageHeading,
+    "attributes": params.label.attributes,
+    "for": id
+  },
+  "hint": params.hint,
+  "classes": "app-stepper-input__input nhsuk-input--width-" ~ width ~ " app-js-stepper-input-input" ~ (" " ~ params.classes if params.classes),
+  "errorMessage": params.errorMessage,
+  "id": id,
+  "name": params.name,
+  "type": "text",
+  "inputmode": params.inputmode if params.inputmode else "numeric",
+  "spellcheck": false,
+  "autocapitalize": "none",
+  "autocomplete": params.autocomplete,
+  "value": params.value,
+  "disabled": params.disabled,
+  "describedBy": params.describedBy,
+  "pattern": params.pattern,
+  "attributes": params.attributes
+}) | trim }}

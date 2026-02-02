@@ -1,0 +1,40 @@
+{#
+  Renders app-specific icons as inline SVG.
+  For design system icons, use nhsukIcon.
+
+  @example
+  Output 'plus' icon:
+
+  ```jinja
+  app_icon("plus")
+  ```
+
+  @example
+  Output 'minus' icon with an accessible title:
+
+  ```jinja
+  app_icon("minus", {
+    "title": "Minus"
+  })
+  ```
+
+  @private
+  @param {string} name - Icon name
+  @param {object} [params] - Icon params
+  @param {string} params.title - Accessible name
+  @param {string} params.classes - Classes to add to the icon
+#}
+{% macro app_icon(name, params) -%}
+<svg class="app-icon app-icon--{{ name }} {%- if params.classes %} {{ params.classes }}{% endif %}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" focusable="false"{% if params.title %} role="img" aria-label="{{ params.title }}"{% else %} aria-hidden="true"{% endif %}>
+{% if params.title %}
+  <title>{{ params.title }}</title>
+{% endif %}
+{% if name == "minus" %}
+  <path d="M5.5 10.5a1.5 1.5 0 0 0 0 3h13a1.5 1.5 0 0 0 0-3h-13Z"/>
+{% elif name == "plus" %}
+  <path d="M13.5 5.5a1.5 1.5 0 0 0-3 0v5h-5a1.5 1.5 0 0 0 0 3h5v5a1.5 1.5 0 0 0 3 0v-5h5a1.5 1.5 0 0 0 0-3h-5v-5Z"/>
+{% elif name == "search" %}
+  <path d="m20.7 19.3-4.1-4.1a7 7 0 1 0-1.4 1.4l4 4.1a1 1 0 0 0 1.5 0c.4-.4.4-1 0-1.4ZM6 11a5 5 0 1 1 10 0 5 5 0 0 1-10 0Z"/>
+{% endif %}
+</svg>
+{% endmacro %}
