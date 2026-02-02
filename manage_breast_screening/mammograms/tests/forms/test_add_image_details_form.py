@@ -3,13 +3,11 @@ from urllib.parse import urlencode
 import pytest
 from django.http import QueryDict
 
-from manage_breast_screening.mammograms.forms.add_image_details_form import (
+from manage_breast_screening.mammograms.forms.images.add_image_details_form import (
     AddImageDetailsForm,
 )
 from manage_breast_screening.manual_images.services import StudyService
-from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
-)
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 @pytest.mark.django_db
