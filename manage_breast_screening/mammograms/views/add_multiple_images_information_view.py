@@ -1,12 +1,16 @@
 import logging
 from functools import cached_property
 
+from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.views.mixins import InProgressAppointmentMixin
 from manage_breast_screening.manual_images.models import Study
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 from ..forms.multiple_images_information_form import MultipleImagesInformationForm
 
@@ -70,6 +74,18 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, UpdateWithAud
         )
 
         return context
+
+    @transaction.atomic
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.mark_workflow_step_complete()
+        return response
+
+    def mark_workflow_step_complete(self):
+        self.appointment.completed_workflow_steps.get_or_create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            defaults={"created_by": self.request.user},
+        )
 
     def should_add_message(self, form) -> bool:
         return False

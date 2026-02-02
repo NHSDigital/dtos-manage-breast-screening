@@ -39,14 +39,18 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
 
     @transaction.atomic
     def form_valid(self, form):
-        form.save(
+        study = form.save(
             StudyService(appointment=self.appointment, current_user=self.request.user),
             RecallService(appointment=self.appointment, current_user=self.request.user),
         )
+
+        if study.has_series_with_multiple_images():
+            return redirect(
+                "mammograms:add_multiple_images_information", pk=self.appointment_pk
+            )
+
         self.mark_workflow_step_complete()
-        return redirect(
-            "mammograms:add_multiple_images_information", pk=self.appointment_pk
-        )
+        return redirect("mammograms:check_information", pk=self.appointment_pk)
 
     def mark_workflow_step_complete(self):
         self.appointment.completed_workflow_steps.get_or_create(

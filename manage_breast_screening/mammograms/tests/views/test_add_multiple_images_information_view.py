@@ -1,11 +1,14 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertInHTML, assertRedirects
+from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
 from manage_breast_screening.manual_images.models import RepeatReason, RepeatType
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
+)
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
@@ -108,6 +111,15 @@ class TestAddMultipleImagesInformationView:
             RepeatReason.PATIENT_MOVED.value,
             RepeatReason.MOTION_BLUR.value,
         ]
+
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(
+                created_by=clinical_user_client.user
+            )
+            .values_list("step_name", flat=True)
+            .distinct(),
+            [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
+        )
 
     def test_invalid_post_renders_errors(self, clinical_user_client):
         appointment = AppointmentFactory.create(

@@ -88,6 +88,10 @@ class Study(BaseModel):
     )
     reasons_incomplete_details = models.TextField(blank=True, null=False, default="")
 
+    def has_series_with_multiple_images(self):
+        """Check if any series has more than one image."""
+        return self.series_set.filter(count__gt=1).exists()
+
 
 class Series(BaseModel):
     study = models.ForeignKey(Study, on_delete=models.PROTECT)

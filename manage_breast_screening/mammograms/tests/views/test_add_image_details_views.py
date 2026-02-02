@@ -48,7 +48,7 @@ class TestAddImageDetailsView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:check_information",
+                "mammograms:add_multiple_images_information",
                 kwargs={"pk": appointment.pk},
             ),
         )
@@ -64,9 +64,9 @@ class TestAddImageDetailsView:
         self._assert_series(series_list[3], "MLO", "L", 4)
         self._assert_series(series_list[4], "CC", "L", 5)
         self._assert_series(series_list[5], "EKLUND", "L", 6)
-        self._assert_take_images_step_completed(appointment, clinical_user_client.user)
+        self._assert_take_images_step_not_completed(appointment)
 
-    def test_valid_post_with_counts_for_one_image(self, clinical_user_client):
+    def test_valid_post_with_high_count(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
@@ -93,7 +93,7 @@ class TestAddImageDetailsView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:check_information",
+                "mammograms:add_multiple_images_information",
                 kwargs={"pk": appointment.pk},
             ),
         )
@@ -104,6 +104,40 @@ class TestAddImageDetailsView:
         series_list = study.series_set.all()
         assert len(series_list) == 1
         self._assert_series(series_list[0], "CC", "L", 20)
+        self._assert_take_images_step_not_completed(appointment)
+
+    def test_valid_post_with_all_counts_one_redirects_to_check_information(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_image_details",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rmlo_count": "1",
+                "rcc_count": "1",
+                "right_eklund_count": "0",
+                "lmlo_count": "1",
+                "lcc_count": "1",
+                "left_eklund_count": "0",
+                "additional_details": "",
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+        study = appointment.study
+        series_list = study.series_set.all()
+        assert len(series_list) == 4
         self._assert_take_images_step_completed(appointment, clinical_user_client.user)
 
     def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
@@ -184,3 +218,8 @@ class TestAddImageDetailsView:
             .distinct(),
             [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
         )
+
+    def _assert_take_images_step_not_completed(self, appointment):
+        assert not appointment.completed_workflow_steps.filter(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
+        ).exists()
