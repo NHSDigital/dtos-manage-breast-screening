@@ -36,7 +36,7 @@
     "aria-controls": id,
     "aria-describedby": id ~ "-label",
     "disabled": {
-      "value": params.min is defined and value <= params.min,
+      "value": params.min is defined and value | int(default=1000000) <= params.min,
       "optional": true
     },
     "hidden": {
@@ -58,7 +58,7 @@
     "aria-controls": id,
     "aria-describedby": id ~ "-label",
     "disabled": {
-      "value": params.max is defined and value >= params.max,
+      "value": params.max is defined and value | int(default=0) >= params.max,
       "optional": true
     },
     "hidden": {
