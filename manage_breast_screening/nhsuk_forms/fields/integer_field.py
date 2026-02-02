@@ -8,6 +8,8 @@ class StepperInput(forms.TextInput):
 
 
 class IntegerField(forms.IntegerField):
+    widget = forms.TextInput
+
     def __init__(
         self,
         *args,

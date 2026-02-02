@@ -39,7 +39,7 @@ class TestIntegerField:
                     "id": "id_field",
                     "name": "field",
                     "inputmode": "numeric",
-                    "type": "number",
+                    "type": "text",
                     "value": 1,
                 }
             },
