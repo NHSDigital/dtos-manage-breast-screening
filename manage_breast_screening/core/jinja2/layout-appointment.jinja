@@ -34,11 +34,11 @@
         <ul class="nhsuk-list">
           {% if not appointment.current_status.is_screened %}
             <li>
-              <a href="#">Cancel or reschedule appointment</a>
+              <a href="#" class="nhsuk-link--no-visited-state">Cancel or reschedule appointment</a>
             </li>
           {% endif %}
           <li>
-            <a href="{{ presented_appointment.special_appointment_url }}"> 
+            <a href="{{ presented_appointment.special_appointment_url }}" class="nhsuk-link--no-visited-state"> 
               {% if presented_appointment.can_be_made_special %} Make special appointment
               {% else %} Change special appointment details
               {% endif %}
