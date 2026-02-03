@@ -13,6 +13,18 @@ class ImplantedMedicalDeviceHistoryItem(BaseModel):
             "Other medical device (or does not know)",
         )
 
+        @classmethod
+        def short_name(cls, value, lower=False):
+            mapping = {
+                cls.CARDIAC_DEVICE: "Cardiac device",
+                cls.HICKMAN_LINE: "Hickman line",
+                cls.OTHER_MEDICAL_DEVICE: "Other medical device",
+            }
+            name = mapping.get(value, value)
+            if lower and value != cls.HICKMAN_LINE:
+                return name.lower()
+            return name
+
     appointment = models.ForeignKey(
         Appointment,
         on_delete=models.PROTECT,

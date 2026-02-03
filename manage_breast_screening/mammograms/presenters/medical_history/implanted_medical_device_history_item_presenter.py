@@ -36,11 +36,7 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
 
     @property
     def device(self):
-        mapping = {
-            ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE: "Cardiac device",
-            ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE: "Other medical device",
-        }
-        return mapping.get(self._item.device, self._item.get_device_display())
+        return ImplantedMedicalDeviceHistoryItem.Device.short_name(self._item.device)
 
     @property
     def procedure_year_with_removal(self):

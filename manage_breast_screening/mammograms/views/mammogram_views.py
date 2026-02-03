@@ -17,6 +17,9 @@ from manage_breast_screening.mammograms.presenters.appointment_presenters import
     AppointmentPresenter,
     ImagesTakenPresenter,
 )
+from manage_breast_screening.mammograms.presenters.medical_history.check_medical_information_presenter import (
+    CheckMedicalInformationPresenter,
+)
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
@@ -203,6 +206,9 @@ def check_information(request, pk):
             "heading": "Check information",
             "presented_appointment": AppointmentPresenter(appointment),
             "presented_images": ImagesTakenPresenter(appointment),
+            "presented_medical_information": CheckMedicalInformationPresenter(
+                appointment
+            ),
         },
     )
 
