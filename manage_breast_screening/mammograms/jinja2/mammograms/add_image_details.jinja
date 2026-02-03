@@ -39,7 +39,7 @@
 
   <div class="nhsuk-inset-text" id="repeat-images-inset" data-module="repeat-images-notice" style="display: none;">
     <span class="nhsuk-u-visually-hidden">Information: </span>
-    <p>Repeat or extra image details captured on the next screen</p>  
+    <p>Repeat or extra image details captured on the next screen</p>
   </div>
 
   {% call fieldset({
@@ -48,6 +48,16 @@
       "classes": "nhsuk-fieldset__legend--m"
     }
   }) %}
+    {{ form.imperfect_but_best_possible.as_field_group() }}
+
+    {% set reasons_html %}
+      {{ form.reasons_incomplete.as_field_group() }}
+      {{ form.reasons_incomplete_details.as_field_group() }}
+      {{ form.should_recall.as_field_group() }}
+    {% endset %}
+    {% do form.not_all_mammograms_taken.add_conditional_html('true', reasons_html) %}
+
+    {{ form.not_all_mammograms_taken.as_field_group() }}
     {{ form.additional_details.as_field_group() }}
   {% endcall %}
 {% endblock %}
