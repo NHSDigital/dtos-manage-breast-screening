@@ -4,11 +4,19 @@ import logging
 import uuid
 from datetime import datetime, timezone
 
+from django.db import IntegrityError
+
 from manage_breast_screening.participants.models import Appointment
 
 from .models import GatewayAction, GatewayActionStatus, GatewayActionType
 
 logger = logging.getLogger(__name__)
+
+
+class GatewayActionAlreadyExistsError(Exception):
+    """Raised when a gateway action already exists for the appointment."""
+
+    pass
 
 
 class WorklistItemService:
@@ -88,14 +96,19 @@ class WorklistItemService:
         accession_number = self._generate_accession_number()
         payload = self._build_payload(action_id, accession_number)
 
-        action = GatewayAction.objects.create(
-            id=action_id,
-            appointment=self.appointment,
-            type=GatewayActionType.WORKLIST_CREATE,
-            accession_number=accession_number,
-            payload=payload,
-            status=GatewayActionStatus.PENDING,
-        )
+        try:
+            action = GatewayAction.objects.create(
+                id=action_id,
+                appointment=self.appointment,
+                type=GatewayActionType.WORKLIST_CREATE,
+                accession_number=accession_number,
+                payload=payload,
+                status=GatewayActionStatus.PENDING,
+            )
+        except IntegrityError as e:
+            raise GatewayActionAlreadyExistsError(
+                f"Gateway action already exists for appointment {self.appointment.pk}"
+            ) from e
 
         logger.info(
             f"Created gateway action {action_id} for appointment {self.appointment.pk}"

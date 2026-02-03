@@ -12,7 +12,10 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
-from manage_breast_screening.gateway.services import WorklistItemService
+from manage_breast_screening.gateway.services import (
+    GatewayActionAlreadyExistsError,
+    WorklistItemService,
+)
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
 )
@@ -191,6 +194,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         try:
             with transaction.atomic():
                 form.save()
+                WorklistItemService.create(self.appointment)
         except (IntegrityError, DatabaseError):
             messages.add_message(
                 self.request,
@@ -201,14 +205,8 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME,
                 pk=self.appointment.pk,
             )
-        try:
-            WorklistItemService.create(self.appointment)
-        except Exception:
-            logger.warning(
-                "Failed to create gateway action for appointment %s",
-                self.appointment.pk,
-                exc_info=True,
-            )
+        except GatewayActionAlreadyExistsError as e:
+            logger.warning(str(e))
 
         return redirect("mammograms:take_images", pk=self.appointment.pk)
 
