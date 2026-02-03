@@ -1,5 +1,6 @@
 import pytest
 from django.forms import Form
+from django.template.loader import render_to_string
 from pytest_django.asserts import assertHTMLEqual
 
 from ...fields import BooleanField
@@ -19,91 +20,111 @@ class TestBooelanField:
         return TestForm
 
     def test_renders_checkbox(self, form_class):
-        assertHTMLEqual(
-            form_class()["field"].as_field_group(),
-            """
-            <div class="nhsuk-form-group">
-                <div class="nhsuk-hint" id="id_field-hint">
-                    Click me
-                </div>
-                <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
-                    <div class="nhsuk-checkboxes__item">
-                        <input aria-describedby="id_field-hint" class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
-                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
-                    </div>
-                </div>
-            </div>
-            """,
+        actual = form_class()["field"].as_field_group()
+        expected = render_to_string(
+            "nhsuk/components/checkboxes/template.jinja",
+            {
+                "params": {
+                    "name": "field",
+                    "idPrefix": "id_field",
+                    "items": [
+                        {
+                            "id": "id_field",
+                            "value": "true",
+                            "text": "Abc",
+                            "checked": False,
+                            "hint": {"html": "Click me"},
+                        }
+                    ],
+                }
+            },
         )
+        assertHTMLEqual(actual, expected)
 
     def test_renders_with_data_true(self, form_class):
-        assertHTMLEqual(
-            form_class(data={"field": "true"})["field"].as_field_group(),
-            """
-            <div class="nhsuk-form-group">
-                <div class="nhsuk-hint" id="id_field-hint">
-                    Click me
-                </div>
-                <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
-                    <div class="nhsuk-checkboxes__item">
-                        <input aria-describedby="id_field-hint" checked class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
-                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
-                    </div>
-                </div>
-            </div>
-            """,
+        actual = form_class(data={"field": "true"})["field"].as_field_group()
+        expected = render_to_string(
+            "nhsuk/components/checkboxes/template.jinja",
+            {
+                "params": {
+                    "name": "field",
+                    "idPrefix": "id_field",
+                    "items": [
+                        {
+                            "id": "id_field",
+                            "value": "true",
+                            "text": "Abc",
+                            "checked": True,
+                            "hint": {"html": "Click me"},
+                        }
+                    ],
+                }
+            },
         )
+        assertHTMLEqual(actual, expected)
 
     def test_renders_with_data_false(self, form_class):
-        assertHTMLEqual(
-            form_class(data={"field": "false"})["field"].as_field_group(),
-            """
-            <div class="nhsuk-form-group">
-                <div class="nhsuk-hint" id="id_field-hint">
-                    Click me
-                </div>
-                <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
-                    <div class="nhsuk-checkboxes__item">
-                        <input aria-describedby="id_field-hint" class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
-                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
-                    </div>
-                </div>
-            </div>
-            """,
+        actual = form_class(data={"field": "false"})["field"].as_field_group()
+        expected = render_to_string(
+            "nhsuk/components/checkboxes/template.jinja",
+            {
+                "params": {
+                    "name": "field",
+                    "idPrefix": "id_field",
+                    "items": [
+                        {
+                            "id": "id_field",
+                            "value": "true",
+                            "text": "Abc",
+                            "checked": False,
+                            "hint": {"html": "Click me"},
+                        }
+                    ],
+                }
+            },
         )
+        assertHTMLEqual(actual, expected)
 
     def test_renders_with_initial_true(self, form_class):
-        assertHTMLEqual(
-            form_class(initial={"field": True})["field"].as_field_group(),
-            """
-            <div class="nhsuk-form-group">
-                <div class="nhsuk-hint" id="id_field-hint">
-                    Click me
-                </div>
-                <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
-                    <div class="nhsuk-checkboxes__item">
-                        <input aria-describedby="id_field-hint" checked class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
-                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
-                    </div>
-                </div>
-            </div>
-            """,
+        actual = form_class(initial={"field": True})["field"].as_field_group()
+        expected = render_to_string(
+            "nhsuk/components/checkboxes/template.jinja",
+            {
+                "params": {
+                    "name": "field",
+                    "idPrefix": "id_field",
+                    "items": [
+                        {
+                            "id": "id_field",
+                            "value": "true",
+                            "text": "Abc",
+                            "checked": True,
+                            "hint": {"html": "Click me"},
+                        }
+                    ],
+                }
+            },
         )
+        assertHTMLEqual(actual, expected)
 
     def test_renders_with_initial_false(self, form_class):
-        assertHTMLEqual(
-            form_class(initial={"field": False})["field"].as_field_group(),
-            """
-            <div class="nhsuk-form-group">
-                <div class="nhsuk-hint" id="id_field-hint">
-                    Click me
-                </div>
-                <div class="nhsuk-checkboxes" data-module="nhsuk-checkboxes">
-                    <div class="nhsuk-checkboxes__item">
-                        <input aria-describedby="id_field-hint" class="nhsuk-checkboxes__input" id="id_field" name="field" type="checkbox" value="true">
-                        <label class="nhsuk-label nhsuk-checkboxes__label" for="id_field">Abc</label>
-                    </div>
-                </div>
-            </div>
-            """,
+        actual = form_class(initial={"field": False})["field"].as_field_group()
+        expected = render_to_string(
+            "nhsuk/components/checkboxes/template.jinja",
+            {
+                "params": {
+                    "name": "field",
+                    "idPrefix": "id_field",
+                    "items": [
+                        {
+                            "id": "id_field",
+                            "value": "true",
+                            "text": "Abc",
+                            "checked": False,
+                            "hint": {"html": "Click me"},
+                        }
+                    ],
+                }
+            },
         )
+        assertHTMLEqual(actual, expected)
