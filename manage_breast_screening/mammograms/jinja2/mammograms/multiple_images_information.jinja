@@ -7,15 +7,6 @@
   <p>You have indicated multiple images were needed for some views.</p>
 
   {% for series, fields in form.get_series_field_groups() %}
-    <h2 class="nhsuk-heading-m">
-      {{ series.count }} {{ series.get_laterality_display() }} {{ series.view_position }} images were taken.
-      {% if series.count == 2 %}
-        Was the additional image a repeat?
-      {% else %}
-        Were the additional images repeats?
-      {% endif %}
-    </h2>
-
     {% set reasons_html = form[fields.repeat_reasons].as_field_group() %}
 
     {% if fields.repeat_count %}
@@ -29,10 +20,4 @@
 
     {{ form[fields.repeat_type].as_field_group() }}
   {% endfor %}
-
-  <div class="nhsuk-button-group">
-    {{ button({
-      "text": "Continue"
-    }) }}
-  </div>
 {% endblock %}

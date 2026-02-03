@@ -24,7 +24,7 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, UpdateWithAud
     model = Study
 
     def update_title(self, thing_name):
-        return "Provide image information"
+        return "Add image information"
 
     def get_object(self, queryset=None):
         return Study.objects.filter(appointment=self.appointment).first()

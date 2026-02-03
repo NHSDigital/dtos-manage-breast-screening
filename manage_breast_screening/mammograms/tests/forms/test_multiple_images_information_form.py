@@ -40,7 +40,7 @@ class TestMultipleImagesInformationForm:
             assert not form.is_valid()
             assert form.errors == {
                 "rmlo_repeat_type": [
-                    "Select whether the additional images were repeats"
+                    "Select whether the additional Right MLO images were repeats"
                 ],
             }
 

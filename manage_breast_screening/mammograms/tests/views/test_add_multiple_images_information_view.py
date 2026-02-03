@@ -138,7 +138,7 @@ class TestAddMultipleImagesInformationView:
 
         assert response.status_code == 200
         assertInHTML(
-            '<a href="#id_rmlo_repeat_type">Select whether the additional images were repeats</a>',
+            '<a href="#id_rmlo_repeat_type">Select whether the additional Right MLO images were repeats</a>',
             response.text,
         )
 

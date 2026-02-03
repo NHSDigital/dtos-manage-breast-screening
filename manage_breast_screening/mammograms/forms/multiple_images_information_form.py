@@ -41,7 +41,9 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         repeat_count_field_name = f"{prefix}_repeat_count"
 
         # Build the radio choices based on image count
+        laterality = series.get_laterality_display()
         if series.count == 2:
+            question = "Was the additional image a repeat?"
             choices = [
                 (RepeatType.ALL_REPEATS.value, "Yes, it was a repeat"),
                 (
@@ -50,6 +52,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 ),
             ]
         else:
+            question = "Were the additional images repeats?"
             choices = [
                 (RepeatType.ALL_REPEATS.value, "Yes, all images were repeats"),
                 (
@@ -62,13 +65,15 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 ),
             ]
 
+        label = f"{series.count} {laterality} {series.view_position} images were taken. {question}"
+
         self.fields[repeat_type_field_name] = ChoiceField(
             choices=choices,
             required=True,
-            label="",
-            label_classes="nhsuk-fieldset__legend--s nhsuk-u-visually-hidden",
+            label=label,
+            label_classes="nhsuk-fieldset__legend--m",
             error_messages={
-                "required": "Select whether the additional images were repeats"
+                "required": f"Select whether the additional {laterality} {series.view_position} images were repeats"
             },
         )
 
