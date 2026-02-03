@@ -1,7 +1,11 @@
 import pytest
+from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
+from manage_breast_screening.mammograms.forms.multiple_images_information_form import (
+    MultipleImagesInformationForm,
+)
 from manage_breast_screening.manual_images.models import RepeatReason, RepeatType
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
@@ -13,6 +17,11 @@ from manage_breast_screening.participants.models.appointment import (
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
 )
+
+
+def _fingerprint_for(series_list, study):
+    form = MultipleImagesInformationForm(series_list=series_list, instance=study)
+    return form.initial["series_fingerprint"]
 
 
 @pytest.mark.django_db
@@ -90,6 +99,7 @@ class TestAddMultipleImagesInformationView:
                 kwargs={"pk": appointment.pk},
             ),
             {
+                "series_fingerprint": _fingerprint_for([series], study),
                 "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
                 "rmlo_repeat_reasons": [
                     RepeatReason.PATIENT_MOVED.value,
@@ -126,14 +136,18 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+        series = SeriesFactory(
+            study=study, laterality="R", view_position="MLO", count=2
+        )
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_multiple_images_information",
                 kwargs={"pk": appointment.pk},
             ),
-            {},
+            {
+                "series_fingerprint": _fingerprint_for([series], study),
+            },
         )
 
         assert response.status_code == 200
@@ -210,6 +224,7 @@ class TestAddMultipleImagesInformationView:
                 kwargs={"pk": appointment.pk},
             ),
             {
+                "series_fingerprint": _fingerprint_for([series], study),
                 "lmlo_repeat_type": RepeatType.SOME_REPEATS.value,
                 "lmlo_repeat_count": "2",
                 "lmlo_repeat_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
@@ -228,3 +243,144 @@ class TestAddMultipleImagesInformationView:
         assert series.repeat_type == RepeatType.SOME_REPEATS.value
         assert series.repeat_count == 2
         assert series.repeat_reasons == [RepeatReason.EQUIPMENT_FAULT.value]
+
+    class TestStaleFormProtection:
+        """Tests for stale form detection and redirection."""
+
+        def test_stale_form_redirects_with_warning(self, clinical_user_client):
+            appointment = AppointmentFactory.create(
+                clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+            )
+            study = StudyFactory(appointment=appointment)
+            series = SeriesFactory(
+                study=study, laterality="R", view_position="MLO", count=2
+            )
+
+            old_fingerprint = _fingerprint_for([series], study)
+
+            # Simulate the series changing (e.g., user resubmitted add_image_details)
+            series.count = 3
+            series.save()
+
+            response = clinical_user_client.http.post(
+                reverse(
+                    "mammograms:add_multiple_images_information",
+                    kwargs={"pk": appointment.pk},
+                ),
+                {
+                    "series_fingerprint": old_fingerprint,
+                    "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
+                },
+            )
+
+            assertRedirects(
+                response,
+                reverse(
+                    "mammograms:add_image_details",
+                    kwargs={"pk": appointment.pk},
+                ),
+                fetch_redirect_response=False,
+            )
+
+            messages = list(get_messages(response.wsgi_request))
+            assert len(messages) == 1
+            assert "The image details have changed. Please review and continue." in str(
+                messages[0]
+            )
+
+        def test_valid_fingerprint_proceeds_normally(self, clinical_user_client):
+            appointment = AppointmentFactory.create(
+                clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+            )
+            study = StudyFactory(appointment=appointment)
+            series = SeriesFactory(
+                study=study, laterality="R", view_position="MLO", count=2
+            )
+
+            response = clinical_user_client.http.post(
+                reverse(
+                    "mammograms:add_multiple_images_information",
+                    kwargs={"pk": appointment.pk},
+                ),
+                {
+                    "series_fingerprint": _fingerprint_for([series], study),
+                    "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
+                    "rmlo_repeat_reasons": [RepeatReason.PATIENT_MOVED.value],
+                },
+            )
+
+            assertRedirects(
+                response,
+                reverse(
+                    "mammograms:check_information",
+                    kwargs={"pk": appointment.pk},
+                ),
+            )
+
+            series.refresh_from_db()
+            assert series.repeat_type == RepeatType.ALL_REPEATS.value
+
+        def test_stale_form_when_series_disappears(self, clinical_user_client):
+            appointment = AppointmentFactory.create(
+                clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+            )
+            study = StudyFactory(appointment=appointment)
+            series1 = SeriesFactory(
+                study=study, laterality="R", view_position="MLO", count=2
+            )
+            series2 = SeriesFactory(
+                study=study, laterality="L", view_position="CC", count=2
+            )
+
+            old_fingerprint = _fingerprint_for([series1, series2], study)
+
+            # series2 drops to count=1 (no longer qualifies)
+            series2.count = 1
+            series2.save()
+
+            # Submit with old fingerprint (includes series2 which is now gone)
+            response = clinical_user_client.http.post(
+                reverse(
+                    "mammograms:add_multiple_images_information",
+                    kwargs={"pk": appointment.pk},
+                ),
+                {
+                    "series_fingerprint": old_fingerprint,
+                    "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
+                    "lcc_repeat_type": RepeatType.NO_REPEATS.value,
+                },
+            )
+
+            assertRedirects(
+                response,
+                reverse(
+                    "mammograms:add_image_details",
+                    kwargs={"pk": appointment.pk},
+                ),
+                fetch_redirect_response=False,
+            )
+
+        def test_post_redirects_when_no_study(self, clinical_user_client):
+            appointment = AppointmentFactory.create(
+                clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+            )
+            # No study created
+
+            response = clinical_user_client.http.post(
+                reverse(
+                    "mammograms:add_multiple_images_information",
+                    kwargs={"pk": appointment.pk},
+                ),
+                {
+                    "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
+                },
+            )
+
+            assertRedirects(
+                response,
+                reverse(
+                    "mammograms:check_information",
+                    kwargs={"pk": appointment.pk},
+                ),
+                fetch_redirect_response=False,
+            )

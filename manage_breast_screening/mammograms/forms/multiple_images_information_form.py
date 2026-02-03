@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 
 from manage_breast_screening.manual_images.models import RepeatReason, RepeatType
@@ -26,6 +28,15 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         self.instance = instance
         super().__init__(*args, **kwargs)
 
+        # Add hidden field for stale form detection
+        self.fields["series_fingerprint"] = forms.CharField(
+            widget=forms.HiddenInput(),
+            required=True,
+        )
+        self.initial["series_fingerprint"] = self._get_series_fingerprint(
+            self.series_list
+        )
+
         for series in self.series_list:
             prefix = self._get_series_prefix(series)
             self._add_fields_for_series(series, prefix)
@@ -33,6 +44,17 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
     def _get_series_prefix(self, series):
         """Generate a field name prefix from the series laterality and view position."""
         return f"{series.laterality.lower()}{series.view_position.lower()}"
+
+    def _get_series_fingerprint(self, series_list):
+        """Generate a fingerprint representing the current series state for stale form detection."""
+        data = [(s.id.hex, s.laterality, s.view_position, s.count) for s in series_list]
+        return json.dumps(data)
+
+    def is_stale(self, current_series_list):
+        """Check if the submitted fingerprint matches the current series state."""
+        submitted_fingerprint = self.data.get("series_fingerprint", "")
+        current_fingerprint = self._get_series_fingerprint(current_series_list)
+        return submitted_fingerprint != current_fingerprint
 
     def _add_fields_for_series(self, series, prefix):
         """Add repeat_type, repeat_reasons, and optionally repeat_count fields for a series."""
