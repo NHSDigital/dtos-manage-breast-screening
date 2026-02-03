@@ -1,9 +1,9 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db import DatabaseError, IntegrityError, transaction
-from django.http import Http404
+from django.http import Http404, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -15,6 +15,7 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.gateway.services import (
     GatewayActionAlreadyExistsError,
     WorklistItemService,
+    get_images_for_appointment,
 )
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
@@ -262,10 +263,13 @@ class TakeImages(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        images = get_images_for_appointment(self.appointment)
         context.update(
             {
                 "heading": "Record images taken",
                 "page_title": "Record images taken",
+                "images": images,
+                "appointment_pk": self.appointment.pk,
             }
         )
         return context
@@ -357,3 +361,29 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
         return redirect(
             MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
         )
+
+
+@login_required
+def appointment_images_json(request, pk):
+    """Return images for an appointment as JSON."""
+    try:
+        provider = request.user.current_provider
+        appointment = provider.appointments.get(pk=pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
+
+    images = get_images_for_appointment(appointment)
+
+    return JsonResponse(
+        {
+            "images": [
+                {
+                    "id": str(image.id),
+                    "sop_instance_uid": image.sop_instance_uid,
+                    "instance_number": image.instance_number,
+                    "image_url": image.image_file.url if image.image_file else None,
+                }
+                for image in images
+            ]
+        }
+    )

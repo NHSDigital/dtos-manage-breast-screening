@@ -348,6 +348,24 @@ class TestTakeImages:
 
 
 @pytest.mark.django_db
+class TestAppointmentImagesJson:
+    def test_returns_empty_list_when_no_images(self, clinical_user_client, appointment):
+        response = clinical_user_client.http.get(
+            reverse("mammograms:appointment_images_json", kwargs={"pk": appointment.pk})
+        )
+        assert response.status_code == 200
+        assert response.json() == {"images": []}
+
+    def test_returns_404_for_unknown_appointment(self, clinical_user_client):
+        import uuid
+
+        response = clinical_user_client.http.get(
+            reverse("mammograms:appointment_images_json", kwargs={"pk": uuid.uuid4()})
+        )
+        assert response.status_code == 404
+
+
+@pytest.mark.django_db
 class TestCheckIn:
     def test_known_redirect(self, clinical_user_client):
         appointment = AppointmentFactory.create(

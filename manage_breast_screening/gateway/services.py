@@ -6,11 +6,30 @@ from datetime import datetime, timezone
 
 from django.db import IntegrityError
 
+from manage_breast_screening.dicom.models import Image
 from manage_breast_screening.participants.models import Appointment
 
 from .models import GatewayAction, GatewayActionStatus, GatewayActionType
 
 logger = logging.getLogger(__name__)
+
+
+def get_images_for_appointment(appointment: Appointment):
+    """
+    Get all DICOM images for an appointment via its GatewayAction.
+    """
+    action = appointment.gateway_actions.filter(
+        type=GatewayActionType.WORKLIST_CREATE
+    ).first()
+
+    if not action:
+        return Image.objects.none()
+
+    return (
+        Image.objects.filter(series__study__source_message_id=str(action.id))
+        .select_related("series__study")
+        .order_by("series__series_number", "instance_number")
+    )
 
 
 class GatewayActionAlreadyExistsError(Exception):
