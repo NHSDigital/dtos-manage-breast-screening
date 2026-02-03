@@ -12,6 +12,10 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.gateway.services import (
+    GatewayActionAlreadyExistsError,
+    WorklistItemService,
+)
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
 )
@@ -190,7 +194,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         try:
             with transaction.atomic():
                 form.save()
-            return redirect("mammograms:take_images", pk=self.appointment.pk)
+                WorklistItemService.create(self.appointment)
         except (IntegrityError, DatabaseError):
             messages.add_message(
                 self.request,
@@ -198,8 +202,13 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "Unable to complete all sections. Please try again.",
             )
             return redirect(
-                MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
+                MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME,
+                pk=self.appointment.pk,
             )
+        except GatewayActionAlreadyExistsError as e:
+            logger.warning(str(e))
+
+        return redirect("mammograms:take_images", pk=self.appointment.pk)
 
 
 class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
