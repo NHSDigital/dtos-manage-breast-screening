@@ -87,7 +87,7 @@ class TestAppointmentNote(SystemTestCase):
     def and_the_appointment_details_tab_shows_the_note(self, text):
         secondary_nav = self.page.locator(".app-secondary-navigation")
         expect(secondary_nav).to_be_visible()
-        appointment_details_tab = secondary_nav.get_by_text("Appointment details")
+        appointment_details_tab = secondary_nav.get_by_text("Appointment")
         appointment_details_tab.click()
 
         note_container = self.page.locator(

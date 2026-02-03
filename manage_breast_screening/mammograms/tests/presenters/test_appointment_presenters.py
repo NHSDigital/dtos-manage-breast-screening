@@ -693,7 +693,7 @@ class TestClinicSlotPresenter:
 
         assert (
             ClinicSlotPresenter(clinic_slot_mock).slot_time_and_clinic_date
-            == "9:30am (30 minutes) - 2 January 2025 (4 months, 17 days ago)"
+            == "2 January 2025 (4 months, 17 days ago) \n 9:30am (30 minutes)"
         )
 
     @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
