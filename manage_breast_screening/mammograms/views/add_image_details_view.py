@@ -5,17 +5,13 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import FormView
 
-from manage_breast_screening.mammograms.views.mixins import (
-    InProgressAppointmentMixin,
-)
+from manage_breast_screening.mammograms.views.mixins import InProgressAppointmentMixin
 from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
 
-from ..forms.add_image_details_form import (
-    AddImageDetailsForm,
-)
+from ..forms.images.add_image_details_form import AddImageDetailsForm
 
 logger = logging.getLogger(__name__)
 

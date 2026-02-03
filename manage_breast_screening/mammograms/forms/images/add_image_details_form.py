@@ -2,6 +2,7 @@ from django.forms.widgets import Textarea
 
 from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.nhsuk_forms.fields import CharField, IntegerField
+from manage_breast_screening.nhsuk_forms.fields.integer_field import StepperInput
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
@@ -15,12 +16,14 @@ class AddImageDetailsForm(FormWithConditionalFields):
         required=True,
         min_value=0,
         max_value=20,
+        initial=1,
         error_messages={
             "min_value": "Number of RMLO images must be at least 0.",
             "max_value": "Number of RMLO images must be at most 20.",
             "invalid": "Enter a valid number of RMLO images.",
             "required": "Enter the number of RMLO images.",
         },
+        widget=StepperInput,
     )
     rcc_count = IntegerField(
         label="RCC",
@@ -28,12 +31,14 @@ class AddImageDetailsForm(FormWithConditionalFields):
         required=True,
         min_value=0,
         max_value=20,
+        initial=1,
         error_messages={
             "min_value": "Number of RCC images must be at least 0.",
             "max_value": "Number of RCC images must be at most 20.",
             "invalid": "Enter a valid number of RCC images.",
             "required": "Enter the number of RCC images.",
         },
+        widget=StepperInput,
     )
     right_eklund_count = IntegerField(
         label="Right Eklund",
@@ -42,12 +47,14 @@ class AddImageDetailsForm(FormWithConditionalFields):
         required=True,
         min_value=0,
         max_value=20,
+        initial=0,
         error_messages={
             "min_value": "Number of Right Eklund images must be at least 0.",
             "max_value": "Number of Right Eklund images must be at most 20.",
             "invalid": "Enter a valid number of Right Eklund images.",
             "required": "Enter the number of Right Eklund images.",
         },
+        widget=StepperInput,
     )
     lmlo_count = IntegerField(
         label="LMLO",
@@ -55,12 +62,14 @@ class AddImageDetailsForm(FormWithConditionalFields):
         required=True,
         min_value=0,
         max_value=20,
+        initial=1,
         error_messages={
             "min_value": "Number of LMLO images must be at least 0.",
             "max_value": "Number of LMLO images must be at most 20.",
             "invalid": "Enter a valid number of LMLO images.",
             "required": "Enter the number of LMLO images.",
         },
+        widget=StepperInput,
     )
     lcc_count = IntegerField(
         label="LCC",
@@ -68,12 +77,14 @@ class AddImageDetailsForm(FormWithConditionalFields):
         required=True,
         min_value=0,
         max_value=20,
+        initial=1,
         error_messages={
             "min_value": "Number of LCC images must be at least 0.",
             "max_value": "Number of LCC images must be at most 20.",
             "invalid": "Enter a valid number of LCC images.",
             "required": "Enter the number of LCC images.",
         },
+        widget=StepperInput,
     )
     left_eklund_count = IntegerField(
         label="Left Eklund",
@@ -82,12 +93,14 @@ class AddImageDetailsForm(FormWithConditionalFields):
         required=True,
         min_value=0,
         max_value=20,
+        initial=0,
         error_messages={
             "min_value": "Number of Left Eklund images must be at least 0.",
             "max_value": "Number of Left Eklund images must be at most 20.",
             "invalid": "Enter a valid number of Left Eklund images.",
             "required": "Enter the number of Left Eklund images.",
         },
+        widget=StepperInput,
     )
 
     additional_details = CharField(
