@@ -30,11 +30,16 @@ class StudyService:
         return study
 
     @transaction.atomic
-    def create(self, additional_details: str, series_data: list[dict]):
+    def create(
+        self,
+        series_data: list[dict],
+        **study_kwargs,
+    ):
         self.remove_existing_study_and_series()
 
         study = Study.objects.create(
-            appointment=self.appointment, additional_details=additional_details
+            appointment=self.appointment,
+            **study_kwargs,
         )
         self.auditor.audit_create(study)
 
