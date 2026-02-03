@@ -2,20 +2,25 @@
 {% macro appointment_note_banner(appointment_note, change_url=None, show_change_link=True) %}
   {% if appointment_note %}
     {% set appointment_note_html %}
-      <div class="nhsuk-u-margin-bottom-3">
-        {{ appointment_note.content | nl2br }}
+      <div class="nhsuk-grid-row">
+        <div class="nhsuk-grid-column-two-thirds">
+          <p>{{ appointment_note.content | nl2br }}</p>
+        </div>
       </div>
-      {% if show_change_link and change_url %}
-        <p class="nhsuk-u-margin-bottom-0">
-          <a href="{{ change_url }}">
-            Change<span class="nhsuk-u-visually-hidden"> appointment note</span>
-          </a>
-        </p>
-      {% endif %}
     {% endset %}
     {{ warningCallout({
       "heading": "Appointment note",
-      "html": appointment_note_html
+      "html": appointment_note_html,
+      "actions": {
+        "items": [
+          {
+            "href": change_url,
+            "text": "Change",
+            "visuallyHiddenText": " note",
+            "classes": "nhsuk-link--no-visited-state",
+          }
+        ]
+      } if show_change_link and change_url else undefined
     }) }}
   {% endif %}
 {% endmacro %}

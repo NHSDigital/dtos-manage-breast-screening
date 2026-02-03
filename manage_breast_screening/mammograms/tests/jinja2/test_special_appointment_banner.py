@@ -33,12 +33,17 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
         response,
         """
         <div class="nhsuk-card nhsuk-card--warning">
+            <div class="nhsuk-card__heading-container">
+                <h3 class="nhsuk-card__heading">
+                <span role="text">
+                    <span class="nhsuk-u-visually-hidden">Important:</span> Special appointment
+                </span>
+                </h3>
+                <div class="nhsuk-card__actions">
+                <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements (Special appointment)</span></a>
+                </div>
+            </div>
             <div class="nhsuk-card__content">
-                <h3 class="nhsuk-card__heading"><span role="text">
-                <span class="nhsuk-u-visually-hidden">Important: </span>
-                Special appointment
-                </span></h3>
-
                 <dl class="nhsuk-summary-list app-special-appointment-banner">
                     <div class="nhsuk-summary-list__row">
                         <dt class="nhsuk-summary-list__key">
@@ -57,9 +62,6 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
                         </dd>
                     </div>
                 </dl>
-                <div class="app-special-appointment-banner__action">
-                    <a href="/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/" style="font-size: 19px;">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements</span></a>
-                </div>
             </div>
         </div>
     """,
