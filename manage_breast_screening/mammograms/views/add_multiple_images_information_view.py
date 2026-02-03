@@ -63,13 +63,9 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, UpdateWithAud
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        participant = self.appointment.participant
-
         context.update(
             {
                 "back_link_params": self.get_back_link_params(),
-                "caption": participant.full_name,
-                "participant_first_name": participant.first_name,
             },
         )
 
