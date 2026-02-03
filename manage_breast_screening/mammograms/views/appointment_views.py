@@ -125,6 +125,7 @@ class ParticipantDetails(AppointmentTabMixin, View):
 
 class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
     template_name = "mammograms/confirm_identity.jinja"
+    CONFIRM_IDENTITY_LABEL = "Confirm identity"
 
     def get_context_data(self, pk, **kwargs):
         context = super().get_context_data()
@@ -133,9 +134,14 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
 
         context.update(
             {
-                "heading": "Confirm identity",
-                "page_title": "Confirm identity",
+                "heading": self.CONFIRM_IDENTITY_LABEL,
+                "page_title": self.CONFIRM_IDENTITY_LABEL,
                 "presented_participant": ParticipantPresenter(participant),
+                "confirm_button_text": (
+                    "Next section"
+                    if self.is_identity_confirmed_by_user(self.request.user)
+                    else self.CONFIRM_IDENTITY_LABEL
+                ),
                 "appointment_cannot_proceed_href": reverse(
                     "mammograms:appointment_cannot_go_ahead", kwargs={"pk": pk}
                 ),
@@ -145,12 +151,19 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
         return context
 
     def post(self, request, pk):
-        self.appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=request.user,
-        )
+        if not self.is_identity_confirmed_by_user(request.user):
+            self.appointment.completed_workflow_steps.create(
+                step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+                created_by=request.user,
+            )
 
         return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
+
+    def is_identity_confirmed_by_user(self, user):
+        return self.appointment.completed_workflow_steps.filter(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=user,
+        ).exists()
 
 
 class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
