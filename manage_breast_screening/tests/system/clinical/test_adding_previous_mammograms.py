@@ -22,10 +22,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        self.and_i_am_on_the_participant_details_page()
+        self.and_i_am_on_the_record_medical_information_page()
         self.then_i_should_see_no_reported_mammograms()
 
-        self.when_i_click_on_add_mammogram()
+        self.when_i_click_on_add_another_mammogram()
         self.then_i_should_be_on_the_add_previous_mammogram_form()
 
         self.when_i_select_the_same_provider()
@@ -33,7 +33,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_select_yes_same_name()
         self.and_i_enter_additional_information()
         self.and_i_click_save()
-        self.then_i_should_be_back_on_the_appointment()
+        self.then_i_should_be_back_on_the_medical_information_page()
         self.and_i_should_see_the_mammogram_with_the_same_provider()
 
         self.when_i_click_change()
@@ -44,7 +44,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_enter_a_different_name()
         self.and_i_enter_additional_information()
         self.and_i_click_save()
-        self.then_i_should_be_back_on_the_appointment()
+        self.then_i_should_be_back_on_the_medical_information_page()
         self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
 
     def test_adding_and_deleting_mammogram_taken_elsewhere_with_a_different_name(self):
@@ -54,10 +54,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        self.and_i_am_on_the_participant_details_page()
+        self.and_i_am_on_the_record_medical_information_page()
         self.then_i_should_see_no_reported_mammograms()
 
-        self.when_i_click_on_add_mammogram()
+        self.when_i_click_on_add_another_mammogram()
         self.then_i_should_be_on_the_add_previous_mammogram_form()
 
         self.when_i_enter_another_location_in_the_uk()
@@ -65,13 +65,13 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_i_enter_a_different_name()
         self.and_i_enter_additional_information()
         self.and_i_click_save()
-        self.then_i_should_be_back_on_the_appointment()
+        self.then_i_should_be_back_on_the_medical_information_page()
         self.and_i_should_see_the_mammogram_with_the_other_provider_and_name()
 
         self.when_i_click_change()
         self.and_i_click_delete_this_mammogram()
         self.and_i_click_delete_item()
-        self.then_i_should_be_back_on_the_appointment()
+        self.then_i_should_be_back_on_the_medical_information_page()
         self.and_the_message_says_mammogram_deleted()
         self.and_the_previous_mammogram_is_gone()
 
@@ -81,10 +81,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        self.and_i_am_on_the_participant_details_page()
+        self.and_i_am_on_the_record_medical_information_page()
         self.then_i_should_see_no_reported_mammograms()
 
-        self.when_i_click_on_add_mammogram()
+        self.when_i_click_on_add_another_mammogram()
         self.then_i_should_be_on_the_add_previous_mammogram_form()
 
         self.when_i_select_the_same_provider()
@@ -110,10 +110,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
-        self.and_i_am_on_the_participant_details_page()
+        self.and_i_am_on_the_record_medical_information_page()
         self.then_i_should_see_no_reported_mammograms()
 
-        self.when_i_click_on_add_mammogram()
+        self.when_i_click_on_add_another_mammogram()
         self.then_i_should_be_on_the_add_previous_mammogram_form()
 
         self.when_i_select_the_same_provider()
@@ -128,7 +128,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
         self.when_i_enter_reason_for_continuing()
         self.and_i_click_proceed()
-        self.then_i_should_be_back_on_the_appointment()
+        self.then_i_should_be_back_on_the_medical_information_page()
         self.and_i_should_see_the_mammogram_with_the_reason_for_continuing()
 
     def test_accessibility(self):
@@ -136,21 +136,6 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_add_previous_mammograms_page()
         self.then_the_accessibility_baseline_is_met()
-
-    def test_adding_a_mammogram_during_an_appointment(self):
-        self.given_i_am_logged_in_as_a_clinical_user()
-        self.and_there_is_an_appointment()
-        self.and_i_am_on_the_record_medical_information_page()
-        self.when_i_click_on_add_another_mammogram()
-        self.then_i_should_be_on_the_add_previous_mammogram_form()
-
-        self.when_i_select_the_same_provider()
-        self.and_i_enter_an_exact_date()
-        self.and_i_select_yes_same_name()
-        self.and_i_enter_additional_information()
-        self.and_i_click_save()
-        self.then_i_should_be_back_on_the_medical_information_page()
-        self.and_i_should_see_the_mammogram_with_the_same_provider()
 
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
