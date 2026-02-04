@@ -9,7 +9,8 @@ from django.db import IntegrityError
 from manage_breast_screening.dicom.models import Image
 from manage_breast_screening.participants.models import Appointment
 
-from .models import GatewayAction, GatewayActionStatus, GatewayActionType
+from .models import GatewayAction, GatewayActionStatus, GatewayActionType, Relay
+from .relay_service import RelayService
 
 logger = logging.getLogger(__name__)
 
@@ -109,8 +110,16 @@ class WorklistItemService:
             },
         }
 
-    def _create_action(self) -> GatewayAction:
+    def _create_action(self) -> GatewayAction | None:
         """Create and persist the gateway action."""
+        relay = Relay.objects.filter(provider=self.appointment.provider).first()
+        if not relay:
+            logger.info(
+                "No relay found for provider %s, skipping create gateway action",
+                self.appointment.provider.name,
+            )
+            return None
+
         action_id = uuid.uuid4()
         accession_number = self._generate_accession_number()
         payload = self._build_payload(action_id, accession_number)
@@ -128,6 +137,8 @@ class WorklistItemService:
             raise GatewayActionAlreadyExistsError(
                 f"Gateway action already exists for appointment {self.appointment.pk}"
             ) from e
+
+        RelayService().send_action(relay, action)
 
         logger.info(
             f"Created gateway action {action_id} for appointment {self.appointment.pk}"

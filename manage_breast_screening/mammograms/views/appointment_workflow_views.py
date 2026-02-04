@@ -14,7 +14,7 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
-from manage_breast_screening.gateway.services import (
+from manage_breast_screening.gateway.worklist_item_service import (
     GatewayActionAlreadyExistsError,
     WorklistItemService,
     get_images_for_appointment,
