@@ -79,17 +79,23 @@ jobs:
             type=sha,format=long,prefix=git-sha-
 
       - name: Print commit SHA
-        run: echo "Commit SHA is ${{ inputs.commit_sha }}"
+        env:
+          COMMIT_SHA: ${{ inputs.commit_sha }}
+        run: echo "Commit SHA is ${COMMIT_SHA}"
 
       - name: Set branch environment variable (push)
         if: github.event_name == 'push'
         shell: bash
-        run: echo "GIT_BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV # GIT_BRANCH will be main for refs/heads/main
+        env:
+          GITHUB_REF_VALUE: ${{ github.ref }}
+        run: echo "GIT_BRANCH=${GITHUB_REF_VALUE##*/}" >> $GITHUB_ENV # GIT_BRANCH will be main for refs/heads/main
 
       - name: Set branch environment variable (pull_request)
         if: github.event_name == 'pull_request'
         shell: bash
-        run: echo "GIT_BRANCH=${GITHUB_HEAD_REF##*/}" >> $GITHUB_ENV
+        env:
+          GITHUB_HEAD_REF_VALUE: ${{ github.head_ref }}
+        run: echo "GIT_BRANCH=${GITHUB_HEAD_REF_VALUE##*/}" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         id: push

@@ -16,13 +16,16 @@ runs:
     - name: 'Check prerequisites for performing static analysis'
       shell: bash
       id: check
-      run: echo "secret_exist=${{ inputs.sonar_token != '' }}" >> $GITHUB_OUTPUT
+      env:
+        SECRET_EXIST: ${{ inputs.sonar_token != '' }}
+      run: echo "secret_exist=${SECRET_EXIST}" >> $GITHUB_OUTPUT
     - name: 'Perform static analysis'
       shell: bash
       if: steps.check.outputs.secret_exist == 'true'
+      env:
+        SONAR_ORGANISATION_KEY: ${{ inputs.sonar_organisation_key }}
+        SONAR_PROJECT_KEY: ${{ inputs.sonar_project_key }}
+        SONAR_TOKEN: ${{ inputs.sonar_token }}
       run: |
         export BRANCH_NAME=${GITHUB_HEAD_REF:-$(echo $GITHUB_REF | sed 's#refs/heads/##')}
-        export SONAR_ORGANISATION_KEY=${{ inputs.sonar_organisation_key }}
-        export SONAR_PROJECT_KEY=${{ inputs.sonar_project_key }}
-        export SONAR_TOKEN=${{ inputs.sonar_token }}
         ./scripts/reports/perform-static-analysis.sh
