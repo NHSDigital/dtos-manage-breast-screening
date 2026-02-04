@@ -107,9 +107,10 @@ test-unit: # Run unit tests @Testing
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing
-	npm run lint
 	uv run ruff check manage_breast_screening
 	uv run python scripts/lint_model_usage_in_views.py
+	uv run python scripts/lint_github_actions_no_expr_in_run.py
+	npm run lint
 
 	# Enable this once we have fixed all the issues
 	# make test-lint-templates
