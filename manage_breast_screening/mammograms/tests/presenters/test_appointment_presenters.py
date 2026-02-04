@@ -33,6 +33,7 @@ class TestAppointmentPresenter:
         mock = MagicMock(spec=Appointment)
         mock.pk = "53ce8d3b-9e65-471a-b906-73809c0475d0"
         mock.screening_episode.participant.nhs_number = "99900900829"
+        mock.screening_episode.participant.phone = "07123456789"
         mock.screening_episode.participant.pk = uuid4()
         return mock
 
@@ -619,6 +620,7 @@ class TestStatusBarPresenter:
     def mock_appointment(self):
         mock = MagicMock(spec=Appointment)
         mock.screening_episode.participant.nhs_number = "99900900829"
+        mock.screening_episode.participant.phone = "07123456789"
         mock.screening_episode.participant.pk = uuid4()
         return mock
 

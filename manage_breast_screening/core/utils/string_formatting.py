@@ -1,5 +1,7 @@
 import re
 
+import phonenumbers
+
 
 def sentence_case(value):
     """
@@ -46,5 +48,9 @@ def format_age(value: int) -> str:
 
 
 def format_phone_number(value: str) -> str:
-    # This is a placeholder until we decide how we will capture and store phone numbers
-    return value
+    try:
+        phone = phonenumbers.parse(value, "GB")
+    except phonenumbers.NumberParseException:
+        return value
+
+    return phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat.NATIONAL)
