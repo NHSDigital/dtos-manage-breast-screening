@@ -27,14 +27,17 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Call delete review app pipeline
+        env:
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           echo "Starting Azure devops pipeline \"Delete review app\"..."
           RUN_ID=$(az pipelines run \
-            --commit-id ${{ github.event.pull_request.head.sha }}\
+            --commit-id "${COMMIT_SHA}"\
             --name "Delete review app"\
             --org https://dev.azure.com/nhse-dtos \
             --project dtos-manage-breast-screening \
-            --parameters commitSHA=${{ github.event.pull_request.head.sha }} prNumber=${{ github.event.pull_request.number }} \
+            --parameters commitSHA="${COMMIT_SHA}" prNumber="${PR_NUMBER}" \
             --output tsv --query id)
 
           echo "See pipeline run in Azure devops: https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build/results?buildId=${RUN_ID}&view=results"

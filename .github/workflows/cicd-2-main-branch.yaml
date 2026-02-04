@@ -101,19 +101,24 @@ jobs:
     steps:
       - name: Determine failed stages
         id: failed_stages
+        env:
+          COMMIT_STAGE_RESULT: ${{ needs.commit-stage.result }}
+          TEST_STAGE_RESULT: ${{ needs.test-stage.result }}
+          BUILD_STAGE_RESULT: ${{ needs.build-stage.result }}
+          DEPLOY_STAGE_RESULT: ${{ needs.deploy-stage.result }}
         run: |
           failed_stages=""
 
-          if [[ "${{ needs.commit-stage.result }}" == "failure" ]]; then
+          if [[ "${COMMIT_STAGE_RESULT}" == "failure" ]]; then
             failed_stages="${failed_stages}• Commit stage\n"
           fi
-          if [[ "${{ needs.test-stage.result }}" == "failure" ]]; then
+          if [[ "${TEST_STAGE_RESULT}" == "failure" ]]; then
             failed_stages="${failed_stages}• Test stage\n"
           fi
-          if [[ "${{ needs.build-stage.result }}" == "failure" ]]; then
+          if [[ "${BUILD_STAGE_RESULT}" == "failure" ]]; then
             failed_stages="${failed_stages}• Build stage\n"
           fi
-          if [[ "${{ needs.deploy-stage.result }}" == "failure" ]]; then
+          if [[ "${DEPLOY_STAGE_RESULT}" == "failure" ]]; then
             failed_stages="${failed_stages}• Deploy stage (check workflow for environment)\n"
           fi
 

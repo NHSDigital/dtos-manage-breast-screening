@@ -24,8 +24,9 @@ runs:
   steps:
     - name: 'Generate SBOM'
       shell: bash
+      env:
+        BUILD_DATETIME: ${{ inputs.build_datetime }}
       run: |
-        export BUILD_DATETIME=${{ inputs.build_datetime }}
         ./scripts/reports/create-sbom-report.sh
     - name: 'Compress SBOM report'
       shell: bash
@@ -39,8 +40,9 @@ runs:
         retention-days: 21
     - name: 'Scan vulnerabilities'
       shell: bash
+      env:
+        BUILD_DATETIME: ${{ inputs.build_datetime }}
       run: |
-        export BUILD_DATETIME=${{ inputs.build_datetime }}
         ./scripts/reports/scan-vulnerabilities.sh
     - name: 'Compress vulnerabilities report'
       shell: bash
@@ -55,7 +57,9 @@ runs:
     - name: 'Check prerequisites for sending the reports'
       shell: bash
       id: check
-      run: echo "secrets_exist=${{ inputs.idp_aws_report_upload_role_name != '' && inputs.idp_aws_report_upload_bucket_endpoint != '' }}" >> $GITHUB_OUTPUT
+      env:
+        SECRETS_EXIST: ${{ inputs.idp_aws_report_upload_role_name != '' && inputs.idp_aws_report_upload_bucket_endpoint != '' }}
+      run: echo "secrets_exist=${SECRETS_EXIST}" >> $GITHUB_OUTPUT
     - name: 'Authenticate to send the reports'
       if: steps.check.outputs.secrets_exist == 'true'
       uses: aws-actions/configure-aws-credentials@v2
@@ -65,10 +69,13 @@ runs:
     - name: 'Send the SBOM and vulnerabilities reports to the central location'
       shell: bash
       if: steps.check.outputs.secrets_exist == 'true'
+      env:
+        BUILD_TIMESTAMP: ${{ inputs.build_timestamp }}
+        UPLOAD_BUCKET_ENDPOINT: ${{ inputs.idp_aws_report_upload_bucket_endpoint }}
       run: |
         aws s3 cp \
           ./sbom-repository-report.json.zip \
-          ${{ inputs.idp_aws_report_upload_bucket_endpoint }}/${{ inputs.build_timestamp }}-sbom-repository-report.json.zip
+          "${UPLOAD_BUCKET_ENDPOINT}/${BUILD_TIMESTAMP}-sbom-repository-report.json.zip"
         aws s3 cp \
           ./vulnerabilities-repository-report.json.zip \
-          ${{ inputs.idp_aws_report_upload_bucket_endpoint }}/${{ inputs.build_timestamp }}-vulnerabilities-repository-report.json.zip
+          "${UPLOAD_BUCKET_ENDPOINT}/${BUILD_TIMESTAMP}-vulnerabilities-repository-report.json.zip"
