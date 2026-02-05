@@ -13,7 +13,7 @@ class StudyService:
 
     @transaction.atomic
     def create_with_default_series(self):
-        self.remove_existing_study_and_series()
+        self.delete_if_exists()
 
         study = Study.objects.create(appointment=self.appointment)
         self.auditor.audit_create(study)
@@ -30,19 +30,20 @@ class StudyService:
         return study
 
     @transaction.atomic
-    def create(
+    def create_or_update(
         self,
         series_data: list[dict],
         **study_kwargs,
     ):
-        self.remove_existing_study_and_series()
-
-        study = Study.objects.create(
-            appointment=self.appointment,
-            **study_kwargs,
+        study, created = Study.objects.update_or_create(
+            appointment=self.appointment, defaults=study_kwargs
         )
-        self.auditor.audit_create(study)
+        if created:
+            self.auditor.audit_create(study)
+        else:
+            self.auditor.audit_update(study)
 
+        self._delete_series()
         series_set = [
             Series(study=study, **data) for data in series_data if data["count"] != 0
         ]
@@ -52,12 +53,18 @@ class StudyService:
         return study
 
     @transaction.atomic
-    def remove_existing_study_and_series(self):
+    def delete_if_exists(self):
+        if hasattr(self.appointment, "study"):
+            self._delete_series()
+
+            study = self.appointment.study
+            self.auditor.audit_delete(study)
+            study.delete()
+
+    def _delete_series(self):
         if hasattr(self.appointment, "study"):
             study = self.appointment.study
             series = study.series_set.all()
 
             self.auditor.audit_bulk_delete(series)
             series.delete()
-            self.auditor.audit_delete(study)
-            study.delete()
