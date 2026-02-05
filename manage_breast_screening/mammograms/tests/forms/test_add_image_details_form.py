@@ -33,12 +33,12 @@ class TestAddImageDetailsForm:
 
         assert not form.is_valid()
         assert form.errors == {
-            "rmlo_count": ["Enter the number of RMLO images."],
-            "rcc_count": ["Enter the number of RCC images."],
-            "right_eklund_count": ["Enter the number of Right Eklund images."],
-            "lmlo_count": ["Enter the number of LMLO images."],
-            "lcc_count": ["Enter the number of LCC images."],
-            "left_eklund_count": ["Enter the number of Left Eklund images."],
+            "rmlo_count": ["Enter the number of RMLO images"],
+            "rcc_count": ["Enter the number of RCC images"],
+            "right_eklund_count": ["Enter the number of Right Eklund images"],
+            "lmlo_count": ["Enter the number of LMLO images"],
+            "lcc_count": ["Enter the number of LCC images"],
+            "left_eklund_count": ["Enter the number of Left Eklund images"],
         }
 
     def test_zero_images(self):
