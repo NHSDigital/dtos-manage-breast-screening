@@ -42,7 +42,7 @@ stages:
                 - task: TerraformInstaller@1
                   displayName: Install terraform
                   inputs:
-                    terraformVersion: 1.7.0
+                    terraformVersion: 1.14.0
 
                 - task: AzureCLI@2
                   displayName: Run terraform
