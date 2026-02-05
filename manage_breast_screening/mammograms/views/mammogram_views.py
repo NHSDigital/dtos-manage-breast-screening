@@ -12,7 +12,9 @@ from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.utils.date_formatting import format_relative_date
-from manage_breast_screening.core.utils.safe_redirects import get_safe_redirect_path
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
@@ -60,7 +62,7 @@ def appointment_should_not_proceed(
         raise Http404("Participant reported mammogram not found")
     exact_date = mammogram.exact_date
 
-    return_url = get_safe_redirect_path(request, default="")
+    return_url = extract_relative_redirect_url(request, default="")
     change_previous_mammogram_url = (
         reverse(
             "mammograms:change_previous_mammogram",
@@ -144,7 +146,7 @@ class AppointmentProceedAnywayView(
         return kwargs
 
     def get_success_url(self):
-        return get_safe_redirect_path(
+        return extract_relative_redirect_url(
             self.request,
             default=reverse(
                 "mammograms:record_medical_information",

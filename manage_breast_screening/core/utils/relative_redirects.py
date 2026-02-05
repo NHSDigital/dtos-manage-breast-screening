@@ -2,9 +2,11 @@ from django.utils.encoding import iri_to_uri
 from django.utils.http import url_has_allowed_host_and_scheme
 
 
-def get_safe_redirect_path(request, default=None, parameter_name="return_url") -> str:
+def extract_relative_redirect_url(
+    request, default=None, parameter_name="return_url"
+) -> str:
     """
-    Extracts a safe redirect path from the request's POST or GET data.
+    Extracts a relative redirect path from the request's POST or GET data.
 
     This function retrieves the value of `parameter_name` (default: "return_url") from the request.
     It validates that the URL is safe for redirection by ensuring:
@@ -19,7 +21,7 @@ def get_safe_redirect_path(request, default=None, parameter_name="return_url") -
         parameter_name: The name of the parameter to look for in POST or GET data.
 
     Returns:
-        A safe redirect path as a string, or the default value if not found or unsafe.
+        A relative redirect path as a string, or the default value if not found or unsafe.
     """
     return_url = request.POST.get(parameter_name) or request.GET.get(parameter_name)
 

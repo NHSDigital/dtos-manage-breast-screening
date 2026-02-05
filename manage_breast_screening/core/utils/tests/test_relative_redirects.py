@@ -1,7 +1,9 @@
 import pytest
 from django.test import RequestFactory
 
-from manage_breast_screening.core.utils.safe_redirects import get_safe_redirect_path
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 
 
 @pytest.mark.parametrize(
@@ -26,57 +28,63 @@ from manage_breast_screening.core.utils.safe_redirects import get_safe_redirect_
         (None, "/default"),
     ],
 )
-def test_get_safe_redirect_path(return_url, expected):
+def test_extract_relative_redirect_url(return_url, expected):
     factory = RequestFactory()
     parameters = {"return_url": return_url} if return_url else {}
-    assert get_safe_redirect_path(factory.get("/", parameters), "/default") == expected
-    assert get_safe_redirect_path(factory.post("/", parameters), "/default") == expected
+    assert (
+        extract_relative_redirect_url(factory.get("/", parameters), "/default")
+        == expected
+    )
+    assert (
+        extract_relative_redirect_url(factory.post("/", parameters), "/default")
+        == expected
+    )
 
 
-def test_get_safe_redirect_path_with_alternative_parameter_name_and_valid_value():
+def test_extract_relative_redirect_url_with_alternative_parameter_name_and_valid_value():
     """
-    get_safe_redirect_path correctly retrieves the URL when using a custom parameter name.
+    extract_relative_redirect_url correctly retrieves the URL when using a custom parameter name.
     """
     factory = RequestFactory()
     parameters = {"abc": "/valid-return-url"}
     assert (
-        get_safe_redirect_path(
+        extract_relative_redirect_url(
             factory.get("/", parameters), default="/default", parameter_name="abc"
         )
         == "/valid-return-url"
     )
     assert (
-        get_safe_redirect_path(
+        extract_relative_redirect_url(
             factory.post("/", parameters), default="/default", parameter_name="abc"
         )
         == "/valid-return-url"
     )
 
 
-def test_get_safe_redirect_path_with_alternative_parameter_name_and_invalid_value():
+def test_extract_relative_redirect_url_with_alternative_parameter_name_and_invalid_value():
     """
-    get_safe_redirect_path uses the default value when using a custom parameter name and an invalid URL.
+    extract_relative_redirect_url uses the default value when using a custom parameter name and an invalid URL.
     """
     factory = RequestFactory()
     parameters = {"abc": "invalid-return-url"}
     assert (
-        get_safe_redirect_path(
+        extract_relative_redirect_url(
             factory.get("/", parameters), default="/default", parameter_name="abc"
         )
         == "/default"
     )
     assert (
-        get_safe_redirect_path(
+        extract_relative_redirect_url(
             factory.post("/", parameters), default="/default", parameter_name="abc"
         )
         == "/default"
     )
 
 
-def test_get_safe_redirect_path_without_specifying_default():
+def test_extract_relative_redirect_url_without_specifying_default():
     """
-    If no default value is specified, get_safe_redirect_path returns None for an invalid URL.
+    If no default value is specified, extract_relative_redirect_url returns None for an invalid URL.
     """
     factory = RequestFactory()
     parameters = {"return_url": "invalid-return-url"}
-    assert not get_safe_redirect_path(factory.get("/", parameters))
+    assert not extract_relative_redirect_url(factory.get("/", parameters))

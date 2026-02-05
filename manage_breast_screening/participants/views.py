@@ -4,7 +4,9 @@ from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
 
-from manage_breast_screening.core.utils.safe_redirects import get_safe_redirect_path
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 
 from ..participants.models import Appointment
 from .forms import EthnicityForm
@@ -37,7 +39,7 @@ def edit_ethnicity(request, pk):
     except Participant.DoesNotExist:
         raise Http404("Participant not found")
 
-    return_url = get_safe_redirect_path(
+    return_url = extract_relative_redirect_url(
         request, reverse("participants:show", kwargs={"pk": participant.pk})
     )
 

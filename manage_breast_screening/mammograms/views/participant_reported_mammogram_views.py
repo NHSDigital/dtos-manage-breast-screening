@@ -4,7 +4,9 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 
-from manage_breast_screening.core.utils.safe_redirects import get_safe_redirect_path
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     DeleteWithAuditView,
@@ -60,7 +62,7 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
         return not self.within_six_months
 
     def get_success_url(self):
-        return_url = get_safe_redirect_path(
+        return_url = extract_relative_redirect_url(
             self.request,
             default=reverse(
                 "mammograms:record_medical_information",
@@ -146,7 +148,7 @@ class DeleteParticipantReportedMammogramView(
         )
 
     def get_success_url(self) -> str:
-        return get_safe_redirect_path(
+        return extract_relative_redirect_url(
             self.request,
             default=reverse(
                 "mammograms:record_medical_information",
