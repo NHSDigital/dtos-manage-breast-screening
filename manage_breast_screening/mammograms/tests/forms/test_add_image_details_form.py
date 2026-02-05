@@ -11,9 +11,11 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 from manage_breast_screening.manual_images.models import (
     IncompleteImagesReason,
+    Series,
     StudyCompleteness,
 )
 from manage_breast_screening.manual_images.services import StudyService
+from manage_breast_screening.manual_images.tests.factories import StudyFactory
 
 
 @pytest.fixture
@@ -267,6 +269,41 @@ class TestAddImageDetailsForm:
             "reasons_incomplete": [
                 "Select a reason why you could not take all the images"
             ]
+        }
+
+    def test_initial(self, in_progress_appointment):
+        study = StudyFactory(
+            appointment=in_progress_appointment,
+            additional_details="important note",
+            completeness=StudyCompleteness.INCOMPLETE,
+            reasons_incomplete=[IncompleteImagesReason.TECHNICAL_ISSUES],
+        )
+        study.series_set.bulk_create(
+            [
+                Series(study=study, view_position="CC", laterality="L", count=1),
+                Series(study=study, view_position="CC", laterality="R", count=0),
+                Series(study=study, view_position="MLO", laterality="L", count=1),
+                Series(study=study, view_position="MLO", laterality="R", count=1),
+            ]
+        )
+
+        form = AddImageDetailsForm(instance=study)
+
+        assert form.initial == {
+            "additional_details": "important note",
+            "imperfect_but_best_possible": False,
+            "lcc_count": 1,
+            "left_eklund_count": 0,
+            "lmlo_count": 1,
+            "not_all_mammograms_taken": True,
+            "rcc_count": 0,
+            "reasons_incomplete": [
+                IncompleteImagesReason.TECHNICAL_ISSUES,
+            ],
+            "reasons_incomplete_details": "",
+            "right_eklund_count": 0,
+            "rmlo_count": 1,
+            "should_recall": AddImageDetailsForm.RecallChoices.TO_BE_RECALLED,
         }
 
     def _assert_series(
