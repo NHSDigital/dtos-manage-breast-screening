@@ -6,7 +6,7 @@ describe('ImageStream', () => {
   /** @type {jest.Mock} */
   let MockEventSource
 
-  /** @type {Record<string, (event: MessageEvent) => void>} */
+  /** @type {Record<string, (...args: unknown[]) => void>} */
   let eventListeners
 
   /** @type {jest.Mock} */
