@@ -41,10 +41,10 @@ class AddImageDetailsForm(FormWithConditionalFields):
         max_value=20,
         initial=1,
         error_messages={
-            "min_value": "Number of RMLO images must be at least 0.",
-            "max_value": "Number of RMLO images must be at most 20.",
-            "invalid": "Enter a valid number of RMLO images.",
-            "required": "Enter the number of RMLO images.",
+            "min_value": "Number of RMLO images must be at least 0",
+            "max_value": "Number of RMLO images must be at most 20",
+            "invalid": "Enter a valid number of RMLO images",
+            "required": "Enter the number of RMLO images",
         },
         widget=StepperInput,
     )
@@ -56,10 +56,10 @@ class AddImageDetailsForm(FormWithConditionalFields):
         max_value=20,
         initial=1,
         error_messages={
-            "min_value": "Number of RCC images must be at least 0.",
-            "max_value": "Number of RCC images must be at most 20.",
-            "invalid": "Enter a valid number of RCC images.",
-            "required": "Enter the number of RCC images.",
+            "min_value": "Number of RCC images must be at least 0",
+            "max_value": "Number of RCC images must be at most 20",
+            "invalid": "Enter a valid number of RCC images",
+            "required": "Enter the number of RCC images",
         },
         widget=StepperInput,
     )
@@ -72,10 +72,10 @@ class AddImageDetailsForm(FormWithConditionalFields):
         max_value=20,
         initial=0,
         error_messages={
-            "min_value": "Number of Right Eklund images must be at least 0.",
-            "max_value": "Number of Right Eklund images must be at most 20.",
-            "invalid": "Enter a valid number of Right Eklund images.",
-            "required": "Enter the number of Right Eklund images.",
+            "min_value": "Number of Right Eklund images must be at least 0",
+            "max_value": "Number of Right Eklund images must be at most 20",
+            "invalid": "Enter a valid number of Right Eklund images",
+            "required": "Enter the number of Right Eklund images",
         },
         widget=StepperInput,
     )
@@ -87,10 +87,10 @@ class AddImageDetailsForm(FormWithConditionalFields):
         max_value=20,
         initial=1,
         error_messages={
-            "min_value": "Number of LMLO images must be at least 0.",
-            "max_value": "Number of LMLO images must be at most 20.",
-            "invalid": "Enter a valid number of LMLO images.",
-            "required": "Enter the number of LMLO images.",
+            "min_value": "Number of LMLO images must be at least 0",
+            "max_value": "Number of LMLO images must be at most 20",
+            "invalid": "Enter a valid number of LMLO images",
+            "required": "Enter the number of LMLO images",
         },
         widget=StepperInput,
     )
@@ -102,10 +102,10 @@ class AddImageDetailsForm(FormWithConditionalFields):
         max_value=20,
         initial=1,
         error_messages={
-            "min_value": "Number of LCC images must be at least 0.",
-            "max_value": "Number of LCC images must be at most 20.",
-            "invalid": "Enter a valid number of LCC images.",
-            "required": "Enter the number of LCC images.",
+            "min_value": "Number of LCC images must be at least 0",
+            "max_value": "Number of LCC images must be at most 20",
+            "invalid": "Enter a valid number of LCC images",
+            "required": "Enter the number of LCC images",
         },
         widget=StepperInput,
     )
@@ -118,10 +118,10 @@ class AddImageDetailsForm(FormWithConditionalFields):
         max_value=20,
         initial=0,
         error_messages={
-            "min_value": "Number of Left Eklund images must be at least 0.",
-            "max_value": "Number of Left Eklund images must be at most 20.",
-            "invalid": "Enter a valid number of Left Eklund images.",
-            "required": "Enter the number of Left Eklund images.",
+            "min_value": "Number of Left Eklund images must be at least 0",
+            "max_value": "Number of Left Eklund images must be at most 20",
+            "invalid": "Enter a valid number of Left Eklund images",
+            "required": "Enter the number of Left Eklund images",
         },
         widget=StepperInput,
     )

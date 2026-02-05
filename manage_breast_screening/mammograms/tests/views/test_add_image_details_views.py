@@ -129,12 +129,12 @@ class TestAddImageDetailsView:
         assertInHTML(
             """
             <ul class="nhsuk-list nhsuk-error-summary__list">
-                <li><a href="#id_rmlo_count">Number of RMLO images must be at least 0.</a></li>
-                <li><a href="#id_rcc_count">Enter a valid number of RCC images.</a></li>
-                <li><a href="#id_right_eklund_count">Enter a valid number of Right Eklund images.</a></li>
-                <li><a href="#id_lmlo_count">Number of LMLO images must be at most 20.</a></li>
-                <li><a href="#id_lcc_count">Number of LCC images must be at most 20.</a></li>
-                <li><a href="#id_left_eklund_count">Enter the number of Left Eklund images.</a></li>
+                <li><a href="#id_rmlo_count">Number of RMLO images must be at least 0</a></li>
+                <li><a href="#id_rcc_count">Enter a valid number of RCC images</a></li>
+                <li><a href="#id_right_eklund_count">Enter a valid number of Right Eklund images</a></li>
+                <li><a href="#id_lmlo_count">Number of LMLO images must be at most 20</a></li>
+                <li><a href="#id_lcc_count">Number of LCC images must be at most 20</a></li>
+                <li><a href="#id_left_eklund_count">Enter the number of Left Eklund images</a></li>
             </ul>
             """,
             response.text,
