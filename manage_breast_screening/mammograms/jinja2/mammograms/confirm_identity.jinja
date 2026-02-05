@@ -12,7 +12,7 @@
     <div class="nhsuk-form-group">
       <form method="post">
         {{ csrf_input }}
-        {{ button({"text": "Confirm identity", "classes": "nhsuk-u-margin-bottom-0"}) }}
+        {{ button({"text": confirm_button_text, "classes": "nhsuk-u-margin-bottom-0"}) }}
       </form>
     </div>
   {% endset %}

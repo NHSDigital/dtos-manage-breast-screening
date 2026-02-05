@@ -1,6 +1,11 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
+from pytest_django.asserts import (
+    assertContains,
+    assertInHTML,
+    assertQuerySetEqual,
+    assertRedirects,
+)
 
 from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
@@ -36,7 +41,7 @@ class TestShowAppointment:
 
 @pytest.mark.django_db
 class TestConfirmIdentity:
-    def test_renders_response(self, clinical_user_client):
+    def test_renders_response_when_identity_not_confirmed(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
@@ -47,6 +52,68 @@ class TestConfirmIdentity:
             )
         )
         assert response.status_code == 200
+        assertInHTML(
+            """
+            <button class="nhsuk-button nhsuk-u-margin-bottom-0" data-module="nhsuk-button" type="submit">
+                Confirm identity
+            </button>
+            """,
+            response.text,
+        )
+
+    def test_renders_response_when_identity_confirmed_by_a_different_user(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        # Create CONFIRM_IDENTITY step for a different user before the POST, to confirm correct button text
+        appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+        assertInHTML(
+            """
+            <button class="nhsuk-button nhsuk-u-margin-bottom-0" data-module="nhsuk-button" type="submit">
+                Confirm identity
+            </button>
+            """,
+            response.text,
+        )
+
+    def test_renders_response_when_identity_confirmed_by_same_user(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        # Create CONFIRM_IDENTITY step for this user before the POST, to confirm correct button text
+        appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user_client.user,
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+        assertInHTML(
+            """
+            <button class="nhsuk-button nhsuk-u-margin-bottom-0" data-module="nhsuk-button" type="submit">
+                Next section
+            </button>
+            """,
+            response.text,
+        )
 
     def test_redirects_to_medical_information_page(self, clinical_user_client):
         appointment = AppointmentFactory.create(
@@ -80,9 +147,59 @@ class TestConfirmIdentity:
         assertQuerySetEqual(
             appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
+            ).values_list("step_name", flat=True),
+            [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
+        )
+
+    def test_does_record_completion_even_when_already_confirmed_by_different_user(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        # Create CONFIRM_IDENTITY for a different user before the POST, to confirm a new record is created
+        appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": appointment.pk},
             )
-            .values_list("step_name", flat=True)
-            .distinct(),
+        )
+
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(
+                created_by=clinical_user_client.user
+            ).values_list("step_name", flat=True),
+            [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
+        )
+
+    def test_does_not_record_completion_if_already_confirmed_by_this_user(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        # Create CONFIRM_IDENTITY for this user before the POST, to confirm no duplicate is created
+        appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user_client.user,
+        )
+
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(
+                created_by=clinical_user_client.user
+            ).values_list("step_name", flat=True),
             [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
         )
 
