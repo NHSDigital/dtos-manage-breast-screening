@@ -10,18 +10,18 @@
   "idPrefix": field.auto_id,
   "errorMessage": error_message,
   "classes": unbound_field.classes if unbound_field.classes,
-  "hint": {
-    "html": unbound_field.hint|e
-  } if unbound_field.hint,
   "items": [
     {
       "id": field.auto_id,
       "value": "true",
       "text": field.label,
       "checked": widget.check_test(field.value()),
+      "hint": {
+        "html": unbound_field.hint|e
+      } if unbound_field.hint else none,
       "conditional": {
         "html": conditional_html
-      } if conditional_html else undefined
+      } if conditional_html else none
     }
   ]
 }) }}

@@ -59,6 +59,10 @@ class TestAddImageDetails(SystemTestCase):
         self.then_images_taken_count_is(3)
         self.and_repeat_images_message_is_hidden()
 
+        self.when_i_select_not_all_images_taken()
+        self.and_i_select_unable_to_scan_tissue()
+        self.and_i_select_partial_mammography()
+
         self.and_i_click_on_continue()
         self.then_i_should_be_on_the_check_information_page()
 
@@ -122,3 +126,12 @@ class TestAddImageDetails(SystemTestCase):
         )
         expect(self.page).to_have_url(re.compile(path))
         self.assert_page_title_contains("Check information")
+
+    def when_i_select_not_all_images_taken(self):
+        self.page.get_by_label("Not all mammograms taken").click()
+
+    def and_i_select_unable_to_scan_tissue(self):
+        self.page.get_by_label("Unable to scan tissue").click()
+
+    def and_i_select_partial_mammography(self):
+        self.page.get_by_label("No, record as 'partial mammography'").click()

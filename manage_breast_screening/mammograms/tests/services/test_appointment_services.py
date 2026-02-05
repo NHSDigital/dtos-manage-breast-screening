@@ -3,6 +3,7 @@ from statemachine.exceptions import TransitionNotAllowed
 
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
+    RecallService,
 )
 from manage_breast_screening.participants.models.appointment import (
     ActionPerformedByDifferentUser,
@@ -245,3 +246,14 @@ class TestAppointmentStatusUpdater:
     def test_class_has_methods_for_each_event(self):
         for event in AppointmentMachine().events:
             assert hasattr(AppointmentStatusUpdater, event), f"missing {event}() method"
+
+
+@pytest.mark.django_db
+class TestRecallService:
+    def test_reinvite(self, clinical_user):
+        appointment = AppointmentFactory(reinvite=False)
+
+        RecallService(appointment, clinical_user).reinvite()
+        appointment.refresh_from_db()
+
+        assert appointment.reinvite

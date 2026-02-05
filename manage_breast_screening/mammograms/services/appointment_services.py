@@ -97,3 +97,19 @@ class AppointmentStatusUpdater:
         return self.appointment.set_status(
             self.machine.current_state_value, created_by=self.current_user
         )
+
+
+class RecallService:
+    """
+    Mark that a user needs to be recalled back for any reason.
+    """
+
+    def __init__(self, appointment, current_user):
+        self.appointment = appointment
+        self.current_user = current_user
+
+    def reinvite(self):
+        # Currently this is just a boolean flag; when we implement appointment
+        # scheduling then this will need to store the reason for the reinvite.
+        self.appointment.reinvite = True
+        self.appointment.save()

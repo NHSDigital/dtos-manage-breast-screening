@@ -2,12 +2,14 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
+from manage_breast_screening.mammograms.forms.images.add_image_details_form import (
+    AddImageDetailsForm,
+)
+from manage_breast_screening.manual_images.models import IncompleteImagesReason
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
-from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
-)
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 @pytest.mark.django_db
@@ -81,6 +83,11 @@ class TestAddImageDetailsView:
                 "lcc_count": "20",
                 "left_eklund_count": "0",
                 "additional_details": "",
+                "not_all_mammograms_taken": "true",
+                "reasons_incomplete": [IncompleteImagesReason.CONSENT_WITHDRAWN],
+                "reasons_incomplete_details": "abc",
+                "imperfect_but_best_possible": "true",
+                "should_recall": AddImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
             },
         )
         assertRedirects(
@@ -122,12 +129,12 @@ class TestAddImageDetailsView:
         assertInHTML(
             """
             <ul class="nhsuk-list nhsuk-error-summary__list">
-                <li><a href="#id_rmlo_count">Number of RMLO images must be at least 0.</a></li>
-                <li><a href="#id_rcc_count">Enter a valid number of RCC images.</a></li>
-                <li><a href="#id_right_eklund_count">Enter a valid number of Right Eklund images.</a></li>
-                <li><a href="#id_lmlo_count">Number of LMLO images must be at most 20.</a></li>
-                <li><a href="#id_lcc_count">Number of LCC images must be at most 20.</a></li>
-                <li><a href="#id_left_eklund_count">Enter the number of Left Eklund images.</a></li>
+                <li><a href="#id_rmlo_count">Number of RMLO images must be at least 0</a></li>
+                <li><a href="#id_rcc_count">Enter a valid number of RCC images</a></li>
+                <li><a href="#id_right_eklund_count">Enter a valid number of Right Eklund images</a></li>
+                <li><a href="#id_lmlo_count">Number of LMLO images must be at most 20</a></li>
+                <li><a href="#id_lcc_count">Number of LCC images must be at most 20</a></li>
+                <li><a href="#id_left_eklund_count">Enter the number of Left Eklund images</a></li>
             </ul>
             """,
             response.text,
