@@ -88,8 +88,9 @@ class TestReviewingMedicalInformation(SystemTestCase):
         expect(heading).to_be_in_viewport()
 
     def when_i_click_complete_all_and_continue(self):
-        button = self.page.get_by_role("button", name="Complete all and continue")
-        button.click()
+        buttons = self.page.get_by_role("button", name="Complete all and continue")
+        assert buttons.count() == 2
+        buttons.first.click()
 
     def then_i_am_redirected_to_the_images_page(self):
         self.expect_url("mammograms:take_images", pk=self.appointment.pk)

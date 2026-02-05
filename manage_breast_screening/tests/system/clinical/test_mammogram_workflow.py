@@ -117,8 +117,9 @@ class TestMammogramWorkflow(SystemTestCase):
         ).first.click()
 
     def when_i_mark_that_imaging_can_go_ahead(self):
-        button = self.page.get_by_role("button", name="Complete all and continue")
-        button.click()
+        buttons = self.page.get_by_role("button", name="Complete all and continue")
+        assert buttons.count() == 2
+        buttons.first.click()
 
     def then_i_should_be_on_the_record_images_page(self):
         self.expect_url("mammograms:take_images", pk=self.appointment.pk)
