@@ -32,15 +32,20 @@
         "rows": rows,
         "classes": "app-special-appointment-banner"
       }) }}
-      {% if show_change_link %}
-        <div class="app-special-appointment-banner__action">
-          <a href="{{ presented_special_appointment.change_url }}" style="font-size: 19px;">Change<span class="nhsuk-u-visually-hidden"> special appointment requirements</span></a>
-        </div>
-      {% endif %}
     {% endset %}
     {{ warningCallout({
       "heading": "Special appointment",
-      "html": special_appointment_html
+      "html": special_appointment_html,
+      "actions": {
+        "items": [
+          {
+            "href": presented_special_appointment.change_url,
+            "text": "Change",
+            "visuallyHiddenText": "special appointment requirements",
+            "classes": "nhsuk-link--no-visited-state",
+          }
+        ]
+      } if show_change_link else undefined
     }) }}
   {% endif %}
 {% endmacro %}
