@@ -30,16 +30,16 @@ class TestGetImagesForAppointment:
         appointment = AppointmentFactory()
         action = WorklistItemService.create(appointment)
         study = Study.objects.create(
-            study_instance_uid="1.2.3",
+            study_instance_uid="1.2.826.0.1.1",  # gitleaks:allow
             source_message_id=str(action.id),
         )
         series = Series.objects.create(
             study=study,
-            series_instance_uid="1.2.3.4",  # gitleaks:allow
+            series_instance_uid="1.2.826.0.1.2",  # gitleaks:allow
         )
         image = Image.objects.create(
             series=series,
-            sop_instance_uid="1.2.3.4.5",  # gitleaks:allow
+            sop_instance_uid="1.2.826.0.1.3",  # gitleaks:allow
         )
 
         images = get_images_for_appointment(appointment)

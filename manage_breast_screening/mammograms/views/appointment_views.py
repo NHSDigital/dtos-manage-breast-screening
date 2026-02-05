@@ -1,10 +1,12 @@
 import logging
+import time
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import DatabaseError, IntegrityError, transaction
-from django.http import Http404, JsonResponse
+from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_http_methods
@@ -363,27 +365,44 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
         )
 
 
+def format_sse_event(event: str, data: str) -> str:
+    """Format data as a Server-Sent Event."""
+    lines = "\n".join(f"data: {line}" for line in data.splitlines())
+    return f"event: {event}\n{lines}\n\n"
+
+
 @login_required
-def appointment_images_json(request, pk):
-    """Return images for an appointment as JSON."""
+@require_http_methods(["GET"])
+def appointment_images_stream(request, pk):
+    """SSE endpoint for streaming appointment images as they arrive."""
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    images = get_images_for_appointment(appointment)
+    def event_stream():
+        last_image_ids = set()
 
-    return JsonResponse(
-        {
-            "images": [
-                {
-                    "id": str(image.id),
-                    "sop_instance_uid": image.sop_instance_uid,
-                    "instance_number": image.instance_number,
-                    "image_url": image.image_file.url if image.image_file else None,
-                }
-                for image in images
-            ]
-        }
+        while True:
+            images = get_images_for_appointment(appointment)
+            current_image_ids = set(str(img.id) for img in images)
+
+            if current_image_ids != last_image_ids:
+                html = render_to_string(
+                    "mammograms/_image_grid.jinja",
+                    {"images": images},
+                    request=request,
+                )
+                yield format_sse_event("images", html)
+                last_image_ids = current_image_ids
+
+            time.sleep(1)
+
+    response = StreamingHttpResponse(
+        event_stream(),
+        content_type="text/event-stream",
     )
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response
