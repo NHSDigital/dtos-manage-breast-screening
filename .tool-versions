@@ -2,7 +2,7 @@ gitleaks 8.18.4
 nodejs 24.11.0
 pre-commit 3.6.0
 python 3.14.0
-terraform 1.7.0
+terraform 1.14.0
 uv 0.9.7
 # docker/ghcr.io/gitleaks/gitleaks v8.30.0@sha256:691af3c7c5a48b16f187ce3446d5f194838f91238f27270ed36eef6359a574d9 # SEE: https://github.com/gitleaks/gitleaks/pkgs/container/gitleaks
 # docker/ghcr.io/anchore/grype v0.104.2@sha256:7416f2fada8bd8f99095d955a6fed700b714b51ceb8150f838920932954b04aa # SEE: https://github.com/anchore/grype/pkgs/container/grype
