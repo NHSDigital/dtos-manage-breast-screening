@@ -301,8 +301,8 @@ urlpatterns = [
         name="add_image_details",
     ),
     path(
-        "<uuid:pk>/images.json",
-        appointment_views.appointment_images_json,
-        name="appointment_images_json",
+        "<uuid:pk>/images/stream",
+        appointment_views.appointment_images_stream,
+        name="appointment_images_stream",
     ),
 ]
