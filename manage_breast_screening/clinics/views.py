@@ -8,7 +8,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 )
 
 from ..core.decorators import current_provider_exempt
-from ..core.utils.urls import extract_next_path_from_params
+from ..core.utils.relative_redirects import extract_relative_redirect_url
 from ..participants.models import Appointment
 from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
@@ -73,7 +73,7 @@ def check_in(request, pk, appointment_pk):
 @current_provider_exempt
 @login_required
 def select_provider(request):
-    next_path = extract_next_path_from_params(request)
+    next_path = extract_relative_redirect_url(request, parameter_name="next")
     user_providers = Provider.objects.filter(
         assignments__user=request.user, assignments__roles__len__gt=0
     )

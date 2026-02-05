@@ -9,7 +9,9 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from manage_breast_screening.core.utils.urls import extract_next_path_from_params
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 
 from .models import PERSONAS
 
@@ -18,7 +20,7 @@ from .models import PERSONAS
 @login_not_required
 def persona_login(request):
     users = _get_users(request.user)
-    next_path = extract_next_path_from_params(request)
+    next_path = extract_relative_redirect_url(request, parameter_name="next")
 
     if request.method == "POST":
         try:

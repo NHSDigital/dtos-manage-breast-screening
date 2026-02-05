@@ -1,28 +1,18 @@
 from logging import getLogger
-from urllib.parse import urlparse
 
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
+
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 
 from ..participants.models import Appointment
 from .forms import EthnicityForm
 from .models import Participant
 
 logger = getLogger(__name__)
-
-
-def parse_return_url(request, default: str) -> str:
-    """
-    Parse the return_url from the request, with a fallback,
-    and validating that the URL is not external to the service.
-    """
-    return_url = request.POST.get("return_url") or request.GET.get("return_url")
-
-    if not return_url or urlparse(return_url).netloc:
-        return default
-
-    return return_url
 
 
 def show(request, pk):
@@ -49,19 +39,17 @@ def edit_ethnicity(request, pk):
     except Participant.DoesNotExist:
         raise Http404("Participant not found")
 
+    return_url = extract_relative_redirect_url(
+        request, reverse("participants:show", kwargs={"pk": participant.pk})
+    )
+
     if request.method == "POST":
-        return_url = request.POST.get("return_url")
         form = EthnicityForm(request.POST, participant=participant)
         if form.is_valid():
             form.save()
             return redirect(return_url)
     else:
-        return_url = request.GET.get("return_url")
         form = EthnicityForm(participant=participant)
-
-    return_url = return_url or reverse(
-        "participants:show", kwargs={"pk": participant.pk}
-    )
 
     return render(
         request,
