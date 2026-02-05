@@ -226,7 +226,7 @@ class AddImageDetailsForm(FormWithConditionalFields):
                 return StudyCompleteness.COMPLETE
 
     def save(self, study_service: StudyService, recall_service: RecallService):
-        study = study_service.create(
+        study = study_service.create_or_update(
             additional_details=self.cleaned_data.get("additional_details", ""),
             imperfect_but_best_possible=self.cleaned_data.get(
                 "imperfect_but_best_possible", False

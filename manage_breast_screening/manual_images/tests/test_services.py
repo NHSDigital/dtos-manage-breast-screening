@@ -22,7 +22,7 @@ class TestStudyService:
         appointment = AppointmentFactory()
         service = StudyService(appointment=appointment, current_user=clinical_user)
         study = service.create_with_default_series()
-        appointment.study.series_set.create(
+        appointment.study.series_set.update_or_create(
             view_position="EKLUND", laterality="L", count=1
         )
 
@@ -50,7 +50,7 @@ class TestStudyService:
     ):
         appointment = AppointmentFactory()
         service = StudyService(appointment=appointment, current_user=clinical_user)
-        study = service.create(
+        study = service.create_or_update(
             additional_details="Some details",
             series_data=[
                 {"view_position": "CC", "laterality": "L", "count": 1},
@@ -79,7 +79,7 @@ class TestStudyService:
     def test_create_with_given_counts_when_some_counts_zero(self, clinical_user):
         appointment = AppointmentFactory()
         service = StudyService(appointment=appointment, current_user=clinical_user)
-        study = service.create(
+        study = service.create_or_update(
             additional_details="Some other details",
             series_data=[
                 {"view_position": "CC", "laterality": "L", "count": 0},
@@ -104,7 +104,7 @@ class TestStudyService:
         appointment = AppointmentFactory()
         service = StudyService(appointment=appointment, current_user=clinical_user)
         study = service.create_with_default_series()
-        appointment.study.series_set.create(
+        appointment.study.series_set.update_or_create(
             view_position="EKLUND", laterality="L", count=1
         )
 
@@ -120,7 +120,7 @@ class TestStudyService:
             ordered=False,
         )
 
-        new_study = service.create(
+        new_study = service.create_or_update(
             additional_details="Some more details",
             series_data=[
                 {"view_position": "CC", "laterality": "L", "count": 7},
