@@ -61,6 +61,14 @@ class Study(BaseModel):
     )
     reasons_incomplete_details = models.TextField(blank=True, null=False, default="")
 
+    def series_counts(self):
+        return {
+            (view_position, laterality): count
+            for view_position, laterality, count in self.series_set.values_list(
+                "view_position", "laterality", "count"
+            )
+        }
+
 
 class Series(BaseModel):
     study = models.ForeignKey(Study, on_delete=models.PROTECT)

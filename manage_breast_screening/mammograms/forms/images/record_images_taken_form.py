@@ -27,10 +27,11 @@ class RecordImagesTakenForm(Form):
     )
 
     def save(self, study_service):
-        if (
-            self.cleaned_data["standard_images"]
-            == self.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO
-        ):
-            study_service.create_with_default_series()
-        else:
-            study_service.remove_existing_study_and_series()
+        match self.cleaned_data["standard_images"]:
+            case self.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO:
+                study_service.create_with_default_series()
+            case self.StandardImagesChoices.NO_IMAGES_TAKEN:
+                study_service.delete_if_exists()
+            case self.StandardImagesChoices.NO_ADD_ADDITIONAL:
+                # Preserve existing study data.
+                pass

@@ -54,7 +54,7 @@ def test_save_with_yes_answer(mock_study_service):
     mock_study_service.create_with_default_series.assert_called_once()
 
 
-def test_save_with_no_answer(mock_study_service):
+def test_save_with_no_add_additional_answer(mock_study_service):
     form = RecordImagesTakenForm(
         QueryDict(
             urlencode(
@@ -67,4 +67,20 @@ def test_save_with_no_answer(mock_study_service):
     form.is_valid()
     form.save(mock_study_service)
 
-    mock_study_service.remove_existing_study_and_series.assert_called_once()
+    mock_study_service.delete_if_exists.assert_not_called()
+
+
+def test_save_with_no_images_taken_answer(mock_study_service):
+    form = RecordImagesTakenForm(
+        QueryDict(
+            urlencode(
+                {
+                    "standard_images": RecordImagesTakenForm.StandardImagesChoices.NO_IMAGES_TAKEN
+                }
+            )
+        )
+    )
+    form.is_valid()
+    form.save(mock_study_service)
+
+    mock_study_service.delete_if_exists.assert_called_once()
