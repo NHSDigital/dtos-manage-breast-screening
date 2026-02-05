@@ -41,3 +41,15 @@ output "app_insights_id" {
 output "relay_namespace_name" {
   value = var.enable_arc_servers ? module.relay_namespace[0].name : null
 }
+
+output "servicebus_namespace_name" {
+  value = var.enable_service_bus ? module.servicebus_namespace[0].namespace_name : null
+}
+
+output "servicebus_namespace_id" {
+  value = var.enable_service_bus ? module.servicebus_namespace[0].namespace_id : null
+}
+
+output "servicebus_topic_ids" {
+  value = var.enable_service_bus ? module.servicebus_namespace[0].topic_ids : {}
+}

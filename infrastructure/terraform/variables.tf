@@ -191,6 +191,24 @@ variable "enable_arc_servers" {
   default     = false
 }
 
+variable "enable_service_bus" {
+  description = "Whether to create Azure Service Bus resources."
+  type        = bool
+  default     = false
+}
+
+variable "servicebus_topics" {
+  description = "Map of Service Bus topics to create. Key is the topic name."
+  type = map(object({
+    max_size_in_megabytes = optional(number, 1024)
+  }))
+  default = {
+    "gateway-actions" = {
+      max_size_in_megabytes = 1024
+    }
+  }
+}
+
 locals {
   region = "uksouth"
 

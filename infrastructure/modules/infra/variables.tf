@@ -63,6 +63,18 @@ variable "enable_arc_servers" {
   type        = bool
 }
 
+variable "enable_service_bus" {
+  description = "Whether to create Azure Service Bus resources."
+  type        = bool
+}
+
+variable "servicebus_topics" {
+  description = "Map of Service Bus topics to create. Key is the topic name."
+  type = map(object({
+    max_size_in_megabytes = optional(number, 1024)
+  }))
+}
+
 locals {
   hub_vnet_rg_name = "rg-hub-${var.hub}-uks-hub-networking"
 }
