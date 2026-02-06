@@ -348,6 +348,26 @@ class TestTakeImages:
 
 
 @pytest.mark.django_db
+class TestAppointmentImagesStream:
+    def test_returns_sse_content_type(self, clinical_user_client, appointment):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:appointment_images_stream", kwargs={"pk": appointment.pk}
+            )
+        )
+        assert response.status_code == 200
+        assert response["Content-Type"] == "text/event-stream"
+
+    def test_returns_404_for_unknown_appointment(self, clinical_user_client):
+        import uuid
+
+        response = clinical_user_client.http.get(
+            reverse("mammograms:appointment_images_stream", kwargs={"pk": uuid.uuid4()})
+        )
+        assert response.status_code == 404
+
+
+@pytest.mark.django_db
 class TestCheckIn:
     def test_known_redirect(self, clinical_user_client):
         appointment = AppointmentFactory.create(

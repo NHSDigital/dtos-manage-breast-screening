@@ -1,10 +1,12 @@
 import logging
+import time
 
 from django.contrib import messages
-from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.db import DatabaseError, IntegrityError, transaction
-from django.http import Http404
+from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.decorators.http import require_http_methods
@@ -15,6 +17,7 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.gateway.services import (
     GatewayActionAlreadyExistsError,
     WorklistItemService,
+    get_images_for_appointment,
 )
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
@@ -262,10 +265,13 @@ class TakeImages(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        images = get_images_for_appointment(self.appointment)
         context.update(
             {
                 "heading": "Record images taken",
                 "page_title": "Record images taken",
+                "images": images,
+                "appointment_pk": self.appointment.pk,
             }
         )
         return context
@@ -357,3 +363,46 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
         return redirect(
             MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
         )
+
+
+def format_sse_event(event: str, data: str) -> str:
+    """Format data as a Server-Sent Event."""
+    lines = "\n".join(f"data: {line}" for line in data.splitlines())
+    return f"event: {event}\n{lines}\n\n"
+
+
+@login_required
+@require_http_methods(["GET"])
+def appointment_images_stream(request, pk):
+    """SSE endpoint for streaming appointment images as they arrive."""
+    try:
+        provider = request.user.current_provider
+        appointment = provider.appointments.get(pk=pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
+
+    def event_stream():
+        last_image_ids = set()
+
+        while True:
+            images = get_images_for_appointment(appointment)
+            current_image_ids = set(str(img.id) for img in images)
+
+            if current_image_ids != last_image_ids:
+                html = render_to_string(
+                    "mammograms/_image_grid.jinja",
+                    {"images": images},
+                    request=request,
+                )
+                yield format_sse_event("images", html)
+                last_image_ids = current_image_ids
+
+            time.sleep(1)
+
+    response = StreamingHttpResponse(
+        event_stream(),
+        content_type="text/event-stream",
+    )
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response

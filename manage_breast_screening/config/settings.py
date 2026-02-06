@@ -214,6 +214,7 @@ if environ.get("DJANGO_ENV", "production") != "production":
             "BACKEND": "django.core.files.storage.FileSystemStorage",
             "OPTIONS": {
                 "location": BASE_DIR / "data" / "dicom",
+                "base_url": "/dicom/",
             },
         }
 else:

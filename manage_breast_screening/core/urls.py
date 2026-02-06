@@ -100,6 +100,9 @@ if settings.DEBUG_TOOLBAR:
     ] + debug_toolbar_urls()
 
 if settings.DEBUG:
+    from django.conf.urls.static import static
+    from django.core.files.storage import storages
+
     urlpatterns.append(
         path(
             "debug/",
@@ -109,3 +112,10 @@ if settings.DEBUG:
             ),
         )
     )
+
+    # Serve DICOM files in development
+    dicom_storage = storages["dicom"]
+    if hasattr(dicom_storage, "base_url") and hasattr(dicom_storage, "location"):
+        urlpatterns += static(
+            dicom_storage.base_url, document_root=dicom_storage.location
+        )
