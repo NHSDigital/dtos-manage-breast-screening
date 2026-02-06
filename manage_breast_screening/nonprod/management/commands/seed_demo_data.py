@@ -20,6 +20,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
     SettingFactory,
 )
+from manage_breast_screening.gateway.models import GatewayAction
 from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
@@ -353,6 +354,7 @@ class Command(BaseCommand):
         BenignLumpHistoryItem.objects.all().delete()
         AppointmentStatus.objects.all().delete()
         ParticipantReportedMammogram.objects.all().delete()
+        GatewayAction.objects.all().delete()
         Appointment.objects.all().delete()
         ScreeningEpisode.objects.all().delete()
         ParticipantAddress.objects.all().delete()
