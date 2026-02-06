@@ -21,4 +21,6 @@
 
     {{ form[fields.repeat_type].as_field_group() }}
   {% endfor %}
+
+  {{ form.additional_details.as_field_group() }}
 {% endblock %}
