@@ -53,7 +53,7 @@ class TestMultipleImagesInformation(SystemTestCase):
         self.expect_url("mammograms:add_image_details", pk=self.appointment.pk)
 
     def when_i_fill_in_image_counts(
-        self, rmlo=0, rcc=0, right_eklund=0, lmlo=0, lcc=0, left_eklund=0
+        self, rmlo=1, rcc=1, right_eklund=0, lmlo=1, lcc=1, left_eklund=0
     ):
         self.page.get_by_label("RMLO").fill(str(rmlo))
         self.page.get_by_label("RCC").fill(str(rcc))
