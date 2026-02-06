@@ -1,16 +1,19 @@
-import { Component, ElementError } from 'nhsuk-frontend'
+import { ConfigurableComponent, ElementError } from 'nhsuk-frontend'
 
 /**
  * Connect to an SSE endpoint and update the image container when new images arrive.
+ *
+ * @augments {ConfigurableComponent<ImageStreamConfig>}
  */
-export class ImageStream extends Component {
+export class ImageStream extends ConfigurableComponent {
   /**
    * @param {Element | null} $root - HTML element to use for component
+   * @param {Partial<ImageStreamConfig>} [config] - Image stream config
    */
-  constructor($root) {
-    super($root)
+  constructor($root, config) {
+    super($root, config)
 
-    const streamUrl = this.$root.getAttribute('data-stream-url')
+    const { streamUrl } = this.config
     if (!streamUrl) {
       throw new ElementError({
         element: $root,
@@ -21,7 +24,6 @@ export class ImageStream extends Component {
 
     this.streamUrl = streamUrl
     this.eventSource = null
-
     this.connect()
   }
 
@@ -51,4 +53,36 @@ export class ImageStream extends Component {
    * Name for the component used when initialising using data-module attributes
    */
   static moduleName = 'app-image-stream'
+
+  /**
+   * Image stream default config
+   *
+   * @see {@link ImageStreamConfig}
+   * @constant
+   * @type {ImageStreamConfig}
+   */
+  static defaults = Object.freeze({})
+
+  /**
+   * Image stream config schema
+   *
+   * @constant
+   * @satisfies {Schema<ImageStreamConfig>}
+   */
+  static schema = Object.freeze({
+    properties: {
+      streamUrl: { type: 'string' }
+    }
+  })
 }
+
+/**
+ * Image stream config
+ *
+ * @typedef {object} ImageStreamConfig
+ * @property {string} [streamUrl] - The SSE endpoint URL for streaming images
+ */
+
+/**
+ * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
+ */
