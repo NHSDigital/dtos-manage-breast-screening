@@ -16,9 +16,8 @@ export class ImageStream extends ConfigurableComponent {
     const { streamUrl } = this.config
     if (!streamUrl) {
       throw new ElementError({
-        element: $root,
         component: ImageStream,
-        identifier: 'data-stream-url attribute'
+        identifier: 'Root element (`$root`) attribute (`data-stream-url`)'
       })
     }
 

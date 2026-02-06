@@ -60,7 +60,7 @@ describe('ImageStream', () => {
 
     expect(console.log).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining('data-stream-url attribute')
+        message: expect.stringContaining('data-stream-url')
       })
     )
   })
