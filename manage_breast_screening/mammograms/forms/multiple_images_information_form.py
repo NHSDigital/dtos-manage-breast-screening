@@ -23,9 +23,9 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
     Field names are prefixed with the series identifier (e.g., rmlo_, lcc_).
     """
 
-    def __init__(self, *args, series_list, instance, **kwargs):
-        self.series_list = series_list
+    def __init__(self, *args, instance, **kwargs):
         self.instance = instance
+        self.series_list = list(instance.series_with_multiple_images())
         super().__init__(*args, **kwargs)
 
         # Add hidden field for stale form detection
@@ -50,10 +50,10 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         data = [(s.id.hex, s.laterality, s.view_position, s.count) for s in series_list]
         return json.dumps(data)
 
-    def is_stale(self, current_series_list):
+    def is_stale(self):
         """Check if the submitted fingerprint matches the current series state."""
         submitted_fingerprint = self.data.get("series_fingerprint", "")
-        current_fingerprint = self._get_series_fingerprint(current_series_list)
+        current_fingerprint = self._get_series_fingerprint(self.series_list)
         return submitted_fingerprint != current_fingerprint
 
     def _add_fields_for_series(self, series, prefix):

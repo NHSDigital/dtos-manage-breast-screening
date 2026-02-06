@@ -19,8 +19,8 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 
-def _fingerprint_for(series_list, study):
-    form = MultipleImagesInformationForm(series_list=series_list, instance=study)
+def _fingerprint_for(study):
+    form = MultipleImagesInformationForm(instance=study)
     return form.initial["series_fingerprint"]
 
 
@@ -99,7 +99,7 @@ class TestAddMultipleImagesInformationView:
                 kwargs={"pk": appointment.pk},
             ),
             {
-                "series_fingerprint": _fingerprint_for([series], study),
+                "series_fingerprint": _fingerprint_for(study),
                 "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
                 "rmlo_repeat_reasons": [
                     RepeatReason.PATIENT_MOVED.value,
@@ -136,9 +136,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        series = SeriesFactory(
-            study=study, laterality="R", view_position="MLO", count=2
-        )
+        SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
 
         response = clinical_user_client.http.post(
             reverse(
@@ -146,7 +144,7 @@ class TestAddMultipleImagesInformationView:
                 kwargs={"pk": appointment.pk},
             ),
             {
-                "series_fingerprint": _fingerprint_for([series], study),
+                "series_fingerprint": _fingerprint_for(study),
             },
         )
 
@@ -224,7 +222,7 @@ class TestAddMultipleImagesInformationView:
                 kwargs={"pk": appointment.pk},
             ),
             {
-                "series_fingerprint": _fingerprint_for([series], study),
+                "series_fingerprint": _fingerprint_for(study),
                 "lmlo_repeat_type": RepeatType.SOME_REPEATS.value,
                 "lmlo_repeat_count": "2",
                 "lmlo_repeat_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
@@ -256,7 +254,7 @@ class TestAddMultipleImagesInformationView:
                 study=study, laterality="R", view_position="MLO", count=2
             )
 
-            old_fingerprint = _fingerprint_for([series], study)
+            old_fingerprint = _fingerprint_for(study)
 
             # Simulate the series changing (e.g., user resubmitted add_image_details)
             series.count = 3
@@ -303,7 +301,7 @@ class TestAddMultipleImagesInformationView:
                     kwargs={"pk": appointment.pk},
                 ),
                 {
-                    "series_fingerprint": _fingerprint_for([series], study),
+                    "series_fingerprint": _fingerprint_for(study),
                     "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
                     "rmlo_repeat_reasons": [RepeatReason.PATIENT_MOVED.value],
                 },
@@ -325,20 +323,18 @@ class TestAddMultipleImagesInformationView:
                 clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
             )
             study = StudyFactory(appointment=appointment)
-            series1 = SeriesFactory(
-                study=study, laterality="R", view_position="MLO", count=2
-            )
-            series2 = SeriesFactory(
+            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            disqualified_series = SeriesFactory(
                 study=study, laterality="L", view_position="CC", count=2
             )
 
-            old_fingerprint = _fingerprint_for([series1, series2], study)
+            old_fingerprint = _fingerprint_for(study)
 
-            # series2 drops to count=1 (no longer qualifies)
-            series2.count = 1
-            series2.save()
+            # disqualified_series drops to count=1 (no longer qualifies)
+            disqualified_series.count = 1
+            disqualified_series.save()
 
-            # Submit with old fingerprint (includes series2 which is now gone)
+            # Submit with old fingerprint (includes disqualified_series which is now gone)
             response = clinical_user_client.http.post(
                 reverse(
                     "mammograms:add_multiple_images_information",

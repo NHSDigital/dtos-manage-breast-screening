@@ -42,15 +42,12 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        current_series = list(self.series_with_multiple_images)
-        if not current_series:
+        if not self.series_with_multiple_images:
             return redirect(self.get_success_url())
 
         # Create a temporary form to check staleness using submitted data
-        form = self.form_class(
-            request.POST, series_list=current_series, instance=self.get_study()
-        )
-        if form.is_stale(current_series):
+        form = self.form_class(request.POST, instance=self.get_study())
+        if form.is_stale():
             messages.add_message(
                 request,
                 messages.WARNING,
@@ -67,7 +64,6 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["series_list"] = self.series_with_multiple_images
         kwargs["instance"] = self.get_study()
         return kwargs
 
