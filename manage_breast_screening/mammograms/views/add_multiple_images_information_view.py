@@ -33,9 +33,7 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
         study = self.get_study()
         if not study:
             return []
-        return list(
-            study.series_set.filter(count__gt=1).order_by("laterality", "view_position")
-        )
+        return list(study.series_with_multiple_images())
 
     def get(self, request, *args, **kwargs):
         if not self.series_with_multiple_images:

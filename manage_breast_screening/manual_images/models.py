@@ -1,6 +1,7 @@
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Case, Value, When
 
 from manage_breast_screening.core.models import BaseModel
 
@@ -67,7 +68,6 @@ class RepeatType(models.TextChoices):
     NO_REPEATS = "NO_REPEATS", "No repeats - all extra images were needed"
 
 
-
 class Study(BaseModel):
     appointment = models.OneToOneField(
         "participants.Appointment", on_delete=models.PROTECT
@@ -89,8 +89,17 @@ class Study(BaseModel):
     reasons_incomplete_details = models.TextField(blank=True, null=False, default="")
 
     def has_series_with_multiple_images(self):
-        """Check if any series has more than one image."""
-        return self.series_set.filter(count__gt=1).exists()
+        return self.series_with_multiple_images().exists()
+
+    def series_with_multiple_images(self):
+        return self.series_set.filter(count__gt=1).order_by(
+            "-laterality",
+            Case(
+                When(view_position="CC", then=Value(0)),
+                When(view_position="MLO", then=Value(1)),
+                When(view_position="EKLUND", then=Value(2)),
+            ),
+        )
 
 
 class Series(BaseModel):
