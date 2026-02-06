@@ -5,10 +5,12 @@ from manage_breast_screening.mammograms.forms.multiple_images_information_form i
     MultipleImagesInformationForm,
 )
 from manage_breast_screening.manual_images.models import RepeatReason, RepeatType
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 def make_query_dict(data: dict) -> QueryDict:
@@ -26,6 +28,11 @@ def get_fingerprint(instance):
     """Get the series fingerprint for testing."""
     form = MultipleImagesInformationForm(instance=instance)
     return form.initial["series_fingerprint"]
+
+
+def make_study_service(study):
+    user = UserFactory()
+    return StudyService(study.appointment, user)
 
 
 @pytest.mark.django_db
@@ -110,7 +117,7 @@ class TestMultipleImagesInformationForm:
 
             assert form.is_valid()
 
-            form.update()
+            form.update(make_study_service(study))
 
             series.refresh_from_db()
             assert series.repeat_type == RepeatType.ALL_REPEATS.value
@@ -181,7 +188,7 @@ class TestMultipleImagesInformationForm:
 
             assert form.is_valid()
 
-            form.update()
+            form.update(make_study_service(study))
 
             series.refresh_from_db()
             assert series.repeat_type == RepeatType.SOME_REPEATS.value
@@ -212,7 +219,7 @@ class TestMultipleImagesInformationForm:
 
             assert form.is_valid()
 
-            form.update()
+            form.update(make_study_service(study))
 
             series.refresh_from_db()
             assert series.repeat_type == RepeatType.NO_REPEATS.value
@@ -244,7 +251,7 @@ class TestMultipleImagesInformationForm:
 
             assert form.is_valid()
 
-            form.update()
+            form.update(make_study_service(study))
 
             series.refresh_from_db()
             assert series.repeat_type == RepeatType.NO_REPEATS.value
@@ -300,7 +307,7 @@ class TestMultipleImagesInformationForm:
 
         assert form.is_valid()
 
-        form.update()
+        form.update(make_study_service(study))
 
         series1.refresh_from_db()
         series2.refresh_from_db()
@@ -478,3 +485,58 @@ class TestMultipleImagesInformationForm:
             )
 
             assert form.is_stale()
+
+    class TestAdditionalDetails:
+        def test_initial_value_from_study(self):
+            study = StudyFactory(additional_details="Existing notes")
+            SeriesFactory(
+                study=study, laterality="R", view_position="MLO", count=2
+            )
+
+            form = MultipleImagesInformationForm(instance=study)
+
+            assert form.initial["additional_details"] == "Existing notes"
+
+        def test_saves_additional_details(self):
+            study = StudyFactory(additional_details="")
+            SeriesFactory(
+                study=study, laterality="R", view_position="MLO", count=2
+            )
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
+                        "additional_details": "Some notes for the reader",
+                    }
+                ),
+                instance=study,
+            )
+
+            assert form.is_valid()
+
+            form.update(make_study_service(study))
+
+            study.refresh_from_db()
+            assert study.additional_details == "Some notes for the reader"
+
+        def test_blank_additional_details_is_valid(self):
+            study = StudyFactory(additional_details="")
+            SeriesFactory(
+                study=study, laterality="R", view_position="MLO", count=2
+            )
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
+                    }
+                ),
+                instance=study,
+            )
+
+            assert form.is_valid()

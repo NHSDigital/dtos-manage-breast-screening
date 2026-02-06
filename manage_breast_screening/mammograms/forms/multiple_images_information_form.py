@@ -1,9 +1,12 @@
 import json
 
 from django import forms
+from django.forms.widgets import Textarea
 
 from manage_breast_screening.manual_images.models import RepeatReason, RepeatType
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.nhsuk_forms.fields import (
+    CharField,
     ChoiceField,
     IntegerField,
     MultipleChoiceField,
@@ -23,10 +26,21 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
     Field names are prefixed with the series identifier (e.g., rmlo_, lcc_).
     """
 
+    additional_details = CharField(
+        hint="Provide information for image readers when reviewing",
+        required=False,
+        label="Notes for reader (optional)",
+        label_classes="nhsuk-label--s",
+        widget=Textarea(attrs={"rows": 2}),
+        max_words=500,
+        error_messages={"max_words": "Notes for reader must be 500 words or less"},
+    )
+
     def __init__(self, *args, instance, **kwargs):
         self.instance = instance
         self.series_list = list(instance.series_with_multiple_images())
         super().__init__(*args, **kwargs)
+        self.initial["additional_details"] = self.instance.additional_details
 
         # Add hidden field for stale form detection
         self.fields["series_fingerprint"] = forms.CharField(
@@ -184,8 +198,8 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             groups.append((series, field_names))
         return groups
 
-    def update(self):
-        """Save the repeat information to each Series."""
+    def update(self, study_service: StudyService):
+        """Save the repeat information to each Series and update study details."""
         for series in self.series_list:
             prefix = self._get_series_prefix(series)
 
@@ -208,5 +222,9 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 series.repeat_count = None
 
             series.save()
+
+        study_service.update_additional_details(
+            self.instance, self.cleaned_data.get("additional_details", "")
+        )
 
         return self.instance
