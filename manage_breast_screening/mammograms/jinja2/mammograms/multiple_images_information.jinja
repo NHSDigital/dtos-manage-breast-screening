@@ -1,0 +1,23 @@
+{% extends "workflow_step.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+
+{% set active_workflow_step = 'TAKE_IMAGES' %}
+
+{% block form %}
+  <p>You have indicated multiple images were needed for some views.</p>
+
+  {% for series, fields in form.get_series_field_groups() %}
+    {% set reasons_html = form[fields.repeat_reasons].as_field_group() %}
+
+    {% if fields.repeat_count %}
+      {% set repeat_count_html = form[fields.repeat_count].as_field_group() %}
+      {% set some_repeats_html = repeat_count_html ~ reasons_html %}
+      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", reasons_html) %}
+      {% do form[fields.repeat_type].add_conditional_html("SOME_REPEATS", some_repeats_html) %}
+    {% else %}
+      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", reasons_html) %}
+    {% endif %}
+
+    {{ form[fields.repeat_type].as_field_group() }}
+  {% endfor %}
+{% endblock %}
