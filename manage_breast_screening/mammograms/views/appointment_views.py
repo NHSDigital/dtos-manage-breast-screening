@@ -372,6 +372,7 @@ def format_sse_event(event: str, data: str) -> str:
 
 
 @login_required
+@require_http_methods(["GET"])
 def appointment_images_stream(request, pk):
     """SSE endpoint for streaming appointment images as they arrive."""
     try:
