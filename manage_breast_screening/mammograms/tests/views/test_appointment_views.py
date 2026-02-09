@@ -13,8 +13,10 @@ from manage_breast_screening.gateway.models import GatewayAction, GatewayActionT
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
 )
+from manage_breast_screening.manual_images.models import Study
 from manage_breast_screening.participants.models import MedicalInformationReview
 from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import (
@@ -401,6 +403,204 @@ class TestStartAppointment:
             clinic_slot__clinic__setting__provider=administrative_user_client.current_provider
         )
         url = reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
+        response = administrative_user_client.http.post(url)
+        assertRedirects(response, reverse(LOGIN_URL, query={"next": url}))
+
+
+@pytest.mark.django_db
+class TestResumeAppointment:
+    @pytest.fixture
+    def paused_appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.PAUSED,
+        )
+
+    def test_redirect_confirm_identity(self, clinical_user_client, paused_appointment):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:confirm_identity", kwargs={"pk": paused_appointment.pk}
+            ),
+        )
+
+    def test_redirect_confirm_identity_when_already_confirmed(
+        self, clinical_user_client, paused_appointment
+    ):
+        """
+        If identity confirmation was completed by a different user,
+        the current user should still be required to confirm identity and not be redirected to the next step.
+        """
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:confirm_identity", kwargs={"pk": paused_appointment.pk}
+            ),
+        )
+
+    def test_redirect_check_information_when_already_taken_images(
+        self, clinical_user_client, paused_appointment
+    ):
+        """
+        If identity confirmation was completed by a different user,
+        the current user should still be required to confirm identity even if images have already been taken.
+        """
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        # check_information expects appointment to have a Study
+        Study.objects.create(appointment=paused_appointment)
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:confirm_identity", kwargs={"pk": paused_appointment.pk}
+            ),
+        )
+
+    def test_redirect_record_medical_information(
+        self, clinical_user_client, paused_appointment
+    ):
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": paused_appointment.pk},
+            ),
+        )
+
+    def test_redirect_take_images(self, clinical_user_client, paused_appointment):
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:take_images", kwargs={"pk": paused_appointment.pk}),
+        )
+
+    def test_redirect_check_information(self, clinical_user_client, paused_appointment):
+        """
+        Redirect to check information when all previous steps have been completed by the user.
+        """
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+        # check_information expects appointment to have a Study
+        Study.objects.create(appointment=paused_appointment)
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:check_information", kwargs={"pk": paused_appointment.pk}
+            ),
+        )
+
+    def test_redirect_check_information_when_images_taken_by_different_user(
+        self, clinical_user_client, paused_appointment
+    ):
+        """
+        If the user has already confirmed identity,
+        redirect to check information when all previous steps have been completed - even if completed by a different user.
+        """
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=UserFactory.create(nhs_uid="different_user"),
+        )
+        paused_appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=UserFactory.create(nhs_uid=clinical_user_client.user.nhs_uid),
+        )
+        # check_information expects appointment to have a Study
+        Study.objects.create(appointment=paused_appointment)
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:check_information", kwargs={"pk": paused_appointment.pk}
+            ),
+        )
+
+    def test_user_not_permitted(self, administrative_user_client, paused_appointment):
+        url = reverse(
+            "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
+        )
         response = administrative_user_client.http.post(url)
         assertRedirects(response, reverse(LOGIN_URL, query={"next": url}))
 

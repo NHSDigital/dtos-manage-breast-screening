@@ -24,6 +24,7 @@ from manage_breast_screening.mammograms.forms.images.record_images_taken_form im
 )
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
+    AppointmentWorkflowService,
 )
 from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models import (
@@ -142,7 +143,9 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
                 "presented_participant": ParticipantPresenter(participant),
                 "confirm_button_text": (
                     "Next section"
-                    if self.is_identity_confirmed_by_user(self.request.user)
+                    if AppointmentWorkflowService(
+                        appointment=self.appointment, current_user=self.request.user
+                    ).is_identity_confirmed_by_user()
                     else self.CONFIRM_IDENTITY_LABEL
                 ),
                 "appointment_cannot_proceed_href": reverse(
@@ -154,19 +157,15 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
         return context
 
     def post(self, request, pk):
-        if not self.is_identity_confirmed_by_user(request.user):
+        if not AppointmentWorkflowService(
+            appointment=self.appointment, current_user=self.request.user
+        ).is_identity_confirmed_by_user():
             self.appointment.completed_workflow_steps.create(
                 step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
                 created_by=request.user,
             )
 
         return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
-
-    def is_identity_confirmed_by_user(self, user):
-        return self.appointment.completed_workflow_steps.filter(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=user,
-        ).exists()
 
 
 class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
@@ -332,6 +331,39 @@ def start_appointment(request, pk):
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
     return redirect("mammograms:confirm_identity", pk=pk)
+
+
+@require_http_methods(["POST"])
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
+def resume_appointment(request, pk):
+    try:
+        provider = request.user.current_provider
+        appointment = provider.appointments.get(pk=pk)
+    except Appointment.DoesNotExist:
+        raise Http404("Appointment not found")
+
+    AppointmentStatusUpdater(
+        appointment=appointment, current_user=request.user
+    ).resume()
+
+    next_step = "mammograms:confirm_identity"
+
+    workflow_service = AppointmentWorkflowService(
+        appointment=appointment, current_user=request.user
+    )
+    if workflow_service.is_identity_confirmed_by_user():
+        completed_steps = workflow_service.get_completed_steps()
+        if AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES in completed_steps:
+            next_step = "mammograms:check_information"
+        elif (
+            AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+            in completed_steps
+        ):
+            next_step = "mammograms:take_images"
+        else:
+            next_step = "mammograms:record_medical_information"
+
+    return redirect(next_step, pk=pk)
 
 
 class MarkSectionReviewed(InProgressAppointmentMixin, View):

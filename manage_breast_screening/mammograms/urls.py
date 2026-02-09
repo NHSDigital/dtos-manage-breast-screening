@@ -42,6 +42,11 @@ urlpatterns = [
         name="start_appointment",
     ),
     path(
+        "<uuid:pk>/resume-appointment/",
+        appointment_views.resume_appointment,
+        name="resume_appointment",
+    ),
+    path(
         "<uuid:pk>/",
         appointment_views.ShowAppointment.as_view(),
         name="show_appointment",

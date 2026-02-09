@@ -3,6 +3,7 @@ import logging
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 
 logger = logging.getLogger(__name__)
@@ -113,3 +114,22 @@ class RecallService:
         # scheduling then this will need to store the reason for the reinvite.
         self.appointment.reinvite = True
         self.appointment.save()
+
+
+class AppointmentWorkflowService:
+    def __init__(self, appointment, current_user):
+        self.appointment = appointment
+        self.current_user = current_user
+
+    def is_identity_confirmed_by_user(self):
+        return self.appointment.completed_workflow_steps.filter(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        ).exists()
+
+    def get_completed_steps(self):
+        return set(
+            self.appointment.completed_workflow_steps.values_list(
+                "step_name", flat=True
+            ).distinct()
+        )
