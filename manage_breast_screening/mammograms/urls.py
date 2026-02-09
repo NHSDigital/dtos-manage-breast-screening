@@ -7,7 +7,7 @@ from .views import (
     add_image_details_view,
     add_multiple_images_information_view,
     appointment_note_views,
-    appointment_views,
+    appointment_workflow_views,
     participant_reported_mammogram_views,
     special_appointment_views,
     symptom_views,
@@ -33,27 +33,27 @@ def not_implemented_view(request, pk):
 urlpatterns = [
     path(
         "<uuid:pk>/check-in/",
-        appointment_views.check_in,
+        appointment_workflow_views.check_in,
         name="check_in",
     ),
     path(
         "<uuid:pk>/start-appointment/",
-        appointment_views.start_appointment,
+        appointment_workflow_views.start_appointment,
         name="start_appointment",
     ),
     path(
         "<uuid:pk>/resume-appointment/",
-        appointment_views.resume_appointment,
+        appointment_workflow_views.resume_appointment,
         name="resume_appointment",
     ),
     path(
         "<uuid:pk>/",
-        appointment_views.ShowAppointment.as_view(),
+        appointment_workflow_views.ShowAppointment.as_view(),
         name="show_appointment",
     ),
     path(
         "<uuid:pk>/participant/",
-        appointment_views.ParticipantDetails.as_view(),
+        appointment_workflow_views.ParticipantDetails.as_view(),
         name="participant_details",
     ),
     path(
@@ -68,27 +68,27 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/confirm-identity/",
-        appointment_views.ConfirmIdentity.as_view(),
+        appointment_workflow_views.ConfirmIdentity.as_view(),
         name="confirm_identity",
     ),
     path(
         "<uuid:pk>/record-medical-information/",
-        appointment_views.RecordMedicalInformation.as_view(),
+        appointment_workflow_views.RecordMedicalInformation.as_view(),
         name="record_medical_information",
     ),
     path(
         "<uuid:pk>/record-medical-information/mark-reviewed/<str:section>/",
-        appointment_views.MarkSectionReviewed.as_view(),
+        appointment_workflow_views.MarkSectionReviewed.as_view(),
         name="mark_section_reviewed",
     ),
     path(
         "<uuid:pk>/take-images/",
-        appointment_views.TakeImages.as_view(),
+        appointment_workflow_views.TakeImages.as_view(),
         name="take_images",
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
-        appointment_views.AppointmentCannotGoAhead.as_view(),
+        appointment_workflow_views.AppointmentCannotGoAhead.as_view(),
         name="appointment_cannot_go_ahead",
     ),
     path(
@@ -313,7 +313,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/images/stream",
-        appointment_views.appointment_images_stream,
+        appointment_workflow_views.appointment_images_stream,
         name="appointment_images_stream",
     ),
 ]
