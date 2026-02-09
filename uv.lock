@@ -871,7 +871,7 @@ requires-dist = [
     { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "gunicorn", specifier = ">=23.0.0,<26.0.0" },
     { name = "jinja2", specifier = ">=3.1.6,<4.0.0" },
-    { name = "mesh-client", specifier = ">=3.2.3,<5.0.0" },
+    { name = "mesh-client", specifier = ">=3.2.3,<6.0.0" },
     { name = "nhsuk-frontend-jinja", specifier = "==0.7.1" },
     { name = "ninja-put-patch-file-upload-middleware", specifier = ">=0.1.4" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
@@ -946,16 +946,16 @@ wheels = [
 
 [[package]]
 name = "mesh-client"
-version = "4.0.1"
+version = "5.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "requests" },
     { name = "urllib3" },
     { name = "werkzeug" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/b0/88a5cd999c844d7e1f19c6f31f90ca9015d87d8bacca7dffcb5d24dece35/mesh_client-4.0.1.tar.gz", hash = "sha256:c29e1c3ebcd6596f1d31956d279b8436d11227234160558cdfd740e8df81d2f1", size = 84821, upload-time = "2025-08-06T08:11:57.634Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/14/70/45ac84638cd3040ccf536b95fa4724459a28b071a1f88bf7413790daa2c2/mesh_client-5.0.1.tar.gz", hash = "sha256:6565cb1a2f6e728ebc0a5274a7543a8a7f554a41c2f74db84e4a4f514ec86d35", size = 93376, upload-time = "2026-01-23T15:19:16.222Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/35/23/379d5b7abb1689990e07d84f812bfcaf5ae27a2dc55224c8b545dd6c25e5/mesh_client-4.0.1-py2.py3-none-any.whl", hash = "sha256:81dd57d9684e10b59eaa2eeef463de1476ec5a5030b7ba480daaa26bff655181", size = 31004, upload-time = "2025-08-06T08:11:56.754Z" },
+    { url = "https://files.pythonhosted.org/packages/89/30/565d27d7483effbad6ebe36821723177c9fe63ed9c0ab5a6ee782228de5b/mesh_client-5.0.1-py2.py3-none-any.whl", hash = "sha256:34210abba5556aeedbbf8921e16b0e27067efd8230a026f350c9f22491637db8", size = 30977, upload-time = "2026-01-23T15:19:14.709Z" },
 ]
 
 [[package]]
