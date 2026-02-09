@@ -1,10 +1,9 @@
 import datetime
-from urllib.parse import urlencode
 
 import pytest
-from django.http import QueryDict
 from django.test import RequestFactory
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
@@ -17,14 +16,10 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 
-def _form_data(data):
-    return QueryDict(urlencode(data, doseq=True))
-
-
 @pytest.mark.django_db
 class TestBenignLumpHistoryItemForm:
     def test_missing_required_fields(self):
-        form = BenignLumpHistoryItemForm(_form_data({}))
+        form = BenignLumpHistoryItemForm(make_query_dict({}))
 
         assert not form.is_valid()
         assert form.errors == {
@@ -45,14 +40,7 @@ class TestBenignLumpHistoryItemForm:
         self, location, detail_field
     ):
         form = BenignLumpHistoryItemForm(
-            _form_data(
-                [
-                    (
-                        "procedure_location",
-                        location,
-                    ),
-                ]
-            )
+            make_query_dict({"procedure_location": location})
         )
 
         assert not form.is_valid()
@@ -77,11 +65,7 @@ class TestBenignLumpHistoryItemForm:
         self, procedure_year, expected_message
     ):
         form = BenignLumpHistoryItemForm(
-            _form_data(
-                [
-                    ("procedure_year", procedure_year),
-                ]
-            )
+            make_query_dict({"procedure_year": procedure_year})
         )
 
         assert not form.is_valid()
@@ -90,24 +74,15 @@ class TestBenignLumpHistoryItemForm:
     def test_create_persists_data(self, clinical_user):
         appointment = AppointmentFactory()
 
-        data = [
-            (
-                "left_breast_procedures",
-                BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY,
-            ),
-            (
-                "right_breast_procedures",
-                BenignLumpHistoryItem.Procedure.NO_PROCEDURES,
-            ),
-            ("procedure_year", datetime.date.today().year - 1),
-            (
-                "procedure_location",
-                BenignLumpHistoryItem.ProcedureLocation.NHS_HOSPITAL,
-            ),
-            ("nhs_hospital_details", "St Thomas' Hospital"),
-            ("additional_details", "Additional details."),
-        ]
-        form = BenignLumpHistoryItemForm(_form_data(data))
+        data = {
+            "left_breast_procedures": BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY,
+            "right_breast_procedures": BenignLumpHistoryItem.Procedure.NO_PROCEDURES,
+            "procedure_year": datetime.date.today().year - 1,
+            "procedure_location": BenignLumpHistoryItem.ProcedureLocation.NHS_HOSPITAL,
+            "nhs_hospital_details": "St Thomas' Hospital",
+            "additional_details": "Additional details.",
+        }
+        form = BenignLumpHistoryItemForm(make_query_dict(data))
         assert form.is_valid()
 
         obj = form.create(appointment=appointment)
@@ -120,7 +95,7 @@ class TestBenignLumpHistoryItemForm:
         assert obj.right_breast_procedures == [
             BenignLumpHistoryItem.Procedure.NO_PROCEDURES
         ]
-        assert obj.procedure_year == data[2][1]
+        assert obj.procedure_year == data["procedure_year"]
         assert obj.procedure_location == (
             BenignLumpHistoryItem.ProcedureLocation.NHS_HOSPITAL
         )
@@ -168,21 +143,15 @@ class TestBenignLumpHistoryItemForm:
         request = RequestFactory().post("/test-form")
         request.user = clinical_user
 
-        data = [
-            ("left_breast_procedures", BenignLumpHistoryItem.Procedure.LUMP_REMOVED),
-            (
-                "right_breast_procedures",
-                BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY,
-            ),
-            ("procedure_year", 2021),
-            (
-                "procedure_location",
-                BenignLumpHistoryItem.ProcedureLocation.PRIVATE_CLINIC_UK,
-            ),
-            ("private_clinic_uk_details", "Private Hospital Updated"),
-            ("additional_details", "Updated details"),
-        ]
-        form = BenignLumpHistoryItemForm(_form_data(data), instance=instance)
+        data = {
+            "left_breast_procedures": BenignLumpHistoryItem.Procedure.LUMP_REMOVED,
+            "right_breast_procedures": BenignLumpHistoryItem.Procedure.NEEDLE_BIOPSY,
+            "procedure_year": 2021,
+            "procedure_location": BenignLumpHistoryItem.ProcedureLocation.PRIVATE_CLINIC_UK,
+            "private_clinic_uk_details": "Private Hospital Updated",
+            "additional_details": "Updated details",
+        }
+        form = BenignLumpHistoryItemForm(make_query_dict(data), instance=instance)
         assert form.is_valid()
         updated_obj = form.update()
         assert updated_obj.pk == instance.pk

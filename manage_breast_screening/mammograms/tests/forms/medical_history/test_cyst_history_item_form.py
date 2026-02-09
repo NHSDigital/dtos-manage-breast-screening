@@ -1,8 +1,7 @@
-from urllib.parse import urlencode
-
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
     CystHistoryItem,
 )
@@ -45,7 +44,7 @@ class TestCystHistoryForm:
     def test_valid_create(self, data):
         appointment = AppointmentFactory()
         form = CystHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.participant,
         )
 
@@ -86,7 +85,7 @@ class TestCystHistoryForm:
         form = CystHistoryItemForm(
             instance=instance,
             participant=instance.appointment.participant,
-            data=QueryDict(urlencode(data, doseq=True)),
+            data=make_query_dict(data),
         )
 
         assert form.is_valid()

@@ -1,5 +1,4 @@
 from datetime import date
-from urllib.parse import urlencode
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -7,6 +6,7 @@ from django.http import QueryDict
 from pytest_django.asserts import assertFormError
 
 from manage_breast_screening.clinics.tests.factories import ProviderFactory
+from manage_breast_screening.conftest import make_query_dict
 
 from ..forms import EthnicityForm, ParticipantReportedMammogramForm
 from ..models import ParticipantReportedMammogram
@@ -143,15 +143,12 @@ class TestParticipantReportedMammogramForm:
 
     def test_no_details_provided(self, appointment, most_recent_provider):
         form = ParticipantReportedMammogramForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "location_type": ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value,
-                        "when_taken": "APPROX",
-                        "name_is_the_same": "NO",
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "location_type": ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value,
+                    "when_taken": "APPROX",
+                    "name_is_the_same": "NO",
+                }
             ),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
@@ -177,7 +174,7 @@ class TestParticipantReportedMammogramForm:
             "exact_date_2": "2025",
         }
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -198,7 +195,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -224,7 +221,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -250,7 +247,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -275,7 +272,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -314,7 +311,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -340,7 +337,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -366,7 +363,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -395,7 +392,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
         )
@@ -428,7 +425,7 @@ class TestParticipantReportedMammogramForm:
         }
 
         form = ParticipantReportedMammogramForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.screening_episode.participant,
             most_recent_provider=most_recent_provider,
             instance=original_instance,

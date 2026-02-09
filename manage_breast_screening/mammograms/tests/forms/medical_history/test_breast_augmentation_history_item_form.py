@@ -1,9 +1,9 @@
 import datetime
-from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
@@ -43,19 +43,16 @@ class TestBreastAugmentationHistoryItemForm:
 
     def test_procedure_year_invalid_format(self, clinical_user):
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "procedure_year": "qwerty",
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "procedure_year": "qwerty",
+                }
             ),
         )
 
@@ -84,16 +81,13 @@ class TestBreastAugmentationHistoryItemForm:
         self, clinical_user, selected_breast_procedures
     ):
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": selected_breast_procedures,
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": selected_breast_procedures,
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                }
             ),
         )
 
@@ -105,16 +99,13 @@ class TestBreastAugmentationHistoryItemForm:
         }
 
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": selected_breast_procedures,
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": selected_breast_procedures,
+                }
             ),
         )
 
@@ -127,20 +118,17 @@ class TestBreastAugmentationHistoryItemForm:
 
     def test_removal_year_invalid_format(self, clinical_user):
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "implants_have_been_removed": True,
-                        "removal_year": "qwerty",
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "implants_have_been_removed": True,
+                    "removal_year": "qwerty",
+                }
             ),
         )
 
@@ -170,19 +158,16 @@ class TestBreastAugmentationHistoryItemForm:
             else (f"Year must be {min_year} or later")
         )
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "procedure_year": procedure_year,
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "procedure_year": procedure_year,
+                }
             ),
         )
 
@@ -208,20 +193,17 @@ class TestBreastAugmentationHistoryItemForm:
             else (f"Year must be {min_year} or later")
         )
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "implants_have_been_removed": True,
-                        "removal_year": removal_year,
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "implants_have_been_removed": True,
+                    "removal_year": removal_year,
+                }
             ),
         )
 
@@ -244,21 +226,18 @@ class TestBreastAugmentationHistoryItemForm:
         self, clinical_user, procedure_year, removal_year
     ):
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "procedure_year": procedure_year,
-                        "implants_have_been_removed": True,
-                        "removal_year": removal_year,
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "procedure_year": procedure_year,
+                    "implants_have_been_removed": True,
+                    "removal_year": removal_year,
+                }
             ),
         )
 
@@ -271,21 +250,18 @@ class TestBreastAugmentationHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
-                        ],
-                        "procedure_year": 2010,
-                        "removal_year": 1900,
-                        "additional_details": "removal_year provided but implants_have_been_removed is False",
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+                    ],
+                    "procedure_year": 2010,
+                    "removal_year": 1900,
+                    "additional_details": "removal_year provided but implants_have_been_removed is False",
+                }
             ),
         )
 
@@ -402,7 +378,7 @@ class TestBreastAugmentationHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = BreastAugmentationHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
         )
 
         assert form.is_valid()
@@ -436,21 +412,18 @@ class TestBreastAugmentationHistoryItemForm:
     def test_success(self, instance):
         form = BreastAugmentationHistoryItemForm(
             instance=instance,
-            data=QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.OTHER_AUGMENTATION
-                        ],
-                        "left_breast_procedures": [
-                            BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
-                        ],
-                        "procedure_year": "2001",
-                        "removal_year": "",
-                        "additional_details": "abc",
-                    },
-                    doseq=True,
-                )
+            data=make_query_dict(
+                {
+                    "right_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.OTHER_AUGMENTATION
+                    ],
+                    "left_breast_procedures": [
+                        BreastAugmentationHistoryItem.Procedure.NO_PROCEDURES
+                    ],
+                    "procedure_year": "2001",
+                    "removal_year": "",
+                    "additional_details": "abc",
+                }
             ),
         )
 

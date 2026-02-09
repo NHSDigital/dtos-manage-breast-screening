@@ -1,9 +1,9 @@
 import datetime
-from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
     MastectomyOrLumpectomyHistoryItem,
 )
@@ -57,23 +57,20 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
     def test_right_breast_other_surgery_no_other_surgery_and_others(self):
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "right_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
-                            MastectomyOrLumpectomyHistoryItem.Surgery.SYMMETRISATION,
-                            MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
-                        ],
-                        "left_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
-                    },
-                    doseq=True,
-                ),
+            make_query_dict(
+                {
+                    "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "right_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
+                        MastectomyOrLumpectomyHistoryItem.Surgery.SYMMETRISATION,
+                        MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
+                    ],
+                    "left_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
+                }
             ),
         )
 
@@ -86,22 +83,19 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
     def test_left_breast_other_surgery_no_other_surgery_and_others(self):
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "right_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
-                        ],
-                        "left_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
-                            MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
-                        ],
-                        "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
-                    },
-                    doseq=True,
-                ),
+            make_query_dict(
+                {
+                    "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "right_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
+                    ],
+                    "left_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
+                        MastectomyOrLumpectomyHistoryItem.Surgery.NO_OTHER_SURGERY,
+                    ],
+                    "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
+                }
             ),
         )
 
@@ -124,22 +118,19 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
     )
     def test_year_of_surgery_outside_range(self, year_of_surgery):
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "right_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "left_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "year_of_surgery": year_of_surgery,
-                        "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
-                    },
-                    doseq=True,
-                ),
+            make_query_dict(
+                {
+                    "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "right_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "left_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "year_of_surgery": year_of_surgery,
+                    "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
+                }
             ),
         )
 
@@ -152,22 +143,19 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
     def test_year_of_surgery_invalid(self):
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "right_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "left_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "year_of_surgery": "invalid value for year_of_surgery",
-                        "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
-                    },
-                    doseq=True,
-                ),
+            make_query_dict(
+                {
+                    "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "right_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "left_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "year_of_surgery": "invalid value for year_of_surgery",
+                    "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
+                }
             ),
         )
 
@@ -178,21 +166,18 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
 
     def test_other_reason_without_details(self):
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "right_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "left_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
-                        ],
-                        "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON,
-                    },
-                    doseq=True,
-                ),
+            make_query_dict(
+                {
+                    "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "right_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "left_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION
+                    ],
+                    "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.OTHER_REASON,
+                }
             ),
         )
 
@@ -205,22 +190,19 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
-                        "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.MASTECTOMY_TISSUE_REMAINING,
-                        "right_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
-                        ],
-                        "left_breast_other_surgery": [
-                            MastectomyOrLumpectomyHistoryItem.Surgery.SYMMETRISATION,
-                        ],
-                        "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
-                        "surgery_other_reason_details": "surgery other details",
-                    },
-                    doseq=True,
-                ),
+            make_query_dict(
+                {
+                    "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
+                    "left_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.MASTECTOMY_TISSUE_REMAINING,
+                    "right_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.RECONSTRUCTION,
+                    ],
+                    "left_breast_other_surgery": [
+                        MastectomyOrLumpectomyHistoryItem.Surgery.SYMMETRISATION,
+                    ],
+                    "surgery_reason": MastectomyOrLumpectomyHistoryItem.SurgeryReason.GENDER_AFFIRMATION,
+                    "surgery_other_reason_details": "surgery other details",
+                }
             ),
         )
 
@@ -300,7 +282,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
         )
 
         assert form.is_valid()
@@ -350,7 +332,7 @@ class TestMastectomyOrLumpectomyHistoryItemForm:
     )
     def test_valid_update(self, instance, data):
         form = MastectomyOrLumpectomyHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             instance=instance,
         )
 

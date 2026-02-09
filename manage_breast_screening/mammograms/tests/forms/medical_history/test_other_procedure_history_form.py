@@ -1,9 +1,9 @@
 import datetime
-from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
@@ -66,12 +66,10 @@ class TestOtherProcedureHistoryForm:
         appointment = AppointmentFactory()
 
         form = OtherProcedureHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "procedure": procedure,
-                    },
-                )
+            make_query_dict(
+                {
+                    "procedure": procedure,
+                }
             ),
             participant=appointment.participant,
         )
@@ -85,14 +83,12 @@ class TestOtherProcedureHistoryForm:
         appointment = AppointmentFactory()
 
         form = OtherProcedureHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "procedure": OtherProcedureHistoryItem.Procedure.BREAST_REDUCTION,
-                        "breast_reduction_details": "Details of breast reduction",
-                        "procedure_year": "invalid_year",
-                    },
-                )
+            make_query_dict(
+                {
+                    "procedure": OtherProcedureHistoryItem.Procedure.BREAST_REDUCTION,
+                    "breast_reduction_details": "Details of breast reduction",
+                    "procedure_year": "invalid_year",
+                }
             ),
             participant=appointment.participant,
         )
@@ -121,14 +117,12 @@ class TestOtherProcedureHistoryForm:
             else (f"Year must be {min_year} or later")
         )
         form = OtherProcedureHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "procedure": OtherProcedureHistoryItem.Procedure.BREAST_REDUCTION,
-                        "breast_reduction_details": "Details of breast reduction",
-                        "procedure_year": procedure_year,
-                    },
-                )
+            make_query_dict(
+                {
+                    "procedure": OtherProcedureHistoryItem.Procedure.BREAST_REDUCTION,
+                    "breast_reduction_details": "Details of breast reduction",
+                    "procedure_year": procedure_year,
+                }
             ),
             participant=appointment.participant,
         )
@@ -166,7 +160,7 @@ class TestOtherProcedureHistoryForm:
     def test_create_success(self, data):
         appointment = AppointmentFactory()
         form = OtherProcedureHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.participant,
         )
 
@@ -183,7 +177,7 @@ class TestOtherProcedureHistoryForm:
     def test_update_success(self, instance, data):
         appointment = AppointmentFactory()
         form = OtherProcedureHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             instance=instance,
             participant=appointment.participant,
         )

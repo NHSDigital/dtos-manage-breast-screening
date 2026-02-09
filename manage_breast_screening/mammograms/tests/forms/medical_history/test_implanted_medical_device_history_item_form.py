@@ -1,9 +1,9 @@
 import datetime
-from urllib.parse import urlencode
 
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
 )
@@ -32,12 +32,10 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
-                    },
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.OTHER_MEDICAL_DEVICE,
+                }
             ),
             participant=appointment.participant,
         )
@@ -51,13 +49,11 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "procedure_year": "qwerty",
-                    },
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                    "procedure_year": "qwerty",
+                }
             ),
             participant=appointment.participant,
         )
@@ -69,14 +65,12 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "device_has_been_removed": True,
-                        "removal_year": "qwerty",
-                    },
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                    "device_has_been_removed": True,
+                    "removal_year": "qwerty",
+                }
             ),
             participant=appointment.participant,
         )
@@ -109,13 +103,11 @@ class TestImplantedMedicalDeviceHistoryItemForm:
             else (f"Year must be {min_year} or later")
         )
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "procedure_year": procedure_year,
-                    },
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                    "procedure_year": procedure_year,
+                }
             ),
             participant=appointment.participant,
         )
@@ -144,14 +136,12 @@ class TestImplantedMedicalDeviceHistoryItemForm:
             else (f"Year must be {min_year} or later")
         )
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "device_has_been_removed": True,
-                        "removal_year": removal_year,
-                    },
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                    "device_has_been_removed": True,
+                    "removal_year": removal_year,
+                }
             ),
             participant=appointment.participant,
         )
@@ -175,15 +165,13 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "procedure_year": procedure_year,
-                        "device_has_been_removed": True,
-                        "removal_year": removal_year,
-                    },
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                    "procedure_year": procedure_year,
+                    "device_has_been_removed": True,
+                    "removal_year": removal_year,
+                }
             ),
             participant=appointment.participant,
         )
@@ -197,16 +185,13 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(
-                urlencode(
-                    {
-                        "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
-                        "procedure_year": 2010,
-                        "removal_year": 1900,
-                        "additional_details": "removal_year provided but not device_has_been_removed",
-                    },
-                    doseq=True,
-                )
+            make_query_dict(
+                {
+                    "device": ImplantedMedicalDeviceHistoryItem.Device.HICKMAN_LINE,
+                    "procedure_year": 2010,
+                    "removal_year": 1900,
+                    "additional_details": "removal_year provided but not device_has_been_removed",
+                }
             ),
             participant=appointment.participant,
         )
@@ -268,7 +253,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         appointment = AppointmentFactory()
 
         form = ImplantedMedicalDeviceHistoryItemForm(
-            QueryDict(urlencode(data, doseq=True)),
+            make_query_dict(data),
             participant=appointment.participant,
         )
 
@@ -311,7 +296,7 @@ class TestImplantedMedicalDeviceHistoryItemForm:
         form = ImplantedMedicalDeviceHistoryItemForm(
             instance=instance,
             participant=instance.appointment.participant,
-            data=QueryDict(urlencode(data, doseq=True)),
+            data=make_query_dict(data),
         )
 
         assert form.is_valid()
