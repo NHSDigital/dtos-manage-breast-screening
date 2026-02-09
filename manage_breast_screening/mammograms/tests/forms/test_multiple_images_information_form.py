@@ -1,6 +1,7 @@
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.conftest import make_query_dict
 from manage_breast_screening.mammograms.forms.multiple_images_information_form import (
     MultipleImagesInformationForm,
 )
@@ -9,17 +10,6 @@ from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
 )
-
-
-def make_query_dict(data: dict) -> QueryDict:
-    """Convert a dict to a QueryDict, handling list values correctly."""
-    qd = QueryDict(mutable=True)
-    for key, value in data.items():
-        if isinstance(value, list):
-            qd.setlist(key, value)
-        else:
-            qd[key] = value
-    return qd
 
 
 @pytest.mark.django_db

@@ -2,6 +2,7 @@ from types import SimpleNamespace
 from unittest import TestCase
 
 import pytest
+from django.http import QueryDict
 from django.test.client import Client
 from django.utils import timezone
 
@@ -21,6 +22,17 @@ def force_mbs_login(client, user):
     session = client.session
     session["login_time"] = timezone.now().isoformat()
     session.save()
+
+
+def make_query_dict(data: dict) -> QueryDict:
+    """Convert a dict to a QueryDict, handling list values correctly."""
+    qd = QueryDict(mutable=True)
+    for key, value in data.items():
+        if isinstance(value, list):
+            qd.setlist(key, [str(v) for v in value])
+        else:
+            qd[key] = str(value)
+    return qd
 
 
 @pytest.fixture
