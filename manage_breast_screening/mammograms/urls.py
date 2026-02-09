@@ -9,6 +9,7 @@ from .views import (
     appointment_note_views,
     appointment_workflow_views,
     participant_reported_mammogram_views,
+    show_appointment_views,
     special_appointment_views,
     symptom_views,
 )
@@ -48,12 +49,12 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/",
-        appointment_workflow_views.ShowAppointment.as_view(),
+        show_appointment_views.ShowAppointment.as_view(),
         name="show_appointment",
     ),
     path(
         "<uuid:pk>/participant/",
-        appointment_workflow_views.ParticipantDetails.as_view(),
+        show_appointment_views.ParticipantDetails.as_view(),
         name="participant_details",
     ),
     path(
