@@ -1,4 +1,5 @@
 import io
+import logging
 from datetime import datetime
 
 import numpy as np
@@ -7,6 +8,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image as PILImage
 
 from .models import Image, Series, Study
+
+logger = logging.getLogger(__name__)
 
 
 class DicomRecorder:
@@ -18,6 +21,12 @@ class DicomRecorder:
         study_uid = ds.StudyInstanceUID
         series_uid = ds.SeriesInstanceUID
         sop_uid = ds.SOPInstanceUID
+
+        logger.info(
+            f"Processing DICOM file with StudyInstanceUID={study_uid}, "
+            f"SeriesInstanceUID={series_uid}, SOPInstanceUID={sop_uid}, "
+            f"PatientID={getattr(ds, 'PatientID', '')}, "
+        )
 
         study, _ = Study.objects.get_or_create(
             study_instance_uid=study_uid,
@@ -69,6 +78,10 @@ class DicomRecorder:
         # Normalize pixel data to 0-255 and convert to uint8
         pixel_array = ds.pixel_array
         pixel_array = pixel_array.astype(np.float32)
+
+        if getattr(ds, "PhotometricInterpretation", "") == "MONOCHROME1":
+            pixel_array = np.max(pixel_array) - pixel_array
+
         pixel_array -= pixel_array.min()
         pixel_array /= pixel_array.max()
         pixel_array *= 255.0
