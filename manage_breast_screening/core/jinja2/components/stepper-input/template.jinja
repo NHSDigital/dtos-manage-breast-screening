@@ -29,12 +29,11 @@
 {{ button({
   "type": "button",
   "classes": "nhsuk-button--secondary app-button--icon nhsuk-button--small app-stepper-input__step-down app-js-stepper-input-step-down",
-  "html": app_icon("minus", {
-    "title": params.step_down_button.visually_hidden_text | default("Decrease", true)
-  }) | trim | indent(2),
+  "html": app_icon("minus") | trim | indent(2),
   "attributes": {
     "aria-controls": id,
     "aria-describedby": id ~ "-label",
+    "aria-label": params.step_down_button.visually_hidden_text | default("Decrease", true),
     "disabled": {
       "value": params.min is defined and value | int(default=1000000) <= params.min,
       "optional": true
@@ -51,12 +50,11 @@
 {{ button({
   "type": "button",
   "classes": "nhsuk-button--secondary app-button--icon nhsuk-button--small app-stepper-input__step-up app-js-stepper-input-step-up",
-  "html": app_icon("plus", {
-  "title": params.step_up_button.visually_hidden_text | default("Increase", true)
-}) | trim | indent(2),
+  "html": app_icon("plus") | trim | indent(2),
   "attributes": {
     "aria-controls": id,
     "aria-describedby": id ~ "-label",
+    "aria-label": params.step_up_button.visually_hidden_text | default("Increase", true),
     "disabled": {
       "value": params.max is defined and value | int(default=0) >= params.max,
       "optional": true

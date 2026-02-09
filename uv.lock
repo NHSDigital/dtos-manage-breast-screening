@@ -872,7 +872,7 @@ requires-dist = [
     { name = "gunicorn", specifier = ">=23.0.0,<26.0.0" },
     { name = "jinja2", specifier = ">=3.1.6,<4.0.0" },
     { name = "mesh-client", specifier = ">=3.2.3,<6.0.0" },
-    { name = "nhsuk-frontend-jinja", specifier = "==0.7.1" },
+    { name = "nhsuk-frontend-jinja", specifier = "==0.7.2" },
     { name = "ninja-put-patch-file-upload-middleware", specifier = ">=0.1.4" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
     { name = "pillow", specifier = ">=12.1.0" },
@@ -1002,14 +1002,14 @@ wheels = [
 
 [[package]]
 name = "nhsuk-frontend-jinja"
-version = "0.7.1"
+version = "0.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/34/cc/c6815622e2de3e8f6d6823f1fbb396ea42158732a403d2a99dae8e352547/nhsuk_frontend_jinja-0.7.1.tar.gz", hash = "sha256:f18738b4c42fbb7f87ebce3c4ffa16fed4226813a6c58c39ce376e3b4e15bf94", size = 27389, upload-time = "2026-01-29T13:55:33.664Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/5e/132ee72606714dddeb79ba6820e4879462e4ebd8cdaf482233539619017d/nhsuk_frontend_jinja-0.7.2.tar.gz", hash = "sha256:a427903b553c430f7665c85bb05b173d5400dfee92d64d0f41a43d08e7e1fd27", size = 69091, upload-time = "2026-02-09T15:05:47.381Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a4/f4/bf9aa15d85eee55ba27ce582c4e086678d726c7825705d42a63c338ebab8/nhsuk_frontend_jinja-0.7.1-py3-none-any.whl", hash = "sha256:f91506cdc195af1b85977f67f10ea4bc926d73ca8316c1af8bfd72aa762b6ea4", size = 60136, upload-time = "2026-01-29T13:55:31.954Z" },
+    { url = "https://files.pythonhosted.org/packages/aa/11/25411c9e4bf24aa35383da5594a7ce623bfbea8d3d3813964fee905f0843/nhsuk_frontend_jinja-0.7.2-py3-none-any.whl", hash = "sha256:2f9892e115c6208c352e1a95755dbc2be644476a24089efb2ef27cb1c30680d3", size = 60115, upload-time = "2026-02-09T15:05:46.17Z" },
 ]
 
 [[package]]
