@@ -51,10 +51,11 @@ class ImageView:
                 return f"{self.view_position} {self.laterality}"
 
 
-STANDARD_VIEWS_RCC_FIRST = [
+ALL_VIEWS_RCC_FIRST = [
     ImageView.from_short_name(name)
     for name in ["RCC", "RMLO", "Right Eklund", "LCC", "LMLO", "Left Eklund"]
 ]
+EKLUND_VIEWS = [ImageView("EKLUND", "R"), ImageView("EKLUND", "L")]
 
 
 class StudyCompleteness(models.TextChoices):
@@ -148,7 +149,7 @@ class Study(BaseModel):
     def series_counts(self):
         # Initialise everything with 0 so missing series are included
         # and the order is respected.
-        counts = {view: 0 for view in STANDARD_VIEWS_RCC_FIRST}
+        counts = {view: 0 for view in ALL_VIEWS_RCC_FIRST}
 
         for view_position, laterality, count in self.series_set.values_list(
             "view_position", "laterality", "count"

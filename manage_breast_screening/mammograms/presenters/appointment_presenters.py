@@ -3,6 +3,7 @@ from functools import cached_property
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.manual_images.models import EKLUND_VIEWS
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
     AppointmentStatusNames,
@@ -300,10 +301,12 @@ class ImagesTakenPresenter:
 
         self.total_count = 0
         self.views_taken = {}
-        for series in study.series_set.all():
-            image_name = str(series)
-            self.views_taken[image_name] = series.count
-            self.total_count += series.count
+        for view, count in study.series_counts().items():
+            if view in EKLUND_VIEWS and not count:
+                continue
+            image_name = view.short_name
+            self.views_taken[image_name] = count
+            self.total_count += count
 
     @property
     def title(self):
