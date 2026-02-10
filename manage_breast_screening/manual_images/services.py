@@ -52,6 +52,11 @@ class StudyService:
 
         return study
 
+    def update_additional_details(self, study, additional_details: str):
+        study.additional_details = additional_details
+        study.save(update_fields=["additional_details"])
+        self.auditor.audit_update(study)
+
     @transaction.atomic
     def delete_if_exists(self):
         if hasattr(self.appointment, "study"):
