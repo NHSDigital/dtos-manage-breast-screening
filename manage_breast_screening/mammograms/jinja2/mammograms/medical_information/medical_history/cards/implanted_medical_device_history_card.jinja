@@ -1,7 +1,7 @@
 {% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
 {% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, item_with_details, paragraph %}
 
-{% macro implanted_medical_device_history_card(implanted_medical_device_history) %}
+{% macro implanted_medical_device_history_card(implanted_medical_device_history, read_only=false) %}
   {% if implanted_medical_device_history %}
   <section>
   {% endif %}
@@ -29,7 +29,7 @@
               "classes": "nhsuk-link--no-visited-state",
             }
           ]
-        }
+        } if not read_only else none
       },
       "headingLevel": 4,
       "rows": [

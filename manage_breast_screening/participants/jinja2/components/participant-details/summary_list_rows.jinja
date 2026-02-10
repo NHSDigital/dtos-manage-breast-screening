@@ -33,15 +33,17 @@
   {% endif %}
 {% endmacro %}
 
-{% macro last_mammogram_html(presented_mammograms) %}
+{% macro last_mammogram_html(presented_mammograms, read_only=false) %}
   {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
   <div data-testid="mammograms">
   {% if mammograms_by_date_added %}
     {% for mammogram in mammograms_by_date_added %}
       <p>
+      {% if not read_only %}
       <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ mammogram.change_link.href}}">
         {{ mammogram.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ mammogram.change_link.visually_hidden_text }}</span>
       </a>
+      {% endif %}
 
       <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
       <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-colour">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}

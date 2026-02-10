@@ -63,6 +63,11 @@ urlpatterns = [
         name="appointment_image_details",
     ),
     path(
+        "<uuid:pk>/medical-information/",
+        show_appointment_views.MedicalInformation.as_view(),
+        name="medical_information",
+    ),
+    path(
         "<uuid:pk>/note/",
         appointment_note_views.AppointmentNoteView.as_view(),
         name="appointment_note",
