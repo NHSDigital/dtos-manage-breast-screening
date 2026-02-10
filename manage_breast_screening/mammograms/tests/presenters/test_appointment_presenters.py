@@ -768,7 +768,7 @@ class TestImagesTakenPresenter:
     def test_standard_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_set.all.return_value = [
+        appointment.study.series_set.order_rcc_first.return_value.all.return_value = [
             Series(view_position="CC", laterality="R", count=1),
             Series(view_position="CC", laterality="L", count=1),
             Series(view_position="MLO", laterality="R", count=1),
@@ -789,7 +789,7 @@ class TestImagesTakenPresenter:
     def test_all_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_set.all.return_value = [
+        appointment.study.series_set.order_rcc_first.return_value.all.return_value = [
             Series(view_position="CC", laterality="R", count=20),
             Series(view_position="CC", laterality="L", count=1),
             Series(view_position="MLO", laterality="R", count=7),
@@ -814,7 +814,7 @@ class TestImagesTakenPresenter:
     def test_one_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_set.all.return_value = [
+        appointment.study.series_set.order_rcc_first.return_value.all.return_value = [
             Series(view_position="MLO", laterality="L", count=1),
         ]
 
