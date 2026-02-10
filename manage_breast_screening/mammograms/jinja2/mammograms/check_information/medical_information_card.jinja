@@ -15,7 +15,8 @@
 
 {% macro medical_information_card(presented_medical_information) %}
   {% call card({
-    "heading": "Medical information"
+    "heading": "Medical information",
+    "feature": true
   }) %}
     {{ summaryList({
       "rows": [

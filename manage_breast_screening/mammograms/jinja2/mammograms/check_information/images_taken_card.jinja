@@ -15,7 +15,8 @@
 
 {% macro images_taken_card(presented_images) %}
   {% call card({
-    "heading": presented_images.title
+    "heading": presented_images.title,
+    "feature": true
   }) %}
     {{ summaryList({
       "rows": [
