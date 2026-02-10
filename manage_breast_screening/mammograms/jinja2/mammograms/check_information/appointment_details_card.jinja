@@ -1,0 +1,43 @@
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from 'nhsuk/components/tag/macro.jinja' import tag %}
+
+{% macro special_appointment_details(presented_appointment) %}
+  {% if presented_appointment.is_special_appointment %}
+    {{ tag(presented_appointment.special_appointment_tag_properties) }}
+    {% for reason in presented_appointment.special_appointment.reasons %}
+      <p class="nhsuk-u-margin-bottom-2">
+        <strong>{{ reason.label }}</strong><br>
+        {{ reason.details | nl2br }}
+      </p>
+    {% endfor %}
+  {% else -%}
+    No
+  {%- endif %}
+{% endmacro %}
+
+{% macro appointment_note_details(presented_appointment) %}
+  {% if presented_appointment.has_appointment_note %}
+    {{ presented_appointment.note.content | nl2br }}
+  {%- endif %}
+{% endmacro %}
+
+{% macro appointment_details_card(presented_appointment) %}
+  {% call card({
+    "heading": "Appointment details",
+    "feature": true
+  }) %}
+    {{ summaryList({
+      "rows": [
+        {
+          "key": { "text": "Special appointment" },
+          "value": {"html": special_appointment_details(presented_appointment) }
+        },
+        {
+          "key": { "text": "Appointment note" },
+          "value": { "text": appointment_note_details(presented_appointment) }
+        }
+      ]
+    }) }}
+  {% endcall %}
+{% endmacro %}
