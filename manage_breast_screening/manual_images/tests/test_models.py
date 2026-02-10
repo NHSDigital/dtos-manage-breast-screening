@@ -10,16 +10,10 @@ from manage_breast_screening.manual_images.tests.factories import (
 @pytest.mark.django_db
 class TestStudy:
     class TestHasSeriesWithMultipleImages:
-        def test_returns_true_when_series_has_count_gt_1(self):
-            study = StudyFactory()
-            SeriesFactory(study=study, count=2)
-
-            assert study.has_series_with_multiple_images() is True
-
         def test_returns_false_when_all_series_have_count_1(self):
             study = StudyFactory()
-            SeriesFactory(study=study, count=1)
-            SeriesFactory(study=study, count=1, laterality="L")
+            SeriesFactory(study=study, count=1, rcc=True)
+            SeriesFactory(study=study, count=1, lcc=True)
 
             assert study.has_series_with_multiple_images() is False
 
@@ -28,46 +22,30 @@ class TestStudy:
 
             assert study.has_series_with_multiple_images() is False
 
-        def test_returns_true_when_one_series_has_count_gt_1(self):
+        def test_returns_true_when_at_least_one_series_has_count_gt_1(self):
             study = StudyFactory()
-            SeriesFactory(study=study, count=1)
-            SeriesFactory(study=study, count=3, laterality="L")
+            SeriesFactory(study=study, rcc=True, count=1)
+            SeriesFactory(study=study, lcc=True, count=3)
 
             assert study.has_series_with_multiple_images() is True
 
     class TestSeriesWithMultipleImages:
         def test_returns_only_series_with_count_gt_1(self):
             study = StudyFactory()
-            SeriesFactory(study=study, count=1, laterality="R", view_position="CC")
-            series_2 = SeriesFactory(
-                study=study, count=2, laterality="R", view_position="MLO"
-            )
-            series_3 = SeriesFactory(
-                study=study, count=3, laterality="L", view_position="CC"
-            )
+            SeriesFactory(study=study, rcc=True, count=1)
+            series_2 = SeriesFactory(study=study, rmlo=True, count=2)
+            series_3 = SeriesFactory(study=study, lcc=True, count=3)
 
             assert set(study.series_with_multiple_images()) == {series_2, series_3}
 
         def test_orders_by_laterality_then_view_position(self):
             study = StudyFactory()
-            rmlo = SeriesFactory(
-                study=study, count=2, laterality="R", view_position="MLO"
-            )
-            lmlo = SeriesFactory(
-                study=study, count=2, laterality="L", view_position="MLO"
-            )
-            rcc = SeriesFactory(
-                study=study, count=2, laterality="R", view_position="CC"
-            )
-            lcc = SeriesFactory(
-                study=study, count=2, laterality="L", view_position="CC"
-            )
-            right_eklund = SeriesFactory(
-                study=study, count=2, laterality="R", view_position="EKLUND"
-            )
-            left_eklund = SeriesFactory(
-                study=study, count=2, laterality="L", view_position="EKLUND"
-            )
+            rmlo = SeriesFactory(study=study, rmlo=True, count=2)
+            lmlo = SeriesFactory(study=study, lmlo=True, count=2)
+            rcc = SeriesFactory(study=study, rcc=True, count=2)
+            lcc = SeriesFactory(study=study, lcc=True, count=2)
+            right_eklund = SeriesFactory(study=study, right_eklund=True, count=2)
+            left_eklund = SeriesFactory(study=study, left_eklund=True, count=2)
 
             assert list(study.series_with_multiple_images()) == [
                 rcc,

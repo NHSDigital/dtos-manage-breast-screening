@@ -42,7 +42,7 @@ class TestMultipleImagesInformationForm:
 
         def test_no_data_requires_repeat_type(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            SeriesFactory(study=study, rmlo=True, count=2)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -59,7 +59,7 @@ class TestMultipleImagesInformationForm:
 
         def test_all_repeats_requires_reasons(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            SeriesFactory(study=study, rmlo=True, count=2)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -79,7 +79,7 @@ class TestMultipleImagesInformationForm:
 
         def test_no_repeats_does_not_require_reasons(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            SeriesFactory(study=study, rmlo=True, count=2)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -96,9 +96,7 @@ class TestMultipleImagesInformationForm:
 
         def test_all_repeats_with_reasons_saves_data(self):
             study = StudyFactory()
-            series = SeriesFactory(
-                study=study, laterality="R", view_position="MLO", count=2
-            )
+            series = SeriesFactory(study=study, rmlo=True, count=2)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -132,7 +130,7 @@ class TestMultipleImagesInformationForm:
 
         def test_some_repeats_requires_count_and_reasons(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="L", view_position="CC", count=3)
+            SeriesFactory(study=study, lcc=True, count=3)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -151,7 +149,7 @@ class TestMultipleImagesInformationForm:
 
         def test_all_repeats_does_not_require_count(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="L", view_position="CC", count=3)
+            SeriesFactory(study=study, lcc=True, count=3)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -169,9 +167,7 @@ class TestMultipleImagesInformationForm:
 
         def test_some_repeats_with_count_and_reasons_saves_data(self):
             study = StudyFactory()
-            series = SeriesFactory(
-                study=study, laterality="L", view_position="CC", count=4
-            )
+            series = SeriesFactory(study=study, lcc=True, count=4)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -199,8 +195,7 @@ class TestMultipleImagesInformationForm:
             study = StudyFactory()
             series = SeriesFactory(
                 study=study,
-                laterality="R",
-                view_position="CC",
+                rcc=True,
                 count=3,
                 repeat_type=RepeatType.ALL_REPEATS.value,
                 repeat_reasons=[RepeatReason.PATIENT_MOVED.value],
@@ -230,8 +225,7 @@ class TestMultipleImagesInformationForm:
             study = StudyFactory()
             series = SeriesFactory(
                 study=study,
-                laterality="R",
-                view_position="CC",
+                rcc=True,
                 count=4,
                 repeat_type=RepeatType.SOME_REPEATS.value,
                 repeat_count=2,
@@ -260,7 +254,7 @@ class TestMultipleImagesInformationForm:
 
         def test_repeat_count_max_value_validation(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="L", view_position="MLO", count=4)
+            SeriesFactory(study=study, lmlo=True, count=4)
             fingerprint = get_fingerprint(study)
 
             # max_value should be count - 1 = 3
@@ -285,12 +279,8 @@ class TestMultipleImagesInformationForm:
 
     def test_multiple_series(self):
         study = StudyFactory()
-        series1 = SeriesFactory(
-            study=study, laterality="R", view_position="MLO", count=2
-        )
-        series2 = SeriesFactory(
-            study=study, laterality="L", view_position="CC", count=3
-        )
+        series1 = SeriesFactory(study=study, rmlo=True, count=2)
+        series2 = SeriesFactory(study=study, lcc=True, count=3)
         fingerprint = get_fingerprint(study)
 
         form = MultipleImagesInformationForm(
@@ -320,12 +310,8 @@ class TestMultipleImagesInformationForm:
 
     def test_get_series_field_groups(self):
         study = StudyFactory()
-        series1 = SeriesFactory(
-            study=study, laterality="R", view_position="MLO", count=2
-        )
-        series2 = SeriesFactory(
-            study=study, laterality="L", view_position="CC", count=3
-        )
+        series1 = SeriesFactory(study=study, rmlo=True, count=2)
+        series2 = SeriesFactory(study=study, lcc=True, count=3)
 
         form = MultipleImagesInformationForm(QueryDict(), instance=study)
 
@@ -351,8 +337,7 @@ class TestMultipleImagesInformationForm:
         study = StudyFactory()
         SeriesFactory(
             study=study,
-            laterality="R",
-            view_position="MLO",
+            rmlo=True,
             count=3,
             repeat_type=RepeatType.SOME_REPEATS.value,
             repeat_count=1,
@@ -373,7 +358,7 @@ class TestMultipleImagesInformationForm:
 
         def test_is_stale_returns_false_when_fingerprints_match(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            SeriesFactory(study=study, rmlo=True, count=2)
 
             # Create form to get the fingerprint
             initial_form = MultipleImagesInformationForm(instance=study)
@@ -394,9 +379,7 @@ class TestMultipleImagesInformationForm:
 
         def test_is_stale_returns_true_when_series_count_changes(self):
             study = StudyFactory()
-            series = SeriesFactory(
-                study=study, laterality="R", view_position="MLO", count=2
-            )
+            series = SeriesFactory(study=study, rmlo=True, count=2)
 
             # Get fingerprint for original state
             initial_form = MultipleImagesInformationForm(instance=study)
@@ -421,10 +404,8 @@ class TestMultipleImagesInformationForm:
 
         def test_is_stale_returns_true_when_series_disappears(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
-            series2 = SeriesFactory(
-                study=study, laterality="L", view_position="CC", count=2
-            )
+            SeriesFactory(study=study, rmlo=True, count=2)
+            series2 = SeriesFactory(study=study, lcc=True, count=2)
 
             # Get fingerprint for original state (includes both series)
             initial_form = MultipleImagesInformationForm(instance=study)
@@ -449,14 +430,14 @@ class TestMultipleImagesInformationForm:
 
         def test_is_stale_returns_true_when_new_series_appears(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            SeriesFactory(study=study, rmlo=True, count=2)
 
             # Get fingerprint for original state (only series1)
             initial_form = MultipleImagesInformationForm(instance=study)
             old_fingerprint = initial_form.initial["series_fingerprint"]
 
             # New series appears
-            SeriesFactory(study=study, laterality="L", view_position="CC", count=2)
+            SeriesFactory(study=study, lcc=True, count=2)
 
             # Form with old fingerprint, but new series in DB
             form = MultipleImagesInformationForm(
@@ -473,7 +454,7 @@ class TestMultipleImagesInformationForm:
 
         def test_is_stale_returns_true_when_no_fingerprint_submitted(self):
             study = StudyFactory()
-            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+            SeriesFactory(study=study, rmlo=True, count=2)
 
             form = MultipleImagesInformationForm(
                 make_query_dict(

@@ -31,7 +31,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+        SeriesFactory(study=study, rmlo=True, count=2)
 
         response = clinical_user_client.http.get(
             reverse(
@@ -47,8 +47,8 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="R", view_position="MLO", count=1)
-        SeriesFactory(study=study, laterality="L", view_position="CC", count=1)
+        SeriesFactory(study=study, rmlo=True, count=1)
+        SeriesFactory(study=study, lcc=True, count=1)
 
         response = clinical_user_client.http.get(
             reverse(
@@ -89,9 +89,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        series = SeriesFactory(
-            study=study, laterality="R", view_position="MLO", count=2
-        )
+        series = SeriesFactory(study=study, rmlo=True, count=2)
 
         response = clinical_user_client.http.post(
             reverse(
@@ -136,7 +134,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
+        SeriesFactory(study=study, rmlo=True, count=2)
 
         response = clinical_user_client.http.post(
             reverse(
@@ -159,7 +157,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="L", view_position="CC", count=2)
+        SeriesFactory(study=study, lcc=True, count=2)
 
         response = clinical_user_client.http.get(
             reverse(
@@ -176,7 +174,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="L", view_position="CC", count=3)
+        SeriesFactory(study=study, lcc=True, count=3)
 
         response = clinical_user_client.http.get(
             reverse(
@@ -193,8 +191,8 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
-        SeriesFactory(study=study, laterality="L", view_position="CC", count=3)
+        SeriesFactory(study=study, rmlo=True, count=2)
+        SeriesFactory(study=study, lcc=True, count=3)
 
         response = clinical_user_client.http.get(
             reverse(
@@ -212,9 +210,7 @@ class TestAddMultipleImagesInformationView:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
         study = StudyFactory(appointment=appointment)
-        series = SeriesFactory(
-            study=study, laterality="L", view_position="MLO", count=4
-        )
+        series = SeriesFactory(study=study, lmlo=True, count=4)
 
         response = clinical_user_client.http.post(
             reverse(
