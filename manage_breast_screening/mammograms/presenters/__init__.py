@@ -9,11 +9,11 @@ from .appointment_presenters import (
 from .last_known_mammogram_presenter import LastKnownMammogramPresenter
 
 
-def present_secondary_nav(pk, current_tab=None):
+def present_secondary_nav(pk, current_tab=None, appointment_complete=False):
     """
     Build a secondary nav for reviewing the information of screened/partially screened appointments.
     """
-    return [
+    tabs = [
         {
             "id": "appointment",
             "text": "Appointment",
@@ -39,6 +39,21 @@ def present_secondary_nav(pk, current_tab=None):
             "current": current_tab == "note",
         },
     ]
+
+    if appointment_complete:
+        tabs.insert(
+            -1,
+            {
+                "id": "images",
+                "text": "Images",
+                "href": reverse(
+                    "mammograms:appointment_image_details", kwargs={"pk": pk}
+                ),
+                "current": current_tab == "images",
+            },
+        )
+
+    return tabs
 
 
 __all__ = [

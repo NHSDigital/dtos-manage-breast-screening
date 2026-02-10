@@ -45,7 +45,9 @@ class ShowAppointment(AppointmentTabMixin, View):
             "presented_mammograms": last_known_mammogram_presenter,
             "appointment_note": appointment_presenter.note,
             "secondary_nav_items": present_secondary_nav(
-                appointment.pk, current_tab="appointment"
+                appointment.pk,
+                current_tab="appointment",
+                appointment_complete=not appointment.active,
             ),
         }
 
@@ -77,7 +79,9 @@ class ParticipantDetails(AppointmentTabMixin, View):
             "presented_participant": appointment_presenter.participant,
             "presented_mammograms": last_known_mammogram_presenter,
             "secondary_nav_items": present_secondary_nav(
-                appointment.pk, current_tab="participant"
+                appointment.pk,
+                current_tab="participant",
+                appointment_complete=not appointment.active,
             ),
         }
 
