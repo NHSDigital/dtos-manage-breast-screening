@@ -19,8 +19,6 @@ class ShowAppointment(AppointmentTabMixin, View):
     if the apppointment is in progress.
     """
 
-    template_name = "mammograms/show.jinja"
-
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
@@ -56,8 +54,6 @@ class ShowAppointment(AppointmentTabMixin, View):
 
 
 class ParticipantDetails(AppointmentTabMixin, View):
-    template_name = "mammograms/show.jinja"
-
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
