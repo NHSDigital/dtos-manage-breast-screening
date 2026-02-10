@@ -1,9 +1,9 @@
+import factory
 from factory import Faker
 from factory.declarations import (
     SubFactory,
 )
 from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyChoice
 
 from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
@@ -20,10 +20,17 @@ class StudyFactory(DjangoModelFactory):
 
 class SeriesFactory(DjangoModelFactory):
     study = SubFactory(StudyFactory)
-    view_position = FuzzyChoice(choices=["CC", "MLO", "EKLUND"])
-    laterality = FuzzyChoice(choices=["L", "R"])
-    count = FuzzyChoice(choices=list(range(1, 21)))
+    view_position = "CC"
+    laterality = "R"
+    count = 1
+
+    class Params:
+        rcc = factory.Trait(view_position="CC", laterality="R")
+        rmlo = factory.Trait(view_position="MLO", laterality="R")
+        right_eklund = factory.Trait(view_position="EKLUND", laterality="R")
+        lcc = factory.Trait(view_position="CC", laterality="L")
+        lmlo = factory.Trait(view_position="MLO", laterality="L")
+        left_eklund = factory.Trait(view_position="EKLUND", laterality="L")
 
     class Meta:
         model = Series
-        django_get_or_create = ("study", "view_position", "laterality")
