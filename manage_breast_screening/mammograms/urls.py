@@ -306,4 +306,9 @@ urlpatterns = [
         add_multiple_images_information_view.AddMultipleImagesInformationView.as_view(),
         name="add_multiple_images_information",
     ),
+    path(
+        "<uuid:pk>/images/stream",
+        appointment_views.appointment_images_stream,
+        name="appointment_images_stream",
+    ),
 ]
