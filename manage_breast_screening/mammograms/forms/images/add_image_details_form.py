@@ -179,7 +179,32 @@ class AddImageDetailsForm(FormWithConditionalFields):
         error_messages={"max_words": "Notes for reader must be 500 words or less"},
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, instance=None, **kwargs):
+        if instance:
+            series_counts = instance.series_counts()
+            match instance.completeness:
+                case StudyCompleteness.INCOMPLETE:
+                    should_recall = self.RecallChoices.TO_BE_RECALLED
+                case StudyCompleteness.PARTIAL:
+                    should_recall = self.RecallChoices.PARTIAL_MAMMOGRAPHY
+                case _:
+                    should_recall = None
+
+            kwargs["initial"] = {
+                "rmlo_count": series_counts.get(("MLO", "R"), 0),
+                "lmlo_count": series_counts.get(("MLO", "L"), 0),
+                "rcc_count": series_counts.get(("CC", "R"), 0),
+                "lcc_count": series_counts.get(("CC", "L"), 0),
+                "right_eklund_count": series_counts.get(("EKLUND", "R"), 0),
+                "left_eklund_count": series_counts.get(("EKLUND", "L"), 0),
+                "imperfect_but_best_possible": instance.imperfect_but_best_possible,
+                "not_all_mammograms_taken": bool(instance.reasons_incomplete),
+                "reasons_incomplete": instance.reasons_incomplete,
+                "reasons_incomplete_details": instance.reasons_incomplete_details,
+                "should_recall": should_recall,
+                "additional_details": instance.additional_details,
+            }
+
         super().__init__(*args, **kwargs)
 
         self.given_field_value("not_all_mammograms_taken", True).require_field(
@@ -226,7 +251,7 @@ class AddImageDetailsForm(FormWithConditionalFields):
                 return StudyCompleteness.COMPLETE
 
     def save(self, study_service: StudyService, recall_service: RecallService):
-        study = study_service.create(
+        study = study_service.create_or_update(
             additional_details=self.cleaned_data.get("additional_details", ""),
             imperfect_but_best_possible=self.cleaned_data.get(
                 "imperfect_but_best_possible", False

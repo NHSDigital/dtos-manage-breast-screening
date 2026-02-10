@@ -37,6 +37,11 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
         )
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = getattr(self.appointment, "study", None)
+        return kwargs
+
     @transaction.atomic
     def form_valid(self, form):
         study = form.save(
