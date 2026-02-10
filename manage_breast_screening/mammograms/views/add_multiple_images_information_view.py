@@ -1,6 +1,7 @@
 import logging
 from functools import cached_property
 
+from django.contrib import messages
 from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -40,9 +41,29 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
             return redirect(self.get_success_url())
         return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        if not self.series_with_multiple_images:
+            return redirect(self.get_success_url())
+
+        # Create a temporary form to check staleness using submitted data
+        form = self.form_class(request.POST, instance=self.get_study())
+        if form.is_stale():
+            messages.add_message(
+                request,
+                messages.WARNING,
+                "The image details have changed. Please review and continue.",
+            )
+            return redirect(
+                reverse(
+                    "mammograms:add_image_details",
+                    kwargs={"pk": self.appointment_pk},
+                )
+            )
+
+        return super().post(request, *args, **kwargs)
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["series_list"] = self.series_with_multiple_images
         kwargs["instance"] = self.get_study()
         return kwargs
 
