@@ -75,8 +75,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_extensions",
     "django_linear_migrations",
-    "django_tasks",
-    "django_tasks.backends.database",
     "manage_breast_screening.core",
     "manage_breast_screening.auth",
     "manage_breast_screening.users",
@@ -234,15 +232,6 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
     "dicom": dicom_storage_options,
-}
-
-TASKS = {
-    "default": {
-        "BACKEND": "django.tasks.backends.immediate.ImmediateBackend",
-    },
-    "database": {
-        "BACKEND": "django_tasks.backends.database.DatabaseBackend",
-    },
 }
 
 # Password validation
