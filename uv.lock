@@ -797,6 +797,7 @@ dependencies = [
     { name = "nhsuk-frontend-jinja" },
     { name = "ninja-put-patch-file-upload-middleware" },
     { name = "pandas" },
+    { name = "phonenumbers" },
     { name = "pillow" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydicom" },
@@ -846,6 +847,7 @@ requires-dist = [
     { name = "nhsuk-frontend-jinja", specifier = "==0.7.2" },
     { name = "ninja-put-patch-file-upload-middleware", specifier = ">=0.1.4" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
+    { name = "phonenumbers", specifier = ">=9.0.22" },
     { name = "pillow", specifier = ">=12.1.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.7,<4.0.0" },
     { name = "pydicom", specifier = ">=3.0.1" },
@@ -1331,6 +1333,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9e/c3/059298687310d527a58bb01f3b1965787ee3b40dce76752eda8b44e9a2c5/pexpect-4.9.0-py2.py3-none-any.whl", hash = "sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523", size = 63772, upload-time = "2023-11-25T06:56:14.81Z" },
+]
+
+[[package]]
+name = "phonenumbers"
+version = "9.0.22"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/12/8583ba0f327cebf42e4c1a63f394332f42d86a5cc16e0f578bb29d17b524/phonenumbers-9.0.22.tar.gz", hash = "sha256:eff985c65575749d1d54e07c56c3517d5243e03e08e4a6191761df9aab2278f2", size = 2297728, upload-time = "2026-01-16T06:31:02.211Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1e/95/a958da5ca5ae35b3a0d4a1ce88b001b4360fd6b48b97339dba2815ec10d4/phonenumbers-9.0.22-py2.py3-none-any.whl", hash = "sha256:645e66cd9a136b3b257b5f941fa97d324124114d31ad3c9f2488682f47ad7ee1", size = 2584081, upload-time = "2026-01-16T06:30:58.43Z" },
 ]
 
 [[package]]
