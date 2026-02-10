@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.views import View
 
+from manage_breast_screening.mammograms.presenters.appointment_presenters import (
+    ImagesTakenPresenter,
+)
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 
 from ..presenters import (
@@ -81,5 +84,30 @@ class ParticipantDetails(AppointmentTabMixin, View):
         return render(
             request,
             template_name="mammograms/show/participant_details.jinja",
+            context=context,
+        )
+
+
+class ImageDetails(AppointmentTabMixin, View):
+    def get(self, request, *args, **kwargs):
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(appointment)
+
+        context = {
+            "heading": appointment_presenter.participant.full_name,
+            "caption": appointment_presenter.caption,
+            "page_title": appointment_presenter.caption,
+            "presented_appointment": appointment_presenter,
+            "presented_images": ImagesTakenPresenter(appointment),
+            "secondary_nav_items": present_secondary_nav(
+                appointment.pk,
+                current_tab="images",
+                appointment_complete=not appointment.active,
+            ),
+        }
+
+        return render(
+            request,
+            template_name="mammograms/show/images.jinja",
             context=context,
         )

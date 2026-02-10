@@ -1,0 +1,30 @@
+{% extends 'layout-appointment.jinja' %}
+{% from 'nhsuk/components/card/macro.jinja' import card %}
+{% from "mammograms/check_information/images_taken_card.jinja" import views_taken %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+
+{% block tab_content %}
+  {% call card({
+    "heading": "Mammogram details",
+    "headingLevel": 2,
+    "feature": true
+  }) %}
+    {{ summaryList({
+      "rows": [
+        {
+          "key": { "text": "Views taken" },
+          "value": { "html": views_taken(presented_images) }
+        },
+        {
+          "key": { "text": "Notes for reader" },
+          "value": {
+            "text": presented_images.additional_details | default('Not provided', true),
+            "classes": "nhsuk-u-secondary-text-colour" if not presented_images.additional_details
+          },
+          "classes": "nhsuk-summary-list__row--no-border"
+        }
+      ]
+    }) }}
+  {% endcall %}
+
+{% endblock %}
