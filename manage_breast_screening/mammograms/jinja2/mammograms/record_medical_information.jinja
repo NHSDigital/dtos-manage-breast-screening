@@ -150,7 +150,7 @@
     {% set breast_features_recorded = false %}
 
     {% set insetHtml %}
-    <p>No breast features have been recorded for this participant. Add any scars, moles, warts or lumps observed or reported during the appointment.</p>
+      <p>No breast features have been recorded for this participant. Add any scars, moles, warts or lumps observed or reported during the appointment.</p>
     {% endset %}
     {{ insetText({
       "html": insetHtml,
@@ -160,21 +160,6 @@
     <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
       <a href="#" class="nhsuk-link nhsuk-link--no-visited-state">{{ "Add another feature" if breast_features_recorded else "Add a feature" }}</a>
     </p>
-
-    {% if presenter.breast_features_action_button %}
-      {% if presenter.breast_features_action_button.is_anchor %}
-        <a href="{{ presenter.breast_features_action_button.href }}" class="nhsuk-link {{ presenter.breast_features_action_button.classes }}">
-          {{ presenter.breast_features_action_button.text }}
-        </a>
-      {% else %}
-        <form method="post" action="{{ presenter.breast_features_action_button.href }}" class="app-inline-form">
-          {{ csrf_input }}
-          <button type="submit" class="nhsuk-link-button {{ presenter.breast_features_action_button.classes }}">
-            {{ presenter.breast_features_action_button.text }}
-          </button>
-        </form>
-      {% endif %}
-    {% endif %}
 {% endcall %}
 
 {% call card_with_status(
@@ -184,27 +169,6 @@
   action_button_properties=presenter.review_action_button_properties(sections.OTHER_INFORMATION),
   csrf_input=csrf_input,
   ) %}
-  {% set hrt_link %}
-  <a class="nhsuk-link" href="#">Enter hormone replacement therapy (HRT)</a>
-  {% endset %}
-  {% set pregnancy_and_breastfeeding_link %}
-  <a class="nhsuk-link" href="#">Enter pregnancy and breastfeeding</a>
-  {% endset %}
-
-  {% if presenter.other_information_action_button %}
-    {% if presenter.other_information_action_button.is_anchor %}
-      <a href="{{ presenter.other_information_action_button.href }}" class="nhsuk-link {{ presenter.other_information_action_button.classes }}">
-        {{ presenter.other_information_action_button.text }}
-      </a>
-    {% else %}
-      <form method="post" action="{{ presenter.other_information_action_button.href }}" class="app-inline-form">
-        {{ csrf_input }}
-        <button type="submit" class="nhsuk-link-button {{ presenter.other_information_action_button.classes }}">
-          {{ presenter.other_information_action_button.text }}
-        </button>
-      </form>
-    {% endif %}
-  {% endif %}
 {% endcall %}
 
 {{ complete_all_button }}
