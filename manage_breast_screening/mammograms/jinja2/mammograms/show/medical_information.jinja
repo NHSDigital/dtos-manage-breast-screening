@@ -1,105 +1,37 @@
 {% extends 'layout-appointment.jinja' %}
 {% from "nhsuk/components/card/macro.jinja" import card %}
-{% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
-{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
-{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
-{% from "mammograms/medical_information/medical_history/cards/benign_lump_history_card.jinja" import benign_lump_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/breast_augmentation_history_card.jinja" import breast_augmentation_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/cyst_history_card.jinja" import cyst_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/implanted_medical_device_history_card.jinja" import implanted_medical_device_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/other_procedure_history_card.jinja" import other_procedure_history_card %}
+{% from "mammograms/medical_information/section_cards.jinja" import mammogram_history_content, symptoms_content, medical_history_content, breast_features_content, other_information_content %}
 
 {% block tab_content %}
 
 {% call card({
   "heading": "Mammogram history"
 }) %}
-  <p>The last confirmed mammogram and any added manually since then</p>
-
-  {{ summaryList({
-    "rows": [
-      {
-        "key": {
-          "text": "Last known mammograms"
-        },
-        "value": {
-          "html": last_mammogram_html(presented_mammograms, read_only=true)
-        }
-      },
-    ]
-  }) }}
+  {{ mammogram_history_content(presenter, presented_mammograms, read_only=true) }}
 {% endcall %}
 
 {% call card({
   "heading": "Symptoms"
 }) %}
-  <p>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
-  {% if presenter.read_only_symptom_rows %}
-     {{ summaryList({
-        "rows": presenter.read_only_symptom_rows
-      }) }}
-  {% else %}
-    {% set insetHtml %}
-      <p>No symptoms have been recorded for this participant.</p>
-    {% endset %}
-    {{ insetText({
-      "html": insetHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-    }) }}
-  {% endif %}
+  {{ symptoms_content(presenter, read_only=true) }}
 {% endcall %}
 
 {% call card({
   "heading": "Medical history"
 }) %}
-  <p>Including breast cancer, implants, prior procedures and treatments</p>
-
-  {% if presenter.any_medical_history %}
-    {{ breast_cancer_history_card(presenter.breast_cancer_history, read_only=true) }}
-    {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history, read_only=true) }}
-    {{ breast_augmentation_history_card(presenter.breast_augmentation_history, read_only=true) }}
-    {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history, read_only=true) }}
-    {{ cyst_history_card(presenter.cyst_history, read_only=true) }}
-    {{ benign_lump_history_card(presenter.benign_lump_history, read_only=true) }}
-    {{ other_procedure_history_card(presenter.other_procedure_history, read_only=true) }}
-  {% else %}
-    {% set insetTextHtml %}
-      <p>
-        No medical history has been added yet.
-      </p>
-    {% endset %}
-
-    {{ insetText({
-      "html": insetTextHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-    }) }}
-  {% endif %}
+  {{ medical_history_content(presenter, read_only=true) }}
 {% endcall %}
 
 {% call card({
   "heading": "Breast features"
 }) %}
-  {% set insetHtml %}
-    <p>No breast features have been recorded for this participant.</p>
-  {% endset %}
-  {{ insetText({
-    "html": insetHtml,
-    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-  }) }}
+  {{ breast_features_content(presenter, read_only=true) }}
 {% endcall %}
 
 {% call card({
   "heading": "Other information"
 }) %}
-  {% set insetHtml %}
-    <p>No other information has been recorded for this participant.</p>
-  {% endset %}
-  {{ insetText({
-    "html": insetHtml,
-    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-  }) }}
+  {{ other_information_content(presenter, read_only=true) }}
 {% endcall %}
 
 {% endblock %}
