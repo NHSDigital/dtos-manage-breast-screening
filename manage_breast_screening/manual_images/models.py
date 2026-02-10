@@ -92,14 +92,7 @@ class Study(BaseModel):
         return self.series_with_multiple_images().exists()
 
     def series_with_multiple_images(self):
-        return self.series_set.filter(count__gt=1).order_by(
-            "-laterality",
-            Case(
-                When(view_position="CC", then=Value(0)),
-                When(view_position="MLO", then=Value(1)),
-                When(view_position="EKLUND", then=Value(2)),
-            ),
-        )
+        return self.series_set.filter(count__gt=1).order_rcc_first()
 
     def series_counts(self):
         return {
@@ -110,7 +103,21 @@ class Study(BaseModel):
         }
 
 
+class SeriesQuerySet(models.QuerySet):
+    def order_rcc_first(self):
+        return self.order_by(
+            "-laterality",
+            Case(
+                When(view_position="CC", then=Value(0)),
+                When(view_position="MLO", then=Value(1)),
+                When(view_position="EKLUND", then=Value(2)),
+            ),
+        )
+
+
 class Series(BaseModel):
+    objects = SeriesQuerySet.as_manager()
+
     study = models.ForeignKey(Study, on_delete=models.PROTECT)
 
     view_position = models.CharField(
