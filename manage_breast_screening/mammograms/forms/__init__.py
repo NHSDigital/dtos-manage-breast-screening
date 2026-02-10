@@ -16,6 +16,9 @@ from .medical_history.other_procedure_history_item_form import (
     OtherProcedureHistoryItemForm,
 )
 from .multiple_images_information_form import MultipleImagesInformationForm
+from .other_information.hormone_replacement_therapy_form import (
+    HormoneReplacementTherapyForm,
+)
 from .record_medical_information_form import RecordMedicalInformationForm
 from .screening_appointment_form import ScreeningAppointmentForm
 from .special_appointment_forms import (
@@ -38,4 +41,5 @@ __all__ = [
     "MastectomyOrLumpectomyHistoryItemForm",
     "ImplantedMedicalDeviceHistoryItemForm",
     "OtherProcedureHistoryItemForm",
+    "HormoneReplacementTherapyForm",
 ]

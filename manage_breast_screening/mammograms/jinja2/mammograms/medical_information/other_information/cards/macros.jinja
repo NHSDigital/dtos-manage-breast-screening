@@ -1,0 +1,17 @@
+{% macro hormone_replacement_therapy_details(presenter, read_only=false) %}
+  {% if not presenter.hormone_replacement_therapy %}
+    {% if read_only %}
+      Not provided
+    {% else %}
+      <a href="{{ presenter.add_hormone_replacement_therapy_link }}">Enter hormone replacement therapy (HRT) details</a>
+    {% endif %}
+  {% elif presenter.hormone_replacement_therapy.status == 'YES' %}
+    <p>Taking HRT ({{ presenter.hormone_replacement_therapy.approx_start_date }})</p>
+  {% elif presenter.hormone_replacement_therapy.status == 'NO_BUT_STOPPED_RECENTLY' %}
+    <p>Recently stopped HRT ({{ presenter.hormone_replacement_therapy.approx_end_date }})</p>
+  {% elif presenter.hormone_replacement_therapy.status == 'NO' -%}
+    <p>Not taking HRT</p>
+  {% else %}
+    {{ presenter.hormone_replacement_therapy.status }}
+  {% endif %}
+{% endmacro %}

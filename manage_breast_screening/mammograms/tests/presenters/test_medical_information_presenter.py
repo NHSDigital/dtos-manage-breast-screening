@@ -4,6 +4,9 @@ from manage_breast_screening.mammograms.presenters.medical_information_presenter
     MedicalInformationPresenter,
 )
 from manage_breast_screening.participants.models import MedicalInformationSection
+from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
+    HormoneReplacementTherapy,
+)
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     SymptomAreas,
@@ -326,3 +329,51 @@ class TestRecordMedicalInformationPresenter:
 
         OtherProcedureHistoryItemFactory.create(appointment=appointment)
         assert MedicalInformationPresenter(appointment).any_medical_history
+
+    def test_add_hormone_replacement_therapy_link(self):
+        appointment = AppointmentFactory()
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.hormone_replacement_therapy is None
+        assert presenter.add_hormone_replacement_therapy_link == (
+            f"/mammograms/{appointment.pk}/record-medical-information/hormone-replacement-therapy/"
+        )
+
+    def test_hormone_replacement_therapy_actions_present(self):
+        appointment = AppointmentFactory()
+        hormone_replacement_therapy = HormoneReplacementTherapy.objects.create(
+            appointment=appointment, status=HormoneReplacementTherapy.Status.YES
+        )
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.hormone_replacement_therapy == hormone_replacement_therapy
+        assert presenter.hormone_replacement_therapy_actions(read_only=False) == {
+            "items": [
+                {
+                    "classes": "nhsuk-link--no-visited-state",
+                    "href": f"/mammograms/{appointment.pk}/record-medical-information/hormone-replacement-therapy/{hormone_replacement_therapy.pk}/",
+                    "text": "Change",
+                    "visuallyHiddenText": "hormone replacement therapy",
+                }
+            ]
+        }
+
+    def test_hormone_replacement_therapy_actions_readonly(self):
+        appointment = AppointmentFactory()
+        hormone_replacement_therapy = HormoneReplacementTherapy.objects.create(
+            appointment=appointment, status=HormoneReplacementTherapy.Status.YES
+        )
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.hormone_replacement_therapy == hormone_replacement_therapy
+        assert not presenter.hormone_replacement_therapy_actions(read_only=True)
+
+    def test_hormone_replacement_therapy_actions_none(self):
+        appointment = AppointmentFactory()
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert not presenter.hormone_replacement_therapy_actions()

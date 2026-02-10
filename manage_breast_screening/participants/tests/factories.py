@@ -26,6 +26,9 @@ from manage_breast_screening.participants.models import (
     MedicalInformationSection,
     OtherProcedureHistoryItem,
 )
+from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
+    HormoneReplacementTherapy,
+)
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
@@ -322,3 +325,11 @@ class SymptomFactory(DjangoModelFactory):
         other = Trait(
             symptom_type_id=models.SymptomType.OTHER, symptom_sub_type_details="abc"
         )
+
+
+class HormoneReplacementTherapyFactory(DjangoModelFactory):
+    class Meta:
+        model = HormoneReplacementTherapy
+
+    appointment = SubFactory(AppointmentFactory)
+    status = HormoneReplacementTherapy.Status.NO

@@ -2,6 +2,9 @@ from django.urls import path
 from django.views.decorators.http import require_http_methods
 
 from manage_breast_screening.mammograms.views import mammogram_views
+from manage_breast_screening.mammograms.views.other_information import (
+    hormone_replacement_therapy_views,
+)
 
 from .views import (
     add_image_details_view,
@@ -326,5 +329,15 @@ urlpatterns = [
         "<uuid:pk>/images/stream",
         appointment_workflow_views.appointment_images_stream,
         name="appointment_images_stream",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/hormone-replacement-therapy/",
+        hormone_replacement_therapy_views.AddHormoneReplacementTherapyView.as_view(),
+        name="add_hormone_replacement_therapy",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/hormone-replacement-therapy/<uuid:hrt_pk>/",
+        hormone_replacement_therapy_views.UpdateHormoneReplacementTherapyView.as_view(),
+        name="change_hormone_replacement_therapy",
     ),
 ]

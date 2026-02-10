@@ -30,7 +30,8 @@
   "fieldset": {
     "legend": {
       "html": label_html(field),
-      "classes": unbound_field.label_classes
+      "classes": unbound_field.label_classes,
+      "isPageHeading": unbound_field.page_heading
     }
   } if field.use_fieldset else none,
   "errorMessage": error_message,
