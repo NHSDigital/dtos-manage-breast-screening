@@ -78,6 +78,30 @@ class TestStudy:
                 (ImageView("EKLUND", "L"), 0),
             ]
 
+    class TestSeriesSummary:
+        def test_includes_missing_series_and_respects_ordering(self):
+            series = SeriesFactory(
+                view_position="MLO", laterality="R", count=2, repeat_count=1
+            )
+            summaries = series.study.series_summary()
+
+            assert list(summaries.keys()) == [
+                ImageView(view_position="CC", laterality="R"),
+                ImageView(view_position="MLO", laterality="R"),
+                ImageView(view_position="EKLUND", laterality="R"),
+                ImageView(view_position="CC", laterality="L"),
+                ImageView(view_position="MLO", laterality="L"),
+                ImageView(view_position="EKLUND", laterality="L"),
+            ]
+            assert list(summaries.values()) == [
+                {"count": 0, "repeat_count": 0, "repeat_reasons": []},
+                {"count": 2, "repeat_count": 1, "repeat_reasons": []},
+                {"count": 0, "repeat_count": 0, "repeat_reasons": []},
+                {"count": 0, "repeat_count": 0, "repeat_reasons": []},
+                {"count": 0, "repeat_count": 0, "repeat_reasons": []},
+                {"count": 0, "repeat_count": 0, "repeat_reasons": []},
+            ]
+
 
 class TestSeries:
     @pytest.mark.parametrize(

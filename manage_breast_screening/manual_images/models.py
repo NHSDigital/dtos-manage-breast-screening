@@ -56,6 +56,8 @@ STANDARD_VIEWS_RCC_FIRST = [
     for name in ["RCC", "RMLO", "Right Eklund", "LCC", "LMLO", "Left Eklund"]
 ]
 
+EKLUND_VIEWS = [ImageView("EKLUND", "R"), ImageView("EKLUND", "L")]
+
 
 class StudyCompleteness(models.TextChoices):
     """
@@ -146,17 +148,34 @@ class Study(BaseModel):
         return self.series_set.filter(count__gt=1).order_rcc_first()
 
     def series_counts(self):
+        return {
+            view: summary["count"] for view, summary in self.series_summary().items()
+        }
+
+    def series_summary(self):
+        """
+        Summarise all series of the studies, including missing ones.
+
+        Returns a dict keyed by ImageView and ordered with CC first.
+        """
         # Initialise everything with 0 so missing series are included
         # and the order is respected.
-        counts = {view: 0 for view in STANDARD_VIEWS_RCC_FIRST}
+        result = {
+            view: {"count": 0, "repeat_count": 0, "repeat_reasons": []}
+            for view in STANDARD_VIEWS_RCC_FIRST
+        }
 
-        for view_position, laterality, count in self.series_set.values_list(
-            "view_position", "laterality", "count"
-        ):
-            view = ImageView(view_position, laterality)
-            counts[view] = count
+        for series in self.series_set.order_rcc_first():
+            view = ImageView(series.view_position, series.laterality)
+            result[view].update(
+                {
+                    "count": series.count,
+                    "repeat_count": series.repeat_count,
+                    "repeat_reasons": series.repeat_reasons,
+                }
+            )
 
-        return counts
+        return result
 
 
 class SeriesQuerySet(models.QuerySet):
