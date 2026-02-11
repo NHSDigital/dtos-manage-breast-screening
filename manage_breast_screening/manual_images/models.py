@@ -9,7 +9,7 @@ from typing_extensions import Literal
 from manage_breast_screening.core.models import BaseModel
 
 
-@dataclass
+@dataclass(frozen=True)
 class ImageView:
     view_position: Literal["CC", "MLO", "EKLUND"]
     laterality: Literal["R", "L"]
@@ -148,15 +148,13 @@ class Study(BaseModel):
     def series_counts(self):
         # Initialise everything with 0 so missing series are included
         # and the order is respected.
-        counts = {
-            (view.view_position, view.laterality): 0
-            for view in STANDARD_VIEWS_RCC_FIRST
-        }
+        counts = {view: 0 for view in STANDARD_VIEWS_RCC_FIRST}
 
         for view_position, laterality, count in self.series_set.values_list(
             "view_position", "laterality", "count"
         ):
-            counts[(view_position, laterality)] = count
+            view = ImageView(view_position, laterality)
+            counts[view] = count
 
         return counts
 

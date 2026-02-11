@@ -70,12 +70,12 @@ class TestStudy:
         def test_includes_missing_series_and_respects_ordering(self):
             series = SeriesFactory(view_position="MLO", laterality="R", count=1)
             assert list(series.study.series_counts().items()) == [
-                (("CC", "R"), 0),
-                (("MLO", "R"), 1),
-                (("EKLUND", "R"), 0),
-                (("CC", "L"), 0),
-                (("MLO", "L"), 0),
-                (("EKLUND", "L"), 0),
+                (ImageView("CC", "R"), 0),
+                (ImageView("MLO", "R"), 1),
+                (ImageView("EKLUND", "R"), 0),
+                (ImageView("CC", "L"), 0),
+                (ImageView("MLO", "L"), 0),
+                (ImageView("EKLUND", "L"), 0),
             ]
 
 
