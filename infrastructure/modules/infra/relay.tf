@@ -1,5 +1,5 @@
 data "azurerm_private_dns_zone" "relay" {
-  count    = var.enable_arc_servers ? 1 : 0
+  count    = var.enable_relay ? 1 : 0
   provider = azurerm.hub
 
   name                = "privatelink.servicebus.windows.net"
@@ -7,7 +7,7 @@ data "azurerm_private_dns_zone" "relay" {
 }
 
 module "relay_namespace" {
-  count  = var.enable_arc_servers ? 1 : 0
+  count  = var.enable_relay ? 1 : 0
   source = "../dtos-devops-templates/infrastructure/modules/relay-namespace"
 
   name                = "relay-${var.app_short_name}-${var.environment}"

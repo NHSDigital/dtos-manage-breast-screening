@@ -14,9 +14,10 @@ module "servicebus_namespace" {
   resource_group_name       = azurerm_resource_group.main.name
   location                  = var.region
 
-  sku_tier                       = "Premium"
-  capacity                       = 1
-  servicebus_topic_map           = var.servicebus_topics
+  sku_tier                      = "Premium"
+  capacity                      = 1
+  servicebus_topic_map          = var.servicebus_topics
+  public_network_access_enabled = var.service_bus_public_network_access_enabled
 
   private_endpoint_properties = {
     private_endpoint_enabled             = true

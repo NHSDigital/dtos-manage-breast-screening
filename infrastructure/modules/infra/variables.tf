@@ -58,13 +58,18 @@ variable "action_group_id" {
   description = "ID of the action group to notify."
 }
 
-variable "enable_arc_servers" {
-  description = "Whether to create the resources for Azure Arc-enabled servers."
+variable "enable_relay" {
+  description = "Whether to create Azure Relay resources."
   type        = bool
 }
 
 variable "enable_service_bus" {
   description = "Whether to create Azure Service Bus resources."
+  type        = bool
+}
+
+variable "service_bus_public_network_access_enabled" {
+  description = "Whether or not public network access is allowed for the Service Bus namespace."
   type        = bool
 }
 

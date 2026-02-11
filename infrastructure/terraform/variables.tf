@@ -185,14 +185,20 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
-variable "enable_arc_servers" {
-  description = "Whether to create the resources for Azure Arc-enabled servers."
+variable "enable_relay" {
+  description = "Whether to create Azure Relay resources."
   type        = bool
   default     = false
 }
 
 variable "enable_service_bus" {
   description = "Whether to create Azure Service Bus resources."
+  type        = bool
+  default     = false
+}
+
+variable "service_bus_public_network_access_enabled" {
+  description = "Whether or not public network access is allowed for the Service Bus namespace."
   type        = bool
   default     = false
 }
