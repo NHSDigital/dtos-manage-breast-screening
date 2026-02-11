@@ -21,7 +21,7 @@ clinic:
             first_name: June
             last_name: Cross
             gender: Female
-            nhs_number: '9740681275'
+            nhs_number: '9990681275'
             phone: 01614960485
             email: junecross@example.com
             date_of_birth: '1967-09-24'
@@ -57,7 +57,7 @@ clinic:
             first_name: Debra
             last_name: Henderson
             gender: Female
-            nhs_number: '9466980624'
+            nhs_number: '9996980624'
             phone: (01632)960082
             email: debrahenderson@example.com
             date_of_birth: '1955-01-21'
@@ -93,7 +93,7 @@ clinic:
             first_name: Charlene
             last_name: Butler
             gender: Female
-            nhs_number: '9013825445'
+            nhs_number: '9993825445'
             phone: +44(0)808 157 0940
             email: charlenebutler@example.com
             date_of_birth: '1965-07-12'
@@ -128,7 +128,7 @@ clinic:
             first_name: Ruth
             last_name: Hayes
             gender: Female
-            nhs_number: '9879634372'
+            nhs_number: '9999634372'
             phone: 0151 496 0706
             email: ruthhayes@example.com
             date_of_birth: '1957-09-10'
@@ -197,7 +197,7 @@ clinic:
             first_name: Diana
             last_name: Austin
             gender: Female
-            nhs_number: '9797471173'
+            nhs_number: '9997471173'
             phone: +44131 496 0876
             email: dianaaustin@example.com
             date_of_birth: '1958-07-22'
@@ -231,7 +231,7 @@ clinic:
             first_name: Alexandra
             last_name: Johnson
             gender: Female
-            nhs_number: '9260711853'
+            nhs_number: '9990711853'
             phone: (0116) 4960563
             email: alexandrajohnson@example.com
             date_of_birth: '1972-06-18'
@@ -267,7 +267,7 @@ clinic:
             first_name: Joyce
             last_name: Green
             gender: Female
-            nhs_number: '9394957750'
+            nhs_number: '9994957750'
             phone: +44117 496 0882
             email: joycegreen@example.com
             date_of_birth: '1959-11-23'
@@ -298,7 +298,7 @@ clinic:
             first_name: Abbie
             last_name: Jones
             gender: Female
-            nhs_number: '9066740463'
+            nhs_number: '9996740463'
             phone: +44(0)29 2018 0333
             email: abbiejones@example.com
             date_of_birth: '1959-11-12'
@@ -333,7 +333,7 @@ clinic:
             first_name: Jessica
             last_name: Nicholls
             gender: Female
-            nhs_number: '9434281334'
+            nhs_number: '9994281334'
             phone: +44(0)117 4960575
             email: jessicanicholls@example.com
             date_of_birth: '1954-12-02'
@@ -364,7 +364,7 @@ clinic:
             first_name: Joanne
             last_name: Pearce
             gender: Female
-            nhs_number: '97070065731'
+            nhs_number: '9997006573'
             phone: +44 7945688213
             email: joannepearce@example.com
             date_of_birth: '1961-08-18'
@@ -392,7 +392,7 @@ clinic:
             first_name: Ann
             last_name: Palmer
             gender: Female
-            nhs_number: '95678435403'
+            nhs_number: '9997843540'
             phone: +44 7494734800
             email: annpalmer@example.com
             date_of_birth: '1956-03-11'
@@ -428,7 +428,7 @@ clinic:
             first_name: Catherine
             last_name: Francis
             gender: Female
-            nhs_number: '96047329509'
+            nhs_number: '9994732950'
             phone: +44 7905378810
             email: catherinefrancis@example.com
             date_of_birth: '1966-11-11'
@@ -456,7 +456,7 @@ clinic:
             first_name: Patricia
             last_name: Harvey
             gender: Female
-            nhs_number: '96307488715'
+            nhs_number: '9990748871'
             phone: +44 7110405918
             email: patriciaharvey@example.com
             date_of_birth: '1960-11-19'
@@ -484,7 +484,7 @@ clinic:
             first_name: Caroline
             last_name: Foster
             gender: Female
-            nhs_number: '99543359263'
+            nhs_number: '9994335926'
             phone: +44 7399805123
             email: carolinefoster@example.com
             date_of_birth: '1973-06-07'
@@ -512,7 +512,7 @@ clinic:
             first_name: Yvonne
             last_name: Reynolds
             gender: Female
-            nhs_number: '93978349255'
+            nhs_number: '9997834925'
             phone: +44 7956077847
             email: yvonnereynolds@example.com
             date_of_birth: '1956-08-21'
@@ -548,7 +548,7 @@ clinic:
             first_name: Margaret
             last_name: Webster
             gender: Female
-            nhs_number: '95832551377'
+            nhs_number: '9993255137'
             phone: +44 7613164451
             email: margaretwebster@example.com
             date_of_birth: '1957-02-19'
@@ -576,7 +576,7 @@ clinic:
             first_name: Barbara
             last_name: Murray
             gender: Female
-            nhs_number: '95154301149'
+            nhs_number: '9995430114'
             phone: +44 7872001363
             email: barbaramurray@example.com
             date_of_birth: '1954-01-14'
@@ -604,7 +604,7 @@ clinic:
             first_name: Susan
             last_name: Riley
             gender: Female
-            nhs_number: '98233238960'
+            nhs_number: '9993323896'
             phone: +44 7597370001
             email: susanriley@example.com
             date_of_birth: '1973-01-21'
@@ -632,7 +632,7 @@ clinic:
             first_name: Karen
             last_name: Knight
             gender: Female
-            nhs_number: '96128423069'
+            nhs_number: '9992842306'
             phone: +44 7428615395
             email: karenknight@example.com
             date_of_birth: '1971-06-07'
