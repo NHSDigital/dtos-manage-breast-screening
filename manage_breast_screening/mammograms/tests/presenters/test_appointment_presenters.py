@@ -16,7 +16,7 @@ from manage_breast_screening.mammograms.presenters import (
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesTakenPresenter,
 )
-from manage_breast_screening.manual_images.models import Series, Study
+from manage_breast_screening.manual_images.models import ImageView, Study
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
@@ -768,12 +768,12 @@ class TestImagesTakenPresenter:
     def test_standard_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_set.order_rcc_first.return_value.all.return_value = [
-            Series(view_position="CC", laterality="R", count=1),
-            Series(view_position="CC", laterality="L", count=1),
-            Series(view_position="MLO", laterality="R", count=1),
-            Series(view_position="MLO", laterality="L", count=1),
-        ]
+        appointment.study.series_counts.return_value = {
+            ImageView(view_position="CC", laterality="R"): 1,
+            ImageView(view_position="CC", laterality="L"): 1,
+            ImageView(view_position="MLO", laterality="R"): 1,
+            ImageView(view_position="MLO", laterality="L"): 1,
+        }
 
         result = ImagesTakenPresenter(appointment)
 
@@ -789,14 +789,15 @@ class TestImagesTakenPresenter:
     def test_all_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_set.order_rcc_first.return_value.all.return_value = [
-            Series(view_position="CC", laterality="R", count=20),
-            Series(view_position="CC", laterality="L", count=1),
-            Series(view_position="MLO", laterality="R", count=7),
-            Series(view_position="MLO", laterality="L", count=2),
-            Series(view_position="EKLUND", laterality="R", count=19),
-            Series(view_position="EKLUND", laterality="L", count=10),
-        ]
+        appointment.study.series_counts.return_value = []
+        appointment.study.series_counts.return_value = {
+            ImageView(view_position="CC", laterality="R"): 20,
+            ImageView(view_position="CC", laterality="L"): 1,
+            ImageView(view_position="MLO", laterality="R"): 7,
+            ImageView(view_position="MLO", laterality="L"): 2,
+            ImageView(view_position="EKLUND", laterality="R"): 19,
+            ImageView(view_position="EKLUND", laterality="L"): 10,
+        }
 
         result = ImagesTakenPresenter(appointment)
 
@@ -814,9 +815,9 @@ class TestImagesTakenPresenter:
     def test_one_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_set.order_rcc_first.return_value.all.return_value = [
-            Series(view_position="MLO", laterality="L", count=1),
-        ]
+        appointment.study.series_counts.return_value = {
+            ImageView(view_position="MLO", laterality="L"): 1,
+        }
 
         result = ImagesTakenPresenter(appointment)
 

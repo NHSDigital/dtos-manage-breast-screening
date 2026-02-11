@@ -300,10 +300,10 @@ class ImagesTakenPresenter:
 
         self.total_count = 0
         self.views_taken = {}
-        for series in study.series_set.order_rcc_first().all():
-            image_name = str(series)
-            self.views_taken[image_name] = series.count
-            self.total_count += series.count
+        for view, count in study.series_counts().items():
+            image_name = view.short_name
+            self.views_taken[image_name] = count
+            self.total_count += count
 
     @property
     def title(self):
