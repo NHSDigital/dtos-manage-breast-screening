@@ -1,6 +1,10 @@
 import pytest
 
-from manage_breast_screening.manual_images.models import Series
+from manage_breast_screening.manual_images.models import (
+    STANDARD_VIEWS_RCC_FIRST,
+    ImageView,
+    Series,
+)
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
@@ -81,3 +85,9 @@ class TestSeries:
     ):
         series = Series(view_position=view_position, laterality=laterality)
         assert str(series) == expected_string
+
+
+class TestImageView:
+    @pytest.mark.parametrize("view", STANDARD_VIEWS_RCC_FIRST)
+    def test_short_name_round_trip(self, view):
+        assert ImageView.from_short_name(view.short_name) == view

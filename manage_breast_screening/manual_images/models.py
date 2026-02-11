@@ -4,14 +4,33 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Value, When
+from typing_extensions import Literal
 
 from manage_breast_screening.core.models import BaseModel
 
 
 @dataclass
 class ImageView:
-    view_position: str
-    laterality: str
+    view_position: Literal["CC", "MLO", "EKLUND"]
+    laterality: Literal["R", "L"]
+
+    @classmethod
+    def from_short_name(cls, short_name):
+        match short_name:
+            case "RCC":
+                return cls("CC", "R")
+            case "RMLO":
+                return cls("MLO", "R")
+            case "Right Eklund":
+                return cls("EKLUND", "R")
+            case "LCC":
+                return cls("CC", "L")
+            case "LMLO":
+                return cls("MLO", "L")
+            case "Left Eklund":
+                return cls("EKLUND", "L")
+            case _:
+                raise ValueError(short_name)
 
     @property
     def short_name(self):
@@ -30,6 +49,12 @@ class ImageView:
                 return "Left Eklund"
             case _:
                 return f"{self.view_position} {self.laterality}"
+
+
+STANDARD_VIEWS_RCC_FIRST = [
+    ImageView.from_short_name(name)
+    for name in ["RCC", "RMLO", "Right Eklund", "LCC", "LMLO", "Left Eklund"]
+]
 
 
 class StudyCompleteness(models.TextChoices):
