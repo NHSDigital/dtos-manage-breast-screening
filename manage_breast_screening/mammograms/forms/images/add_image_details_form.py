@@ -5,6 +5,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
     RecallService,
 )
 from manage_breast_screening.manual_images.models import (
+    ImageView,
     IncompleteImagesReason,
     StudyCompleteness,
 )
@@ -191,12 +192,12 @@ class AddImageDetailsForm(FormWithConditionalFields):
                     should_recall = None
 
             kwargs["initial"] = {
-                "rmlo_count": series_counts.get(("MLO", "R"), 0),
-                "lmlo_count": series_counts.get(("MLO", "L"), 0),
-                "rcc_count": series_counts.get(("CC", "R"), 0),
-                "lcc_count": series_counts.get(("CC", "L"), 0),
-                "right_eklund_count": series_counts.get(("EKLUND", "R"), 0),
-                "left_eklund_count": series_counts.get(("EKLUND", "L"), 0),
+                "rmlo_count": series_counts[ImageView("MLO", "R")],
+                "lmlo_count": series_counts[ImageView("MLO", "L")],
+                "rcc_count": series_counts[ImageView("CC", "R")],
+                "lcc_count": series_counts[ImageView("CC", "L")],
+                "right_eklund_count": series_counts[ImageView("EKLUND", "R")],
+                "left_eklund_count": series_counts[ImageView("EKLUND", "L")],
                 "imperfect_but_best_possible": instance.imperfect_but_best_possible,
                 "not_all_mammograms_taken": bool(instance.reasons_incomplete),
                 "reasons_incomplete": instance.reasons_incomplete,

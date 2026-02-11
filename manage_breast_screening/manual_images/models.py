@@ -1,9 +1,60 @@
+from dataclasses import dataclass
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Value, When
+from typing_extensions import Literal
 
 from manage_breast_screening.core.models import BaseModel
+
+
+@dataclass(frozen=True)
+class ImageView:
+    view_position: Literal["CC", "MLO", "EKLUND"]
+    laterality: Literal["R", "L"]
+
+    @classmethod
+    def from_short_name(cls, short_name):
+        match short_name:
+            case "RCC":
+                return cls("CC", "R")
+            case "RMLO":
+                return cls("MLO", "R")
+            case "Right Eklund":
+                return cls("EKLUND", "R")
+            case "LCC":
+                return cls("CC", "L")
+            case "LMLO":
+                return cls("MLO", "L")
+            case "Left Eklund":
+                return cls("EKLUND", "L")
+            case _:
+                raise ValueError(short_name)
+
+    @property
+    def short_name(self):
+        match (self.view_position, self.laterality):
+            case ("CC", "R"):
+                return "RCC"
+            case ("MLO", "R"):
+                return "RMLO"
+            case ("EKLUND", "R"):
+                return "Right Eklund"
+            case ("CC", "L"):
+                return "LCC"
+            case ("MLO", "L"):
+                return "LMLO"
+            case ("EKLUND", "L"):
+                return "Left Eklund"
+            case _:
+                return f"{self.view_position} {self.laterality}"
+
+
+STANDARD_VIEWS_RCC_FIRST = [
+    ImageView.from_short_name(name)
+    for name in ["RCC", "RMLO", "Right Eklund", "LCC", "LMLO", "Left Eklund"]
+]
 
 
 class StudyCompleteness(models.TextChoices):
@@ -95,12 +146,17 @@ class Study(BaseModel):
         return self.series_set.filter(count__gt=1).order_rcc_first()
 
     def series_counts(self):
-        return {
-            (view_position, laterality): count
-            for view_position, laterality, count in self.series_set.values_list(
-                "view_position", "laterality", "count"
-            )
-        }
+        # Initialise everything with 0 so missing series are included
+        # and the order is respected.
+        counts = {view: 0 for view in STANDARD_VIEWS_RCC_FIRST}
+
+        for view_position, laterality, count in self.series_set.values_list(
+            "view_position", "laterality", "count"
+        ):
+            view = ImageView(view_position, laterality)
+            counts[view] = count
+
+        return counts
 
 
 class SeriesQuerySet(models.QuerySet):
@@ -150,18 +206,4 @@ class Series(BaseModel):
         unique_together = ["study", "view_position", "laterality"]
 
     def __str__(self):
-        match (self.view_position, self.laterality):
-            case ("CC", "R"):
-                return "RCC"
-            case ("MLO", "R"):
-                return "RMLO"
-            case ("EKLUND", "R"):
-                return "Right Eklund"
-            case ("CC", "L"):
-                return "LCC"
-            case ("MLO", "L"):
-                return "LMLO"
-            case ("EKLUND", "L"):
-                return "Left Eklund"
-            case _:
-                return f"{self.view_position} {self.laterality}"
+        return ImageView(self.view_position, self.laterality).short_name
