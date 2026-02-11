@@ -149,6 +149,8 @@ TEMPLATES = [
                 "manage_breast_screening.core.context_processors.nav_active",
             ],
             "undefined": ChainableUndefined,
+            "trim_blocks": True,
+            "lstrip_blocks": True,
         },
     },
     {
