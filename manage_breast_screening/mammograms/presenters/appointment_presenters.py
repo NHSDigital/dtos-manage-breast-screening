@@ -3,6 +3,7 @@ from functools import cached_property
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.manual_images.models import EKLUND_VIEWS, RepeatReason
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
     AppointmentStatusNames,
@@ -293,6 +294,32 @@ class SpecialAppointmentPresenter:
         )
 
 
+class ViewSummaryPresenter:
+    def __init__(self, view, view_summary):
+        self.view = view
+        self.count = view_summary["count"]
+        self.repeat_count = view_summary.get("repeat_count", 0)
+        self.repeat_reasons = [
+            RepeatReason(reason).label
+            for reason in view_summary.get("repeat_reasons", [])
+        ]
+
+    @property
+    def repeat_count_text(self):
+        if not self.repeat_count:
+            return ""
+
+        noun = "repeat" if self.repeat_count == 1 else "repeats"
+        return f"{self.repeat_count} {noun}"
+
+    @property
+    def reasons_heading(self):
+        if len(self.repeat_reasons) == 1:
+            return "Repeat reason"
+        else:
+            return "Repeat reasons"
+
+
 class ImagesTakenPresenter:
     def __init__(self, appointment):
         study = appointment.study
@@ -300,10 +327,20 @@ class ImagesTakenPresenter:
 
         self.total_count = 0
         self.views_taken = {}
-        for view, count in study.series_counts().items():
+        self.view_descriptions = {}
+
+        summary = study.series_summary()
+
+        # Don't include Eklund views unless there are images
+        for view in EKLUND_VIEWS:
+            if not summary[view]["count"]:
+                del summary[view]
+
+        for view, view_summary in summary.items():
             image_name = view.short_name
-            self.views_taken[image_name] = count
-            self.total_count += count
+
+            self.views_taken[image_name] = ViewSummaryPresenter(view, view_summary)
+            self.total_count += view_summary["count"]
 
     @property
     def title(self):

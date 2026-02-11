@@ -3,9 +3,20 @@
 
 {% macro views_taken(presented_images) %}
   {% if presented_images.total_count > 0 %}
-    {% for type, count in presented_images.views_taken.items() %}
+    {% for type, presented_view in presented_images.views_taken.items() %}
       <p class="nhsuk-u-margin-bottom-2">
-        <strong>{{ count }}× {{ type }}</strong>
+        <strong>{{ presented_view.count }}× {{ type }}</strong>
+        {% if presented_view.repeat_count_text %}
+          <br>{{ presented_view.reasons_heading }}:
+          {{ presented_view.repeat_count_text }}
+          {%- if presented_view.repeat_reasons -%}
+          <ul class='nhsuk-list nhsuk-list--bullet nhsuk-u-margin-bottom-0'>
+            {% for reason in presented_view.repeat_reasons %}
+            <li>{{ reason }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        {% endif %}
       </p>
     {% endfor %}
   {% else -%}

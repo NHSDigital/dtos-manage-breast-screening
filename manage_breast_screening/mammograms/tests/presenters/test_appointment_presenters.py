@@ -768,61 +768,139 @@ class TestImagesTakenPresenter:
     def test_standard_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_counts.return_value = {
-            ImageView(view_position="CC", laterality="R"): 1,
-            ImageView(view_position="CC", laterality="L"): 1,
-            ImageView(view_position="MLO", laterality="R"): 1,
-            ImageView(view_position="MLO", laterality="L"): 1,
+        appointment.study.series_summary.return_value = {
+            ImageView(view_position="CC", laterality="R"): {
+                "count": 1,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="MLO", laterality="R"): {
+                "count": 1,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="EKLUND", laterality="R"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="CC", laterality="L"): {
+                "count": 1,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="MLO", laterality="L"): {
+                "count": 1,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="EKLUND", laterality="L"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
         }
 
         result = ImagesTakenPresenter(appointment)
 
         assert result.title == "4 images taken"
         assert result.total_count == 4
-        assert result.views_taken == {
-            "RCC": 1,
-            "LCC": 1,
-            "RMLO": 1,
-            "LMLO": 1,
-        }
+
+        assert result.views_taken["RCC"].count == 1
+        assert result.views_taken["LCC"].count == 1
+        assert result.views_taken["RMLO"].count == 1
+        assert result.views_taken["LMLO"].count == 1
+        assert "Right Eklund" not in result.views_taken
+        assert "Left Eklund" not in result.views_taken
 
     def test_all_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_counts.return_value = []
-        appointment.study.series_counts.return_value = {
-            ImageView(view_position="CC", laterality="R"): 20,
-            ImageView(view_position="CC", laterality="L"): 1,
-            ImageView(view_position="MLO", laterality="R"): 7,
-            ImageView(view_position="MLO", laterality="L"): 2,
-            ImageView(view_position="EKLUND", laterality="R"): 19,
-            ImageView(view_position="EKLUND", laterality="L"): 10,
+        appointment.study.series_summary.return_value = {
+            ImageView(view_position="CC", laterality="R"): {
+                "count": 20,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="CC", laterality="L"): {
+                "count": 1,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="MLO", laterality="R"): {
+                "count": 7,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="MLO", laterality="L"): {
+                "count": 2,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="EKLUND", laterality="R"): {
+                "count": 19,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="EKLUND", laterality="L"): {
+                "count": 10,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
         }
 
         result = ImagesTakenPresenter(appointment)
 
         assert result.title == "59 images taken"
         assert result.total_count == 59
-        assert result.views_taken == {
-            "RCC": 20,
-            "LCC": 1,
-            "RMLO": 7,
-            "LMLO": 2,
-            "Right Eklund": 19,
-            "Left Eklund": 10,
-        }
+
+        assert result.views_taken["RCC"].count == 20
+        assert result.views_taken["LCC"].count == 1
+        assert result.views_taken["RMLO"].count == 7
+        assert result.views_taken["LMLO"].count == 2
+        assert result.views_taken["Right Eklund"].count == 19
+        assert result.views_taken["Left Eklund"].count == 10
 
     def test_one_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_counts.return_value = {
-            ImageView(view_position="MLO", laterality="L"): 1,
+        appointment.study.series_summary.return_value = {
+            ImageView(view_position="CC", laterality="R"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="CC", laterality="L"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="MLO", laterality="R"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="MLO", laterality="L"): {
+                "count": 1,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="EKLUND", laterality="R"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
+            ImageView(view_position="EKLUND", laterality="L"): {
+                "count": 0,
+                "repeat_count": 0,
+                "repeat_reasons": [],
+            },
         }
 
         result = ImagesTakenPresenter(appointment)
 
         assert result.title == "1 image taken"
         assert result.total_count == 1
-        assert result.views_taken == {
-            "LMLO": 1,
-        }
+        assert result.views_taken["LMLO"].count == 1
+        assert "Right Eklund" not in result.views_taken
+        assert "Left Eklund" not in result.views_taken
