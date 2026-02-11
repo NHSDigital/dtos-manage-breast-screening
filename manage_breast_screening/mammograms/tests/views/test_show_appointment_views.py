@@ -2,12 +2,11 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertInHTML
 
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
-
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
 )
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 @pytest.mark.django_db

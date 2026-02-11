@@ -7,10 +7,14 @@ from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
 )
+from manage_breast_screening.participants.models.symptom import SymptomType
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    BreastCancerHistoryItemFactory,
     ParticipantFactory,
+    ParticipantReportedMammogramFactory,
     ScreeningEpisodeFactory,
+    SymptomFactory,
 )
 from manage_breast_screening.users.tests.factories import UserFactory
 
@@ -25,6 +29,7 @@ class TestAppointmentTabs(SystemTestCase):
         """
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_in_progress_with_someone_else()
+        self.and_the_appointment_has_medical_history()
         self.and_i_am_on_the_appointment_show_page()
         self.then_i_should_see_the_demographic_banner()
         self.and_the_message_says_in_progress_with_someone_else()
@@ -35,6 +40,14 @@ class TestAppointmentTabs(SystemTestCase):
 
         self.when_i_change_to_the_note_details_tab()
         self.then_i_should_see_the_notes_details()
+        self.and_the_message_says_in_progress_with_someone_else()
+
+        self.when_i_change_to_the_medical_information_tab()
+        self.then_i_should_see_the_mammogram_history_section()
+        self.and_i_should_see_the_symptoms_section()
+        self.and_i_should_see_the_medical_history_section()
+        self.and_i_should_see_the_breast_features_placeholder()
+        self.and_i_should_see_the_other_information_placeholder()
         self.and_the_message_says_in_progress_with_someone_else()
 
         self.when_i_change_to_the_appointment_details_tab()
@@ -205,6 +218,53 @@ class TestAppointmentTabs(SystemTestCase):
         expect(self.page.get_by_text("1× RMLO")).to_be_attached()
         expect(self.page.get_by_text("1× LCC")).to_be_attached()
 
+    def and_the_appointment_has_medical_history(self):
+        SymptomType.objects.get_or_create(id=SymptomType.LUMP, name="Lump")
+        ParticipantReportedMammogramFactory(appointment=self.appointment)
+        SymptomFactory(lump=True, appointment=self.appointment)
+        BreastCancerHistoryItemFactory(
+            appointment=self.appointment,
+            diagnosis_location="RIGHT_BREAST",
+        )
+
+    def when_i_change_to_the_medical_information_tab(self):
+        self.when_i_change_to_an_appointment_tab("Medical information")
+
+    def then_i_should_see_the_mammogram_history_section(self):
+        card = self.page.locator(".nhsuk-card", has_text="Mammogram history")
+        expect(card).to_be_visible()
+        expect(card).to_contain_text(
+            "The last confirmed mammogram and any added manually since then"
+        )
+        expect(card).to_contain_text("Last known mammograms")
+        expect(card).to_contain_text("Added today")
+        expect(card).to_contain_text("Date unknown")
+
+    def and_i_should_see_the_symptoms_section(self):
+        card = self.page.locator(".nhsuk-card", has_text="Symptoms")
+        expect(card).to_be_visible()
+        expect(card).to_contain_text("Lump")
+
+    def and_i_should_see_the_medical_history_section(self):
+        card = self.page.locator(".nhsuk-card", has_text="Medical history")
+        expect(card).to_be_visible()
+        expect(card).to_contain_text("Breast cancer")
+        expect(card).to_contain_text("Cancer location")
+        expect(card).to_contain_text("Right breast")
+
+    def and_i_should_see_the_breast_features_placeholder(self):
+        card = self.page.locator(".nhsuk-card", has_text="Breast features")
+        expect(card).to_be_visible()
+        expect(card).to_contain_text(
+            "No breast features have been recorded for this participant."
+        )
+
+    def and_i_should_see_the_other_information_placeholder(self):
+        card = self.page.locator(".nhsuk-card", has_text="Other information")
+        expect(card).to_be_visible()
+        expect(card).to_contain_text(
+            "No other information has been recorded for this participant."
+        )
     def when_i_change_to_an_appointment_tab(self, tab_name):
         secondary_nav = self.page.locator(".app-secondary-navigation")
         expect(secondary_nav).to_be_visible()
