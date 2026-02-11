@@ -1,5 +1,4 @@
 import os
-from datetime import datetime, timezone
 
 from django.db import models
 from django.utils.functional import cached_property
@@ -38,6 +37,7 @@ class GatewayAction(BaseModel):
 
     sent_at = models.DateTimeField(null=True, blank=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
+    failed_at = models.DateTimeField(null=True, blank=True)
 
     retry_count = models.IntegerField(default=0)
     next_retry_at = models.DateTimeField(null=True, blank=True)
@@ -48,20 +48,6 @@ class GatewayAction(BaseModel):
         indexes = [
             models.Index(fields=["status", "next_retry_at"]),
         ]
-
-    def update_status(self, new_status: GatewayActionStatus):
-        self.status = new_status
-        if new_status == GatewayActionStatus.SENT:
-            self.sent_at = datetime.now(timezone.utc)
-            self.save(update_fields=["status", "sent_at"])
-        elif new_status == GatewayActionStatus.CONFIRMED:
-            self.confirmed_at = datetime.now(timezone.utc)
-            self.save(update_fields=["status", "confirmed_at"])
-
-    def mark_failed(self, error_message: str):
-        self.status = GatewayActionStatus.FAILED
-        self.last_error = error_message
-        self.save(update_fields=["status", "last_error"])
 
     def __str__(self):
         return f"{self.type} - {self.accession_number} ({self.status})"
@@ -85,6 +71,10 @@ class Relay(BaseModel):
         blank=True,
         help_text="Environment variable name containing the shared access key",
     )
+
+    @classmethod
+    def for_provider(cls, provider):
+        return cls.objects.filter(provider=provider).first()
 
     @cached_property
     def shared_access_key(self) -> str:
