@@ -4,12 +4,10 @@ import hashlib
 import hmac
 import json
 import logging
-import threading
 import time
 import urllib.parse
+from datetime import datetime, timezone
 
-from asgiref.sync import sync_to_async
-from django import db
 from websockets.asyncio.client import ClientConnection, connect
 
 from .models import GatewayAction, GatewayActionStatus, Relay
@@ -51,82 +49,82 @@ class RelayURI:
         )
 
 
+class SendActionResult:
+    def __init__(
+        self,
+        sent_at: datetime | None = None,
+        confirmed_at: datetime | None = None,
+        failed_at: datetime | None = None,
+    ):
+        self.sent_at = sent_at
+        self.confirmed_at = confirmed_at
+        self.failed_at = failed_at
+        self.error = None
+        self.status = GatewayActionStatus.PENDING
+
+    def failed(self, msg: str):
+        logger.error(msg)
+        self.status = GatewayActionStatus.FAILED
+        self.failed_at = datetime.now(timezone.utc)
+        self.error = msg
+
+    def sent(self, msg: str):
+        logger.info(msg)
+        self.status = GatewayActionStatus.SENT
+        self.sent_at = datetime.now(timezone.utc)
+
+    def confirmed(self, msg: str):
+        logger.info(msg)
+        self.status = GatewayActionStatus.CONFIRMED
+        self.confirmed_at = datetime.now(timezone.utc)
+
+
 class RelayService:
     def __init__(self):
         self._connections: dict[str, object] = {}
 
-    def send_action(self, relay: Relay, action: GatewayAction) -> threading.Thread:
+    def send_action(self, relay: Relay, action: GatewayAction):
         """
-        Send an action to a gateway in a daemon thread.
+        Synchronous wrapper around async_send_action.
+        Updates the GatewayAction based on the eventloop outcome.
+        """
+        result = asyncio.run(self.async_send_action(relay, action))
+        self.update_gateway_action(action, result)
 
-        Args:
-            relay: The Relay used to connect to the Gateway application
-            action: The GatewayAction containing the payload to send
-        """
-        thread = threading.Thread(
-            target=self.sync_send_action, args=(relay, action), daemon=True
-        )
-        thread.start()
-        return thread
+    async def async_send_action(
+        self, relay: Relay, action: GatewayAction
+    ) -> SendActionResult:
+        result = SendActionResult()
 
-    def sync_send_action(self, relay: Relay, action: GatewayAction):
-        """
-        Synchronous wrapper to send an action to a gateway.
-
-        Args:
-            relay: The Relay used to connect to the Gateway application
-            action: The GatewayAction containing the payload to send
-        """
-        # Ensure database connections are not left open in threads
-        asyncio.run(self.async_send_action(relay, action))
-        db.connection.close()
-
-    async def async_send_action(self, relay: Relay, action: GatewayAction):
-        """
-        Send an action to a gateway and wait for acknowledgment.
-
-        Args:
-            relay: The Relay used to connect to the Gateway application
-            action: The GatewayAction containing the payload to send
-        """
         try:
             conn = await self._get_connection(relay)
             if not conn:
-                logger.error(f"Failed to get connection for relay {relay.id}")
+                result.failed(f"No connection available for relay {relay.id}")
+                return result
 
             await conn.send(json.dumps(action.payload))
-            await sync_to_async(action.update_status)(GatewayActionStatus.SENT)
+            result.sent(f"Sent action {action.id} to relay {relay.id}")
 
-            logger.info(f"Sent action {action.id} to relay {relay.id}")
+            response = await asyncio.wait_for(
+                conn.recv(), timeout=RECEIVE_TIMEOUT_SECONDS
+            )
+            response_data = json.loads(response)
 
-            try:
-                response = await asyncio.wait_for(
-                    conn.recv(), timeout=RECEIVE_TIMEOUT_SECONDS
+            if response_data.get("status") in ("created", "processed"):
+                result.confirmed(f"Action {action.id} confirmed by gateway")
+            else:
+                result.failed(
+                    f"Unexpected response status from gateway: {response_data}"
                 )
-                response_data = json.loads(response)
 
-                if response_data.get("status") in ("created", "processed"):
-                    logger.info(f"Action {action.id} confirmed by gateway")
-                    await sync_to_async(action.update_status)(
-                        GatewayActionStatus.CONFIRMED
-                    )
-                else:
-                    warning_msg = (
-                        f"Unexpected response status from gateway: {response_data}"
-                    )
-                    logger.warning(warning_msg)
-                    await sync_to_async(action.mark_failed)(warning_msg)
-
-            except asyncio.TimeoutError:
-                error_msg = f"Timeout waiting for response from gateway {relay.id}"
-                logger.error(error_msg)
-                await sync_to_async(action.mark_failed)(error_msg)
+        except asyncio.TimeoutError:
+            result.failed(f"Timeout waiting for response from gateway {relay.id}")
 
         except Exception as e:
-            error_msg = f"Error sending action to gateway {relay.id}: {e}"
-            logger.error(error_msg)
-            await sync_to_async(action.mark_failed)(error_msg)
+            result.failed(f"Error sending action to gateway {relay.id}: {e}")
             self._connections.pop(relay.id, None)
+
+        return result
 
     async def _get_connection(self, relay: Relay) -> ClientConnection:
         if relay.id not in self._connections:
@@ -140,3 +138,18 @@ class RelayService:
         )
         logger.info(f"Created relay connection for relay {relay_uri.relay.id}")
         return websocket
+
+    def update_gateway_action(self, action: GatewayAction, result: SendActionResult):
+        """Update the GatewayAction based on the SendActionResult."""
+        action.status = result.status
+        if result.status == GatewayActionStatus.FAILED:
+            action.last_error = result.error
+            action.failed_at = result.failed_at
+            action.save(update_fields=["status", "last_error"])
+        elif result.status == GatewayActionStatus.SENT:
+            action.sent_at = result.sent_at
+            action.save(update_fields=["status", "sent_at"])
+        elif result.status == GatewayActionStatus.CONFIRMED:
+            action.sent_at = result.sent_at
+            action.confirmed_at = result.confirmed_at
+            action.save(update_fields=["status", "sent_at", "confirmed_at"])

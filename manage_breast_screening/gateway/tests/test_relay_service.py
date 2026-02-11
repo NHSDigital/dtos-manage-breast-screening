@@ -4,10 +4,9 @@ import hashlib
 import hmac
 import json
 import urllib.parse
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from asgiref.sync import sync_to_async
 from websockets.asyncio.client import ClientConnection
 
 from manage_breast_screening.gateway.relay_service import (
@@ -75,37 +74,35 @@ class TestRelayService:
         assert "sb-hc-action=connect" in url
         assert "sb-hc-token=TOKEN" in url
 
-    @pytest.mark.asyncio
     @pytest.mark.django_db(transaction=True)
-    async def test_async_send_action_success(self, relay, gateway_action):
+    def test_send_action_success(self, relay, gateway_action):
         subject = RelayService()
 
         mock_ws = AsyncMock(spec=ClientConnection)
         mock_ws.recv.return_value = json.dumps({"status": "created"})
 
         with patch.object(subject, "_get_connection", return_value=mock_ws):
-            await subject.async_send_action(relay, gateway_action)
+            subject.send_action(relay, gateway_action)
 
         mock_ws.send.assert_called_once_with(
             json.dumps({"action_id": "a1", "type": "test"})
         )
 
-        await sync_to_async(gateway_action.refresh_from_db)()
+        gateway_action.refresh_from_db()
         assert gateway_action.status == "confirmed"
         assert gateway_action.last_error == ""
         assert gateway_action.sent_at is not None
         assert gateway_action.confirmed_at is not None
 
-    @pytest.mark.asyncio
     @pytest.mark.django_db(transaction=True)
-    async def test_send_action_timeout(self, relay, gateway_action):
+    def test_send_action_timeout(self, relay, gateway_action):
         subject = RelayService()
 
         mock_ws = AsyncMock(spec=ClientConnection)
         mock_ws.recv.side_effect = asyncio.TimeoutError
 
         with patch.object(subject, "_get_connection", return_value=mock_ws):
-            await subject.async_send_action(
+            subject.send_action(
                 relay,
                 gateway_action,
             )
@@ -114,20 +111,19 @@ class TestRelayService:
             json.dumps({"action_id": "a1", "type": "test"})
         )
 
-        await sync_to_async(gateway_action.refresh_from_db)()
+        gateway_action.refresh_from_db()
         assert gateway_action.status == "failed"
         assert "Timeout waiting for response" in gateway_action.last_error
 
-    @pytest.mark.asyncio
     @pytest.mark.django_db(transaction=True)
-    async def test_send_action_bad_response(self, relay, gateway_action):
+    def test_send_action_bad_response(self, relay, gateway_action):
         subject = RelayService()
 
         mock_ws = AsyncMock(spec=ClientConnection)
         mock_ws.recv.return_value = json.dumps({"unexpected": "data"})
 
         with patch.object(subject, "_get_connection", return_value=mock_ws):
-            await subject.async_send_action(
+            subject.send_action(
                 relay,
                 gateway_action,
             )
@@ -136,18 +132,18 @@ class TestRelayService:
             json.dumps({"action_id": "a1", "type": "test"})
         )
 
-        await sync_to_async(gateway_action.refresh_from_db)()
+        gateway_action.refresh_from_db()
         assert gateway_action.status == "failed"
         assert "Unexpected response status from gateway" in gateway_action.last_error
 
-    def test_sync_send_action(self, relay, gateway_action):
+    def test_send_action(self, relay, gateway_action):
         subject = RelayService()
 
         with patch.object(
             asyncio,
             "run",
         ) as mock_asyncio_run:
-            subject.sync_send_action(relay, gateway_action)
+            subject.send_action(relay, gateway_action)
 
         assert mock_asyncio_run.call_count == 1
         coro = mock_asyncio_run.call_args[0][0]
@@ -156,24 +152,6 @@ class TestRelayService:
             == "RelayService.async_send_action"
         )
         coro.close()
-
-    def test_send_action_starts_new_thread(self, relay, gateway_action):
-        subject = RelayService()
-
-        mock_thread = Mock()
-
-        with patch(
-            f"{RelayService.__module__}.threading.Thread", return_value=mock_thread
-        ) as mock_thread_class:
-            new_thread = subject.send_action(relay, gateway_action)
-
-        mock_thread_class.assert_called_once_with(
-            target=subject.sync_send_action,
-            args=(relay, gateway_action),
-            daemon=True,
-        )
-        mock_thread.start.assert_called_once()
-        assert new_thread is mock_thread
 
     @pytest.mark.asyncio
     async def test_connection_is_cached(self):

@@ -112,7 +112,8 @@ class WorklistItemService:
 
     def _create_action(self) -> GatewayAction | None:
         """Create and persist the gateway action."""
-        relay = Relay.objects.filter(provider=self.appointment.provider).first()
+        relay = Relay.for_provider(self.appointment.provider)
+
         if not relay:
             logger.info(
                 "No relay found for provider %s, skipping create gateway action",
@@ -138,9 +139,13 @@ class WorklistItemService:
                 f"Gateway action already exists for appointment {self.appointment.pk}"
             ) from e
 
-        RelayService().send_action(relay, action)
-
         logger.info(
             f"Created gateway action {action_id} for appointment {self.appointment.pk}"
         )
+
+        try:
+            RelayService().send_action(relay, action)
+        except Exception as e:
+            logger.error(f"Failed to send gateway action {action_id} to relay: {e}")
+
         return action
