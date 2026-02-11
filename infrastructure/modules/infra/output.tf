@@ -39,7 +39,7 @@ output "app_insights_id" {
 }
 
 output "relay_namespace_name" {
-  value = var.enable_arc_servers ? module.relay_namespace[0].name : null
+  value = var.enable_relay ? module.relay_namespace[0].name : null
 }
 
 output "servicebus_namespace_name" {

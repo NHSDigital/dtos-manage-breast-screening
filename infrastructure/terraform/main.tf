@@ -8,21 +8,22 @@ module "infra" {
     azurerm.hub = azurerm.hub
   }
 
-  region                      = local.region
-  resource_group_name         = local.resource_group_name
-  infra_key_vault_name        = local.infra_key_vault_name
-  infra_key_vault_rg          = local.infra_key_vault_rg
-  app_short_name              = var.app_short_name
-  environment                 = var.env_config
-  hub                         = var.hub
-  protect_keyvault            = var.protect_keyvault
-  vnet_address_space          = var.vnet_address_space
-  cae_zone_redundancy_enabled = var.cae_zone_redundancy_enabled
-  enable_alerting             = var.enable_alerting
-  action_group_id             = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
-  enable_arc_servers          = var.enable_arc_servers
-  enable_service_bus          = var.enable_service_bus
-  servicebus_topics           = var.servicebus_topics
+  region                                    = local.region
+  resource_group_name                       = local.resource_group_name
+  infra_key_vault_name                      = local.infra_key_vault_name
+  infra_key_vault_rg                        = local.infra_key_vault_rg
+  app_short_name                            = var.app_short_name
+  environment                               = var.env_config
+  hub                                       = var.hub
+  protect_keyvault                          = var.protect_keyvault
+  vnet_address_space                        = var.vnet_address_space
+  cae_zone_redundancy_enabled               = var.cae_zone_redundancy_enabled
+  enable_alerting                           = var.enable_alerting
+  action_group_id                           = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
+  enable_relay                              = var.enable_relay
+  enable_service_bus                        = var.enable_service_bus
+  service_bus_public_network_access_enabled = var.service_bus_public_network_access_enabled
+  servicebus_topics                         = var.servicebus_topics
 }
 
 module "shared_config" {
