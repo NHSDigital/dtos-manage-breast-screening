@@ -54,7 +54,7 @@ class ParticipantFactory(DjangoModelFactory):
     first_name = Faker("first_name")
     last_name = Faker("last_name")
     gender = "Female"
-    nhs_number = Sequence(lambda n: f"9{n:010d}")
+    nhs_number = Sequence(lambda n: f"999{n:07d}")
     phone = "07700900829"
     email = "janet.williams@example.com"
     date_of_birth = date(1959, 7, 22)
