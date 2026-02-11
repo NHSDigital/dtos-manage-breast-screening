@@ -2,6 +2,7 @@
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "components/participant-details/summary_list_rows.jinja" import ethnicity_html %}
+{% from "mammograms/check_information/appointment_details_card.jinja" import appointment_details_card %}
 {% from "mammograms/check_information/images_taken_card.jinja" import images_taken_card %}
 {% from "mammograms/check_information/medical_information_card.jinja" import medical_information_card %}
 
@@ -32,6 +33,7 @@
 
   {{ medical_information_card(presented_medical_information) }}
   {{ images_taken_card(presented_images) }}
+  {{ appointment_details_card(presented_appointment) }}
 {% endblock %}
 
 
