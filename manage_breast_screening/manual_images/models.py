@@ -146,12 +146,19 @@ class Study(BaseModel):
         return self.series_set.filter(count__gt=1).order_rcc_first()
 
     def series_counts(self):
-        return {
-            (view_position, laterality): count
-            for view_position, laterality, count in self.series_set.values_list(
-                "view_position", "laterality", "count"
-            )
+        # Initialise everything with 0 so missing series are included
+        # and the order is respected.
+        counts = {
+            (view.view_position, view.laterality): 0
+            for view in STANDARD_VIEWS_RCC_FIRST
         }
+
+        for view_position, laterality, count in self.series_set.values_list(
+            "view_position", "laterality", "count"
+        ):
+            counts[(view_position, laterality)] = count
+
+        return counts
 
 
 class SeriesQuerySet(models.QuerySet):
