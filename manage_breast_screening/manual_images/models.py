@@ -1,9 +1,35 @@
+from dataclasses import dataclass
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Case, Value, When
 
 from manage_breast_screening.core.models import BaseModel
+
+
+@dataclass
+class ImageView:
+    view_position: str
+    laterality: str
+
+    @property
+    def short_name(self):
+        match (self.view_position, self.laterality):
+            case ("CC", "R"):
+                return "RCC"
+            case ("MLO", "R"):
+                return "RMLO"
+            case ("EKLUND", "R"):
+                return "Right Eklund"
+            case ("CC", "L"):
+                return "LCC"
+            case ("MLO", "L"):
+                return "LMLO"
+            case ("EKLUND", "L"):
+                return "Left Eklund"
+            case _:
+                return f"{self.view_position} {self.laterality}"
 
 
 class StudyCompleteness(models.TextChoices):
@@ -150,18 +176,4 @@ class Series(BaseModel):
         unique_together = ["study", "view_position", "laterality"]
 
     def __str__(self):
-        match (self.view_position, self.laterality):
-            case ("CC", "R"):
-                return "RCC"
-            case ("MLO", "R"):
-                return "RMLO"
-            case ("EKLUND", "R"):
-                return "Right Eklund"
-            case ("CC", "L"):
-                return "LCC"
-            case ("MLO", "L"):
-                return "LMLO"
-            case ("EKLUND", "L"):
-                return "Left Eklund"
-            case _:
-                return f"{self.view_position} {self.laterality}"
+        return ImageView(self.view_position, self.laterality).short_name
