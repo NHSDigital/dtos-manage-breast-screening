@@ -27,7 +27,7 @@ class TestParticipantPresenter:
         participant_id = uuid4()
         participant = ParticipantFactory.build(
             pk=participant_id,
-            nhs_number="99900900829",
+            nhs_number="9990090082",
             ethnic_background_id="irish",
             first_name="Firstname",
             last_name="Lastname",
@@ -55,7 +55,7 @@ class TestParticipantPresenter:
         assert result.email == "Firstname.Lastname@example.com"
         assert result.address == {"lines": ["1", "2", "3"], "postcode": "A123 "}
         assert result.phone == "07700 900000"
-        assert result.nhs_number == "999 009 00829"
+        assert result.nhs_number == "999 009 0082"
         assert result.date_of_birth == "1 January 1955"
         assert result.age == "70 years"
         assert result.risk_level == ""
