@@ -96,7 +96,7 @@ a.app-workflow-side-nav__step {
   flex: 0 0 nhsuk-px-to-rem(24px);
   width: nhsuk-px-to-rem(24px);
   height: nhsuk-px-to-rem(24px);
-  background-color: nhsuk-colour("grey-3");
+  background-color: nhsuk-colour("grey-4");
   color: nhsuk-colour("grey-1");
   border-radius: 50%;
   font-weight: 600;
@@ -161,7 +161,7 @@ a.app-workflow-side-nav__step:focus .app-workflow-side-nav__number {
 .app-workflow-side-nav__item--disabled {
   .app-workflow-side-nav__step--clickable .app-workflow-side-nav__number,
   .app-workflow-side-nav__number {
-    background-color: nhsuk-colour("grey-3");
+    background-color: nhsuk-colour("grey-4");
     color: nhsuk-colour("grey-1");
   }
 }
