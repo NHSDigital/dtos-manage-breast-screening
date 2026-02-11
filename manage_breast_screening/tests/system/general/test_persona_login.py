@@ -28,10 +28,12 @@ class TestPersonaLogin(SystemTestCase):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
 
     def then_i_am_shown_the_persona_login(self):
-        expect(self.page).to_have_title("Personas – Manage breast screening – NHS")
+        expect(self.page).to_have_title(
+            "Persona logins – Manage breast screening – NHS"
+        )
 
     def when_i_click_on_the_login_button(self):
-        self.page.get_by_role("button", name="Per Sona").click()
+        self.page.get_by_role("button", name="Log in as Per Sona, Clinical").click()
 
     def then_i_am_on_the_clinics_page(self):
         expect(self.page).to_have_title(
