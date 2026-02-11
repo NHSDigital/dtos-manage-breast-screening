@@ -342,9 +342,10 @@ def resume_appointment(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    AppointmentStatusUpdater(
-        appointment=appointment, current_user=request.user
-    ).resume()
+    if not appointment.current_status.is_in_progress_with(request.user):
+        AppointmentStatusUpdater(
+            appointment=appointment, current_user=request.user
+        ).resume()
 
     next_step = "mammograms:confirm_identity"
 

@@ -1,4 +1,5 @@
 import pytest
+import statemachine
 from django.urls import reverse
 from pytest_django.asserts import (
     assertContains,
@@ -416,6 +417,63 @@ class TestResumeAppointment:
             current_status=AppointmentStatusNames.PAUSED,
         )
 
+    def test_can_resume_when_in_progress_with_user(self, clinical_user_client):
+        """
+        A user should still be able to resume an in progress appointment when it's in progress with them.
+        """
+        in_progress_appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.IN_PROGRESS,
+                "created_by": clinical_user_client.user,
+            },
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:resume_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:confirm_identity", kwargs={"pk": in_progress_appointment.pk}
+            ),
+        )
+
+    def test_cannot_resume_when_in_progress_with_different_user(
+        self, clinical_user_client
+    ):
+        """
+        A user should not be able to resume an in progress appointment when it's in progress with a different user.
+        """
+        different_user = UserFactory.create(nhs_uid="different_user")
+        in_progress_appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.IN_PROGRESS,
+                "created_by": different_user,
+            },
+        )
+
+        with pytest.raises(
+            statemachine.exceptions.TransitionNotAllowed,
+            match="Can't Resume when in In progress.",
+        ):
+            clinical_user_client.http.post(
+                reverse(
+                    "mammograms:resume_appointment",
+                    kwargs={"pk": in_progress_appointment.pk},
+                )
+            )
+
+        in_progress_appointment.refresh_from_db()
+        assert (
+            in_progress_appointment.current_status.name
+            == AppointmentStatusNames.IN_PROGRESS
+        )
+        assert in_progress_appointment.current_status.created_by == different_user
+
     def test_redirect_confirm_identity(self, clinical_user_client, paused_appointment):
         response = clinical_user_client.http.post(
             reverse(
@@ -428,6 +486,11 @@ class TestResumeAppointment:
                 "mammograms:confirm_identity", kwargs={"pk": paused_appointment.pk}
             ),
         )
+        paused_appointment.refresh_from_db()
+        assert (
+            paused_appointment.current_status.name == AppointmentStatusNames.IN_PROGRESS
+        )
+        assert paused_appointment.current_status.created_by == clinical_user_client.user
 
     def test_redirect_confirm_identity_when_already_confirmed(
         self, clinical_user_client, paused_appointment
