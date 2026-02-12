@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import DatabaseError, IntegrityError, transaction
 from django.http import Http404, StreamingHttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -38,93 +38,13 @@ from manage_breast_screening.participants.models.appointment import (
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
 from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
-from ..presenters import (
-    AppointmentPresenter,
-    LastKnownMammogramPresenter,
-    present_secondary_nav,
-)
+from ..presenters import LastKnownMammogramPresenter
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
-from .mixins import AppointmentTabMixin, InProgressAppointmentMixin
+from .mixins import InProgressAppointmentMixin
 
 MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME = "mammograms:record_medical_information"
 
 logger = logging.getLogger(__name__)
-
-
-class ShowAppointment(AppointmentTabMixin, View):
-    """
-    Show a completed appointment. Redirects to the start screening form
-    if the apppointment is in progress.
-    """
-
-    template_name = "mammograms/show.jinja"
-
-    def get(self, request, *args, **kwargs):
-        appointment = self.appointment
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
-        appointment_presenter = AppointmentPresenter(
-            appointment, tab_description="Appointment details"
-        )
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_mammograms,
-            appointment_pk=appointment.pk,
-            current_url=self.request.path,
-        )
-
-        context = {
-            "heading": appointment_presenter.participant.full_name,
-            "caption": appointment_presenter.caption,
-            "page_title": appointment_presenter.page_title,
-            "presented_appointment": appointment_presenter,
-            "presented_participant": appointment_presenter.participant,
-            "presented_mammograms": last_known_mammogram_presenter,
-            "appointment_note": appointment_presenter.note,
-            "secondary_nav_items": present_secondary_nav(
-                appointment.pk, current_tab="appointment"
-            ),
-        }
-
-        return render(
-            request,
-            template_name="mammograms/show/appointment_details.jinja",
-            context=context,
-        )
-
-
-class ParticipantDetails(AppointmentTabMixin, View):
-    template_name = "mammograms/show.jinja"
-
-    def get(self, request, *args, **kwargs):
-        appointment = self.appointment
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
-        appointment_presenter = AppointmentPresenter(appointment)
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_mammograms,
-            appointment_pk=appointment.pk,
-            current_url=self.request.path,
-        )
-
-        context = {
-            "heading": appointment_presenter.participant.full_name,
-            "caption": appointment_presenter.caption,
-            "page_title": appointment_presenter.caption,
-            "presented_appointment": appointment_presenter,
-            "presented_participant": appointment_presenter.participant,
-            "presented_mammograms": last_known_mammogram_presenter,
-            "secondary_nav_items": present_secondary_nav(
-                appointment.pk, current_tab="participant"
-            ),
-        }
-
-        return render(
-            request,
-            template_name="mammograms/show/participant_details.jinja",
-            context=context,
-        )
 
 
 class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):

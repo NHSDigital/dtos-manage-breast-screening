@@ -34,7 +34,9 @@ class AppointmentNoteView(AppointmentTabMixin, FormView):
                 "page_title": appointment_presenter.page_title,
                 "presented_appointment": appointment_presenter,
                 "secondary_nav_items": present_secondary_nav(
-                    appointment.pk, current_tab="note"
+                    appointment.pk,
+                    current_tab="note",
+                    appointment_complete=not appointment.active,
                 ),
             }
         )

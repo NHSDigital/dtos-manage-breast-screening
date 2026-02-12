@@ -3,6 +3,7 @@ from playwright.sync_api import expect
 
 from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
+from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
 )
@@ -70,14 +71,25 @@ class TestAppointmentTabs(SystemTestCase):
         self.then_i_should_see_the_participant_details()
         self.and_no_message_says_in_progress_with_someone_else()
 
+    def test_the_images_tab_of_a_completed_appointment(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_a_completed_appointment()
+        self.and_i_am_on_the_appointment_show_page()
+        self.when_i_change_to_the_images_tab()
+        self.then_i_should_see_the_image_counts()
+        self.and_no_message_says_in_progress_with_someone_else()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
-        self.and_there_is_an_appointment_in_progress_with_someone_else()
+        self.and_there_is_a_completed_appointment()
         self.and_i_am_on_the_appointment_show_page()
         self.then_the_accessibility_baseline_is_met()
 
         self.when_i_change_to_the_participant_details_tab()
         self.then_the_accessibility_baseline_is_met()
+
+        self.when_i_change_to_the_images_tab()
+        self.then_i_should_see_the_image_counts()
 
         self.when_i_change_to_the_note_details_tab()
         self.then_the_accessibility_baseline_is_met()
@@ -111,6 +123,21 @@ class TestAppointmentTabs(SystemTestCase):
                 "created_by": another_user,
             },
         )
+
+    def and_there_is_a_completed_appointment(self):
+        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.SCREENED,
+                "created_by": self.current_user,
+            },
+        )
+        self.study = StudyService(
+            self.appointment, self.current_user
+        ).create_with_default_series()
 
     def and_there_is_an_appointment_in_progress_with_someone_else(self):
         another_user = UserFactory.create(first_name="Firstname", last_name="Lastname")
@@ -166,8 +193,17 @@ class TestAppointmentTabs(SystemTestCase):
     def when_i_change_to_the_appointment_details_tab(self):
         self.when_i_change_to_an_appointment_tab("Appointment")
 
+    def when_i_change_to_the_images_tab(self):
+        self.when_i_change_to_an_appointment_tab("Images")
+
     def then_i_should_see_the_appointment_details(self):
         expect(self.page.get_by_text("Scheduled date and time")).to_be_attached()
+
+    def then_i_should_see_the_image_counts(self):
+        expect(self.page.get_by_text("1× RCC")).to_be_attached()
+        expect(self.page.get_by_text("1× LCC")).to_be_attached()
+        expect(self.page.get_by_text("1× RMLO")).to_be_attached()
+        expect(self.page.get_by_text("1× LCC")).to_be_attached()
 
     def when_i_change_to_an_appointment_tab(self, tab_name):
         secondary_nav = self.page.locator(".app-secondary-navigation")

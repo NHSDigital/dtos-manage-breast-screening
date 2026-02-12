@@ -1,6 +1,10 @@
 import pytest
 
-from manage_breast_screening.manual_images.models import Series
+from manage_breast_screening.manual_images.models import (
+    ALL_VIEWS_RCC_FIRST,
+    ImageView,
+    Series,
+)
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
@@ -62,6 +66,18 @@ class TestStudy:
 
             assert list(study.series_with_multiple_images()) == []
 
+    class TestSeriesCounts:
+        def test_includes_missing_series_and_respects_ordering(self):
+            series = SeriesFactory(view_position="MLO", laterality="R", count=1)
+            assert list(series.study.series_counts().items()) == [
+                (ImageView("CC", "R"), 0),
+                (ImageView("MLO", "R"), 1),
+                (ImageView("EKLUND", "R"), 0),
+                (ImageView("CC", "L"), 0),
+                (ImageView("MLO", "L"), 0),
+                (ImageView("EKLUND", "L"), 0),
+            ]
+
 
 class TestSeries:
     @pytest.mark.parametrize(
@@ -81,3 +97,9 @@ class TestSeries:
     ):
         series = Series(view_position=view_position, laterality=laterality)
         assert str(series) == expected_string
+
+
+class TestImageView:
+    @pytest.mark.parametrize("view", ALL_VIEWS_RCC_FIRST)
+    def test_short_name_round_trip(self, view):
+        assert ImageView.from_short_name(view.short_name) == view
