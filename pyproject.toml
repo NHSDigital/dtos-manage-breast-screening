@@ -37,6 +37,7 @@ dependencies = [
   "ninja-put-patch-file-upload-middleware>=0.1.4",
   "pillow>=12.1.0",
   "phonenumbers>=9.0.22",
+  "websockets>=16.0",
 ]
 
 [dependency-groups]
@@ -53,6 +54,7 @@ dev = [
   "pytest-cov>=7.0.0,<8",
   "djlint>=1.36.4,<2",
   "jsonschema>=4.25.1,<5",
+  "pytest-asyncio>=1.3.0",
 ]
 
 [tool.uv]
