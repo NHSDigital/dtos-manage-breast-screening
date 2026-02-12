@@ -29,6 +29,9 @@ from manage_breast_screening.participants.models import (
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
     HormoneReplacementTherapy,
 )
+from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
+    PregnancyAndBreastfeeding,
+)
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
@@ -333,3 +336,12 @@ class HormoneReplacementTherapyFactory(DjangoModelFactory):
 
     appointment = SubFactory(AppointmentFactory)
     status = HormoneReplacementTherapy.Status.NO
+
+
+class PregnancyAndBreastfeedingFactory(DjangoModelFactory):
+    class Meta:
+        model = PregnancyAndBreastfeeding
+
+    appointment = SubFactory(AppointmentFactory)
+    pregnancy_status = PregnancyAndBreastfeeding.PregnancyStatus.NO
+    breastfeeding_status = PregnancyAndBreastfeeding.BreastfeedingStatus.NO

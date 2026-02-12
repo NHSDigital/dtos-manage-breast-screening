@@ -103,6 +103,10 @@ class MedicalInformationPresenter:
             appointment, "hormone_replacement_therapy", None
         )
 
+        self.pregnancy_and_breastfeeding = getattr(
+            appointment, "pregnancy_and_breastfeeding", None
+        )
+
     @property
     def symptom_rows(self):
         return [symptom.summary_list_row for symptom in self.symptoms]
@@ -378,5 +382,34 @@ class MedicalInformationPresenter:
                 ],
             }
             if self.hormone_replacement_therapy and not read_only
+            else None
+        )
+
+    @property
+    def add_pregnancy_and_breastfeeding_link(self):
+        return reverse(
+            "mammograms:add_pregnancy_and_breastfeeding",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+    def pregnancy_and_breastfeeding_actions(self, read_only=False):
+        return (
+            {
+                "items": [
+                    {
+                        "href": reverse(
+                            "mammograms:change_pregnancy_and_breastfeeding",
+                            kwargs={
+                                "pk": self.appointment.pk,
+                                "pab_pk": self.pregnancy_and_breastfeeding.pk,
+                            },
+                        ),
+                        "text": "Change",
+                        "visuallyHiddenText": "pregnancy and breastfeeding",
+                        "classes": "nhsuk-link--no-visited-state",
+                    },
+                ],
+            }
+            if self.pregnancy_and_breastfeeding and not read_only
             else None
         )

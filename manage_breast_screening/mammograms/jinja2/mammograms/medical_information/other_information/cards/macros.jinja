@@ -15,3 +15,33 @@
     {{ presenter.hormone_replacement_therapy.status }}
   {% endif %}
 {% endmacro %}
+
+{% macro pregnancy_and_breastfeeding_details(presenter, read_only=false) %}
+  {% if not presenter.pregnancy_and_breastfeeding %}
+    <a href="{{ presenter.add_pregnancy_and_breastfeeding_link }}">Enter pregnancy and breastfeeding details</a>
+  {% else %}
+    {% if presenter.pregnancy_and_breastfeeding.pregnancy_status == 'YES' %}
+      <p>Currently pregnant</p>
+      <p>Timeframe: {{ presenter.pregnancy_and_breastfeeding.approx_pregnancy_due_date }}</p>
+    {% elif presenter.pregnancy_and_breastfeeding.pregnancy_status == 'NO_BUT_HAS_BEEN_RECENTLY' %}
+      <p>Recently pregnant</p>
+      <p>Details: {{ presenter.pregnancy_and_breastfeeding.approx_pregnancy_end_date }}</p>
+    {% elif presenter.pregnancy_and_breastfeeding.pregnancy_status == 'NO' -%}
+      <p>Not pregnant</p>
+    {% else %}
+      {{ presenter.pregnancy_and_breastfeeding.pregnancy_status }}
+    {% endif %}
+
+    {% if presenter.pregnancy_and_breastfeeding.breastfeeding_status == 'YES' %}
+      <p>Currently breastfeeding</p>
+      <p>Details: {{ presenter.pregnancy_and_breastfeeding.approx_breastfeeding_start_date }}</p>
+    {% elif presenter.pregnancy_and_breastfeeding.breastfeeding_status == 'NO_BUT_STOPPED_RECENTLY' %}
+      <p>Recently breastfeeding</p>
+      <p>Details: {{ presenter.pregnancy_and_breastfeeding.approx_breastfeeding_end_date }}</p>
+    {% elif presenter.pregnancy_and_breastfeeding.breastfeeding_status == 'NO' -%}
+      <p>Not breastfeeding</p>
+    {% else %}
+      {{ presenter.pregnancy_and_breastfeeding.breastfeeding_status }}
+    {% endif %}
+  {% endif %}
+{% endmacro %}

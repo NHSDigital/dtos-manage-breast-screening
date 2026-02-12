@@ -4,6 +4,7 @@ from django.views.decorators.http import require_http_methods
 from manage_breast_screening.mammograms.views import mammogram_views
 from manage_breast_screening.mammograms.views.other_information import (
     hormone_replacement_therapy_views,
+    pregnancy_and_breastfeeding_views,
 )
 
 from .views import (
@@ -339,5 +340,15 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/hormone-replacement-therapy/<uuid:hrt_pk>/",
         hormone_replacement_therapy_views.UpdateHormoneReplacementTherapyView.as_view(),
         name="change_hormone_replacement_therapy",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/",
+        pregnancy_and_breastfeeding_views.AddPregnancyAndBreastfeedingView.as_view(),
+        name="add_pregnancy_and_breastfeeding",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/<uuid:pab_pk>/",
+        pregnancy_and_breastfeeding_views.UpdatePregnancyAndBreastfeedingView.as_view(),
+        name="change_pregnancy_and_breastfeeding",
     ),
 ]
