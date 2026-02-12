@@ -14,7 +14,7 @@ This guide was migrated from the [manage breast screening prototype](https://git
 2. Run `illustrator-processing-script.jsx` in Illustrator
 3. Export as SVG (Use Artboards: on, Styling: Presentation Attributes)
 4. Run `node process-exported-svg.js [exported-file].svg`
-5. Copy the processed SVG to `manage_breast_screening/static/breast-diagram/breast-diagram-<version>.svg`
+5. Copy the processed SVG to `manage_breast_screening/core/components/breast-diagram/<version>.svg`
 
 ---
 
@@ -83,7 +83,7 @@ The script validates the output and will error if expected elements are missing.
 
 ### Using in the app
 
-Copy the processed SVG to `manage_breast_screening/static/breast-diagram/breast-diagram-<version>.svg`
+Copy the processed SVG to `manage_breast_screening/core/components/breast-diagram/<version>.svg`
 
 ---
 
