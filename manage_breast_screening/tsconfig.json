@@ -6,5 +6,10 @@
     "target": "ES2015"
   },
   "include": ["**/*.js"],
-  "exclude": ["**/*.test.js", "**/compiled/**", "**/staticfiles/**"]
+  "exclude": [
+    "**/*.test.js",
+    "**/compiled/**",
+    "**/staticfiles/**",
+    "**/breast-diagram/*.js"
+  ]
 }
