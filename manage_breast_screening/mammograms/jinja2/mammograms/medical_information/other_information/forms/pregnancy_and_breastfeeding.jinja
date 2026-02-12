@@ -1,0 +1,15 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+
+{% block form %}
+  {{ form.pregnancy_status.as_field_group() }}
+
+  {{ form.breastfeeding_status.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+{% endblock %}
