@@ -62,6 +62,7 @@ class Image(models.Model):
     instance_number = models.IntegerField(null=True, blank=True)
     dicom_file = models.FileField(storage=dicom_storage)
     image_file = models.FileField(storage=dicom_storage, null=True, blank=True)
+    laterality = models.CharField(max_length=16, blank=True)
 
     def __str__(self):
         return self.sop_instance_uid

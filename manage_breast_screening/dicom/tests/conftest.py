@@ -23,6 +23,7 @@ def dataset():
     ds.Modality = "MG"
     ds.SeriesNumber = 1
     ds.InstanceNumber = 1
+    ds.ImageLaterality = "RMLO"
 
     ds.file_meta = pydicom.Dataset()
     ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
