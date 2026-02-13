@@ -1,0 +1,26 @@
+{% extends "layout-app.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+{% from "django_form_helpers.jinja" import form_error_summary %}
+
+{% block page_content %}
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-two-thirds">
+      {{ form_error_summary(form) }}
+
+      <span class="nhsuk-caption-l">{{ caption }}</span>
+
+      <form action="{{request.path}}" method="post" novalidate>
+        {{ csrf_input }}
+
+        {{ form.details.as_field_group() }}
+
+        <div class="nhsuk-button-group">
+          {{ button({
+            "text": "Save"
+          }) }}
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

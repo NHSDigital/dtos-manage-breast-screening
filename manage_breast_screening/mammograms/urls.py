@@ -7,6 +7,7 @@ from manage_breast_screening.mammograms.views import (
 )
 from manage_breast_screening.mammograms.views.other_information import (
     hormone_replacement_therapy_views,
+    other_medical_information_views,
     pregnancy_and_breastfeeding_views,
 )
 
@@ -358,5 +359,15 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/<uuid:pab_pk>/",
         pregnancy_and_breastfeeding_views.UpdatePregnancyAndBreastfeedingView.as_view(),
         name="change_pregnancy_and_breastfeeding",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/other-medical-information/",
+        other_medical_information_views.AddOtherMedicalInformationView.as_view(),
+        name="add_other_medical_information",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/other-medical-information/<uuid:other_medical_information_pk>/",
+        other_medical_information_views.UpdateOtherMedicalInformationView.as_view(),
+        name="change_other_medical_information",
     ),
 ]

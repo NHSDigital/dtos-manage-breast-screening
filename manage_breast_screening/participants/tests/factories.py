@@ -29,6 +29,9 @@ from manage_breast_screening.participants.models import (
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
     HormoneReplacementTherapy,
 )
+from manage_breast_screening.participants.models.other_information.other_medical_information import (
+    OtherMedicalInformation,
+)
 from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
     PregnancyAndBreastfeeding,
 )
@@ -345,3 +348,11 @@ class PregnancyAndBreastfeedingFactory(DjangoModelFactory):
     appointment = SubFactory(AppointmentFactory)
     pregnancy_status = PregnancyAndBreastfeeding.PregnancyStatus.NO
     breastfeeding_status = PregnancyAndBreastfeeding.BreastfeedingStatus.NO
+
+
+class OtherMedicalInformationFactory(DjangoModelFactory):
+    class Meta:
+        model = OtherMedicalInformation
+
+    appointment = SubFactory(AppointmentFactory)
+    details = Faker("sentence")

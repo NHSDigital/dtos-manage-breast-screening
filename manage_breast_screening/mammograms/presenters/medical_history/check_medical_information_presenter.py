@@ -12,6 +12,12 @@ from manage_breast_screening.participants.models.medical_history.mastectomy_or_l
 from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
+from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
+    HormoneReplacementTherapy,
+)
+from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
+    PregnancyAndBreastfeeding,
+)
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     SkinChangeChoices,
@@ -58,6 +64,47 @@ class CheckMedicalInformationPresenter:
         medical_history.extend(self.format_benign_lump())
         medical_history.extend(self.format_other_procedure())
         return medical_history
+
+    @cached_property
+    def other_relevant_information(self):
+        info = []
+
+        hrt = getattr(self.appointment, "hormone_replacement_therapy", None)
+        if hrt and hrt.status == HormoneReplacementTherapy.Status.YES:
+            info.append(f"Taking HRT ({hrt.approx_start_date})")
+        if (
+            hrt
+            and hrt.status == HormoneReplacementTherapy.Status.NO_BUT_STOPPED_RECENTLY
+        ):
+            info.append(f"Recently stopped HRT ({hrt.approx_end_date})")
+
+        pb = getattr(self.appointment, "pregnancy_and_breastfeeding", None)
+        if pb:
+            if pb.pregnancy_status == PregnancyAndBreastfeeding.PregnancyStatus.YES:
+                info.append(f"Pregnant ({pb.approx_pregnancy_due_date})")
+            if (
+                pb.pregnancy_status
+                == PregnancyAndBreastfeeding.PregnancyStatus.NO_BUT_HAS_BEEN_RECENTLY
+            ):
+                info.append(f"Recently pregnant ({pb.approx_pregnancy_end_date})")
+            if (
+                pb.breastfeeding_status
+                == PregnancyAndBreastfeeding.BreastfeedingStatus.YES
+            ):
+                info.append(f"Breastfeeding ({pb.approx_breastfeeding_start_date})")
+            if (
+                pb.breastfeeding_status
+                == PregnancyAndBreastfeeding.BreastfeedingStatus.NO_BUT_STOPPED_RECENTLY
+            ):
+                info.append(
+                    f"Recently stopped breastfeeding ({pb.approx_breastfeeding_end_date})"
+                )
+
+        omi = getattr(self.appointment, "other_medical_information", None)
+        if omi:
+            info.append(omi.details)
+
+        return info
 
     def format_breast_cancer(self):
         result = []
