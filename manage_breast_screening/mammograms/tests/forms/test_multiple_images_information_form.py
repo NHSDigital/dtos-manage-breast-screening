@@ -53,7 +53,7 @@ class TestMultipleImagesInformationForm:
             assert not form.is_valid()
             assert form.errors == {
                 "rmlo_repeat_type": [
-                    "Select whether the additional RMLO images were repeats"
+                    "Select whether the additional RMLO image was a repeat"
                 ],
             }
 
@@ -74,7 +74,9 @@ class TestMultipleImagesInformationForm:
 
             assert not form.is_valid()
             assert form.errors == {
-                "rmlo_repeat_reasons": ["Select why RMLO repeats were needed"],
+                "rmlo_all_repeats_reasons": [
+                    "Select why a repeat RMLO image was needed"
+                ],
             }
 
         def test_no_repeats_does_not_require_reasons(self):
@@ -104,7 +106,7 @@ class TestMultipleImagesInformationForm:
                     {
                         "series_fingerprint": fingerprint,
                         "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
-                        "rmlo_repeat_reasons": [
+                        "rmlo_all_repeats_reasons": [
                             RepeatReason.PATIENT_MOVED.value,
                             RepeatReason.MOTION_BLUR.value,
                         ],
@@ -145,7 +147,7 @@ class TestMultipleImagesInformationForm:
 
             assert not form.is_valid()
             assert "lcc_repeat_count" in form.errors
-            assert "lcc_repeat_reasons" in form.errors
+            assert "lcc_some_repeats_reasons" in form.errors
 
         def test_all_repeats_does_not_require_count(self):
             study = StudyFactory()
@@ -157,7 +159,7 @@ class TestMultipleImagesInformationForm:
                     {
                         "series_fingerprint": fingerprint,
                         "lcc_repeat_type": RepeatType.ALL_REPEATS.value,
-                        "lcc_repeat_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
+                        "lcc_all_repeats_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
                     }
                 ),
                 instance=study,
@@ -176,7 +178,7 @@ class TestMultipleImagesInformationForm:
                         "series_fingerprint": fingerprint,
                         "lcc_repeat_type": RepeatType.SOME_REPEATS.value,
                         "lcc_repeat_count": 2,
-                        "lcc_repeat_reasons": [RepeatReason.FOLDED_SKIN.value],
+                        "lcc_some_repeats_reasons": [RepeatReason.FOLDED_SKIN.value],
                     }
                 ),
                 instance=study,
@@ -272,7 +274,7 @@ class TestMultipleImagesInformationForm:
                         "series_fingerprint": fingerprint,
                         "lmlo_repeat_type": RepeatType.SOME_REPEATS.value,
                         "lmlo_repeat_count": 4,  # Too high
-                        "lmlo_repeat_reasons": [RepeatReason.OTHER.value],
+                        "lmlo_some_repeats_reasons": [RepeatReason.OTHER.value],
                     }
                 ),
                 instance=study,
@@ -296,7 +298,7 @@ class TestMultipleImagesInformationForm:
                 {
                     "series_fingerprint": fingerprint,
                     "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
-                    "rmlo_repeat_reasons": [RepeatReason.PATIENT_MOVED.value],
+                    "rmlo_all_repeats_reasons": [RepeatReason.PATIENT_MOVED.value],
                     "lcc_repeat_type": RepeatType.NO_REPEATS.value,
                 }
             ),
@@ -327,18 +329,20 @@ class TestMultipleImagesInformationForm:
 
         assert len(groups) == 2
 
-        # First series (count=2, no repeat_count field)
+        # First series (count=2, no repeat_count or some_repeats_reasons field)
         series, fields = groups[0]
         assert series == series1
         assert fields["repeat_type"] == "rmlo_repeat_type"
-        assert fields["repeat_reasons"] == "rmlo_repeat_reasons"
+        assert fields["all_repeats_reasons"] == "rmlo_all_repeats_reasons"
+        assert fields["some_repeats_reasons"] is None
         assert fields["repeat_count"] is None
 
-        # Second series (count=3, has repeat_count field)
+        # Second series (count=3, has repeat_count and some_repeats_reasons fields)
         series, fields = groups[1]
         assert series == series2
         assert fields["repeat_type"] == "lcc_repeat_type"
-        assert fields["repeat_reasons"] == "lcc_repeat_reasons"
+        assert fields["all_repeats_reasons"] == "lcc_all_repeats_reasons"
+        assert fields["some_repeats_reasons"] == "lcc_some_repeats_reasons"
         assert fields["repeat_count"] == "lcc_repeat_count"
 
     def test_initial_values_from_series(self):
@@ -356,7 +360,11 @@ class TestMultipleImagesInformationForm:
 
         assert form.initial["rmlo_repeat_type"] == RepeatType.SOME_REPEATS.value
         assert form.initial["rmlo_repeat_count"] == 1
-        assert form.initial["rmlo_repeat_reasons"] == [
+        assert form.initial["rmlo_all_repeats_reasons"] == [
+            RepeatReason.MOTION_BLUR.value,
+            RepeatReason.OTHER.value,
+        ]
+        assert form.initial["rmlo_some_repeats_reasons"] == [
             RepeatReason.MOTION_BLUR.value,
             RepeatReason.OTHER.value,
         ]

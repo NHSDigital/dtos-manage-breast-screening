@@ -73,7 +73,8 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
     def _add_fields_for_series(self, series, prefix):
         """Add repeat_type, repeat_reasons, and optionally repeat_count fields for a series."""
         repeat_type_field_name = f"{prefix}_repeat_type"
-        repeat_reasons_field_name = f"{prefix}_repeat_reasons"
+        all_repeats_reasons_field_name = f"{prefix}_all_repeats_reasons"
+        some_repeats_reasons_field_name = f"{prefix}_some_repeats_reasons"
         repeat_count_field_name = f"{prefix}_repeat_count"
 
         # Build the radio choices based on image count
@@ -109,23 +110,39 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             label=label,
             label_classes="nhsuk-fieldset__legend--m",
             error_messages={
-                "required": f"Select whether the additional {series_name} images were repeats"
+                "required": f"Select whether the additional {series_name} image was a repeat"
+                if series.count == 2
+                else f"Select whether the additional {series_name} images were repeats"
             },
         )
 
-        self.fields[repeat_reasons_field_name] = MultipleChoiceField(
+        reasons_error_message = (
+            f"Select why a repeat {series_name} image was needed"
+            if series.count == 2
+            else f"Select why {series_name} repeats were needed"
+        )
+
+        self.fields[all_repeats_reasons_field_name] = MultipleChoiceField(
             choices=RepeatReason.choices,
             required=False,
             label="Why were repeats needed?",
             hint="Select all that apply",
             label_classes="nhsuk-fieldset__legend--s",
-            error_messages={
-                "required": f"Select why {series_name} repeats were needed"
-            },
+            error_messages={"required": reasons_error_message},
         )
 
-        # For count > 2, add repeat_count field
+        # For count > 2, add a separate reasons field for the SOME_REPEATS
+        # conditional panel to avoid duplicate DOM IDs
         if series.count > 2:
+            self.fields[some_repeats_reasons_field_name] = MultipleChoiceField(
+                choices=RepeatReason.choices,
+                required=False,
+                label="Why were repeats needed?",
+                hint="Select all that apply",
+                label_classes="nhsuk-fieldset__legend--s",
+                error_messages={"required": reasons_error_message},
+            )
+
             additional_image_count = series.count - 1
             self.fields[repeat_count_field_name] = IntegerField(
                 required=False,
@@ -152,30 +169,40 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         if series.repeat_type:
             self.initial[repeat_type_field_name] = series.repeat_type
         if series.repeat_reasons:
-            self.initial[repeat_reasons_field_name] = series.repeat_reasons
+            self.initial[all_repeats_reasons_field_name] = series.repeat_reasons
+            if series.count > 2:
+                self.initial[some_repeats_reasons_field_name] = series.repeat_reasons
         if series.repeat_count is not None:
             self.initial[repeat_count_field_name] = series.repeat_count
 
     def clean(self):
         cleaned_data = super().clean()
 
-        # Validate that repeat_reasons is provided when ALL_REPEATS or SOME_REPEATS is selected
         for series in self.series_list:
             prefix = self._get_series_prefix(series)
             repeat_type = cleaned_data.get(f"{prefix}_repeat_type")
-            repeat_reasons = cleaned_data.get(f"{prefix}_repeat_reasons")
 
-            if repeat_type in (
-                RepeatType.ALL_REPEATS.value,
-                RepeatType.SOME_REPEATS.value,
-            ):
-                if not repeat_reasons:
+            if repeat_type == RepeatType.ALL_REPEATS.value:
+                reasons_field = f"{prefix}_all_repeats_reasons"
+                if not cleaned_data.get(reasons_field):
                     self.add_error(
-                        f"{prefix}_repeat_reasons",
+                        reasons_field,
                         forms.ValidationError(
-                            message=self.fields[
-                                f"{prefix}_repeat_reasons"
-                            ].error_messages["required"],
+                            message=self.fields[reasons_field].error_messages[
+                                "required"
+                            ],
+                            code="required",
+                        ),
+                    )
+            elif repeat_type == RepeatType.SOME_REPEATS.value:
+                reasons_field = f"{prefix}_some_repeats_reasons"
+                if not cleaned_data.get(reasons_field):
+                    self.add_error(
+                        reasons_field,
+                        forms.ValidationError(
+                            message=self.fields[reasons_field].error_messages[
+                                "required"
+                            ],
                             code="required",
                         ),
                     )
@@ -188,7 +215,8 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
 
         Each field_names_dict contains:
         - repeat_type: field name for the repeat type radio
-        - repeat_reasons: field name for the reasons checkboxes
+        - all_repeats_reasons: field name for the reasons checkboxes (ALL_REPEATS conditional)
+        - some_repeats_reasons: field name for the reasons checkboxes (SOME_REPEATS conditional, or None)
         - repeat_count: field name for the count (may be None if series.count == 2)
         """
         groups = []
@@ -196,7 +224,10 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             prefix = self._get_series_prefix(series)
             field_names = {
                 "repeat_type": f"{prefix}_repeat_type",
-                "repeat_reasons": f"{prefix}_repeat_reasons",
+                "all_repeats_reasons": f"{prefix}_all_repeats_reasons",
+                "some_repeats_reasons": f"{prefix}_some_repeats_reasons"
+                if series.count > 2
+                else None,
                 "repeat_count": f"{prefix}_repeat_count" if series.count > 2 else None,
             }
             groups.append((series, field_names))
@@ -210,12 +241,13 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             repeat_type = self.cleaned_data.get(f"{prefix}_repeat_type")
             series.repeat_type = repeat_type
 
-            if repeat_type in (
-                RepeatType.ALL_REPEATS.value,
-                RepeatType.SOME_REPEATS.value,
-            ):
+            if repeat_type == RepeatType.ALL_REPEATS.value:
                 series.repeat_reasons = self.cleaned_data.get(
-                    f"{prefix}_repeat_reasons", []
+                    f"{prefix}_all_repeats_reasons", []
+                )
+            elif repeat_type == RepeatType.SOME_REPEATS.value:
+                series.repeat_reasons = self.cleaned_data.get(
+                    f"{prefix}_some_repeats_reasons", []
                 )
             else:
                 series.repeat_reasons = []

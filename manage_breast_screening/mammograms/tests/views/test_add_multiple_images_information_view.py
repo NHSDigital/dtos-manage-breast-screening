@@ -40,7 +40,7 @@ class TestAddMultipleImagesInformationView:
             )
         )
         assert response.status_code == 200
-        assert "2 Right MLO images were taken." in response.text
+        assert "2 RMLO images were taken." in response.text
 
     def test_redirects_when_no_series_with_multiple_images(self, clinical_user_client):
         appointment = AppointmentFactory.create(
@@ -99,7 +99,7 @@ class TestAddMultipleImagesInformationView:
             {
                 "series_fingerprint": _fingerprint_for(study),
                 "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
-                "rmlo_repeat_reasons": [
+                "rmlo_all_repeats_reasons": [
                     RepeatReason.PATIENT_MOVED.value,
                     RepeatReason.MOTION_BLUR.value,
                 ],
@@ -148,7 +148,7 @@ class TestAddMultipleImagesInformationView:
 
         assert response.status_code == 200
         assertInHTML(
-            '<a href="#id_rmlo_repeat_type">Select whether the additional Right MLO images were repeats</a>',
+            '<a href="#id_rmlo_repeat_type">Select whether the additional RMLO image was a repeat</a>',
             response.text,
         )
 
@@ -202,8 +202,8 @@ class TestAddMultipleImagesInformationView:
         )
 
         assert response.status_code == 200
-        assert "2 Right MLO images were taken." in response.text
-        assert "3 Left CC images were taken." in response.text
+        assert "2 RMLO images were taken." in response.text
+        assert "3 LCC images were taken." in response.text
 
     def test_post_with_some_repeats_saves_count(self, clinical_user_client):
         appointment = AppointmentFactory.create(
@@ -221,7 +221,7 @@ class TestAddMultipleImagesInformationView:
                 "series_fingerprint": _fingerprint_for(study),
                 "lmlo_repeat_type": RepeatType.SOME_REPEATS.value,
                 "lmlo_repeat_count": "2",
-                "lmlo_repeat_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
+                "lmlo_some_repeats_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
             },
         )
 
@@ -299,7 +299,7 @@ class TestAddMultipleImagesInformationView:
                 {
                     "series_fingerprint": _fingerprint_for(study),
                     "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
-                    "rmlo_repeat_reasons": [RepeatReason.PATIENT_MOVED.value],
+                    "rmlo_all_repeats_reasons": [RepeatReason.PATIENT_MOVED.value],
                 },
             )
 
