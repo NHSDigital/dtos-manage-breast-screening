@@ -77,7 +77,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         repeat_count_field_name = f"{prefix}_repeat_count"
 
         # Build the radio choices based on image count
-        laterality = series.get_laterality_display()
+        series_name = str(series)
         if series.count == 2:
             question = "Was the additional image a repeat?"
             choices = [
@@ -101,7 +101,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 ),
             ]
 
-        label = f"{series.count} {laterality} {series.view_position} images were taken. {question}"
+        label = f"{series.count} {series_name} images were taken. {question}"
 
         self.fields[repeat_type_field_name] = ChoiceField(
             choices=choices,
@@ -109,7 +109,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             label=label,
             label_classes="nhsuk-fieldset__legend--m",
             error_messages={
-                "required": f"Select whether the additional {laterality} {series.view_position} images were repeats"
+                "required": f"Select whether the additional {series_name} images were repeats"
             },
         )
 
@@ -120,7 +120,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             hint="Select all that apply",
             label_classes="nhsuk-fieldset__legend--s",
             error_messages={
-                "required": f"Select why {laterality} {series.view_position} repeats were needed"
+                "required": f"Select why {series_name} repeats were needed"
             },
         )
 
@@ -136,10 +136,10 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 min_value=1,
                 max_value=additional_image_count,
                 error_messages={
-                    "required": f"Enter how many {laterality} {series.view_position} images were repeats",
-                    "min_value": f"Number of {laterality} {series.view_position} repeats must be at least 1",
-                    "max_value": f"Number of {laterality} {series.view_position} repeats must be at most {additional_image_count}",
-                    "invalid": f"Enter a valid number for {laterality} {series.view_position} repeats",
+                    "required": f"Enter how many {series_name} images were repeats",
+                    "min_value": f"Number of {series_name} repeats must be at least 1",
+                    "max_value": f"Number of {series_name} repeats must be at most {additional_image_count}",
+                    "invalid": f"Enter a valid number for {series_name} repeats",
                 },
             )
 
