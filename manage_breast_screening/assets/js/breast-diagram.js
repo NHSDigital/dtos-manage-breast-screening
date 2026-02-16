@@ -16,9 +16,9 @@ export class BreastDiagram extends Component {
   $input
 
   /**
-   * @type {BreastFeatureValue[] | null}
+   * @type {BreastFeatureValue[]}
    */
-  values = null
+  values
 
   /**
    * @param {Element | null} $root - HTML element to use for component
@@ -38,6 +38,20 @@ export class BreastDiagram extends Component {
 
     this.$input = $input
 
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      this.values = /** @type {BreastFeatureValue[]} */ (
+        JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
+      )
+    } catch (e) {
+      console.error(e)
+
+      throw new ElementError({
+        component: BreastDiagram,
+        identifier: 'Breast diagram feature JSON (`input[name="features"]`)'
+      })
+    }
+
     const [$imageMap] = createAll(
       ImageMap,
       {
@@ -49,6 +63,7 @@ export class BreastDiagram extends Component {
       { scope: this.$root }
     )
 
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!$imageMap) {
       throw new ElementError({
         component: BreastDiagram,
@@ -68,19 +83,6 @@ export class BreastDiagram extends Component {
    * Get diagram features
    */
   get features() {
-    if (!this.values) {
-      try {
-        this.values ??= /** @type {BreastFeatureValue[]} */ (
-          JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
-        )
-      } catch {
-        throw new ElementError({
-          component: BreastDiagram,
-          identifier: 'Breast diagram feature JSON (`input[name="features"]`)'
-        })
-      }
-    }
-
     return this.values
       .map(({ id, name, x, y }) => {
         const $path = this.$imageMap.getPathById(id)
@@ -106,7 +108,7 @@ export class BreastDiagram extends Component {
    * Write diagram features to hidden input
    */
   write() {
-    this.$input.value = JSON.stringify(this.values ?? [])
+    this.$input.value = JSON.stringify(this.values)
   }
 
   /**
@@ -138,7 +140,7 @@ export class BreastDiagram extends Component {
     $debugY.textContent = point?.y.toString() ?? 'N/A'
     $debugRegion.textContent = label ?? 'N/A'
     $debugInput.textContent =
-      this.values?.map(({ id }) => id).join(', ') || 'N/A'
+      this.values.map(({ id }) => id).join(', ') || 'N/A'
   }
 
   /**
@@ -156,7 +158,6 @@ export class BreastDiagram extends Component {
 
     switch (state) {
       case 'active':
-        this.values ??= []
         this.values.push({
           id: region.id,
           name: 'Pending',
