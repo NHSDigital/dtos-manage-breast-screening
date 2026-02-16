@@ -53,6 +53,7 @@ class DicomRecorder:
             defaults={
                 "instance_number": getattr(ds, "InstanceNumber", None),
                 "laterality": getattr(ds, "ImageLaterality", ""),
+                "view_position": getattr(ds, "ViewPosition", ""),
             },
         )
         if created:
