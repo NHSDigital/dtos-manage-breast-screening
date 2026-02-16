@@ -15,14 +15,18 @@ describe('Image map', () => {
 
   it("rejects SVGs if the selectors don't match anything", () => {
     document.body.innerHTML = emptySvg
-    const $root = document.querySelector('[data-module="app-image-map"]')
+    const $root = document.querySelector(
+      `[data-module='${ImageMap.moduleName}']`
+    )
 
     expect(
       () =>
         new ImageMap($root, {
           selectors: ['path']
         })
-    ).toThrow('app-image-map: Image paths and polygons (`path`) not found')
+    ).toThrow(
+      `${ImageMap.moduleName}: Image paths and polygons (\`path\`) not found`
+    )
   })
 
   it('parses the paths from the image', () => {
