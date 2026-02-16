@@ -63,6 +63,12 @@ class Image(models.Model):
     dicom_file = models.FileField(storage=dicom_storage)
     image_file = models.FileField(storage=dicom_storage, null=True, blank=True)
     laterality = models.CharField(max_length=16, blank=True)
+    view_position = models.CharField(max_length=16, blank=True)
+
+    def laterality_and_view(self):
+        if self.laterality and self.view_position:
+            return f"{self.laterality}{self.view_position}".upper()
+        return None
 
     def __str__(self):
         return self.sop_instance_uid
