@@ -74,7 +74,7 @@ class TestMultipleImagesInformationForm:
 
             assert not form.is_valid()
             assert form.errors == {
-                "rmlo_repeat_reasons": ["Select why repeats were needed"],
+                "rmlo_repeat_reasons": ["Select why Right MLO repeats were needed"],
             }
 
         def test_no_repeats_does_not_require_reasons(self):
@@ -281,7 +281,7 @@ class TestMultipleImagesInformationForm:
             assert not form.is_valid()
             assert "lmlo_repeat_count" in form.errors
             assert (
-                "Number of repeats must be at most 3"
+                "Number of Left MLO repeats must be at most 3"
                 in form.errors["lmlo_repeat_count"][0]
             )
 

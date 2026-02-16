@@ -119,7 +119,9 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             label="Why were repeats needed?",
             hint="Select all that apply",
             label_classes="nhsuk-fieldset__legend--s",
-            error_messages={"required": "Select why repeats were needed"},
+            error_messages={
+                "required": f"Select why {laterality} {series.view_position} repeats were needed"
+            },
         )
 
         # For count > 2, add repeat_count field
@@ -134,10 +136,10 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 min_value=1,
                 max_value=additional_image_count,
                 error_messages={
-                    "required": "Enter how many were repeats",
-                    "min_value": "Number of repeats must be at least 1",
-                    "max_value": f"Number of repeats must be at most {additional_image_count}",
-                    "invalid": "Enter a valid number",
+                    "required": f"Enter how many {laterality} {series.view_position} images were repeats",
+                    "min_value": f"Number of {laterality} {series.view_position} repeats must be at least 1",
+                    "max_value": f"Number of {laterality} {series.view_position} repeats must be at most {additional_image_count}",
+                    "invalid": f"Enter a valid number for {laterality} {series.view_position} repeats",
                 },
             )
 
