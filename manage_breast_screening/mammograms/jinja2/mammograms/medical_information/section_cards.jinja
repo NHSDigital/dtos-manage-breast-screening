@@ -1,0 +1,131 @@
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
+{% from "mammograms/medical_information/medical_history/cards/benign_lump_history_card.jinja" import benign_lump_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/breast_augmentation_history_card.jinja" import breast_augmentation_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/cyst_history_card.jinja" import cyst_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/implanted_medical_device_history_card.jinja" import implanted_medical_device_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
+{% from "mammograms/medical_information/medical_history/cards/other_procedure_history_card.jinja" import other_procedure_history_card %}
+
+{% macro mammogram_history_content(presented_medical_info, presented_mammograms, read_only=false) %}
+  <p>The last confirmed mammogram and any added manually since then</p>
+
+  {{ summaryList({
+    "rows": [
+      {
+        "key": {
+          "text": "Last known mammograms"
+        },
+        "value": {
+          "html": last_mammogram_html(presented_mammograms, read_only=read_only)
+        }
+      },
+    ]
+  }) }}
+
+  {% if not read_only %}
+    {{ button({
+      "text": presented_medical_info.add_mammogram_button.text,
+      "href": presented_medical_info.add_mammogram_button.href,
+      "classes": "nhsuk-button--secondary nhsuk-button--small"
+    }) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro symptoms_content(presented_medical_info, read_only=false) %}
+  {% set symptom_rows = presented_medical_info.read_only_symptom_rows if read_only else presented_medical_info.symptom_rows %}
+  <p {%- if not read_only and not symptom_rows %} class="nhsuk-u-margin-bottom-3"{% endif %}>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
+  {% if symptom_rows %}
+     {{ summaryList({
+        "rows": symptom_rows
+      }) }}
+  {% else %}
+    {% set insetHtml %}
+      <p>No symptoms have been recorded for this participant.</p>
+    {% endset %}
+    {{ insetText({
+      "html": insetHtml,
+      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+    }) }}
+  {% endif %}
+
+  {% if not read_only %}
+    <hr>
+    <h3>Add symptoms</h3>
+
+    <div class="nhsuk-button-group app-button-group--small">
+      {% for button_info in presented_medical_info.symptom_buttons %}
+        {{ button({
+          "text": button_info.text,
+          "href": button_info.href,
+          "classes": "nhsuk-button--secondary nhsuk-button--small"
+        }) }}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro medical_history_content(presented_medical_info, read_only=false) %}
+  <p>Including breast cancer, implants, prior procedures and treatments</p>
+
+  {% if presented_medical_info.any_medical_history %}
+    {{ breast_cancer_history_card(presented_medical_info.breast_cancer_history, read_only=read_only) }}
+    {{ implanted_medical_device_history_card(presented_medical_info.implanted_medical_device_history, read_only=read_only) }}
+    {{ breast_augmentation_history_card(presented_medical_info.breast_augmentation_history, read_only=read_only) }}
+    {{ mastectomy_or_lumpectomy_history_card(presented_medical_info.mastectomy_or_lumpectomy_history, read_only=read_only) }}
+    {{ cyst_history_card(presented_medical_info.cyst_history, read_only=read_only) }}
+    {{ benign_lump_history_card(presented_medical_info.benign_lump_history, read_only=read_only) }}
+    {{ other_procedure_history_card(presented_medical_info.other_procedure_history, read_only=read_only) }}
+  {% else %}
+    {% set insetTextHtml %}
+      <p>
+        No medical history has been added yet.
+      </p>
+    {% endset %}
+
+    {{ insetText({
+      "html": insetTextHtml,
+      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+    }) }}
+  {% endif %}
+
+  {% if not read_only %}
+    <hr>
+    <h3>Add medical history</h3>
+
+    <div class="nhsuk-button-group app-button-group--small">
+      {% for button_info in presented_medical_info.medical_history_buttons %}
+        {% if button_info %}
+          {{ button({
+            "text": button_info.text,
+            "href": button_info.href,
+            "classes": "nhsuk-button--secondary nhsuk-button--small"
+          }) }}
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endmacro %}
+
+{% macro breast_features_content(presented_medical_info, read_only=false) %}
+  {% set insetHtml %}
+    <p>No breast features have been recorded for this participant.</p>
+  {% endset %}
+  {{ insetText({
+    "html": insetHtml,
+    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+  }) }}
+{% endmacro %}
+
+{% macro other_information_content(presented_medical_info, read_only=false) %}
+  {% set insetHtml %}
+    <p>No other information has been recorded for this participant.</p>
+  {% endset %}
+  {{ insetText({
+    "html": insetHtml,
+    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+  }) }}
+{% endmacro %}

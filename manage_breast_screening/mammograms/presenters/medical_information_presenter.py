@@ -104,6 +104,13 @@ class MedicalInformationPresenter:
         return [symptom.summary_list_row for symptom in self.symptoms]
 
     @property
+    def read_only_symptom_rows(self):
+        return [
+            symptom.build_summary_list_row(include_actions=False)
+            for symptom in self.symptoms
+        ]
+
+    @property
     def symptom_buttons(self):
         return [
             self.add_lump_button,

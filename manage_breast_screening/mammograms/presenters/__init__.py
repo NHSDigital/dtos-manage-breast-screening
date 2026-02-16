@@ -29,7 +29,7 @@ def present_secondary_nav(pk, current_tab=None, appointment_complete=False):
         {
             "id": "medical_information",
             "text": "Medical information",
-            "href": "#",
+            "href": reverse("mammograms:medical_information", kwargs={"pk": pk}),
             "current": current_tab == "medical_information",
         },
         {

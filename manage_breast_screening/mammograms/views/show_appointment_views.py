@@ -11,9 +11,8 @@ from ..presenters import (
     LastKnownMammogramPresenter,
     present_secondary_nav,
 )
+from ..presenters.medical_information_presenter import MedicalInformationPresenter
 from .mixins import AppointmentTabMixin
-
-MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME = "mammograms:record_medical_information"
 
 
 class ShowAppointment(AppointmentTabMixin, View):
@@ -88,6 +87,40 @@ class ParticipantDetails(AppointmentTabMixin, View):
         return render(
             request,
             template_name="mammograms/show/participant_details.jinja",
+            context=context,
+        )
+
+
+class MedicalInformation(AppointmentTabMixin, View):
+    def get(self, request, *args, **kwargs):
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(appointment)
+        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
+            appointment_id=appointment.pk
+        ).order_by("-created_at")
+        last_known_mammogram_presenter = LastKnownMammogramPresenter(
+            last_known_mammograms,
+            appointment_pk=appointment.pk,
+            current_url=self.request.path,
+        )
+
+        context = {
+            "heading": appointment_presenter.participant.full_name,
+            "caption": appointment_presenter.caption,
+            "page_title": appointment_presenter.caption,
+            "presented_appointment": appointment_presenter,
+            "presenter": MedicalInformationPresenter(appointment),
+            "presented_mammograms": last_known_mammogram_presenter,
+            "secondary_nav_items": present_secondary_nav(
+                appointment.pk,
+                current_tab="medical_information",
+                appointment_complete=not appointment.active,
+            ),
+        }
+
+        return render(
+            request,
+            template_name="mammograms/show/medical_information.jinja",
             context=context,
         )
 

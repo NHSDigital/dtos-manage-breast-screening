@@ -1,11 +1,12 @@
 import pytest
 from django.urls import reverse
-from pytest_django.asserts import assertInHTML
+from pytest_django.asserts import assertContains, assertInHTML
 
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
 )
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 @pytest.mark.django_db
@@ -18,6 +19,25 @@ class TestShowAppointment:
             )
         )
         assert response.status_code == 200
+
+
+@pytest.mark.django_db
+class TestMedicalInformation:
+    def test_displays_medical_information_sections(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:medical_information",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assertContains(response, "Mammogram history")
+        assertContains(response, "Symptoms")
+        assertContains(response, "Medical history")
+        assertContains(response, "Breast features")
+        assertContains(response, "Other information")
 
 
 @pytest.mark.django_db

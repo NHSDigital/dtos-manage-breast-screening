@@ -1,15 +1,7 @@
 {% extends "workflow_step.jinja" %}
 {% from "nhsuk/components/button/macro.jinja" import button %}
-{% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
-{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
-{% from "mammograms/medical_information/medical_history/cards/benign_lump_history_card.jinja" import benign_lump_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/breast_augmentation_history_card.jinja" import breast_augmentation_history_card %}{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
-{% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/cyst_history_card.jinja" import cyst_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/implanted_medical_device_history_card.jinja" import implanted_medical_device_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
-{% from "mammograms/medical_information/medical_history/cards/other_procedure_history_card.jinja" import other_procedure_history_card %}
 {% from "mammograms/components/card_with_status.jinja" import card_with_status %}
+{% from "mammograms/medical_information/section_cards.jinja" import mammogram_history_content, symptoms_content, medical_history_content, breast_features_content, other_information_content %}
 
 {% set active_workflow_step = 'REVIEW_MEDICAL_INFORMATION' %}
 
@@ -36,26 +28,7 @@
   action_button_properties=presenter.review_action_button_properties(sections.MAMMOGRAM_HISTORY),
   csrf_input=csrf_input,
   ) %}
-  <p>The last confirmed mammogram and any added manually since then</p>
-
-  {{ summaryList({
-    "rows": [
-      {
-        "key": {
-          "text": "Last known mammograms"
-        },
-        "value": {
-          "html": last_mammogram_html(presented_mammograms)
-        }
-      },
-    ]
-  }) }}
-
-  {{ button({
-    "text": presenter.add_mammogram_button.text,
-    "href": presenter.add_mammogram_button.href,
-    "classes": "nhsuk-button--secondary nhsuk-button--small"
-  }) }}
+  {{ mammogram_history_content(presenter, presented_mammograms) }}
 {% endcall %}
 
 {% call card_with_status(
@@ -65,33 +38,7 @@
   action_button_properties=presenter.review_action_button_properties(sections.SYMPTOMS),
   csrf_input=csrf_input,
   ) %}
-  <p {%- if not presenter.symptom_rows %} class="nhsuk-u-margin-bottom-3"{% endif %}>Any problems or symptoms, including lumps, swelling, rashes or nipple changes</p>
-  {% if presenter.symptom_rows %}
-     {{ summaryList({
-        "rows": presenter.symptom_rows
-      }) }}
-  {% else %}
-    {% set insetHtml %}
-      <p>No symptoms have been recorded for this participant.</p>
-    {% endset %}
-    {{ insetText({
-      "html": insetHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-    }) }}
-  {% endif %}
-
-  <hr>
-  <h3>Add symptoms</h3>
-
-  <div class="nhsuk-button-group app-button-group--small">
-    {% for button_info in presenter.symptom_buttons %}
-      {{ button({
-        "text": button_info.text,
-        "href": button_info.href,
-        "classes": "nhsuk-button--secondary nhsuk-button--small"
-      }) }}
-    {% endfor %}
-  </div>
+  {{ symptoms_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(
@@ -101,43 +48,7 @@
   action_button_properties=presenter.review_action_button_properties(sections.MEDICAL_HISTORY),
   csrf_input=csrf_input,
   ) %}
-  <p>Including breast cancer, implants, prior procedures and treatments</p>
-
-  {% if presenter.any_medical_history %}
-    {{ breast_cancer_history_card(presenter.breast_cancer_history) }}
-    {{ implanted_medical_device_history_card(presenter.implanted_medical_device_history) }}
-    {{ breast_augmentation_history_card(presenter.breast_augmentation_history) }}
-    {{ mastectomy_or_lumpectomy_history_card(presenter.mastectomy_or_lumpectomy_history) }}
-    {{ cyst_history_card(presenter.cyst_history) }}
-    {{ benign_lump_history_card(presenter.benign_lump_history) }}
-    {{ other_procedure_history_card(presenter.other_procedure_history) }}
-  {% else %}
-    {% set insetTextHtml %}
-      <p>
-        No medical history has been added yet.
-      </p>
-    {% endset %}
-
-    {{ insetText({
-      "html": insetTextHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-    }) }}
-  {% endif %}
-
-  <hr>
-  <h3>Add medical history</h3>
-
-  <div class="nhsuk-button-group app-button-group--small">
-    {% for button_info in presenter.medical_history_buttons %}
-      {% if button_info %}
-        {{ button({
-          "text": button_info.text,
-          "href": button_info.href,
-          "classes": "nhsuk-button--secondary nhsuk-button--small"
-        }) }}
-      {% endif %}
-    {% endfor %}
-  </div>
+  {{ medical_history_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(
@@ -147,34 +58,7 @@
   action_button_properties=presenter.review_action_button_properties(sections.BREAST_FEATURES),
   csrf_input=csrf_input,
   ) %}
-    {% set breast_features_recorded = false %}
-
-    {% set insetHtml %}
-    <p>No breast features have been recorded for this participant. Add any scars, moles, warts or lumps observed or reported during the appointment.</p>
-    {% endset %}
-    {{ insetText({
-      "html": insetHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4 app-inset-text"
-    }) }}
-
-    <p class="nhsuk-u-margin-top-4 nhsuk-u-margin-bottom-0">
-      <a href="#" class="nhsuk-link nhsuk-link--no-visited-state">{{ "Add another feature" if breast_features_recorded else "Add a feature" }}</a>
-    </p>
-
-    {% if presenter.breast_features_action_button %}
-      {% if presenter.breast_features_action_button.is_anchor %}
-        <a href="{{ presenter.breast_features_action_button.href }}" class="nhsuk-link {{ presenter.breast_features_action_button.classes }}">
-          {{ presenter.breast_features_action_button.text }}
-        </a>
-      {% else %}
-        <form method="post" action="{{ presenter.breast_features_action_button.href }}" class="app-inline-form">
-          {{ csrf_input }}
-          <button type="submit" class="nhsuk-link-button {{ presenter.breast_features_action_button.classes }}">
-            {{ presenter.breast_features_action_button.text }}
-          </button>
-        </form>
-      {% endif %}
-    {% endif %}
+  {{ breast_features_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(
@@ -184,27 +68,7 @@
   action_button_properties=presenter.review_action_button_properties(sections.OTHER_INFORMATION),
   csrf_input=csrf_input,
   ) %}
-  {% set hrt_link %}
-  <a class="nhsuk-link" href="#">Enter hormone replacement therapy (HRT)</a>
-  {% endset %}
-  {% set pregnancy_and_breastfeeding_link %}
-  <a class="nhsuk-link" href="#">Enter pregnancy and breastfeeding</a>
-  {% endset %}
-
-  {% if presenter.other_information_action_button %}
-    {% if presenter.other_information_action_button.is_anchor %}
-      <a href="{{ presenter.other_information_action_button.href }}" class="nhsuk-link {{ presenter.other_information_action_button.classes }}">
-        {{ presenter.other_information_action_button.text }}
-      </a>
-    {% else %}
-      <form method="post" action="{{ presenter.other_information_action_button.href }}" class="app-inline-form">
-        {{ csrf_input }}
-        <button type="submit" class="nhsuk-link-button {{ presenter.other_information_action_button.classes }}">
-          {{ presenter.other_information_action_button.text }}
-        </button>
-      </form>
-    {% endif %}
-  {% endif %}
+  {{ other_information_content(presenter) }}
 {% endcall %}
 
 {{ complete_all_button }}

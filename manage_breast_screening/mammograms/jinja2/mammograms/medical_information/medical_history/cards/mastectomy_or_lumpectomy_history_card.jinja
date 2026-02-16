@@ -2,7 +2,7 @@
 {% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, item_with_details,
 paragraph %}
 
-{% macro mastectomy_or_lumpectomy_history_card(presented_items) %}
+{% macro mastectomy_or_lumpectomy_history_card(presented_items, read_only=false) %}
   {% if presented_items %}
   <section>
   {% endif %}
@@ -21,7 +21,7 @@ paragraph %}
               "classes": "nhsuk-link--no-visited-state",
             }
           ]
-        }
+        } if not read_only else none
       },
       "headingLevel": 4,
       "rows": [

@@ -1,0 +1,37 @@
+{% extends 'layout-appointment.jinja' %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "mammograms/medical_information/section_cards.jinja" import mammogram_history_content, symptoms_content, medical_history_content, breast_features_content, other_information_content %}
+
+{% block tab_content %}
+
+{% call card({
+  "heading": "Mammogram history"
+}) %}
+  {{ mammogram_history_content(presenter, presented_mammograms, read_only=true) }}
+{% endcall %}
+
+{% call card({
+  "heading": "Symptoms"
+}) %}
+  {{ symptoms_content(presenter, read_only=true) }}
+{% endcall %}
+
+{% call card({
+  "heading": "Medical history"
+}) %}
+  {{ medical_history_content(presenter, read_only=true) }}
+{% endcall %}
+
+{% call card({
+  "heading": "Breast features"
+}) %}
+  {{ breast_features_content(presenter, read_only=true) }}
+{% endcall %}
+
+{% call card({
+  "heading": "Other information"
+}) %}
+  {{ other_information_content(presenter, read_only=true) }}
+{% endcall %}
+
+{% endblock %}

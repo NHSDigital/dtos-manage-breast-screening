@@ -26,7 +26,7 @@ class TestSecondaryNav:
             },
             {
                 "current": False,
-                "href": "#",
+                "href": f"/mammograms/{pk}/medical-information/",
                 "id": "medical_information",
                 "text": "Medical information",
             },
@@ -56,7 +56,7 @@ class TestSecondaryNav:
             },
             {
                 "current": False,
-                "href": "#",
+                "href": f"/mammograms/{pk}/medical-information/",
                 "id": "medical_information",
                 "text": "Medical information",
             },

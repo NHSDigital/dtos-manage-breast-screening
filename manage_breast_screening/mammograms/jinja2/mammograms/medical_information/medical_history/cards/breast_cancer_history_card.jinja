@@ -1,7 +1,7 @@
 {% from "components/nested-info-card/macro.jinja" import app_nested_info_card %}
 {% from "mammograms/medical_information/medical_history/cards/macros.jinja" import list_with_default, item_with_details, paragraph %}
 
-{% macro breast_cancer_history_card(breast_cancer_history) %}
+{% macro breast_cancer_history_card(breast_cancer_history, read_only=false) %}
   {% if breast_cancer_history %}
   <section>
   {% endif %}
@@ -20,7 +20,7 @@
               "classes": "nhsuk-link--no-visited-state",
             }
           ]
-        }
+        } if not read_only else none
       },
       "headingLevel": 4,
       "rows": [
