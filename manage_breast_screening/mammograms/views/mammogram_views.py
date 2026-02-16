@@ -211,6 +211,12 @@ def check_information(request, pk):
             "presented_medical_information": CheckMedicalInformationPresenter(
                 appointment
             ),
+            "appointment_cannot_proceed_href": reverse(
+                "mammograms:appointment_cannot_go_ahead",
+                kwargs={
+                    "pk": appointment.pk,
+                },
+            ),
         },
     )
 

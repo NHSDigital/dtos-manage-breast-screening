@@ -34,6 +34,11 @@
   {{ medical_information_card(presented_medical_information) }}
   {{ images_taken_card(presented_images) }}
   {{ appointment_details_card(presented_appointment) }}
+
+  <p>
+    <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ appointment_cannot_proceed_href }}">Appointment cannot proceed</a>
+  </p>
+
 {% endblock %}
 
 
