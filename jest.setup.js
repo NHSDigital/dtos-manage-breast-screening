@@ -10,6 +10,45 @@ Object.defineProperty(window, 'fetch', {
   value: jest.fn().mockResolvedValue(undefined)
 })
 
+/**
+ * Mock out SVG functionality that isn't implemented by JSDOM.
+ * These mocks are not remotely realistic, so don't depend on them
+ * for testing complex SVG interactions.
+ */
+Object.defineProperty(globalThis.SVGElement.prototype, 'getScreenCTM', {
+  configurable: true,
+  writable: true,
+  value: jest.fn().mockImplementation(() => ({
+    a: 1,
+    b: 0,
+    c: 0,
+    d: 1,
+    e: 0,
+    f: 0,
+    inverse: jest.fn().mockReturnThis(),
+    multiply: jest.fn().mockReturnThis(),
+    translate: jest.fn().mockReturnThis(),
+    scale: jest.fn().mockReturnThis(),
+    rotate: jest.fn().mockReturnThis()
+  }))
+})
+
+Object.defineProperty(globalThis.SVGElement.prototype, 'createSVGPoint', {
+  configurable: true,
+  writable: true,
+  value: jest.fn().mockImplementation(() => ({
+    x: 0,
+    y: 0,
+    matrixTransform: jest.fn().mockReturnThis
+  }))
+})
+
+Object.defineProperty(globalThis.SVGElement.prototype, 'isPointInFill', {
+  configurable: true,
+  writable: true,
+  value: jest.fn().mockImplementation(() => true)
+})
+
 beforeEach(() => {
   const stylesheet = document.createElement('style')
 
