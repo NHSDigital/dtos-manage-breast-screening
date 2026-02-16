@@ -117,6 +117,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
             choices=RepeatReason.choices,
             required=False,
             label="Why were repeats needed?",
+            hint="Select all that apply",
             label_classes="nhsuk-fieldset__legend--s",
             error_messages={"required": "Select why repeats were needed"},
         )
@@ -128,6 +129,7 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                 required=False,
                 label="How many were repeats?",
                 label_classes="nhsuk-label--s",
+                hint=f"Out of {additional_image_count} extra images",
                 classes="nhsuk-input--width-4",
                 min_value=1,
                 max_value=additional_image_count,

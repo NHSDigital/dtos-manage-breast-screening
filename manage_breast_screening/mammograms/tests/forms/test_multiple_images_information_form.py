@@ -252,6 +252,14 @@ class TestMultipleImagesInformationForm:
             assert series.repeat_reasons == []
             assert series.repeat_count is None
 
+        def test_repeat_count_hint_shows_extra_image_count(self):
+            study = StudyFactory()
+            SeriesFactory(study=study, lcc=True, count=4)
+
+            form = MultipleImagesInformationForm(instance=study)
+
+            assert form.fields["lcc_repeat_count"].hint == "Out of 3 extra images"
+
         def test_repeat_count_max_value_validation(self):
             study = StudyFactory()
             SeriesFactory(study=study, lmlo=True, count=4)
@@ -470,9 +478,7 @@ class TestMultipleImagesInformationForm:
     class TestAdditionalDetails:
         def test_initial_value_from_study(self):
             study = StudyFactory(additional_details="Existing notes")
-            SeriesFactory(
-                study=study, laterality="R", view_position="MLO", count=2
-            )
+            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
 
             form = MultipleImagesInformationForm(instance=study)
 
@@ -480,9 +486,7 @@ class TestMultipleImagesInformationForm:
 
         def test_saves_additional_details(self):
             study = StudyFactory(additional_details="")
-            SeriesFactory(
-                study=study, laterality="R", view_position="MLO", count=2
-            )
+            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
@@ -505,9 +509,7 @@ class TestMultipleImagesInformationForm:
 
         def test_blank_additional_details_is_valid(self):
             study = StudyFactory(additional_details="")
-            SeriesFactory(
-                study=study, laterality="R", view_position="MLO", count=2
-            )
+            SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
             fingerprint = get_fingerprint(study)
 
             form = MultipleImagesInformationForm(
