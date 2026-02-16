@@ -91,9 +91,9 @@ To set multi-line secrets in a key vault, do the following:
 For each environment, e.g. 'dev':
 
 1. Connect to [Azure virtual desktop](https://azure.microsoft.com/en-us/products/virtual-desktop). Ask the platform team for access with Administrator role.
-1. If not present, install the following software: terraform (version 1.7.0), git, make, jq.
+1. If not present, install the following software: terraform (version specified in `.tool-versions`), git, make, jq.
    - Run a Command prompt as administrator
-   - choco install terraform --version 1.7.0
+   - choco install terraform --version 1.14.0
    - choco install terraform git make jq
 1. Open git bash
 1. Clone the repository: `git clone https://github.com/NHSDigital/dtos-manage-breast-screening.git`

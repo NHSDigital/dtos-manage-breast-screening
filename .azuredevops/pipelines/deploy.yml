@@ -39,10 +39,15 @@ stages:
                     versionSpec: '3.x'
                     architecture: 'x64'
 
+                - bash: |
+                    TF_VERSION=$(grep "^terraform" .tool-versions | awk '{print $2}')
+                    echo "##vso[task.setvariable variable=TF_VERSION]$TF_VERSION"
+                  displayName: 'Get Terraform version from .tool-versions'
+
                 - task: TerraformInstaller@1
                   displayName: Install terraform
                   inputs:
-                    terraformVersion: 1.14.0
+                    terraformVersion: $(TF_VERSION)
 
                 - task: AzureCLI@2
                   displayName: Run terraform
