@@ -58,17 +58,22 @@ describe('Check in', () => {
       </table>
     `
 
-    checkInContainer = document.querySelector('[data-module="app-check-in"]')
+    checkInContainer = document.querySelector('div[data-module="app-check-in"]')
+
     startAppointmentContainer = document.querySelector(
-      '[data-module="app-start-appointment"]'
+      'div[data-module="app-start-appointment"]'
     )
+
     statusContainer = document.querySelector(
-      '[data-appointment-status-container="123"]'
+      'div[data-appointment-status-container="123"]'
     )
+
     form = checkInContainer.querySelector('form')
     button = getByRole(form, 'button', { name: 'Check in' })
-    currentStatus = statusContainer.querySelector('[data-hide-on-check-in]')
-    checkedInStatus = statusContainer.querySelector('[data-show-on-check-in]')
+    currentStatus = statusContainer.querySelector('span[data-hide-on-check-in]')
+    checkedInStatus = statusContainer.querySelector(
+      'span[data-show-on-check-in]'
+    )
 
     jest.spyOn(console, 'error').mockImplementation(() => {})
     jest.spyOn(console, 'warn').mockImplementation(() => {})

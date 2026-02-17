@@ -21,6 +21,10 @@ export default {
       terser({
         // Allow Terser to remove @preserve comments
         format: { comments: false },
+        mangle: {
+          keep_classnames: true,
+          keep_fnames: true
+        },
 
         // Include sources content from source maps to inspect
         // NHS.UK frontend and other dependencies' source code
@@ -34,15 +38,11 @@ export default {
     ]
   },
   plugins: [
-    // NHS.UK frontend uses commonjs, so we need to resolve and convert to ES modules
-    nodeResolve({
-      browser: true
-    }),
-    commonjs({
-      requireReturnsDefault: 'preferred',
-      defaultIsModuleExports: true
-    }),
-    babel({ babelHelpers: 'bundled' }) // must come after commonjs
+    nodeResolve(),
+    commonjs(),
+    babel({
+      babelHelpers: 'bundled'
+    })
   ]
 }
 

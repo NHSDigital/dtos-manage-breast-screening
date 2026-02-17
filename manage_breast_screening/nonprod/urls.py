@@ -7,5 +7,9 @@ urlpatterns = [
     path(
         "components/",
         TemplateView.as_view(template_name="nonprod/components.jinja"),
-    )
+    ),
+    path(
+        "breast-features/",
+        TemplateView.as_view(template_name="nonprod/breast-features-debug.jinja"),
+    ),
 ]

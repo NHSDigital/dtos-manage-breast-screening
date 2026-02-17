@@ -1,10 +1,16 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "strict": true,
-    "target": "ES2015"
+    "target": "ES2015",
+    "types": ["node", "typed-query-selector"]
   },
   "include": ["**/*.js"],
-  "exclude": ["**/*.test.js", "**/compiled/**", "**/staticfiles/**"]
+  "exclude": [
+    "**/*.test.js",
+    "**/compiled/**",
+    "**/staticfiles/**",
+    "**/breast-diagram/*.js"
+  ]
 }
