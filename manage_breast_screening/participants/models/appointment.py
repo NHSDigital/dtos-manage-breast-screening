@@ -7,6 +7,7 @@ from django.db.models import OuterRef, Prefetch, Subquery
 from statemachine import Event, StateMachine
 from statemachine.states import States
 
+from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.users.models import User
 
 from ...core.models import BaseModel
@@ -155,6 +156,15 @@ class Appointment(BaseModel):
                 return current_status
 
         return self.statuses.create(name=status_name, created_by=created_by)
+
+    def series(self):
+        """
+        Get the series associated with this appointment, if any.
+        """
+        try:
+            return self.study.series_set.all()
+        except Study.DoesNotExist:
+            return Series.objects.none()
 
 
 class AppointmentStatusNames(models.TextChoices):
