@@ -149,6 +149,7 @@ class SymptomPresenter:
                 "items": [
                     {
                         "text": "Change",
+                        "classes": "nhsuk-link--no-visited-state",
                         "visuallyHiddenText": self._symptom.symptom_type.name.lower(),
                         "href": reverse(
                             self.change_view(),
