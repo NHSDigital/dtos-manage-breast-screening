@@ -213,17 +213,8 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         )
 
         # For count > 2, add a separate reasons field for the SOME_REPEATS
-        # conditional panel to avoid duplicate DOM IDs
+        # conditional checkboxes to avoid duplicate DOM IDs
         if series.count > 2:
-            self.fields[some_repeats_reasons_field_name] = MultipleChoiceField(
-                choices=RepeatReason.choices,
-                required=False,
-                label="Why were repeats needed?",
-                hint="Select all that apply",
-                label_classes="nhsuk-fieldset__legend--s",
-                error_messages={"required": reasons_error_message},
-            )
-
             additional_image_count = series.count - 1
             self.fields[repeat_count_field_name] = IntegerField(
                 required=False,
@@ -239,6 +230,15 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
                     "max_value": f"Number of {series_name} repeats must be at most {additional_image_count}",
                     "invalid": f"Enter a valid number for {series_name} repeats",
                 },
+            )
+
+            self.fields[some_repeats_reasons_field_name] = MultipleChoiceField(
+                choices=RepeatReason.choices,
+                required=False,
+                label="Why were repeats needed?",
+                hint="Select all that apply",
+                label_classes="nhsuk-fieldset__legend--s",
+                error_messages={"required": reasons_error_message},
             )
 
             # Set up conditional requirement for repeat_count
