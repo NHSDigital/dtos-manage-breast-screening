@@ -21,6 +21,10 @@ export default {
       terser({
         // Allow Terser to remove @preserve comments
         format: { comments: false },
+        mangle: {
+          keep_classnames: true,
+          keep_fnames: true
+        },
 
         // Include sources content from source maps to inspect
         // NHS.UK frontend and other dependencies' source code
