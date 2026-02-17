@@ -719,7 +719,7 @@ class TestSpecialAppointmentPresenter:
             == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/"
         )
 
-    def test_reasons(self):
+    def test_reasons_subset(self):
         appointment_pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
         result = SpecialAppointmentPresenter(
             {
@@ -738,6 +738,100 @@ class TestSpecialAppointmentPresenter:
                 "details": None,
                 "label": "Social, emotional, and mental health",
                 "temporary": None,
+            },
+        ]
+
+    def test_reasons_all(self):
+        """
+        Order of reasons should be the same as the order in which they are defined in the SupportReasons enum
+        """
+        appointment_pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        result = SpecialAppointmentPresenter(
+            {
+                "OTHER": {
+                    "details": "Other support needs not listed",
+                    "temporary": False,
+                },
+                "VISION": {
+                    "details": "Requires assistance due to visual impairment",
+                    "temporary": True,
+                },
+                "HEARING": {
+                    "details": "Requires assistance due to hearing impairment",
+                    "temporary": False,
+                },
+                "LANGUAGE": {
+                    "details": "Requires interpreter or language support",
+                    "temporary": True,
+                },
+                "BREAST_IMPLANTS": {
+                    "details": "Has breast implants",
+                    "temporary": False,
+                },
+                "GENDER_IDENTITY": {
+                    "details": "Support related to gender identity",
+                    "temporary": False,
+                },
+                "MEDICAL_DEVICES": {
+                    "details": "Has implanted medical devices",
+                    "temporary": False,
+                },
+                "PHYSICAL_RESTRICTION": {
+                    "details": "Requires mobility assistance or has physical restrictions",
+                    "temporary": True,
+                },
+                "SOCIAL_EMOTIONAL_MENTAL_HEALTH": {
+                    "details": "Needs support for social, emotional, or mental health reasons",
+                    "temporary": True,
+                },
+            },
+            appointment_pk,
+        )
+        assert result.reasons == [
+            {
+                "label": "Breast implants",
+                "temporary": False,
+                "details": "Has breast implants",
+            },
+            {
+                "label": "Implanted medical devices",
+                "temporary": False,
+                "details": "Has implanted medical devices",
+            },
+            {
+                "label": "Vision",
+                "temporary": True,
+                "details": "Requires assistance due to visual impairment",
+            },
+            {
+                "label": "Hearing",
+                "temporary": False,
+                "details": "Requires assistance due to hearing impairment",
+            },
+            {
+                "label": "Physical restriction",
+                "temporary": True,
+                "details": "Requires mobility assistance or has physical restrictions",
+            },
+            {
+                "label": "Social, emotional, and mental health",
+                "temporary": True,
+                "details": "Needs support for social, emotional, or mental health reasons",
+            },
+            {
+                "label": "Language",
+                "temporary": True,
+                "details": "Requires interpreter or language support",
+            },
+            {
+                "label": "Gender identity",
+                "temporary": False,
+                "details": "Support related to gender identity",
+            },
+            {
+                "label": "Other",
+                "temporary": False,
+                "details": "Other support needs not listed",
             },
         ]
 

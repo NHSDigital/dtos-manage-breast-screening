@@ -275,15 +275,18 @@ class SpecialAppointmentPresenter:
 
     @cached_property
     def reasons(self):
+        order = [choice[0] for choice in SupportReasons.choices]
         result = []
-        for reason, reason_details in self._extra_needs.items():
-            result.append(
-                {
-                    "label": SupportReasons[reason].label,
-                    "temporary": reason_details.get("temporary"),
-                    "details": reason_details.get("details"),
-                }
-            )
+        for reason in order:
+            if reason in self._extra_needs:
+                reason_details = self._extra_needs[reason]
+                result.append(
+                    {
+                        "label": SupportReasons[reason].label,
+                        "temporary": reason_details.get("temporary"),
+                        "details": reason_details.get("details"),
+                    }
+                )
         return result
 
     @cached_property
