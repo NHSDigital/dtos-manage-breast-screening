@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "strict": true,
     "target": "ES2015",
     "types": ["node", "typed-query-selector"]
