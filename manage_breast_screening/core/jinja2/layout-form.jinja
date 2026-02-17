@@ -1,5 +1,6 @@
 {% extends 'layout-app.jinja' %}
 {% from 'django_form_helpers.jinja' import form_error_summary %}
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
 
 {% block page_content %}
 <div class="nhsuk-grid-row">
@@ -15,7 +16,7 @@
       {{ heading }}
     </h1>
 
-    <form action="{{request.path}}" method="POST" novalidate>
+    <form action="{{request.path}}" method="POST" novalidate {{ nhsukAttributes(form_attributes) }}>
       {{ csrf_input }}
 
       {% block form %}

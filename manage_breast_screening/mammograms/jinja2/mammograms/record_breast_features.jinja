@@ -1,0 +1,76 @@
+{% extends "layout-form.jinja" %}
+
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/input/macro.jinja" import input %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+
+{% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
+
+{% set form_attributes = {'data-module': 'app-breast-diagram'} %}
+
+{% block form %}
+  {{ form.features }}
+
+  {% if 'debug' in request.GET %}
+    {{ summaryList({
+      "card": {
+        "image": {
+          "html": app_breast_diagram(version=diagram_version)
+        }
+      },
+      "rows": [
+        {
+          "key": {
+            "text": "Image X"
+          },
+          "value": {
+            "text": "N/A",
+            "classes": "app-js-image-x"
+          }
+        },
+        {
+          "key": {
+            "text": "Image Y"
+          },
+          "value": {
+            "text": "N/A",
+            "classes": "app-js-image-y"
+          }
+        },
+        {
+          "key": {
+            "text": "Image region"
+          },
+          "value": {
+            "text": "N/A",
+            "classes": "app-js-image-region"
+          }
+        },
+        {
+          "key": {
+            "text": "Input values"
+          },
+          "value": {
+            "text": "N/A",
+            "classes": "app-js-image-input"
+          },
+          "classes": "nhsuk-summary-list__row--no-border"
+        }
+      ]
+    }) }}
+  {% else %}
+    {{ card({
+      "image": {
+        "html": app_breast_diagram(version=diagram_version)
+      }
+    }) }}
+  {% endif %}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Save"
+    }) }}
+  </div>
+{% endblock %}

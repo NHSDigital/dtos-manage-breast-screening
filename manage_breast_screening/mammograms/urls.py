@@ -1,7 +1,10 @@
 from django.urls import path
 from django.views.decorators.http import require_http_methods
 
-from manage_breast_screening.mammograms.views import mammogram_views
+from manage_breast_screening.mammograms.views import (
+    mammogram_views,
+    record_breast_features_view,
+)
 from manage_breast_screening.mammograms.views.other_information import (
     hormone_replacement_therapy_views,
     pregnancy_and_breastfeeding_views,
@@ -270,6 +273,11 @@ urlpatterns = [
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete/",
         other_procedure_history_item_views.DeleteOtherProcedureHistoryView.as_view(),
         name="delete_other_procedure_history_item",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/breast-features/",
+        record_breast_features_view.RecordBreastFeaturesView.as_view(),
+        name="record_breast_features",
     ),
     path(
         "<uuid:pk>/previous-mammograms/add",
