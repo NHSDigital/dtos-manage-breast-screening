@@ -72,6 +72,7 @@ class ParticipantPresenter:
                 "items": [
                     {
                         "href": change_url,
+                        "classes": "nhsuk-link--no-visited-state",
                         "text": "Change",
                         "visuallyHiddenText": "ethnicity",
                     }

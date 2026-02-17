@@ -152,6 +152,7 @@ class TestSymptomPresenter:
                 "items": [
                     {
                         "href": f"/mammograms/{symptom.appointment_id}/record-medical-information/lump/{symptom.id}/",
+                        "classes": "nhsuk-link--no-visited-state",
                         "text": "Change",
                         "visuallyHiddenText": "lump",
                     },

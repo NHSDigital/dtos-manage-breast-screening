@@ -123,6 +123,7 @@ class TestParticipantPresenter:
             "items": [
                 {
                     "href": f"/participants/{participant.pk}/edit-ethnicity?return_url=/return",
+                    "classes": "nhsuk-link--no-visited-state",
                     "text": "Change",
                     "visuallyHiddenText": "ethnicity",
                 },

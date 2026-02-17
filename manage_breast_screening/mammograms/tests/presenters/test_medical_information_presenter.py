@@ -50,6 +50,7 @@ class TestRecordMedicalInformationPresenter:
                     "items": [
                         {
                             "href": f"/mammograms/{appointment.id}/record-medical-information/lump/{symptom1.id}/",
+                            "classes": "nhsuk-link--no-visited-state",
                             "text": "Change",
                             "visuallyHiddenText": "lump",
                         },
@@ -67,6 +68,7 @@ class TestRecordMedicalInformationPresenter:
                     "items": [
                         {
                             "href": f"/mammograms/{appointment.id}/record-medical-information/swelling-or-shape-change/{symptom2.id}/",
+                            "classes": "nhsuk-link--no-visited-state",
                             "text": "Change",
                             "visuallyHiddenText": "swelling or shape change",
                         },
