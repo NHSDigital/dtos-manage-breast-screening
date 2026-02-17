@@ -16,16 +16,3 @@ class GatewayActionFactory(DjangoModelFactory):
     status = models.GatewayActionStatus.PENDING
     accession_number = Sequence(lambda n: f"ACC20240601{n:04d}")
     sent_at = None
-
-
-class RelayFactory(DjangoModelFactory):
-    class Meta:
-        model = models.Relay
-
-    namespace = Sequence(lambda n: f"myrelay{n}.servicebus.windows.net")
-    hybrid_connection_name = Sequence(lambda n: f"hybrid-connection-{n}")
-    key_name = "RootManageSharedAccessKey"
-    shared_access_key_variable_name = Sequence(lambda n: f"SHARED_ACCESS_KEY_{n}")
-    provider = SubFactory(
-        "manage_breast_screening.clinics.tests.factories.ProviderFactory"
-    )

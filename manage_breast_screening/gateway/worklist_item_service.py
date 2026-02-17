@@ -9,8 +9,8 @@ from django.db import IntegrityError
 from manage_breast_screening.dicom.models import Image
 from manage_breast_screening.participants.models import Appointment
 
-from .models import GatewayAction, GatewayActionStatus, GatewayActionType, Relay
-from .relay_service import RelayService
+from .models import GatewayAction, GatewayActionStatus, GatewayActionType
+from .service_bus_sender import ServiceBusSender
 
 logger = logging.getLogger(__name__)
 
@@ -112,15 +112,6 @@ class WorklistItemService:
 
     def _create_action(self) -> GatewayAction | None:
         """Create and persist the gateway action."""
-        relay = Relay.for_provider(self.appointment.provider)
-
-        if not relay:
-            logger.info(
-                "No relay found for provider %s, skipping create gateway action",
-                self.appointment.provider.name,
-            )
-            return None
-
         action_id = uuid.uuid4()
         accession_number = self._generate_accession_number()
         payload = self._build_payload(action_id, accession_number)
@@ -144,8 +135,10 @@ class WorklistItemService:
         )
 
         try:
-            RelayService().send_action(relay, action)
+            ServiceBusSender().send_action(action)
         except Exception as e:
-            logger.error(f"Failed to send gateway action {action_id} to relay: {e}")
+            logger.error(
+                f"Failed to send gateway action {action_id} to Service Bus: {e}"
+            )
 
         return action

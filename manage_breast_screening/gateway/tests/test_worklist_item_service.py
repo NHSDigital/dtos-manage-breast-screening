@@ -10,19 +10,16 @@ from manage_breast_screening.gateway.models import (
     GatewayActionStatus,
     GatewayActionType,
 )
-from manage_breast_screening.gateway.relay_service import RelayService
+from manage_breast_screening.gateway.service_bus_sender import ServiceBusSender
 from manage_breast_screening.gateway.worklist_item_service import WorklistItemService
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
-from .factories import RelayFactory
-
 
 @pytest.mark.django_db
-@patch.object(RelayService, "send_action")
+@patch.object(ServiceBusSender, "send_action")
 class TestWorklistItemService:
     def test_create_returns_gateway_action(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
@@ -35,7 +32,6 @@ class TestWorklistItemService:
     @time_machine.travel("2025-06-15 10:30:00", tick=False)
     def test_accession_number_format(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
@@ -43,23 +39,13 @@ class TestWorklistItemService:
 
     def test_send_action_is_called(self, mock_send_action):
         appointment = AppointmentFactory()
-        relay = RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
-        mock_send_action.assert_called_once_with(relay, action)
-
-    def test_no_relay_does_not_create_action(self, mock_send_action):
-        appointment = AppointmentFactory()
-
-        action = WorklistItemService.create(appointment)
-
-        assert action is None
-        mock_send_action.assert_not_called()
+        mock_send_action.assert_called_once_with(action)
 
     def test_payload_has_action_id(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
         participant = appointment.participant
@@ -73,7 +59,6 @@ class TestWorklistItemService:
 
     def test_payload_has_participant_name_in_dicom_format(self, _):
         appointment = AppointmentFactory(first_name="Jane", last_name="Smith")
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
@@ -84,7 +69,6 @@ class TestWorklistItemService:
         appointment = AppointmentFactory()
         appointment.participant.date_of_birth = date(1975, 3, 21)
         appointment.participant.save()
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
@@ -95,7 +79,6 @@ class TestWorklistItemService:
         appointment = AppointmentFactory()
         appointment.participant.gender = ""
         appointment.participant.save()
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
@@ -106,7 +89,6 @@ class TestWorklistItemService:
         appointment = AppointmentFactory(
             starts_at=datetime(2025, 7, 10, 14, 30, tzinfo=timezone.utc)
         )
-        RelayFactory(provider=appointment.provider)
 
         action = WorklistItemService.create(appointment)
 
