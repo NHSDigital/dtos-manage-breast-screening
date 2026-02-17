@@ -9,8 +9,8 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestMultipleImagesInformation(SystemTestCase):
-    LCC_LEGEND = "3 Left CC images were taken. Were the additional images repeats?"
-    RMLO_LEGEND = "2 Right MLO images were taken. Was the additional image a repeat?"
+    LCC_LEGEND = "3 LCC images were taken. Were the additional images repeats?"
+    RMLO_LEGEND = "2 RMLO images were taken. Was the additional image a repeat?"
 
     def test_multiple_images_information_flow(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -76,14 +76,14 @@ class TestMultipleImagesInformation(SystemTestCase):
 
     def then_i_should_see_lcc_validation_error(self):
         self.expect_validation_error(
-            error_text="Select whether the additional Left CC images were repeats",
+            error_text="Select whether the additional LCC images were repeats",
             field_label="Yes, all images were repeats",
             fieldset_legend=self.LCC_LEGEND,
         )
 
     def and_i_should_see_rmlo_validation_error(self):
         self.expect_validation_error(
-            error_text="Select whether the additional Right MLO images were repeats",
+            error_text="Select whether the additional RMLO image was a repeat",
             field_label="Yes, it was a repeat",
             fieldset_legend=self.RMLO_LEGEND,
         )
@@ -103,7 +103,10 @@ class TestMultipleImagesInformation(SystemTestCase):
     def fill_in_series(self, legend_text, repeat_type_label, reason_label):
         fieldset = self.get_fieldset_by_legend(legend_text)
         fieldset.get_by_label(repeat_type_label).check()
-        fieldset.get_by_label(reason_label).check()
+        visible_reasons = fieldset.locator(
+            ".nhsuk-radios__conditional:not(.nhsuk-radios__conditional--hidden)"
+        )
+        visible_reasons.get_by_label(reason_label).check()
 
     def then_i_should_be_on_the_check_information_page(self):
         path = reverse(

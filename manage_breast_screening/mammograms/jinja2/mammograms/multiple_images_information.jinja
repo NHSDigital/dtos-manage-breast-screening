@@ -8,15 +8,16 @@
   <p>You have indicated multiple images were needed for some views.</p>
 
   {% for series, fields in form.get_series_field_groups() %}
-    {% set reasons_html = form[fields.repeat_reasons].as_field_group() %}
+    {% set all_repeats_reasons_html = form[fields.all_repeats_reasons].as_field_group() %}
 
-    {% if fields.repeat_count %}
+    {% if fields.some_repeats_reasons %}
       {% set repeat_count_html = form[fields.repeat_count].as_field_group() %}
-      {% set some_repeats_html = repeat_count_html ~ reasons_html %}
-      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", reasons_html) %}
+      {% set some_repeats_reasons_html = form[fields.some_repeats_reasons].as_field_group() %}
+      {% set some_repeats_html = repeat_count_html ~ some_repeats_reasons_html %}
+      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", all_repeats_reasons_html) %}
       {% do form[fields.repeat_type].add_conditional_html("SOME_REPEATS", some_repeats_html) %}
     {% else %}
-      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", reasons_html) %}
+      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", all_repeats_reasons_html) %}
     {% endif %}
 
     {{ form[fields.repeat_type].as_field_group() }}
