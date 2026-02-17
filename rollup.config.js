@@ -34,15 +34,11 @@ export default {
     ]
   },
   plugins: [
-    // NHS.UK frontend uses commonjs, so we need to resolve and convert to ES modules
-    nodeResolve({
-      browser: true
-    }),
-    commonjs({
-      requireReturnsDefault: 'preferred',
-      defaultIsModuleExports: true
-    }),
-    babel({ babelHelpers: 'bundled' }) // must come after commonjs
+    nodeResolve(),
+    commonjs(),
+    babel({
+      babelHelpers: 'bundled'
+    })
   ]
 }
 
