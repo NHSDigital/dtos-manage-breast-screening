@@ -43,8 +43,8 @@ export class BreastDiagram extends Component {
       this.values = /** @type {BreastFeatureValue[]} */ (
         JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
       )
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      console.error(error)
 
       throw new ElementError({
         component: BreastDiagram,
