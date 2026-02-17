@@ -43,9 +43,14 @@ describe('Stepper input', () => {
         </div>
       </div>
     `
-    $root = document.querySelector(`[data-module="${StepperInput.moduleName}"]`)
+
+    $root = /** @type {HTMLElement} */ (
+      document.querySelector(`[data-module="${StepperInput.moduleName}"]`)
+    )
+
     $stepUpButton = getByLabelText(document.body, 'Increase').parentElement
     $stepDownButton = getByLabelText(document.body, 'Decrease').parentElement
+
     $input = getByRole($root, 'spinbutton', {
       name: 'Number of giraffes'
     })
@@ -82,13 +87,14 @@ describe('Stepper input', () => {
   it('announces the change after buttons are clicked', async () => {
     createAll(StepperInput)
 
-    /** @type {HTMLElement} */
-    const liveRegion = document.querySelector("[aria-live='polite']")
+    const $screenReaderStatusMessage = document.querySelector(
+      "div[aria-live='polite']"
+    )
 
     await user.click($stepUpButton)
-    expect(liveRegion.innerText).toBe('3')
+    expect($screenReaderStatusMessage.innerText).toBe('3')
     await user.click($stepDownButton)
-    expect(liveRegion.innerText).toBe('2')
+    expect($screenReaderStatusMessage.innerText).toBe('2')
   })
 
   it('assumes the min value when stepping down if the input is empty', async () => {
