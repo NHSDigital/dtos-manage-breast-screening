@@ -52,7 +52,7 @@ export class BreastDiagram extends Component {
       })
     }
 
-    const [$imageMap] = createAll(
+    const $imageMaps = createAll(
       ImageMap,
       {
         selectors: [
@@ -63,15 +63,14 @@ export class BreastDiagram extends Component {
       { scope: this.$root }
     )
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!$imageMap) {
+    if (!$imageMaps.length) {
       throw new ElementError({
         component: BreastDiagram,
         identifier: `Image map (\`[data-module="${ImageMap.moduleName}"]\`)`
       })
     }
 
-    this.$imageMap = $imageMap
+    this.$imageMap = $imageMaps[0]
     this.$imageMap.onUpdate = this.onUpdate.bind(this)
 
     // Render diagram features
