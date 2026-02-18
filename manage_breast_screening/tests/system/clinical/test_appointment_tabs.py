@@ -47,7 +47,7 @@ class TestAppointmentTabs(SystemTestCase):
         self.and_i_should_see_the_symptoms_section()
         self.and_i_should_see_the_medical_history_section()
         self.and_i_should_see_the_breast_features_placeholder()
-        self.and_i_should_see_the_other_information_placeholder()
+        self.and_i_should_see_the_other_information_section()
         self.and_the_message_says_in_progress_with_someone_else()
 
         self.when_i_change_to_the_appointment_details_tab()
@@ -259,12 +259,14 @@ class TestAppointmentTabs(SystemTestCase):
             "No breast features have been recorded for this participant."
         )
 
-    def and_i_should_see_the_other_information_placeholder(self):
+    def and_i_should_see_the_other_information_section(self):
         card = self.page.locator(".nhsuk-card", has_text="Other information")
         expect(card).to_be_visible()
-        expect(card).to_contain_text(
-            "No other information has been recorded for this participant."
+        row = card.locator(
+            ".nhsuk-summary-list__row", has_text="Hormone replacement therapy (HRT)"
         )
+        expect(row).to_contain_text("Not provided")
+
     def when_i_change_to_an_appointment_tab(self, tab_name):
         secondary_nav = self.page.locator(".app-secondary-navigation")
         expect(secondary_nav).to_be_visible()

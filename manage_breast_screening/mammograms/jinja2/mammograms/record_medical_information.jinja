@@ -68,7 +68,7 @@
   action_button_properties=presenter.review_action_button_properties(sections.OTHER_INFORMATION),
   csrf_input=csrf_input,
   ) %}
-  {{ other_information_content(presenter) }}
+  {{ other_information_content(presenter, read_only=false) }}
 {% endcall %}
 
 {{ complete_all_button }}

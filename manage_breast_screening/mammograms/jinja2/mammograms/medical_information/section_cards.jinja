@@ -9,6 +9,7 @@
 {% from "mammograms/medical_information/medical_history/cards/implanted_medical_device_history_card.jinja" import implanted_medical_device_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/other_procedure_history_card.jinja" import other_procedure_history_card %}
+{% from "mammograms/medical_information/other_information/cards/macros.jinja" import hormone_replacement_therapy_details %}
 
 {% macro mammogram_history_content(presented_medical_info, presented_mammograms, read_only=false) %}
   <p>The last confirmed mammogram and any added manually since then</p>
@@ -121,11 +122,34 @@
 {% endmacro %}
 
 {% macro other_information_content(presented_medical_info, read_only=false) %}
-  {% set insetHtml %}
-    <p>No other information has been recorded for this participant.</p>
-  {% endset %}
-  {{ insetText({
-    "html": insetHtml,
-    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+  <p>Including HRT, pregnancy, breastfeeding and mammographer notes</p>
+  {{ summaryList({
+    "rows": [
+      {
+        "key": {
+            "text": "Hormone replacement therapy (HRT)"
+        },
+        "value" : {
+            "html": hormone_replacement_therapy_details(presented_medical_info, read_only)
+        },
+        "actions": presented_medical_info.hormone_replacement_therapy_actions(read_only)
+      },
+      {
+        "key": {
+            "text": "Pregnancy and breastfeeding"
+        },
+        "value" : {
+            "html": "<a href='#'>Enter pregnancy and breastfeeding details</a>"
+        }
+      },
+      {
+        "key": {
+            "text": "Other medical information"
+        },
+        "value" : {
+            "html": "<a href='#'>Enter other medical information details</a>"
+        }
+      }
+    ]
   }) }}
 {% endmacro %}

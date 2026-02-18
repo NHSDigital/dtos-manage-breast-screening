@@ -73,6 +73,7 @@ class ChoiceField(forms.ChoiceField):
         visually_hidden_label_suffix=None,
         classes=None,
         choice_hints=None,
+        page_heading=False,
         **kwargs,
     ):
         kwargs["template_name"] = ChoiceField._template_name(
@@ -85,6 +86,7 @@ class ChoiceField(forms.ChoiceField):
         self.visually_hidden_label_prefix = visually_hidden_label_prefix
         self.visually_hidden_label_suffix = visually_hidden_label_suffix
         self.choice_hints = choice_hints or {}
+        self.page_heading = page_heading
 
         super().__init__(*args, **kwargs)
 

@@ -99,6 +99,10 @@ class MedicalInformationPresenter:
             for review in appointment.medical_information_reviews.all()
         }
 
+        self.hormone_replacement_therapy = getattr(
+            appointment, "hormone_replacement_therapy", None
+        )
+
     @property
     def symptom_rows(self):
         return [symptom.summary_list_row for symptom in self.symptoms]
@@ -347,3 +351,32 @@ class MedicalInformationPresenter:
                 "text": "Mark as reviewed",
                 "is_anchor": False,
             }
+
+    @property
+    def add_hormone_replacement_therapy_link(self):
+        return reverse(
+            "mammograms:add_hormone_replacement_therapy",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+    def hormone_replacement_therapy_actions(self, read_only=False):
+        return (
+            {
+                "items": [
+                    {
+                        "href": reverse(
+                            "mammograms:change_hormone_replacement_therapy",
+                            kwargs={
+                                "pk": self.appointment.pk,
+                                "hrt_pk": self.hormone_replacement_therapy.pk,
+                            },
+                        ),
+                        "text": "Change",
+                        "visuallyHiddenText": "hormone replacement therapy",
+                        "classes": "nhsuk-link--no-visited-state",
+                    },
+                ],
+            }
+            if self.hormone_replacement_therapy and not read_only
+            else None
+        )
