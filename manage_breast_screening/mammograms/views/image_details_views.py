@@ -30,10 +30,12 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
             {
                 "heading": "Provide image details",
                 "page_title": "Provide image details",
-                "back_link_params": reverse(
-                    "mammograms:take_images",
-                    kwargs={"pk": self.appointment_pk},
-                ),
+                "back_link_params": {
+                    "href": reverse(
+                        "mammograms:take_images",
+                        kwargs={"pk": self.appointment_pk},
+                    )
+                },
             }
         )
         return context

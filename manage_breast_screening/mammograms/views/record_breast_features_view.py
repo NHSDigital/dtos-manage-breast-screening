@@ -23,10 +23,12 @@ class RecordBreastFeaturesView(InProgressAppointmentMixin, FormView):
                 "heading": "Record breast features",
                 "page_title": "Record breast features",
                 "diagram_version": 1,
-                "back_link_params": reverse(
-                    "mammograms:record_medical_information",
-                    kwargs={"pk": self.appointment_pk},
-                ),
+                "back_link_params": {
+                    "href": reverse(
+                        "mammograms:record_medical_information",
+                        kwargs={"pk": self.appointment_pk},
+                    )
+                },
             }
         )
         return context
