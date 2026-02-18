@@ -114,6 +114,12 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
                 "presenter": MedicalInformationPresenter(self.appointment),
                 "presented_mammograms": presented_mammograms,
                 "sections": MedicalInformationSection,
+                "appointment_cannot_proceed_href": reverse(
+                    "mammograms:appointment_cannot_go_ahead",
+                    kwargs={
+                        "pk": self.appointment.pk,
+                    },
+                ),
             }
         )
 
