@@ -6,7 +6,7 @@ from .mixins import InProgressAppointmentMixin
 
 
 class RecordBreastFeaturesView(InProgressAppointmentMixin, FormView):
-    template_name = "mammograms/record_breast_features.jinja"
+    template_name = "mammograms/medical_information/breast_features/form.jinja"
 
     def get_form(self):
         if hasattr(self.appointment, "breast_features"):
