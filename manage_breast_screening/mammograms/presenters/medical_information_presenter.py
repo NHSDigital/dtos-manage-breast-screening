@@ -156,135 +156,77 @@ class MedicalInformationPresenter:
 
     @property
     def add_lump_button(self):
-        url = reverse("mammograms:add_symptom_lump", kwargs={"pk": self.appointment.pk})
-
-        return {"href": url, "text": "Lump"}
+        return self._subpage_button("mammograms:add_symptom_lump", "Lump")
 
     @property
     def add_swelling_or_shape_change_button(self):
-        url = reverse(
+        return self._subpage_button(
             "mammograms:add_symptom_swelling_or_shape_change",
-            kwargs={"pk": self.appointment.pk},
+            "Swelling or shape change",
         )
-
-        return {"href": url, "text": "Swelling or shape change"}
 
     @property
     def add_skin_change_button(self):
-        url = reverse(
-            "mammograms:add_symptom_skin_change",
-            kwargs={"pk": self.appointment.pk},
-        )
-
-        return {"href": url, "text": "Skin change"}
+        return self._subpage_button("mammograms:add_symptom_skin_change", "Skin change")
 
     @property
     def add_nipple_change_button(self):
-        url = reverse(
-            "mammograms:add_symptom_nipple_change",
-            kwargs={"pk": self.appointment.pk},
+        return self._subpage_button(
+            "mammograms:add_symptom_nipple_change", "Nipple change"
         )
-
-        return {"href": url, "text": "Nipple change"}
 
     @property
     def add_other_symptom_button(self):
-        url = reverse(
-            "mammograms:add_symptom_other",
-            kwargs={"pk": self.appointment.pk},
-        )
-
-        return {"href": url, "text": "Other"}
+        return self._subpage_button("mammograms:add_symptom_other", "Other")
 
     @property
     def add_breast_cancer_history_button(self):
-        url = reverse(
-            "mammograms:add_breast_cancer_history_item",
-            kwargs={"pk": self.appointment.pk},
+        return self._subpage_button(
+            "mammograms:add_breast_cancer_history_item", "Breast cancer"
         )
-
-        return {
-            "href": url,
-            "text": "Breast cancer",
-        }
 
     @property
     def add_implanted_medical_device_history_button(self):
-        url = reverse(
+        return self._subpage_button(
             "mammograms:add_implanted_medical_device_history_item",
-            kwargs={"pk": self.appointment.pk},
+            "Implanted medical device",
         )
-
-        return {
-            "href": url,
-            "text": "Implanted medical device",
-        }
 
     @property
     def add_cyst_history_button(self):
         if self.cyst_history:
             return None
 
-        url = reverse(
-            "mammograms:add_cyst_history_item",
-            kwargs={"pk": self.appointment.pk},
-        )
-
-        return {
-            "href": url,
-            "text": ("Cysts"),
-        }
+        return self._subpage_button("mammograms:add_cyst_history_item", "Cysts")
 
     @property
     def add_breast_augmentation_history_button(self):
         if self.breast_augmentation_history:
             return None
 
-        url = reverse(
+        return self._subpage_button(
             "mammograms:add_breast_augmentation_history_item",
-            kwargs={"pk": self.appointment.pk},
+            "Breast implants or augmentation",
         )
-
-        return {
-            "href": url,
-            "text": "Breast implants or augmentation",
-        }
 
     @property
     def add_benign_lump_history_button(self):
-        url = reverse(
-            "mammograms:add_benign_lump_history_item",
-            kwargs={"pk": self.appointment.pk},
+        return self._subpage_button(
+            "mammograms:add_benign_lump_history_item", "Benign lumps"
         )
-
-        return {
-            "href": url,
-            "text": "Benign lumps",
-        }
 
     @property
     def add_mastectomy_or_lumpectomy_history_button(self):
-        url = reverse(
+        return self._subpage_button(
             "mammograms:add_mastectomy_or_lumpectomy_history_item",
-            kwargs={"pk": self.appointment.pk},
+            "Mastectomy or lumpectomy",
         )
-
-        return {
-            "href": url,
-            "text": "Mastectomy or lumpectomy",
-        }
 
     @property
     def add_other_procedure_history_button(self):
-        url = reverse(
-            "mammograms:add_other_procedure_history_item",
-            kwargs={"pk": self.appointment.pk},
+        return self._subpage_button(
+            "mammograms:add_other_procedure_history_item", "Other procedures"
         )
-
-        return {
-            "href": url,
-            "text": "Other procedures",
-        }
 
     @property
     def medical_information_url(self):
@@ -294,16 +236,18 @@ class MedicalInformationPresenter:
 
     @property
     def add_mammogram_button(self):
-        url = (
-            reverse(
-                "mammograms:add_previous_mammogram",
-                kwargs={"pk": self.appointment.pk},
-            )
-            + "?return_url="
-            + quote(self.medical_information_url)
+        return self._subpage_button(
+            "mammograms:add_previous_mammogram",
+            "Add another mammogram",
+            include_return_url=True,
         )
 
-        return {"href": url, "text": "Add another mammogram"}
+    def _subpage_button(self, urlpattern, text, include_return_url=False):
+        url = reverse(urlpattern, kwargs={"pk": self.appointment.pk})
+        if include_return_url:
+            url += "?return_url=" + quote(self.medical_information_url)
+
+        return {"href": url, "text": text}
 
     def _present_items(self, items, presenter_class):
         items = list(items)
