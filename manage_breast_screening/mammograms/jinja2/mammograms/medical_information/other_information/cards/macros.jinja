@@ -18,7 +18,11 @@
 
 {% macro pregnancy_and_breastfeeding_details(presenter, read_only=false) %}
   {% if not presenter.pregnancy_and_breastfeeding %}
-    <a href="{{ presenter.add_pregnancy_and_breastfeeding_link }}">Enter pregnancy and breastfeeding details</a>
+    {% if read_only %}
+      Not provided
+    {% else %}
+      <a href="{{ presenter.add_pregnancy_and_breastfeeding_link }}">Enter pregnancy and breastfeeding details</a>
+    {% endif %}
   {% else %}
     {% if presenter.pregnancy_and_breastfeeding.pregnancy_status == 'YES' %}
       <p>Currently pregnant</p>
