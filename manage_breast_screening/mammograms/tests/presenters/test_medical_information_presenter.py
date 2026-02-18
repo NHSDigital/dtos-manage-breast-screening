@@ -4,6 +4,9 @@ from manage_breast_screening.mammograms.presenters.medical_information_presenter
     MedicalInformationPresenter,
 )
 from manage_breast_screening.participants.models import MedicalInformationSection
+from manage_breast_screening.participants.models.breast_features import (
+    BreastFeatureAnnotation,
+)
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
     HormoneReplacementTherapy,
 )
@@ -432,3 +435,24 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(appointment)
 
         assert not presenter.pregnancy_and_breastfeeding_actions()
+
+    def test_add_breast_features_button(self, in_progress_appointment):
+        presenter = MedicalInformationPresenter(in_progress_appointment)
+
+        assert presenter.add_or_update_breast_features_button == {
+            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/",
+            "text": "Add a feature",
+        }
+
+    def test_update_breast_features_button(self, in_progress_appointment):
+        in_progress_appointment.breast_features = BreastFeatureAnnotation(
+            appointment=in_progress_appointment,
+            annotations_json=[{"name": "abc", "id": "abc", "x": 1, "y": 1}],
+        )
+
+        presenter = MedicalInformationPresenter(in_progress_appointment)
+
+        assert presenter.add_or_update_breast_features_button == {
+            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/",
+            "text": "View or edit breast features",
+        }

@@ -2,6 +2,9 @@ from urllib.parse import quote
 
 from django.urls import reverse
 
+from manage_breast_screening.mammograms.presenters.breast_features_presenter import (
+    BreastFeaturesPresenter,
+)
 from manage_breast_screening.mammograms.presenters.medical_history.benign_lump_history_item_presenter import (
     BenignLumpHistoryItemPresenter,
 )
@@ -56,6 +59,11 @@ class MedicalInformationPresenter:
             "symptom_type__name", "reported_at"
         )
         self.symptoms = [SymptomPresenter(symptom) for symptom in symptoms]
+
+        breast_features = getattr(appointment, "breast_features", None)
+        self.breast_features = (
+            BreastFeaturesPresenter(breast_features) if breast_features else None
+        )
 
         self.breast_cancer_history = self._present_items(
             appointment.breast_cancer_history_items.all(),
@@ -239,6 +247,14 @@ class MedicalInformationPresenter:
         return self._subpage_button(
             "mammograms:add_previous_mammogram",
             "Add another mammogram",
+            include_return_url=True,
+        )
+
+    @property
+    def add_or_update_breast_features_button(self):
+        return self._subpage_button(
+            "mammograms:record_breast_features",
+            "View or edit breast features" if self.breast_features else "Add a feature",
             include_return_url=True,
         )
 
