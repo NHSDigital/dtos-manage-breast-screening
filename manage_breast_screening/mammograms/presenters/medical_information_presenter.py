@@ -255,7 +255,6 @@ class MedicalInformationPresenter:
         return self._subpage_button(
             "mammograms:record_breast_features",
             "View or edit breast features" if self.breast_features else "Add a feature",
-            include_return_url=True,
         )
 
     def _subpage_button(self, urlpattern, text, include_return_url=False):
