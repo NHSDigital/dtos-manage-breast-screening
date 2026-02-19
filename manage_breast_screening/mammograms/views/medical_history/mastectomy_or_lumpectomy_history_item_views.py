@@ -10,9 +10,6 @@ from manage_breast_screening.core.views.generic import (
 from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
     MedicalInformationPresenter,
 )
-from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
-    MastectomyOrLumpectomyHistoryItem,
-)
 
 from ...forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
     MastectomyOrLumpectomyHistoryItemForm,
@@ -54,12 +51,14 @@ class UpdateMastectomyOrLumpectomyHistoryView(
 
     def get_object(self):
         try:
-            return MastectomyOrLumpectomyHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+            return self.appointment.mastectomy_or_lumpectomy_history_items.get(
+                pk=self.kwargs["history_item_pk"]
             )
-        except MastectomyOrLumpectomyHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+        except AttributeError:
+            logger.exception(
+                "MastectomyOrLumpectomyHistoryItem does not exist for kwargs=%s",
+                self.kwargs,
+            )
             return None
 
     def get_context_data(self, **kwargs):

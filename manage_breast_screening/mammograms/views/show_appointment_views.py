@@ -87,8 +87,7 @@ class MedicalInformation(AppointmentTabMixin, View):
             reported_mammograms=reported_mammograms,
             last_confirmed_mammogram=last_confirmed_mammogram,
             appointment_pk=self.appointment.pk,
-            current_url=self.request.path,
-        )
+
 
         context = {
             "heading": appointment_presenter.participant.full_name,
