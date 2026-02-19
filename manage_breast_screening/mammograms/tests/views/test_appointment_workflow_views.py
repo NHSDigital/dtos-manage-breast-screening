@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+import django
 import pytest
 import statemachine
 from django.urls import reverse
@@ -752,3 +753,140 @@ class TestMarkSectionReviewed:
             response,
             "This section has already been reviewed by Jane Doe",
         )
+
+
+@pytest.mark.django_db
+class TestPauseAppointment:
+    @pytest.fixture
+    def in_progress_appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.IN_PROGRESS,
+                "created_by": clinical_user_client.user,
+            },
+        )
+
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:pause_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+        assertInHTML(
+            f"""
+            <h1 class="nhsuk-heading-l">
+                <span class="nhsuk-caption-l">
+                    {in_progress_appointment.participant.full_name}
+                </span>
+                Pause this appointment
+            </h1>
+            """,
+            response.text,
+        )
+
+    def test_can_pause_when_in_progress_with_user(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        """
+        A user should be able to pause an in progress appointment when it's in progress with them.
+        """
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:pause_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "clinics:show",
+                kwargs={"pk": in_progress_appointment.clinic_slot.clinic.pk},
+            ),
+        )
+
+        in_progress_appointment.refresh_from_db()
+        assert (
+            in_progress_appointment.current_status.name == AppointmentStatusNames.PAUSED
+        )
+        assert (
+            in_progress_appointment.current_status.created_by
+            == clinical_user_client.user
+        )
+
+    def test_cannot_pause_when_not_in_progress(self, clinical_user_client):
+        """
+        A user should not be able to pause an in progress appointment when it's not in progress.
+        """
+        screened_appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.SCREENED,
+                "created_by": clinical_user_client.user,
+            },
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:pause_appointment",
+                kwargs={"pk": screened_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment", kwargs={"pk": screened_appointment.pk}
+            ),
+        )
+
+        screened_appointment.refresh_from_db()
+        assert (
+            screened_appointment.current_status.name == AppointmentStatusNames.SCREENED
+        )
+        assert (
+            screened_appointment.current_status.created_by == clinical_user_client.user
+        )
+
+    def test_cannot_pause_when_in_progress_with_different_user(
+        self, clinical_user_client
+    ):
+        """
+        A user should not be able to pause an in progress appointment when it's in progress with a different user.
+        """
+        different_user = UserFactory.create(nhs_uid="different_user")
+        in_progress_appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.IN_PROGRESS,
+                "created_by": different_user,
+            },
+        )
+
+        with pytest.raises(
+            django.core.exceptions.ValidationError,
+            match="Can't pause when not in progress with the user",
+        ):
+            clinical_user_client.http.post(
+                reverse(
+                    "mammograms:pause_appointment",
+                    kwargs={"pk": in_progress_appointment.pk},
+                )
+            )
+
+        in_progress_appointment.refresh_from_db()
+        assert (
+            in_progress_appointment.current_status.name
+            == AppointmentStatusNames.IN_PROGRESS
+        )
+        assert in_progress_appointment.current_status.created_by == different_user
+
+    def test_user_not_permitted(
+        self, administrative_user_client, in_progress_appointment
+    ):
+        url = reverse(
+            "mammograms:pause_appointment", kwargs={"pk": in_progress_appointment.pk}
+        )
+        assert administrative_user_client.http.get(url).status_code == 403
+        assert administrative_user_client.http.post(url).status_code == 403

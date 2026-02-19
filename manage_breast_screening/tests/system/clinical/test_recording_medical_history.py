@@ -1,3 +1,4 @@
+import re
 from datetime import date
 
 import time_machine
@@ -40,6 +41,12 @@ class TestRecordingMedicalInformation(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_device_is_listed()
         self.and_the_message_says_device_added()
+
+        self.when_i_select_pause_appointment()
+        self.then_i_should_be_on_the_pause_appointment_page()
+
+        self.when_i_click_confirm()
+        self.then_i_should_be_on_the_clinic_page()
 
     def test_changing_medical_history(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -359,3 +366,24 @@ class TestRecordingMedicalInformation(SystemTestCase):
         expect(
             self.page.get_by_text("No medical history has been added yet.")
         ).to_be_attached()
+
+    def when_i_select_pause_appointment(self):
+        self.page.get_by_text("Pause appointment").click()
+
+    def then_i_should_be_on_the_pause_appointment_page(self):
+        path = reverse(
+            "mammograms:pause_appointment",
+            kwargs={"pk": self.appointment.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Pause this appointment")
+
+    def when_i_click_confirm(self):
+        self.page.get_by_role("button").filter(has_text="Confirm").click()
+
+    def then_i_should_be_on_the_clinic_page(self):
+        path = reverse(
+            "clinics:show",
+            kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))

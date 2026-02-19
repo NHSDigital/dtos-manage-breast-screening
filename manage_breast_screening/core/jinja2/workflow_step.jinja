@@ -13,13 +13,6 @@
   }) }}
 {% endblock %}
 
-{% block beforeContent %}
-{# Using javascript temporarily - this should be replaced with proper URLs #}
-{{ backLink({
-  "href": "javascript:history.back()",
-}) }}
-{% endblock beforeContent %}
-
 {% block content %}
 <div class="app-workflow-container">
   <div class="nhsuk-grid-row app-workflow-container__row">

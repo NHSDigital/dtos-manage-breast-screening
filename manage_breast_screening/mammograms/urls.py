@@ -50,6 +50,11 @@ urlpatterns = [
         name="start_appointment",
     ),
     path(
+        "<uuid:pk>/pause-appointment/",
+        appointment_workflow_views.PauseAppointment.as_view(),
+        name="pause_appointment",
+    ),
+    path(
         "<uuid:pk>/resume-appointment/",
         appointment_workflow_views.resume_appointment,
         name="resume_appointment",

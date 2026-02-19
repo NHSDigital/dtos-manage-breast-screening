@@ -3,7 +3,9 @@ import time
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.core.exceptions import ValidationError
 from django.db import DatabaseError, IntegrityError, transaction
+from django.forms import Form
 from django.http import Http404, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
@@ -37,7 +39,10 @@ from manage_breast_screening.participants.models.appointment import (
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
-from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
+from ..forms import (
+    AppointmentCannotGoAheadForm,
+    RecordMedicalInformationForm,
+)
 from ..presenters import LastKnownMammogramPresenter
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
 from .mixins import InProgressAppointmentMixin
@@ -296,6 +301,47 @@ def resume_appointment(request, pk):
             next_step = "mammograms:record_medical_information"
 
     return redirect(next_step, pk=pk)
+
+
+class PauseAppointment(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/pause_appointment.jinja"
+    form_class = Form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        provider = self.request.user.current_provider
+        participant = provider.participants.get(
+            screeningepisode__appointment__pk=self.appointment.pk
+        )
+        context.update(
+            {
+                "heading": "Pause this appointment",
+                "caption": participant.full_name,
+                "page_title": "Pause this appointment",
+            }
+        )
+        return context
+
+    def form_valid(self, form):
+        try:
+            provider = self.request.user.current_provider
+            appointment = provider.appointments.get(pk=self.appointment.pk)
+        except Appointment.DoesNotExist:
+            raise Http404("Appointment not found")
+
+        if not appointment.current_status.is_in_progress_with(self.request.user):
+            raise ValidationError("Can't pause when not in progress with the user")
+
+        AppointmentStatusUpdater(
+            appointment=appointment, current_user=self.request.user
+        ).pause()
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            "clinics:show", kwargs={"pk": self.appointment.clinic_slot.clinic.pk}
+        )
 
 
 class MarkSectionReviewed(InProgressAppointmentMixin, View):
