@@ -1,13 +1,33 @@
-from django.forms import Form, HiddenInput, JSONField
+from logging import getLogger
+
+import jsonschema
+from django.forms import Form, HiddenInput, JSONField, ValidationError
 
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.participants.models.breast_features import (
     BreastFeatureAnnotation,
 )
 
+logger = getLogger(__name__)
+
 
 class BreastFeatureForm(Form):
     VERSION = 1
+    SCHEMA = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "id": {"type": "string"},
+                "name": {"type": "string"},
+                "x": {"type": "number"},
+                "y": {"type": "number"},
+            },
+            "required": ["id", "name", "x", "y"],
+            "additionalProperties": False,
+        },
+    }
 
     features = JSONField(
         widget=HiddenInput,
@@ -22,6 +42,20 @@ class BreastFeatureForm(Form):
     def __init__(self, *args, appointment, **kwargs):
         self.appointment = appointment
         super().__init__(*args, **kwargs)
+
+    def clean_features(self):
+        data = self.cleaned_data["features"]
+
+        try:
+            jsonschema.validate(data, self.SCHEMA)
+        except jsonschema.ValidationError as error:
+            logger.exception(f"features JSON is not valid: {error.message}")
+            raise ValidationError(
+                message=self.fields["features"].error_messages["invalid"],
+                code="invalid",
+            )
+
+        return data
 
 
 class CreateBreastFeatureForm(BreastFeatureForm):

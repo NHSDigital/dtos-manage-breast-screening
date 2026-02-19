@@ -16,7 +16,7 @@ from manage_breast_screening.participants.models.breast_features import (
 @pytest.mark.django_db
 class TestCreateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
-        json_obj = [{"arbitrary": "json"}]
+        json_obj = [{"id": "abc", "name": "def", "x": 1, "y": 2}]
         form = CreateBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -35,13 +35,13 @@ class TestCreateBreastFeatureForm:
         assert instance.appointment == in_progress_appointment
         assert instance.annotations_json == json_obj
 
-    def test_intiial(self, in_progress_appointment):
+    def test_intitial(self, in_progress_appointment):
         form = CreateBreastFeatureForm(
             appointment=in_progress_appointment,
         )
         assert form["features"].initial == []
 
-    def test_invalid_json(self, in_progress_appointment):
+    def test_malformed_json(self, in_progress_appointment):
         form = CreateBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -59,15 +59,34 @@ class TestCreateBreastFeatureForm:
             "features": ["There was a problem saving the annotations"]
         }
 
+    def test_invalid_json(self, in_progress_appointment):
+        form = CreateBreastFeatureForm(
+            QueryDict(
+                urlencode(
+                    {
+                        "features": '[{"name": "abc"}]',
+                    },
+                    doseq=True,
+                )
+            ),
+            appointment=in_progress_appointment,
+        )
+
+        assert not form.is_valid()
+        assert form.errors == {
+            "features": ["There was a problem saving the annotations"]
+        }
+
 
 @pytest.mark.django_db
 class TestUpdateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
         BreastFeatureAnnotation.objects.create(
-            annotations_json=[{"existing": "data"}], appointment=in_progress_appointment
+            annotations_json=[{"id": "existing", "name": "features", "x": 0, "y": 0}],
+            appointment=in_progress_appointment,
         )
 
-        json_obj = [{"arbitrary": "json"}]
+        json_obj = [{"id": "abc", "name": "def", "x": 1, "y": 2}]
         form = UpdateBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -87,10 +106,12 @@ class TestUpdateBreastFeatureForm:
         assert instance.annotations_json == json_obj
 
     def test_populates_initial_data(self, in_progress_appointment):
+        initial_features = [{"id": "abc", "name": "def", "x": 1, "y": 2}]
         BreastFeatureAnnotation.objects.create(
-            annotations_json={"existing": "data"}, appointment=in_progress_appointment
+            annotations_json=initial_features,
+            appointment=in_progress_appointment,
         )
         form = UpdateBreastFeatureForm(
             appointment=in_progress_appointment,
         )
-        assert form["features"].initial == {"existing": "data"}
+        assert form["features"].initial == initial_features
