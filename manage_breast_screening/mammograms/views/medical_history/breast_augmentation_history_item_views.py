@@ -8,9 +8,6 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
-    BreastAugmentationHistoryItem,
-)
 
 from ...forms.medical_history.breast_augmentation_history_item_form import (
     BreastAugmentationHistoryItemForm,
@@ -53,12 +50,14 @@ class UpdateBreastAugmentationHistoryView(MedicalInformationMixin, UpdateWithAud
 
     def get_object(self):
         try:
-            return BreastAugmentationHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+            return self.appointment.breast_augmentation_history_items.get(
+                pk=self.kwargs["history_item_pk"]
             )
-        except BreastAugmentationHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+        except AttributeError:
+            logger.exception(
+                "BreastAugmentationHistoryItem does not exist for kwargs=%s",
+                self.kwargs,
+            )
             return None
 
     def get_delete_url(self):

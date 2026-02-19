@@ -4,7 +4,6 @@ from django.views import View
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesTakenPresenter,
 )
-from manage_breast_screening.participants.models import ParticipantReportedMammogram
 
 from ..presenters import (
     AppointmentPresenter,
@@ -23,9 +22,7 @@ class ShowAppointment(AppointmentTabMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
+        last_known_mammograms = appointment.reported_mammograms.order_by("-created_at")
         appointment_presenter = AppointmentPresenter(
             appointment, tab_description="Appointment details"
         )
@@ -60,9 +57,7 @@ class ShowAppointment(AppointmentTabMixin, View):
 class ParticipantDetails(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
+        last_known_mammograms = appointment.reported_mammograms.order_by("-created_at")
         appointment_presenter = AppointmentPresenter(appointment)
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
             last_known_mammograms,
@@ -95,9 +90,7 @@ class MedicalInformation(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
+        last_known_mammograms = appointment.reported_mammograms.order_by("-created_at")
         last_known_mammogram_presenter = LastKnownMammogramPresenter(
             last_known_mammograms,
             appointment_pk=appointment.pk,

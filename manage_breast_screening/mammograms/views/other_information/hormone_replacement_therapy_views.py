@@ -47,12 +47,10 @@ class UpdateHormoneReplacementTherapyView(MedicalInformationMixin, UpdateWithAud
 
     def get_object(self):
         try:
-            appointment = self.appointment
-            return appointment.hormone_replacement_therapy
+            return self.appointment.hormone_replacement_therapy
         except AttributeError:
             logger.exception(
-                "HormoneReplacementTherapy does not exist for appointment pk=%s",
-                appointment.pk,
+                "HormoneReplacementTherapy does not exist for kwargs=%s", self.kwargs
             )
             return None
 

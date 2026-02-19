@@ -12,13 +12,6 @@ REPO_ROOT = Path(__file__).parent.parent
 ALLOWLISTED_MODELS = (
     "User",
     "Provider",
-    "BenignLumpHistoryItem",  # Temporarily allowed
-    "BreastAugmentationHistoryItem",  # Temporarily allowed
-    "CystHistoryItem",  # Temporarily allowed
-    "ImplantedMedicalDeviceHistoryItem",  # Temporarily allowed
-    "MastectomyOrLumpectomyHistoryItem",  # Temporarily allowed
-    "OtherProcedureHistoryItem",  # Temporarily allowed
-    "ParticipantReportedMammogram",  # Temporarily allowed
 )
 
 TARGETS = {

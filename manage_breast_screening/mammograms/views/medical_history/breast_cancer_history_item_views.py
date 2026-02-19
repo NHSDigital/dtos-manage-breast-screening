@@ -45,11 +45,12 @@ class UpdateBreastCancerHistoryView(MedicalInformationMixin, UpdateWithAuditView
     def get_object(self):
         try:
             return self.appointment.breast_cancer_history_items.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+                pk=self.kwargs["history_item_pk"]
             )
         except BreastCancerHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+            logger.exception(
+                "BreastCancerHistoryItem does not exist for kwargs=%s", self.kwargs
+            )
             return None
 
     def get_delete_url(self):
