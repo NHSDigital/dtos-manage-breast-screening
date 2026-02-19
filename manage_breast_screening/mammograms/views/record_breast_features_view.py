@@ -21,6 +21,7 @@ class RecordBreastFeaturesView(InProgressAppointmentMixin, FormView):
         context.update(
             {
                 "heading": "Record breast features",
+                "caption": self.participant.full_name,
                 "page_title": "Record breast features",
                 "diagram_version": 1,
                 "back_link_params": {
@@ -29,6 +30,10 @@ class RecordBreastFeaturesView(InProgressAppointmentMixin, FormView):
                         kwargs={"pk": self.appointment_pk},
                     )
                 },
+                "cannot_proceed_url": reverse(
+                    "mammograms:appointment_cannot_go_ahead",
+                    kwargs={"pk": self.appointment_pk},
+                ),
             }
         )
         return context

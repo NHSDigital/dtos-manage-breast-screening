@@ -1,76 +1,118 @@
-{% extends "layout-form.jinja" %}
+{% extends "layout-app.jinja" %}
 
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/input/macro.jinja" import input %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+{% from 'django_form_helpers.jinja' import form_error_summary %}
 
 {% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
 {% set form_attributes = {'data-module': 'app-breast-diagram'} %}
 
-{% block form %}
-  {{ form.features }}
+{% block page_content %}
+<div class="nhsuk-u-reading-width">
+    {{ form_error_summary(form) }}
 
-  {% if 'debug' in request.GET %}
-    {{ summaryList({
-      "card": {
-        "image": {
-          "html": app_breast_diagram(version=diagram_version)
-        }
-      },
-      "rows": [
-        {
-          "key": {
-            "text": "Image X"
-          },
-          "value": {
-            "text": "N/A",
-            "classes": "app-js-image-x"
-          }
-        },
-        {
-          "key": {
-            "text": "Image Y"
-          },
-          "value": {
-            "text": "N/A",
-            "classes": "app-js-image-y"
-          }
-        },
-        {
-          "key": {
-            "text": "Image region"
-          },
-          "value": {
-            "text": "N/A",
-            "classes": "app-js-image-region"
-          }
-        },
-        {
-          "key": {
-            "text": "Input values"
-          },
-          "value": {
-            "text": "N/A",
-            "classes": "app-js-image-input"
-          },
-          "classes": "nhsuk-summary-list__row--no-border"
-        }
-      ]
-    }) }}
-  {% else %}
-    {{ card({
-      "image": {
-        "html": app_breast_diagram(version=diagram_version)
-      }
-    }) }}
-  {% endif %}
+    <h1 class="nhsuk-heading-l">
+      {% if caption %}
+      <span class="nhsuk-caption-l">
+        {{ caption }}
+      </span>
+      {% endif %}
+      {{ heading }}
+    </h1>
 
-  <div class="nhsuk-button-group">
-    {{ button({
-      "text": "Save"
-    }) }}
-  </div>
+    <form action="{{ request.path }}" method="post" novalidate {{ nhsukAttributes(form_attributes) }}>
+      {{ csrf_input }}
+
+      <p class="nhsuk-body" id="breast-diagram-description">
+        Click the diagram to add notable features such as scars, moles, or warts that image readers may need to be aware of. These could be observed by you or reported by the participant.
+      </p>
+
+      <div class="breast-features-diagram-header">
+          <h2 class="nhsuk-heading-m">Where is the feature?</h2>
+      </div>
+
+      {% set diagram_html = app_breast_diagram(
+        version=diagram_version,
+        attributes={
+          'aria-labeled-by': 'breast-diagram-description'
+        }
+      ) %}
+
+      {{ form.features }}
+
+      {% if 'debug' in request.GET %}
+        {{ summaryList({
+          "card": {
+            "image": {
+              "html": diagram_html
+            }
+          },
+          "rows": [
+            {
+              "key": {
+                "text": "Image X"
+              },
+              "value": {
+                "text": "N/A",
+                "classes": "app-js-image-x"
+              }
+            },
+            {
+              "key": {
+                "text": "Image Y"
+              },
+              "value": {
+                "text": "N/A",
+                "classes": "app-js-image-y"
+              }
+            },
+            {
+              "key": {
+                "text": "Image region"
+              },
+              "value": {
+                "text": "N/A",
+                "classes": "app-js-image-region"
+              }
+            },
+            {
+              "key": {
+                "text": "Input values"
+              },
+              "value": {
+                "text": "N/A",
+                "classes": "app-js-image-input"
+              },
+              "classes": "nhsuk-summary-list__row--no-border"
+            }
+          ]
+        }) }}
+      {% else %}
+        {{ card({
+          "image": {
+            "html": diagram_html
+          },
+          "classes": "nhsuk-u-margin-bottom-6"
+        }) }}
+      {% endif %}
+
+
+
+      <div class="nhsuk-button-group">
+        {{ button({
+          "text": "Save"
+        }) }}
+      </div>
+
+      <p>
+        <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ cannot_proceed_url }}">
+          Save and stop appointment because it cannot proceed
+        </a>
+      </p>
+    </form>
+</div>
 {% endblock %}

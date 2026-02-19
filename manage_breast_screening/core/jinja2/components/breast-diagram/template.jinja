@@ -1,8 +1,7 @@
-<figure class="nhsuk-image nhsuk-u-width-full" data-module="app-image-map">
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
+
+<figure class="nhsuk-image nhsuk-u-width-full" data-module="app-image-map" {{ nhsukAttributes(attributes) }}>
 {% if version == 1 %}
 {% include "components/breast-diagram/v1.svg" %}
 {% endif %}
-  <figcaption class="nhsuk-image__caption">
-    Click on the diagram to select a location
-  </figcaption>
 </figure>

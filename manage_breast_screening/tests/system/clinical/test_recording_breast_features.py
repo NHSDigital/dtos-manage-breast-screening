@@ -95,7 +95,7 @@ class TestRecordingBreastFeatures(SystemTestCase):
         )
 
     def and_i_save_the_form(self):
-        self.page.get_by_text("Save").click()
+        self.page.get_by_role("button").filter(has_text="Save").click()
 
     when_i_save_the_form = and_i_save_the_form
 
