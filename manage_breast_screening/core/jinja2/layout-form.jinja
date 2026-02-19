@@ -16,7 +16,7 @@
       {{ heading }}
     </h1>
 
-    <form action="{{request.path}}" method="POST" novalidate {{ nhsukAttributes(form_attributes) }}>
+    <form action="{{ request.path }}" method="post" novalidate {{ nhsukAttributes(form_attributes) }}>
       {{ csrf_input }}
 
       {% block form %}
