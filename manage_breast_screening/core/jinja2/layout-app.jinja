@@ -24,6 +24,11 @@
     "navigation": {
       "items": [
         {
+          "href": url('mammograms:pause_appointment', kwargs={'pk': presented_appointment.pk}),
+          "text": "Pause appointment",
+        },
+      ] if presented_appointment.status_bar and presented_appointment.status_bar.show_status_bar_for(request.user) else [
+        {
           "href": "/",
           "text": "Home",
           "current": true if navActive == "home"

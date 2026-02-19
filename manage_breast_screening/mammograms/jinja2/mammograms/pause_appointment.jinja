@@ -1,0 +1,19 @@
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+
+{% block beforeContent %}
+{{ backLink({
+  "href": "javascript:history.back()",
+}) }}
+{% endblock beforeContent %}
+
+{% block form %}
+  <p>It can be resumed from the appointment or clinic screen.</p>
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Confirm"
+    }) }}
+  </div>
+{% endblock %}
+
