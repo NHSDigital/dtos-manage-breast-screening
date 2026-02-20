@@ -120,7 +120,8 @@ def jwks(request):
         jwk_dict["alg"] = "RS512"
         return JsonResponse({"keys": [jwk_dict]})
     except Exception:
-        return JsonResponse({"keys": []})
+        logger.exception("Failed to build JWKS response")
+        return JsonResponse({"keys": []}, status=500)
 
 
 @current_provider_exempt
