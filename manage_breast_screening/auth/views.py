@@ -1,6 +1,8 @@
 import logging
 
+from authlib.integrations.base_client.errors import MismatchingStateError, OAuthError
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
@@ -65,7 +67,16 @@ def cis2_login(request):
 def cis2_callback(request):
     """Handle CIS2 OAuth2/OIDC callback, create/login the Django user, then redirect home."""
     client = get_cis2_client()
-    token = client.authorize_access_token(request)
+    try:
+        token = client.authorize_access_token(request)
+    except MismatchingStateError:
+        logger.exception("CIS2 callback failed: OAuth state mismatch")
+        messages.warning(request, "Your login session expired. Please try again.")
+        return redirect(reverse("auth:login"))
+    except OAuthError:
+        logger.exception("CIS2 callback failed: OAuth error")
+        messages.warning(request, "There was a problem logging in. Please try again.")
+        return redirect(reverse("auth:login"))
 
     id_token_userinfo = token.get("userinfo")
     userinfo = client.userinfo(token=token)
@@ -120,7 +131,8 @@ def jwks(request):
         jwk_dict["alg"] = "RS512"
         return JsonResponse({"keys": [jwk_dict]})
     except Exception:
-        return JsonResponse({"keys": []})
+        logger.exception("Failed to build JWKS response")
+        return JsonResponse({"keys": []}, status=500)
 
 
 @current_provider_exempt
