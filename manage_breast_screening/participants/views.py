@@ -1,3 +1,4 @@
+import json
 from logging import getLogger
 
 from django.http import Http404
@@ -6,6 +7,9 @@ from django.urls import reverse
 
 from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
+)
+from manage_breast_screening.participants.services import (
+    convert_bss_batch_to_participants,
 )
 
 from ..participants.models import Appointment
@@ -30,6 +34,22 @@ def show(request, pk):
         return redirect(reverse("clinics:list_clinics"))
 
     return redirect("mammograms:participant_details", pk=appointment_id)
+
+
+def index(request):
+    participants = Participant.objects.filter(first_name__icontains="bss").order_by(
+        "first_name"
+    )
+    new_participants_count = 3
+    return render(
+        request,
+        "index.jinja",
+        context={
+            "page_title": "Participants",
+            "participants": participants,
+            "new_participants_count": new_participants_count,
+        },
+    )
 
 
 def edit_ethnicity(request, pk):
@@ -63,4 +83,17 @@ def edit_ethnicity(request, pk):
             },
             "page_title": "Ethnicity",
         },
+    )
+
+
+def upload_bss_batch(request):
+    if request.method == "POST":
+        with open(
+            "manage_breast_screening/participants/fixtures/bss_batch.json"
+        ) as file:
+            batch = json.loads(file.read())
+            convert_bss_batch_to_participants(batch)
+        return redirect(reverse("participants:index"))
+    return render(
+        request, "upload_bss_batch.jinja", context={"page_title": "Upload BSS batch"}
     )

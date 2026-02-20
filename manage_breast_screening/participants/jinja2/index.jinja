@@ -1,0 +1,40 @@
+{% extends 'layout-form.jinja' %}
+
+{% block page_content %}
+  <h2>Participants</h2>
+  {% if new_participants_count != 0 %}
+    <p>{{new_participants_count}} NEW PARTICIPANTS ADDED</p>
+  {% endif %}
+  {% if participants | length == 0 %}
+  <p>No participants found.</p>
+  {% else %}
+      <table class="nhsuk-table">
+      <thead class="nhsuk-table__head">
+        <tr>
+          <th class="nhsuk-table__header">Name</th>
+          <th class="nhsuk-table__header">Postcode</th>
+          <th class="nhsuk-table__header">NHS number</th>
+          <th class="nhsuk-table__header">Birth date</th>
+        </tr>
+      </thead>
+      <tbody class="nhsuk-table__body">
+        {% for participant in participants %}
+          <tr>
+            <td class="nhsuk-table__cell">
+              {{participant.full_name}}
+             </td>
+            <td class="nhsuk-table__cell">
+              <p>participant</p>
+            </td>
+            <td class="nhsuk-table__cell">
+              {{participant.nhs_number}}
+             </td>
+            <td class="nhsuk-table__cell">
+              <p>{{participant.date_of_birth}}</p>
+             </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+      </table>
+  {% endif %}
+{% endblock %}

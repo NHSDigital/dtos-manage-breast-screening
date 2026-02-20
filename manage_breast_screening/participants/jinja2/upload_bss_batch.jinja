@@ -1,0 +1,11 @@
+{% extends 'layout-form.jinja' %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+
+{% block form %}
+  <h2 class="nhsuk-fieldset__legend--s">Upload BSS data</h2>
+  <div class="nhsuk-form-group">
+    {{ button({
+      "text": "Save and continue"
+    }) }}
+  </div>
+{% endblock form %}

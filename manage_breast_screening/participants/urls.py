@@ -12,6 +12,7 @@ urlpatterns = [
         name="show",
     ),
     path("<uuid:pk>/previous-mammograms/", RedirectView.as_view(pattern_name="show")),
-    path("", RedirectView.as_view(pattern_name="home"), name="index"),
+    path("", views.index, name="index"),
     path("<uuid:pk>/edit-ethnicity", views.edit_ethnicity, name="edit_ethnicity"),
+    path("upload-bss-batch/", views.upload_bss_batch, name="upload_bss_batch"),
 ]
