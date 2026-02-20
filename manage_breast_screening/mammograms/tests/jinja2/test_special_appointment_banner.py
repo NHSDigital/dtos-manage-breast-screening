@@ -10,7 +10,7 @@ from manage_breast_screening.mammograms.presenters import SpecialAppointmentPres
 def presenter():
     return SpecialAppointmentPresenter(
         {
-            "PHYSICAL_RESTRICTION": {"details": "broken foot", "temporary": "True"},
+            "PHYSICAL_RESTRICTION": {"details": "broken foot"},
             "SOCIAL_EMOTIONAL_MENTAL_HEALTH": {},
         },
         "68d758d0-792d-430f-9c52-1e7a0c2aa1dd",
@@ -50,7 +50,7 @@ def test_special_appointment_banner_with_change_link(jinja_env, presenter):
                         Physical restriction
                         </dt>
                         <dd class="nhsuk-summary-list__value">
-                        broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
+                        broken foot
                         </dd>
                     </div>
                     <div class="nhsuk-summary-list__row">
@@ -96,7 +96,7 @@ def test_special_appointment_banner_without_change_link(jinja_env, presenter):
                         Physical restriction
                         </dt>
                         <dd class="nhsuk-summary-list__value">
-                        broken foot<br><span class="nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2">Temporary</span>
+                        broken foot
                         </dd>
                     </div>
                     <div class="nhsuk-summary-list__row">

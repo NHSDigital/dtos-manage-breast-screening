@@ -5,17 +5,12 @@
     {% set special_appointment_html %}
       {% set rows = [] %}
       {% for reason in presented_special_appointment.reasons %}
-        {# Build the value content (details + temporary tag if applicable) #}
+        {# Build the value content (details) #}
         {% set value_content = "" %}
         {% if reason.details %}
           {% set value_content = reason.details %}
         {% else %}
           {% set value_content = "<span class=\"nhsuk-u-secondary-text-colour\">No details provided</span>" %}
-        {% endif %}
-
-        {# Add temporary tag to the value content if needed #}
-        {% if reason.temporary %}
-          {% set value_content = value_content + "<br><span class=\"nhsuk-tag nhsuk-tag--white nhsuk-u-margin-top-2\">Temporary</span>" %}
         {% endif %}
 
         {# Add row for this support reason #}

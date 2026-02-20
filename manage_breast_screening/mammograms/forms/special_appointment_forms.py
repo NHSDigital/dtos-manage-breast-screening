@@ -1,10 +1,8 @@
 from django import forms
-from django.db.models import TextChoices
 from django.forms import Textarea
 
 from manage_breast_screening.nhsuk_forms.fields import (
     CharField,
-    ChoiceField,
     MultipleChoiceField,
 )
 from manage_breast_screening.participants.models import SupportReasons
@@ -12,10 +10,6 @@ from manage_breast_screening.participants.models import SupportReasons
 
 class ProvideSpecialAppointmentDetailsForm(forms.Form):
     SupportReasons = SupportReasons
-
-    class TemporaryChoices(TextChoices):
-        YES = ("YES", "Yes")
-        NO = ("NO", "No")
 
     SupportReasonHints = {
         SupportReasons.PHYSICAL_RESTRICTION: "For example, mobility or dexterity",
@@ -51,16 +45,6 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
                 hint=self.SupportReasonHints.get(option),
             )
 
-        self.fields["any_temporary"] = ChoiceField(
-            label="Are any of these reasons temporary?",
-            hint="This includes issues that are likely to be resolved by their next mammogram, for example a broken foot or a short-term eye problem.",
-            choices=self.TemporaryChoices,  # type: ignore
-            required=True,
-            error_messages={
-                "required": "Select whether any of the reasons are temporary"
-            },
-        )
-
     def clean(self):
         for reason in self.cleaned_data.get("support_reasons", []):
             details_field = reason.lower() + "_details"
@@ -77,21 +61,11 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
         Generate JSON that can be stored on the participant record
         """
         result = {}
-        any_temporary = (
-            self.cleaned_data.get("any_temporary") == self.TemporaryChoices.YES
-        )
 
         for reason in self.cleaned_data.get("support_reasons", []):
-            need = {"details": self.cleaned_data.get(reason.lower() + "_details", "")}
-            if not any_temporary:
-                need["temporary"] = False
-            else:
-                # Preserve answers from the second form if we are editing the first form
-                existing_value = self.saved_data.get(reason, {}).get("temporary")
-                if existing_value is not None:
-                    need["temporary"] = existing_value
-
-            result[reason] = need
+            result[reason] = {
+                "details": self.cleaned_data.get(reason.lower() + "_details", "")
+            }
         return result
 
     def _init_from_json(self, json):
@@ -108,58 +82,4 @@ class ProvideSpecialAppointmentDetailsForm(forms.Form):
                 initial["support_reasons"].append(reason.value)
                 initial[reason.value.lower() + "_details"] = need["details"]
 
-        if any(need.get("temporary") for need in json.values()):
-            initial["any_temporary"] = self.TemporaryChoices.YES  # type: ignore
-        else:
-            initial["any_temporary"] = self.TemporaryChoices.NO  # type: ignore
-
         self.initial = initial
-
-
-class MarkReasonsTemporaryForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        self.saved_data = kwargs.pop("saved_data", {}) or {}
-        super().__init__(*args, **kwargs)
-
-        choices = [
-            (reason.value, reason.label)
-            for reason in ProvideSpecialAppointmentDetailsForm.SupportReasons
-            if reason.value in self.saved_data
-        ]
-
-        self.fields["which_are_temporary"] = MultipleChoiceField(
-            label="Which of these reasons are temporary?",
-            hint="If any reasons are relevant to this appointment only, mark them as temporary so they are not retained the next time this participant is invited for breast screening",
-            choices=choices,  # type: ignore
-            required=True,
-            error_messages={"required": "Select which reasons are temporary"},
-        )
-
-        # Populate the initial data based on the JSON field
-        self._init_from_json(self.saved_data)
-
-    def to_json(self):
-        """
-        Generate JSON that can be stored on the participant record
-        """
-        result = self.saved_data
-        for reason, details in self.saved_data.items():
-            temporary = reason in self.cleaned_data.get("which_are_temporary", [])
-            details["temporary"] = temporary
-
-        return result
-
-    def _init_from_json(self, json):
-        """
-        Set initial values from JSON stored on the participant record
-        """
-        if not json:
-            return
-
-        self.initial = {
-            "which_are_temporary": [
-                reason
-                for reason, details in self.saved_data.items()
-                if details and details.get("temporary", False)
-            ]
-        }

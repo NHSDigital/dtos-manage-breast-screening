@@ -72,10 +72,9 @@ def test_appointment_details_is_special_appointmet(template, appointment):
     appointment.screening_episode.participant.extra_needs = {
         "BREAST_IMPLANTS": {
             "details": "details of\nbreast implants",
-            "temporary": True,
         },
-        "MEDICAL_DEVICES": {"details": "has pacemaker", "temporary": False},
-        "OTHER": {"details": "Other details.", "temporary": False},
+        "MEDICAL_DEVICES": {"details": "has pacemaker"},
+        "OTHER": {"details": "Other details."},
     }
 
     response = template.render({"presenter": AppointmentPresenter(appointment)})
@@ -166,7 +165,6 @@ def test_appointment_details_special_appointment_with_note(template, appointment
     appointment.screening_episode.participant.extra_needs = {
         "SOCIAL_EMOTIONAL_MENTAL_HEALTH": {
             "details": "Social, emotional & mental health",
-            "temporary": True,
         },
     }
     appointment.note.content = "Things to consider before & during the appointment."
