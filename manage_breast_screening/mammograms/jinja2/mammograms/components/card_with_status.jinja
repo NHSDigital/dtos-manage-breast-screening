@@ -20,20 +20,21 @@
         {{ outer_caller() }}
       {% endif %}
 
-      <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
-
-      {% if presented_section.is_reviewed %}
-        <a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }}</a>
-      {% else %}
-        {% if presented_section.next_section_link %}
-        <span data-show-on-review hidden><a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }}</a></span>
+      {% if not presented_section.is_reviewed or presented_section.next_section_link %}
+      <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4" {% if not presented_section.next_anchor %}data-hide-on-review{% endif %}>
+        {% if presented_section.is_reviewed %}
+          <a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }}</a>
+        {% else %}
+          {% if presented_section.next_section_link %}
+          <span data-show-on-review hidden><a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }}</a></span>
+          {% endif %}
+          <div data-module="app-mark-reviewed" data-status-card-id="{{ presented_section.anchor }}" {% if presented_section.next_anchor %}data-next-card-id="{{ presented_section.next_anchor }}"{% endif %}>
+            <form method="post" action="{{ presented_section.review_button.href }}">
+              {{ csrf_input }}
+              <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ presented_section.review_button.text }} </button>
+            </form>
+          </div>
         {% endif %}
-        <div data-module="app-mark-reviewed" data-status-card-id="{{ presented_section.anchor }}" data-next-card-id="{{ presented_section.next_anchor }}">
-          <form method="post" action="{{ presented_section.review_button.href }}">
-            {{ csrf_input }}
-            <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ presented_section.review_button.text }} </button>
-          </form>
-        </div>
       {% endif %}
     {% endcall %}
   </div>

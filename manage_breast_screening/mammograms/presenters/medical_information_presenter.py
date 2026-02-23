@@ -39,7 +39,7 @@ SECTION_ORDER = {
     MedicalInformationSection.SYMPTOMS: MedicalInformationSection.MEDICAL_HISTORY,
     MedicalInformationSection.MEDICAL_HISTORY: MedicalInformationSection.BREAST_FEATURES,
     MedicalInformationSection.BREAST_FEATURES: MedicalInformationSection.OTHER_INFORMATION,
-    MedicalInformationSection.OTHER_INFORMATION: MedicalInformationSection.OTHER_INFORMATION,
+    MedicalInformationSection.OTHER_INFORMATION: None,
 }
 
 # Section IDs for anchor navigation
@@ -79,11 +79,12 @@ class SectionPresenter:
 
     @property
     def next_section_link(self):
-        return {
-            "href": f"#{self.next_anchor}",
-            "text": "Next section",
-            "is_anchor": True,
-        }
+        if self.next_anchor:
+            return {
+                "href": f"#{self.next_anchor}",
+                "text": "Next section",
+                "is_anchor": True,
+            }
 
     @property
     def review_button(self):
