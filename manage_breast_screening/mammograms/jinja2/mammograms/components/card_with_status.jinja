@@ -1,16 +1,18 @@
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/tag/macro.jinja" import tag %}
 
-{% macro card_with_status(section, anchor, status_tag_properties, action_button_properties=None, csrf_input=None) %}
+{% macro card_with_status(presented_section, csrf_input=None) %}
   {% set outer_caller = caller if caller is defined else none %}
-  <div id="{{ anchor }}" class="app-card-with-status">
+  <div id="{{ presented_section.anchor }}" class="app-card-with-status">
     {% call card({
-      "heading": section.label
+      "heading": presented_section.label
     }) %}
       <div class="app-card-with-status__tag" aria-live="polite">
-        <span data-hide-on-review>{{ tag(status_tag_properties.current) }}</span>
-        {% if action_button_properties and status_tag_properties.reviewed %}
-          <span data-show-on-review hidden>{{ tag(status_tag_properties.reviewed) }}</span>
+        {% if presented_section.is_reviewed %}
+          {{ tag(presented_section.reviewed_tag) }}
+        {% else %}
+          <span data-hide-on-review>{{ tag(presented_section.to_review_tag) }}</span>
+          <span data-show-on-review hidden>{{ tag(presented_section.reviewed_tag) }}</span>
         {% endif %}
       </div>
 
@@ -18,19 +20,17 @@
         {{ outer_caller() }}
       {% endif %}
 
-      {% if action_button_properties %}
-        <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
+      <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
 
-        {% if action_button_properties.is_anchor %}
-          <a href="{{ action_button_properties.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button_properties.text }} </a>
-        {% else %}
-          <div data-module="app-mark-reviewed" data-status-card-id="{{ anchor }}">
-            <form method="post" action="{{ action_button_properties.href }}">
-              {{ csrf_input }}
-              <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ action_button_properties.text }} </button>
-            </form>
-          </div>
-        {% endif %}
+      {% if presented_section.is_reviewed %}
+        <a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }} </a>
+      {% else %}
+        <div data-module="app-mark-reviewed" data-status-card-id="{{ presented_section.anchor }}">
+          <form method="post" action="{{ presented_section.review_button.href }}">
+            {{ csrf_input }}
+            <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ presented_section.review_button.text }} </button>
+          </form>
+        </div>
       {% endif %}
     {% endcall %}
   </div>

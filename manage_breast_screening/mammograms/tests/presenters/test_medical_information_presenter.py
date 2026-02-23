@@ -300,35 +300,6 @@ class TestRecordMedicalInformationPresenter:
             "text": "Add another mammogram",
         }
 
-    @pytest.mark.parametrize(
-        "section,expected_anchor",
-        [
-            (MedicalInformationSection.MAMMOGRAM_HISTORY, "mammogram-history"),
-            (MedicalInformationSection.SYMPTOMS, "symptoms"),
-            (MedicalInformationSection.MEDICAL_HISTORY, "medical-history"),
-            (MedicalInformationSection.BREAST_FEATURES, "breast-features"),
-            (MedicalInformationSection.OTHER_INFORMATION, "other-information"),
-        ],
-    )
-    def test_get_anchor_returns_correct_anchor(self, section, expected_anchor):
-        appointment = AppointmentFactory()
-        presenter = MedicalInformationPresenter(appointment)
-
-        assert presenter.get_anchor(section) == expected_anchor
-
-    def test_is_section_reviewed_returns_true_when_reviewed(self):
-        appointment = AppointmentFactory()
-        MedicalInformationReviewFactory.create(
-            appointment=appointment, section=MedicalInformationSection.SYMPTOMS
-        )
-        presenter = MedicalInformationPresenter(appointment)
-
-        assert presenter.is_section_reviewed(MedicalInformationSection.SYMPTOMS) is True
-        assert (
-            presenter.is_section_reviewed(MedicalInformationSection.BREAST_FEATURES)
-            is False
-        )
-
     def test_any_medical_history(self):
         appointment = AppointmentFactory()
         assert not MedicalInformationPresenter(appointment).any_medical_history
@@ -456,3 +427,35 @@ class TestRecordMedicalInformationPresenter:
             "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/update/",
             "text": "View or edit breast features",
         }
+
+
+@pytest.mark.django_db
+class TestSectionPresenter:
+    @pytest.mark.parametrize(
+        "section,expected_anchor",
+        [
+            (MedicalInformationSection.MAMMOGRAM_HISTORY, "mammogram-history"),
+            (MedicalInformationSection.SYMPTOMS, "symptoms"),
+            (MedicalInformationSection.MEDICAL_HISTORY, "medical-history"),
+            (MedicalInformationSection.BREAST_FEATURES, "breast-features"),
+            (MedicalInformationSection.OTHER_INFORMATION, "other-information"),
+        ],
+    )
+    def test_get_anchor_returns_correct_anchor(
+        self, in_progress_appointment, section, expected_anchor
+    ):
+        presenter = MedicalInformationPresenter(in_progress_appointment)
+
+        assert presenter.get_section(section).anchor == expected_anchor
+
+    def test_is_reviewed_returns_true_when_reviewed(self, in_progress_appointment):
+        MedicalInformationReviewFactory.create(
+            appointment=in_progress_appointment,
+            section=MedicalInformationSection.SYMPTOMS,
+        )
+        presenter = MedicalInformationPresenter(in_progress_appointment)
+
+        assert presenter.get_section(MedicalInformationSection.SYMPTOMS).is_reviewed
+        assert not presenter.get_section(
+            MedicalInformationSection.BREAST_FEATURES
+        ).is_reviewed

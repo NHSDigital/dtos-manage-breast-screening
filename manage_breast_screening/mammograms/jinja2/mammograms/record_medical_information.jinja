@@ -22,50 +22,35 @@
 {{ complete_all_button }}
 
 {% call card_with_status(
-  section=sections.MAMMOGRAM_HISTORY,
-  anchor=presenter.get_anchor(sections.MAMMOGRAM_HISTORY),
-  status_tag_properties=presenter.review_status_tag_properties(sections.MAMMOGRAM_HISTORY),
-  action_button_properties=presenter.review_action_button_properties(sections.MAMMOGRAM_HISTORY),
+  presented_section=presenter.get_section(sections.MAMMOGRAM_HISTORY),
   csrf_input=csrf_input,
   ) %}
   {{ mammogram_history_content(presenter, presented_mammograms) }}
 {% endcall %}
 
 {% call card_with_status(
-  section=sections.SYMPTOMS,
-  anchor=presenter.get_anchor(sections.SYMPTOMS),
-  status_tag_properties=presenter.review_status_tag_properties(sections.SYMPTOMS),
-  action_button_properties=presenter.review_action_button_properties(sections.SYMPTOMS),
+  presented_section=presenter.get_section(sections.SYMPTOMS),
   csrf_input=csrf_input,
   ) %}
   {{ symptoms_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(
-  section=sections.MEDICAL_HISTORY,
-  anchor=presenter.get_anchor(sections.MEDICAL_HISTORY),
-  status_tag_properties=presenter.review_status_tag_properties(sections.MEDICAL_HISTORY),
-  action_button_properties=presenter.review_action_button_properties(sections.MEDICAL_HISTORY),
+  presented_section=presenter.get_section(sections.MEDICAL_HISTORY),
   csrf_input=csrf_input,
   ) %}
   {{ medical_history_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(
-  section=sections.BREAST_FEATURES,
-  anchor=presenter.get_anchor(sections.BREAST_FEATURES),
-  status_tag_properties=presenter.review_status_tag_properties(sections.BREAST_FEATURES),
-  action_button_properties=presenter.review_action_button_properties(sections.BREAST_FEATURES),
+  presented_section=presenter.get_section(sections.BREAST_FEATURES),
   csrf_input=csrf_input,
   ) %}
   {{ breast_features_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(
-  section=sections.OTHER_INFORMATION,
-  anchor=presenter.get_anchor(sections.OTHER_INFORMATION),
-  status_tag_properties=presenter.review_status_tag_properties(sections.OTHER_INFORMATION),
-  action_button_properties=presenter.review_action_button_properties(sections.OTHER_INFORMATION),
+  presented_section=presenter.get_section(sections.OTHER_INFORMATION),
   csrf_input=csrf_input,
   ) %}
   {{ other_information_content(presenter, read_only=false) }}
