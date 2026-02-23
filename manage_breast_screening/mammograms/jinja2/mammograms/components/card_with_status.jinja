@@ -23,8 +23,9 @@
       <hr class="nhsuk-section-break nhsuk-section-break--visible nhsuk-u-margin-bottom-4">
 
       {% if presented_section.is_reviewed %}
-        <a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }} </a>
+        <a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }}</a>
       {% else %}
+        <span data-show-on-review hidden><a href="{{ presented_section.next_section_link.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ presented_section.next_section_link.text }}</a></span>
         <div data-module="app-mark-reviewed" data-status-card-id="{{ presented_section.anchor }}">
           <form method="post" action="{{ presented_section.review_button.href }}">
             {{ csrf_input }}
