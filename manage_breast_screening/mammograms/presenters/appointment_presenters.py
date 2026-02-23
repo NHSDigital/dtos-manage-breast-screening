@@ -283,7 +283,6 @@ class SpecialAppointmentPresenter:
                 result.append(
                     {
                         "label": SupportReasons[reason].label,
-                        "temporary": reason_details.get("temporary"),
                         "details": reason_details.get("details"),
                     }
                 )

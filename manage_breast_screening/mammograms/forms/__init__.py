@@ -22,7 +22,6 @@ from .other_information.hormone_replacement_therapy_form import (
 from .record_medical_information_form import RecordMedicalInformationForm
 from .screening_appointment_form import ScreeningAppointmentForm
 from .special_appointment_forms import (
-    MarkReasonsTemporaryForm,
     ProvideSpecialAppointmentDetailsForm,
 )
 
@@ -37,7 +36,6 @@ __all__ = [
     "RecordMedicalInformationForm",
     "ScreeningAppointmentForm",
     "ProvideSpecialAppointmentDetailsForm",
-    "MarkReasonsTemporaryForm",
     "MastectomyOrLumpectomyHistoryItemForm",
     "ImplantedMedicalDeviceHistoryItemForm",
     "OtherProcedureHistoryItemForm",

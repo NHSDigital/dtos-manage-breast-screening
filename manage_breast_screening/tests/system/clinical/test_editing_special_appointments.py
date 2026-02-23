@@ -24,18 +24,6 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.then_i_am_on_the_special_appointment_form()
 
         self.when_i_add_a_reason()
-        self.and_i_select_no_reasons_are_temporary()
-        self.and_i_submit_the_form()
-        self.then_i_am_back_on_the_appointment()
-        self.and_i_see_the_created_special_appointment()
-
-    def test_setting_up_a_special_appointment_with_a_temporary_reason(self):
-        self.given_i_am_logged_in_as_a_clinical_user()
-        self.and_there_is_an_appointment()
-        self.and_i_am_on_the_appointment_show_page()
-        self.when_i_click_on_make_special_appointment()
-        self.and_i_add_a_reason()
-        self.and_i_select_some_reasons_are_temporary()
         self.and_i_submit_the_form()
         self.then_i_am_back_on_the_appointment()
         self.and_i_see_the_created_special_appointment()
@@ -47,9 +35,6 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.when_i_click_on_make_special_appointment()
         self.and_i_add_a_reason()
         self.and_i_add_another_reason()
-        self.and_i_select_some_reasons_are_temporary()
-        self.and_i_submit_the_form()
-        self.then_i_select_the_temporary_reason()
         self.and_i_submit_the_form()
         self.then_i_am_back_on_the_appointment()
         self.and_i_see_the_created_special_appointment_with_both_reasons()
@@ -180,12 +165,6 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.page.keyboard.press("Tab")
         self.page.locator("*:focus").fill("Non-binary")
 
-    def and_i_select_no_reasons_are_temporary(self):
-        self.page.get_by_label("No").click()
-
-    def and_i_select_some_reasons_are_temporary(self):
-        self.page.get_by_label("Yes").click()
-
     def and_i_submit_the_form(self):
         self.page.get_by_text("Continue").click()
 
@@ -196,12 +175,6 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def then_i_should_see_an_error_for_the_required_fields(self):
         self.expect_validation_error(
-            error_text="Select whether any of the reasons are temporary",
-            fieldset_legend="Are any of these reasons temporary?",
-            field_label="Yes",
-        )
-
-        self.expect_validation_error(
             error_text="Select a reason",
             fieldset_legend="Why does Janet Williams need additional support?",
             field_label="Breast implants",
@@ -209,6 +182,3 @@ class TestEditingSpecialAppointments(SystemTestCase):
 
     def when_i_click_on_make_special_appointment(self):
         self.page.get_by_text("Make special appointment").click()
-
-    def then_i_select_the_temporary_reason(self):
-        self.page.get_by_label("Hearing").click()

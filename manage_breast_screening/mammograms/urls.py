@@ -111,11 +111,6 @@ urlpatterns = [
         name="provide_special_appointment_details",
     ),
     path(
-        "<uuid:pk>/special-appointment/which-reasons/",
-        special_appointment_views.MarkReasonsTemporary.as_view(),
-        name="mark_reasons_temporary",
-    ),
-    path(
         "<uuid:pk>/record-medical-information/lump/",
         symptom_views.AddLumpView.as_view(),
         name="add_symptom_lump",
