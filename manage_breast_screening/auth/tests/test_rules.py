@@ -1,8 +1,13 @@
 import pytest
 
 from manage_breast_screening.auth.models import Permission
-from manage_breast_screening.auth.rules import is_administrative, is_clinical
+from manage_breast_screening.auth.rules import (
+    is_administrative,
+    is_clinical,
+    is_sysadmin,
+)
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db
@@ -81,3 +86,16 @@ class TestViewParticipantDataPermission:
         user_assignment = UserAssignmentFactory.create()
 
         assert not user_assignment.user.has_perm(Permission.VIEW_PARTICIPANT_DATA)
+
+
+@pytest.mark.django_db
+class TestIsSysadmin:
+    def test_returns_true_for_sysadmin_user(self):
+        user = UserFactory.create(is_sysadmin=True)
+
+        assert is_sysadmin(user)
+
+    def test_returns_false_for_non_sysadmin_user(self):
+        user = UserFactory.create(is_sysadmin=False)
+
+        assert not is_sysadmin(user)
