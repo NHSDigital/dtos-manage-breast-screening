@@ -1,4 +1,5 @@
 import logging
+import os
 import time
 
 from django.contrib import messages
@@ -14,10 +15,17 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.dicom.study_service import (
+    StudyService as DicomStudyService,
+)
+from manage_breast_screening.gateway.models import Relay
 from manage_breast_screening.gateway.worklist_item_service import (
     GatewayActionAlreadyExistsError,
     WorklistItemService,
     get_images_for_appointment,
+)
+from manage_breast_screening.mammograms.forms.images.gateway_image_details_form import (
+    GatewayImageDetailsForm,
 )
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
@@ -25,6 +33,7 @@ from manage_breast_screening.mammograms.forms.images.record_images_taken_form im
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
     AppointmentWorkflowService,
+    RecallService,
 )
 from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models import (
@@ -149,6 +158,9 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         except GatewayActionAlreadyExistsError as e:
             logger.warning(str(e))
 
+        if gateway_images_enabled(self.appointment):
+            return redirect("mammograms:gateway_images", pk=self.appointment.pk)
+
         return redirect("mammograms:take_images", pk=self.appointment.pk)
 
 
@@ -235,6 +247,47 @@ class TakeImages(InProgressAppointmentMixin, FormView):
         )
 
 
+class GatewayImages(InProgressAppointmentMixin, FormView):
+    template_name = "mammograms/gateway_images.jinja"
+    form_class = GatewayImageDetailsForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        images = get_images_for_appointment(self.appointment)
+        title = "Review image details"
+
+        context.update(
+            {
+                "heading": title,
+                "page_title": title,
+                "images": DicomStudyService.images_by_laterality_and_view(images),
+                "image_count": len(images),
+                "appointment_pk": self.appointment.pk,
+                "confirm_button_text": "Confirm images",
+            }
+        )
+        return context
+
+    @transaction.atomic
+    def form_valid(self, form):
+        form.save(
+            DicomStudyService(
+                appointment=self.appointment, current_user=self.request.user
+            ),
+            RecallService(appointment=self.appointment, current_user=self.request.user),
+        )
+
+        self.mark_workflow_step_complete()
+
+        return redirect("mammograms:check_information", pk=self.appointment_pk)
+
+    def mark_workflow_step_complete(self):
+        self.appointment.completed_workflow_steps.get_or_create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            defaults={"created_by": self.request.user},
+        )
+
+
 @require_http_methods(["POST"])
 def check_in(request, pk):
     try:
@@ -291,7 +344,10 @@ def resume_appointment(request, pk):
             AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
             in completed_steps
         ):
-            next_step = "mammograms:take_images"
+            if gateway_images_enabled(appointment):
+                next_step = "mammograms:gateway_images"
+            else:
+                next_step = "mammograms:take_images"
         else:
             next_step = "mammograms:record_medical_information"
 
@@ -335,6 +391,14 @@ def format_sse_event(event: str, data: str) -> str:
     return f"event: {event}\n{lines}\n\n"
 
 
+def gateway_images_enabled(appointment):
+    """Check if automatic gateway image retrieval is enabled."""
+    return (
+        os.getenv("GATEWAY_IMAGES_ENABLED", "false").lower() == "true"
+        and Relay.for_provider(appointment.provider) is not None
+    )
+
+
 @login_required
 @require_http_methods(["GET"])
 def appointment_images_stream(request, pk):
@@ -355,7 +419,12 @@ def appointment_images_stream(request, pk):
             if current_image_ids != last_image_ids:
                 html = render_to_string(
                     "mammograms/_image_grid.jinja",
-                    {"images": images},
+                    {
+                        "images": DicomStudyService.images_by_laterality_and_view(
+                            images
+                        ),
+                        "image_count": len(images),
+                    },
                     request=request,
                 )
                 yield format_sse_event("images", html)
