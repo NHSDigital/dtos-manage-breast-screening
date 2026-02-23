@@ -1,0 +1,39 @@
+{% from "nhsuk/components/details/macro.jinja" import details %}
+
+<div class="nhsuk-u-margin-bottom-3">
+  {% if (images | length) == 0 %}
+    <h3 class="nhsuk-u-margin-bottom-2 nhsuk-u-secondary-text-color">
+      0× {{ laterality }}
+    </h3>
+
+    <div class="app-mammogram-image--placeholder app-mammogram-image--missing nhsuk-u-margin-bottom-3">
+      <div class="app-mammogram-image--missing-content">
+        <span class="nhsuk-u-secondary-text-color">No image</span>
+      </div>
+    </div>
+  {% else %}
+    <h3 class="nhsuk-u-margin-bottom-2">
+      {{ images | length }}× {{ laterality }}
+    </h3>
+
+    <div class="">
+      {% for image in images %}
+        {% if image.image_file %}
+          <div class="app-mammogram-image--placeholder nhsuk-u-margin-right-3 nhsuk-u-margin-bottom-2" style="float:left">
+            <img class="nhsuk-image__img" src="{{image.image_file.url}}" alt="Mammogram image thumbnail {{ laterality }} view">
+          </div>
+        {% endif %}
+      {% endfor %}
+      <div style="clear:both"></div>
+    </div>
+    {% if images | length > 1 %}
+      <div class="nhsuk-u-margin-top-3">
+        {% call details({
+          "summaryText": "Additional image details"
+        }) %}
+        <!-- TODO: Additional image details -->
+        {% endcall %}
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
