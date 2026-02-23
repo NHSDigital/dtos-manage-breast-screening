@@ -2,7 +2,7 @@ from django.db import transaction
 
 from manage_breast_screening.core.services.auditor import Auditor
 
-from .models import Study, Image
+from .models import Image, Study
 
 
 class StudyService:

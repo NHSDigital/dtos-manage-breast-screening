@@ -72,6 +72,11 @@ class Study(models.Model):
     )
     reasons_incomplete_details = models.TextField(blank=True, null=False, default="")
 
+    def images(self) -> models.QuerySet["Image"]:
+        return Image.objects.filter(series__study=self).order_by(
+            "series__series_number", "instance_number"
+        )
+
     @classmethod
     def for_appointment(cls, appointment):
         action = appointment.gateway_actions.first()
