@@ -37,6 +37,9 @@ BASIC_AUTH_PASSWORD=changeme
 # Django Ninja API
 API_ENABLED=True
 
+# Automatic loading of PACS images from gateway
+GATEWAY_IMAGES_ENABLED=False
+
 # Notifications specific env vars
 API_OAUTH_API_KEY=""
 API_OAUTH_API_KID=""

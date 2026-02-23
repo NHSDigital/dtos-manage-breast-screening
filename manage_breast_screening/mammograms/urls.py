@@ -102,6 +102,11 @@ urlpatterns = [
         name="take_images",
     ),
     path(
+        "<uuid:pk>/gateway-images/",
+        appointment_workflow_views.GatewayImages.as_view(),
+        name="gateway_images",
+    ),
+    path(
         "<uuid:pk>/cannot-go-ahead/",
         appointment_workflow_views.AppointmentCannotGoAhead.as_view(),
         name="appointment_cannot_go_ahead",
