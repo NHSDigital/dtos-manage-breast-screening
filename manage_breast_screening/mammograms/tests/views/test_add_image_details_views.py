@@ -2,8 +2,8 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
-from manage_breast_screening.mammograms.forms.images.add_image_details_form import (
-    AddImageDetailsForm,
+from manage_breast_screening.mammograms.forms.images.image_details_form import (
+    ImageDetailsForm,
 )
 from manage_breast_screening.manual_images.models import IncompleteImagesReason
 from manage_breast_screening.manual_images.tests.factories import (
@@ -91,7 +91,7 @@ class TestAddImageDetailsView:
                 "reasons_incomplete": [IncompleteImagesReason.CONSENT_WITHDRAWN],
                 "reasons_incomplete_details": "abc",
                 "imperfect_but_best_possible": "true",
-                "should_recall": AddImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
+                "should_recall": ImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
             },
         )
         assertRedirects(
