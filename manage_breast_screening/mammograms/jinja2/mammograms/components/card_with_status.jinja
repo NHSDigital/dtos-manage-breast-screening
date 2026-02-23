@@ -7,8 +7,11 @@
     {% call card({
       "heading": section.label
     }) %}
-      <div class="app-card-with-status__tag">
-        {{ tag(status_tag_properties) }}
+      <div class="app-card-with-status__tag" aria-live="polite">
+        <span data-hide-on-review>{{ tag(status_tag_properties.current) }}</span>
+        {% if action_button_properties and status_tag_properties.reviewed %}
+          <span data-show-on-review hidden>{{ tag(status_tag_properties.reviewed) }}</span>
+        {% endif %}
       </div>
 
       {% if outer_caller %}
@@ -21,10 +24,12 @@
         {% if action_button_properties.is_anchor %}
           <a href="{{ action_button_properties.href }}" class="nhsuk-button nhsuk-button--secondary"> {{ action_button_properties.text }} </a>
         {% else %}
-          <form method="post" action="{{ action_button_properties.href }}">
-            {{ csrf_input }}
-            <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ action_button_properties.text }} </button>
-          </form>
+          <div data-module="app-mark-reviewed" data-status-card-id="{{ anchor }}">
+            <form method="post" action="{{ action_button_properties.href }}">
+              {{ csrf_input }}
+              <button type="submit" class="nhsuk-button nhsuk-button--secondary nhsuk-u-margin-bottom-0"> {{ action_button_properties.text }} </button>
+            </form>
+          </div>
         {% endif %}
       {% endif %}
     {% endcall %}

@@ -281,16 +281,19 @@ class MedicalInformationPresenter:
         return section in self._section_reviews
 
     def review_status_tag_properties(self, section):
+        reviewed = {
+            "text": "Reviewed",
+            "classes": "nhsuk-tag--green app-section-review-tag",
+        }
+        to_review = {
+            "text": "To review",
+            "classes": "nhsuk-tag--blue app-section-review-tag",
+        }
+
         if self.is_section_reviewed(section):
-            return {
-                "text": "Reviewed",
-                "classes": "nhsuk-tag--green app-section-review-tag",
-            }
+            return {"current": reviewed}
         else:
-            return {
-                "text": "To review",
-                "classes": "nhsuk-tag--blue app-section-review-tag",
-            }
+            return {"current": to_review, "reviewed": reviewed}
 
     def review_action_button_properties(self, section):
         if self.is_section_reviewed(section):

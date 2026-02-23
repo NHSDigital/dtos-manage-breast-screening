@@ -3,6 +3,7 @@ import { createAll, initAll } from 'nhsuk-frontend'
 import { BreastDiagram } from './breast-diagram.js'
 import { CheckIn } from './check-in.js'
 import { ImageStream } from './image-stream.js'
+import { MarkReviewed } from './mark-reviewed.js'
 import { StepperInput } from './stepper-input.js'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,5 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   createAll(BreastDiagram)
   createAll(CheckIn)
   createAll(ImageStream)
+  createAll(MarkReviewed)
   createAll(StepperInput)
 })
