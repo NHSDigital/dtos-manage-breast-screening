@@ -45,6 +45,9 @@ from manage_breast_screening.participants.models import (
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
+from manage_breast_screening.participants.models.breast_features import (
+    BreastFeatureAnnotation,
+)
 from manage_breast_screening.participants.models.medical_information_review import (
     MedicalInformationReview,
 )
@@ -351,6 +354,7 @@ class Command(BaseCommand):
         Symptom.objects.all().delete()
         BreastAugmentationHistoryItem.objects.all().delete()
         BreastCancerHistoryItem.objects.all().delete()
+        BreastFeatureAnnotation.objects.all().delete()
         MastectomyOrLumpectomyHistoryItem.objects.all().delete()
         CystHistoryItem.objects.all().delete()
         ImplantedMedicalDeviceHistoryItem.objects.all().delete()
