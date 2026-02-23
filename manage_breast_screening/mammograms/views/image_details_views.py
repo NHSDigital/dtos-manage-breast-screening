@@ -3,6 +3,7 @@ import logging
 from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views import View
 from django.views.generic import FormView
 
 from manage_breast_screening.mammograms.services.appointment_services import (
@@ -62,3 +63,9 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
             step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
             defaults={"created_by": self.request.user},
         )
+
+
+class UpdateImageDetailsView(InProgressAppointmentMixin, View):
+    # Temporarily redirect to the add image details page until we have implemented the edit image details form
+    def get(self, request, pk):
+        return redirect("mammograms:add_image_details", pk=pk)

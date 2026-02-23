@@ -322,6 +322,21 @@ class TestTakeImages:
             [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
         )
 
+    def test_redirects_to_update_image_details_when_series_exist(
+        self, clinical_user_client, appointment
+    ):
+        study = Study.objects.create(appointment=appointment)
+        study.series_set.create(view_position="CC", laterality="R", count=1)
+
+        response = clinical_user_client.http.get(
+            reverse("mammograms:take_images", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk}),
+            target_status_code=302,
+        )
+
     def test_yes_creates_the_study(self, clinical_user_client, appointment):
         clinical_user_client.http.post(
             reverse(

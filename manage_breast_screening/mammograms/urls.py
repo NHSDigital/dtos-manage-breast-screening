@@ -7,10 +7,10 @@ from manage_breast_screening.mammograms.views.other_information import (
 )
 
 from .views import (
-    add_image_details_view,
     add_multiple_images_information_view,
     appointment_note_views,
     appointment_workflow_views,
+    image_details_views,
     participant_reported_mammogram_views,
     show_appointment_views,
     special_appointment_views,
@@ -312,8 +312,13 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/image-details/new/",
-        add_image_details_view.AddImageDetailsView.as_view(),
+        image_details_views.AddImageDetailsView.as_view(),
         name="add_image_details",
+    ),
+    path(
+        "<uuid:pk>/image-details/update/",
+        image_details_views.UpdateImageDetailsView.as_view(),
+        name="update_image_details",
     ),
     path(
         "<uuid:pk>/multiple-images-information/add",
