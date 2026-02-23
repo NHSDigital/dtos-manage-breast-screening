@@ -1,21 +1,67 @@
-{% if images %}
-  <div class="nhsuk-grid-row">
-    {% for image in images %}
-      <div class="nhsuk-grid-column-one-quarter nhsuk-u-margin-bottom-4">
-        <div class="app-mammogram-thumbnail">
-          {% if image.image_file %}
-            <img src="{{ image.image_file.url }}" alt="Mammogram image" class="app-mammogram-thumbnail__image">
-          {% else %}
-            <div class="app-mammogram-thumbnail__placeholder">
-              <span>Processing...</span>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
+
+{% if image_count > 0 %}
+  {% set inset_text_html %}
+    <p>
+      {{ image_count }} image{{ " has" if image_count == 1 else "s have" }} been received
+    </p>
+  {% endset %}
 {% else %}
-  <p class="nhsuk-body-s nhsuk-u-secondary-text-color">
-    No images received yet.
-  </p>
+  {% set inset_text_html %}
+    <span class="nhsuk-u-visually-hidden">Information: </span>
+    <p>
+      Mammography images will appear below once they have been received
+    </p>
+  {% endset %}
 {% endif %}
+
+{{ insetText({ "html": inset_text_html }) }}
+
+{% if image_count > 0 %}
+  <div class="nhsuk-grid-row">
+    <div class="nhsuk-grid-column-one-half">
+      {% set right_views_html %}
+        <input type="hidden" name="rmlo_count" value="{{ images["RMLO"]|length }}" />
+        <input type="hidden" name="rcc_count" value="{{ images["RCC"]|length }}" />
+        {% with images=images["RMLO"], laterality="RMLO" %}
+          {% include "mammograms/_image_set.jinja" %}
+        {% endwith %}
+        {% with images=images["RCC"], laterality="RCC" %}
+          {% include "mammograms/_image_set.jinja" %}
+        {% endwith %}
+      {% endset %}
+      {{ card({
+        "heading": "Right breast",
+        "headingLevel": "2",
+        "feature": true,
+        "descriptionHtml": right_views_html
+      }) }}
+    </div>
+
+    <div class="nhsuk-grid-column-one-half">
+      {% set left_views_html %}
+        <input type="hidden" name="lmlo_count" value="{{ images["LMLO"]|length }}" />
+        <input type="hidden" name="lcc_count" value="{{ images["LCC"]|length }}" />
+        {% with images=images["LMLO"], laterality="LMLO" %}
+          {% include "mammograms/_image_set.jinja" %}
+        {% endwith %}
+        {% with images=images["LCC"], laterality="LCC" %}
+          {% include "mammograms/_image_set.jinja" %}
+        {% endwith %}
+      {% endset %}
+      {{ card({
+        "heading": "Left breast",
+        "headingLevel": "2",
+        "feature": true,
+        "descriptionHtml": left_views_html
+      }) }}
+    </div>
+  </div>
+{% endif %}
+
+<noscript>
+  <p class="nhsuk-body-s nhsuk-u-margin-top-4">
+    <a href="" class="nhsuk-link">Refresh the page</a> to see new images.
+  </p>
+</noscript>
