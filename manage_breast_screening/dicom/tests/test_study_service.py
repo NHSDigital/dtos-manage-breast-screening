@@ -4,7 +4,11 @@ import pytest
 
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.dicom.study_service import StudyService
-from manage_breast_screening.dicom.tests.factories import SeriesFactory, StudyFactory, ImageFactory
+from manage_breast_screening.dicom.tests.factories import (
+    ImageFactory,
+    SeriesFactory,
+    StudyFactory,
+)
 from manage_breast_screening.gateway.tests.factories import GatewayActionFactory
 
 
