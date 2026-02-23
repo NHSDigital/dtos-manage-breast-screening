@@ -34,6 +34,29 @@ class Provider(BaseModel):
             screeningepisode__appointment__clinic_slot__clinic__setting__provider=self
         ).distinct()
 
+    def get_config(self) -> "ProviderConfig":
+        config, _ = ProviderConfig.objects.get_or_create(provider=self)
+        return config
+
+
+class ProviderConfig(BaseModel):
+    provider = models.OneToOneField(
+        Provider,
+        on_delete=models.CASCADE,
+        related_name="config",
+    )
+    manual_image_collection = models.BooleanField(
+        default=True,
+        help_text="If enabled, staff confirm images were taken without gateway integration. If disabled, images are received automatically via gateway.",
+    )
+
+    class Meta:
+        verbose_name = "Provider configuration"
+        verbose_name_plural = "Provider configurations"
+
+    def __str__(self):
+        return f"Config for {self.provider.name}"
+
 
 class Setting(BaseModel):
     name = models.TextField()
