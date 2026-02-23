@@ -14,13 +14,13 @@ from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
 
-from ..forms.images.add_image_details_form import AddImageDetailsForm
+from ..forms.images.image_details_form import ImageDetailsForm
 
 logger = logging.getLogger(__name__)
 
 
 class AddImageDetailsView(InProgressAppointmentMixin, FormView):
-    form_class = AddImageDetailsForm
+    form_class = ImageDetailsForm
     template_name = "mammograms/add_image_details.jinja"
 
     def get_context_data(self, **kwargs):
@@ -65,7 +65,7 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
 
 
 class UpdateImageDetailsView(InProgressAppointmentMixin, FormView):
-    form_class = AddImageDetailsForm
+    form_class = ImageDetailsForm
     template_name = "mammograms/add_image_details.jinja"
 
     def get_context_data(self, **kwargs):
