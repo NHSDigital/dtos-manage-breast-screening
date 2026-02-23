@@ -31,6 +31,21 @@ export class MarkReviewed extends Component {
       })
     }
 
+    const nextCardId = this.$root.getAttribute('data-next-card-id')
+    if (nextCardId) {
+      this.$nextCard = document.getElementById(nextCardId)
+
+      if (this.$nextCard === null) {
+        throw new ElementError({
+          element: $root,
+          component: MarkReviewed,
+          identifier: `#${nextCardId}`
+        })
+      }
+    } else {
+      this.$nextCard = null
+    }
+
     this.$form = $form
     this.$card = document.getElementById(cardId)
 
@@ -68,6 +83,10 @@ export class MarkReviewed extends Component {
 
     // Hide the mark reviewed form
     this.$root.setAttribute('hidden', '')
+
+    if (this.$nextCard) {
+      this.$nextCard.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   /**
