@@ -29,4 +29,9 @@ def is_administrative(user):
     ).exists()
 
 
+@rules.predicate
+def is_sysadmin(user):
+    return getattr(user, "is_sysadmin", False)
+
+
 rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, is_clinical | is_administrative)

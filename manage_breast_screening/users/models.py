@@ -21,6 +21,10 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=150, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    is_sysadmin = models.BooleanField(
+        default=False,
+        help_text="Grants access to system-wide settings across all providers.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
