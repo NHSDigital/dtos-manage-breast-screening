@@ -140,6 +140,8 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
 
             if series.count > 2 and repeat_type == RepeatType.SOME_REPEATS.value:
                 series.repeat_count = self.cleaned_data.get(f"{prefix}_repeat_count")
+            elif series.count >= 2 and repeat_type == RepeatType.ALL_REPEATS.value:
+                series.repeat_count = series.count - 1
             else:
                 series.repeat_count = None
 

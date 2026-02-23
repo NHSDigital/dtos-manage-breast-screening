@@ -1,9 +1,15 @@
+from dataclasses import dataclass, field
 from functools import cached_property
 
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
-from manage_breast_screening.manual_images.models import EKLUND_VIEWS
+from manage_breast_screening.manual_images.models import (
+    ALL_VIEWS_RCC_FIRST,
+    EKLUND_VIEWS,
+    ImageView,
+    RepeatReason,
+)
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
     AppointmentStatusNames,
@@ -296,19 +302,65 @@ class SpecialAppointmentPresenter:
         )
 
 
+@dataclass
+class ViewSummary:
+    count: int = 0
+    repeat_count: int = 0
+    extra_count: int = 0
+    repeat_reasons: list[str] = field(default_factory=list)
+
+    @property
+    def repeat_count_string(self):
+        if not self.repeat_count:
+            return ""
+        elif self.repeat_count == 1:
+            return "1 repeat"
+        else:
+            return f"{self.repeat_count} repeats"
+
+    @property
+    def extra_count_string(self):
+        if not self.extra_count:
+            return ""
+        else:
+            return f"{self.extra_count} extra"
+
+    @property
+    def repeat_and_extra_count_string(self):
+        if self.repeat_count_string and self.extra_count_string:
+            return f"{self.repeat_count_string}, {self.extra_count_string}"
+        elif self.repeat_count_string:
+            return self.repeat_count_string
+        elif self.extra_count_string:
+            return self.extra_count_string
+        else:
+            return ""
+
+
 class ImagesTakenPresenter:
     def __init__(self, appointment):
         study = appointment.study
         self.additional_details = study.additional_details
 
         self.total_count = 0
-        self.views_taken = {}
-        for view, count in study.series_counts().items():
-            if view in EKLUND_VIEWS and not count:
-                continue
-            image_name = view.short_name
-            self.views_taken[image_name] = count
-            self.total_count += count
+        self.views_taken = {view: ViewSummary() for view in ALL_VIEWS_RCC_FIRST}
+
+        for series in study.series_set.order_rcc_first():
+            view = ImageView(series.view_position, series.laterality)
+
+            summary = self.views_taken[view]
+            summary.count = series.count
+            summary.extra_count = series.extra_count
+            summary.repeat_count = series.repeat_count
+            summary.repeat_reasons = [
+                RepeatReason(reason).label for reason in series.repeat_reasons
+            ]
+
+            self.total_count += series.count
+
+        for view in EKLUND_VIEWS:
+            if not self.views_taken[view].count:
+                del self.views_taken[view]
 
     @property
     def title(self):

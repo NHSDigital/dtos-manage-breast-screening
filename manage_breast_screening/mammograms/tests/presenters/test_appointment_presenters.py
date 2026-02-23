@@ -15,8 +15,9 @@ from manage_breast_screening.mammograms.presenters import (
 )
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesTakenPresenter,
+    ViewSummary,
 )
-from manage_breast_screening.manual_images.models import ImageView, Study
+from manage_breast_screening.manual_images.models import ImageView, Series, Study
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
@@ -837,66 +838,179 @@ class TestImagesTakenPresenter:
 
         assert result.title == "No images taken"
         assert result.total_count == 0
-        assert result.views_taken == {}
+        assert result.views_taken == {
+            ImageView(view_position="CC", laterality="L"): ViewSummary(),
+            ImageView(view_position="MLO", laterality="L"): ViewSummary(),
+            ImageView(view_position="CC", laterality="R"): ViewSummary(),
+            ImageView(view_position="MLO", laterality="R"): ViewSummary(),
+        }
 
     def test_standard_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_counts.return_value = {
-            ImageView(view_position="CC", laterality="R"): 1,
-            ImageView(view_position="CC", laterality="L"): 1,
-            ImageView(view_position="MLO", laterality="R"): 1,
-            ImageView(view_position="MLO", laterality="L"): 1,
-        }
+        appointment.study.series_set.order_rcc_first.return_value = [
+            MagicMock(
+                spec=Series,
+                view_position="CC",
+                laterality="R",
+                count=1,
+                repeat_count=0,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="CC",
+                laterality="L",
+                count=1,
+                repeat_count=0,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="MLO",
+                laterality="R",
+                count=1,
+                repeat_count=0,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="MLO",
+                laterality="L",
+                count=1,
+                repeat_count=0,
+                extra_count=0,
+            ),
+        ]
 
         result = ImagesTakenPresenter(appointment)
 
         assert result.title == "4 images taken"
         assert result.total_count == 4
         assert result.views_taken == {
-            "RCC": 1,
-            "LCC": 1,
-            "RMLO": 1,
-            "LMLO": 1,
+            ImageView(view_position="CC", laterality="R"): ViewSummary(count=1),
+            ImageView(view_position="CC", laterality="L"): ViewSummary(count=1),
+            ImageView(view_position="MLO", laterality="R"): ViewSummary(count=1),
+            ImageView(view_position="MLO", laterality="L"): ViewSummary(count=1),
         }
 
     def test_all_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_counts.return_value = []
-        appointment.study.series_counts.return_value = {
-            ImageView(view_position="CC", laterality="R"): 20,
-            ImageView(view_position="CC", laterality="L"): 1,
-            ImageView(view_position="MLO", laterality="R"): 7,
-            ImageView(view_position="MLO", laterality="L"): 2,
-            ImageView(view_position="EKLUND", laterality="R"): 19,
-            ImageView(view_position="EKLUND", laterality="L"): 10,
-        }
+        appointment.study.series_set.order_rcc_first.return_value = []
+        appointment.study.series_set.order_rcc_first.return_value = [
+            MagicMock(
+                spec=Series,
+                view_position="CC",
+                laterality="R",
+                count=20,
+                repeat_count=19,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="CC",
+                laterality="L",
+                count=1,
+                repeat_count=0,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="MLO",
+                laterality="R",
+                count=7,
+                repeat_count=6,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="MLO",
+                laterality="L",
+                count=2,
+                repeat_count=0,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="EKLUND",
+                laterality="R",
+                count=19,
+                repeat_count=18,
+                extra_count=0,
+            ),
+            MagicMock(
+                spec=Series,
+                view_position="EKLUND",
+                laterality="L",
+                count=10,
+                repeat_count=9,
+                extra_count=0,
+            ),
+        ]
 
         result = ImagesTakenPresenter(appointment)
 
         assert result.title == "59 images taken"
         assert result.total_count == 59
+
         assert result.views_taken == {
-            "RCC": 20,
-            "LCC": 1,
-            "RMLO": 7,
-            "LMLO": 2,
-            "Right Eklund": 19,
-            "Left Eklund": 10,
+            ImageView(view_position="CC", laterality="L"): ViewSummary(count=1),
+            ImageView(view_position="MLO", laterality="L"): ViewSummary(
+                count=2, repeat_count=0
+            ),
+            ImageView(view_position="EKLUND", laterality="L"): ViewSummary(
+                count=10, repeat_count=9
+            ),
+            ImageView(view_position="CC", laterality="R"): ViewSummary(
+                count=20, repeat_count=19
+            ),
+            ImageView(view_position="MLO", laterality="R"): ViewSummary(
+                count=7, repeat_count=6
+            ),
+            ImageView(view_position="EKLUND", laterality="R"): ViewSummary(
+                count=19, repeat_count=18
+            ),
         }
 
     def test_one_image_types(self):
         appointment = MagicMock(spec=Appointment)
         appointment.study = MagicMock(spec=Study)
-        appointment.study.series_counts.return_value = {
-            ImageView(view_position="MLO", laterality="L"): 1,
-        }
+        appointment.study.series_set.order_rcc_first.return_value = [
+            MagicMock(
+                spec=Series,
+                view_position="MLO",
+                laterality="L",
+                count=1,
+                repeat_count=0,
+                extra_count=0,
+            )
+        ]
 
         result = ImagesTakenPresenter(appointment)
 
         assert result.title == "1 image taken"
         assert result.total_count == 1
         assert result.views_taken == {
-            "LMLO": 1,
+            ImageView(view_position="CC", laterality="R"): ViewSummary(count=0),
+            ImageView(view_position="CC", laterality="L"): ViewSummary(count=0),
+            ImageView(view_position="MLO", laterality="R"): ViewSummary(count=0),
+            ImageView(view_position="MLO", laterality="L"): ViewSummary(count=1),
         }
+
+
+class TestViewSummary:
+    @pytest.mark.parametrize(
+        "repeats, extra, expected",
+        [
+            (0, 0, ""),
+            (0, 1, "1 extra"),
+            (1, 0, "1 repeat"),
+            (2, 3, "2 repeats, 3 extra"),
+        ],
+    )
+    def test_repeat_and_extra_messages(self, repeats, extra, expected):
+        summary = ViewSummary(
+            count=repeats + extra + 1, repeat_count=repeats, extra_count=extra
+        )
+        assert summary.repeat_and_extra_count_string == expected

@@ -203,6 +203,13 @@ class Series(BaseModel):
         blank=True,
     )
 
+    @property
+    def extra_count(self):
+        if self.view_position == "EKLUND":
+            return 0
+        else:
+            return self.count - (self.repeat_count or 0) - 1
+
     class Meta:
         unique_together = ["study", "view_position", "laterality"]
 

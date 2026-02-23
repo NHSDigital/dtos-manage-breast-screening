@@ -3,10 +3,21 @@
 
 {% macro views_taken(presented_images) %}
   {% if presented_images.total_count > 0 %}
-    {% for type, count in presented_images.views_taken.items() %}
-      <p class="nhsuk-u-margin-bottom-2">
-        <strong>{{ count }}× {{ type }}</strong>
-      </p>
+    {% for view, summary in presented_images.views_taken.items() %}
+      <div class="nhsuk-u-margin-bottom-2">
+        <p class="nhsuk-u-margin-bottom-1">
+          <strong>{{ summary.count }}× {{ view.short_name }}{% if summary.repeat_and_extra_count_string %}:{% endif %}</strong>
+          {%- if summary.repeat_and_extra_count_string %} {{ summary.repeat_and_extra_count_string }}{% endif %}
+        </p>
+        {% if summary.repeat_count and summary.repeat_reasons %}
+          <p class="nhsuk-u-margin-bottom-1">Repeat reason:</p>
+          <ul class="nhsuk-list nhsuk-list--bullet nhsuk-u-margin-bottom-0">
+            {% for reason in summary.repeat_reasons %}
+              <li> {{ reason }} </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
     {% endfor %}
   {% else -%}
     Not provided

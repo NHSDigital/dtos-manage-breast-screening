@@ -125,7 +125,7 @@ class TestMultipleImagesInformationForm:
                 RepeatReason.PATIENT_MOVED.value,
                 RepeatReason.MOTION_BLUR.value,
             ]
-            assert series.repeat_count is None
+            assert series.repeat_count == 1
 
     class TestWithCountGreaterThan2:
         """Tests for series with count > 2 (multiple additional images)."""
