@@ -72,6 +72,14 @@ class Study(models.Model):
     )
     reasons_incomplete_details = models.TextField(blank=True, null=False, default="")
 
+    @classmethod
+    def for_appointment(cls, appointment):
+        action = appointment.gateway_actions.first()
+        if not action:
+            return None
+
+        return cls.objects.filter(source_message_id=action.id).first()
+
     def __str__(self):
         return self.study_instance_uid
 
