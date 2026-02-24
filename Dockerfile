@@ -9,7 +9,7 @@ RUN apk add --no-cache bash
 
 # Compile static assets
 COPY .browserslistrc babel.config.cjs package.json package-lock.json rollup.config.js  ./
-COPY manage_breast_screening ./manage_breast_screening
+COPY manage_breast_screening/assets ./manage_breast_screening/assets
 RUN npm ci
 RUN npm run compile
 
@@ -34,9 +34,6 @@ RUN uv sync --frozen --no-dev --compile-bytecode --no-editable && rm -rf $UV_CAC
 
 FROM python:3.14.0-alpine3.21@sha256:f1ac9e01293a18a24919826ea8c7bb8f7bbc25497887a0a1cade58801bb83d1c
 
-# Workaround for CVE-2024-6345 upgrade the installed version of setuptools to the latest version
-RUN pip install -U setuptools
-
 # Use a non-root user
 ENV CONTAINER_USER=appuser \
     CONTAINER_GROUP=appuser \
@@ -56,6 +53,7 @@ COPY --from=python_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ${VIRTUA
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ./manage_breast_screening /app/manage_breast_screening
 COPY --from=node_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} /app/manage_breast_screening/assets/compiled /app/manage_breast_screening/assets/compiled
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} manage.py ./
+COPY --chown=root:root --chmod=755 scripts/docker/entrypoint.sh /app/entrypoint.sh
 
 # Run django commands
 ENV DEBUG=0
@@ -66,4 +64,11 @@ EXPOSE 8000
 ARG COMMIT_SHA
 ENV COMMIT_SHA=$COMMIT_SHA
 
-ENTRYPOINT ["/app/.venv/bin/gunicorn", "--bind", "0.0.0.0:8000", "manage_breast_screening.config.wsgi"]
+# Gunicorn tuning — overridable per environment via Container App environment variables
+ENV GUNICORN_WORKERS=2 \
+    GUNICORN_WORKER_CONNECTIONS=1000 \
+    GUNICORN_TIMEOUT=120 \
+    GUNICORN_MAX_REQUESTS=1000 \
+    GUNICORN_MAX_REQUESTS_JITTER=100
+
+ENTRYPOINT ["/app/entrypoint.sh"]
