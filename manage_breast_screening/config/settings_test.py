@@ -22,6 +22,7 @@ STORAGES = {
     },
     "dicom": {
         "BACKEND": "django.core.files.storage.InMemoryStorage",
+        "OPTIONS": {"base_url": "/dicom/"},
     },
 }
 
