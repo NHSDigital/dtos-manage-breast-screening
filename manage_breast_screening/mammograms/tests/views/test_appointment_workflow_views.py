@@ -404,12 +404,19 @@ class TestGatewayImages:
         )
         assert response.status_code == 200
 
-    @pytest.mark.xfail(
-        reason="The check information view for gateway images is not implemented yet"
+    @patch(
+        "manage_breast_screening.mammograms.views.mammogram_views.gateway_images_enabled",
+        return_value=True,
     )
+    @pytest.mark.django_db
     def test_marks_the_step_complete_and_redirects_to_check_info(
-        self, clinical_user_client, appointment
+        self, _, clinical_user_client, appointment
     ):
+        dicom_study = DicomStudyFactory()
+        GatewayActionFactory.create(
+            id=str(dicom_study.source_message_id),
+            appointment=appointment,
+        )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:gateway_images",

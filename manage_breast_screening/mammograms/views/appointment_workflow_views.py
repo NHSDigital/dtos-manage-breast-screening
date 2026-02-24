@@ -1,5 +1,4 @@
 import logging
-import os
 import time
 
 from django.contrib import messages
@@ -18,7 +17,6 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.dicom.study_service import (
     StudyService as DicomStudyService,
 )
-from manage_breast_screening.gateway.models import Relay
 from manage_breast_screening.gateway.worklist_item_service import (
     GatewayActionAlreadyExistsError,
     WorklistItemService,
@@ -35,6 +33,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentWorkflowService,
     RecallService,
 )
+from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models import (
     Appointment,
@@ -389,14 +388,6 @@ def format_sse_event(event: str, data: str) -> str:
     """Format data as a Server-Sent Event."""
     lines = "\n".join(f"data: {line}" for line in data.splitlines())
     return f"event: {event}\n{lines}\n\n"
-
-
-def gateway_images_enabled(appointment):
-    """Check if automatic gateway image retrieval is enabled."""
-    return (
-        os.getenv("GATEWAY_IMAGES_ENABLED", "false").lower() == "true"
-        and Relay.for_provider(appointment.provider) is not None
-    )
 
 
 @login_required

@@ -1,3 +1,5 @@
+import os
+
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -5,7 +7,10 @@ from manage_breast_screening.dicom.tests.factories import (
     ImageFactory,
     StudyFactory,
 )
-from manage_breast_screening.gateway.tests.factories import GatewayActionFactory
+from manage_breast_screening.gateway.tests.factories import (
+    GatewayActionFactory,
+    RelayFactory,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
 )
@@ -27,16 +32,25 @@ class TestGatewayImages(SystemTestCase):
     def test_renders_images(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
+        self.and_gateway_images_are_enabled()
         self.and_there_are_images_for_the_appointment()
         self.when_i_visit_the_take_images_page()
 
         self.then_i_see_the_image_stream_container()
         self.and_i_see_the_images()
 
+        self.when_i_fill_in_additional_details_for_the_images()
+        self.and_i_click_continue()
+        self.then_i_see_the_image_counts_on_the_check_information_page()
+
     def and_there_is_an_appointment(self):
         self.appointment = AppointmentFactory(
             clinic_slot__clinic__setting__provider=self.current_provider,
         )
+
+    def and_gateway_images_are_enabled(self):
+        os.environ["GATEWAY_IMAGES_ENABLED"] = "true"
+        RelayFactory(provider=self.appointment.provider)
 
     def when_i_visit_the_take_images_page(self):
         self.page.goto(
@@ -77,9 +91,28 @@ class TestGatewayImages(SystemTestCase):
         ImageFactory.create(series__study=study, laterality="R", view_position="MLO")
         ImageFactory.create(series__study=study, laterality="R", view_position="CC")
         ImageFactory.create(series__study=study, laterality="R", view_position="CC")
+        ImageFactory.create(series__study=study, laterality="L", view_position="MLO")
+        ImageFactory.create(series__study=study, laterality="L", view_position="CC")
 
     def and_i_see_the_images(self):
         expect(self.page.get_by_text("1× RMLO")).to_be_visible()
         expect(self.page.get_by_text("2× RCC")).to_be_visible()
-        expect(self.page.get_by_text("0× LMLO")).to_be_visible()
-        expect(self.page.get_by_text("0× LCC")).to_be_visible()
+        expect(self.page.get_by_text("1× LMLO")).to_be_visible()
+        expect(self.page.get_by_text("1× LCC")).to_be_visible()
+
+    def when_i_fill_in_additional_details_for_the_images(self):
+        self.page.get_by_label("Notes for reader (optional)").fill(
+            "Some additional details"
+        )
+
+    def and_i_click_continue(self):
+        self.page.get_by_role("button", name="Continue").click()
+
+    def then_i_see_the_image_counts_on_the_check_information_page(self):
+        expect(
+            self.page.get_by_role("heading", name="Check information")
+        ).to_be_visible()
+        expect(self.page.get_by_text("1× RMLO")).to_be_visible()
+        expect(self.page.get_by_text("2× RCC")).to_be_visible()
+        expect(self.page.get_by_text("1× LMLO")).to_be_visible()
+        expect(self.page.get_by_text("1× LCC")).to_be_visible()
