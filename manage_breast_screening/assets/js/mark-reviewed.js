@@ -47,15 +47,17 @@ export class MarkReviewed extends Component {
     }
 
     this.$form = $form
-    this.$card = document.getElementById(cardId)
+    const $card = document.getElementById(cardId)
 
-    if (this.$card === null) {
+    if (!($card instanceof HTMLElement)) {
       throw new ElementError({
         element: $root,
         component: MarkReviewed,
         identifier: `#${cardId}`
       })
     }
+    
+    this.$card = $card
 
     const updateDom = this.updateDom.bind(this)
 
