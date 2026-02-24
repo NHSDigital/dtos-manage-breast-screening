@@ -13,7 +13,6 @@ from pytest_django.asserts import (
 from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.gateway.models import GatewayAction, GatewayActionType
-from manage_breast_screening.gateway.tests.factories import RelayFactory
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
 )
@@ -228,12 +227,13 @@ class TestRecordMedicalInformation:
             [AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION],
         )
 
-    @patch("manage_breast_screening.gateway.relay_service.RelayService.send_action")
+    @patch(
+        "manage_breast_screening.gateway.service_bus_sender.ServiceBusSender.send_action"
+    )
     def test_creates_gateway_action(self, mock_send_action, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
         )
-        relay = RelayFactory.create(provider=appointment.provider)
         clinical_user_client.http.post(
             reverse(
                 "mammograms:record_medical_information",
@@ -246,7 +246,7 @@ class TestRecordMedicalInformation:
             action.payload["parameters"]["worklist_item"]["participant"]["nhs_number"]
             == appointment.participant.nhs_number
         )
-        mock_send_action.assert_called_once_with(relay, action)
+        mock_send_action.assert_called_once_with(action)
 
 
 @pytest.mark.django_db
