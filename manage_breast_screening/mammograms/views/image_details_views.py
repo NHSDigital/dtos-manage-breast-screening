@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class AddImageDetailsView(InProgressAppointmentMixin, FormView):
     form_class = ImageDetailsForm
-    template_name = "mammograms/add_image_details.jinja"
+    template_name = "mammograms/image_details.jinja"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -66,7 +66,7 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
 
 class UpdateImageDetailsView(InProgressAppointmentMixin, FormView):
     form_class = ImageDetailsForm
-    template_name = "mammograms/add_image_details.jinja"
+    template_name = "mammograms/image_details.jinja"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
