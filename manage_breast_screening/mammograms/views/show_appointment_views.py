@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.views import View
 
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
+    GatewayImagesPresenter,
     ImagesTakenPresenter,
 )
+from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 
 from ..presenters import (
@@ -129,13 +131,18 @@ class ImageDetails(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
+        images_presenter = (
+            GatewayImagesPresenter
+            if gateway_images_enabled(appointment)
+            else ImagesTakenPresenter
+        )
 
         context = {
             "heading": appointment_presenter.participant.full_name,
             "caption": appointment_presenter.caption,
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
-            "presented_images": ImagesTakenPresenter(appointment),
+            "presented_images": images_presenter(appointment),
             "secondary_nav_items": present_secondary_nav(
                 appointment.pk,
                 current_tab="images",
