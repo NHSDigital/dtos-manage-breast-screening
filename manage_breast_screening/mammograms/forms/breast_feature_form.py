@@ -58,7 +58,7 @@ class BreastFeatureForm(Form):
         return data
 
 
-class CreateBreastFeatureForm(BreastFeatureForm):
+class AddBreastFeatureForm(BreastFeatureForm):
     def save(self, current_user):
         instance = BreastFeatureAnnotation.objects.create(
             appointment=self.appointment,

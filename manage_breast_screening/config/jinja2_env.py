@@ -1,3 +1,4 @@
+import inflect
 from django.conf import settings
 from django.templatetags.static import static
 from django.urls import reverse
@@ -29,6 +30,8 @@ def environment(**options):
             ]
         )
 
+    inflector = inflect.engine()
+
     env.globals.update(
         {
             "STATIC_URL": settings.STATIC_URL,
@@ -37,11 +40,13 @@ def environment(**options):
             "raise": raise_helper,
             "static": static,
             "url": reverse,
+            "inflector": inflector,
         }
     )
 
     env.filters["no_wrap"] = no_wrap
     env.filters["as_hint"] = as_hint
     env.filters["nl2br"] = nl2br
+    env.filters["plural"] = inflector.plural
 
     return env

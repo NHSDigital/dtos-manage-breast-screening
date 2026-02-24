@@ -39,6 +39,7 @@ dependencies = [
   "pillow>=12.1.0",
   "phonenumbers>=9.0.22",
   "websockets>=16.0",
+  "inflect>=7.5.0",
 ]
 
 [dependency-groups]

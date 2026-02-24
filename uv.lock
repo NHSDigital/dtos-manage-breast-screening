@@ -658,6 +658,19 @@ wheels = [
 ]
 
 [[package]]
+name = "inflect"
+version = "7.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "more-itertools" },
+    { name = "typeguard" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/78/c6/943357d44a21fd995723d07ccaddd78023eace03c1846049a2645d4324a3/inflect-7.5.0.tar.gz", hash = "sha256:faf19801c3742ed5a05a8ce388e0d8fe1a07f8d095c82201eb904f5d27ad571f", size = 73751, upload-time = "2024-12-28T17:11:18.897Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8a/eb/427ed2b20a38a4ee29f24dbe4ae2dafab198674fe9a85e3d6adf9e5f5f41/inflect-7.5.0-py3-none-any.whl", hash = "sha256:2aea70e5e70c35d8350b8097396ec155ffd68def678c7ff97f51aa69c1d92344", size = 35197, upload-time = "2024-12-28T17:11:15.931Z" },
+]
+
+[[package]]
 name = "iniconfig"
 version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -815,6 +828,7 @@ dependencies = [
     { name = "factory-boy" },
     { name = "gevent" },
     { name = "gunicorn" },
+    { name = "inflect" },
     { name = "jinja2" },
     { name = "mesh-client" },
     { name = "nhsuk-frontend-jinja" },
@@ -868,6 +882,7 @@ requires-dist = [
     { name = "factory-boy", specifier = ">=3.3.3" },
     { name = "gevent", specifier = ">=25.0.0,<26.0.0" },
     { name = "gunicorn", specifier = ">=23.0.0,<26.0.0" },
+    { name = "inflect", specifier = ">=7.5.0" },
     { name = "jinja2", specifier = ">=3.1.6,<4.0.0" },
     { name = "mesh-client", specifier = ">=3.2.3,<6.0.0" },
     { name = "nhsuk-frontend-jinja", specifier = "==0.7.2" },
@@ -957,6 +972,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/14/70/45ac84638cd3040ccf536b95fa4724459a28b071a1f88bf7413790daa2c2/mesh_client-5.0.1.tar.gz", hash = "sha256:6565cb1a2f6e728ebc0a5274a7543a8a7f554a41c2f74db84e4a4f514ec86d35", size = 93376, upload-time = "2026-01-23T15:19:16.222Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/89/30/565d27d7483effbad6ebe36821723177c9fe63ed9c0ab5a6ee782228de5b/mesh_client-5.0.1-py2.py3-none-any.whl", hash = "sha256:34210abba5556aeedbbf8921e16b0e27067efd8230a026f350c9f22491637db8", size = 30977, upload-time = "2026-01-23T15:19:14.709Z" },
+]
+
+[[package]]
+name = "more-itertools"
+version = "10.8.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/5d/38b681d3fce7a266dd9ab73c66959406d565b3e85f21d5e66e1181d93721/more_itertools-10.8.0.tar.gz", hash = "sha256:f638ddf8a1a0d134181275fb5d58b086ead7c6a72429ad725c67503f13ba30bd", size = 137431, upload-time = "2025-09-02T15:23:11.018Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/8e/469e5a4a2f5855992e425f3cb33804cc07bf18d48f2db061aec61ce50270/more_itertools-10.8.0-py3-none-any.whl", hash = "sha256:52d4362373dcf7c52546bc4af9a86ee7c4579df9a8dc268be0a2f949d376cc9b", size = 69667, upload-time = "2025-09-02T15:23:09.635Z" },
 ]
 
 [[package]]
@@ -2043,6 +2067,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/eb/79/72064e6a701c2183016abbbfedaba506d81e30e232a68c9f0d6f6fcd1574/traitlets-5.14.3.tar.gz", hash = "sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7", size = 161621, upload-time = "2024-04-19T11:11:49.746Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/00/c0/8f5d070730d7836adc9c9b6408dec68c6ced86b304a9b26a14df072a6e8c/traitlets-5.14.3-py3-none-any.whl", hash = "sha256:b74e89e397b1ed28cc831db7aea759ba6640cb3de13090ca145426688ff1ac4f", size = 85359, upload-time = "2024-04-19T11:11:46.763Z" },
+]
+
+[[package]]
+name = "typeguard"
+version = "4.5.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7e/ec/adfe3dd6b5f7c5fc0b3cecdf6f893f1756dbd23cf749cd1ae49db069414f/typeguard-4.5.0.tar.gz", hash = "sha256:749bea21cdb2553e12831bc29f1eae980b22c7de8331ab67ae7db9e85470b5a7", size = 79993, upload-time = "2026-02-15T00:24:25.244Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d4/35/7541d1f046491fac8ce05d543d3f0de0af02086ad864dd3a23535ec703b9/typeguard-4.5.0-py3-none-any.whl", hash = "sha256:cfda388fc88a9ce42a41890900d6f31ee124bea9b73bb84701a32438e92165c3", size = 36724, upload-time = "2026-02-15T00:24:23.581Z" },
 ]
 
 [[package]]

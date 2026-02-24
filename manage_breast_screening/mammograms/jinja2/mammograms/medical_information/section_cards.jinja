@@ -112,13 +112,29 @@
 {% endmacro %}
 
 {% macro breast_features_content(presented_medical_info, read_only=false) %}
-  {% set insetHtml %}
-    <p>No breast features have been recorded for this participant.</p>
-  {% endset %}
-  {{ insetText({
-    "html": insetHtml,
-    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
-  }) }}
+  <p>Non-surgical scars, moles and other features that may appear on mammogram images</p>
+  {% if presented_medical_info.breast_features %}
+    {% set count = presented_medical_info.breast_features.feature_count %}
+    <p>
+      {{ count }} breast {{ "feature" | plural(count) }} recorded
+    </p>
+  {% else %}
+    {% set insetHtml %}
+      <p>No breast features have been recorded for this participant.</p>
+    {% endset %}
+    {{ insetText({
+      "html": insetHtml,
+      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+    }) }}
+  {% endif %}
+
+  <div class="nhsuk-form-group">
+    {{ button({
+      "text": presented_medical_info.add_or_update_breast_features_button.text,
+      "href": presented_medical_info.add_or_update_breast_features_button.href,
+      "classes": "nhsuk-button--secondary nhsuk-button--small"
+    }) }}
+  </div>
 {% endmacro %}
 
 {% macro other_information_content(presented_medical_info, read_only=false) %}
