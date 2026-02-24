@@ -1,13 +1,13 @@
-// reference/breast-diagram/process-exported-svg.js
+/* eslint-disable n/no-process-exit */
 //
 // Processes the exported SVG from Illustrator to add required data attributes
 // and clean up for use in the breast features component.
 //
-// Usage: node process-exported-svg.js <input-file.svg>
+// Usage: node process-exported-svg.cjs <input-file.svg>
 // Output: Creates <input-file>-processed.svg in the same directory
 
-const fs = require('fs')
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 
 // BEM block name - the SVG elements are all children of this block
 const BEM_BLOCK = 'app-breast-diagram'
@@ -16,7 +16,7 @@ const BEM_BLOCK = 'app-breast-diagram'
 const inputFile = process.argv[2]
 
 if (!inputFile) {
-  console.error('Usage: node process-exported-svg.js <input-file.svg>')
+  console.error('Usage: node process-exported-svg.cjs <input-file.svg>')
   process.exit(1)
 }
 
@@ -44,6 +44,9 @@ console.log(`Processed SVG written to: ${outputFile}`)
 
 // ============ Processing Functions ============
 
+/**
+ * @param {string} svg
+ */
 function processSvg(svg) {
   // Track stats for reporting
   const stats = {
@@ -96,6 +99,9 @@ function processSvg(svg) {
   return svg
 }
 
+/**
+ * @param {string} svg
+ */
 function processSvgElement(svg) {
   // Add class attribute and remove fixed width/height from the root SVG element
   // The viewBox will handle aspect ratio, CSS will handle sizing
@@ -143,6 +149,11 @@ function processSvgElement(svg) {
   return svg.replace(svgTagRegex, `<svg ${attributes}>`)
 }
 
+/**
+ * @param {string} svg
+ * @param {string} side
+ * @param {{ regionsProcessed: number; leftRegions: number; rightRegions: number; }} stats
+ */
 function processRegionGroup(svg, side, stats) {
   // Find the group for this side
   const groupRegex = new RegExp(
@@ -220,6 +231,9 @@ function processRegionGroup(svg, side, stats) {
   return svg
 }
 
+/**
+ * @param {string} svg
+ */
 function wrapRegionsInContainer(svg) {
   // Find both left and right groups and wrap them in a container
 
@@ -254,6 +268,9 @@ function wrapRegionsInContainer(svg) {
   return svg
 }
 
+/**
+ * @param {string} svg
+ */
 function processOutlineGroup(svg) {
   // Find all breast and nipple outline elements and extract them
   // We want to flatten the nested structure into a single group with clip-path
@@ -289,10 +306,11 @@ function processOutlineGroup(svg) {
   }
 
   // Helper to strip data-name from captured attributes
-  const stripDataName = (str) => str.replace(/\s*data-name="[^"]*"/g, '')
+  const stripDataName = (/** @type {string} */ str) =>
+    str.replace(/\s*data-name="[^"]*"/g, '')
 
   // Helper to strip attributes that have no effect on circles (closed paths)
-  const stripCircleOnlyAttrs = (str) =>
+  const stripCircleOnlyAttrs = (/** @type {string} */ str) =>
     str
       .replace(/\s*stroke-linecap="[^"]*"/g, '')
       .replace(/\s*stroke-miterlimit="[^"]*"/g, '')
@@ -322,6 +340,9 @@ function processOutlineGroup(svg) {
   return svg
 }
 
+/**
+ * @param {string} svg
+ */
 function removeInlineStylesFromRegions(svg) {
   // Keep fill="none" (or style="fill: none;") on region elements
   // This ensures the SVG displays correctly when viewed standalone (e.g. on GitHub)
@@ -330,6 +351,9 @@ function removeInlineStylesFromRegions(svg) {
   return svg
 }
 
+/**
+ * @param {string} svg
+ */
 function cleanupDefs(svg) {
   // Remove unnecessary id and data-name from elements in defs
   // The clippath rect doesn't need these attributes
@@ -340,6 +364,9 @@ function cleanupDefs(svg) {
   return svg
 }
 
+/**
+ * @param {string} svg
+ */
 function autoIndentSvg(svg) {
   // Auto-indent SVG based on tag nesting depth
   // This provides consistent formatting regardless of how transformations affect whitespace
@@ -387,6 +414,10 @@ function autoIndentSvg(svg) {
 
 // ============ Validation ============
 
+/**
+ * @param {string} svg
+ * @param {{ regionsProcessed: number; leftRegions: number; rightRegions: number; }} stats
+ */
 function validateProcessedSvg(svg, stats) {
   const errors = []
   const warnings = []
@@ -451,6 +482,9 @@ function validateProcessedSvg(svg, stats) {
   }
 }
 
+/**
+ * @param {string} svg
+ */
 function addProcessedComment(svg) {
   // Add a comment indicating this file was processed
   const comment = `<!-- Source: ${inputFile} -->\n<!-- Processed by process-exported-svg.js - do not edit manually -->\n\n`

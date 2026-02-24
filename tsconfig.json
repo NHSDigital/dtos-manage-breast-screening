@@ -7,6 +7,9 @@
     },
     {
       "path": "./manage_breast_screening/tsconfig.json"
+    },
+    {
+      "path": "./manage_breast_screening/tsconfig.node.json"
     }
   ]
 }
