@@ -3,7 +3,7 @@ from django.views.decorators.http import require_http_methods
 
 from manage_breast_screening.mammograms.views import (
     mammogram_views,
-    record_breast_features_view,
+    update_breast_features_view,
 )
 from manage_breast_screening.mammograms.views.other_information import (
     hormone_replacement_therapy_views,
@@ -275,9 +275,9 @@ urlpatterns = [
         name="delete_other_procedure_history_item",
     ),
     path(
-        "<uuid:pk>/record-medical-information/breast-features/",
-        record_breast_features_view.RecordBreastFeaturesView.as_view(),
-        name="record_breast_features",
+        "<uuid:pk>/record-medical-information/breast-features/update/",
+        update_breast_features_view.UpdateBreastFeaturesView.as_view(),
+        name="update_breast_features",
     ),
     path(
         "<uuid:pk>/previous-mammograms/add",

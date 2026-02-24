@@ -253,7 +253,7 @@ class MedicalInformationPresenter:
     @property
     def add_or_update_breast_features_button(self):
         return self._subpage_button(
-            "mammograms:record_breast_features",
+            "mammograms:update_breast_features",
             "View or edit breast features" if self.breast_features else "Add a feature",
         )
 

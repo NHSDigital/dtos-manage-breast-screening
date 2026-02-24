@@ -440,7 +440,7 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(in_progress_appointment)
 
         assert presenter.add_or_update_breast_features_button == {
-            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/",
+            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/update/",
             "text": "Add a feature",
         }
 
@@ -453,6 +453,6 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(in_progress_appointment)
 
         assert presenter.add_or_update_breast_features_button == {
-            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/",
+            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/update/",
             "text": "View or edit breast features",
         }

@@ -1,18 +1,18 @@
 from django.urls import reverse
 from django.views.generic import FormView
 
-from ..forms.breast_feature_form import CreateBreastFeatureForm, UpdateBreastFeatureForm
+from ..forms.breast_feature_form import AddBreastFeatureForm, UpdateBreastFeatureForm
 from .mixins import InProgressAppointmentMixin
 
 
-class RecordBreastFeaturesView(InProgressAppointmentMixin, FormView):
+class UpdateBreastFeaturesView(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/medical_information/breast_features/form.jinja"
 
     def get_form(self):
         if hasattr(self.appointment, "breast_features"):
             form_class = UpdateBreastFeatureForm
         else:
-            form_class = CreateBreastFeatureForm
+            form_class = AddBreastFeatureForm
 
         return form_class(appointment=self.appointment, **self.get_form_kwargs())
 

@@ -5,7 +5,7 @@ import pytest
 from django.http import QueryDict
 
 from manage_breast_screening.mammograms.forms.breast_feature_form import (
-    CreateBreastFeatureForm,
+    AddBreastFeatureForm,
     UpdateBreastFeatureForm,
 )
 from manage_breast_screening.participants.models.breast_features import (
@@ -17,7 +17,7 @@ from manage_breast_screening.participants.models.breast_features import (
 class TestCreateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
         json_obj = [{"id": "abc", "name": "def", "x": 1, "y": 2}]
-        form = CreateBreastFeatureForm(
+        form = AddBreastFeatureForm(
             QueryDict(
                 urlencode(
                     {
@@ -36,13 +36,13 @@ class TestCreateBreastFeatureForm:
         assert instance.annotations_json == json_obj
 
     def test_intitial(self, in_progress_appointment):
-        form = CreateBreastFeatureForm(
+        form = AddBreastFeatureForm(
             appointment=in_progress_appointment,
         )
         assert form["features"].initial == []
 
     def test_malformed_json(self, in_progress_appointment):
-        form = CreateBreastFeatureForm(
+        form = AddBreastFeatureForm(
             QueryDict(
                 urlencode(
                     {
@@ -60,7 +60,7 @@ class TestCreateBreastFeatureForm:
         }
 
     def test_invalid_json(self, in_progress_appointment):
-        form = CreateBreastFeatureForm(
+        form = AddBreastFeatureForm(
             QueryDict(
                 urlencode(
                     {

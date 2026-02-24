@@ -14,7 +14,7 @@ class TestRecordBreastFeaturesView:
     def test_get_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:record_breast_features",
+                "mammograms:update_breast_features",
                 kwargs={"pk": in_progress_appointment.pk},
             )
         )
@@ -29,7 +29,7 @@ class TestRecordBreastFeaturesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:record_breast_features",
+                "mammograms:update_breast_features",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {"features": json.dumps([feature])},
@@ -57,7 +57,7 @@ class TestRecordBreastFeaturesView:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:record_breast_features",
+                "mammograms:update_breast_features",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {"features": json.dumps([feature])},
@@ -79,7 +79,7 @@ class TestRecordBreastFeaturesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:record_breast_features",
+                "mammograms:update_breast_features",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {

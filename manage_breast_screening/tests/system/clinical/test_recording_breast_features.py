@@ -71,7 +71,7 @@ class TestRecordingBreastFeatures(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:record_breast_features",
+                "mammograms:update_breast_features",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -87,7 +87,7 @@ class TestRecordingBreastFeatures(SystemTestCase):
 
     def then_i_am_on_the_breast_feature_form(self):
         self.assert_page_title_contains("Record breast features")
-        self.expect_url("mammograms:record_breast_features", pk=self.appointment.pk)
+        self.expect_url("mammograms:update_breast_features", pk=self.appointment.pk)
 
     def when_i_click_on_the_right_central_region(self):
         self.page.locator(".app-breast-diagram__regions-right .right_central").click(
