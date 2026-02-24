@@ -178,13 +178,13 @@ function processRegionGroup(svg, side, stats) {
       const cleanId = id.replace(/-\d+$/, '')
       const regionId = `${side}_${cleanId}`
 
-      // aria-label: "right upper inner" for sided regions, just "pre-sternal" for center
-      const ariaLabel =
+      // label: "right upper inner" for sided regions, just "pre-sternal" for center
+      const label =
         humanName === 'pre-sternal' ? humanName : `${side} ${humanName}`
 
       // Build the new path element - minimal attributes
       // Use class instead of id for reusability (multiple diagrams on page)
-      return `<path class="${regionId}" aria-label="${ariaLabel}" d="${dPath}"${rest}/>`
+      return `<path class="${regionId}" data-label="${label}" d="${dPath}"${rest}/>`
     }
   )
 
@@ -204,12 +204,12 @@ function processRegionGroup(svg, side, stats) {
       const regionId = `${side}_${cleanId}`
 
       // aria-label: "right upper inner" for sided regions, just "pre-sternal" for center
-      const ariaLabel =
+      const label =
         humanName === 'pre-sternal' ? humanName : `${side} ${humanName}`
 
       // Build the new polygon element - minimal attributes
       // Use class instead of id for reusability (multiple diagrams on page)
-      return `<polygon class="${regionId}" aria-label="${ariaLabel}" points="${points}"${rest}/>`
+      return `<polygon class="${regionId}" data-label="${label}" points="${points}"${rest}/>`
     }
   )
 
