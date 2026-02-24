@@ -14,6 +14,7 @@ var roleID = {
   contributor: 'b24988ac-6180-42a0-ab88-20f7382dd24c'
   kvSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
   kvSecretsOfficer: 'b86a8fe4-44ce-4948-aee5-eccb2c155cd7'
+  networkContributor: '4d97b98b-1d4f-4787-a291-c67834d212e7'
   rbacAdmin: 'f58310d9-a9f6-439a-9e8d-f62e7b41a168'
   storageBlobDataContributor: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
   storageQueueDataContributor: '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
@@ -30,6 +31,11 @@ var miRoleAssignments = [
     roleName: 'kvSecretsUser'
     roleId: roleID.kvSecretsUser
     description: 'kvSecretsUser access to subscription'
+  }
+  {
+    roleName: 'networkContributor'
+    roleId: roleID.networkContributor
+    description: 'Network Contributor access to subscription'
   }
   {
     roleName: 'rbacAdmin'
@@ -52,6 +58,11 @@ var groupRoleAssignments = [
     roleName: 'kvSecretsOfficer'
     roleId: roleID.kvSecretsOfficer
     description: 'kvSecretsOfficer access to subscription'
+  }
+  {
+    roleName: 'networkContributor'
+    roleId: roleID.networkContributor
+    description: 'Network Contributor access to subscription'
   }
   {
     roleName: 'rbacAdmin'
