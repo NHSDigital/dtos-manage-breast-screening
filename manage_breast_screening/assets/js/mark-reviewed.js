@@ -1,17 +1,21 @@
-import { Component, ElementError } from 'nhsuk-frontend'
+import { ConfigurableComponent, ElementError } from 'nhsuk-frontend'
 
 import setSubmit from './set-submit.js'
 
 /**
  * Enhance the mark as reviewed button to submit via fetch and update the review
  * status without a full page reload.
+ *
+ * @augments {ConfigurableComponent<MarkReviewedConfig>}
  */
-export class MarkReviewed extends Component {
+export class MarkReviewed extends ConfigurableComponent {
   /**
    * @param {Element | null} $root - HTML element to use for component
    */
   constructor($root) {
     super($root)
+
+    const { statusCardId, nextCardId } = this.config
 
     const $form = this.$root.querySelector('form')
     if (!$form) {
@@ -22,8 +26,7 @@ export class MarkReviewed extends Component {
       })
     }
 
-    const cardId = this.$root.dataset.statusCardId
-    if (!cardId) {
+    if (!statusCardId) {
       throw new ElementError({
         element: $root,
         component: MarkReviewed,
@@ -31,33 +34,34 @@ export class MarkReviewed extends Component {
       })
     }
 
-    const nextCardId = this.$root.dataset.nextCardId
     if (nextCardId) {
-      this.$nextCard = document.getElementById(nextCardId)
+      const $nextCard = document.getElementById(nextCardId)
 
-      if (this.$nextCard === null) {
+      if (!($nextCard instanceof HTMLElement)) {
         throw new ElementError({
           element: $root,
           component: MarkReviewed,
           identifier: `#${nextCardId}`
         })
       }
+
+      this.$nextCard = $nextCard
     } else {
       this.$nextCard = null
     }
 
-    this.$form = $form
-    const $card = document.getElementById(cardId)
+    const $card = document.getElementById(statusCardId)
 
     if (!($card instanceof HTMLElement)) {
       throw new ElementError({
         element: $root,
         component: MarkReviewed,
-        identifier: `#${cardId}`
+        identifier: `#${statusCardId}`
       })
     }
-    
+
     this.$card = $card
+    this.$form = $form
 
     const updateDom = this.updateDom.bind(this)
 
@@ -95,4 +99,42 @@ export class MarkReviewed extends Component {
    * Name for the component used when initialising using data-module attributes
    */
   static moduleName = 'app-mark-reviewed'
+
+  /**
+   * MarkReviewed default config
+   *
+   * @see {@link MarkReviewedConfig}
+   * @constant
+   * @type {MarkReviewedConfig}
+   */
+  static defaults = Object.freeze({
+    statusCardId: '',
+    nextCardId: ''
+  })
+
+  /**
+   * Image map config schema
+   *
+   * @constant
+   * @satisfies {Schema<MarkReviewedConfig>}
+   */
+  static schema = Object.freeze({
+    properties: {
+      statusCardId: { type: 'string' },
+      nextCardId: { type: 'string' }
+    }
+  })
 }
+
+/**
+ * MarkReviewed config
+ *
+ * @see {@link ImageMap.defaults}
+ * @typedef {object} MarkReviewedConfig
+ * @property {string} statusCardId - Id of the card for the current section
+ * @property {string} nextCardId - Id of the next section's card, if there is one
+ */
+
+/**
+ * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
+ */
