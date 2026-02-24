@@ -7,6 +7,9 @@ from manage_breast_screening.participants.models import MedicalInformationSectio
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
     HormoneReplacementTherapy,
 )
+from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
+    PregnancyAndBreastfeeding,
+)
 from manage_breast_screening.participants.models.symptom import (
     RelativeDateChoices,
     SymptomAreas,
@@ -377,3 +380,55 @@ class TestRecordMedicalInformationPresenter:
         presenter = MedicalInformationPresenter(appointment)
 
         assert not presenter.hormone_replacement_therapy_actions()
+
+    def test_add_pregnancy_and_breastfeeding_link(self):
+        appointment = AppointmentFactory()
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.pregnancy_and_breastfeeding is None
+        assert presenter.add_pregnancy_and_breastfeeding_link == (
+            f"/mammograms/{appointment.pk}/record-medical-information/pregnancy-and-breastfeeding/"
+        )
+
+    def test_pregnancy_and_breastfeeding_actions_present(self):
+        appointment = AppointmentFactory()
+        pregnancy_and_breastfeeding = PregnancyAndBreastfeeding.objects.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.NO,
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.NO,
+        )
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.pregnancy_and_breastfeeding == pregnancy_and_breastfeeding
+        assert presenter.pregnancy_and_breastfeeding_actions(read_only=False) == {
+            "items": [
+                {
+                    "classes": "nhsuk-link--no-visited-state",
+                    "href": f"/mammograms/{appointment.pk}/record-medical-information/pregnancy-and-breastfeeding/{pregnancy_and_breastfeeding.pk}/",
+                    "text": "Change",
+                    "visuallyHiddenText": "pregnancy and breastfeeding",
+                }
+            ]
+        }
+
+    def test_pregnancy_and_breastfeeding_actions_readonly(self):
+        appointment = AppointmentFactory()
+        pregnancy_and_breastfeeding = PregnancyAndBreastfeeding.objects.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.NO,
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.NO,
+        )
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert presenter.pregnancy_and_breastfeeding == pregnancy_and_breastfeeding
+        assert not presenter.pregnancy_and_breastfeeding_actions(read_only=True)
+
+    def test_pregnancy_and_breastfeeding_actions_none(self):
+        appointment = AppointmentFactory()
+
+        presenter = MedicalInformationPresenter(appointment)
+
+        assert not presenter.pregnancy_and_breastfeeding_actions()
