@@ -62,6 +62,7 @@ module "container-apps" {
   environment                           = var.environment
   env_config                            = var.env_config
   fetch_secrets_from_app_key_vault      = var.fetch_secrets_from_app_key_vault
+  deploy_infra                          = var.deploy_infra
   front_door_profile                    = var.front_door_profile
   hub                                   = var.hub
   log_analytics_workspace_id            = var.deploy_infra ? module.infra[0].log_analytics_workspace_id : data.azurerm_log_analytics_workspace.audit[0].id

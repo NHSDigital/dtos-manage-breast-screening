@@ -80,7 +80,7 @@ module managedIdentiyGHtoADO 'managedIdentity.bicep' = {
 
 // Let the GHtoADO managed identity access a subscription
 resource readerAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, envConfig, 'reader')
+  name: guid(subscription().subscriptionId, miGHtoADOname, 'reader')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.reader)
     principalId: managedIdentiyGHtoADO.outputs.miPrincipalID
@@ -133,7 +133,7 @@ module storageAccountPrivateEndpoint 'privateEndpoint.bicep' = {
 
 // Let the managed identity manage monitoring resources (Application Insights, Log Analytics)
 resource monitoringContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, envConfig, 'monitoringContributor')
+  name: guid(subscription().subscriptionId, miADOtoAZname, 'monitoringContributor')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.monitoringContributor)
     principalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
@@ -143,7 +143,7 @@ resource monitoringContributorAssignment 'Microsoft.Authorization/roleAssignment
 
 // Let the managed identity configure vnet peering and DNS records
 resource networkContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, envConfig, 'networkContributor')
+  name: guid(subscription().subscriptionId, miADOtoAZname, 'networkContributor')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.networkContributor)
     principalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
@@ -187,7 +187,7 @@ module keyVaultModule 'keyVault.bicep' = {
 
 // Let the managed identity configure Front door and its resources
 resource CDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, envConfig, 'CDNContributor')
+  name: guid(subscription().subscriptionId, miADOtoAZname, 'CDNContributor')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.CDNContributor)
     principalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
@@ -197,7 +197,7 @@ resource CDNContributorAssignment 'Microsoft.Authorization/roleAssignments@2022-
 
 // Let the managed identity assign the Key Vault Secrets User role to other principals
 resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(subscription().subscriptionId, envConfig, 'rbacAdmin')
+  name: guid(subscription().subscriptionId, miADOtoAZname, 'rbacAdmin')
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.rbacAdmin)
     principalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
