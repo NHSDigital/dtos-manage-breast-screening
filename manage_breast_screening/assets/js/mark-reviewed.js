@@ -22,7 +22,7 @@ export class MarkReviewed extends Component {
       })
     }
 
-    const cardId = this.$root.getAttribute('data-status-card-id')
+    const cardId = this.$root.dataset.statusCardId
     if (!cardId) {
       throw new ElementError({
         element: $root,
@@ -31,7 +31,7 @@ export class MarkReviewed extends Component {
       })
     }
 
-    const nextCardId = this.$root.getAttribute('data-next-card-id')
+    const nextCardId = this.$root.dataset.nextCardId
     if (nextCardId) {
       this.$nextCard = document.getElementById(nextCardId)
 

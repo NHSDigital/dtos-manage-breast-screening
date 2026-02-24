@@ -22,7 +22,7 @@ export class CheckIn extends Component {
       })
     }
 
-    const appointmentId = this.$root.getAttribute('data-appointment-id')
+    const appointmentId = this.$root.dataset.appointmentId
     if (!appointmentId) {
       throw new ElementError({
         element: $root,
