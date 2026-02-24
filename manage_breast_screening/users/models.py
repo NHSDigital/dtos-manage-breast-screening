@@ -59,6 +59,15 @@ class User(AbstractBaseUser):
             key_salt, str(self.is_active), algorithm="sha256"
         ).hexdigest()
 
+    @property
+    def access_labels(self):
+        labels = list(
+            {role for assignment in self.assignments.all() for role in assignment.roles}
+        )
+        if self.is_sysadmin:
+            labels.append("Sysadmin")
+        return labels
+
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
 

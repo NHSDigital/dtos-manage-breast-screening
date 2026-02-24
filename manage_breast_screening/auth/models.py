@@ -19,6 +19,7 @@ class Persona:
     first_name: str
     last_name: str
     role: str
+    is_sysadmin: bool = False
 
     @property
     def username(self):
@@ -27,9 +28,11 @@ class Persona:
 
 ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
 CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
+SYSADMIN_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_sysadmin=True)
 PERSONAS = [
     ADMINISTRATIVE_PERSONA,
     CLINICAL_PERSONA,
     Persona("Olivia", "Morgan", Role.ADMINISTRATIVE),
     Persona("Ella", "Foster", Role.CLINICAL),
+    SYSADMIN_PERSONA,
 ]

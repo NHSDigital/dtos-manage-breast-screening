@@ -107,6 +107,7 @@ def select_provider(request):
     )
 
 
+@require_http_methods(["GET", "POST"])
 @permission_required(Permission.MANAGE_PROVIDER_SETTINGS, raise_exception=True)
 def provider_settings(request):
     provider = request.user.current_provider
@@ -123,7 +124,7 @@ def provider_settings(request):
 
     return render(
         request,
-        "clinics/settings.jinja",
+        "clinics/provider_settings.jinja",
         context={
             "form": form,
             "provider": provider,
