@@ -80,11 +80,7 @@ class SectionPresenter:
     @property
     def next_section_link(self):
         if self.next_anchor:
-            return {
-                "href": f"#{self.next_anchor}",
-                "text": "Next section",
-                "is_anchor": True,
-            }
+            return {"href": f"#{self.next_anchor}", "text": "Next section"}
 
     @property
     def review_button(self):
