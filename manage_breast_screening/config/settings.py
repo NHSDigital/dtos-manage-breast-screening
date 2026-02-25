@@ -179,6 +179,10 @@ DATABASES = {
         "PORT": environ.get("DATABASE_PORT", "5432"),
         "OPTIONS": {"sslmode": environ.get("DATABASE_SSLMODE", "prefer")},
         "TIME_ZONE": "Europe/London",
+        # The pod authenticates to PostgreSQL via Azure AD managed identity (DefaultAzureCredential).
+        # Tokens last ~60-75 minutes. CONN_MAX_AGE must be shorter than the token lifetime to avoid reusing connections with expired tokens.
+        "CONN_MAX_AGE": 300,
+        "CONN_HEALTH_CHECKS": True,
     }
 }
 
