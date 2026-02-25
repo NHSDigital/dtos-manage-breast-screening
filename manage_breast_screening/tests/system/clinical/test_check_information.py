@@ -55,6 +55,43 @@ class TestCheckInformation(SystemTestCase):
         self.and_i_am_on_the_check_information_page()
         self.then_the_accessibility_baseline_is_met()
 
+    def test_check_information_change_links(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment_with_information_to_be_checked()
+        self.then_i_can_change_ethnicity_details()
+
+    def and_there_is_an_appointment_with_information_to_be_checked(self):
+        self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
+        self.and_there_is_an_appointment_for_the_clinic()
+        self.and_there_is_medical_information_for_the_appointment()
+        self.and_the_appointment_has_images()
+        self.and_the_appointment_has_a_note()
+        self.and_i_am_on_the_check_information_page()
+
+    def then_i_can_change_ethnicity_details(self):
+        self.page.get_by_role("link", name="Change ethnicity").click()
+        expect(self.page).to_have_url(
+            re.compile(
+                reverse(
+                    "participants:edit_ethnicity",
+                    kwargs={"pk": self.appointment.participant.pk},
+                )
+            )
+        )
+
+        self.page.get_by_role("link", name="Back").click()
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+
+        self.page.get_by_role("link", name="Change ethnicity").click()
+        self.page.get_by_label("Chinese").check()
+        self.page.get_by_role("button", name="Save and continue").click()
+
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+        ethnicity_row = self.page.locator(".nhsuk-summary-list__row").filter(
+            has_text="Ethnicity"
+        )
+        expect(ethnicity_row).to_contain_text("Asian or Asian British (Chinese)")
+
     def and_there_is_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
         self.clinic = ClinicFactory(
