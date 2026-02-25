@@ -12,42 +12,45 @@ const path = require('node:path')
 // BEM block name - the SVG elements are all children of this block
 const BEM_BLOCK = 'app-breast-diagram'
 
-// Get input file from command line
-const inputFile = process.argv[2]
+if (require.main === module) {
+  // Get input file from command line
+  const inputFile = process.argv[2]
 
-if (!inputFile) {
-  console.error('Usage: node process-exported-svg.cjs <input-file.svg>')
-  process.exit(1)
+  if (!inputFile) {
+    console.error('Usage: node process-exported-svg.cjs <input-file.svg>')
+    process.exit(1)
+  }
+
+  if (!fs.existsSync(inputFile)) {
+    console.error(`File not found: ${inputFile}`)
+    process.exit(1)
+  }
+
+  // Read the SVG file
+  const svgContent = fs.readFileSync(inputFile, 'utf8')
+
+  // Process the SVG
+  const processedSvg = processSvg(svgContent, inputFile)
+
+  // Generate output filename
+  const ext = path.extname(inputFile)
+  const basename = path.basename(inputFile, ext)
+  const dirname = path.dirname(inputFile)
+  const outputFile = path.join(dirname, `${basename}-processed${ext}`)
+
+  // Write the processed SVG
+  fs.writeFileSync(outputFile, processedSvg)
+
+  console.log(`Processed SVG written to: ${outputFile}`)
 }
-
-if (!fs.existsSync(inputFile)) {
-  console.error(`File not found: ${inputFile}`)
-  process.exit(1)
-}
-
-// Read the SVG file
-const svgContent = fs.readFileSync(inputFile, 'utf8')
-
-// Process the SVG
-const processedSvg = processSvg(svgContent)
-
-// Generate output filename
-const ext = path.extname(inputFile)
-const basename = path.basename(inputFile, ext)
-const dirname = path.dirname(inputFile)
-const outputFile = path.join(dirname, `${basename}-processed${ext}`)
-
-// Write the processed SVG
-fs.writeFileSync(outputFile, processedSvg)
-
-console.log(`Processed SVG written to: ${outputFile}`)
 
 // ============ Processing Functions ============
 
 /**
  * @param {string} svg
+ * @param {string} source
  */
-function processSvg(svg) {
+function processSvg(svg, source) {
   // Track stats for reporting
   const stats = {
     regionsProcessed: 0,
@@ -78,7 +81,7 @@ function processSvg(svg) {
   svg = autoIndentSvg(svg)
 
   // Add processed comment at the top
-  svg = addProcessedComment(svg)
+  svg = addProcessedComment(svg, source)
 
   // Validate the processed SVG
   const validation = validateProcessedSvg(svg, stats)
@@ -484,11 +487,14 @@ function validateProcessedSvg(svg, stats) {
 
 /**
  * @param {string} svg
+ * @param {string} source
  */
-function addProcessedComment(svg) {
+function addProcessedComment(svg, source) {
   // Add a comment indicating this file was processed
-  const comment = `<!-- Source: ${inputFile} -->\n<!-- Processed by process-exported-svg.js - do not edit manually -->\n\n`
+  const comment = `<!-- Source: ${source} -->\n<!-- Processed by process-exported-svg.js - do not edit manually -->\n\n`
 
   // Insert at the start (XML declaration already removed)
   return comment + svg
 }
+
+module.exports = { processSvg }
