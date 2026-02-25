@@ -1,4 +1,3 @@
-/* eslint-disable n/no-process-exit */
 //
 // Processes the exported SVG from Illustrator to add required data attributes
 // and clean up for use in the breast features component.
@@ -13,17 +12,23 @@ const path = require('node:path')
 const BEM_BLOCK = 'app-breast-diagram'
 
 if (require.main === module) {
+  cli()
+}
+
+function cli() {
   // Get input file from command line
   const inputFile = process.argv[2]
 
   if (!inputFile) {
     console.error('Usage: node process-exported-svg.cjs <input-file.svg>')
-    process.exit(1)
+    process.exitCode = 1
+    return
   }
 
   if (!fs.existsSync(inputFile)) {
     console.error(`File not found: ${inputFile}`)
-    process.exit(1)
+    process.exitCode = 1
+    return
   }
 
   // Read the SVG file
@@ -86,9 +91,9 @@ function processSvg(svg, source) {
   // Validate the processed SVG
   const validation = validateProcessedSvg(svg, stats)
   if (!validation.valid) {
-    console.error('\n❌ Validation failed:')
-    validation.errors.forEach((err) => console.error(`   - ${err}`))
-    process.exit(1)
+    const errors = validation.errors.map((err) => `   - ${err}`).join('\n')
+    const error_summary = `\n❌ Validation failed: ${errors}`
+    throw new Error(error_summary)
   }
   if (validation.warnings.length > 0) {
     console.warn('\n⚠️  Warnings:')
@@ -198,7 +203,7 @@ function processRegionGroup(svg, side, stats) {
 
       // Build the new path element - minimal attributes
       // Use class instead of id for reusability (multiple diagrams on page)
-      return `<path class="${regionId}" data-label="${label}" d="${dPath}"${rest}/>`
+      return `<path class="${regionId}" d="${dPath}"${rest}><title>${label}</title></path>`
     }
   )
 
@@ -223,7 +228,7 @@ function processRegionGroup(svg, side, stats) {
 
       // Build the new polygon element - minimal attributes
       // Use class instead of id for reusability (multiple diagrams on page)
-      return `<polygon class="${regionId}" data-label="${label}" points="${points}"${rest}/>`
+      return `<polygon class="${regionId}" points="${points}"${rest}><title>${label}</title></polygon>`
     }
   )
 
@@ -321,10 +326,10 @@ function processOutlineGroup(svg) {
 
   // Build the flattened structure - indentation handled by autoIndentSvg
   const flattenedDiagram = `<g class="${BEM_BLOCK}__diagram" clip-path="url(${clipPathUrl})">
-<path data-side="left" aria-label="left breast outline" vector-effect="non-scaling-stroke"${stripDataName(leftBreastMatch[1])}d="${leftBreastMatch[2]}"${stripDataName(leftBreastMatch[3])}/>
-<circle data-side="left" aria-label="left nipple outline" vector-effect="non-scaling-stroke"${stripCircleOnlyAttrs(stripDataName(leftNippleMatch[1]))}/>
-<path data-side="right" aria-label="right breast outline" vector-effect="non-scaling-stroke"${stripDataName(rightBreastMatch[1])}d="${rightBreastMatch[2]}"${stripDataName(rightBreastMatch[3])}/>
-<circle data-side="right" aria-label="right nipple outline" vector-effect="non-scaling-stroke"${stripCircleOnlyAttrs(stripDataName(rightNippleMatch[1]))}/>
+<path data-side="left" vector-effect="non-scaling-stroke"${stripDataName(leftBreastMatch[1])}d="${leftBreastMatch[2]}"${stripDataName(leftBreastMatch[3])}><title>left breast outline</title></path>
+<circle data-side="left" vector-effect="non-scaling-stroke"${stripCircleOnlyAttrs(stripDataName(leftNippleMatch[1]))}><title>left nipple outline</title></circle>
+<path data-side="right" vector-effect="non-scaling-stroke"${stripDataName(rightBreastMatch[1])}d="${rightBreastMatch[2]}"${stripDataName(rightBreastMatch[3])}><title>right breast outline</title></path>
+<circle data-side="right" vector-effect="non-scaling-stroke"${stripCircleOnlyAttrs(stripDataName(rightNippleMatch[1]))}><title>right nipple outline</title></circle>
 </g>`
 
   // Replace the entire diagram group structure
