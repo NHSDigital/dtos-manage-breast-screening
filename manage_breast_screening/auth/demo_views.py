@@ -1,8 +1,8 @@
+from collections import OrderedDict
 from urllib.parse import urlencode
 
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.decorators import login_not_required
-from django.db.models import Case, Q, When
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -19,7 +19,6 @@ from .models import PERSONAS
 @csrf_exempt
 @login_not_required
 def persona_login(request):
-    users = _get_users(request.user)
     next_path = extract_relative_redirect_url(request, parameter_name="next")
 
     if request.method == "POST":
@@ -44,23 +43,40 @@ def persona_login(request):
             request,
             "auth/persona_login.jinja",
             context={
-                "users": users,
-                "page_title": "Personas",
-                "current_user": request.user,
+                "providers_with_users": _get_providers_with_users(request.user),
+                "page_title": "Persona logins",
                 "next": next_path,
             },
         )
 
 
-def _get_users(current_user):
-    users = get_user_model().objects.filter(
-        nhs_uid__in=(persona.username for persona in PERSONAS)
+def _get_providers_with_users(current_user):
+    persona_usernames = [persona.username for persona in PERSONAS]
+    users = (
+        get_user_model()
+        .objects.filter(nhs_uid__in=persona_usernames)
+        .prefetch_related("assignments__provider")
+        .order_by("first_name")
     )
 
-    if current_user.is_authenticated:
-        # Stick the current user at the top of the list
-        return users.annotate(
-            ordering=Case(When(Q(nhs_uid=current_user.nhs_uid), then=0), default=1)
-        ).order_by("ordering", "first_name")
+    providers = OrderedDict()
+    for user in users:
+        is_current = (
+            current_user.is_authenticated and user.nhs_uid == current_user.nhs_uid
+        )
+        user_entry = {"user": user, "is_current": is_current}
 
-    return users.order_by("first_name")
+        for assignment in user.assignments.all():
+            provider = assignment.provider
+            if provider.pk not in providers:
+                providers[provider.pk] = {"provider": provider, "roles": OrderedDict()}
+
+            for role in sorted(assignment.roles):
+                if role not in providers[provider.pk]["roles"]:
+                    providers[provider.pk]["roles"][role] = []
+                providers[provider.pk]["roles"][role].append(user_entry)
+
+    providers = OrderedDict(
+        sorted(providers.items(), key=lambda item: item[1]["provider"].name)
+    )
+    return providers.values()
