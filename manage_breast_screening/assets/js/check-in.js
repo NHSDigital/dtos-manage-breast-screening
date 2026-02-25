@@ -1,12 +1,14 @@
-import { Component, ElementError } from 'nhsuk-frontend'
+import { ConfigurableComponent, ElementError } from 'nhsuk-frontend'
 
 import setSubmit from './set-submit.js'
 
 /**
  * Enhance a check-in form to submit via fetch and update the appointment
  * status without a full page reload.
+ *
+ * @augments {ConfigurableComponent<CheckInConfig>}
  */
-export class CheckIn extends Component {
+export class CheckIn extends ConfigurableComponent {
   /**
    * @param {Element | null} $root - HTML element to use for component
    */
@@ -22,7 +24,7 @@ export class CheckIn extends Component {
       })
     }
 
-    const appointmentId = this.$root.dataset.appointmentId
+    const appointmentId = this.config.appointmentId
     if (!appointmentId) {
       throw new ElementError({
         element: $root,
@@ -93,4 +95,39 @@ export class CheckIn extends Component {
    * Name for the component used when initialising using data-module attributes
    */
   static moduleName = 'app-check-in'
+
+  /**
+   * Check in default config
+   *
+   * @see {@link CheckInConfig}
+   * @constant
+   * @type {CheckInConfig}
+   */
+  static defaults = Object.freeze({
+    appointmentId: ''
+  })
+
+  /**
+   * Check in config schema
+   *
+   * @constant
+   * @satisfies {Schema<CheckInConfig>}
+   */
+  static schema = Object.freeze({
+    properties: {
+      appointmentId: { type: 'string' }
+    }
+  })
 }
+
+/**
+ * Check in config
+ *
+ * @see {@link CheckIn.defaults}
+ * @typedef {object} CheckInConfig
+ * @property {string} appointmentId - Id of the container for the status and check in button of the current appointment
+ */
+
+/**
+ * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
+ */
