@@ -389,26 +389,27 @@ function autoIndentSvg(svg) {
 
       // Check if line is a closing tag - decrease depth before indenting
       const isClosingTag = trimmed.startsWith('</')
-      // Check if line is a self-closing tag or comment
-      const isSelfClosing = trimmed.endsWith('/>') || trimmed.startsWith('<!--')
-      // Check if line is an opening tag (not closing, not self-closing, not comment)
-      const isOpeningTag =
-        trimmed.startsWith('<') &&
-        !isClosingTag &&
-        !isSelfClosing &&
-        !trimmed.startsWith('<!')
 
-      // Decrease depth for closing tags before indenting this line
       if (isClosingTag) {
-        depth = Math.max(0, depth - 1)
+        depth -= 1
       }
 
       const indented = indent.repeat(depth) + trimmed
 
-      // Increase depth after opening tags for subsequent lines
-      if (isOpeningTag) {
-        depth++
+      if (isClosingTag) {
+        return indented
       }
+
+      // Adjust indent of following line based on number of tags opened/closed
+      const tagMarkers = trimmed.matchAll(/<\/?/g).toArray()
+      const selfClosings = trimmed.matchAll(/(\/>)|(-->)/g).toArray()
+
+      depth = tagMarkers.reduce(
+        (partialSum, match) =>
+          match[0].length == 2 ? partialSum - 1 : partialSum + 1,
+        depth
+      )
+      depth = Math.max(0, depth - selfClosings.length)
 
       return indented
     })
