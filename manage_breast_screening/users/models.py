@@ -1,3 +1,5 @@
+from functools import cache
+
 import rules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
@@ -28,6 +30,14 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "nhs_uid"
     REQUIRED_FIELDS = []
+
+    @cache
+    def has_role(self, role):
+        if not self.current_provider:
+            return False
+        return self.assignments.filter(
+            provider_id=self.current_provider, roles__contains=[role]
+        ).exists()
 
     @property
     def current_provider(self):
