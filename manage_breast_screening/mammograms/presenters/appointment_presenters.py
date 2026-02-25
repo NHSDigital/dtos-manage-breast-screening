@@ -8,6 +8,7 @@ from manage_breast_screening.dicom.models import Study as DicomStudy
 from manage_breast_screening.dicom.study_service import (
     StudyService as DicomStudyService,
 )
+from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.manual_images.models import (
     ALL_VIEWS_RCC_FIRST,
     EKLUND_VIEWS,
@@ -339,6 +340,15 @@ class ViewSummary:
             return self.extra_count_string
         else:
             return ""
+
+
+class ImagesPresenterFactory:
+    @staticmethod
+    def presenter_for(appointment):
+        if gateway_images_enabled(appointment):
+            return GatewayImagesPresenter(appointment)
+        else:
+            return ImagesTakenPresenter(appointment)
 
 
 class ImagesPresenter:
