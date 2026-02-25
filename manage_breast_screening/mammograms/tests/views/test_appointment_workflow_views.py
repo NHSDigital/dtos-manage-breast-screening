@@ -405,7 +405,7 @@ class TestGatewayImages:
         assert response.status_code == 200
 
     @patch(
-        "manage_breast_screening.mammograms.views.mammogram_views.gateway_images_enabled",
+        "manage_breast_screening.mammograms.presenters.appointment_presenters.gateway_images_enabled",
         return_value=True,
     )
     @pytest.mark.django_db

@@ -70,7 +70,7 @@ class TestImages:
         assertInHTML("0× LCC", response.text)
 
     @patch(
-        "manage_breast_screening.mammograms.views.show_appointment_views.gateway_images_enabled",
+        "manage_breast_screening.mammograms.presenters.appointment_presenters.gateway_images_enabled",
         return_value=True,
     )
     def test_renders_gateway_images_view_counts(

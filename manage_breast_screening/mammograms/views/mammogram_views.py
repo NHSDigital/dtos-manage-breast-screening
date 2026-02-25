@@ -18,8 +18,7 @@ from manage_breast_screening.core.utils.relative_redirects import (
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
-    GatewayImagesPresenter,
-    ImagesTakenPresenter,
+    ImagesPresenterFactory,
 )
 from manage_breast_screening.mammograms.presenters.medical_history.check_medical_information_presenter import (
     CheckMedicalInformationPresenter,
@@ -27,7 +26,6 @@ from manage_breast_screening.mammograms.presenters.medical_history.check_medical
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
-from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
@@ -202,12 +200,6 @@ def check_information(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    images_presenter = (
-        GatewayImagesPresenter
-        if gateway_images_enabled(appointment)
-        else ImagesTakenPresenter
-    )
-
     return render(
         request,
         "mammograms/check_information.jinja",
@@ -215,7 +207,7 @@ def check_information(request, pk):
             "page_title": "Check information",
             "heading": "Check information",
             "presented_appointment": AppointmentPresenter(appointment),
-            "presented_images": images_presenter(appointment),
+            "presented_images": ImagesPresenterFactory.presenter_for(appointment),
             "presented_medical_information": CheckMedicalInformationPresenter(
                 appointment
             ),
