@@ -40,7 +40,7 @@
         {% endset %}
         {% set ns.rows = ns.rows + [{
           "key": {
-            "text": entry.user.first_name ~ " " ~ entry.user.last_name,
+            "text": entry.user.first_name ~ " " ~ entry.user.last_name ~ (" (Sysadmin)" if entry.user.is_sysadmin else ""),
             "classes": "nhsuk-u-width-three-quarters"
           },
           "value": {
