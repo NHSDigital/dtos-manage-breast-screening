@@ -9,23 +9,26 @@ from .settings import *
 
 SECRET_KEY = "testing"
 
+if DEBUG:
+    INSTALLED_APPS.remove("debug_toolbar")
+    MIDDLEWARE.remove("debug_toolbar.middleware.DebugToolbarMiddleware")
+    DEBUG_TOOLBAR = False
+# Ensure DEBUG is False in tests (we import from settings.py, which may have DEBUG=True)
+DEBUG = False
+
 STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
     "dicom": {
         "BACKEND": "django.core.files.storage.InMemoryStorage",
+        "OPTIONS": {"base_url": "/dicom/"},
     },
 }
 
 MIDDLEWARE.remove(
     "whitenoise.middleware.WhiteNoiseMiddleware",
 )
-
-if DEBUG:
-    INSTALLED_APPS.remove("debug_toolbar")
-    MIDDLEWARE.remove("debug_toolbar.middleware.DebugToolbarMiddleware")
-    DEBUG_TOOLBAR = False
 
 # CIS2 / Authlib configuration
 CIS2_SERVER_METADATA_URL = (
