@@ -5,7 +5,6 @@
 {% set active_workflow_step = 'TAKE_IMAGES' %}
 
 {% block form %}
-
   <div class="nhsuk-u-margin-bottom-6"
        data-module="app-image-stream"
        data-stream-url="{{ url('mammograms:appointment_images_stream', kwargs={'pk': appointment_pk}) }}">
@@ -14,23 +13,26 @@
 
   {% include "mammograms/_troubleshoot_images.jinja" %}
 
-  {% call fieldset({
-    "legend": {
-      "text": "Additional details",
-      "classes": "nhsuk-fieldset__legend--m"
-    }
-  }) %}
-    {{ form.imperfect_but_best_possible.as_field_group() }}
+  <div class="nhsuk-grid-column-two-thirds nhsuk-u-padding-0">
+    {% call fieldset({
+      "legend": {
+        "text": "Additional details",
+        "classes": "nhsuk-fieldset__legend--m"
+      }
+    }) %}
+      {{ form.imperfect_but_best_possible.as_field_group() }}
 
-    {% set reasons_html %}
-      {{ form.reasons_incomplete.as_field_group() }}
-      {{ form.reasons_incomplete_details.as_field_group() }}
-      {{ form.should_recall.as_field_group() }}
-    {% endset %}
-    {% do form.not_all_mammograms_taken.add_conditional_html('true', reasons_html) %}
+      {% set reasons_html %}
+        {{ form.reasons_incomplete.as_field_group() }}
+        {{ form.reasons_incomplete_details.as_field_group() }}
+        {{ form.should_recall.as_field_group() }}
+      {% endset %}
+      {% do form.not_all_mammograms_taken.add_conditional_html('true', reasons_html) %}
 
-    {{ form.not_all_mammograms_taken.as_field_group() }}
-    {{ form.additional_details.as_field_group() }}
-  {% endcall %}
+      {{ form.not_all_mammograms_taken.as_field_group() }}
+      {{ form.additional_details.as_field_group() }}
+    {% endcall %}
+  </div>
+  <div style="clear: both;"></div>
 
 {% endblock %}

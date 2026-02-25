@@ -22,8 +22,6 @@
   <div class="nhsuk-grid-row">
     <div class="nhsuk-grid-column-one-half">
       {% set right_views_html %}
-        <input type="hidden" name="rmlo_count" value="{{ images["RMLO"]|length }}" />
-        <input type="hidden" name="rcc_count" value="{{ images["RCC"]|length }}" />
         {% with images=images["RMLO"], laterality="RMLO" %}
           {% include "mammograms/_image_set.jinja" %}
         {% endwith %}
@@ -41,8 +39,6 @@
 
     <div class="nhsuk-grid-column-one-half">
       {% set left_views_html %}
-        <input type="hidden" name="lmlo_count" value="{{ images["LMLO"]|length }}" />
-        <input type="hidden" name="lcc_count" value="{{ images["LCC"]|length }}" />
         {% with images=images["LMLO"], laterality="LMLO" %}
           {% include "mammograms/_image_set.jinja" %}
         {% endwith %}
@@ -65,3 +61,8 @@
     <a href="" class="nhsuk-link">Refresh the page</a> to see new images.
   </p>
 </noscript>
+
+<input type="hidden" name="lmlo_count" value="{{ images["LMLO"]|length }}" />
+<input type="hidden" name="lcc_count" value="{{ images["LCC"]|length }}" />
+<input type="hidden" name="rmlo_count" value="{{ images["RMLO"]|length }}" />
+<input type="hidden" name="rcc_count" value="{{ images["RCC"]|length }}" />
