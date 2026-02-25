@@ -153,7 +153,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def and_i_can_see_remaining_appointments(self):
         remaining_link = self.page.get_by_role("link", name=re.compile("Remaining"))
         count_span = remaining_link.locator(".app-count")
-        expect(count_span).to_contain_text("5")
+        expect(count_span).to_contain_text("3")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
             rows,
@@ -161,8 +161,6 @@ class TestUserViewsClinicShowPage(SystemTestCase):
                 self.scheduled_appointment,
                 self.another_scheduled_appointment,
                 self.checked_in_appointment,
-                self.in_progress_appointment,
-                self.paused_appointment,
             ],
         )
 
@@ -274,7 +272,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=timezone.utc),
             first_name="Someone",
             last_name="Withnote",
-            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status=AppointmentStatusNames.CHECKED_IN,
         )
         AppointmentNoteFactory(
             appointment=appointment_with_note, content="This is a note."

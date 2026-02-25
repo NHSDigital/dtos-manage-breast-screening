@@ -173,7 +173,7 @@ class TestAppointment:
 
         assertQuerySetEqual(
             models.Appointment.objects.for_filter("remaining"),
-            {confirmed, checked_in, in_progress, paused},
+            {confirmed, checked_in},
             ordered=False,
         )
         assertQuerySetEqual(

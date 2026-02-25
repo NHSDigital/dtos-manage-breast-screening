@@ -39,8 +39,6 @@ class AppointmentQuerySet(models.QuerySet):
     def remaining(self):
         return self.in_status(
             *AppointmentStatus.YET_TO_BEGIN_STATUSES,
-            AppointmentStatusNames.IN_PROGRESS,
-            AppointmentStatusNames.PAUSED,
         )
 
     def checked_in(self):
