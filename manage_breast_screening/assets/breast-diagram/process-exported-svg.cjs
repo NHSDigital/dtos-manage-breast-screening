@@ -313,12 +313,19 @@ function processOutlineGroup(svg) {
     return svg
   }
 
-  // Helper to strip data-name from captured attributes
-  const stripDataName = (/** @type {string} */ str) =>
-    str.replace(/\s*data-name="[^"]*"/g, '')
+  /**
+   * Helper to strip data-name from captured attributes
+   *
+   * @param {string} str
+   */
+  const stripDataName = (str) => str.replace(/\s*data-name="[^"]*"/g, '')
 
-  // Helper to strip attributes that have no effect on circles (closed paths)
-  const stripCircleOnlyAttrs = (/** @type {string} */ str) =>
+  /**
+   * Helper to strip attributes that have no effect on circles (closed paths)
+   *
+   * @param {string} str
+   */
+  const stripCircleOnlyAttrs = (str) =>
     str
       .replace(/\s*stroke-linecap="[^"]*"/g, '')
       .replace(/\s*stroke-miterlimit="[^"]*"/g, '')
