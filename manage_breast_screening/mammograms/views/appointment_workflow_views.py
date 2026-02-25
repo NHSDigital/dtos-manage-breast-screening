@@ -262,7 +262,8 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
                 "images": DicomStudyService.images_by_laterality_and_view(images),
                 "image_count": len(images),
                 "appointment_pk": self.appointment.pk,
-                "confirm_button_text": "Confirm images",
+                "continue_button_text": "Confirm images",
+                "form_container_classes": "nhsuk-grid-column-full",
             }
         )
         return context
