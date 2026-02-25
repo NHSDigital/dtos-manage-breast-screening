@@ -42,6 +42,8 @@ class TestUserViewsClinicShowPage(SystemTestCase):
 
         self.when_i_click_on_checked_in()
         self.then_i_can_see_checked_in_appointments()
+        self.when_i_click_on_in_progress()
+        self.then_i_can_see_in_progress_appointments()
         self.when_i_click_on_complete()
         self.then_i_can_see_completed_appointments()
         self.when_i_click_on_all()
@@ -120,6 +122,11 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
             current_status=AppointmentStatusNames.IN_PROGRESS,
         )
+        self.paused_appointment = AppointmentFactory(
+            clinic_slot__clinic=self.clinic,
+            starts_at=datetime.now().replace(hour=11, minute=42, tzinfo=tzinfo),
+            current_status=AppointmentStatusNames.PAUSED,
+        )
 
     def and_i_am_on_the_clinic_list(self):
         self.page.goto(self.live_server_url + reverse("clinics:index"))
@@ -146,7 +153,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def and_i_can_see_remaining_appointments(self):
         remaining_link = self.page.get_by_role("link", name=re.compile("Remaining"))
         count_span = remaining_link.locator(".app-count")
-        expect(count_span).to_contain_text("4")
+        expect(count_span).to_contain_text("5")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
             rows,
@@ -155,6 +162,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
                 self.another_scheduled_appointment,
                 self.checked_in_appointment,
                 self.in_progress_appointment,
+                self.paused_appointment,
             ],
         )
 
@@ -167,6 +175,22 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         expect(count_span).to_contain_text("1")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(rows, [self.checked_in_appointment])
+
+    def when_i_click_on_in_progress(self):
+        self.page.get_by_role("link", name=re.compile("In progress")).click()
+
+    def then_i_can_see_in_progress_appointments(self):
+        in_progress_link = self.page.get_by_role("link", name=re.compile("In progress"))
+        count_span = in_progress_link.locator(".app-count")
+        expect(count_span).to_contain_text("2")
+        rows = self.page.locator("table.nhsuk-table tbody tr").all()
+        self._expect_rows_to_match_appointments(
+            rows,
+            [
+                self.in_progress_appointment,
+                self.paused_appointment,
+            ],
+        )
 
     def when_i_click_on_complete(self):
         self.page.get_by_role("link", name=re.compile("Complete")).click()
@@ -184,7 +208,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def then_i_can_see_all_appointments(self):
         all_link = self.page.get_by_role("link", name=re.compile(r"All\s+"))
         count_span = all_link.locator(".app-count")
-        expect(count_span).to_contain_text("5")
+        expect(count_span).to_contain_text("6")
         rows = self.page.locator("table.nhsuk-table tbody tr").all()
         self._expect_rows_to_match_appointments(
             rows,
@@ -194,6 +218,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
                 self.checked_in_appointment,
                 self.screened_appointment,
                 self.in_progress_appointment,
+                self.paused_appointment,
             ],
         )
 

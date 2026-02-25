@@ -40,13 +40,16 @@ class AppointmentQuerySet(models.QuerySet):
         return self.in_status(
             *AppointmentStatus.YET_TO_BEGIN_STATUSES,
             AppointmentStatusNames.IN_PROGRESS,
+            AppointmentStatusNames.PAUSED,
         )
 
     def checked_in(self):
         return self.in_status(AppointmentStatusNames.CHECKED_IN)
 
-    def in_progress(self):
-        return self.in_status(AppointmentStatusNames.IN_PROGRESS)
+    def in_progress_or_paused(self):
+        return self.in_status(
+            AppointmentStatusNames.IN_PROGRESS, AppointmentStatusNames.PAUSED
+        )
 
     def for_participant(self, participant_id):
         return self.filter(screening_episode__participant_id=participant_id)
@@ -67,7 +70,7 @@ class AppointmentQuerySet(models.QuerySet):
             case "checked_in":
                 return self.checked_in()
             case "in_progress":
-                return self.in_progress()
+                return self.in_progress_or_paused()
             case "complete":
                 return self.complete()
             case "all":
