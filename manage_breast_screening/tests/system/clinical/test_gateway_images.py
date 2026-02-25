@@ -40,7 +40,7 @@ class TestGatewayImages(SystemTestCase):
         self.and_i_see_the_images()
 
         self.when_i_fill_in_additional_details_for_the_images()
-        self.and_i_click_continue()
+        self.and_i_click_confirm_images()
         self.then_i_see_the_image_counts_on_the_check_information_page()
 
     def and_there_is_an_appointment(self):
@@ -105,8 +105,8 @@ class TestGatewayImages(SystemTestCase):
             "Some additional details"
         )
 
-    def and_i_click_continue(self):
-        self.page.get_by_role("button", name="Continue").click()
+    def and_i_click_confirm_images(self):
+        self.page.get_by_role("button", name="Confirm images").click()
 
     def then_i_see_the_image_counts_on_the_check_information_page(self):
         expect(
