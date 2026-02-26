@@ -6,12 +6,7 @@
 // Output: Creates <input-file>-processed.svg in the same directory
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import {
-  extname,
-  basename as _basename,
-  dirname as _dirname,
-  join
-} from 'node:path'
+import { parse, join } from 'node:path'
 
 import { processSvg } from './breast-diagram.js'
 
@@ -38,10 +33,8 @@ function cli() {
   const processedSvg = processSvg(svgContent, inputFile)
 
   // Generate output filename
-  const ext = extname(inputFile)
-  const basename = _basename(inputFile, ext)
-  const dirname = _dirname(inputFile)
-  const outputFile = join(dirname, `${basename}-processed${ext}`)
+  const { dir, ext, name } = parse(inputFile)
+  const outputFile = join(dir, `${name}-processed${ext}`)
 
   // Write the processed SVG
   writeFileSync(outputFile, processedSvg)
