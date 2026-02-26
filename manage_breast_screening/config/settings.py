@@ -359,3 +359,21 @@ BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
 BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
 
 API_PATH_PREFIX = "/api/"
+
+# HTTP Strict Transport Security (HSTS)
+# SECURE_SSL_REDIRECT is set to False because TLS termination is handled at the Azure Container Apps layer
+SECURE_SSL_REDIRECT = False
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+
+# Prevent the browser from guessing content types
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Referrer policy for enhanced privacy
+SECURE_REFERRER_POLICY = "same-origin"
+
+# Session and CSRF cookie security
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = False
