@@ -504,7 +504,7 @@ function validateProcessedSvg(svg, stats) {
  */
 function addProcessedComment(svg, source) {
   // Add a comment indicating this file was processed
-  const comment = `<!-- Source: ${source} -->\n<!-- Processed by process-exported-svg.js - do not edit manually -->\n\n`
+  const comment = `<!-- Source: ${source} -->\n<!-- Processed by process-exported-svg.cjs - do not edit manually -->\n\n`
 
   // Insert at the start (XML declaration already removed)
   return comment + svg
