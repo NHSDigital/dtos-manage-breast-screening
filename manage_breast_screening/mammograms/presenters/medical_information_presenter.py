@@ -39,7 +39,7 @@ SECTION_ORDER = {
     MedicalInformationSection.SYMPTOMS: MedicalInformationSection.MEDICAL_HISTORY,
     MedicalInformationSection.MEDICAL_HISTORY: MedicalInformationSection.BREAST_FEATURES,
     MedicalInformationSection.BREAST_FEATURES: MedicalInformationSection.OTHER_INFORMATION,
-    MedicalInformationSection.OTHER_INFORMATION: MedicalInformationSection.OTHER_INFORMATION,
+    MedicalInformationSection.OTHER_INFORMATION: None,
 }
 
 # Section IDs for anchor navigation
@@ -50,6 +50,51 @@ SECTION_ANCHORS = {
     MedicalInformationSection.BREAST_FEATURES: "breast-features",
     MedicalInformationSection.OTHER_INFORMATION: "other-information",
 }
+
+
+class SectionPresenter:
+    def __init__(self, appointment_pk, section, is_reviewed):
+        self._appointment_pk = appointment_pk
+        self._section = section
+        self.anchor = SECTION_ANCHORS[section]
+        self.is_reviewed = is_reviewed
+        self.label = section.label
+
+        next_section = SECTION_ORDER.get(section)
+        self.next_anchor = SECTION_ANCHORS[next_section] if next_section else None
+
+    @property
+    def reviewed_tag(self):
+        return {
+            "text": "Reviewed",
+            "classes": "nhsuk-tag--green app-section-review-tag",
+        }
+
+    @property
+    def to_review_tag(self):
+        return {
+            "text": "To review",
+            "classes": "nhsuk-tag--blue app-section-review-tag",
+        }
+
+    @property
+    def next_section_link(self):
+        if self.next_anchor:
+            return {"href": f"#{self.next_anchor}", "text": "Next section"}
+
+    @property
+    def review_button(self):
+        url = reverse(
+            "mammograms:mark_section_reviewed",
+            kwargs={
+                "pk": self._appointment_pk,
+                "section": self._section,
+            },
+        )
+        return {
+            "href": url,
+            "text": "Mark as reviewed",
+        }
 
 
 class MedicalInformationPresenter:
@@ -274,46 +319,12 @@ class MedicalInformationPresenter:
                 for counter, item in enumerate(items, 1)
             ]
 
-    def get_anchor(self, section):
-        return SECTION_ANCHORS.get(section)
-
-    def is_section_reviewed(self, section):
-        return section in self._section_reviews
-
-    def review_status_tag_properties(self, section):
-        if self.is_section_reviewed(section):
-            return {
-                "text": "Reviewed",
-                "classes": "nhsuk-tag--green app-section-review-tag",
-            }
-        else:
-            return {
-                "text": "To review",
-                "classes": "nhsuk-tag--blue app-section-review-tag",
-            }
-
-    def review_action_button_properties(self, section):
-        if self.is_section_reviewed(section):
-            next_section = SECTION_ORDER.get(section)
-            anchor = SECTION_ANCHORS.get(next_section)
-            return {
-                "href": f"#{anchor}",
-                "text": "Next section",
-                "is_anchor": True,
-            }
-        else:
-            url = reverse(
-                "mammograms:mark_section_reviewed",
-                kwargs={
-                    "pk": self.appointment.pk,
-                    "section": section,
-                },
-            )
-            return {
-                "href": url,
-                "text": "Mark as reviewed",
-                "is_anchor": False,
-            }
+    def get_section(self, section):
+        return SectionPresenter(
+            self.appointment.pk,
+            section=section,
+            is_reviewed=section in self._section_reviews,
+        )
 
     @property
     def add_hormone_replacement_therapy_link(self):

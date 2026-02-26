@@ -21,13 +21,40 @@ class TestReviewingMedicalInformation(SystemTestCase):
         self.and_there_is_an_appointment()
         self.and_i_am_on_the_record_medical_information_page()
 
-        for section, anchor, next_section in self._medical_information_sections():
-            self.then_section_has_to_review_tag(section)
-            self.when_i_mark_section_as_reviewed(section)
-            self.then_section_has_reviewed_tag(section)
+        self.then_section_has_to_review_tag("Mammogram history")
+        self.when_i_mark_section_as_reviewed("Mammogram history")
+        self.then_section_has_reviewed_tag("Mammogram history")
+        self.when_i_click_next_section("Mammogram history")
+        self.then_the_next_section_is_in_focus("Symptoms", anchor="symptoms")
 
-            self.when_i_click_next_section(section)
-            self.then_the_next_section_is_in_focus(next_section, anchor)
+        self.then_section_has_to_review_tag("Symptoms")
+        self.when_i_mark_section_as_reviewed("Symptoms")
+        self.then_section_has_reviewed_tag("Symptoms")
+        self.when_i_click_next_section("Symptoms")
+        self.then_the_next_section_is_in_focus(
+            "Medical history", anchor="medical-history"
+        )
+
+        self.then_section_has_to_review_tag("Medical history")
+        self.when_i_mark_section_as_reviewed("Medical history")
+        self.then_section_has_reviewed_tag("Medical history")
+        self.when_i_click_next_section("Medical history")
+        self.then_the_next_section_is_in_focus(
+            "Breast features", anchor="breast-features"
+        )
+
+        self.then_section_has_to_review_tag("Breast features")
+        self.when_i_mark_section_as_reviewed("Breast features")
+        self.then_section_has_reviewed_tag("Breast features")
+        self.when_i_click_next_section("Breast features")
+        self.then_the_next_section_is_in_focus(
+            "Other information", anchor="other-information"
+        )
+
+        self.then_section_has_to_review_tag("Other information")
+        self.when_i_mark_section_as_reviewed("Other information")
+        self.then_section_has_reviewed_tag("Other information")
+        self.and_there_is_no_next_section_link("Other information")
 
     def test_complete_all_and_continue(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -76,6 +103,11 @@ class TestReviewingMedicalInformation(SystemTestCase):
         next_section_control = card.get_by_role("link", name="Next section")
         next_section_control.click()
 
+    def and_there_is_no_next_section_link(self, section_heading: str):
+        card = self._medical_information_card(section_heading)
+        next_section_control = card.get_by_role("link", name="Next section")
+        expect(next_section_control).not_to_be_attached()
+
     def then_the_next_section_is_in_focus(self, section_heading: str, anchor: str):
         path = reverse(
             "mammograms:record_medical_information", kwargs={"pk": self.appointment.pk}
@@ -103,16 +135,16 @@ class TestReviewingMedicalInformation(SystemTestCase):
                 kwargs={"pk": self.appointment.pk},
             )
         )
-        for section_heading, _, _ in self._medical_information_sections():
+        for section_heading in self._medical_information_sections():
             self.then_section_has_reviewed_tag(section_heading)
 
     def _medical_information_sections(self):
         return [
-            ("Mammogram history", "symptoms", "Symptoms"),
-            ("Symptoms", "medical-history", "Medical history"),
-            ("Medical history", "breast-features", "Breast features"),
-            ("Breast features", "other-information", "Other information"),
-            ("Other information", "other-information", "Other information"),
+            "Mammogram history",
+            "Symptoms",
+            "Medical history",
+            "Breast features",
+            "Other information",
         ]
 
     def _medical_information_card(self, heading: str):

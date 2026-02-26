@@ -300,35 +300,6 @@ class TestRecordMedicalInformationPresenter:
             "text": "Add another mammogram",
         }
 
-    @pytest.mark.parametrize(
-        "section,expected_anchor",
-        [
-            (MedicalInformationSection.MAMMOGRAM_HISTORY, "mammogram-history"),
-            (MedicalInformationSection.SYMPTOMS, "symptoms"),
-            (MedicalInformationSection.MEDICAL_HISTORY, "medical-history"),
-            (MedicalInformationSection.BREAST_FEATURES, "breast-features"),
-            (MedicalInformationSection.OTHER_INFORMATION, "other-information"),
-        ],
-    )
-    def test_get_anchor_returns_correct_anchor(self, section, expected_anchor):
-        appointment = AppointmentFactory()
-        presenter = MedicalInformationPresenter(appointment)
-
-        assert presenter.get_anchor(section) == expected_anchor
-
-    def test_is_section_reviewed_returns_true_when_reviewed(self):
-        appointment = AppointmentFactory()
-        MedicalInformationReviewFactory.create(
-            appointment=appointment, section=MedicalInformationSection.SYMPTOMS
-        )
-        presenter = MedicalInformationPresenter(appointment)
-
-        assert presenter.is_section_reviewed(MedicalInformationSection.SYMPTOMS) is True
-        assert (
-            presenter.is_section_reviewed(MedicalInformationSection.BREAST_FEATURES)
-            is False
-        )
-
     def test_any_medical_history(self):
         appointment = AppointmentFactory()
         assert not MedicalInformationPresenter(appointment).any_medical_history
@@ -455,4 +426,76 @@ class TestRecordMedicalInformationPresenter:
         assert presenter.add_or_update_breast_features_button == {
             "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/breast-features/update/",
             "text": "View or edit breast features",
+        }
+
+
+@pytest.mark.django_db
+class TestSectionPresenter:
+    @pytest.mark.parametrize(
+        "section,expected_anchor",
+        [
+            (MedicalInformationSection.MAMMOGRAM_HISTORY, "mammogram-history"),
+            (MedicalInformationSection.SYMPTOMS, "symptoms"),
+            (MedicalInformationSection.MEDICAL_HISTORY, "medical-history"),
+            (MedicalInformationSection.BREAST_FEATURES, "breast-features"),
+            (MedicalInformationSection.OTHER_INFORMATION, "other-information"),
+        ],
+    )
+    def test_anchor(self, in_progress_appointment, section, expected_anchor):
+        presenter = MedicalInformationPresenter(in_progress_appointment)
+
+        assert presenter.get_section(section).anchor == expected_anchor
+
+    def test_is_reviewed(self, in_progress_appointment):
+        MedicalInformationReviewFactory.create(
+            appointment=in_progress_appointment,
+            section=MedicalInformationSection.SYMPTOMS,
+        )
+        presenter = MedicalInformationPresenter(in_progress_appointment)
+
+        assert presenter.get_section(MedicalInformationSection.SYMPTOMS).is_reviewed
+        assert not presenter.get_section(
+            MedicalInformationSection.BREAST_FEATURES
+        ).is_reviewed
+
+    def test_next_anchor(self, in_progress_appointment):
+        assert (
+            MedicalInformationPresenter(in_progress_appointment)
+            .get_section(MedicalInformationSection.MAMMOGRAM_HISTORY)
+            .next_anchor
+            == "symptoms"
+        )
+
+        assert (
+            MedicalInformationPresenter(in_progress_appointment)
+            .get_section(MedicalInformationSection.OTHER_INFORMATION)
+            .next_anchor
+            is None
+        )
+
+    def test_next_section_link(self, in_progress_appointment):
+        assert MedicalInformationPresenter(in_progress_appointment).get_section(
+            MedicalInformationSection.MAMMOGRAM_HISTORY
+        ).next_section_link == {"href": "#symptoms", "text": "Next section"}
+
+        assert (
+            MedicalInformationPresenter(in_progress_appointment)
+            .get_section(MedicalInformationSection.OTHER_INFORMATION)
+            .next_section_link
+            is None
+        )
+
+    def test_review_button(self, in_progress_appointment):
+        assert MedicalInformationPresenter(in_progress_appointment).get_section(
+            MedicalInformationSection.MAMMOGRAM_HISTORY
+        ).review_button == {
+            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/mark-reviewed/MAMMOGRAM_HISTORY/",
+            "text": "Mark as reviewed",
+        }
+
+        assert MedicalInformationPresenter(in_progress_appointment).get_section(
+            MedicalInformationSection.OTHER_INFORMATION
+        ).review_button == {
+            "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/mark-reviewed/OTHER_INFORMATION/",
+            "text": "Mark as reviewed",
         }

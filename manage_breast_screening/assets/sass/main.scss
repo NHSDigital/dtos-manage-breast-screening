@@ -18,6 +18,10 @@
 
 $color_app-dark-blue: #00386e;
 
+html {
+  scroll-behavior: smooth;
+}
+
 h1 {
   @extend %nhsuk-heading-l;
 }

@@ -64,18 +64,3 @@ module "azurerm_application_insights_standard_web_test" {
   application_insights_id = var.app_insights_id
   target_url              = var.target_url
 }
-
-module "dashboard" {
-  source = "../dtos-devops-templates/infrastructure/modules/dashboard"
-
-  name                = "dash-${var.app_short_name}-${var.environment}-notifications"
-  location            = var.region
-  resource_group_name = local.resource_group_name
-
-  dashboard_properties = templatefile("${path.module}/../../modules/container-apps/templates/dash-notifications-template.tpl",
-    {
-      environment = var.environment
-      sub_id      = data.azurerm_subscription.current.subscription_id
-    }
-  )
-}
