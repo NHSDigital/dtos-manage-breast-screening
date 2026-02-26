@@ -13,7 +13,7 @@ This guide was migrated from the [manage breast screening prototype](https://git
 1. Edit the Illustrator file (if needed)
 2. Run `illustrator-processing-script.jsx` in Illustrator
 3. Export as SVG (Use Artboards: on, Styling: Presentation Attributes)
-4. Run `node process-exported-svg.js [exported-file].svg`
+4. Run `npm run breast-diagram [exported-file].svg`
 5. Copy the processed SVG to `manage_breast_screening/core/components/breast-diagram/<version>.svg`
 
 ---

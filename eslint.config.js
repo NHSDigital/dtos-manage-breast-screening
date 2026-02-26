@@ -295,10 +295,7 @@ export default defineConfig([
     'node_modules/.*',
 
     // Prevent CHANGELOG history changes
-    'CHANGELOG.md',
-
-    // Ignore the breast diagram code (remove this once we have brought it in line with conventions)
-    '**/breast-diagram/*.js'
+    'CHANGELOG.md'
   ]),
   includeIgnoreFile(gitignorePath, 'Imported .gitignore patterns')
 ])

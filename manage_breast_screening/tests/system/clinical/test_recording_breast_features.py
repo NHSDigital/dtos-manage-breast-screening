@@ -1,4 +1,3 @@
-import unittest
 from datetime import date
 
 import time_machine
@@ -39,7 +38,6 @@ class TestRecordingBreastFeatures(SystemTestCase):
         self.then_i_am_back_on_the_record_medical_information_page()
         self.and_i_see_the_feature_is_added()
 
-    @unittest.skip("Needs additional work")
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_with_no_medical_information_added()

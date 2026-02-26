@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["node"]
+  },
+  "include": ["**/breast-diagram/*.js"],
+  "exclude": ["**/*.test.js"]
+}
