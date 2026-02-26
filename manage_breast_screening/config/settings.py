@@ -101,28 +101,13 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "manage_breast_screening.core.middleware.auth.ManageAuthenticationMiddleware",
+    "manage_breast_screening.core.middleware.auth.ManageLoginRequiredMiddleware",
     "manage_breast_screening.core.middleware.session_timeout.SessionTimeoutMiddleware",
     "manage_breast_screening.core.middleware.current_provider.CurrentProviderMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "ninja.compatibility.files.fix_request_files_middleware",
 ]
-
-# TODO: remove the check once we've implemented CIS2 auth. For now,
-# we only apply auth protection when a viable auth method is available. This keeps our
-# tests passing and prevents us forcing a sign in without a way to do so.
-if PERSONAS_ENABLED:
-    # Enforce auth globally only in PERSONAS_ENABLED mode
-    idx = (
-        MIDDLEWARE.index(
-            "manage_breast_screening.core.middleware.auth.ManageAuthenticationMiddleware"
-        )
-        + 1
-    )
-    MIDDLEWARE.insert(
-        idx,
-        "manage_breast_screening.core.middleware.auth.ManageLoginRequiredMiddleware",
-    )
 
 if DEBUG:
     INTERNAL_IPS = ["127.0.0.1"]
