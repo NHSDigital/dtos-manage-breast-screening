@@ -6,10 +6,10 @@
       "path": "./tsconfig.dev.json"
     },
     {
-      "path": "./manage_breast_screening/tsconfig.json"
+      "path": "./manage_breast_screening/tsconfig.client.json"
     },
     {
-      "path": "./manage_breast_screening/tsconfig.node.json"
+      "path": "./manage_breast_screening/tsconfig.server.json"
     }
   ]
 }
