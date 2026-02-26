@@ -413,8 +413,8 @@ function autoIndentSvg(svg) {
       }
 
       // Adjust indent of following line based on number of tags opened/closed
-      const tagMarkers = trimmed.matchAll(/<\/?/g).toArray()
-      const selfClosings = trimmed.matchAll(/(\/>)|(-->)/g).toArray()
+      const tagMarkers = [...trimmed.matchAll(/<\/?/g)]
+      const selfClosings = [...trimmed.matchAll(/(\/>)|(-->)/g)]
 
       depth = tagMarkers.reduce(
         (partialSum, match) =>
