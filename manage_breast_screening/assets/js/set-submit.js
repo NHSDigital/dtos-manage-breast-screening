@@ -1,6 +1,6 @@
 import { ElementError } from 'nhsuk-frontend'
 
-const TIMEOUT = 2000
+const TIMEOUT = 5000
 
 /**
  * Enable a form to be submitted in the background via `fetch()`.
