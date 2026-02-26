@@ -1,5 +1,9 @@
-from functools import partial
+from functools import partial, wraps
 from typing import Callable
+
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 
 _basic_auth_exempt_views = set()
 _current_provider_exempt_views = set()
@@ -31,6 +35,23 @@ def current_provider_exempt(view_func: Callable) -> Callable:
 def is_current_provider_exempt(view_func: Callable) -> bool:
     """Check if a view function is exempt from CurrentProviderMiddleware."""
     return view_func_identifier(view_func) in _current_provider_exempt_views
+
+
+def permission_denied_redirects(message: str, redirect_to: str = "clinics:index"):
+    """Redirect to a URL with a flash message instead of raising a 403."""
+
+    def decorator(view_func: Callable) -> Callable:
+        @wraps(view_func)
+        def wrapper(request, *args, **kwargs):
+            try:
+                return view_func(request, *args, **kwargs)
+            except PermissionDenied:
+                messages.warning(request, message)
+                return redirect(redirect_to)
+
+        return wrapper
+
+    return decorator
 
 
 def view_func_identifier(view_func: Callable) -> str:

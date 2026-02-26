@@ -1,11 +1,67 @@
 from functools import partial, wraps
 
+import pytest
+from django.contrib.messages import get_messages
+from django.contrib.messages.storage.cookie import CookieStorage
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.test import RequestFactory
+
 from manage_breast_screening.core.decorators import (
     _basic_auth_exempt_views,
     basic_auth_exempt,
     is_basic_auth_exempt,
+    permission_denied_redirects,
     view_func_identifier,
 )
+
+
+@pytest.mark.django_db
+class TestPermissionDeniedRedirects:
+    def _request_with_messages(self):
+        request = RequestFactory().get("/")
+        request._messages = CookieStorage(request)
+        return request
+
+    def test_redirects_to_dashboard_on_permission_denied(self):
+        @permission_denied_redirects("Access denied.")
+        def view(request):
+            raise PermissionDenied
+
+        response = view(self._request_with_messages())
+
+        assert response.status_code == 302
+        assert response["Location"] == "/clinics/"
+
+    def test_adds_flash_message_on_permission_denied(self):
+        @permission_denied_redirects("Access denied.")
+        def view(request):
+            raise PermissionDenied
+
+        request = self._request_with_messages()
+        view(request)
+
+        assert any("Access denied." in str(m) for m in get_messages(request))
+
+    def test_passes_through_when_no_exception(self):
+        @permission_denied_redirects("Access denied.")
+        def view(request):
+            return HttpResponse("ok")
+
+        response = view(self._request_with_messages())
+
+        assert response.status_code == 200
+
+    def test_custom_redirect_url(self):
+        @permission_denied_redirects(
+            "Access denied.", redirect_to="clinics:select_provider"
+        )
+        def view(request):
+            raise PermissionDenied
+
+        response = view(self._request_with_messages())
+
+        assert response["Location"] == "/clinics/select-provider/"
 
 
 class TestBasicAuthExempt:
