@@ -25,3 +25,4 @@ def is_sysadmin(user):
 
 
 rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, is_clinical | is_administrative)
+rules.add_perm(Permission.MANAGE_PROVIDER_SETTINGS, is_sysadmin)

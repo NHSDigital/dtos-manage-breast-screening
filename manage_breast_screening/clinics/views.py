@@ -1,8 +1,11 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
+from rules.contrib.views import permission_required
 
+from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
@@ -10,6 +13,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 from ..core.decorators import current_provider_exempt
 from ..core.utils.relative_redirects import extract_relative_redirect_url
 from ..participants.models import Appointment
+from .forms import ProviderSettingsForm
 from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 
@@ -100,5 +104,31 @@ def select_provider(request):
             "providers": user_providers,
             "page_title": "Select Provider",
             "next": next_path,
+        },
+    )
+
+
+@require_http_methods(["GET", "POST"])
+@permission_required(Permission.MANAGE_PROVIDER_SETTINGS, raise_exception=True)
+def provider_settings(request):
+    provider = request.user.current_provider
+    config = provider.get_config()
+
+    if request.method == "POST":
+        form = ProviderSettingsForm(request.POST, instance=config)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Settings saved successfully.")
+            return redirect("clinics:settings")
+    else:
+        form = ProviderSettingsForm(instance=config)
+
+    return render(
+        request,
+        "clinics/provider_settings.jinja",
+        context={
+            "form": form,
+            "provider": provider,
+            "page_title": "Provider settings",
         },
     )

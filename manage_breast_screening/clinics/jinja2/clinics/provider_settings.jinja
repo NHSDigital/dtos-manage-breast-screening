@@ -1,0 +1,38 @@
+{% extends 'layout-app.jinja' %}
+
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'nhsuk/components/checkboxes/macro.jinja' import checkboxes %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <h1 class="nhsuk-heading-xl">Settings</h1>
+    <p class="nhsuk-body-l">{{ provider.name }}</p>
+
+    <form method="post">
+      {{ csrf_input }}
+
+      <h2 class="nhsuk-heading-m">Image collection</h2>
+
+      {{ checkboxes({
+        "idPrefix": "manual_image_collection",
+        "name": "manual_image_collection",
+        "items": [
+          {
+            "value": "true",
+            "text": "Manual image collection",
+            "hint": {
+              "text": form.fields["manual_image_collection"].help_text
+            },
+            "checked": form.instance.manual_image_collection
+          }
+        ]
+      }) }}
+
+      {{ button({
+        "text": "Save settings"
+      }) }}
+    </form>
+  </div>
+</div>
+{% endblock %}

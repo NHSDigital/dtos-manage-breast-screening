@@ -99,3 +99,22 @@ class TestIsSysadmin:
         user = UserFactory.create(is_sysadmin=False)
 
         assert not is_sysadmin(user)
+
+
+@pytest.mark.django_db
+class TestManageProviderSettingsPermission:
+    def test_returns_true_for_sysadmin(self):
+        user = UserFactory.create(is_sysadmin=True)
+
+        assert user.has_perm(Permission.MANAGE_PROVIDER_SETTINGS)
+
+    def test_returns_false_for_non_sysadmin(self):
+        user = UserFactory.create(is_sysadmin=False)
+
+        assert not user.has_perm(Permission.MANAGE_PROVIDER_SETTINGS)
+
+    def test_returns_false_for_administrative_user(self):
+        user_assignment = UserAssignmentFactory.create(administrative=True)
+        user_assignment.make_current()
+
+        assert not user_assignment.user.has_perm(Permission.MANAGE_PROVIDER_SETTINGS)

@@ -11,6 +11,7 @@ class Permission(StrEnum):
     VIEW_PARTICIPANT_DATA = "participants.view_participant_data"
     VIEW_MAMMOGRAM_APPOINTMENT = "mammograms.view_mammogram_appointment"
     DO_MAMMOGRAM_APPOINTMENT = "mammograms.do_mammogram_appointment"
+    MANAGE_PROVIDER_SETTINGS = "clinics.manage_provider_settings"
 
 
 @dataclass
@@ -18,6 +19,7 @@ class Persona:
     first_name: str
     last_name: str
     role: str
+    is_sysadmin: bool = False
 
     @property
     def username(self):
@@ -26,9 +28,11 @@ class Persona:
 
 ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
 CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
+SYSADMIN_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_sysadmin=True)
 PERSONAS = [
     ADMINISTRATIVE_PERSONA,
     CLINICAL_PERSONA,
     Persona("Olivia", "Morgan", Role.ADMINISTRATIVE),
     Persona("Ella", "Foster", Role.CLINICAL),
+    SYSADMIN_PERSONA,
 ]
