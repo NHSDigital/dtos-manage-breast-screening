@@ -2,18 +2,16 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from manage_breast_screening.notifications.services.application_insights_logging import (
+from manage_breast_screening.core.services.application_insights_logging import (
     ApplicationInsightsLogging,
 )
 
 
 @patch(
-    "manage_breast_screening.notifications.services.application_insights_logging.configure_azure_monitor",
+    "manage_breast_screening.core.services.application_insights_logging.configure_azure_monitor",
     return_value=MagicMock(),
 )
-@patch(
-    "manage_breast_screening.notifications.services.application_insights_logging.logging"
-)
+@patch("manage_breast_screening.core.services.application_insights_logging.logging")
 @pytest.mark.skip_insights_mock
 class TestApplicationInsightsLogging:
     @pytest.fixture(autouse=True)
