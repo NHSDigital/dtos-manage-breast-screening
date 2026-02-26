@@ -81,7 +81,6 @@ INSTALLED_APPS = [
     "manage_breast_screening.clinics",
     "manage_breast_screening.dicom",
     "manage_breast_screening.nhsuk_forms",
-    "manage_breast_screening.notifications",
     "manage_breast_screening.participants",
     "manage_breast_screening.mammograms",
     "manage_breast_screening.manual_images",
