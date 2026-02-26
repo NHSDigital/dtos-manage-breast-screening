@@ -4,6 +4,12 @@ variable "api_oauth_token_url" {
   default     = null
 }
 
+variable "deploy_infra" {
+  description = "Whether foundational infrastructure is being deployed; false for ephemeral PR review apps"
+  type        = bool
+  default     = true
+}
+
 variable "app_key_vault_id" {
   description = "Application key vault ID"
   type        = string
