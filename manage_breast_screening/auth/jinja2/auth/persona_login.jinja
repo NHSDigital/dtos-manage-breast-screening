@@ -2,6 +2,38 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 
+{% macro persona_summary_list(entries, role) %}
+  {% set ns = namespace(rows=[]) %}
+  {% for entry in entries %}
+    {% set visually_hidden_html -%}
+      <span class="nhsuk-u-visually-hidden"> as {{ entry.user.first_name }} {{ entry.user.last_name }}, {{ role }}</span>
+    {%- endset %}
+    {% set value_html %}
+      {% if entry.is_current %}
+        Logged in{{ visually_hidden_html | safe }}
+      {% else %}
+        {{ button({
+          "html": "Log in" ~ visually_hidden_html | safe,
+          "classes": "nhsuk-button--small nhsuk-u-margin-bottom-2",
+          "name": "username",
+          "value": entry.user.nhs_uid
+        }) }}
+      {% endif %}
+    {% endset %}
+    {% set ns.rows = ns.rows + [{
+      "key": {
+        "text": entry.user.first_name ~ " " ~ entry.user.last_name,
+        "classes": "nhsuk-u-width-three-quarters"
+      },
+      "value": {
+        "html": value_html,
+        "classes": "nhsuk-u-text-align-right"
+      }
+    }] %}
+  {% endfor %}
+  {{ summaryList({"rows": ns.rows}) }}
+{% endmacro %}
+
 {% block page_content %}
 <div class="nhsuk-grid-row">
   <div class="nhsuk-grid-column-two-thirds">
@@ -17,44 +49,16 @@
 
       {% for group in providers_with_users %}
       <h2 class="nhsuk-heading-m">{{ group.provider.name }}</h2>
-
       {% for role, entries in group.roles.items() %}
       <h3 class="nhsuk-heading-s">{{ role }}</h3>
-      {% set ns = namespace() %}
-      {% set ns.rows = [] %}
-      {% for entry in entries %}
-        {% set visually_hidden_html -%}
-          <span class="nhsuk-u-visually-hidden"> as {{ entry.user.first_name }} {{ entry.user.last_name }}, {{ role }}</span>
-        {%- endset %}
-        {% set value_html %}
-          {% if entry.is_current %}
-            Logged in{{ visually_hidden_html | safe }}
-          {% else %}
-            {{ button({
-              "html": "Log in" ~ visually_hidden_html | safe,
-              "classes": "nhsuk-button--small nhsuk-u-margin-bottom-2",
-              "name": "username",
-              "value": entry.user.nhs_uid
-            }) }}
-          {% endif %}
-        {% endset %}
-        {% set ns.rows = ns.rows + [{
-          "key": {
-            "text": entry.user.first_name ~ " " ~ entry.user.last_name ~ (" (Sysadmin)" if entry.user.is_sysadmin else ""),
-            "classes": "nhsuk-u-width-three-quarters"
-          },
-          "value": {
-            "html": value_html,
-            "classes": "nhsuk-u-text-align-right"
-          }
-        }] %}
+      {{ persona_summary_list(entries, role) }}
       {% endfor %}
-      {{ summaryList({
-        "rows": ns.rows
-      }) }}
       {% endfor %}
 
-      {% endfor %}
+      {% if sysadmin_users %}
+      <h2 class="nhsuk-heading-m">Sysadmin</h2>
+      {{ persona_summary_list(sysadmin_users, "Sysadmin") }}
+      {% endif %}
     </form>
   </div>
 </div>

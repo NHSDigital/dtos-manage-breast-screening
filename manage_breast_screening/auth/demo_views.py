@@ -44,28 +44,35 @@ def persona_login(request):
             "auth/persona_login.jinja",
             context={
                 "providers_with_users": _get_providers_with_users(request.user),
+                "sysadmin_users": _get_sysadmin_users(request.user),
                 "page_title": "Persona logins",
                 "next": next_path,
             },
         )
 
 
-def _get_providers_with_users(current_user):
+def _persona_users(current_user):
     persona_usernames = [persona.username for persona in PERSONAS]
-    users = (
+    return (
         get_user_model()
         .objects.filter(nhs_uid__in=persona_usernames)
         .prefetch_related("assignments__provider")
         .order_by("first_name")
     )
 
-    providers = OrderedDict()
-    for user in users:
-        is_current = (
-            current_user.is_authenticated and user.nhs_uid == current_user.nhs_uid
-        )
-        user_entry = {"user": user, "is_current": is_current}
 
+def _user_entry(user, current_user):
+    return {
+        "user": user,
+        "is_current": current_user.is_authenticated
+        and user.nhs_uid == current_user.nhs_uid,
+    }
+
+
+def _get_providers_with_users(current_user):
+    providers = OrderedDict()
+    for user in _persona_users(current_user).filter(is_sysadmin=False):
+        entry = _user_entry(user, current_user)
         for assignment in user.assignments.all():
             provider = assignment.provider
             if provider.pk not in providers:
@@ -74,9 +81,16 @@ def _get_providers_with_users(current_user):
             for role in sorted(assignment.roles):
                 if role not in providers[provider.pk]["roles"]:
                     providers[provider.pk]["roles"][role] = []
-                providers[provider.pk]["roles"][role].append(user_entry)
+                providers[provider.pk]["roles"][role].append(entry)
 
-    providers = OrderedDict(
+    return OrderedDict(
         sorted(providers.items(), key=lambda item: item[1]["provider"].name)
-    )
-    return providers.values()
+    ).values()
+
+
+def _get_sysadmin_users(current_user):
+    return [
+        _user_entry(user, current_user)
+        for user in _persona_users(current_user)
+        if user.is_sysadmin
+    ]
