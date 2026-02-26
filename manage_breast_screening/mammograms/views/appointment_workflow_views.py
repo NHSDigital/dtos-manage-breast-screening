@@ -4,7 +4,7 @@ import time
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import DatabaseError, IntegrityError, transaction
-from django.http import Http404, StreamingHttpResponse
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
@@ -312,6 +312,12 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
             section=section
         ).first()
 
+        if self.request.accepts("text/html"):
+            return self._handle_html(request, section, existing_review)
+        else:
+            return self._handle_plain(request, section, existing_review)
+
+    def _handle_html(self, request, section, existing_review):
         if existing_review:
             messages.add_message(
                 request,
@@ -327,6 +333,16 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
         return redirect(
             MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
         )
+
+    def _handle_plain(self, request, section, existing_review):
+        if existing_review:
+            return HttpResponse(status=409)
+        else:
+            self.appointment.medical_information_reviews.create(
+                section=section,
+                reviewed_by=request.user,
+            )
+            return HttpResponse(status=201)
 
 
 def format_sse_event(event: str, data: str) -> str:

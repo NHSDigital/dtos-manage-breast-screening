@@ -5,7 +5,7 @@ const TIMEOUT = 2000
 /**
  * Enable a form to be submitted in the background via `fetch()`.
  * If this fails for any reason, it will fall back to normal form submission
- * (this assumes the form action is idempotent)
+ * (this assumes the form action is idempotent!)
  *
  * @param {HTMLFormElement} $form - HTML form element
  * @param {object} [options] - Handler options
@@ -37,7 +37,11 @@ export default ($form, options = {}) => {
     }
 
     /** @type {RequestInit} */
-    const fetchOptions = { method: method, body: new FormData($form) }
+    const fetchOptions = {
+      method: method,
+      body: new FormData($form),
+      headers: { Accept: 'text/plain, application/json' }
+    }
 
     // Check for timeout support
     if ('AbortSignal' in window && 'timeout' in AbortSignal) {
