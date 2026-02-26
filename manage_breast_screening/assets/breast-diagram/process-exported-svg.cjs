@@ -91,9 +91,9 @@ function processSvg(svg, source) {
   // Validate the processed SVG
   const validation = validateProcessedSvg(svg, stats)
   if (!validation.valid) {
-    const errors = validation.errors.map((err) => `   - ${err}`).join('\n')
-    const error_summary = `\n❌ Validation failed: ${errors}`
-    throw new Error(error_summary)
+    throw new Error('❌ Validation failed', {
+      cause: validation.errors
+    })
   }
   if (validation.warnings.length > 0) {
     console.warn('\n⚠️  Warnings:')
