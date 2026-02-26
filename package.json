@@ -6,7 +6,7 @@
     "!**/*.test.*"
   ],
   "scripts": {
-    "breast-diagram": "node manage_breast_screening/assets/breast-diagram/process-exported-svg.cjs",
+    "breast-diagram": "node manage_breast_screening/assets/breast-diagram/process-exported-svg.js",
     "compile": "concurrently npm:compile:js npm:compile:css --group --prefix none",
     "compile:css": "sass --color --quiet-deps --load-path=node_modules manage_breast_screening/assets/sass:manage_breast_screening/assets/compiled/css",
     "compile:css:watch": "npm run compile:css -- --watch",

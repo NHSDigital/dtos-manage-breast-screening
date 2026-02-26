@@ -1,61 +1,11 @@
-//
-// Processes the exported SVG from Illustrator to add required data attributes
-// and clean up for use in the breast features component.
-//
-// Usage: node process-exported-svg.cjs <input-file.svg>
-// Output: Creates <input-file>-processed.svg in the same directory
-
-const fs = require('node:fs')
-const path = require('node:path')
-
 // BEM block name - the SVG elements are all children of this block
 const BEM_BLOCK = 'app-breast-diagram'
-
-if (require.main === module) {
-  cli()
-}
-
-function cli() {
-  // Get input file from command line
-  const inputFile = process.argv[2]
-
-  if (!inputFile) {
-    console.error('Usage: node process-exported-svg.cjs <input-file.svg>')
-    process.exitCode = 1
-    return
-  }
-
-  if (!fs.existsSync(inputFile)) {
-    console.error(`File not found: ${inputFile}`)
-    process.exitCode = 1
-    return
-  }
-
-  // Read the SVG file
-  const svgContent = fs.readFileSync(inputFile, 'utf8')
-
-  // Process the SVG
-  const processedSvg = processSvg(svgContent, inputFile)
-
-  // Generate output filename
-  const ext = path.extname(inputFile)
-  const basename = path.basename(inputFile, ext)
-  const dirname = path.dirname(inputFile)
-  const outputFile = path.join(dirname, `${basename}-processed${ext}`)
-
-  // Write the processed SVG
-  fs.writeFileSync(outputFile, processedSvg)
-
-  console.log(`Processed SVG written to: ${outputFile}`)
-}
-
-// ============ Processing Functions ============
 
 /**
  * @param {string} svg
  * @param {string} source
  */
-function processSvg(svg, source) {
+export function processSvg(svg, source) {
   // Track stats for reporting
   const stats = {
     regionsProcessed: 0,
@@ -504,10 +454,10 @@ function validateProcessedSvg(svg, stats) {
  */
 function addProcessedComment(svg, source) {
   // Add a comment indicating this file was processed
-  const comment = `<!-- Source: ${source} -->\n<!-- Processed by process-exported-svg.cjs - do not edit manually -->\n\n`
+  const comment = `<!-- Source: ${source} -->\n<!-- Processed by process-exported-svg.js - do not edit manually -->\n\n`
 
   // Insert at the start (XML declaration already removed)
   return comment + svg
 }
 
-module.exports = { processSvg }
+export default { processSvg }

@@ -1,4 +1,11 @@
-const { processSvg } = require('./process-exported-svg.cjs')
+//
+// Processes the exported SVG from Illustrator to add required data attributes
+// and clean up for use in the breast features component.
+//
+// Usage: node process-exported-svg.js <input-file.svg>
+// Output: Creates <input-file>-processed.svg in the same directory
+
+import { processSvg } from './breast-diagram.js'
 
 const testSVG = `<?xml version="1.0" encoding="UTF-8"?>
 <svg id="Breast_diagram_to_export" data-name="Breast diagram to export" xmlns="http://www.w3.org/2000/svg" width="800" height="400" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 400">

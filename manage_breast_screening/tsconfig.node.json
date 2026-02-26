@@ -4,6 +4,6 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["**/*.cjs"],
-  "exclude": ["**/*.test.cjs"]
+  "include": ["**/breast-diagram/*.js"],
+  "exclude": ["**/*.test.js"]
 }
