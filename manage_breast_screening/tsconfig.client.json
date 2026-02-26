@@ -7,5 +7,10 @@
     "types": ["node", "typed-query-selector"]
   },
   "include": ["**/*.js"],
-  "exclude": ["**/*.test.js", "**/compiled/**", "**/staticfiles/**", "**/breast-diagram/*.js"]
+  "exclude": [
+    "**/*.test.js",
+    "**/compiled/**",
+    "**/staticfiles/**",
+    "**/breast-diagram/*.js"
+  ]
 }
