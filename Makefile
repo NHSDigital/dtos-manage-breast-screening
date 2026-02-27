@@ -103,7 +103,7 @@ shell:
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	uv run pytest -m 'not system' --ignore manage_breast_screening/notifications/tests/dependencies --ignore manage_breast_screening/notifications/tests/integration --ignore manage_breast_screening/notifications/tests/end_to_end --ignore scripts/python/smoke_test --cov --cov-report term-missing:skip-covered
+	uv run pytest -m 'not system' --cov --cov-report term-missing:skip-covered
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing
@@ -118,13 +118,8 @@ test-lint-templates: # Lint just the templates @Testing
 	uv run djlint -e jinja --lint --profile jinja manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	uv run pytest -m system --ignore manage_breast_screening/notifications
+	uv run pytest -m system
 
-test-integration:
-	cd manage_breast_screening/notifications && ./tests/integration/run.sh
-
-test-end-to-end:
-	cd manage_breast_screening/notifications && ./tests/end_to_end/run.sh
 
 # ---------------------------------------------------------------------------
 # Build & Deploy

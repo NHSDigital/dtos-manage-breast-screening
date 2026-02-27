@@ -25,4 +25,3 @@ manage_breast_screening/config/settings_test.py:private-key:34
 manage_breast_screening/config/settings_test.py:public-key:61
 manage_breast_screening/config/.env.tpl:generic-api-key:36
 manage_breast_screening/config/.env.tpl:generic-api-key:42
-manage_breast_screening/notifications/management/commands/README_MESH_POLLING.md:generic-api-key:207
