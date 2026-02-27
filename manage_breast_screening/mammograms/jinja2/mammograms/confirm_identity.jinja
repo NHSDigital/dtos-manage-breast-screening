@@ -8,6 +8,7 @@
 {% set active_workflow_step = 'CONFIRM_IDENTITY' %}
 
 {% block step_content %}
+  {% set return_url = request.path %}
   {% set confirm_button %}
     <div class="nhsuk-form-group">
       <form method="post">
@@ -87,7 +88,7 @@
             "text": "Ethnicity"
           },
           "value": {
-            "html": ethnicity_html(presented_participant) | safe
+            "html": ethnicity_html(presented_participant, return_url) | safe
           },
           "actions": presented_participant.ethnicity_actions(return_url)
         }

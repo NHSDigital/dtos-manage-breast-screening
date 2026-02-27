@@ -11,16 +11,7 @@
 {% block step_content %}
   <p>Before concluding this appointment, confirm that the information recorded is correct.</p>
 
-  {% set ethnicity_change_link = {
-      "items": [
-        {
-          "href": presented_appointment.participant.ethnicity_url(request.path),
-          "text": "Change" if presented_appointment.participant.ethnic_background else "Add",
-          "classes": "nhsuk-link--no-visited-state",
-          "visuallyHiddenText": "ethnicity"
-        }
-      ]
-    } %}
+  {% set return_url = request.path %}
 
   {% call card({
   "heading": "Personal Information",
@@ -34,9 +25,9 @@
               "text": "Ethnicity"
           },
           "value" : {
-              "text": ethnicity_html(presented_appointment.participant) | default("Not provided", true)
+              "html": ethnicity_html(presented_appointment.participant, return_url) | safe
           },
-          "actions": ethnicity_change_link
+          "actions": presented_appointment.participant.ethnicity_actions(return_url)
       }
       ]
   }) }}

@@ -16,7 +16,7 @@
   <span class="nhsuk-hint">({{ presented_participant.age }})</span>
 {% endmacro %}
 
-{% macro ethnicity_html(presented_participant) %}
+{% macro ethnicity_html(presented_participant, return_url=none) %}
   {% set ethnic_background = presented_participant.ethnic_background %}
   {% set ethnic_background_category = presented_participant.ethnic_category %}
   {% set ethnicity_details_url = presented_participant.ethnicity_url(return_url) %}
