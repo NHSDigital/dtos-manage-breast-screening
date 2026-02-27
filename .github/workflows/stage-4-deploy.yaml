@@ -51,6 +51,7 @@ jobs:
           fi
 
           SMOKE_TEST_TOKEN=$(openssl rand -hex 16)
+          echo "::add-mask::${SMOKE_TEST_TOKEN}"
           echo "SMOKE_TEST_TOKEN=${SMOKE_TEST_TOKEN}" >> $GITHUB_ENV
 
           source "infrastructure/environments/${ENVIRONMENT}/variables.sh"
