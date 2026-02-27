@@ -6,7 +6,7 @@ data "azurerm_cdn_frontdoor_profile" "this" {
 }
 
 resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
-  count    = var.deploy_infra ? 1 : 0
+  count    = (var.deploy_infra || var.enable_smoke_test_bypass) ? 1 : 0
   provider = azurerm.hub
 
   name                              = "wafmanbrs${replace(var.environment, "-", "")}"
@@ -27,17 +27,43 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
     action  = "Block"
   }
 
-  custom_rule {
-    name     = "BlockNonUK"
-    priority = 10
-    type     = "MatchRule"
-    action   = "Block"
+  dynamic "custom_rule" {
+    for_each = var.enable_smoke_test_bypass ? [1] : []
+    content {
+      name     = "AllowSmokeTest"
+      priority = 1
+      type     = "MatchRule"
+      action   = "Allow"
 
-    match_condition {
-      match_variable     = "SocketAddr"
-      operator           = "GeoMatch"
-      negation_condition = true
-      match_values       = ["GB"]
+      match_condition {
+        match_variable = "RequestHeader"
+        selector       = "User-Agent"
+        operator       = "Contains"
+        match_values   = [var.smoke_test_token]
+      }
+
+      match_condition {
+        match_variable = "RequestUri"
+        operator       = "Contains"
+        match_values   = ["/sha"]
+      }
+    }
+  }
+
+  dynamic "custom_rule" {
+    for_each = var.enable_smoke_test_bypass ? [] : [1]
+    content {
+      name     = "BlockNonUK"
+      priority = 10
+      type     = "MatchRule"
+      action   = "Block"
+
+      match_condition {
+        match_variable     = "SocketAddr"
+        operator           = "GeoMatch"
+        negation_condition = true
+        match_values       = ["GB"]
+      }
     }
   }
 
@@ -95,7 +121,7 @@ module "frontdoor_endpoint" {
     patterns_to_match      = local.patterns_to_match
   }
 
-  security_policies = var.deploy_infra ? {
+  security_policies = (var.deploy_infra || var.enable_smoke_test_bypass) ? {
     WAF = {
       cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.this[0].id
       associated_domain_keys           = ["${var.environment}-domain"]

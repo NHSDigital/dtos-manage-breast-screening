@@ -23,7 +23,16 @@ else
 fi
 
 # Script timeout and check interval in seconds
-TIMEOUT=$((15*60))
+# PR environments require a longer timeout because Front Door must provision
+# a new managed TLS certificate for each new custom domain (up to 60 minutes).
+# Permanent environments: AFD configuration updates take up to 20 minutes to
+# propagate across all POPs after Terraform apply returns (up to 40 minutes for
+# back-to-back changes). 30 minutes covers the standard case with a safety margin.
+if [ -n "$PR_NUMBER" ]; then
+  TIMEOUT=$((60*60))
+else
+  TIMEOUT=$((30*60))
+fi
 INTERVAL=5
 
 start_time=$(date +%s)
@@ -31,7 +40,7 @@ start_time=$(date +%s)
 while true; do
   # Send request to /sha URL. Only print the sha and fail if required.
   # It should fail initially until front door presents the right certificate.
-  if ACTUAL_SHA=$(curl -fsS "$ENDPOINT" 2>/dev/null); then
+  if ACTUAL_SHA=$(curl -fsS -A "${SMOKE_TEST_TOKEN:-SmokeTest}" "$ENDPOINT" 2>/dev/null); then
     echo "Endpoint responded: $ACTUAL_SHA"
     if [ "$ACTUAL_SHA" = "$EXPECTED_SHA" ]; then
       echo "✅ SHA matches expected commit: $EXPECTED_SHA"

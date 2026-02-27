@@ -15,6 +15,10 @@ parameters:
   - name: pool
     displayName: ADO management pool
     type: string
+  - name: smokeTestToken
+    displayName: Smoke test token
+    type: string
+    default: 'SmokeTest'
 
 stages:
   - stage: ${{ parameters.environment }}
@@ -61,6 +65,7 @@ stages:
                       export ARM_CLIENT_ID="$servicePrincipalId"
                       export ARM_OIDC_TOKEN="$idToken"
                       export ARM_USE_OIDC=true
+                      export SMOKE_TEST_TOKEN="${{ parameters.smokeTestToken }}"
                       make ci ${{ parameters.environment }} terraform-apply DOCKER_IMAGE_TAG=git-sha-${{ parameters.commitSHA }} PR_NUMBER=${{ parameters.prNumber }}
 
                 - task: AzureCLI@2
