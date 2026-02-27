@@ -4,6 +4,11 @@ from functools import cached_property
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.dicom.models import Study as DicomStudy
+from manage_breast_screening.dicom.study_service import (
+    StudyService as DicomStudyService,
+)
+from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.manual_images.models import (
     ALL_VIEWS_RCC_FIRST,
     EKLUND_VIEWS,
@@ -337,7 +342,53 @@ class ViewSummary:
             return ""
 
 
-class ImagesTakenPresenter:
+class ImagesPresenterFactory:
+    @staticmethod
+    def presenter_for(appointment):
+        if gateway_images_enabled(appointment):
+            return GatewayImagesPresenter(appointment)
+        else:
+            return ImagesTakenPresenter(appointment)
+
+
+class ImagesPresenter:
+    def __init__(self):
+        self.total_count = 0
+
+    @property
+    def title(self):
+        if self.total_count == 0:
+            return "No images taken"
+        elif self.total_count == 1:
+            return "1 image taken"
+        else:
+            return f"{self.total_count} images taken"
+
+
+class GatewayImagesPresenter(ImagesPresenter):
+    def __init__(self, appointment):
+        study = DicomStudy.for_appointment(appointment)
+        self.additional_details = study.additional_details
+
+        images = study.images()
+        self.total_count = images.count()
+        view_counts = DicomStudyService.image_counts_by_laterality_and_view(
+            images.all()
+        )
+        self.views_taken = {view: ViewSummary() for view in ALL_VIEWS_RCC_FIRST}
+        for view, count in view_counts.items():
+            summary = self.views_taken[ImageView.from_short_name(view)]
+            summary.count = count
+            summary.extra_count = count - 1 if count > 1 else 0
+            summary.repeat_count = 0  # TODO: Not implemented yet
+            summary.repeat_reasons = []  # TODO: Not implemented yet
+
+        for view in EKLUND_VIEWS:
+            if not self.views_taken[view].count:
+                del self.views_taken[view]
+
+
+class ImagesTakenPresenter(ImagesPresenter):
     def __init__(self, appointment):
         study = appointment.study
         self.additional_details = study.additional_details
@@ -361,12 +412,3 @@ class ImagesTakenPresenter:
         for view in EKLUND_VIEWS:
             if not self.views_taken[view].count:
                 del self.views_taken[view]
-
-    @property
-    def title(self):
-        if self.total_count == 0:
-            return "No images taken"
-        elif self.total_count == 1:
-            return "1 image taken"
-        else:
-            return f"{self.total_count} images taken"

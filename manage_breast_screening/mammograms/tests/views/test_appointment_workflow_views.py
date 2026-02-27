@@ -12,8 +12,15 @@ from pytest_django.asserts import (
 
 from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
+from manage_breast_screening.dicom.models import Study as DicomStudy
+from manage_breast_screening.dicom.tests.factories import (
+    StudyFactory as DicomStudyFactory,
+)
 from manage_breast_screening.gateway.models import GatewayAction, GatewayActionType
-from manage_breast_screening.gateway.tests.factories import RelayFactory
+from manage_breast_screening.gateway.tests.factories import (
+    GatewayActionFactory,
+    RelayFactory,
+)
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
 )
@@ -248,6 +255,30 @@ class TestRecordMedicalInformation:
         )
         mock_send_action.assert_called_once_with(relay, action)
 
+    def test_redirects_to_gateway_images_when_enabled(
+        self, clinical_user_client, monkeypatch
+    ):
+        monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        RelayFactory.create(provider=appointment.provider)
+
+        with patch(
+            "manage_breast_screening.gateway.relay_service.RelayService.send_action"
+        ):
+            response = clinical_user_client.http.post(
+                reverse(
+                    "mammograms:record_medical_information",
+                    kwargs={"pk": appointment.pk},
+                )
+            )
+
+        assertRedirects(
+            response,
+            reverse("mammograms:gateway_images", kwargs={"pk": appointment.pk}),
+        )
+
 
 @pytest.mark.django_db
 class TestTakeImages:
@@ -354,6 +385,95 @@ class TestTakeImages:
             {("CC", "L", 1), ("CC", "R", 1), ("MLO", "L", 1), ("MLO", "R", 1)},
             ordered=False,
         )
+
+
+@pytest.mark.django_db
+class TestGatewayImages:
+    def test_renders_response(self, clinical_user_client, appointment):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:gateway_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rcc_count": 1,
+                "rmlo_count": 1,
+                "lcc_count": 1,
+                "lmlo_count": 1,
+            },
+        )
+        assert response.status_code == 200
+
+    @patch(
+        "manage_breast_screening.mammograms.presenters.appointment_presenters.gateway_images_enabled",
+        return_value=True,
+    )
+    @pytest.mark.django_db
+    def test_marks_the_step_complete_and_redirects_to_check_info(
+        self, _, clinical_user_client, appointment
+    ):
+        dicom_study = DicomStudyFactory()
+        GatewayActionFactory.create(
+            id=str(dicom_study.source_message_id),
+            appointment=appointment,
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:gateway_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rcc_count": 1,
+                "rmlo_count": 1,
+                "lcc_count": 1,
+                "lmlo_count": 1,
+                "additional_details": "Some details about the images",
+                "not_all_mammograms_taken": False,
+                "imperfect_but_best_possible": False,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:check_information", kwargs={"pk": appointment.pk}),
+        )
+        assertQuerySetEqual(
+            appointment.completed_workflow_steps.filter(
+                created_by=clinical_user_client.user
+            )
+            .values_list("step_name", flat=True)
+            .distinct(),
+            [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
+        )
+
+    def test_updates_the_study(self, clinical_user_client, appointment):
+        dicom_study = DicomStudyFactory()
+        GatewayActionFactory.create(
+            id=str(dicom_study.source_message_id),
+            appointment=appointment,
+        )
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:gateway_images",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rcc_count": 1,
+                "rmlo_count": 1,
+                "lcc_count": 1,
+                "lmlo_count": 1,
+                "additional_details": "Some details about the images",
+                "not_all_mammograms_taken": False,
+                "imperfect_but_best_possible": False,
+                "reasons_incomplete": "",
+                "reasons_incomplete_details": "",
+            },
+        )
+
+        study = DicomStudy.for_appointment(appointment)
+        assert study.additional_details == "Some details about the images"
+        assert study.imperfect_but_best_possible is False
+        assert not study.reasons_incomplete
+        assert study.reasons_incomplete_details == ""
 
 
 @pytest.mark.django_db

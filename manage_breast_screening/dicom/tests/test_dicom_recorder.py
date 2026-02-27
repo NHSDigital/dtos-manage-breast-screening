@@ -42,6 +42,7 @@ class TestDicomRecorder:
         assert series.series_number == dataset.SeriesNumber
         assert image.instance_number == dataset.InstanceNumber
         assert image.laterality == dataset.ImageLaterality
+        assert image.view_position == dataset.ViewPosition
 
         assert image.dicom_file.name.endswith(f"{dataset.SOPInstanceUID}.dcm")
         assert image.dicom_file.size > 0
