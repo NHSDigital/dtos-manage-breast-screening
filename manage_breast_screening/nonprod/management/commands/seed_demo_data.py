@@ -54,6 +54,12 @@ from manage_breast_screening.participants.models.medical_information_review impo
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
     HormoneReplacementTherapy,
 )
+from manage_breast_screening.participants.models.other_information.other_medical_information import (
+    OtherMedicalInformation,
+)
+from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
+    PregnancyAndBreastfeeding,
+)
 from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
@@ -344,6 +350,8 @@ class Command(BaseCommand):
             )
 
     def reset_db(self):
+        OtherMedicalInformation.objects.all().delete()
+        PregnancyAndBreastfeeding.objects.all().delete()
         HormoneReplacementTherapy.objects.all().delete()
         AppointmentWorkflowStepCompletion.objects.all().delete()
         Series.objects.all().delete()

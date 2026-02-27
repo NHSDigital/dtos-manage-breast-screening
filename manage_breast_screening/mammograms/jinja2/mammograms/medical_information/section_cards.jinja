@@ -9,7 +9,8 @@
 {% from "mammograms/medical_information/medical_history/cards/implanted_medical_device_history_card.jinja" import implanted_medical_device_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/other_procedure_history_card.jinja" import other_procedure_history_card %}
-{% from "mammograms/medical_information/other_information/cards/macros.jinja" import hormone_replacement_therapy_details, pregnancy_and_breastfeeding_details %}
+{% from "mammograms/medical_information/other_information/cards/macros.jinja" import hormone_replacement_therapy_details, pregnancy_and_breastfeeding_details, other_medical_information_details %}
+
 
 {% macro mammogram_history_content(presented_medical_info, presented_mammograms, read_only=false) %}
   <p>The last confirmed mammogram and any added manually since then</p>
@@ -164,8 +165,9 @@
             "text": "Other medical information"
         },
         "value" : {
-            "html": "<a href='#'>Enter other medical information details</a>"
-        }
+            "html": other_medical_information_details(presented_medical_info, read_only)
+        },
+        "actions": presented_medical_info.other_medical_information_actions(read_only)
       }
     ]
   }) }}

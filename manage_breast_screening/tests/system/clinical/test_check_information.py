@@ -152,6 +152,12 @@ class TestCheckInformation(SystemTestCase):
         value = row.locator(".nhsuk-summary-list__value")
         expect(value).to_contain_text("No symptoms recorded")
 
+        row = section.locator(
+            ".nhsuk-summary-list__row", has_text="Other relevant information"
+        )
+        value = row.locator(".nhsuk-summary-list__value")
+        expect(value).to_contain_text("No other information added")
+
     def and_the_image_details_are_listed(self):
         heading = self.page.get_by_role("heading").filter(has_text="21 images taken")
         section = self.page.locator(".nhsuk-card").filter(has=heading)

@@ -5,7 +5,8 @@
 {% set character_count_params = {
     "label": {
       "html": label_html(field),
-      "classes": unbound_field.label_classes if unbound_field.label_classes
+      "classes": unbound_field.label_classes if unbound_field.label_classes,
+      "isPageHeading": unbound_field.page_heading
     },
     "hint": {
       "text": unbound_field.hint

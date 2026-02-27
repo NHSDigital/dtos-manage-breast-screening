@@ -272,6 +272,11 @@ class TestAppointmentTabs(SystemTestCase):
                 ".nhsuk-summary-list__row", has_text="Pregnancy and breastfeeding"
             )
         ).to_contain_text("Not provided")
+        expect(
+            card.locator(
+                ".nhsuk-summary-list__row", has_text="Other medical information"
+            )
+        ).to_contain_text("Not provided")
 
     def when_i_change_to_an_appointment_tab(self, tab_name):
         secondary_nav = self.page.locator(".app-secondary-navigation")

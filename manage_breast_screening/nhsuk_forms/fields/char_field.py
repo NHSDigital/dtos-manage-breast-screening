@@ -25,6 +25,7 @@ class CharField(forms.CharField):
         visually_hidden_label_prefix=None,
         visually_hidden_label_suffix=None,
         inputmode=None,
+        page_heading=False,
         **kwargs,
     ):
         self.hint = hint
@@ -36,6 +37,7 @@ class CharField(forms.CharField):
         self.max_words = max_words
         self.threshold = threshold
         self.inputmode = inputmode
+        self.page_heading = page_heading
 
         if max_length and max_words:
             raise ValueError("Cannot set both max_length and max_words")

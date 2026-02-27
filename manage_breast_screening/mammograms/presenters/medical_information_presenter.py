@@ -160,6 +160,10 @@ class MedicalInformationPresenter:
             appointment, "pregnancy_and_breastfeeding", None
         )
 
+        self.other_medical_information = getattr(
+            appointment, "other_medical_information", None
+        )
+
     @property
     def symptom_rows(self):
         return [symptom.summary_list_row for symptom in self.symptoms]
@@ -381,5 +385,34 @@ class MedicalInformationPresenter:
                 ],
             }
             if self.pregnancy_and_breastfeeding and not read_only
+            else None
+        )
+
+    @property
+    def add_other_medical_information_link(self):
+        return reverse(
+            "mammograms:add_other_medical_information",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+    def other_medical_information_actions(self, read_only=False):
+        return (
+            {
+                "items": [
+                    {
+                        "href": reverse(
+                            "mammograms:change_other_medical_information",
+                            kwargs={
+                                "pk": self.appointment.pk,
+                                "other_medical_information_pk": self.other_medical_information.pk,
+                            },
+                        ),
+                        "text": "Change",
+                        "visuallyHiddenText": "other medical information",
+                        "classes": "nhsuk-link--no-visited-state",
+                    },
+                ],
+            }
+            if self.other_medical_information and not read_only
             else None
         )

@@ -49,3 +49,13 @@
     {% endif %}
   {% endif %}
 {% endmacro %}
+
+{% macro other_medical_information_details(presenter, read_only=false) %}
+  {% if presenter.other_medical_information %}
+    {{ presenter.other_medical_information.details | nl2br }}
+  {% elif read_only %}
+    Not provided
+  {% else %}
+    <a href="{{ presenter.add_other_medical_information_link }}">Enter other medical information details</a>
+  {% endif %}
+{% endmacro %}

@@ -24,6 +24,12 @@ from manage_breast_screening.participants.models.medical_history.mastectomy_or_l
 from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
     OtherProcedureHistoryItem,
 )
+from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
+    HormoneReplacementTherapy,
+)
+from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
+    PregnancyAndBreastfeeding,
+)
 from manage_breast_screening.participants.models.symptom import (
     NippleChangeChoices,
     RelativeDateChoices,
@@ -37,10 +43,13 @@ from manage_breast_screening.participants.tests.factories import (
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
     CystHistoryItemFactory,
+    HormoneReplacementTherapyFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
+    OtherMedicalInformationFactory,
     OtherProcedureHistoryItemFactory,
     ParticipantReportedMammogramFactory,
+    PregnancyAndBreastfeedingFactory,
     SymptomFactory,
 )
 
@@ -909,3 +918,139 @@ class TestCheckMedicalInformationPresenter:
         assert "Skin change: colour change (left breast)" in item.symptoms
         assert "Lump (right breast)" in item.symptoms
         assert "Swelling or shape change (right breast)" in item.symptoms
+
+    def test_no_other_relevant_information(self):
+        appointment = AppointmentFactory.create()
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert not item.other_relevant_information
+
+    def test_hormone_replacement_therapy_yes(self):
+        appointment = AppointmentFactory.create()
+        HormoneReplacementTherapyFactory.create(
+            appointment=appointment,
+            status=HormoneReplacementTherapy.Status.YES,
+            approx_start_date="Summer 2022",
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == ["Taking HRT (Summer 2022)"]
+
+    def test_hormone_replacement_therapy_no_but_stopped_recently(self):
+        appointment = AppointmentFactory.create()
+        HormoneReplacementTherapyFactory.create(
+            appointment=appointment,
+            status=HormoneReplacementTherapy.Status.NO_BUT_STOPPED_RECENTLY,
+            approx_previous_duration="2 years",
+            approx_end_date="Winter 2023",
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == ["Recently stopped HRT (Winter 2023)"]
+
+    def test_hormone_replacement_therapy_no(self):
+        appointment = AppointmentFactory.create()
+        HormoneReplacementTherapyFactory.create(
+            appointment=appointment,
+            status=HormoneReplacementTherapy.Status.NO,
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert not item.other_relevant_information
+
+    def test_pregnancy_yes(self):
+        appointment = AppointmentFactory.create()
+        PregnancyAndBreastfeedingFactory.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.YES,
+            approx_pregnancy_due_date="November 2022",
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.NO,
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == ["Pregnant (November 2022)"]
+
+    def test_pregnancy_no_but_has_been_recently(self):
+        appointment = AppointmentFactory.create()
+        PregnancyAndBreastfeedingFactory.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.NO_BUT_HAS_BEEN_RECENTLY,
+            approx_pregnancy_end_date="December 2023",
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.NO,
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == ["Recently pregnant (December 2023)"]
+
+    def test_breast_feeding_yes(self):
+        appointment = AppointmentFactory.create()
+        PregnancyAndBreastfeedingFactory.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.NO,
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.YES,
+            approx_breastfeeding_start_date="November 2022",
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == ["Breastfeeding (November 2022)"]
+
+    def test_breastfeeding_no_but_stopped_recently(self):
+        appointment = AppointmentFactory.create()
+        PregnancyAndBreastfeedingFactory.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.NO,
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.NO_BUT_STOPPED_RECENTLY,
+            approx_breastfeeding_end_date="December 2023",
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == [
+            "Recently stopped breastfeeding (December 2023)"
+        ]
+
+    def test_other_medical_information(self):
+        appointment = AppointmentFactory.create()
+        OtherMedicalInformationFactory.create(
+            appointment=appointment,
+            details="Some other medical information",
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == ["Some other medical information"]
+
+    def test_full_other_medical_information(self):
+        appointment = AppointmentFactory.create()
+        HormoneReplacementTherapyFactory.create(
+            appointment=appointment,
+            status=HormoneReplacementTherapy.Status.YES,
+            approx_start_date="Summer 2022",
+        )
+        PregnancyAndBreastfeedingFactory.create(
+            appointment=appointment,
+            pregnancy_status=PregnancyAndBreastfeeding.PregnancyStatus.YES,
+            approx_pregnancy_due_date="November 2022",
+            breastfeeding_status=PregnancyAndBreastfeeding.BreastfeedingStatus.NO_BUT_STOPPED_RECENTLY,
+            approx_breastfeeding_end_date="December 2023",
+        )
+        OtherMedicalInformationFactory.create(
+            appointment=appointment,
+            details="Some other medical information",
+        )
+
+        item = CheckMedicalInformationPresenter(appointment)
+
+        assert item.other_relevant_information == [
+            "Taking HRT (Summer 2022)",
+            "Pregnant (November 2022)",
+            "Recently stopped breastfeeding (December 2023)",
+            "Some other medical information",
+        ]
