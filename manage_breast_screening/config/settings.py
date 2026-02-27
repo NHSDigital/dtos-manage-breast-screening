@@ -359,9 +359,11 @@ BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
 API_PATH_PREFIX = "/api/"
 
 # HTTP Strict Transport Security (HSTS)
-SECURE_HSTS_SECONDS = 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = False
+# tells Django to trust the X-Forwarded-Proto header that comes from our proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Prevent the browser from guessing content types
 SECURE_CONTENT_TYPE_NOSNIFF = True
