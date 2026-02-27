@@ -7,9 +7,6 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
-    OtherProcedureHistoryItem,
-)
 
 from ...forms.medical_history.other_procedure_history_item_form import (
     OtherProcedureHistoryItemForm,
@@ -49,12 +46,13 @@ class UpdateOtherProcedureHistoryView(MedicalInformationMixin, UpdateWithAuditVi
 
     def get_object(self):
         try:
-            return OtherProcedureHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+            return self.appointment.other_procedure_history_items.get(
+                pk=self.kwargs["history_item_pk"]
             )
-        except OtherProcedureHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+        except AttributeError:
+            logger.exception(
+                "OtherProcedureHistoryItem does not exist for kwargs=%s", self.kwargs
+            )
             return None
 
     def get_form_kwargs(self):

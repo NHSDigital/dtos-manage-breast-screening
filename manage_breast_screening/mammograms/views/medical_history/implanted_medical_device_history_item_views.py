@@ -7,9 +7,6 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
-    ImplantedMedicalDeviceHistoryItem,
-)
 
 from ...forms.medical_history.implanted_medical_device_history_item_form import (
     ImplantedMedicalDeviceHistoryItemForm,
@@ -51,12 +48,14 @@ class UpdateImplantedMedicalDeviceHistoryView(
 
     def get_object(self):
         try:
-            return ImplantedMedicalDeviceHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+            return self.appointment.implanted_medical_device_history_items.get(
+                pk=self.kwargs["history_item_pk"]
             )
-        except ImplantedMedicalDeviceHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+        except AttributeError:
+            logger.exception(
+                "ImplantedMedicalDeviceHistoryItem does not exist for kwargs=%s",
+                self.kwargs,
+            )
             return None
 
     def get_form_kwargs(self):
