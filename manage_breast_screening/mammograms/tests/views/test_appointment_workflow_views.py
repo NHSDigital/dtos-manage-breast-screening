@@ -725,6 +725,28 @@ class TestMarkSectionReviewed:
         )
         assert review.reviewed_by == clinical_user_client.user
 
+    def test_creates_medical_information_review_with_plain_response(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:mark_section_reviewed",
+                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+            ),
+            headers={"Accept": "text/plain"},
+        )
+        assert response.status_code == 201
+        assert MedicalInformationReview.objects.filter(
+            appointment=appointment, section="SYMPTOMS"
+        ).exists()
+        review = MedicalInformationReview.objects.get(
+            appointment=appointment, section="SYMPTOMS"
+        )
+        assert review.reviewed_by == clinical_user_client.user
+
     def test_does_not_update_reviewed_by_if_already_reviewed(
         self, clinical_user_client
     ):
@@ -752,3 +774,28 @@ class TestMarkSectionReviewed:
             response,
             "This section has already been reviewed by Jane Doe",
         )
+
+    def test_does_not_update_reviewed_by_if_already_reviewed_with_plain_response(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        original_user = UserFactory.create(first_name="Jane", last_name="Doe")
+        MedicalInformationReviewFactory.create(
+            appointment=appointment, section="SYMPTOMS", reviewed_by=original_user
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:mark_section_reviewed",
+                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+            ),
+            headers={"Accept": "text/plain"},
+        )
+        assert response.status_code == 409
+
+        review = MedicalInformationReview.objects.get(
+            appointment=appointment, section="SYMPTOMS"
+        )
+        assert review.reviewed_by == original_user
