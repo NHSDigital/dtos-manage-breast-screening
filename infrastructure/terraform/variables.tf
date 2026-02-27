@@ -185,6 +185,18 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
+variable "enable_smoke_test_bypass" {
+  description = "Whether to add a WAF rule allowing smoke test requests to bypass the firewall. Should only be enabled in dev and review environments."
+  type        = bool
+  default     = false
+}
+
+variable "smoke_test_token" {
+  description = "A secret token used by the smoke test to bypass WAF rules."
+  type        = string
+  sensitive   = true
+}
+
 variable "enable_relay" {
   description = "Whether to create Azure Relay resources."
   type        = bool

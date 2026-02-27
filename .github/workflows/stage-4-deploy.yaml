@@ -50,6 +50,9 @@ jobs:
             pr_argument=""
           fi
 
+          SMOKE_TEST_TOKEN=$(openssl rand -hex 16)
+          echo "SMOKE_TEST_TOKEN=${SMOKE_TEST_TOKEN}" >> $GITHUB_ENV
+
           source "infrastructure/environments/${ENVIRONMENT}/variables.sh"
 
           echo "Starting Azure devops pipeline \"Deploy to Azure - ${ENVIRONMENT}\"..."
@@ -58,7 +61,7 @@ jobs:
             --name "Deploy to Azure - ${ENVIRONMENT}" \
             --org https://dev.azure.com/nhse-dtos \
             --project dtos-manage-breast-screening \
-            --parameters commitSHA="${COMMIT_SHA}" ${pr_argument} environment="${ENVIRONMENT}" pool="${ADO_MANAGEMENT_POOL}" \
+            --parameters commitSHA="${COMMIT_SHA}" ${pr_argument} environment="${ENVIRONMENT}" pool="${ADO_MANAGEMENT_POOL}" smokeTestToken="${SMOKE_TEST_TOKEN}" \
             --output tsv --query id)
 
           echo "See pipeline run in Azure devops: https://dev.azure.com/nhse-dtos/dtos-manage-breast-screening/_build/results?buildId=${RUN_ID}&view=results"
@@ -70,6 +73,7 @@ jobs:
           ENVIRONMENT: ${{ matrix.environment }}
           COMMIT_SHA: ${{ inputs.commit_sha }}
           PR_NUMBER: ${{ inputs.pr_number }}
+          SMOKE_TEST_TOKEN: ${{ env.SMOKE_TEST_TOKEN }}
         run: |
           dns_zone_name=$( grep dns_zone_name "infrastructure/environments/${ENVIRONMENT}/variables.tfvars" | awk -F'"' '{print $2}' )
           use_apex_domain=$( grep use_apex_domain "infrastructure/environments/${ENVIRONMENT}/variables.tfvars" | awk '{print $3}' || echo "false" )

@@ -76,6 +76,8 @@ module "container-apps" {
   postgres_enable_high_availability     = var.postgres_enable_high_availability
   main_subnet_id                        = var.deploy_infra ? module.infra[0].main_subnet_id : data.azurerm_subnet.main[0].id
   run_notifications_smoke_test          = var.run_notifications_smoke_test
+  enable_smoke_test_bypass              = var.enable_smoke_test_bypass
+  smoke_test_token                      = var.smoke_test_token
   seed_demo_data                        = var.seed_demo_data
   use_apex_domain                       = var.use_apex_domain
   infra_key_vault_name                  = local.infra_key_vault_name
