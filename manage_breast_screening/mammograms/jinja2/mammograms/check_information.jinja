@@ -11,6 +11,8 @@
 {% block step_content %}
   <p>Before concluding this appointment, confirm that the information recorded is correct.</p>
 
+  {% set return_url = request.path %}
+
   {% call card({
   "heading": "Personal Information",
   "feature": true
@@ -23,8 +25,9 @@
               "text": "Ethnicity"
           },
           "value" : {
-              "text": ethnicity_html(presented_appointment.participant) | default("Not provided", true) 
-          }
+              "html": ethnicity_html(presented_appointment.participant, return_url) | safe
+          },
+          "actions": presented_appointment.participant.ethnicity_actions(return_url)
       }
       ]
   }) }}
