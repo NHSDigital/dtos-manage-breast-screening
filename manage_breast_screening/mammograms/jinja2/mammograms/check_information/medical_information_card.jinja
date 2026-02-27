@@ -22,15 +22,18 @@
       "rows": [
         {
           "key": { "text": "Previous mammograms" },
-          "value" : { "text": presented_medical_information.previous_mammograms }
+          "value" : { "text": presented_medical_information.previous_mammograms },
+          "actions": presented_medical_information.previous_mammograms_action
         },
         {
           "key": { "text": "Medical history" },
-          "value" : { "html": medical_history(presented_medical_information.medical_history, 'No medical history added') }
+          "value" : { "html": medical_history(presented_medical_information.medical_history, 'No medical history added') },
+          "actions": presented_medical_information.medical_history_action
         },
         {
           "key": { "text": "Symptoms" },
-          "value" : { "html": medical_history(presented_medical_information.symptoms, 'No symptoms recorded') }
+          "value" : { "html": medical_history(presented_medical_information.symptoms, 'No symptoms recorded') },
+          "actions": presented_medical_information.symptoms_action
         },
         {
           "key": { "text": "Other relevant information" },
