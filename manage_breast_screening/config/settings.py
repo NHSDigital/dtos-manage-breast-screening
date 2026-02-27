@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.manual_images",
     "manage_breast_screening.gateway",
     "rules.apps.AutodiscoverRulesConfig",
+    "csp",
 ]
 
 if DJANGO_ENV != "production":
@@ -107,6 +108,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "ninja.compatibility.files.fix_request_files_middleware",
+    "csp.middleware.CSPMiddleware",
 ]
 
 if DEBUG:
@@ -378,3 +380,19 @@ SECURE_REFERRER_POLICY = "same-origin"
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_HTTPONLY = True
+
+CSP_SELF = "'self'"
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "base-uri": (CSP_SELF,),
+        "connect-src": (CSP_SELF,),
+        "default-src": (CSP_SELF,),
+        "font-src": (CSP_SELF, "https://assets.nhs.uk"),
+        "form-action": (CSP_SELF,),
+        "frame-ancestors": ("'none'",),
+        "img-src": (CSP_SELF, "data:"),
+        "object-src": ("'none'",),
+        "script-src": (CSP_SELF, "'unsafe-inline'"),
+        "style-src": (CSP_SELF,),
+    }
+}
