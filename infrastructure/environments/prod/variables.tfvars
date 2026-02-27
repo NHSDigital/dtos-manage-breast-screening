@@ -13,3 +13,4 @@ use_apex_domain                       = true
 cae_zone_redundancy_enabled           = true
 enable_notifications_jobs_schedule    = false
 min_replicas                          = 2
+container_memory                      = "1"
