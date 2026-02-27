@@ -50,17 +50,20 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
     }
   }
 
-  custom_rule {
-    name     = "BlockNonUK"
-    priority = 10
-    type     = "MatchRule"
-    action   = "Block"
+  dynamic "custom_rule" {
+    for_each = var.enable_smoke_test_bypass ? [] : [1]
+    content {
+      name     = "BlockNonUK"
+      priority = 10
+      type     = "MatchRule"
+      action   = "Block"
 
-    match_condition {
-      match_variable     = "SocketAddr"
-      operator           = "GeoMatch"
-      negation_condition = true
-      match_values       = ["GB"]
+      match_condition {
+        match_variable     = "SocketAddr"
+        operator           = "GeoMatch"
+        negation_condition = true
+        match_values       = ["GB"]
+      }
     }
   }
 
