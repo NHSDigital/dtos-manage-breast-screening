@@ -27,6 +27,29 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
     action  = "Block"
   }
 
+  dynamic "custom_rule" {
+    for_each = var.enable_smoke_test_bypass ? [1] : []
+    content {
+      name     = "AllowSmokeTest"
+      priority = 1
+      type     = "MatchRule"
+      action   = "Allow"
+
+      match_condition {
+        match_variable = "RequestHeader"
+        selector       = "User-Agent"
+        operator       = "Contains"
+        match_values   = [var.smoke_test_token]
+      }
+
+      match_condition {
+        match_variable = "RequestUri"
+        operator       = "Contains"
+        match_values   = ["/sha"]
+      }
+    }
+  }
+
   custom_rule {
     name     = "BlockNonUK"
     priority = 10

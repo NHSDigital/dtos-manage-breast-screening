@@ -62,6 +62,7 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 	$(eval export TF_VAR_hub=${HUB})
 	$(eval export TF_VAR_hub_subscription_id=${HUB_SUBSCRIPTION_ID})
 	$(eval export TF_VAR_run_notifications_smoke_test=${RUN_NOTIFICATIONS_SMOKE_TEST})
+	$(eval export TF_VAR_smoke_test_token=${SMOKE_TEST_TOKEN})
 
 terraform-plan: terraform-init # Plan Terraform changes - make <env> terraform-plan DOCKER_IMAGE_TAG=abcd123
 	terraform -chdir=infrastructure/terraform plan -var-file ../environments/${ENV_CONFIG}/variables.tfvars

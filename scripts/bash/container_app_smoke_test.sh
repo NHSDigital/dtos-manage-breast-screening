@@ -31,7 +31,7 @@ start_time=$(date +%s)
 while true; do
   # Send request to /sha URL. Only print the sha and fail if required.
   # It should fail initially until front door presents the right certificate.
-  if ACTUAL_SHA=$(curl -fsS "$ENDPOINT" 2>/dev/null); then
+  if ACTUAL_SHA=$(curl -fsS -A "${SMOKE_TEST_TOKEN:-SmokeTest}" "$ENDPOINT" 2>/dev/null); then
     echo "Endpoint responded: $ACTUAL_SHA"
     if [ "$ACTUAL_SHA" = "$EXPECTED_SHA" ]; then
       echo "✅ SHA matches expected commit: $EXPECTED_SHA"

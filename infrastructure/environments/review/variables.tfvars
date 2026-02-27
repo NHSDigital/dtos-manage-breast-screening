@@ -9,6 +9,7 @@ protect_keyvault                          = false
 vnet_address_space                        = "10.142.0.0/16"
 deploy_database_as_container              = true
 seed_demo_data                            = true
+enable_smoke_test_bypass                  = true
 enable_relay                              = true
 enable_service_bus                        = true
 service_bus_public_network_access_enabled = true
