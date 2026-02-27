@@ -3,8 +3,8 @@ from urllib.parse import urlencode
 import pytest
 from django.http import QueryDict
 
-from manage_breast_screening.mammograms.forms.images.add_image_details_form import (
-    AddImageDetailsForm,
+from manage_breast_screening.mammograms.forms.images.image_details_form import (
+    ImageDetailsForm,
 )
 from manage_breast_screening.mammograms.services.appointment_services import (
     RecallService,
@@ -29,9 +29,9 @@ def recall_service(in_progress_appointment):
 
 
 @pytest.mark.django_db
-class TestAddImageDetailsForm:
+class TestImageDetailsForm:
     def test_no_data(self):
-        form = AddImageDetailsForm(QueryDict())
+        form = ImageDetailsForm(QueryDict())
 
         assert not form.is_valid()
         assert form.errors == {
@@ -44,7 +44,7 @@ class TestAddImageDetailsForm:
         }
 
     def test_zero_images(self):
-        form = AddImageDetailsForm(
+        form = ImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -79,7 +79,7 @@ class TestAddImageDetailsForm:
         lcc_count = 1
         left_eklund_count = 19
         additional_details = "Some additional details"
-        form = AddImageDetailsForm(
+        form = ImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -125,7 +125,7 @@ class TestAddImageDetailsForm:
     ):
         appointment = study_service.appointment
         lmlo_count = 1
-        form = AddImageDetailsForm(
+        form = ImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -142,7 +142,7 @@ class TestAddImageDetailsForm:
                         ],
                         "reasons_incomplete_details": "",
                         "imperfect_but_best_possible": False,
-                        "should_recall": AddImageDetailsForm.RecallChoices.TO_BE_RECALLED,
+                        "should_recall": ImageDetailsForm.RecallChoices.TO_BE_RECALLED,
                     },
                     doseq=True,
                 )
@@ -173,7 +173,7 @@ class TestAddImageDetailsForm:
     ):
         appointment = study_service.appointment
         lmlo_count = 1
-        form = AddImageDetailsForm(
+        form = ImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -189,7 +189,7 @@ class TestAddImageDetailsForm:
                         ],
                         "reasons_incomplete_details": "",
                         "imperfect_but_best_possible": True,
-                        "should_recall": AddImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
+                        "should_recall": ImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
                     },
                     doseq=True,
                 )
@@ -215,7 +215,7 @@ class TestAddImageDetailsForm:
         self._assert_series(series_list[0], "MLO", "L", lmlo_count)
 
     def test_not_all_mammograms_taken_but_not_marked_as_such(self):
-        form = AddImageDetailsForm(
+        form = ImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -243,7 +243,7 @@ class TestAddImageDetailsForm:
         }
 
     def test_not_all_mammograms_taken_missing_reason(self):
-        form = AddImageDetailsForm(
+        form = ImageDetailsForm(
             QueryDict(
                 urlencode(
                     {
@@ -257,7 +257,7 @@ class TestAddImageDetailsForm:
                         "reasons_incomplete": [],
                         "reasons_incomplete_details": "",
                         "imperfect_but_best_possible": False,
-                        "should_recall": AddImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
+                        "should_recall": ImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
                     },
                     doseq=True,
                 )
@@ -287,7 +287,7 @@ class TestAddImageDetailsForm:
             ]
         )
 
-        form = AddImageDetailsForm(instance=study)
+        form = ImageDetailsForm(instance=study)
 
         assert form.initial == {
             "additional_details": "important note",
@@ -303,7 +303,7 @@ class TestAddImageDetailsForm:
             "reasons_incomplete_details": "",
             "right_eklund_count": 0,
             "rmlo_count": 1,
-            "should_recall": AddImageDetailsForm.RecallChoices.TO_BE_RECALLED,
+            "should_recall": ImageDetailsForm.RecallChoices.TO_BE_RECALLED,
         }
 
     def _assert_series(

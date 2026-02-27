@@ -2,10 +2,14 @@ import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
-from manage_breast_screening.mammograms.forms.images.add_image_details_form import (
-    AddImageDetailsForm,
+from manage_breast_screening.mammograms.forms.images.image_details_form import (
+    ImageDetailsForm,
 )
 from manage_breast_screening.manual_images.models import IncompleteImagesReason
+from manage_breast_screening.manual_images.tests.factories import (
+    SeriesFactory,
+    StudyFactory,
+)
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
@@ -87,7 +91,7 @@ class TestAddImageDetailsView:
                 "reasons_incomplete": [IncompleteImagesReason.CONSENT_WITHDRAWN],
                 "reasons_incomplete_details": "abc",
                 "imperfect_but_best_possible": "true",
-                "should_recall": AddImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
+                "should_recall": ImageDetailsForm.RecallChoices.PARTIAL_MAMMOGRAPHY,
             },
         )
         assertRedirects(
@@ -223,3 +227,141 @@ class TestAddImageDetailsView:
         assert not appointment.completed_workflow_steps.filter(
             step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
         ).exists()
+
+
+@pytest.mark.django_db
+class TestUpdateImageDetailsView:
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_existing_data_is_prepopulated_and_post_updates_db(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        study = StudyFactory.create(
+            appointment=appointment, additional_details="original notes"
+        )
+        SeriesFactory.create(study=study, view_position="MLO", laterality="R", count=3)
+        SeriesFactory.create(study=study, view_position="CC", laterality="R", count=1)
+        SeriesFactory.create(study=study, view_position="MLO", laterality="L", count=1)
+        SeriesFactory.create(study=study, view_position="CC", laterality="L", count=1)
+
+        get_response = clinical_user_client.http.get(
+            reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk})
+        )
+        assert 'id="id_rmlo_count"' in get_response.text
+        assert 'value="3"' in get_response.text
+
+        clinical_user_client.http.post(
+            reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk}),
+            {
+                "rmlo_count": "5",
+                "rcc_count": "1",
+                "right_eklund_count": "0",
+                "lmlo_count": "1",
+                "lcc_count": "1",
+                "left_eklund_count": "0",
+                "additional_details": "updated notes",
+            },
+        )
+
+        study.refresh_from_db()
+        assert study.additional_details == "updated notes"
+        assert study.series_set.get(view_position="MLO", laterality="R").count == 5
+
+    def test_valid_post_with_single_images_redirects_to_check_information(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rmlo_count": "1",
+                "rcc_count": "1",
+                "right_eklund_count": "0",
+                "lmlo_count": "1",
+                "lcc_count": "1",
+                "left_eklund_count": "0",
+                "additional_details": "",
+            },
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:check_information", kwargs={"pk": appointment.pk}),
+        )
+
+    def test_valid_post_with_multiple_images_redirects_to_add_multiple_images_information(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        StudyFactory.create(appointment=appointment)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rmlo_count": "2",
+                "rcc_count": "1",
+                "right_eklund_count": "0",
+                "lmlo_count": "1",
+                "lcc_count": "1",
+                "left_eklund_count": "0",
+                "additional_details": "",
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:add_multiple_images_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        StudyFactory.create(appointment=appointment)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "rmlo_count": "-1",
+                "rcc_count": "1",
+                "right_eklund_count": "0",
+                "lmlo_count": "1",
+                "lcc_count": "1",
+                "left_eklund_count": "0",
+                "additional_details": "",
+            },
+        )
+        assert response.status_code == 200
+        assertInHTML(
+            """
+            <ul class="nhsuk-list nhsuk-error-summary__list">
+                <li><a href="#id_rmlo_count">Number of RMLO images must be at least 0</a></li>
+            </ul>
+            """,
+            response.text,
+        )

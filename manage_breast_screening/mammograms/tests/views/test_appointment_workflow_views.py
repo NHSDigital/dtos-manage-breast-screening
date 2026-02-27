@@ -334,7 +334,7 @@ class TestTakeImages:
         assertRedirects(
             response,
             reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk}),
-            target_status_code=302,
+            target_status_code=200,
         )
 
     def test_yes_creates_the_study(self, clinical_user_client, appointment):
