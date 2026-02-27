@@ -6,7 +6,7 @@ data "azurerm_cdn_frontdoor_profile" "this" {
 }
 
 resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
-  count    = var.deploy_infra ? 1 : 0
+  count    = (var.deploy_infra || var.enable_smoke_test_bypass) ? 1 : 0
   provider = azurerm.hub
 
   name                              = "wafmanbrs${replace(var.environment, "-", "")}"
@@ -118,7 +118,7 @@ module "frontdoor_endpoint" {
     patterns_to_match      = local.patterns_to_match
   }
 
-  security_policies = var.deploy_infra ? {
+  security_policies = (var.deploy_infra || var.enable_smoke_test_bypass) ? {
     WAF = {
       cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.this[0].id
       associated_domain_keys           = ["${var.environment}-domain"]
