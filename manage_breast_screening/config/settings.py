@@ -371,7 +371,7 @@ CONTENT_SECURITY_POLICY = {
         "form-action": ("'self'",),
         "frame-ancestors": ("'none'",),
         "img-src": ("'self'", "data:"),
-        "script-src": ("'self'",),
+        "script-src": ("'self'", "'unsafe-inline'"),
         "style-src": ("'self'",),
     }
 }
