@@ -10,7 +10,7 @@ from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
 )
 
-from ..core.decorators import current_provider_exempt
+from ..core.decorators import current_provider_exempt, permission_denied_redirects
 from ..core.utils.relative_redirects import extract_relative_redirect_url
 from ..participants.models import Appointment
 from .forms import ProviderSettingsForm
@@ -109,6 +109,7 @@ def select_provider(request):
 
 
 @require_http_methods(["GET", "POST"])
+@permission_denied_redirects("You do not have permission to access provider settings.")
 @permission_required(Permission.MANAGE_PROVIDER_SETTINGS, raise_exception=True)
 def provider_settings(request):
     provider = request.user.current_provider
