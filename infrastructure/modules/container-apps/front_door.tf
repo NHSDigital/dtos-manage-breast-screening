@@ -6,7 +6,11 @@ data "azurerm_cdn_frontdoor_profile" "this" {
 }
 
 resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
+<<<<<<< HEAD
   count    = 0 # temporarily disabled pending WAF smoke test investigation (DTOSS-12358)
+=======
+  count    = (var.deploy_infra || var.enable_smoke_test_bypass) ? 1 : 0
+>>>>>>> 08b2e2ab (feat(container-apps): enable smoke test bypass in front door configuration)
   provider = azurerm.hub
 
   name                              = "wafmanbrs${replace(var.environment, "-", "")}"
@@ -118,5 +122,14 @@ module "frontdoor_endpoint" {
     patterns_to_match      = local.patterns_to_match
   }
 
+<<<<<<< HEAD
   security_policies = {} # temporarily disabled pending WAF smoke test investigation (DTOSS-12358)
+=======
+  security_policies = (var.deploy_infra || var.enable_smoke_test_bypass) ? {
+    WAF = {
+      cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.this[0].id
+      associated_domain_keys           = ["${var.environment}-domain"]
+    }
+  } : {}
+>>>>>>> 08b2e2ab (feat(container-apps): enable smoke test bypass in front door configuration)
 }
