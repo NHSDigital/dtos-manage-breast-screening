@@ -59,6 +59,7 @@ class TestCheckInformation(SystemTestCase):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_with_information_to_be_checked()
         self.then_i_can_change_ethnicity_details()
+        self.then_i_can_change_medical_information()
 
     def and_there_is_an_appointment_with_information_to_be_checked(self):
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
@@ -67,6 +68,40 @@ class TestCheckInformation(SystemTestCase):
         self.and_the_appointment_has_images()
         self.and_the_appointment_has_a_note()
         self.and_i_am_on_the_check_information_page()
+
+    def then_i_can_change_medical_information(self):
+        medical_info_heading = self.page.get_by_role("heading").filter(
+            has_text="Medical information"
+        )
+        section = self.page.locator(".nhsuk-card").filter(has=medical_info_heading)
+
+        record_medical_info_url = reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        previous_mammograms_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Previous mammograms"
+        )
+        expect(
+            previous_mammograms_row.get_by_role("link", name="Add a mammogram")
+        ).to_have_attribute("href", f"{record_medical_info_url}#mammogram-history")
+
+        medical_history_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Medical history"
+        )
+        expect(
+            medical_history_row.get_by_role(
+                "link", name="View or change medical history"
+            )
+        ).to_have_attribute("href", f"{record_medical_info_url}#medical-history")
+
+        symptoms_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Symptoms"
+        )
+        expect(symptoms_row.get_by_role("link", name="Add symptoms")).to_have_attribute(
+            "href", f"{record_medical_info_url}#symptoms"
+        )
 
     def then_i_can_change_ethnicity_details(self):
         self.page.get_by_role("link", name="Change ethnicity").click()
