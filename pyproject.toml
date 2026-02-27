@@ -41,6 +41,7 @@ dependencies = [
   "websockets>=16.0",
   "inflect>=7.5.0",
   "jsonschema>=4.26.0",
+  "django-csp>=4.0",
 ]
 
 [dependency-groups]

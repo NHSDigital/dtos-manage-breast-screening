@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.manual_images",
     "manage_breast_screening.gateway",
     "rules.apps.AutodiscoverRulesConfig",
+    "csp",
 ]
 
 if getenv("DJANGO_ENV", "production") != "production":
@@ -107,6 +108,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "ninja.compatibility.files.fix_request_files_middleware",
+    "csp.middleware.CSPMiddleware",
 ]
 
 if DEBUG:
@@ -359,3 +361,17 @@ BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
 BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
 
 API_PATH_PREFIX = "/api/"
+
+CONTENT_SECURITY_POLICY = {
+    "DIRECTIVES": {
+        "base-uri": ("'self'",),
+        "connect-src": ("'self'",),
+        "default-src": ("'self'",),
+        "font-src": ("'self'", "https://assets.nhs.uk"),
+        "form-action": ("'self'",),
+        "frame-ancestors": ("'none'",),
+        "img-src": ("'self'", "data:"),
+        "script-src": ("'self'",),
+        "style-src": ("'self'",),
+    }
+}
