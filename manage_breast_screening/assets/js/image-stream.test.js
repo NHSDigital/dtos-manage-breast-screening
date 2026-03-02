@@ -84,6 +84,34 @@ describe('ImageStream', () => {
     expect(container.innerHTML).toBe(newContent)
   })
 
+  it('updates creates Radios components when receiving an images event', () => {
+    document.body.innerHTML = `
+      <div data-module="${ImageStream.moduleName}" data-stream-url="/api/images/stream">
+        <p>No images yet</p>
+      </div>
+    `
+
+    createAll(ImageStream)
+
+    jest.spyOn(createAll, 'Radios').mockImplementation(() => {})
+
+    const container = document.querySelector(
+      `[data-module="${ImageStream.moduleName}"]`
+    )
+
+    const newContent = '<div class="image-grid"><img src="/img/1.jpg"></div>'
+
+    eventListeners['images']({ data: newContent })
+
+    expect(createAll.Radios).toHaveBeenCalledWith(
+      undefined,
+      expect.objectContaining({
+        scope: container,
+        onError: expect.any(Function)
+      })
+    )
+  })
+
   it('logs a warning on connection error', () => {
     document.body.innerHTML = `
       <div data-module="${ImageStream.moduleName}" data-stream-url="/api/images/stream">

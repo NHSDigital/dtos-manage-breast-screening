@@ -14,6 +14,7 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.dicom.models import Study as DicomStudy
 from manage_breast_screening.dicom.study_service import (
     StudyService as DicomStudyService,
 )
@@ -250,6 +251,11 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/gateway_images.jinja"
     form_class = GatewayImageDetailsForm
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = DicomStudy.for_appointment(self.appointment)  # type: ignore
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         images = get_images_for_appointment(self.appointment)
@@ -269,7 +275,7 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
         return context
 
     @transaction.atomic
-    def form_valid(self, form):
+    def form_valid(self, form: GatewayImageDetailsForm):
         form.save(
             DicomStudyService(
                 appointment=self.appointment, current_user=self.request.user
@@ -405,17 +411,21 @@ def appointment_images_stream(request, pk):
         last_image_ids = set()
 
         while True:
-            images = get_images_for_appointment(appointment)
+            study = DicomStudy.for_appointment(appointment)
+            images = study.images().all() if study else []
             current_image_ids = set(str(img.id) for img in images)
+            grouped_images = DicomStudyService.images_by_laterality_and_view(images)
 
             if current_image_ids != last_image_ids:
+                form_params = GatewayImageDetailsForm.streamed_form_params(
+                    request.GET, grouped_images
+                )
                 html = render_to_string(
                     "mammograms/_image_grid.jinja",
                     {
-                        "images": DicomStudyService.images_by_laterality_and_view(
-                            images
-                        ),
+                        "images": grouped_images,
                         "image_count": len(images),
+                        "form": GatewayImageDetailsForm(form_params, instance=study),  # type: ignore
                     },
                     request=request,
                 )

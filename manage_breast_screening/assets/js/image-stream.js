@@ -1,4 +1,4 @@
-import { ConfigurableComponent, ElementError } from 'nhsuk-frontend'
+import { ConfigurableComponent, createAll, ElementError, Radios } from 'nhsuk-frontend'
 
 /**
  * Connect to an SSE endpoint and update the image container when new images arrive.
@@ -33,6 +33,12 @@ export class ImageStream extends ConfigurableComponent {
       'images',
       /** @param {MessageEvent<string>} event */ (event) => {
         this.$root.innerHTML = event.data
+        createAll(Radios, undefined, {
+          scope: this.$root,
+          onError(error, context) {
+            console.error('Error initialising Radios component within ImageStream:', error, context)
+          }
+        })
       }
     )
 

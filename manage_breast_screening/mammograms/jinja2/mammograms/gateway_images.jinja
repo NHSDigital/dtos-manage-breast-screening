@@ -7,11 +7,11 @@
 {% block form %}
   <div class="nhsuk-u-margin-bottom-6"
        data-module="app-image-stream"
-       data-stream-url="{{ url('mammograms:appointment_images_stream', kwargs={'pk': appointment_pk}) }}">
-    {% include "mammograms/_image_grid.jinja" %}
+       data-stream-url="{{ url('mammograms:appointment_images_stream', kwargs={'pk': appointment_pk}) }}?{{ form.streamed_form_params(request.POST, images) | urlencode }}">
+    {% with form=form %}
+      {% include "mammograms/_image_grid.jinja" %}
+    {% endwith %}
   </div>
-
-  {% include "mammograms/_troubleshoot_images.jinja" %}
 
   <div class="nhsuk-grid-column-two-thirds nhsuk-u-padding-0">
     {% call fieldset({

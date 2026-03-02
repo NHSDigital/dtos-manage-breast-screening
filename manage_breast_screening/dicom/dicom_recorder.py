@@ -25,6 +25,7 @@ class DicomRecorder:
         logger.info(
             f"Processing DICOM file with StudyInstanceUID={study_uid}, "
             f"SeriesInstanceUID={series_uid}, SOPInstanceUID={sop_uid}, "
+            f"SeriesNumber={getattr(ds, 'SeriesNumber', '')}, "
             f"PatientID={getattr(ds, 'PatientID', '')}, "
         )
 

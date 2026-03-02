@@ -7,21 +7,9 @@
   {{ form.series_fingerprint }}
   <p>You have indicated multiple images were needed for some views.</p>
 
-  {% for series, fields in form.get_series_field_groups() %}
-    {% set all_repeats_reasons_html = form[fields.all_repeats_reasons].as_field_group() %}
-
-    {% if fields.some_repeats_reasons %}
-      {% set repeat_count_html = form[fields.repeat_count].as_field_group() %}
-      {% set some_repeats_reasons_html = form[fields.some_repeats_reasons].as_field_group() %}
-      {% set some_repeats_html = repeat_count_html ~ some_repeats_reasons_html %}
-      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", all_repeats_reasons_html) %}
-      {% do form[fields.repeat_type].add_conditional_html("SOME_REPEATS", some_repeats_html) %}
-    {% else %}
-      {% do form[fields.repeat_type].add_conditional_html("ALL_REPEATS", all_repeats_reasons_html) %}
-    {% endif %}
-
-    {{ form[fields.repeat_type].as_field_group() }}
-  {% endfor %}
+  {% with form=form %}
+    {% include "mammograms/_multiple_images_fields.jinja" %}
+  {% endwith %}
 
   {{ form.additional_details.as_field_group() }}
 {% endblock %}

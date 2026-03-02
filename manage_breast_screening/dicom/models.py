@@ -4,6 +4,8 @@ from django.db import models
 
 from manage_breast_screening.manual_images.models import (
     IncompleteImagesReason,
+    RepeatReason,
+    RepeatType,
     StudyCompleteness,
 )
 
@@ -46,6 +48,11 @@ class Study(models.Model):
             "series__series_number", "instance_number"
         )
 
+    def series_with_multiple_images(self) -> models.QuerySet["Series"]:
+        return self.series.annotate(image_count=models.Count("images")).filter(
+            image_count__gt=1
+        )
+
     @classmethod
     def for_appointment(cls, appointment):
         action = appointment.gateway_actions.first()
@@ -69,8 +76,22 @@ class Series(models.Model):
     modality = models.CharField(max_length=16, blank=True)
     series_number = models.IntegerField(null=True, blank=True)
 
+    repeat_type = models.CharField(
+        max_length=20, choices=RepeatType.choices, blank=True, null=True
+    )
+    repeat_count = models.PositiveSmallIntegerField(blank=True, null=True)
+    repeat_reasons = ArrayField(
+        base_field=models.CharField(max_length=30, choices=RepeatReason.choices),
+        default=list,
+        blank=True,
+    )
+
+    @property
+    def count(self):
+        return self.images.count()
+
     def __str__(self):
-        return self.series_instance_uid
+        return str(self.images.first())
 
 
 class Image(models.Model):
@@ -93,4 +114,4 @@ class Image(models.Model):
         return None
 
     def __str__(self):
-        return self.sop_instance_uid
+        return self.laterality_and_view() or self.sop_instance_uid
