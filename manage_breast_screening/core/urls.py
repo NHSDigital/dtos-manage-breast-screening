@@ -26,6 +26,8 @@ from manage_breast_screening.core.decorators import basic_auth_exempt
 
 from .api import api
 
+handler403 = "manage_breast_screening.core.views.errors.permission_denied"
+
 
 @require_GET
 @basic_auth_exempt

@@ -1,0 +1,17 @@
+{% extends "layout-app.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+
+{% set page_title = "You do not have permission to view this page" %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-two-thirds">
+    <h1 class="nhsuk-heading-l">{{ page_title }}</h1>
+    <p>If you think you should have access, contact your system administrator.</p>
+    {{ button({
+      "text": "Go to dashboard",
+      "href": url("clinics:index")
+    }) }}
+  </div>
+</div>
+{% endblock %}

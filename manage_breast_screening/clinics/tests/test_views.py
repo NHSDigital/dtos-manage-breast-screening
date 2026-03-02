@@ -92,6 +92,7 @@ class TestProviderSettings:
         response = client.get(reverse("clinics:settings"))
 
         assert response.status_code == 403
+        assert "You do not have permission" in response.text
 
     @pytest.mark.django_db
     def test_accessible_to_sysadmin(self, client):
