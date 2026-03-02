@@ -9,7 +9,7 @@ from manage_breast_screening.config.settings import boolean_env
 class ApplicationInsightsLogging:
     def __init__(self) -> None:
         self.logger_name = os.getenv(
-            "APPLICATIONINSIGHTS_LOGGER_NAME", "manbrs-notifications"
+            "APPLICATIONINSIGHTS_LOGGER_NAME", "manage-breast-screening"
         )
         self.logger = self.getLogger()
 
@@ -30,23 +30,28 @@ class ApplicationInsightsLogging:
     def getLogger(self):
         return logging.getLogger(self.logger_name)
 
-    def exception(self, exception_name: str):
-        self.logger.exception(exception_name, stack_info=True)
+    def exception(self, exception_name: str, correlation_id: str = None):
+        extra = {"correlation_id": correlation_id} if correlation_id else {}
+        self.logger.exception(exception_name, stack_info=True, extra=extra)
 
-    def custom_event_warning(self, message: str, event_name: str):
-        self.logger.warning(
-            message,
-            extra={
-                "microsoft.custom_event.name": event_name,
-                "additional_attrs": message,
-            },
-        )
+    def custom_event_warning(
+        self, message: str, event_name: str, correlation_id: str = None
+    ):
+        extra = {
+            "microsoft.custom_event.name": event_name,
+            "additional_attrs": message,
+        }
+        if correlation_id:
+            extra["correlation_id"] = correlation_id
+        self.logger.warning(message, extra=extra)
 
-    def custom_event_info(self, message: str, event_name: str):
-        self.logger.info(
-            message,
-            extra={
-                "microsoft.custom_event.name": event_name,
-                "additional_attrs": message,
-            },
-        )
+    def custom_event_info(
+        self, message: str, event_name: str, correlation_id: str = None
+    ):
+        extra = {
+            "microsoft.custom_event.name": event_name,
+            "additional_attrs": message,
+        }
+        if correlation_id:
+            extra["correlation_id"] = correlation_id
+        self.logger.info(message, extra=extra)

@@ -58,7 +58,16 @@ class TestApplicationInsightsLogging:
         ApplicationInsightsLogging().exception("CustomError")
         mock_logging.getLogger.assert_called_with("insights-logger")
         mock_logging.getLogger.return_value.exception.assert_called_with(
-            "CustomError", stack_info=True
+            "CustomError", stack_info=True, extra={}
+        )
+
+    def test_raise_exception_with_correlation_id(
+        self, mock_logging, mock_configure_azure
+    ):
+        ApplicationInsightsLogging().exception("CustomError", correlation_id="12345")
+        mock_logging.getLogger.assert_called_with("insights-logger")
+        mock_logging.getLogger.return_value.exception.assert_called_with(
+            "CustomError", stack_info=True, extra={"correlation_id": "12345"}
         )
 
     def test_custom_event_warning(self, mock_logging, mock_configure_azure):

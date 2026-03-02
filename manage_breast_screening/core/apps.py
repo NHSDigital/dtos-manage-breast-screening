@@ -5,10 +5,10 @@ from manage_breast_screening.core.services.application_insights_logging import (
 )
 
 
-class NotificationsConfig(AppConfig):
+class CoreConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "manage_breast_screening.notifications"
+    name = "manage_breast_screening.core"
 
-    def ready(self) -> None:
+    def ready(self):
+        super().ready()
         ApplicationInsightsLogging().configure_azure_monitor()
-        return super().ready()
