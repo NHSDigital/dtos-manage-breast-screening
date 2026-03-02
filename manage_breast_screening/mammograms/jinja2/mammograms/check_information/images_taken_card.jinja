@@ -25,6 +25,19 @@
 {% endmacro %}
 
 {% macro images_taken_card(presented_images) %}
+  {% if presented_images.additional_details %}
+    {% set notes_row = {
+      "key": { "text": "Notes for reader" },
+      "value": { "html": presented_images.additional_details },
+      "actions": presented_images.notes_for_reader_action
+    } %}
+  {% else %}
+    {% set add_image_details_url = "<a href='" ~ presented_images.add_image_details_url ~ "'>Enter notes for reader details</a>" %}
+    {% set notes_row = {
+      "key": { "text": "Notes for reader" },
+      "value": { "html": add_image_details_url | safe },
+    } %}
+  {% endif %}
   {% call card({
     "heading": presented_images.title,
     "feature": true
@@ -33,12 +46,10 @@
       "rows": [
         {
           "key": { "text": "Views taken" },
-          "value": { "html": views_taken(presented_images) }
+          "value": { "html": views_taken(presented_images) },
+          "actions": presented_images.views_taken_action
         },
-        {
-          "key": { "text": "Notes for reader" },
-          "value": { "text": presented_images.additional_details }
-        }
+        notes_row
       ]
     }) }}
   {% endcall %}
