@@ -96,6 +96,7 @@ if DJANGO_ENV != "production":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "manage_breast_screening.core.middleware.exception_logging.CorrelationIdMiddleware",
     "manage_breast_screening.core.middleware.robots.RobotsTagMiddleware",
     "manage_breast_screening.core.middleware.basic_auth.BasicAuthMiddleware",
     "qsessions.middleware.SessionMiddleware",
@@ -109,6 +110,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "ninja.compatibility.files.fix_request_files_middleware",
     "csp.middleware.CSPMiddleware",
+    "manage_breast_screening.core.middleware.exception_logging.ExceptionLoggingMiddleware",
 ]
 
 if DEBUG:
@@ -277,9 +279,17 @@ LOG_QUERIES = boolean_env("LOG_QUERIES")
 LOGGING = {
     "version": 1,  # the dictConfig format version
     "disable_existing_loggers": False,  # retain the default loggers
+    "filters": {
+        "correlation_id": {
+            "()": "manage_breast_screening.core.middleware.exception_logging.CorrelationIdFilter",
+        },
+        "pii_redaction": {
+            "()": "manage_breast_screening.core.middleware.exception_logging.PIIRedactionFilter",
+        },
+    },
     "formatters": {
         "verbose": {
-            "format": "%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s",
+            "format": "%(asctime)s [%(process)d] [%(levelname)s] [%(correlation_id)s] [%(module)s] %(message)s",
             "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
             "class": "logging.Formatter",
         }
@@ -289,6 +299,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
             "stream": sys.stdout,
+            "filters": ["correlation_id", "pii_redaction"],
         },
     },
     "root": {
