@@ -11,6 +11,7 @@ class ApplicationInsightsLogging:
         self.logger_name = os.getenv(
             "APPLICATIONINSIGHTS_LOGGER_NAME", "insights-logger"
         )
+        os.environ.setdefault("OTEL_SERVICE_NAME", self.logger_name)
         self.logger = self.getLogger()
 
     def configure_azure_monitor(self):
@@ -30,17 +31,10 @@ class ApplicationInsightsLogging:
     def getLogger(self):
         return logging.getLogger(self.logger_name)
 
-    def exception(self, exception_name: str):
-        self.logger.exception(exception_name, stack_info=True)
-
-    def custom_event_warning(self, message: str, event_name: str):
-        self.logger.warning(
-            message,
-            extra={
-                "microsoft.custom_event.name": event_name,
-                "additional_attrs": message,
-            },
-        )
+    def exception(self, message: str, extra: dict = None):
+        # Keys in extra are forwarded to Application Insights
+        # as customDimensions and become filterable in the Logs blade and alerting rules.
+        self.logger.exception(message, extra=extra)
 
     def custom_event_info(self, message: str, event_name: str):
         self.logger.info(
