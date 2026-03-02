@@ -19,13 +19,15 @@ from manage_breast_screening.manual_images.tests.factories import StudyFactory
 
 
 @pytest.fixture
-def study_service(in_progress_appointment):
-    return StudyService(appointment=in_progress_appointment, current_user=None)
+def study_service(in_progress_appointment, clinical_user):
+    return StudyService(appointment=in_progress_appointment, current_user=clinical_user)
 
 
 @pytest.fixture
-def recall_service(in_progress_appointment):
-    return RecallService(appointment=in_progress_appointment, current_user=None)
+def recall_service(in_progress_appointment, clinical_user):
+    return RecallService(
+        appointment=in_progress_appointment, current_user=clinical_user
+    )
 
 
 @pytest.mark.django_db
