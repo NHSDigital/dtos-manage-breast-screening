@@ -887,6 +887,67 @@ class TestCheckMedicalInformationPresenter:
 
         assert item.symptoms == [expected]
 
+    def test_previous_mammograms_action_with_no_mammograms(self):
+        appointment = AppointmentFactory.create()
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.previous_mammograms_action["items"]
+        assert action["text"] == "Add a mammogram"
+        assert action["href"].endswith("#mammogram-history")
+        assert "visuallyHiddenText" not in action
+
+    def test_previous_mammograms_action_with_mammograms(self):
+        appointment = AppointmentFactory.create()
+        ParticipantReportedMammogramFactory.create(appointment=appointment)
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.previous_mammograms_action["items"]
+        assert action["text"] == "View or change"
+        assert action["href"].endswith("#mammogram-history")
+        assert action["visuallyHiddenText"] == "previous mammograms"
+
+    def test_medical_history_action_with_no_history(self):
+        appointment = AppointmentFactory.create()
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.medical_history_action["items"]
+        assert action["text"] == "Add medical history"
+        assert action["href"].endswith("#medical-history")
+        assert "visuallyHiddenText" not in action
+
+    def test_medical_history_action_with_history(self):
+        appointment = AppointmentFactory.create()
+        ImplantedMedicalDeviceHistoryItemFactory.create(appointment=appointment)
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.medical_history_action["items"]
+        assert action["text"] == "View or change"
+        assert action["href"].endswith("#medical-history")
+        assert action["visuallyHiddenText"] == "medical history"
+
+    def test_symptoms_action_with_no_symptoms(self):
+        appointment = AppointmentFactory.create()
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.symptoms_action["items"]
+        assert action["text"] == "Add symptoms"
+        assert action["href"].endswith("#symptoms")
+        assert "visuallyHiddenText" not in action
+
+    def test_symptoms_action_with_symptoms(self):
+        appointment = AppointmentFactory.create()
+        SymptomFactory.create(
+            appointment=appointment,
+            symptom_type_id=SymptomType.LUMP,
+            area=SymptomAreas.RIGHT_BREAST,
+        )
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.symptoms_action["items"]
+        assert action["text"] == "View or change"
+        assert action["href"].endswith("#symptoms")
+        assert action["visuallyHiddenText"] == "symptoms"
+
     def test_many_symptons(self):
         appointment = AppointmentFactory.create()
         SymptomFactory.create(

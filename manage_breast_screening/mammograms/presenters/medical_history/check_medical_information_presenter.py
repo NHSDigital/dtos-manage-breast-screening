@@ -1,5 +1,7 @@
 from functools import cached_property
 
+from django.urls import reverse
+
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
@@ -31,15 +33,76 @@ class CheckMedicalInformationPresenter:
         self.appointment = appointment
 
     @cached_property
+    def record_medical_information_url(self):
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+    @cached_property
+    def previous_mammograms_url(self):
+        return self.record_medical_information_url + "#mammogram-history"
+
+    @cached_property
+    def medical_history_url(self):
+        return self.record_medical_information_url + "#medical-history"
+
+    @cached_property
+    def symptoms_url(self):
+        return self.record_medical_information_url + "#symptoms"
+
+    @cached_property
+    def previous_mammograms_action(self):
+        has_data = self._previous_mammograms_count > 0
+        item = {
+            "href": self.previous_mammograms_url,
+            "classes": "nhsuk-link--no-visited-state",
+        }
+        if has_data:
+            item["text"] = "View or change"
+            item["visuallyHiddenText"] = "previous mammograms"
+        else:
+            item["text"] = "Add a mammogram"
+        return {"items": [item]}
+
+    @cached_property
+    def medical_history_action(self):
+        has_data = bool(self.medical_history)
+        item = {
+            "href": self.medical_history_url,
+            "classes": "nhsuk-link--no-visited-state",
+        }
+        if has_data:
+            item["text"] = "View or change"
+            item["visuallyHiddenText"] = "medical history"
+        else:
+            item["text"] = "Add medical history"
+        return {"items": [item]}
+
+    @cached_property
+    def symptoms_action(self):
+        has_data = bool(self.symptoms)
+        item = {"href": self.symptoms_url, "classes": "nhsuk-link--no-visited-state"}
+        if has_data:
+            item["text"] = "View or change"
+            item["visuallyHiddenText"] = "symptoms"
+        else:
+            item["text"] = "Add symptoms"
+        return {"items": [item]}
+
+    @cached_property
+    def _previous_mammograms_count(self):
+        return self.appointment.reported_mammograms.count()
+
+    @cached_property
     def previous_mammograms(self):
-        previous_mammograms_count = self.appointment.reported_mammograms.count()
-        match previous_mammograms_count:
+        match self._previous_mammograms_count:
             case 0:
                 return "No additional mammograms added"
             case 1:
                 return "1 additional mammogram added"
             case _:
-                return f"{previous_mammograms_count} additional mammograms added"
+                return f"{self._previous_mammograms_count} additional mammograms added"
 
     @cached_property
     def symptoms(self):
