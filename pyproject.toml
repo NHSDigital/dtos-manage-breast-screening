@@ -95,3 +95,5 @@ omit = [
 
 [tool.djlint]
 ignore = "T003"
+preserve_blank_lines = true
+profile="django"
