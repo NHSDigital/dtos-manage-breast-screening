@@ -64,7 +64,7 @@ describe('Image map', () => {
 
     expect(callback).toHaveBeenCalled()
     expect(callback.mock.calls).toHaveLength(1)
-    expect(callback.mock.calls[0][0]).toBe('highlight')
+    expect(callback.mock.calls[0][1]).toBe('highlight')
   })
 
   it('notifies on click', async () => {
@@ -82,6 +82,6 @@ describe('Image map', () => {
 
     expect(callback).toHaveBeenCalled()
     expect(callback.mock.calls).toHaveLength(2)
-    expect(callback.mock.calls[1][0]).toBe('active')
+    expect(callback.mock.calls[1][1]).toBe('active')
   })
 })

@@ -69,7 +69,7 @@ describe('Breast diagram', () => {
 
     const diagram = new BreastDiagram($root)
 
-    diagram.onUpdate('active', dummyRegion)
+    diagram.onUpdate(dummyRegion, 'active', true)
 
     expect(diagram.features).toEqual([
       {

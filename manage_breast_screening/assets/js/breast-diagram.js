@@ -1,6 +1,7 @@
 import { createAll, isObject, Component, ElementError } from 'nhsuk-frontend'
 
 import { ImageMap } from './image-map.js'
+import { ImageMarker } from './image-marker.js'
 
 /**
  * Breast diagram component
@@ -14,6 +15,11 @@ export class BreastDiagram extends Component {
    * @type {HTMLInputElement}
    */
   $input
+
+  /**
+   * @type {ImageMarker[]}
+   */
+  markers
 
   /**
    * @type {BreastFeatureValue[]}
@@ -37,6 +43,7 @@ export class BreastDiagram extends Component {
     }
 
     this.$input = $input
+    this.markers = []
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -63,7 +70,7 @@ export class BreastDiagram extends Component {
       { scope: this.$root }
     )
 
-    if (!$imageMaps.length) {
+    if (!$imageMaps.length || !($imageMaps[0].$root instanceof HTMLElement)) {
       throw new ElementError({
         component: BreastDiagram,
         identifier: `Image map (\`[data-module="${ImageMap.moduleName}"]\`)`
@@ -80,26 +87,35 @@ export class BreastDiagram extends Component {
 
   /**
    * Get diagram features
+   *
+   * @returns {BreastFeature[]}
    */
   get features() {
-    return this.values
-      .map(({ id, name, x, y }) => {
-        const $path = this.$imageMap.getPathById(id)
-        const point = this.$imageMap.createPoint(x, y, id)
-        return { name, region: this.$imageMap.createRegion($path, point) }
-      })
-      .filter(
-        /** @returns {feature is BreastFeature} */
-        (feature) => !!feature.region
-      )
+    return this.values.map(({ id, name, x, y }, index) => {
+      const $path = this.$imageMap.getPathById(id)
+      const point = this.$imageMap.createPoint(x, y, id)
+      const region = this.$imageMap.createRegion($path, point)
+
+      this.setMarker(region, index)
+
+      return { name, region }
+    })
   }
 
   /**
    * Render diagram features
    */
   render() {
-    for (const feature of this.features) {
-      this.$imageMap.setState('active', feature.region, null)
+    const { $imageMap, features, markers } = this
+
+    // Remove excess markers
+    for (const marker of markers.splice(features.length)) {
+      marker.$root.remove()
+    }
+
+    // Set active regions
+    for (const feature of features) {
+      $imageMap.setState(feature.region, 'active')
     }
   }
 
@@ -143,32 +159,76 @@ export class BreastDiagram extends Component {
   }
 
   /**
-   * Update form inputs
+   * Update region state and write to form input
    *
-   * @param {ImageMapState} state - State to set, e.g. 'highlight'
-   * @param {ImageMapRegion} [region] - Image map region
+   * @type {ImageMapStateCallback}
    */
-  onUpdate(state, region) {
-    this.debug(region)
-
+  onUpdate(region, state, value) {
+    const { markers, values } = this
     if (!region) {
       return
     }
 
-    switch (state) {
-      case 'active':
-        this.values.push({
+    if (state === 'active') {
+      const entry = values.find(
+        (value) =>
+          value.id === region.id &&
+          value.x === region.point.x &&
+          value.y === region.point.y
+      )
+
+      if (value && !entry) {
+        values.push({
           id: region.id,
           name: 'Pending',
           x: region.point.x,
           y: region.point.y
         })
 
-        this.write()
-        this.debug(region)
+        this.setMarker(region, values.length - 1)
+      } else if (!value && entry) {
+        const index = values.indexOf(entry)
 
-        break
+        markers[index].$root.remove()
+        markers.splice(index, 1)
+        values.splice(index, 1)
+      }
+
+      this.write()
+      this.debug(region)
     }
+  }
+
+  /**
+   * Set marker for image map region
+   *
+   * @param {ImageMapRegion} region - Image map region
+   * @param {number} index - Image marker index
+   */
+  setMarker(region, index) {
+    const { $imageMap, $input, markers } = this
+    const { width, height } = $imageMap
+
+    if (!markers[index]) {
+      markers[index] = new ImageMarker(null, {
+        href: $input.readOnly ? undefined : `#${region.id}`,
+        width: width,
+        height: height
+      })
+    }
+
+    const marker = markers[index]
+
+    // Set marker properties
+    marker.textContent = `${index + 1}`
+    marker.point = region.point
+
+    // Append new markers only
+    if (!marker.$root.parentElement) {
+      $imageMap.$root.appendChild(marker.$root)
+    }
+
+    return marker
   }
 
   /**
@@ -246,5 +306,5 @@ function isValid(value) {
  */
 
 /**
- * @import { ImageMapRegion, ImageMapState } from './image-map.js'
+ * @import { ImageMapRegion, ImageMapStateCallback } from './image-map.js'
  */
