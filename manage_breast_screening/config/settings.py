@@ -53,12 +53,10 @@ DEBUG = boolean_env("DEBUG", default=False)
 ALLOWED_HOSTS = list_env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = list_env("CSRF_TRUSTED_ORIGINS")
 
-allowed_hosts_except_localhost = set(ALLOWED_HOSTS) - {"localhost", "127.0.0.1"}
-
-if allowed_hosts_except_localhost:
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = False
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT is set to False because TLS termination is handled at the Azure Container Apps layer
+SECURE_SSL_REDIRECT = False
 
 # SECURITY WARNING: don't run with PERSONAS_ENABLED turned on in production!
 PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
@@ -359,3 +357,21 @@ BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
 BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
 
 API_PATH_PREFIX = "/api/"
+
+# HTTP Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = False
+# tells Django to trust the X-Forwarded-Proto header that comes from our proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Prevent the browser from guessing content types
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Referrer policy for enhanced privacy
+SECURE_REFERRER_POLICY = "same-origin"
+
+# Session and CSRF cookie security
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = True
