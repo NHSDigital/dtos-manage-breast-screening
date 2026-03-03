@@ -163,6 +163,10 @@ class TestAppointment:
         checked_in = AppointmentFactory.create(
             current_status=AppointmentStatusNames.CHECKED_IN
         )
+        in_progress = AppointmentFactory.create(
+            current_status=AppointmentStatusNames.IN_PROGRESS
+        )
+        paused = AppointmentFactory.create(current_status=AppointmentStatusNames.PAUSED)
         screened = AppointmentFactory.create(
             current_status=AppointmentStatusNames.SCREENED
         )
@@ -178,13 +182,18 @@ class TestAppointment:
             ordered=False,
         )
         assertQuerySetEqual(
+            models.Appointment.objects.for_filter("in_progress"),
+            {in_progress, paused},
+            ordered=False,
+        )
+        assertQuerySetEqual(
             models.Appointment.objects.for_filter("complete"),
             {screened},
             ordered=False,
         )
         assertQuerySetEqual(
             models.Appointment.objects.for_filter("all"),
-            {confirmed, checked_in, screened},
+            {confirmed, checked_in, in_progress, paused, screened},
             ordered=False,
         )
 
