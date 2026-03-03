@@ -1,3 +1,4 @@
+import hmac
 import os
 from functools import wraps
 
@@ -24,7 +25,10 @@ def check_availability():
 
 class GlobalAuth(HttpBearer):
     def authenticate(self, request, token):
-        if token == os.getenv("API_AUTH_TOKEN", ""):
+        expected_token = os.getenv("API_AUTH_TOKEN")
+        if not expected_token:
+            return None
+        if hmac.compare_digest(token, expected_token):
             return token
 
 
