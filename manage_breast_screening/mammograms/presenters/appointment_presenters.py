@@ -339,6 +339,7 @@ class ViewSummary:
 
 class ImagesTakenPresenter:
     def __init__(self, appointment):
+        self.appointment = appointment
         study = appointment.study
         self.additional_details = study.additional_details
 
@@ -370,3 +371,37 @@ class ImagesTakenPresenter:
             return "1 image taken"
         else:
             return f"{self.total_count} images taken"
+
+    @cached_property
+    def add_image_details_url(self):
+        return reverse(
+            "mammograms:update_image_details", kwargs={"pk": self.appointment.pk}
+        )
+
+    @cached_property
+    def notes_for_reader_action(self):
+        return {
+            "items": [
+                {
+                    "href": self.add_image_details_url,
+                    "text": "Change",
+                    "visuallyHiddenText": "notes for reader",
+                    "classes": "nhsuk-link--no-visited-state",
+                }
+            ]
+        }
+
+    @cached_property
+    def views_taken_action(self):
+        return {
+            "items": [
+                {
+                    "href": reverse(
+                        "mammograms:take_images", kwargs={"pk": self.appointment.pk}
+                    ),
+                    "text": "Change",
+                    "visuallyHiddenText": "views taken",
+                    "classes": "nhsuk-link--no-visited-state",
+                }
+            ]
+        }

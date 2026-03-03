@@ -60,13 +60,14 @@ class TestCheckInformation(SystemTestCase):
         self.and_there_is_an_appointment_with_information_to_be_checked()
         self.then_i_can_change_ethnicity_details()
         self.then_i_can_change_medical_information()
+        self.then_i_can_change_views_taken()
+        self.and_i_can_enter_notes_for_reader()
 
     def and_there_is_an_appointment_with_information_to_be_checked(self):
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
         self.and_there_is_an_appointment_for_the_clinic()
         self.and_there_is_medical_information_for_the_appointment()
         self.and_the_appointment_has_images()
-        self.and_the_appointment_has_a_note()
         self.and_i_am_on_the_check_information_page()
 
     def then_i_can_change_medical_information(self):
@@ -102,6 +103,52 @@ class TestCheckInformation(SystemTestCase):
         expect(symptoms_row.get_by_role("link", name="Add symptoms")).to_have_attribute(
             "href", f"{record_medical_info_url}#symptoms"
         )
+
+    def then_i_can_change_views_taken(self):
+        images_taken_heading = self.page.get_by_role("heading").filter(
+            has_text="images taken"
+        )
+        section = self.page.locator(".nhsuk-card").filter(has=images_taken_heading)
+
+        take_images_url = reverse(
+            "mammograms:take_images",
+            kwargs={"pk": self.appointment.pk},
+        )
+
+        views_taken_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Views taken"
+        )
+        expect(
+            views_taken_row.get_by_role("link", name="Change views taken")
+        ).to_have_attribute("href", take_images_url)
+
+    def and_i_can_enter_notes_for_reader(self):
+        images_taken_heading = self.page.get_by_role("heading").filter(
+            has_text="images taken"
+        )
+        section = self.page.locator(".nhsuk-card").filter(has=images_taken_heading)
+        notes_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Notes for reader"
+        )
+        notes_row.get_by_role("link", name="Enter notes for reader details").click()
+
+        self.page.get_by_label("Notes for reader (optional)").fill(
+            "Test notes for reader"
+        )
+        self.page.get_by_role("button", name="Continue").click()
+
+        # Images with count > 1 trigger the multiple images information form
+        for radio in self.page.locator("input[value='NO_REPEATS']").all():
+            radio.check()
+        self.page.get_by_role("button", name="Continue").click()
+
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+        expect(notes_row.locator(".nhsuk-summary-list__value")).to_contain_text(
+            "Test notes for reader"
+        )
+        expect(
+            notes_row.get_by_role("link", name="Change notes for reader")
+        ).to_be_visible()
 
     def then_i_can_change_ethnicity_details(self):
         self.page.get_by_role("link", name="Change ethnicity").click()
@@ -156,7 +203,6 @@ class TestCheckInformation(SystemTestCase):
     def and_the_appointment_has_images(self):
         study = Study.objects.create(
             appointment=self.appointment,
-            additional_details="Test study details",
         )
         self._add_series(study, "CC", "R", 1)
         self._add_series(study, "CC", "L", 2)
@@ -246,7 +292,9 @@ class TestCheckInformation(SystemTestCase):
 
         row = section.locator(".nhsuk-summary-list__row", has_text="Notes for reader")
         value = row.locator(".nhsuk-summary-list__value")
-        expect(value).to_contain_text("Test study details")
+        expect(
+            value.get_by_role("link", name="Enter notes for reader details")
+        ).to_be_visible()
 
     def and_the_appointment_details_are_listed(self):
         heading = self.page.get_by_role("heading").filter(

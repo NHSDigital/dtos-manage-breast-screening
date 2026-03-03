@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 import pytest
 import time_machine
+from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.clinics.models import ClinicSlot
@@ -997,6 +998,43 @@ class TestImagesTakenPresenter:
             ImageView(view_position="MLO", laterality="R"): ViewSummary(count=0),
             ImageView(view_position="MLO", laterality="L"): ViewSummary(count=1),
         }
+
+    def test_views_taken_action(self):
+        pk = uuid4()
+        appointment = MagicMock(spec=Appointment)
+        appointment.pk = pk
+        appointment.study = MagicMock(spec=Study)
+
+        [action] = ImagesTakenPresenter(appointment).views_taken_action["items"]
+
+        expected_url = reverse("mammograms:take_images", kwargs={"pk": pk})
+        assert action["text"] == "Change"
+        assert action["visuallyHiddenText"] == "views taken"
+        assert action["href"] == expected_url
+        assert action["classes"] == "nhsuk-link--no-visited-state"
+
+    def test_add_image_details_url(self):
+        pk = uuid4()
+        appointment = MagicMock(spec=Appointment)
+        appointment.pk = pk
+        appointment.study = MagicMock(spec=Study)
+
+        expected_url = reverse("mammograms:update_image_details", kwargs={"pk": pk})
+        assert ImagesTakenPresenter(appointment).add_image_details_url == expected_url
+
+    def test_notes_for_reader_action(self):
+        pk = uuid4()
+        appointment = MagicMock(spec=Appointment)
+        appointment.pk = pk
+        appointment.study = MagicMock(spec=Study)
+
+        [action] = ImagesTakenPresenter(appointment).notes_for_reader_action["items"]
+
+        expected_url = reverse("mammograms:update_image_details", kwargs={"pk": pk})
+        assert action["text"] == "Change"
+        assert action["visuallyHiddenText"] == "notes for reader"
+        assert action["href"] == expected_url
+        assert action["classes"] == "nhsuk-link--no-visited-state"
 
 
 class TestViewSummary:
