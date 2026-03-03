@@ -5,11 +5,11 @@
 {% from "nhsuk/components/input/macro.jinja" import input %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
-{% from 'django_form_helpers.jinja' import form_error_summary %}
+{% from "django_form_helpers.jinja" import form_error_summary %}
 
 {% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
-{% set form_attributes = {'data-module': 'app-breast-diagram'} %}
+{% set form_attributes = { "data-module": "app-breast-diagram" } %}
 
 {% block page_content %}
 <div class="nhsuk-u-reading-width">
@@ -24,7 +24,7 @@
       {{ heading }}
     </h1>
 
-    <form action="{{ request.path }}" method="post" novalidate {{ nhsukAttributes(form_attributes) }}>
+    <form class="app-breast-diagram" action="{{ request.path }}" method="post" novalidate {{ nhsukAttributes(form_attributes) }}>
       {{ csrf_input }}
 
       <p class="nhsuk-body" id="breast-diagram-description">
@@ -32,25 +32,20 @@
       </p>
 
       <div class="breast-features-diagram-header">
-          <h2 class="nhsuk-heading-m">Where is the feature?</h2>
+        <h2 class="nhsuk-heading-m">Where is the feature?</h2>
       </div>
 
-      {% set diagram_html = app_breast_diagram(
+      {{ app_breast_diagram(
         version=diagram_version,
         attributes={
-          'aria-labelledby': 'breast-diagram-description'
+          "aria-labelledby": "breast-diagram-description"
         }
-      ) %}
+      ) }}
 
       {{ form.features }}
 
-      {% if 'debug' in request.GET %}
+      {% if "debug" in request.GET %}
         {{ summaryList({
-          "card": {
-            "image": {
-              "html": diagram_html
-            }
-          },
           "rows": [
             {
               "key": {
@@ -91,16 +86,7 @@
             }
           ]
         }) }}
-      {% else %}
-        {{ card({
-          "image": {
-            "html": diagram_html
-          },
-          "classes": "nhsuk-u-margin-bottom-6"
-        }) }}
       {% endif %}
-
-
 
       <div class="nhsuk-button-group">
         {{ button({

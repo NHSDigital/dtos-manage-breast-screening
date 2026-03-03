@@ -1,6 +1,11 @@
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
 
-<figure class="nhsuk-image nhsuk-u-width-full" data-module="app-image-map" {{ nhsukAttributes(attributes) }}>
+<div class="app-breast-diagram__side-labels">
+  <span>Right</span>
+  <span>Left</span>
+</div>
+
+<figure class="app-breast-diagram__image-map nhsuk-u-width-full" data-module="app-image-map" {{- nhsukAttributes(attributes) }}>
 {% if version == 1 %}
 {% include "components/breast-diagram/v1.svg" %}
 {% endif %}
