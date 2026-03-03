@@ -53,8 +53,21 @@ def test_status_wrong_auth(monkeypatch):
     assert response.json() == {"detail": "Unauthorized"}
 
 
-def test_status_empty_token(monkeypatch):
+def test_status_empty_expected_token(monkeypatch):
     monkeypatch.setenv("API_AUTH_TOKEN", "")
+    monkeypatch.setenv("API_ENABLED", "true")
+
+    response = client.get(
+        "/status",
+        headers={"Authorization": "Bearer testtoken"},
+    )
+
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Unauthorized"}
+
+
+def test_status_empty_provided_token(monkeypatch):
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
     monkeypatch.setenv("API_ENABLED", "true")
 
     response = client.get(
@@ -70,10 +83,7 @@ def test_status_no_token(monkeypatch):
     monkeypatch.delenv("API_AUTH_TOKEN", raising=False)
     monkeypatch.setenv("API_ENABLED", "true")
 
-    response = client.get(
-        "/status",
-        headers={"Authorization": "Bearer "},
-    )
+    response = client.get("/status")
 
     assert response.status_code == 401
     assert response.json() == {"detail": "Unauthorized"}
@@ -83,11 +93,8 @@ def test_hmac_compare_digest_true(monkeypatch):
     monkeypatch.setenv("API_AUTH_TOKEN", "expected-token")
     auth = GlobalAuth()
 
-    class DummyRequest:
-        pass
-
     with patch.object(hmac, "compare_digest", return_value=True) as mock_compare:
-        result = auth.authenticate(DummyRequest(), "provided-token")
+        result = auth.authenticate(object(), "provided-token")
 
     mock_compare.assert_called_once_with("provided-token", "expected-token")
     assert result == "provided-token"
@@ -97,11 +104,8 @@ def test_hmac_compare_digest_false(monkeypatch):
     monkeypatch.setenv("API_AUTH_TOKEN", "expected-token")
     auth = GlobalAuth()
 
-    class DummyRequest:
-        pass
-
     with patch.object(hmac, "compare_digest", return_value=False) as mock_compare:
-        result = auth.authenticate(DummyRequest(), "provided-token")
+        result = auth.authenticate(object(), "provided-token")
 
     mock_compare.assert_called_once_with("provided-token", "expected-token")
     assert not result
