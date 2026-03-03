@@ -72,13 +72,12 @@ class Auditor:
         self.actor = actor if actor and actor.is_authenticated else None
         self.system_update_id = system_update_id
 
-        # Temporarily disable the requirement for a logged in user until we've implemented auth.
-        # This should also consider non-production environments such as review apps.
-        #
-        # if self.actor is None and self.system_update_id is None:
-        #     raise AnonymousAuditError(
-        #         "Attempted to audit an operation with no logged in user and no system_update_id"
-        #     )
+        # Ensure all data modifications are properly attributed.
+        # Any code paths that legitimately operate without a user (e.g. system/background tasks) should pass a system_update_id instead.
+        if self.actor is None and self.system_update_id is None:
+            raise AnonymousAuditError(
+                "Attempted to audit an operation with no logged in user and no system_update_id"
+            )
 
     def audit_create(self, object) -> AuditLog:
         if object is None:

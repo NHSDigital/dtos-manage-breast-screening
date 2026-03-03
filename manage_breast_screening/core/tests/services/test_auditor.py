@@ -3,7 +3,7 @@ from django.test import RequestFactory
 
 from manage_breast_screening.clinics.models import Provider
 from manage_breast_screening.clinics.tests.factories import ProviderFactory
-from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.services.auditor import AnonymousAuditError, Auditor
 from manage_breast_screening.participants.models import Participant
 from manage_breast_screening.participants.tests.factories import ParticipantFactory
 
@@ -174,3 +174,20 @@ class TestAuditor:
         auditor = Auditor.from_request(request)
         log = auditor.audit_create(user)
         assert log.actor == user
+
+    def test_auditor_without_user_or_system_update_id(self):
+        with pytest.raises(
+            AnonymousAuditError,
+            match="Attempted to audit an operation with no logged in user and no system_update_id",
+        ):
+            Auditor()
+
+    def test_from_request_without_user(self):
+        request = RequestFactory().get("/clinics")
+        request.user = None
+
+        with pytest.raises(
+            AnonymousAuditError,
+            match="Attempted to audit an operation with no logged in user and no system_update_id",
+        ):
+            Auditor.from_request(request)
