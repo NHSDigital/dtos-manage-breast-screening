@@ -104,6 +104,13 @@ class TestCheckInformation(SystemTestCase):
             "href", f"{record_medical_info_url}#symptoms"
         )
 
+        other_info_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Other relevant information"
+        )
+        expect(
+            other_info_row.get_by_role("link", name="Add other information")
+        ).to_have_attribute("href", f"{record_medical_info_url}#other-information")
+
     def then_i_can_change_views_taken(self):
         images_taken_heading = self.page.get_by_role("heading").filter(
             has_text="images taken"

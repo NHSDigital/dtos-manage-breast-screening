@@ -1115,3 +1115,26 @@ class TestCheckMedicalInformationPresenter:
             "Recently stopped breastfeeding (December 2023)",
             "Some other medical information",
         ]
+
+    def test_other_relevant_information_action_with_no_data(self):
+        appointment = AppointmentFactory.create()
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.other_relevant_information_action["items"]
+        assert action["text"] == "Add other information"
+        assert action["href"].endswith("#other-information")
+        assert "visuallyHiddenText" not in action
+
+    def test_other_relevant_information_action_with_data(self):
+        appointment = AppointmentFactory.create()
+        HormoneReplacementTherapyFactory.create(
+            appointment=appointment,
+            status=HormoneReplacementTherapy.Status.YES,
+            approx_start_date="Summer 2022",
+        )
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.other_relevant_information_action["items"]
+        assert action["text"] == "View or change"
+        assert action["href"].endswith("#other-information")
+        assert action["visuallyHiddenText"] == "other relevant information"
