@@ -4,6 +4,7 @@ from datetime import datetime
 
 import numpy as np
 import pydicom
+from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image as PILImage
 
@@ -15,7 +16,7 @@ logger = logging.getLogger(__name__)
 class DicomRecorder:
     @staticmethod
     def get_or_create_records(
-        source_message_id: str, dicom_file: bytes
+        source_message_id: str, dicom_file: File
     ) -> tuple[Study, Series, Image]:
         ds = pydicom.dcmread(dicom_file)
         study_uid = ds.StudyInstanceUID
