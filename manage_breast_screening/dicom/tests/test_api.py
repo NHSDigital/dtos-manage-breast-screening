@@ -1,5 +1,6 @@
 import io
 import os
+from unittest.mock import patch
 
 import pydicom
 import pytest
@@ -7,6 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from ninja.testing import TestClient
 
 from manage_breast_screening.core.api import api
+from manage_breast_screening.dicom.dicom_recorder import DicomRecorder
 from manage_breast_screening.dicom.models import Study
 
 os.environ["NINJA_SKIP_REGISTRY"] = "yes"
@@ -29,20 +31,21 @@ def test_upload_success(dataset, dicom_file, monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
     monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
-    response = client.put(
-        "/dicom/abc123",
-        FILES={"file": dicom_file},
-        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
-    )
+    with patch.object(DicomRecorder, "appointment_in_progress", return_value=True):
+        response = client.put(
+            "/dicom/abc123",
+            FILES={"file": dicom_file},
+            headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
+        )
 
-    assert response.status_code == 201
-    assert response.json() == {
-        "study_instance_uid": dataset.StudyInstanceUID,
-        "series_instance_uid": dataset.SeriesInstanceUID,
-        "sop_instance_uid": dataset.SOPInstanceUID,
-        "instance_id": 1,
-    }
-    assert Study.objects.last().source_message_id == "abc123"
+        assert response.status_code == 201
+        assert response.json() == {
+            "study_instance_uid": dataset.StudyInstanceUID,
+            "series_instance_uid": dataset.SeriesInstanceUID,
+            "sop_instance_uid": dataset.SOPInstanceUID,
+            "instance_id": 1,
+        }
+        assert Study.objects.last().source_message_id == "abc123"
 
 
 def test_upload_no_file(monkeypatch):
@@ -66,11 +69,12 @@ def test_upload_invalid_file(monkeypatch):
         "invalid.dcm", b"not a dicom file", content_type="application/dicom"
     )
 
-    response = client.put(
-        "/dicom/abc123",
-        FILES={"file": invalid_file},
-        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
-    )
+    with patch.object(DicomRecorder, "appointment_in_progress", return_value=True):
+        response = client.put(
+            "/dicom/abc123",
+            FILES={"file": invalid_file},
+            headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
+        )
 
     assert response.status_code == 400
     assert response.json()["title"] == "Invalid DICOM file"
@@ -93,11 +97,12 @@ def test_upload_missing_uids(dataset, monkeypatch):
             "temp.dcm", buffer.read(), content_type="application/dicom"
         )
 
-    response = client.put(
-        "/dicom/abc123",
-        FILES={"file": dicom_file},
-        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
-    )
+    with patch.object(DicomRecorder, "appointment_in_progress", return_value=True):
+        response = client.put(
+            "/dicom/abc123",
+            FILES={"file": dicom_file},
+            headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
+        )
 
     assert response.status_code == 400
     assert response.json()["title"] == "Missing DICOM attributes"

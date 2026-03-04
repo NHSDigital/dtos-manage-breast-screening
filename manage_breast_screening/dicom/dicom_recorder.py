@@ -7,9 +7,17 @@ import pydicom
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image as PILImage
 
+from manage_breast_screening.gateway.models import GatewayAction
+
 from .models import Image, Series, Study
 
 logger = logging.getLogger(__name__)
+
+
+class DicomProcessingError(Exception):
+    """Custom exception for DICOM processing errors."""
+
+    pass
 
 
 class DicomRecorder:
@@ -17,6 +25,12 @@ class DicomRecorder:
     def get_or_create_records(
         source_message_id: str, dicom_file: bytes
     ) -> tuple[Study, Series, Image]:
+        if not __class__.appointment_in_progress(source_message_id):
+            raise DicomProcessingError(
+                f"Cannot process DICOM file for source_message_id={source_message_id} "
+                "because the associated appointment is not in progress."
+            )
+
         ds = pydicom.dcmread(dicom_file)
         study_uid = ds.StudyInstanceUID
         series_uid = ds.SeriesInstanceUID
@@ -101,3 +115,10 @@ class DicomRecorder:
             size=in_memory_file.getbuffer().nbytes,
             charset=None,
         )
+
+    @staticmethod
+    def appointment_in_progress(source_message_id: str) -> bool:
+        gateway_action = GatewayAction.objects.filter(id=source_message_id).first()
+        if not gateway_action or not gateway_action.appointment:
+            return False
+        return gateway_action.appointment.current_status.is_in_progress()
