@@ -10,7 +10,7 @@
 {% from "mammograms/medical_information/medical_history/cards/mastectomy_or_lumpectomy_history_card.jinja" import mastectomy_or_lumpectomy_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/other_procedure_history_card.jinja" import other_procedure_history_card %}
 {% from "mammograms/medical_information/other_information/cards/macros.jinja" import hormone_replacement_therapy_details, pregnancy_and_breastfeeding_details, other_medical_information_details %}
-
+{% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
 {% macro mammogram_history_content(presented_medical_info, presented_mammograms, read_only=false) %}
   <p>The last confirmed mammogram and any added manually since then</p>
@@ -119,6 +119,21 @@
     <p>
       {{ count }} breast {{ "feature" | plural(count) }} recorded
     </p>
+
+    <form data-module="app-breast-diagram">
+      <input readonly name="features"  type="hidden" value="{{ presented_medical_info.breast_features.features }}">
+      <div class="nhsuk-grid-row nhsuk-u-margin-bottom-3">
+        <div class="nhsuk-grid-column-two-thirds">
+          {{ app_breast_diagram(
+            version=presented_medical_info.breast_features.diagram_version,
+            attributes={
+              'aria-labelledby': 'breast-diagram-description'
+            }
+          ) }}
+          </div>
+        </div>
+      </form>
+
   {% else %}
     {% set insetHtml %}
       <p>No breast features have been recorded for this participant.</p>
