@@ -27,6 +27,8 @@ from manage_breast_screening.core.decorators import basic_auth_exempt
 from .api import api
 
 handler403 = "manage_breast_screening.core.views.errors.permission_denied"
+handler404 = "manage_breast_screening.core.views.errors.page_not_found"
+handler500 = "manage_breast_screening.core.views.errors.server_error"
 
 
 @require_GET
@@ -114,7 +116,6 @@ if settings.DEBUG:
             ),
         )
     )
-
     # Serve DICOM files in development
     dicom_storage = storages["dicom"]
     if hasattr(dicom_storage, "base_url") and hasattr(dicom_storage, "location"):
