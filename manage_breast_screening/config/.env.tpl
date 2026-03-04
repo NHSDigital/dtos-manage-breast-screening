@@ -35,7 +35,8 @@ BASIC_AUTH_USERNAME=changeme
 BASIC_AUTH_PASSWORD=changeme
 
 # Django Ninja API
-API_ENABLED=True
+API_ENABLED=true
+API_DOCS_ENABLED=true
 
 # Automatic loading of PACS images from gateway
 GATEWAY_IMAGES_ENABLED=False
