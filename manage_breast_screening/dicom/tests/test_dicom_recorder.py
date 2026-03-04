@@ -1,4 +1,5 @@
 import tempfile
+import uuid
 from datetime import datetime
 from unittest.mock import patch
 
@@ -6,17 +7,34 @@ import numpy as np
 import pydicom
 import pytest
 
-from manage_breast_screening.dicom.dicom_recorder import DicomRecorder
+from manage_breast_screening.dicom.dicom_recorder import (
+    DicomProcessingError,
+    DicomRecorder,
+)
 from manage_breast_screening.dicom.models import Image, Series, Study
+from manage_breast_screening.gateway.tests.factories import GatewayActionFactory
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
+@pytest.mark.django_db
 class TestDicomRecorder:
     @pytest.fixture
-    def source_message_id(self):
-        return "test-source-message-id"
+    def gateway_action(self, source_message_id):
+        return GatewayActionFactory(
+            id=source_message_id,
+            appointment=AppointmentFactory(
+                current_status=AppointmentStatusNames.IN_PROGRESS
+            ),
+        )
 
-    @pytest.mark.django_db
-    def test_get_or_create_records(self, source_message_id, dataset):
+    @pytest.fixture
+    def source_message_id(self):
+        return str(uuid.uuid4())
+
+    def test_get_or_create_records(self, source_message_id, dataset, gateway_action):
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
                 temp_file.name, dataset, write_like_original=False
@@ -52,8 +70,9 @@ class TestDicomRecorder:
         assert image.image_file.size > 0
         assert image.image_file.storage.exists(image.image_file.name)
 
-    @pytest.mark.django_db
-    def test_get_or_create_records_duplicate(self, source_message_id, dataset):
+    def test_get_or_create_records_duplicate(
+        self, source_message_id, dataset, gateway_action
+    ):
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
                 temp_file.name, dataset, write_like_original=False
@@ -72,7 +91,9 @@ class TestDicomRecorder:
                     image,
                 )
 
-    def test_get_or_create_records_invalid_dicom(self, source_message_id):
+    def test_get_or_create_records_invalid_dicom(
+        self, source_message_id, gateway_action
+    ):
         with tempfile.NamedTemporaryFile() as temp_file:
             invalid_ds = pydicom.Dataset()
             invalid_ds.transfer_syntax_uid = pydicom.uid.ExplicitVRLittleEndian
@@ -89,6 +110,25 @@ class TestDicomRecorder:
                 with pytest.raises(AttributeError):
                     DicomRecorder.get_or_create_records(source_message_id, dicom_file)
 
+    def test_get_or_create_records_appointment_not_in_progress(
+        self, source_message_id, dataset
+    ):
+        GatewayActionFactory(
+            id=source_message_id,
+            appointment=AppointmentFactory(
+                current_status=AppointmentStatusNames.SCREENED
+            ),
+        )
+        with tempfile.NamedTemporaryFile() as temp_file:
+            pydicom.filewriter.dcmwrite(
+                temp_file.name, dataset, write_like_original=False
+            )
+            with open(temp_file.name, "rb") as dicom_file:
+                with pytest.raises(DicomProcessingError):
+                    DicomRecorder.get_or_create_records(source_message_id, dicom_file)
+
+
+class TestJpegConversion:
     def test_dataset_to_jpeg(self, dataset):
         expected_pixel_array = self.expected_pixel_array(dataset)
 
