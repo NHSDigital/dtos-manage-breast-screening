@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 import ninja
@@ -10,6 +11,8 @@ from manage_breast_screening.core.api_schema import ErrorResponse, StatusRespons
 from .dicom_recorder import DicomRecorder
 
 router = Router()
+
+logger = logging.getLogger(__name__)
 
 
 class SuccessResponse(ninja.Schema):
@@ -58,10 +61,11 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
             "detail": "The DICOM file is missing required UID attributes.",
         }
     except Exception as e:
+        logger.error("Error processing DICOM file: %s", e, exc_info=True)
         return 500, {
             "title": "Internal Server Error",
             "status": 500,
-            "detail": f"An unexpected error occurred: {str(e)}",
+            "detail": "An unexpected error occurred.",
         }
 
     return 201, {
