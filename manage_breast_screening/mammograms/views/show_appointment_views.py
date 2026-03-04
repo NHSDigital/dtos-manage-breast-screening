@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views import View
 
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
-    ImagesTakenPresenter,
+    ImagesPresenterFactory,
 )
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 
@@ -135,7 +135,7 @@ class ImageDetails(AppointmentTabMixin, View):
             "caption": appointment_presenter.caption,
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
-            "presented_images": ImagesTakenPresenter(appointment),
+            "presented_images": ImagesPresenterFactory.presenter_for(appointment),
             "secondary_nav_items": present_secondary_nav(
                 appointment.pk,
                 current_tab="images",

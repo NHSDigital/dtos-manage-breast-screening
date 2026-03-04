@@ -1,5 +1,11 @@
+from django.contrib.postgres.fields import ArrayField
 from django.core.files.storage import storages
 from django.db import models
+
+from manage_breast_screening.manual_images.models import (
+    IncompleteImagesReason,
+    StudyCompleteness,
+)
 
 
 def dicom_storage():
@@ -20,6 +26,34 @@ class Study(models.Model):
     date_and_time = models.DateTimeField(null=True, blank=True)
     description = models.CharField(max_length=255, blank=True)
 
+    additional_details = models.TextField(blank=True, null=False, default="")
+    imperfect_but_best_possible = models.BooleanField(default=False, null=False)
+    completeness = models.CharField(
+        choices=StudyCompleteness, blank=True, null=False, default=""
+    )
+
+    reasons_incomplete = ArrayField(
+        base_field=models.CharField(
+            choices=IncompleteImagesReason, blank=True, null=False, default=""
+        ),
+        default=list,
+        null=False,
+    )
+    reasons_incomplete_details = models.TextField(blank=True, null=False, default="")
+
+    def images(self) -> models.QuerySet["Image"]:
+        return Image.objects.filter(series__study=self).order_by(
+            "series__series_number", "instance_number"
+        )
+
+    @classmethod
+    def for_appointment(cls, appointment):
+        action = appointment.gateway_actions.first()
+        if not action:
+            return None
+
+        return cls.objects.filter(source_message_id=action.id).first()
+
     def __str__(self):
         return self.study_instance_uid
 
@@ -28,12 +62,6 @@ class Series(models.Model):
     class Meta:
         indexes = [
             models.Index(fields=["series_instance_uid"]),
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["series_number", "study"],
-                name="unique_series_number_per_study",
-            )
         ]
 
     series_instance_uid = models.CharField(max_length=128, unique=True)
@@ -50,12 +78,6 @@ class Image(models.Model):
         indexes = [
             models.Index(fields=["sop_instance_uid"]),
         ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["instance_number", "series"],
-                name="unique_instance_number_per_series",
-            )
-        ]
 
     sop_instance_uid = models.CharField(max_length=128, unique=True)
     series = models.ForeignKey(Series, on_delete=models.CASCADE, related_name="images")
@@ -63,6 +85,12 @@ class Image(models.Model):
     dicom_file = models.FileField(storage=dicom_storage)
     image_file = models.FileField(storage=dicom_storage, null=True, blank=True)
     laterality = models.CharField(max_length=16, blank=True)
+    view_position = models.CharField(max_length=16, blank=True)
+
+    def laterality_and_view(self):
+        if self.laterality and self.view_position:
+            return f"{self.laterality}{self.view_position}".upper()
+        return None
 
     def __str__(self):
         return self.sop_instance_uid

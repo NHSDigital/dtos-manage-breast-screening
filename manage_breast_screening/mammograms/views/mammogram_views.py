@@ -18,7 +18,7 @@ from manage_breast_screening.core.utils.relative_redirects import (
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
-    ImagesTakenPresenter,
+    ImagesPresenterFactory,
 )
 from manage_breast_screening.mammograms.presenters.medical_history.check_medical_information_presenter import (
     CheckMedicalInformationPresenter,
@@ -207,7 +207,7 @@ def check_information(request, pk):
             "page_title": "Check information",
             "heading": "Check information",
             "presented_appointment": AppointmentPresenter(appointment),
-            "presented_images": ImagesTakenPresenter(appointment),
+            "presented_images": ImagesPresenterFactory.presenter_for(appointment),
             "presented_medical_information": CheckMedicalInformationPresenter(
                 appointment
             ),

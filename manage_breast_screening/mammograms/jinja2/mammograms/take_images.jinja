@@ -2,20 +2,6 @@
 
 {% set active_workflow_step = 'TAKE_IMAGES' %}
 
-{% block step_content %}
-<div class="nhsuk-u-margin-bottom-6"
-     data-module="app-image-stream"
-     data-stream-url="{{ url('mammograms:appointment_images_stream', kwargs={'pk': appointment_pk}) }}">
-  {% include "mammograms/_image_grid.jinja" %}
-</div>
-
-<noscript>
-  <p class="nhsuk-body-s nhsuk-u-margin-top-4">
-    <a href="" class="nhsuk-link">Refresh the page</a> to see new images.
-  </p>
-</noscript>
-{% endblock %}
-
 {% block form %}
 {% do form.standard_images.add_divider_after("NO_ADD_ADDITIONAL", "or") %}
 {{ form.standard_images.as_field_group() }}
