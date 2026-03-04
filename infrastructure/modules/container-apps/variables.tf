@@ -217,6 +217,11 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
+variable "container_memory" {
+  description = "Memory allocated to the webapp container in Gi. CPU is automatically set to half the memory value by the container-app module."
+  type        = string
+}
+
 variable "enable_smoke_test_bypass" {
   description = "Whether to add a WAF rule allowing smoke test requests to bypass the firewall. Should only be enabled in dev and review environments."
   type        = bool
