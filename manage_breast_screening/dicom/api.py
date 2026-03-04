@@ -33,6 +33,15 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
     Accepts PUT with a single DICOM file in form field 'file'
     """
     dicom_file = request.FILES.get("file")
+
+    max_size = 100 * 1024 * 1024
+    if file.size > max_size:
+        return 400, {
+            "title": "File too large",
+            "status": 400,
+            "detail": "The file cannot be larger than 100MB",
+        }
+
     if dicom_file is None:
         return 400, {
             "title": "No file uploaded",

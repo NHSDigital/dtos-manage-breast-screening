@@ -1,5 +1,6 @@
 import io
 import os
+from unittest.mock import MagicMock
 
 import pydicom
 import pytest
@@ -76,6 +77,24 @@ def test_upload_invalid_file(monkeypatch):
     assert response.json()["title"] == "Invalid DICOM file"
     assert response.json()["status"] == 400
     assert response.json()["detail"] == "The uploaded file is not a valid DICOM file."
+
+
+def test_upload_file_thats_too_large(monkeypatch):
+    monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
+
+    invalid_file = MagicMock(spec=SimpleUploadedFile, size=101 * 1024 * 1024)
+
+    response = client.put(
+        "/dicom/abc123",
+        FILES={"file": invalid_file},
+        headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["title"] == "File too large"
+    assert response.json()["status"] == 400
+    assert response.json()["detail"] == "The file cannot be larger than 100MB"
 
 
 def test_upload_missing_uids(dataset, monkeypatch):
