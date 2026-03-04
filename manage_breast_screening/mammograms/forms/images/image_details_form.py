@@ -26,7 +26,7 @@ from manage_breast_screening.participants.models.appointment import (
 )
 
 
-class AddImageDetailsForm(FormWithConditionalFields):
+class ImageDetailsForm(FormWithConditionalFields):
     class RecallChoices(TextChoices):
         TO_BE_RECALLED = "TO_BE_RECALLED", "Yes, record as 'to be recalled'"
         PARTIAL_MAMMOGRAPHY = (

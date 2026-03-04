@@ -3,7 +3,6 @@ import logging
 from django.db import transaction
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views import View
 from django.views.generic import FormView
 
 from manage_breast_screening.mammograms.services.appointment_services import (
@@ -15,14 +14,14 @@ from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
 
-from ..forms.images.add_image_details_form import AddImageDetailsForm
+from ..forms.images.image_details_form import ImageDetailsForm
 
 logger = logging.getLogger(__name__)
 
 
 class AddImageDetailsView(InProgressAppointmentMixin, FormView):
-    form_class = AddImageDetailsForm
-    template_name = "mammograms/add_image_details.jinja"
+    form_class = ImageDetailsForm
+    template_name = "mammograms/image_details.jinja"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -67,7 +66,39 @@ class AddImageDetailsView(InProgressAppointmentMixin, FormView):
         )
 
 
-class UpdateImageDetailsView(InProgressAppointmentMixin, View):
-    # Temporarily redirect to the add image details page until we have implemented the edit image details form
-    def get(self, request, pk):
-        return redirect("mammograms:add_image_details", pk=pk)
+class UpdateImageDetailsView(InProgressAppointmentMixin, FormView):
+    form_class = ImageDetailsForm
+    template_name = "mammograms/image_details.jinja"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "heading": "Edit image details",
+                "page_title": "Edit image details",
+                "back_link_params": reverse(
+                    "mammograms:take_images",
+                    kwargs={"pk": self.appointment_pk},
+                ),
+            }
+        )
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["instance"] = getattr(self.appointment, "study", None)
+        return kwargs
+
+    @transaction.atomic
+    def form_valid(self, form):
+        study = form.save(
+            StudyService(appointment=self.appointment, current_user=self.request.user),
+            RecallService(appointment=self.appointment, current_user=self.request.user),
+        )
+
+        if study.has_series_with_multiple_images():
+            return redirect(
+                "mammograms:add_multiple_images_information", pk=self.appointment_pk
+            )
+
+        return redirect("mammograms:check_information", pk=self.appointment_pk)
