@@ -79,7 +79,7 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
       match_variable     = "SocketAddr"
       operator           = "Any"
       negation_condition = false
-      match_values       = []
+      match_values       = ["/"]
     }
   }
 
