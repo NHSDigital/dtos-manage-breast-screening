@@ -51,7 +51,7 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
   }
 
   dynamic "custom_rule" {
-    for_each = var.enable_smoke_test_bypass ? [] : [1]
+    for_each = var.enable_smoke_test_bypass ? [1] : [0]
     content {
       name     = "BlockNonUK"
       priority = 10
