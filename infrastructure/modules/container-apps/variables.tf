@@ -217,11 +217,6 @@ variable "run_notifications_smoke_test" {
   type        = bool
 }
 
-<<<<<<< HEAD
-variable "container_memory" {
-  description = "Memory allocated to the webapp container in Gi. CPU is automatically set to half the memory value by the container-app module."
-  type        = string
-=======
 variable "enable_smoke_test_bypass" {
   description = "Whether to add a WAF rule allowing smoke test requests to bypass the firewall. Should only be enabled in dev and review environments."
   type        = bool
@@ -232,7 +227,6 @@ variable "smoke_test_token" {
   description = "A secret token used by the smoke test to bypass WAF rules."
   type        = string
   sensitive   = true
->>>>>>> 9732da7f (feat(ci): add smoke test token parameter and configuration)
 }
 
 variable "relay_namespace_name" {
