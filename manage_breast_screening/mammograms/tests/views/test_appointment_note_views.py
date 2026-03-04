@@ -60,6 +60,20 @@ class TestAppointmentNoteView:
         saved_note = AppointmentNote.objects.get(appointment=appointment)
         assert saved_note.content == note_content
 
+    def test_save_redirects_to_return_url(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        check_info_url = reverse(
+            "mammograms:check_information", kwargs={"pk": appointment.pk}
+        )
+        response = clinical_user_client.http.post(
+            reverse("mammograms:appointment_note", kwargs={"pk": appointment.pk})
+            + f"?return_url={check_info_url}",
+            {"content": "Test note content"},
+        )
+        assertRedirects(response, check_info_url, fetch_redirect_response=False)
+
     @pytest.mark.parametrize(
         "client_fixture", ["clinical_user_client", "administrative_user_client"]
     )

@@ -55,6 +55,15 @@ class AppointmentPresenter:
             kwargs={"pk": self._appointment.pk},
         )
 
+    def appointment_note_url(self, return_url):
+        return (
+            reverse(
+                "mammograms:appointment_note",
+                kwargs={"pk": self._appointment.pk},
+            )
+            + f"?return_url={return_url}"
+        )
+
     def special_appointment_action(self, return_url):
         item = {
             "href": self.special_appointment_url + f"?return_url={return_url}",
@@ -66,6 +75,20 @@ class AppointmentPresenter:
         else:
             item["text"] = "Add special appointment"
         return {"items": [item]}
+
+    def appointment_note_action(self, return_url):
+        if not self.has_appointment_note:
+            return None
+        return {
+            "items": [
+                {
+                    "href": self.appointment_note_url(return_url),
+                    "classes": "nhsuk-link--no-visited-state",
+                    "text": "Change",
+                    "visuallyHiddenText": "appointment note",
+                }
+            ]
+        }
 
     @cached_property
     def caption(self):

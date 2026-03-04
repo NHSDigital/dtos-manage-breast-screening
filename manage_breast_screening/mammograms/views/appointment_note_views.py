@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.participants.models import AppointmentNote
 
@@ -38,6 +41,12 @@ class AppointmentNoteView(AppointmentTabMixin, FormView):
                     current_tab="note",
                     appointment_complete=not appointment.active,
                 ),
+                "return_url": extract_relative_redirect_url(
+                    self.request,
+                    default=reverse(
+                        "mammograms:appointment_note", kwargs={"pk": appointment.pk}
+                    ),
+                ),
             }
         )
         return context
@@ -63,7 +72,13 @@ class AppointmentNoteView(AppointmentTabMixin, FormView):
             messages.SUCCESS,
             "Appointment note saved",
         )
-        return redirect("mammograms:appointment_note", pk=self.appointment.pk)
+        return_url = extract_relative_redirect_url(
+            self.request,
+            default=reverse(
+                "mammograms:appointment_note", kwargs={"pk": self.appointment.pk}
+            ),
+        )
+        return redirect(return_url)
 
 
 class DeleteAppointmentNoteView(DeleteWithAuditView):
