@@ -113,3 +113,15 @@ class TestWorklistItemService:
         worklist_item = action.payload["parameters"]["worklist_item"]
         assert worklist_item["scheduled"]["date"] == "20250710"
         assert worklist_item["scheduled"]["time"] == "143000"
+
+    def test_create_action_does_not_duplicate_for_same_appointment(
+        self, mock_send_action
+    ):
+        appointment = AppointmentFactory()
+        RelayFactory(provider=appointment.provider)
+
+        WorklistItemService.create(appointment)
+        action = WorklistItemService.create(appointment)
+
+        assert action is None
+        mock_send_action.assert_called_once()
