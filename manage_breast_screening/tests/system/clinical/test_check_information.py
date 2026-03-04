@@ -62,6 +62,7 @@ class TestCheckInformation(SystemTestCase):
         self.then_i_can_change_medical_information()
         self.then_i_can_change_views_taken()
         self.and_i_can_enter_notes_for_reader()
+        self.then_i_can_change_special_appointment()
 
     def and_there_is_an_appointment_with_information_to_be_checked(self):
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
@@ -155,6 +156,31 @@ class TestCheckInformation(SystemTestCase):
         )
         expect(
             notes_row.get_by_role("link", name="Change notes for reader")
+        ).to_be_visible()
+
+    def then_i_can_change_special_appointment(self):
+        appointment_details_heading = self.page.get_by_role("heading").filter(
+            has_text="Appointment details"
+        )
+        section = self.page.locator(".nhsuk-card").filter(
+            has=appointment_details_heading
+        )
+        special_appointment_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Special appointment"
+        )
+        special_appointment_row.get_by_role(
+            "link", name="Add special appointment"
+        ).click()
+
+        self.page.get_by_label("Language").check()
+        self.page.get_by_label("Describe support required").fill("Needs interpreter")
+        self.page.get_by_role("button", name="Continue").click()
+
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+        expect(
+            special_appointment_row.get_by_role(
+                "link", name="Change special appointment"
+            )
         ).to_be_visible()
 
     def then_i_can_change_ethnicity_details(self):

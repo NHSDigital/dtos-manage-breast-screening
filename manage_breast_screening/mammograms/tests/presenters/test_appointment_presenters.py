@@ -231,6 +231,38 @@ class TestAppointmentPresenter:
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.is_special_appointment == expected_result
 
+    def test_special_appointment_action_with_no_special_appointment(
+        self, mock_appointment
+    ):
+        mock_appointment.pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        mock_appointment.screening_episode.participant.extra_needs = []
+        presenter = AppointmentPresenter(mock_appointment)
+
+        [action] = presenter.special_appointment_action("/return/")["items"]
+        assert action["text"] == "Add special appointment"
+        assert (
+            action["href"]
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=/return/"
+        )
+        assert "visuallyHiddenText" not in action
+
+    def test_special_appointment_action_with_special_appointment(
+        self, mock_appointment
+    ):
+        mock_appointment.pk = "68d758d0-792d-430f-9c52-1e7a0c2aa1dd"
+        mock_appointment.screening_episode.participant.extra_needs = [
+            "Wheelchair access"
+        ]
+        presenter = AppointmentPresenter(mock_appointment)
+
+        [action] = presenter.special_appointment_action("/return/")["items"]
+        assert action["text"] == "Change"
+        assert (
+            action["href"]
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=/return/"
+        )
+        assert action["visuallyHiddenText"] == "special appointment"
+
     class TestCurrentStatus:
         @pytest.mark.parametrize(
             "status_name, expected_classes, expected_text, expected_key, is_confirmed, is_screened",

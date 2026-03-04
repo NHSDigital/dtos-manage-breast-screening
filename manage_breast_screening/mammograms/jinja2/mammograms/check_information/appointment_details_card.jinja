@@ -22,7 +22,7 @@
   {%- endif %}
 {% endmacro %}
 
-{% macro appointment_details_card(presented_appointment) %}
+{% macro appointment_details_card(presented_appointment, return_url) %}
   {% call card({
     "heading": "Appointment details",
     "feature": true
@@ -31,7 +31,8 @@
       "rows": [
         {
           "key": { "text": "Special appointment" },
-          "value": {"html": special_appointment_details(presented_appointment) }
+          "value": {"html": special_appointment_details(presented_appointment) },
+          "actions": presented_appointment.special_appointment_action(return_url)
         },
         {
           "key": { "text": "Appointment note" },

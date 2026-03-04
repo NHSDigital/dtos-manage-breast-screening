@@ -3,6 +3,9 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 
 from ..forms import ProvideSpecialAppointmentDetailsForm
 from .mixins import AppointmentMixin
@@ -19,21 +22,27 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
         "mammograms/special_appointments/provide_special_appointment_details.jinja"
     )
 
+    def get_return_url(self):
+        return extract_relative_redirect_url(
+            self.request,
+            default=reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": self.appointment_pk},
+            ),
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
 
         context.update(
             {
                 "back_link_params": {
-                    "href": reverse(
-                        "mammograms:show_appointment",
-                        kwargs={"pk": self.appointment_pk},
-                    ),
-                    "text": "Back to appointment",
+                    "href": self.get_return_url(),
                 },
                 "caption": self.participant.full_name,
                 "page_title": "Provide special appointment details",
                 "heading": "Provide special appointment details",
+                "return_url": self.get_return_url(),
             },
         )
 
@@ -50,4 +59,4 @@ class ProvideSpecialAppointmentDetails(AppointmentMixin, FormView):
         self.participant.save()
         Auditor.from_request(self.request).audit_update(self.participant)
 
-        return redirect("mammograms:show_appointment", pk=self.appointment_pk)
+        return redirect(self.get_return_url())

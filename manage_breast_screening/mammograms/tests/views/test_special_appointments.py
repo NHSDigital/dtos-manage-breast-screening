@@ -45,6 +45,26 @@ class TestProvideDetails:
             ),
         )
 
+    def test_valid_post_redirects_to_return_url(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        check_info_url = reverse(
+            "mammograms:check_information", kwargs={"pk": appointment.pk}
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:provide_special_appointment_details",
+                kwargs={"pk": appointment.pk},
+            )
+            + f"?return_url={check_info_url}",
+            {
+                "support_reasons": [SupportReasons.MEDICAL_DEVICES],
+                "medical_devices_details": "has pacemaker",
+            },
+        )
+        assertRedirects(response, check_info_url, fetch_redirect_response=False)
+
     def test_valid_post_creates_an_audit_record(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
