@@ -26,4 +26,5 @@ def mock_appointment():
     mock_appointment.screening_episode.participant.nhs_number = "1234567890"
     mock_appointment.screening_episode.participant.pk = uuid4()
     mock_appointment.screening_episode.participant.phone = "01234123456"
+    mock_appointment.breast_features = None
     return mock_appointment
