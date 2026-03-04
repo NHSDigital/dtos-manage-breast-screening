@@ -121,6 +121,15 @@ class WorklistItemService:
             )
             return None
 
+        if self.appointment.gateway_actions.filter(
+            type=GatewayActionType.WORKLIST_CREATE,
+            status__in=[GatewayActionStatus.PENDING, GatewayActionStatus.SENT],
+        ).exists():
+            logger.info(
+                f"Gateway action already exists for appointment {self.appointment.pk}, skipping creation"
+            )
+            return None
+
         action_id = uuid.uuid4()
         accession_number = self._generate_accession_number()
         payload = self._build_payload(action_id, accession_number)
