@@ -188,6 +188,7 @@ variable "run_notifications_smoke_test" {
 variable "container_memory" {
   description = "Memory allocated to the webapp container in Gi. CPU is automatically set to half the memory value by the container-app module."
   type        = string
+  default     = "0.5"
 }
 
 variable "enable_smoke_test_bypass" {
