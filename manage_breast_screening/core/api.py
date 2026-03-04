@@ -2,6 +2,7 @@ import hmac
 import os
 from functools import wraps
 
+from django.http import HttpResponseNotFound
 from ninja import NinjaAPI
 from ninja.security import HttpBearer
 
@@ -23,6 +24,19 @@ def check_availability():
     return decorator
 
 
+def docs_enabled():
+    def decorator(func):
+        @wraps(func)
+        def wrapper(request, *args, **kwargs):
+            if not os.getenv("API_DOCS_ENABLED", "true").lower() == "true":
+                return HttpResponseNotFound("API documentation is not available")
+            return func(request, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
 class GlobalAuth(HttpBearer):
     def authenticate(self, request, token):
         expected_token = os.getenv("API_AUTH_TOKEN")
@@ -32,7 +46,13 @@ class GlobalAuth(HttpBearer):
             return token
 
 
-api = NinjaAPI(auth=GlobalAuth(), title="Manage Breast Screening API", version="1.0.0")
+api = NinjaAPI(
+    auth=GlobalAuth(),
+    docs_decorator=docs_enabled(),
+    title="Manage Breast Screening API",
+    version="1.0.0",
+)
+
 api.add_router("/dicom/", dicom_router, tags=["DICOM"])
 api.add_decorator(check_availability())
 dicom_router.add_decorator(check_availability())

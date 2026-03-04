@@ -109,3 +109,21 @@ def test_hmac_compare_digest_false(monkeypatch):
 
     mock_compare.assert_called_once_with("provided-token", "expected-token")
     assert not result
+
+
+def test_api_docs(monkeypatch):
+    monkeypatch.setenv("API_DOCS_ENABLED", "true")
+
+    response = client.get("/docs")
+
+    assert response.status_code == 200
+    assert "Manage Breast Screening API" in response.content.decode()
+
+
+def test_api_docs_disabled(monkeypatch):
+    monkeypatch.setenv("API_DOCS_ENABLED", "false")
+
+    response = client.get("/docs")
+
+    assert response.status_code == 404
+    assert "API documentation is not available" in response.content.decode()
