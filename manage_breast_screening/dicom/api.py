@@ -32,8 +32,6 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
     """
     Accepts PUT with a single DICOM file in form field 'file'
     """
-    dicom_file = request.FILES.get("file")
-
     max_size = 100 * 1024 * 1024
     if file.size > max_size:
         return 400, {
@@ -42,7 +40,7 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
             "detail": "The file cannot be larger than 100MB",
         }
 
-    if dicom_file is None:
+    if file is None:
         return 400, {
             "title": "No file uploaded",
             "status": 400,
@@ -51,7 +49,7 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
 
     try:
         study, series, image = DicomRecorder.get_or_create_records(
-            source_message_id, dicom_file
+            source_message_id, file
         )
 
     except pydicom.errors.InvalidDicomError:
