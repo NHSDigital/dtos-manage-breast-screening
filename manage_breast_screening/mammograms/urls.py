@@ -380,4 +380,9 @@ urlpatterns = [
         other_medical_information_views.UpdateOtherMedicalInformationView.as_view(),
         name="change_other_medical_information",
     ),
+    path(
+        "<uuid:pk>/record-medical-information/other-medical-information/<uuid:other_medical_information_pk>/delete/",
+        other_medical_information_views.DeleteOtherMedicalInformationView.as_view(),
+        name="delete_other_medical_information",
+    ),
 ]
