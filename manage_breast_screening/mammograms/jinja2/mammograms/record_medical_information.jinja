@@ -29,17 +29,17 @@
 {% endcall %}
 
 {% call card_with_status(
-  presented_section=presenter.get_section(sections.SYMPTOMS),
-  csrf_input=csrf_input,
-  ) %}
-  {{ symptoms_content(presenter) }}
-{% endcall %}
-
-{% call card_with_status(
   presented_section=presenter.get_section(sections.MEDICAL_HISTORY),
   csrf_input=csrf_input,
   ) %}
   {{ medical_history_content(presenter) }}
+{% endcall %}
+
+{% call card_with_status(
+  presented_section=presenter.get_section(sections.SYMPTOMS),
+  csrf_input=csrf_input,
+  ) %}
+  {{ symptoms_content(presenter) }}
 {% endcall %}
 
 {% call card_with_status(

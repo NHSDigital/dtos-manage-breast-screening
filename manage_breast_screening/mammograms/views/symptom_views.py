@@ -37,7 +37,7 @@ class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
                 "mammograms:record_medical_information",
                 kwargs={"pk": self.appointment_pk},
             ),
-            "text": "Back to appointment",
+            "text": "Back",
         }
 
     def get_context_data(self, **kwargs):
@@ -130,6 +130,13 @@ class AddLumpView(AddSymptomView):
     form_class = LumpForm
     template_name = "mammograms/medical_information/symptoms/forms/simple_symptom.jinja"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["heading_description"] = (
+            "Lumps are a recognised symptom of breast cancer. Information recorded here will be highlighted during image reading."
+        )
+        return context
+
 
 class AddSwellingOrShapeChangeView(AddSymptomView):
     """
@@ -187,6 +194,13 @@ class ChangeLumpView(ChangeSymptomView):
 
     def extra_filters(self):
         return {"symptom_type_id": SymptomType.LUMP}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["heading_description"] = (
+            "Record whether the lump is in the left breast, right breast or both."
+        )
+        return context
 
 
 class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
