@@ -18,14 +18,14 @@ from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 
 
-def clinic_list(request, filter="today"):
+def list_clinics(request, filter="today"):
     provider = request.user.current_provider
     clinics = provider.clinics.by_filter(filter).prefetch_related("setting")
     counts_by_filter = Clinic.filter_counts(provider.pk)
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
-        "clinics/index.jinja",
+        "clinics/list_clinics.jinja",
         context={
             "presenter": presenter,
             "page_title": presenter.heading,
@@ -34,7 +34,7 @@ def clinic_list(request, filter="today"):
     )
 
 
-def clinic(request, pk, filter="remaining"):
+def list_clinic_appointments(request, pk, filter="remaining"):
     provider = request.user.current_provider
     clinic = provider.clinics.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
@@ -51,7 +51,7 @@ def clinic(request, pk, filter="remaining"):
     )
     return render(
         request,
-        "clinics/show.jinja",
+        "clinics/list_clinic_appointments.jinja",
         context={
             "presented_clinic": presented_clinic,
             "presented_appointment_list": presented_appointment_list,
