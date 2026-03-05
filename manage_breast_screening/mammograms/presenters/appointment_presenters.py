@@ -294,11 +294,18 @@ class ClinicSlotPresenter:
         return reverse("clinics:show", kwargs={"pk": self._clinic.pk})
 
     @cached_property
-    def slot_time_and_clinic_date(self):
+    def slot_timestamp_multi_line(self):
         clinic_slot = self._clinic_slot
         clinic = self._clinic
 
-        return f"{format_date(clinic.starts_at)} ({format_relative_date(clinic.starts_at)}) \n {format_time(clinic_slot.starts_at)} ({clinic_slot.duration_in_minutes} minutes)"
+        return f"{format_time(clinic_slot.starts_at)} ({clinic_slot.duration_in_minutes} minutes) - {format_date(clinic.starts_at)} ({format_relative_date(clinic.starts_at)})"
+
+    @cached_property
+    def slot_timestamp_single_line(self):
+        clinic_slot = self._clinic_slot
+        clinic = self._clinic
+
+        return f"{format_date(clinic_slot.starts_at)} ({format_relative_date(clinic.starts_at)}) \n {format_time(clinic.starts_at)} ({clinic_slot.duration_in_minutes} minutes)"
 
     @cached_property
     def clinic_date_and_slot_time(self):

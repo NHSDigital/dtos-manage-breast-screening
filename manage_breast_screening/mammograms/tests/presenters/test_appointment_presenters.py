@@ -742,14 +742,14 @@ class TestClinicSlotPresenter:
         )
 
     @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
-    def test_slot_time_and_clinic_date(self, clinic_slot_mock):
+    def test_slot_timestamp_multi_line(self, clinic_slot_mock):
         clinic_slot_mock.starts_at = datetime(2025, 1, 2, 9, 30)
         clinic_slot_mock.duration_in_minutes = 30
         clinic_slot_mock.clinic.starts_at = date(2025, 1, 2)
 
         assert (
-            ClinicSlotPresenter(clinic_slot_mock).slot_time_and_clinic_date
-            == "2 January 2025 (4 months, 17 days ago) \n 9:30am (30 minutes)"
+            ClinicSlotPresenter(clinic_slot_mock).slot_timestamp_multi_line
+            == "9:30am (30 minutes) - 2 January 2025 (4 months, 17 days ago)"
         )
 
     @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))

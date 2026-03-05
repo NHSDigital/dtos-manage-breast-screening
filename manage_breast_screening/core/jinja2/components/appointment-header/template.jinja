@@ -5,7 +5,7 @@
 
 <p class="nhsuk-u-secondary-text-colour"><span>NHS Number: {{ participant.nhs_number }}</span></p>
 
-<p>{{ clinic_slot.slot_time_and_clinic_date }}</p>
+<p>{{ clinic_slot.slot_timestamp_multi_line }}</p>
 
 {% if appointment.can_be_started_by(user) %}
   <form action="{{ url('mammograms:start_appointment', kwargs={'pk': appointment.pk}) }}" method="post">
