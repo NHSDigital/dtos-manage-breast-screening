@@ -115,19 +115,16 @@ class TestChangeHormoneReplacementTherapyView:
                 "mammograms:change_hormone_replacement_therapy",
                 kwargs={
                     "pk": hrt.appointment.pk,
-                    "hrt_pk": hrt.pk,
                 },
             )
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, hrt
-    ):
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client, hrt):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_hormone_replacement_therapy",
-                kwargs={"pk": appointment.pk, "hrt_pk": hrt.pk},
+                kwargs={"pk": hrt.appointment.pk},
             ),
             {
                 "status": HormoneReplacementTherapy.Status.NO,
@@ -137,7 +134,7 @@ class TestChangeHormoneReplacementTherapyView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": hrt.appointment.pk},
             ),
         )
         assertMessages(

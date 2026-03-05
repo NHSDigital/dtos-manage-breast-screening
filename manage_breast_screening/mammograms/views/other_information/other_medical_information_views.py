@@ -1,9 +1,11 @@
 import logging
 
 from django.shortcuts import redirect
+from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
+    DeleteWithAuditView,
     UpdateWithAuditView,
 )
 from manage_breast_screening.mammograms.forms.other_information.other_medical_information_form import (
@@ -60,3 +62,32 @@ class UpdateOtherMedicalInformationView(MedicalInformationMixin, UpdateWithAudit
         kwargs = super().get_form_kwargs()
         kwargs["participant"] = self.participant
         return kwargs
+
+    def confirm_delete_link_text(self, thing_name):
+        return "Delete other medical information"
+
+    def get_delete_url(self):
+        return reverse(
+            "mammograms:delete_other_medical_information",
+            kwargs={
+                "pk": self.kwargs["pk"],
+            },
+        )
+
+
+class DeleteOtherMedicalInformationView(DeleteWithAuditView):
+    thing_name = THING_NAME
+
+    def get_success_message_content(self, object):
+        return "Deleted other medical information"
+
+    def get_object(self):
+        provider = self.request.user.current_provider
+        appointment = provider.appointments.get(pk=self.kwargs["pk"])
+        return appointment.other_medical_information
+
+    def get_success_url(self) -> str:
+        return reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": self.kwargs["pk"]},
+        )

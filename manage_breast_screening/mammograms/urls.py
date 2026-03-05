@@ -356,7 +356,7 @@ urlpatterns = [
         name="add_hormone_replacement_therapy",
     ),
     path(
-        "<uuid:pk>/record-medical-information/hormone-replacement-therapy/<uuid:hrt_pk>/",
+        "<uuid:pk>/record-medical-information/hormone-replacement-therapy/update/",
         hormone_replacement_therapy_views.UpdateHormoneReplacementTherapyView.as_view(),
         name="change_hormone_replacement_therapy",
     ),
@@ -366,7 +366,7 @@ urlpatterns = [
         name="add_pregnancy_and_breastfeeding",
     ),
     path(
-        "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/<uuid:pab_pk>/",
+        "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/update/",
         pregnancy_and_breastfeeding_views.UpdatePregnancyAndBreastfeedingView.as_view(),
         name="change_pregnancy_and_breastfeeding",
     ),
@@ -376,8 +376,13 @@ urlpatterns = [
         name="add_other_medical_information",
     ),
     path(
-        "<uuid:pk>/record-medical-information/other-medical-information/<uuid:other_medical_information_pk>/",
+        "<uuid:pk>/record-medical-information/other-medical-information/update/",
         other_medical_information_views.UpdateOtherMedicalInformationView.as_view(),
         name="change_other_medical_information",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/other-medical-information/delete/",
+        other_medical_information_views.DeleteOtherMedicalInformationView.as_view(),
+        name="delete_other_medical_information",
     ),
 ]
