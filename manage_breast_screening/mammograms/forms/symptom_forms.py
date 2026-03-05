@@ -485,3 +485,47 @@ class OtherSymptomForm(SymptomForm):
         self.given_field_value("investigated", YesNo.YES).require_field(
             "investigation_details"
         )
+
+
+class BreastPainForm(SymptomForm):
+    BREAST_PAIN_NAME = "pain"
+
+    area = CommonFields.area_radios(symptom_name=BREAST_PAIN_NAME)
+    area_description_right_breast = CommonFields.area_description(
+        BREAST_PAIN_NAME, visually_hidden_label_suffix=": right breast"
+    )
+    area_description_left_breast = CommonFields.area_description(
+        BREAST_PAIN_NAME, visually_hidden_label_suffix=": left breast"
+    )
+    area_description_other = CommonFields.area_description(
+        BREAST_PAIN_NAME,
+        visually_hidden_label_suffix=": other",
+        classes="nhsuk-u-width-two-thirds",
+    )
+    when_started = CommonFields.when_started
+    specific_date = CommonFields.specific_date
+    intermittent = CommonFields.intermittent
+    recently_resolved = CommonFields.recently_resolved
+    when_resolved = CommonFields.when_resolved
+    investigated = CommonFields.investigated
+    investigation_details = CommonFields.investigation_details
+    additional_information = CommonFields.additional_information
+
+    def __init__(self, instance=None, **kwargs):
+        super().__init__(
+            symptom_type=SymptomType.BREAST_PAIN,
+            instance=instance,
+            **kwargs,
+        )
+
+        self.given_field("area").require_field_with_prefix("area_description")
+
+        self.given_field_value(
+            "when_started", RelativeDateChoices.SINCE_A_SPECIFIC_DATE
+        ).require_field("specific_date")
+
+        self.given_field_value("recently_resolved", True).require_field("when_resolved")
+
+        self.given_field_value("investigated", YesNo.YES).require_field(
+            "investigation_details"
+        )

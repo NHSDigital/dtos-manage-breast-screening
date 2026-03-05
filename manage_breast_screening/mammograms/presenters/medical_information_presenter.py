@@ -182,6 +182,7 @@ class MedicalInformationPresenter:
             self.add_swelling_or_shape_change_button,
             self.add_skin_change_button,
             self.add_nipple_change_button,
+            self.add_breast_pain_button,
             self.add_other_symptom_button,
         ]
 
@@ -231,6 +232,10 @@ class MedicalInformationPresenter:
         return self._subpage_button(
             "mammograms:add_symptom_nipple_change", "Nipple change"
         )
+
+    @property
+    def add_breast_pain_button(self):
+        return self._subpage_button("mammograms:add_symptom_breast_pain", "Breast pain")
 
     @property
     def add_other_symptom_button(self):

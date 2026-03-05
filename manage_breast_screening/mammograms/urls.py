@@ -166,6 +166,16 @@ urlpatterns = [
         name="change_symptom_nipple_change",
     ),
     path(
+        "<uuid:pk>/record-medical-information/breast-pain/",
+        symptom_views.AddBreastPainView.as_view(),
+        name="add_symptom_breast_pain",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/breast-pain/<uuid:symptom_pk>/",
+        symptom_views.ChangeBreastPainView.as_view(),
+        name="change_symptom_breast_pain",
+    ),
+    path(
         "<uuid:pk>/record-medical-information/other/",
         symptom_views.AddOtherSymptomView.as_view(),
         name="add_symptom_other",
