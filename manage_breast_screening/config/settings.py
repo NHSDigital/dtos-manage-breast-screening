@@ -97,6 +97,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "manage_breast_screening.core.middleware.exception_logging.CorrelationIdMiddleware",
+    "manage_breast_screening.core.middleware.exception_logging.ExceptionLoggingMiddleware",
     "manage_breast_screening.core.middleware.robots.RobotsTagMiddleware",
     "manage_breast_screening.core.middleware.basic_auth.BasicAuthMiddleware",
     "qsessions.middleware.SessionMiddleware",
@@ -110,7 +111,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "ninja.compatibility.files.fix_request_files_middleware",
     "csp.middleware.CSPMiddleware",
-    "manage_breast_screening.core.middleware.exception_logging.ExceptionLoggingMiddleware",
 ]
 
 if DEBUG:
@@ -302,6 +302,7 @@ LOGGING = {
     "root": {
         "handlers": ["console"],
         "level": ROOT_LOG_LEVEL,
+        "filters": ["correlation_id"],
     },
     "loggers": {
         "django": {

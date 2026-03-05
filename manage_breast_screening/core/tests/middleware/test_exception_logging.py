@@ -179,7 +179,6 @@ class TestCorrelationIdMiddleware:
         correlation_id_ctx.set(previous_value)
 
         request = self.DummyRequest()
-        response = self.DummyResponse()
 
         # process_request sets a new correlation_id and stores its token
         middleware.process_request(request)
@@ -188,7 +187,7 @@ class TestCorrelationIdMiddleware:
         assert request._correlation_id_token.old_value == previous_value
 
         # process_exception should reset to previous_value
-        middleware.process_exception(request, response)
+        middleware.process_exception(request, Exception("test"))
         assert correlation_id_ctx.get() == previous_value
         assert not request._correlation_id_token
 

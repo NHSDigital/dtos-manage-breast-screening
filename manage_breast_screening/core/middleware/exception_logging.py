@@ -54,7 +54,7 @@ class CorrelationIdMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         correlation_id = getattr(request, "correlation_id", None)
         if correlation_id:
-            response["X-Correlation-ID"] = correlation_id
+            response[self.RESPONSE_HEADER] = correlation_id
         # Reset the context var to avoid leaking
         token = getattr(request, "_correlation_id_token", None)
         if token is not None:
