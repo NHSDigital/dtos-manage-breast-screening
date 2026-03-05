@@ -10,16 +10,6 @@ workspace {
       tags external
     }
 
-    mesh = softwareSystem "NBSS MESH mailbox" {
-      description "Events from NBSS in each breast screening office"
-      tags external
-    }
-
-    notify = softwareSystem "NHS Notify" {
-      description "Send invitations via NHS app, SMS, post"
-      tags external
-    }
-
     azure_arc = softwareSystem "Azure ARC" "Manages external VMs at scale" {
       tags azure
     }
@@ -35,40 +25,6 @@ workspace {
           technology "Managed Azure postgres"
           tags database azure
         }
-
-        jobs = container "Functions" "Process events asynchronously" {
-          technology "Event driven container app jobs"
-          create_appointments = component "Create appointments" {
-              technology "Event driven container app job"
-              tags job
-          }
-          store_mesh_messages = component "Store Mesh messages" {
-              technology "Event driven container app job"
-              tags job
-          }
-          create_report = component "Create report" {
-              technology "Event driven container app job"
-              tags job
-          }
-
-          mesh_blob_container = component "MESH data" {
-              technology "Azure storage blob container"
-              tags azure
-          }
-          reports_blob_container = component "Reports" {
-              technology "Azure storage blob container"
-              tags azure
-          }
-          queue = component "Message status queue" {
-              technology "Azure storage queue"
-              tags azure
-          }
-          retry_queue = component "Retry queue" {
-              technology "Azure storage queue"
-              tags azure
-          }
-        }
-
         webApplication -> azurePostgres "Reads from and writes to"
       }
     }
@@ -113,26 +69,6 @@ workspace {
 
     user -> cis2 "Authenticates via"
     cis2 -> webApplication "Provides authentication token to"
-
-    store_mesh_messages -> mesh "Fetches appointments from" {
-      tags store_mesh
-    }
-    create_appointments -> mesh_blob_container "Gets MESH messages"
-    store_mesh_messages -> mesh_blob_container "Stores MESH messages"
-    create_report -> reports_blob_container "Stores message status reports"
-
-    # Commented to avoid cluttering - Grouped with send_message_batch
-    # retry_failed_message_batch -> retry_queue "Gets failed batches"
-    # retry_failed_message_batch -> notify "Retry messages"
-
-    # Commented to avoid cluttering - DB connection in view title
-    # store_mesh_messages -> azurePostgres "Store messages to"
-    # send_message_batch -> azurePostgres "Gets appointments from"
-    # create_appointments -> azurePostgres "Converts to appointments and clinic"
-    # create_report -> azurePostgres "Gets message statuses from"
-
-    # Commented to avoid cluttering
-    # jobs -> azurePostgres "Store data"
   }
 
   views {
@@ -140,22 +76,15 @@ workspace {
     systemContext breastScreeningSystem {
       include * user
       exclude azure_relay
-      autolayout lr
+      autolayout lr 350 150
     }
 
     container breastScreeningSystem {
-      include "element.parent==breastScreeningSystem" mesh notify cis2 azure_relay
-      exclude "webApplication->jobs"
+      include "element.parent==breastScreeningSystem" cis2 azure_relay
       autolayout tb
     }
 
     container hospital_screening {
-      include *
-      autolayout tb
-    }
-
-    component jobs {
-      title "Functions [Connections to database are omitted]"
       include *
       autolayout tb
     }
@@ -182,12 +111,6 @@ workspace {
       element azure {
         background blue
         colour white
-      }
-      relationship store_mesh {
-        position 60
-      }
-      relationship send_retry {
-        position 20
       }
     }
 
