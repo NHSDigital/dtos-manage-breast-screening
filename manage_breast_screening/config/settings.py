@@ -283,9 +283,6 @@ LOGGING = {
         "correlation_id": {
             "()": "manage_breast_screening.core.middleware.exception_logging.CorrelationIdFilter",
         },
-        "pii_redaction": {
-            "()": "manage_breast_screening.core.middleware.exception_logging.PIIRedactionFilter",
-        },
     },
     "formatters": {
         "verbose": {
@@ -299,7 +296,7 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
             "stream": sys.stdout,
-            "filters": ["correlation_id", "pii_redaction"],
+            "filters": ["correlation_id"],
         },
     },
     "root": {

@@ -85,24 +85,3 @@ class CorrelationIdFilter(logging.Filter):
         if existing_correlation_id is None:
             record.correlation_id = correlation_id_ctx.get() or "-"
         return True
-
-
-class PIIRedactionFilter(logging.Filter):
-    """
-    Logging filter that redacts NHS numbers and patient identifiers from log messages.
-    NHS numbers: 10-digit numbers (optionally with spaces).
-    Patient identifiers: UUIDs (standard 8-4-4-4-12 format).
-    """
-
-    NHS_REGEX = re.compile(r"\b\d{3}\s?\d{3}\s?\d{4}\b")
-    UUID_REGEX = re.compile(
-        r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"
-    )
-
-    def filter(self, record):
-        message = str(record.getMessage())
-        message = self.NHS_REGEX.sub("[REDACTED_NHS]", message)
-        message = self.UUID_REGEX.sub("[REDACTED_ID]", message)
-        record.msg = message
-        record.args = ()
-        return True

@@ -8,7 +8,6 @@ from manage_breast_screening.core.middleware.exception_logging import (
     CorrelationIdFilter,
     CorrelationIdMiddleware,
     ExceptionLoggingMiddleware,
-    PIIRedactionFilter,
     correlation_id_ctx,
 )
 
@@ -251,77 +250,3 @@ class TestCorrelationIdFilter:
 
         assert filter.filter(record)
         assert record.correlation_id == "-"
-
-
-class TestPIIRedactionFilter:
-    @pytest.mark.parametrize(
-        "unredacted_message,expected",
-        [
-            ("Log message with no PII", "Log message with no PII"),
-            ("18e767b7-243e-4d2a-b4e6-2c8d5a3c05a1", "[REDACTED_ID]"),
-            ("9300000001", "[REDACTED_NHS]"),
-            ("123 456 7890", "[REDACTED_NHS]"),
-            (
-                "18e767b7-243e-4d2a-b4e6-2c8d5a3c05a1 9300000001 123 456 7890 ec8ad97e-b97b-4d96-90ea-98f62ca083f6",
-                "[REDACTED_ID] [REDACTED_NHS] [REDACTED_NHS] [REDACTED_ID]",
-            ),
-            (
-                "NHS number is 9300000001, email is john.doe@example.com and phone is 01234 123 456",
-                "NHS number is [REDACTED_NHS], email is john.doe@example.com and phone is 01234 123 456",
-            ),
-            (
-                "0000000000, 9999999999, 0000000000, 0123456789 and 987 654 3210",
-                "[REDACTED_NHS], [REDACTED_NHS], [REDACTED_NHS], [REDACTED_NHS] and [REDACTED_NHS]",
-            ),
-            (
-                "123456789 123-456-7890 12345678901",
-                "123456789 123-456-7890 12345678901",
-            ),
-        ],
-    )
-    def test_pii_redaction_filter(self, unredacted_message, expected):
-        record = logging.LogRecord(
-            name="test_logger",
-            level=logging.INFO,
-            pathname="test_path",
-            lineno=10,
-            msg=unredacted_message,
-            args=(),
-            exc_info=None,
-        )
-
-        filter = PIIRedactionFilter()
-        filter.filter(record)
-        assert record.msg == expected
-
-    def test_pii_redaction_filter_with_args(self):
-        # Simulate logger.info("NHS %s", "9300000001")
-        record = logging.LogRecord(
-            name="test_logger",
-            level=logging.INFO,
-            pathname="test_path",
-            lineno=10,
-            msg="NHS %s",
-            args=("9300000001",),
-            exc_info=None,
-        )
-        filter = PIIRedactionFilter()
-        filter.filter(record)
-
-        assert record.msg == "NHS [REDACTED_NHS]"
-
-    def test_pii_redaction_filter_with_non_string_msg(self):
-        # Simulate logger.info(12345)
-        record = logging.LogRecord(
-            name="test_logger",
-            level=logging.INFO,
-            pathname="test_path",
-            lineno=10,
-            msg=12345,
-            args=(),
-            exc_info=None,
-        )
-        filter = PIIRedactionFilter()
-
-        filter.filter(record)
-        assert record.msg == "12345"
