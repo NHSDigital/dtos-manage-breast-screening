@@ -11,15 +11,15 @@
 {% endcall %}
 
 {% call card({
-  "heading": "Symptoms"
-}) %}
-  {{ symptoms_content(presenter, read_only=true) }}
-{% endcall %}
-
-{% call card({
   "heading": "Medical history"
 }) %}
   {{ medical_history_content(presenter, read_only=true) }}
+{% endcall %}
+
+{% call card({
+  "heading": "Symptoms"
+}) %}
+  {{ symptoms_content(presenter, read_only=true) }}
 {% endcall %}
 
 {% call card({
