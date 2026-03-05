@@ -107,7 +107,7 @@ class AppointmentListPresenter:
                     "label": filter_label,
                     "count": count,
                     "href": reverse(
-                        "clinics:show_" + filter_identifier,
+                        "clinics:list_clinic_appointments_" + filter_identifier,
                         kwargs={"pk": self.clinic_pk},
                     ),
                     "current": filter_identifier == self.filter,

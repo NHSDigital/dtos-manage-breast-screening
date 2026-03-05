@@ -395,7 +395,7 @@ class PauseAppointment(InProgressAppointmentMixin, FormView):
 
     def get_success_url(self):
         return reverse(
-            "clinics:show_in_progress",
+            "clinics:list_clinic_appointments_in_progress",
             kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
         )
 
