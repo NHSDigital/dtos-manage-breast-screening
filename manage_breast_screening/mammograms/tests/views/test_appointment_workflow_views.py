@@ -969,7 +969,7 @@ class TestPauseAppointment:
         assertRedirects(
             response,
             reverse(
-                "clinics:show_in_progress",
+                "clinics:list_clinic_appointments_in_progress",
                 kwargs={"pk": in_progress_appointment.clinic_slot.clinic.pk},
             ),
         )
