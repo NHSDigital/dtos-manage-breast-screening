@@ -320,7 +320,7 @@ class TestCheckInformation(SystemTestCase):
 
     def then_i_should_be_on_the_clinic_page(self):
         path = reverse(
-            "clinics:show",
+            "clinics:show_clinic",
             kwargs={"pk": self.clinic.pk},
         )
         expect(self.page).to_have_url(re.compile(path))

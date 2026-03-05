@@ -48,7 +48,7 @@
     {% for presented_clinic in presenter.clinics %}
     <tr>
       <td>
-        {% set clinic_url = url('clinics:show', kwargs={"pk": presented_clinic.pk}) %}
+        {% set clinic_url = url('clinics:show_clinic', kwargs={"pk": presented_clinic.pk}) %}
         <a href="{{ clinic_url }}" class="nhsuk-link">
           {{ presented_clinic.location_name }}
           <br>

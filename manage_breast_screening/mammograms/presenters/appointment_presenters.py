@@ -256,7 +256,7 @@ class ClinicSlotPresenter:
 
     @cached_property
     def clinic_url(self):
-        return reverse("clinics:show", kwargs={"pk": self._clinic.pk})
+        return reverse("clinics:show_clinic", kwargs={"pk": self._clinic.pk})
 
     @cached_property
     def slot_time_and_clinic_date(self):

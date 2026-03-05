@@ -26,7 +26,7 @@ urlpatterns = [
     ),
     path("all/", views.clinic_list, name="index_all", kwargs={"filter": "all"}),
     # Clinic show
-    path("<uuid:pk>/", views.clinic, name="show"),
+    path("<uuid:pk>/", views.clinic, name="show_clinic"),
     path(
         "<uuid:pk>/remaining/",
         views.clinic,
