@@ -94,7 +94,7 @@ class TestLogin(SystemTestCase):
         self.page.get_by_role("button", name="Log in with my Care Identity").click()
 
     def then_i_am_redirected_to_home(self):
-        expect(self.page).to_have_url(re.compile(reverse("clinics:index")))
+        expect(self.page).to_have_url(re.compile(reverse("clinics:list_clinics")))
 
     def then_i_am_redirected_to_provider_selection(self):
         expect(self.page).to_have_url(re.compile(reverse("clinics:select_provider")))

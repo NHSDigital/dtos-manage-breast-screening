@@ -168,7 +168,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
 class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/appointment_cannot_go_ahead.jinja"
     form_class = AppointmentCannotGoAheadForm
-    success_url = reverse_lazy("clinics:index")
+    success_url = reverse_lazy("clinics:list_clinics")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

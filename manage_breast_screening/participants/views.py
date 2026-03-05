@@ -27,7 +27,7 @@ def show(request, pk):
         )
     except Appointment.DoesNotExist:
         logger.exception(f"Appointment not found for participant {pk}")
-        return redirect(reverse("clinics:index"))
+        return redirect(reverse("clinics:list_clinics"))
 
     return redirect("mammograms:participant_details", pk=appointment_id)
 

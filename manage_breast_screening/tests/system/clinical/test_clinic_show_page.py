@@ -129,7 +129,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         )
 
     def and_i_am_on_the_clinic_list(self):
-        self.page.goto(self.live_server_url + reverse("clinics:index"))
+        self.page.goto(self.live_server_url + reverse("clinics:list_clinics"))
         self.assert_page_title_contains("Today’s clinics")
         heading = self.page.get_by_role("heading", level=1)
         expect(heading).to_contain_text(self.current_provider.name)

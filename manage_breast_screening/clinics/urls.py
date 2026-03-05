@@ -10,18 +10,23 @@ urlpatterns = [
     # Provider settings
     path("settings/", views.provider_settings, name="settings"),
     # Clinic list
-    path("", views.list_clinics, name="index"),
-    path("today/", views.list_clinics, name="index_today", kwargs={"filter": "today"}),
+    path("", views.list_clinics, name="list_clinics"),
+    path(
+        "today/",
+        views.list_clinics,
+        name="list_clinics_today",
+        kwargs={"filter": "today"},
+    ),
     path(
         "upcoming/",
         views.list_clinics,
-        name="index_upcoming",
+        name="list_clinics_upcoming",
         kwargs={"filter": "upcoming"},
     ),
     path(
         "completed/",
         views.list_clinics,
-        name="index_completed",
+        name="list_clinics_completed",
         kwargs={"filter": "completed"},
     ),
     path("all/", views.list_clinics, name="index_all", kwargs={"filter": "all"}),
