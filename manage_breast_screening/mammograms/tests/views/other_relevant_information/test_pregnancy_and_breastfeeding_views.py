@@ -117,19 +117,18 @@ class TestChangePregnancyAndBreastfeedingView:
                 "mammograms:change_pregnancy_and_breastfeeding",
                 kwargs={
                     "pk": pregnancy_and_breastfeeding.appointment.pk,
-                    "pab_pk": pregnancy_and_breastfeeding.pk,
                 },
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, pregnancy_and_breastfeeding
+        self, clinical_user_client, pregnancy_and_breastfeeding
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_pregnancy_and_breastfeeding",
-                kwargs={"pk": appointment.pk, "pab_pk": pregnancy_and_breastfeeding.pk},
+                kwargs={"pk": pregnancy_and_breastfeeding.appointment.pk},
             ),
             {
                 "pregnancy_status": PregnancyAndBreastfeeding.PregnancyStatus.NO,
@@ -140,7 +139,7 @@ class TestChangePregnancyAndBreastfeedingView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": pregnancy_and_breastfeeding.appointment.pk},
             ),
         )
         assertMessages(

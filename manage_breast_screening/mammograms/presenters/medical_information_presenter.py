@@ -346,7 +346,6 @@ class MedicalInformationPresenter:
                             "mammograms:change_hormone_replacement_therapy",
                             kwargs={
                                 "pk": self.appointment.pk,
-                                "hrt_pk": self.hormone_replacement_therapy.pk,
                             },
                         ),
                         "text": "Change",
@@ -375,7 +374,6 @@ class MedicalInformationPresenter:
                             "mammograms:change_pregnancy_and_breastfeeding",
                             kwargs={
                                 "pk": self.appointment.pk,
-                                "pab_pk": self.pregnancy_and_breastfeeding.pk,
                             },
                         ),
                         "text": "Change",
@@ -404,7 +402,6 @@ class MedicalInformationPresenter:
                             "mammograms:change_other_medical_information",
                             kwargs={
                                 "pk": self.appointment.pk,
-                                "other_medical_information_pk": self.other_medical_information.pk,
                             },
                         ),
                         "text": "Change",

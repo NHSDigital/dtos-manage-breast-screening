@@ -115,7 +115,6 @@ class TestChangeOtherMedicalInformationView:
                 "mammograms:change_other_medical_information",
                 kwargs={
                     "pk": other_medical_information.appointment.pk,
-                    "other_medical_information_pk": other_medical_information.pk,
                 },
             )
         )
@@ -128,8 +127,7 @@ class TestChangeOtherMedicalInformationView:
             reverse(
                 "mammograms:change_other_medical_information",
                 kwargs={
-                    "pk": appointment.pk,
-                    "other_medical_information_pk": other_medical_information.pk,
+                    "pk": other_medical_information.appointment.pk,
                 },
             ),
             {
@@ -174,7 +172,6 @@ class TestDeleteOtherMedicalInformationView:
                 "mammograms:delete_other_medical_information",
                 kwargs={
                     "pk": other_medical_information.appointment.pk,
-                    "other_medical_information_pk": other_medical_information.pk,
                 },
             )
         )
@@ -188,7 +185,6 @@ class TestDeleteOtherMedicalInformationView:
                 "mammograms:delete_other_medical_information",
                 kwargs={
                     "pk": other_medical_information.appointment.pk,
-                    "other_medical_information_pk": other_medical_information.pk,
                 },
             )
         )
@@ -217,7 +213,6 @@ class TestDeleteOtherMedicalInformationView:
                 "mammograms:delete_other_medical_information",
                 kwargs={
                     "pk": other_medical_information.appointment.pk,
-                    "other_medical_information_pk": other_medical_information.pk,
                 },
             )
         )

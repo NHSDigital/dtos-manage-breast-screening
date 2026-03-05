@@ -330,7 +330,7 @@ class TestRecordMedicalInformationPresenter:
             "items": [
                 {
                     "classes": "nhsuk-link--no-visited-state",
-                    "href": f"/mammograms/{appointment.pk}/record-medical-information/hormone-replacement-therapy/{hormone_replacement_therapy.pk}/",
+                    "href": f"/mammograms/{appointment.pk}/record-medical-information/hormone-replacement-therapy/update/",
                     "text": "Change",
                     "visuallyHiddenText": "hormone replacement therapy",
                 }
@@ -380,7 +380,7 @@ class TestRecordMedicalInformationPresenter:
             "items": [
                 {
                     "classes": "nhsuk-link--no-visited-state",
-                    "href": f"/mammograms/{appointment.pk}/record-medical-information/pregnancy-and-breastfeeding/{pregnancy_and_breastfeeding.pk}/",
+                    "href": f"/mammograms/{appointment.pk}/record-medical-information/pregnancy-and-breastfeeding/update/",
                     "text": "Change",
                     "visuallyHiddenText": "pregnancy and breastfeeding",
                 }
