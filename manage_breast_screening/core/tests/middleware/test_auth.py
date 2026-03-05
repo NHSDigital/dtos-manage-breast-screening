@@ -77,7 +77,7 @@ def test_manage_authentication_in_middleware():
 
 
 def test_unauthenticated_redirects_to_login(client):
-    url = reverse("clinics:index")
+    url = reverse("clinics:list_clinics")
     response = client.get(url)
     assert response.status_code == 302
     assert response.url == reverse(settings.LOGIN_URL) + "?next=" + url

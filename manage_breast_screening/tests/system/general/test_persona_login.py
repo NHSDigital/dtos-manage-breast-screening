@@ -25,7 +25,7 @@ class TestPersonaLogin(SystemTestCase):
         UserAssignmentFactory.create(user=user, clinical=True)
 
     def when_i_visit_the_clinics_page(self):
-        self.page.goto(self.live_server_url + reverse("clinics:index"))
+        self.page.goto(self.live_server_url + reverse("clinics:list_clinics"))
 
     def then_i_am_shown_the_persona_login(self):
         expect(self.page).to_have_title(

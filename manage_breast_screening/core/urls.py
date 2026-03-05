@@ -93,7 +93,7 @@ urlpatterns = [
         "sha",
         sha_view,
     ),
-    path("", RedirectView.as_view(pattern_name="clinics:index"), name="home"),
+    path("", RedirectView.as_view(pattern_name="clinics:list_clinics"), name="home"),
 ]
 
 if settings.DEBUG_TOOLBAR:

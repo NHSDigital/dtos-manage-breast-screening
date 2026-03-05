@@ -87,7 +87,7 @@ def select_provider(request):
         request.session["current_provider"] = str(user_providers.first().pk)
         if next_path:
             return redirect(next_path)
-        return redirect("clinics:index")
+        return redirect("clinics:list_clinics")
 
     if request.method == "POST":
         provider_id = request.POST.get("provider")
@@ -95,7 +95,7 @@ def select_provider(request):
             request.session["current_provider"] = provider_id
             if next_path:
                 return redirect(next_path)
-            return redirect("clinics:index")
+            return redirect("clinics:list_clinics")
 
     return render(
         request,

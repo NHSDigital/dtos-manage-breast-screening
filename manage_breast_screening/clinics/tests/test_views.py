@@ -57,7 +57,7 @@ class TestSelectProvider:
         )
 
         assert response.status_code == 302
-        assert response.headers["location"] == reverse("clinics:index")
+        assert response.headers["location"] == reverse("clinics:list_clinics")
 
     @pytest.mark.django_db
     def test_excludes_providers_with_no_roles(self, client):

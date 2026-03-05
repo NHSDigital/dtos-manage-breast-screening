@@ -38,5 +38,5 @@ class TestShowParticipant:
 
         assertRedirects(
             response,
-            reverse("clinics:index"),
+            reverse("clinics:list_clinics"),
         )
