@@ -3,6 +3,12 @@
 {% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
 
 {% block form %}
+  {% if heading_description %}
+    <div class="nhsuk-inset-text nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4">
+      <p>{{ heading_description }}</p>
+    </div>
+  {% endif %}
+
   {% include "mammograms/medical_information/symptoms/forms/inline_area_radios.jinja" %}
 
   {% do form.when_started.add_divider_after("OVER_THREE_YEARS", "or") %}
