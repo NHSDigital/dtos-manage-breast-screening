@@ -55,6 +55,7 @@ class TestLogin(SystemTestCase):
         self.then_i_see_no_providers_message()
 
     def test_session_expires_after_max_session_time(self):
+        self.given_a_user_with_single_provider()
         self.given_i_am_on_the_home_page()
         self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_home()
@@ -62,6 +63,7 @@ class TestLogin(SystemTestCase):
         self.and_i_am_logged_out_when_the_max_session_time_has_passed_even_if_i_have_been_active()
 
     def test_session_expires_after_inactivity_timeout_reached(self):
+        self.given_a_user_with_single_provider()
         self.given_i_am_on_the_home_page()
         self.when_i_log_in_via_cis2()
         self.then_i_am_redirected_to_home()
@@ -74,7 +76,7 @@ class TestLogin(SystemTestCase):
     def given_a_user_with_single_provider(self):
         self.user = UserFactory(nhs_uid="cis2-user-1")
         self.provider = ProviderFactory(name="Provider One")
-        UserAssignmentFactory(user=self.user, provider=self.provider)
+        UserAssignmentFactory(user=self.user, provider=self.provider, clinical=True)
 
     def given_a_user_with_multiple_providers(self):
         self.user = UserFactory(nhs_uid="cis2-user-1")
