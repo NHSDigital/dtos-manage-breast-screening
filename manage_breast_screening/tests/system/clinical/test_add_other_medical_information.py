@@ -47,6 +47,27 @@ class TestAddOtherMedicalInformation(SystemTestCase):
         self.then_i_should_be_on_the_check_information_page()
         self.and_the_medical_other_information_is_listed()
 
+    def test_deleting_other_medical_information(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_record_medical_information_page()
+
+        self.when_i_click_add_other_medical_information()
+        self.then_i_see_the_add_other_medical_information_form()
+
+        self.when_i_enter_details("some info entered by user")
+        self.and_i_click_save()
+        self.then_i_am_back_on_the_medical_information_page()
+        self.and_the_message_says_other_medical_information_added()
+        self.and_the_other_medical_information_is_displayed("some info entered by user")
+
+        self.when_i_click_change_other_medical_information()
+        self.then_i_see_the_edit_other_medical_information_form()
+        self.and_i_click_delete_this_other_medical_information()
+        self.and_i_click_delete_item()
+        self.and_the_previous_other_medical_information_is_gone()
+        self.and_the_message_says_other_medical_information_deleted()
+
     def test_accessibility(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -88,11 +109,15 @@ class TestAddOtherMedicalInformation(SystemTestCase):
         self.page.get_by_role("link", name="Change other medical information").click()
 
     def then_i_see_the_add_other_medical_information_form(self):
-        expect(self.page.get_by_text("Other medical information")).to_be_visible()
+        expect(
+            self.page.get_by_role("heading", name="Other medical information", level=1)
+        ).to_be_visible()
         self.assert_page_title_contains("Add other medical information")
 
     def then_i_see_the_edit_other_medical_information_form(self):
-        expect(self.page.get_by_text("Other medical information")).to_be_visible()
+        expect(
+            self.page.get_by_role("heading", name="Other medical information", level=1)
+        ).to_be_visible()
         self.assert_page_title_contains("Edit other medical information")
 
     def when_i_enter_details(self, details):
@@ -166,3 +191,20 @@ class TestAddOtherMedicalInformation(SystemTestCase):
         )
         value = row.locator(".nhsuk-summary-list__value")
         expect(value).to_contain_text("some updated info entered by user")
+
+    def and_i_click_delete_this_other_medical_information(self):
+        self.page.get_by_text("Delete other medical information").click()
+
+    def and_i_click_delete_item(self):
+        self.page.get_by_text("Delete other medical information").click()
+
+    def and_the_previous_other_medical_information_is_gone(self):
+        self.and_the_other_medical_information_is_displayed(
+            "Enter other medical information details"
+        )
+
+    def and_the_message_says_other_medical_information_deleted(self):
+        alert = self.page.get_by_role("alert")
+
+        expect(alert).to_contain_text("Success")
+        expect(alert).to_contain_text("Deleted other medical information")

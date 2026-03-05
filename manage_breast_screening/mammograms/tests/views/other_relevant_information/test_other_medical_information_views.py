@@ -3,6 +3,9 @@ from django.contrib import messages
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertMessages, assertRedirects
 
+from manage_breast_screening.participants.models.other_information.other_medical_information import (
+    OtherMedicalInformation,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     OtherMedicalInformationFactory,
@@ -149,3 +152,76 @@ class TestChangeOtherMedicalInformationView:
                 )
             ],
         )
+
+
+@pytest.mark.django_db
+class TestDeleteOtherMedicalInformationView:
+    @pytest.fixture
+    def appointment(self, clinical_user_client):
+        return AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+
+    @pytest.fixture
+    def other_medical_information(self, appointment):
+        return OtherMedicalInformationFactory.create(appointment=appointment)
+
+    def test_get_renders_response(
+        self, clinical_user_client, other_medical_information
+    ):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:delete_other_medical_information",
+                kwargs={
+                    "pk": other_medical_information.appointment.pk,
+                    "other_medical_information_pk": other_medical_information.pk,
+                },
+            )
+        )
+        assert response.status_code == 200
+
+    def test_post_redirects_to_record_medical_information(
+        self, clinical_user_client, other_medical_information
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_other_medical_information",
+                kwargs={
+                    "pk": other_medical_information.appointment.pk,
+                    "other_medical_information_pk": other_medical_information.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": other_medical_information.appointment.pk},
+            ),
+        )
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.SUCCESS,
+                    message="Deleted other medical information",
+                )
+            ],
+        )
+
+    def test_the_other_medical_information_is_deleted(
+        self, clinical_user_client, other_medical_information
+    ):
+        clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_other_medical_information",
+                kwargs={
+                    "pk": other_medical_information.appointment.pk,
+                    "other_medical_information_pk": other_medical_information.pk,
+                },
+            )
+        )
+
+        assert not OtherMedicalInformation.objects.filter(
+            pk=other_medical_information.pk
+        ).exists()

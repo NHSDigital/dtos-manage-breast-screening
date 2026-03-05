@@ -63,6 +63,9 @@ class UpdateOtherMedicalInformationView(MedicalInformationMixin, UpdateWithAudit
         kwargs["participant"] = self.participant
         return kwargs
 
+    def confirm_delete_link_text(self, thing_name):
+        return "Delete other medical information"
+
     def get_delete_url(self):
         return reverse(
             "mammograms:delete_other_medical_information",
@@ -76,7 +79,7 @@ class UpdateOtherMedicalInformationView(MedicalInformationMixin, UpdateWithAudit
 
 
 class DeleteOtherMedicalInformationView(DeleteWithAuditView):
-    thing_name = "item"
+    thing_name = THING_NAME
 
     def get_success_message_content(self, object):
         return "Deleted other medical information"
