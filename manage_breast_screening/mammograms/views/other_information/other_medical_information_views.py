@@ -1,5 +1,6 @@
 import logging
 
+from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -87,7 +88,16 @@ class DeleteOtherMedicalInformationView(DeleteWithAuditView):
     def get_object(self):
         provider = self.request.user.current_provider
         appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.other_medical_information
+        other_medical_information_pk = self.kwargs["other_medical_information_pk"]
+        try:
+            omi = appointment.other_medical_information
+        except AttributeError:
+            raise Http404(
+                "Other medical information does not exist for this appointment."
+            )
+        if str(omi.pk) != str(other_medical_information_pk):
+            raise Http404("Other medical information pk does not match.")
+        return omi
 
     def get_success_url(self) -> str:
         return reverse(

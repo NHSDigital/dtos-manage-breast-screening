@@ -63,8 +63,8 @@ class TestAddOtherMedicalInformation(SystemTestCase):
 
         self.when_i_click_change_other_medical_information()
         self.then_i_see_the_edit_other_medical_information_form()
-        self.and_i_click_delete_this_other_medical_information()
-        self.and_i_click_delete_item()
+        self.when_i_click_delete_other_medical_information_link()
+        self.when_i_click_confirm_delete_other_medical_information_button()
         self.and_the_previous_other_medical_information_is_gone()
         self.and_the_message_says_other_medical_information_deleted()
 
@@ -192,11 +192,11 @@ class TestAddOtherMedicalInformation(SystemTestCase):
         value = row.locator(".nhsuk-summary-list__value")
         expect(value).to_contain_text("some updated info entered by user")
 
-    def and_i_click_delete_this_other_medical_information(self):
-        self.page.get_by_text("Delete other medical information").click()
+    def when_i_click_delete_other_medical_information_link(self):
+        self.page.get_by_role("link", name="Delete other medical information").click()
 
-    def and_i_click_delete_item(self):
-        self.page.get_by_text("Delete other medical information").click()
+    def when_i_click_confirm_delete_other_medical_information_button(self):
+        self.page.get_by_role("button", name="Delete other medical information").click()
 
     def and_the_previous_other_medical_information_is_gone(self):
         self.and_the_other_medical_information_is_displayed(
