@@ -48,7 +48,7 @@ def test_post_persona_login(client):
         {"username": "anna_davies", "next": "/some-url"},
     )
     assert response.status_code == 302
-    assert response.headers["location"] == "/clinics/select-provider/?next=%2Fsome-url"
+    assert response.headers["location"] == "/current-provider/select/?next=%2Fsome-url"
 
 
 @pytest.mark.django_db
@@ -202,7 +202,7 @@ class TestCis2Callback:
             response = client.get(reverse("auth:cis2_callback"))
 
             assert response.status_code == 302
-            assert "/clinics/select-provider" in response.headers["location"]
+            assert "/current-provider/select/" in response.headers["location"]
 
             mock_authenticate.assert_called_once_with(
                 ANY, cis2_sub="user-123", cis2_userinfo={"sub": "user-123"}

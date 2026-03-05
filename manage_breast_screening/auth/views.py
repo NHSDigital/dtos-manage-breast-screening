@@ -115,7 +115,7 @@ def cis2_callback(request):
     request.session["login_time"] = now.isoformat()
     request.session["last_activity"] = now.isoformat()
 
-    return redirect(reverse("clinics:select_provider"))
+    return redirect(reverse("select_provider"))
 
 
 @current_provider_exempt

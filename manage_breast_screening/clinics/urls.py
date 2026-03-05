@@ -5,9 +5,6 @@ from . import views
 app_name = "clinics"
 
 urlpatterns = [
-    # Providers
-    path("select-provider/", views.select_provider, name="select_provider"),
-    path("settings/", views.provider_settings, name="settings"),
     # Clinics
     path("", views.list_clinics, name="list_clinics"),
     path(
@@ -63,7 +60,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/appointments/<uuid:appointment_pk>/check-in/",
-        views.check_in,
-        name="check_in",
+        views.check_in_appointment,
+        name="check_in_appointment",
     ),
 ]
