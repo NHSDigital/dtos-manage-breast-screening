@@ -5,11 +5,10 @@ from . import views
 app_name = "clinics"
 
 urlpatterns = [
-    # Provider selection
+    # Providers
     path("select-provider/", views.select_provider, name="select_provider"),
-    # Provider settings
     path("settings/", views.provider_settings, name="settings"),
-    # Clinic list
+    # Clinics
     path("", views.list_clinics, name="list_clinics"),
     path(
         "today/",
@@ -30,7 +29,7 @@ urlpatterns = [
         kwargs={"filter": "completed"},
     ),
     path("all/", views.list_clinics, name="index_all", kwargs={"filter": "all"}),
-    # Clinic show
+    # Clinic appointments
     path("<uuid:pk>/", views.list_clinic_appointments, name="show_clinic"),
     path(
         "<uuid:pk>/appointments/",
