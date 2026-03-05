@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import sys
-from os import environ, getenv
+from os import environ
 from pathlib import Path
 
 from azure.identity import DefaultAzureCredential
@@ -50,6 +50,8 @@ SECRET_KEY = environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = boolean_env("DEBUG", default=False)
 
+DJANGO_ENV = environ.get("DJANGO_ENV", "production")
+
 ALLOWED_HOSTS = list_env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = list_env("CSRF_TRUSTED_ORIGINS")
 
@@ -87,7 +89,7 @@ INSTALLED_APPS = [
     "rules.apps.AutodiscoverRulesConfig",
 ]
 
-if getenv("DJANGO_ENV", "production") != "production":
+if DJANGO_ENV != "production":
     INSTALLED_APPS.append("manage_breast_screening.nonprod")
 
 MIDDLEWARE = [
@@ -185,7 +187,7 @@ DATABASES = {
 }
 
 
-if environ.get("DJANGO_ENV", "production") != "production":
+if DJANGO_ENV != "production":
     if environ.get("BLOB_STORAGE_CONNECTION_STRING"):
         # Use connection string if provided (e.g., in local development using Azurite)
         dicom_storage_options = {
@@ -268,6 +270,7 @@ STATICFILES_DIRS = [BASE_DIR / "static", BASE_DIR / "assets" / "compiled"]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 
+ROOT_LOG_LEVEL = environ.get("LOG_LEVEL", "INFO").upper()
 LOG_QUERIES = boolean_env("LOG_QUERIES")
 LOGGING = {
     "version": 1,  # the dictConfig format version
@@ -288,7 +291,7 @@ LOGGING = {
     },
     "root": {
         "handlers": ["console"],
-        "level": "DEBUG",
+        "level": ROOT_LOG_LEVEL,
     },
     "loggers": {
         "django": {
