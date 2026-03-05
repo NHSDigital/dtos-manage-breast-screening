@@ -72,7 +72,7 @@ def check_in(request, pk, appointment_pk):
         appointment=appointment, current_user=request.user
     ).check_in()
 
-    return redirect("clinics:show", pk=pk)
+    return redirect("clinics:show_clinic", pk=pk)
 
 
 @current_provider_exempt

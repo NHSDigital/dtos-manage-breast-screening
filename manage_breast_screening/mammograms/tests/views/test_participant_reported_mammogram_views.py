@@ -78,7 +78,7 @@ def assert_attended_not_screened_flow(client, appointment):
     assertRedirects(
         response,
         reverse(
-            "clinics:show",
+            "clinics:show_clinic",
             kwargs={"pk": appointment.clinic_slot.clinic.pk},
         ),
     )
@@ -517,7 +517,7 @@ class TestCompleteScreening:
         assertRedirects(
             response,
             reverse(
-                "clinics:show",
+                "clinics:show_clinic",
                 kwargs={"pk": appointment.clinic_slot.clinic.pk},
             ),
         )

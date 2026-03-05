@@ -295,7 +295,8 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "clinics:show", kwargs={"pk": self.appointment.clinic_slot.clinic.pk}
+                "clinics:show_clinic",
+                kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
             )
         )
         self.assert_page_title_contains(

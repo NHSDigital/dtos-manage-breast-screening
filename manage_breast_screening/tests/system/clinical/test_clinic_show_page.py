@@ -137,7 +137,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
     def and_i_am_on_the_clinic_show_page(self):
         self.page.goto(
             self.live_server_url
-            + reverse("clinics:show", kwargs={"pk": self.clinic.pk})
+            + reverse("clinics:show_clinic", kwargs={"pk": self.clinic.pk})
         )
         self.assert_page_title_contains("Routine risk screening clinic")
 

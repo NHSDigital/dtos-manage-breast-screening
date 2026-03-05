@@ -115,7 +115,7 @@ def attended_not_screened(request, appointment_pk):
         appointment, current_user=request.user
     ).mark_attended_not_screened()
 
-    return redirect("clinics:show", pk=appointment.clinic_slot.clinic.pk)
+    return redirect("clinics:show_clinic", pk=appointment.clinic_slot.clinic.pk)
 
 
 class AppointmentProceedAnywayView(
@@ -257,4 +257,4 @@ def complete_screening(request, pk):
         ),
     )
 
-    return redirect("clinics:show", pk=appointment.clinic_slot.clinic.pk)
+    return redirect("clinics:show_clinic", pk=appointment.clinic_slot.clinic.pk)
