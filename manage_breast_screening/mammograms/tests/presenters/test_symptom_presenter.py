@@ -181,3 +181,8 @@ class TestSymptomPresenter:
             presenter.add_message_html
             == '<h3 class="nhsuk-notification-banner__heading">Symptom added</h3><p>Added lump.</p>'
         )
+
+    def test_change_view(self):
+        symptom = SymptomFactory.create(symptom_type_id=SymptomType.BREAST_PAIN)
+        presenter = SymptomPresenter(symptom)
+        assert presenter.change_view() == "mammograms:change_symptom_breast_pain"

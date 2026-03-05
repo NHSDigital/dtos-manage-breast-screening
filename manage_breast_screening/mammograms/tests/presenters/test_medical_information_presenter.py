@@ -108,6 +108,14 @@ class TestRecordMedicalInformationPresenter:
             "text": "Nipple change",
         }
 
+    def test_add_breast_pain_button(self):
+        appointment = AppointmentFactory()
+
+        assert MedicalInformationPresenter(appointment).add_breast_pain_button == {
+            "href": f"/mammograms/{appointment.pk}/record-medical-information/breast-pain/",
+            "text": "Breast pain",
+        }
+
     def test_add_breast_cancer_history_button(self):
         appointment = AppointmentFactory()
 
@@ -499,3 +507,18 @@ class TestSectionPresenter:
             "href": f"/mammograms/{in_progress_appointment.pk}/record-medical-information/mark-reviewed/OTHER_INFORMATION/",
             "text": "Mark as reviewed",
         }
+
+    def test_symptom_buttons(self):
+        appointment = AppointmentFactory()
+        presenter = MedicalInformationPresenter(appointment)
+        buttons = presenter.symptom_buttons
+
+        assert [button["text"] for button in buttons] == [
+            "Lump",
+            "Swelling or shape change",
+            "Skin change",
+            "Nipple change",
+            "Breast pain",
+            "Other",
+        ]
+        assert all(button.get("href") for button in buttons)

@@ -865,6 +865,15 @@ class TestCheckMedicalInformationPresenter:
                 },
             ),
             (
+                "Breast pain (both breasts)",
+                {
+                    "symptom_type_id": SymptomType.BREAST_PAIN,
+                    "symptom_sub_type_details": "user provided details",
+                    "area": SymptomAreas.BOTH_BREASTS,
+                    "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS,
+                },
+            ),
+            (
                 "user provided details (both breasts)",
                 {
                     "symptom_type_id": SymptomType.OTHER,
