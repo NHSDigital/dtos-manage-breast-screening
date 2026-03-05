@@ -58,7 +58,7 @@ class TestCurrentProviderMiddleware:
 
         assert response is not None
         assert response.status_code == 302
-        assert response.url == "/clinics/select-provider/"
+        assert response.url == "/current-provider/select/"
 
     def test_adds_current_provider_to_request_when_in_session(self):
         provider = ProviderFactory(name="Test Provider")

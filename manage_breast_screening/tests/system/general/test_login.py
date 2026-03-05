@@ -97,7 +97,7 @@ class TestLogin(SystemTestCase):
         expect(self.page).to_have_url(re.compile(reverse("clinics:list_clinics")))
 
     def then_i_am_redirected_to_provider_selection(self):
-        expect(self.page).to_have_url(re.compile(reverse("clinics:select_provider")))
+        expect(self.page).to_have_url(re.compile(reverse("select_provider")))
         expect(self.page.get_by_text("Select your provider")).to_be_visible()
         expect(self.page.get_by_label("Provider One")).to_be_visible()
         expect(self.page.get_by_label("Provider Two")).to_be_visible()
