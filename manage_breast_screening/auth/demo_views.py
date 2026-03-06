@@ -33,7 +33,7 @@ def persona_login(request):
         now = timezone.now()
         request.session["login_time"] = now.isoformat()
 
-        redirect_url = reverse("clinics:select_provider")
+        redirect_url = reverse("select_provider")
         if next_path:
             redirect_url = f"{redirect_url}?{urlencode({'next': next_path})}"
 

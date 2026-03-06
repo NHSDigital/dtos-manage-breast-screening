@@ -5,56 +5,62 @@ from . import views
 app_name = "clinics"
 
 urlpatterns = [
-    # Provider selection
-    path("select-provider/", views.select_provider, name="select_provider"),
-    # Provider settings
-    path("settings/", views.provider_settings, name="settings"),
-    # Clinic list
-    path("", views.clinic_list, name="index"),
-    path("today/", views.clinic_list, name="index_today", kwargs={"filter": "today"}),
+    # Clinics
+    path("", views.list_clinics, name="list_clinics"),
+    path(
+        "today/",
+        views.list_clinics,
+        name="list_clinics_today",
+        kwargs={"filter": "today"},
+    ),
     path(
         "upcoming/",
-        views.clinic_list,
-        name="index_upcoming",
+        views.list_clinics,
+        name="list_clinics_upcoming",
         kwargs={"filter": "upcoming"},
     ),
     path(
         "completed/",
-        views.clinic_list,
-        name="index_completed",
+        views.list_clinics,
+        name="list_clinics_completed",
         kwargs={"filter": "completed"},
     ),
-    path("all/", views.clinic_list, name="index_all", kwargs={"filter": "all"}),
-    # Clinic show
-    path("<uuid:pk>/", views.clinic, name="show"),
+    path("all/", views.list_clinics, name="index_all", kwargs={"filter": "all"}),
+    # Clinic appointments
+    path("<uuid:pk>/", views.list_clinic_appointments, name="show_clinic"),
     path(
-        "<uuid:pk>/remaining/",
-        views.clinic,
-        name="show_remaining",
+        "<uuid:pk>/appointments/",
+        views.list_clinic_appointments,
+        name="list_clinic_appointments_all",
+        kwargs={"filter": "all"},
+    ),
+    path(
+        "<uuid:pk>/appointments/remaining/",
+        views.list_clinic_appointments,
+        name="list_clinic_appointments_remaining",
         kwargs={"filter": "remaining"},
     ),
     path(
-        "<uuid:pk>/checked_in/",
-        views.clinic,
-        name="show_checked_in",
+        "<uuid:pk>/appointments/checked_in/",
+        views.list_clinic_appointments,
+        name="list_clinic_appointments_checked_in",
         kwargs={"filter": "checked_in"},
     ),
     path(
-        "<uuid:pk>/in_progress/",
-        views.clinic,
-        name="show_in_progress",
+        "<uuid:pk>/appointments/in_progress/",
+        views.list_clinic_appointments,
+        name="list_clinic_appointments_in_progress",
         kwargs={"filter": "in_progress"},
     ),
     path(
-        "<uuid:pk>/complete/",
-        views.clinic,
-        name="show_complete",
+        "<uuid:pk>/appointments/complete/",
+        views.list_clinic_appointments,
+        name="list_clinic_appointments_complete",
         kwargs={"filter": "complete"},
     ),
-    path("<uuid:pk>/all/", views.clinic, name="show_all", kwargs={"filter": "all"}),
     path(
-        "<uuid:pk>/appointment/<uuid:appointment_pk>/check-in/",
-        views.check_in,
-        name="check_in",
+        "<uuid:pk>/appointments/<uuid:appointment_pk>/check-in/",
+        views.check_in_appointment,
+        name="check_in_appointment",
     ),
 ]

@@ -24,6 +24,7 @@ from django.views.generic.base import RedirectView
 
 from manage_breast_screening.core.decorators import basic_auth_exempt
 
+from ..clinics import views as clinic_views
 from .api import api
 
 handler403 = "manage_breast_screening.core.views.errors.permission_denied"
@@ -65,6 +66,14 @@ urlpatterns = [
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
     ),
     path(
+        "current-provider/select/", clinic_views.select_provider, name="select_provider"
+    ),
+    path(
+        "current-provider/settings/",
+        clinic_views.update_provider_settings,
+        name="update_provider_settings",
+    ),
+    path(
         "clinics/", include("manage_breast_screening.clinics.urls", namespace="clinics")
     ),
     path(
@@ -93,7 +102,7 @@ urlpatterns = [
         "sha",
         sha_view,
     ),
-    path("", RedirectView.as_view(pattern_name="clinics:index"), name="home"),
+    path("", RedirectView.as_view(pattern_name="clinics:list_clinics"), name="home"),
 ]
 
 if settings.DEBUG_TOOLBAR:

@@ -66,7 +66,8 @@ class TestAppointmentListPresenter:
         assert nav_data[0]["label"] == "Remaining"
         assert nav_data[0]["count"] == 5
         expected_remaining_url = reverse(
-            "clinics:show_remaining", kwargs={"pk": clinic_pk, "filter": "remaining"}
+            "clinics:list_clinic_appointments_remaining",
+            kwargs={"pk": clinic_pk, "filter": "remaining"},
         )
         assert nav_data[0]["href"] == expected_remaining_url
         assert not nav_data[0]["current"]
@@ -74,7 +75,8 @@ class TestAppointmentListPresenter:
         assert nav_data[1]["label"] == "Checked in"
         assert nav_data[1]["count"] == 3
         expected_checked_in_url = reverse(
-            "clinics:show_checked_in", kwargs={"pk": clinic_pk, "filter": "checked_in"}
+            "clinics:list_clinic_appointments_checked_in",
+            kwargs={"pk": clinic_pk, "filter": "checked_in"},
         )
         assert nav_data[1]["href"] == expected_checked_in_url
         assert nav_data[1]["current"]
@@ -82,7 +84,7 @@ class TestAppointmentListPresenter:
         assert nav_data[2]["label"] == "In progress"
         assert nav_data[2]["count"] == 2
         expected_in_progress_url = reverse(
-            "clinics:show_in_progress",
+            "clinics:list_clinic_appointments_in_progress",
             kwargs={"pk": clinic_pk, "filter": "in_progress"},
         )
         assert nav_data[2]["href"] == expected_in_progress_url
@@ -91,7 +93,8 @@ class TestAppointmentListPresenter:
         assert nav_data[3]["label"] == "Complete"
         assert nav_data[3]["count"] == 2
         expected_complete_url = reverse(
-            "clinics:show_complete", kwargs={"pk": clinic_pk, "filter": "complete"}
+            "clinics:list_clinic_appointments_complete",
+            kwargs={"pk": clinic_pk, "filter": "complete"},
         )
         assert nav_data[3]["href"] == expected_complete_url
         assert not nav_data[3]["current"]
@@ -99,7 +102,8 @@ class TestAppointmentListPresenter:
         assert nav_data[4]["label"] == "All"
         assert nav_data[4]["count"] == 10
         expected_all_url = reverse(
-            "clinics:show_all", kwargs={"pk": clinic_pk, "filter": "all"}
+            "clinics:list_clinic_appointments_all",
+            kwargs={"pk": clinic_pk, "filter": "all"},
         )
         assert nav_data[4]["href"] == expected_all_url
         assert not nav_data[4]["current"]

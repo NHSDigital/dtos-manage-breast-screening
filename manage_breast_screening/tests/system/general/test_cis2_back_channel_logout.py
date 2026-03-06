@@ -74,7 +74,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
         )
 
         self.login_as_user(self.user)
-        self.page.goto(self.live_server_url + reverse("clinics:index"))
+        self.page.goto(self.live_server_url + reverse("clinics:list_clinics"))
         header = self.page.get_by_role("navigation")
         expect(header.get_by_text("Log out")).to_be_visible()
 
