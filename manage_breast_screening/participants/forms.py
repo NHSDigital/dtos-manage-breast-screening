@@ -1,3 +1,5 @@
+import json
+import logging
 from datetime import date
 
 from django import forms
@@ -10,8 +12,13 @@ from manage_breast_screening.nhsuk_forms.fields import (
 )
 from manage_breast_screening.nhsuk_forms.fields.split_date_field import SplitDateField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
+from manage_breast_screening.participants.services import (
+    convert_bss_batch_to_participants,
+)
 
 from .models import Ethnicity, ParticipantReportedMammogram
+
+logger = logging.getLogger(__name__)
 
 
 class EthnicityForm(forms.Form):
@@ -276,3 +283,13 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         self.participant_reported_mammogram_pk = self.instance.pk
 
         return self.instance
+
+
+class BatchForm(forms.Form):
+    json_file = forms.FileField()
+    description = forms.CharField(max_length=255, required=False)
+
+    def save(self):
+        logger.info("saving form")
+        batch_json = json.load(self.cleaned_data["json_file"])
+        convert_bss_batch_to_participants(batch_json)
