@@ -33,6 +33,7 @@ def convert_bss_batch_to_participants(bss_batch) -> list[Participant]:
     """
     participants = []
     for record in bss_batch["records"]:
+        logger.info(f"Processing record: {record['nhsNumber']}")
         participants.append(
             Participant(
                 nhs_number=record["nhsNumber"],

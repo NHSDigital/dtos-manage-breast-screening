@@ -1,4 +1,3 @@
-import json
 from logging import getLogger
 
 from django.http import Http404
@@ -8,12 +7,9 @@ from django.urls import reverse
 from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
 )
-from manage_breast_screening.participants.services import (
-    convert_bss_batch_to_participants,
-)
 
 from ..participants.models import Appointment
-from .forms import EthnicityForm
+from .forms import BatchForm, EthnicityForm
 from .models import Participant
 
 logger = getLogger(__name__)
@@ -88,12 +84,12 @@ def edit_ethnicity(request, pk):
 
 def upload_bss_batch(request):
     if request.method == "POST":
-        with open(
-            "manage_breast_screening/participants/fixtures/bss_batch.json"
-        ) as file:
-            batch = json.loads(file.read())
-            convert_bss_batch_to_participants(batch)
-        return redirect(reverse("participants:index"))
-    return render(
-        request, "upload_bss_batch.jinja", context={"page_title": "Upload BSS batch"}
-    )
+        form = BatchForm(request.POST, request.FILES)
+        if form.is_valid():
+            logger.info("form is valid")
+            logger.info(form.cleaned_data)
+            form.save()
+            return redirect(reverse("participants:index"))
+    else:
+        form = BatchForm()
+    return render(request, "upload_bss_batch.jinja", {"form": form})
