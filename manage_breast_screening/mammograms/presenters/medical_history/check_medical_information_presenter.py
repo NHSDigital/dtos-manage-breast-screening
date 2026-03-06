@@ -52,6 +52,10 @@ class CheckMedicalInformationPresenter:
         return self.record_medical_information_url + "#symptoms"
 
     @cached_property
+    def other_relevant_information_url(self):
+        return self.record_medical_information_url + "#other-information"
+
+    @cached_property
     def previous_mammograms_action(self):
         has_data = self._previous_mammograms_count > 0
         item = {
@@ -88,6 +92,20 @@ class CheckMedicalInformationPresenter:
             item["visuallyHiddenText"] = "symptoms"
         else:
             item["text"] = "Add symptoms"
+        return {"items": [item]}
+
+    @cached_property
+    def other_relevant_information_action(self):
+        has_data = bool(self.other_relevant_information)
+        item = {
+            "href": self.other_relevant_information_url,
+            "classes": "nhsuk-link--no-visited-state",
+        }
+        if has_data:
+            item["text"] = "View or change"
+            item["visuallyHiddenText"] = "other relevant information"
+        else:
+            item["text"] = "Add other information"
         return {"items": [item]}
 
     @cached_property

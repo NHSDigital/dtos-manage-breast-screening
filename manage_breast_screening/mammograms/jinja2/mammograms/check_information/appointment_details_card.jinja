@@ -16,13 +16,15 @@
   {%- endif %}
 {% endmacro %}
 
-{% macro appointment_note_details(presented_appointment) %}
+{% macro appointment_note_details(presented_appointment, return_url) %}
   {% if presented_appointment.has_appointment_note %}
     {{ presented_appointment.note.content | nl2br }}
-  {%- endif %}
+  {% else %}
+    <a href="{{ presented_appointment.appointment_note_url(return_url) }}" class="nhsuk-link">Enter appointment note</a>
+  {% endif %}
 {% endmacro %}
 
-{% macro appointment_details_card(presented_appointment) %}
+{% macro appointment_details_card(presented_appointment, return_url) %}
   {% call card({
     "heading": "Appointment details",
     "feature": true
@@ -31,11 +33,13 @@
       "rows": [
         {
           "key": { "text": "Special appointment" },
-          "value": {"html": special_appointment_details(presented_appointment) }
+          "value": {"html": special_appointment_details(presented_appointment) },
+          "actions": presented_appointment.special_appointment_action(return_url)
         },
         {
           "key": { "text": "Appointment note" },
-          "value": { "text": appointment_note_details(presented_appointment) }
+          "value": { "html": appointment_note_details(presented_appointment, return_url) },
+          "actions": presented_appointment.appointment_note_action(return_url)
         }
       ]
     }) }}

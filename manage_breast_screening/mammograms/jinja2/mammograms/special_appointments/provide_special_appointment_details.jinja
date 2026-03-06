@@ -8,6 +8,8 @@
 
   {{ form.support_reasons.as_field_group() }}
 
+  <input type="hidden" name="return_url" value="{{ return_url }}">
+
   <div class="nhsuk-button-group">
     {{ button({
       "text": "Continue"

@@ -62,6 +62,8 @@ class TestCheckInformation(SystemTestCase):
         self.then_i_can_change_medical_information()
         self.then_i_can_change_views_taken()
         self.and_i_can_enter_notes_for_reader()
+        self.then_i_can_change_special_appointment()
+        self.then_i_can_change_appointment_note()
 
     def and_there_is_an_appointment_with_information_to_be_checked(self):
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
@@ -103,6 +105,13 @@ class TestCheckInformation(SystemTestCase):
         expect(symptoms_row.get_by_role("link", name="Add symptoms")).to_have_attribute(
             "href", f"{record_medical_info_url}#symptoms"
         )
+
+        other_info_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Other relevant information"
+        )
+        expect(
+            other_info_row.get_by_role("link", name="Add other information")
+        ).to_have_attribute("href", f"{record_medical_info_url}#other-information")
 
     def then_i_can_change_views_taken(self):
         images_taken_heading = self.page.get_by_role("heading").filter(
@@ -148,6 +157,54 @@ class TestCheckInformation(SystemTestCase):
         )
         expect(
             notes_row.get_by_role("link", name="Change notes for reader")
+        ).to_be_visible()
+
+    def then_i_can_change_special_appointment(self):
+        appointment_details_heading = self.page.get_by_role("heading").filter(
+            has_text="Appointment details"
+        )
+        section = self.page.locator(".nhsuk-card").filter(
+            has=appointment_details_heading
+        )
+        special_appointment_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Special appointment"
+        )
+        special_appointment_row.get_by_role(
+            "link", name="Add special appointment"
+        ).click()
+
+        self.page.get_by_label("Language").check()
+        self.page.locator("#id_language_details").fill("Needs interpreter")
+        self.page.get_by_role("button", name="Continue").click()
+
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+        expect(
+            special_appointment_row.get_by_role(
+                "link", name="Change special appointment"
+            )
+        ).to_be_visible()
+
+    def then_i_can_change_appointment_note(self):
+        appointment_details_heading = self.page.get_by_role("heading").filter(
+            has_text="Appointment details"
+        )
+        section = self.page.locator(".nhsuk-card").filter(
+            has=appointment_details_heading
+        )
+        note_row = section.locator(".nhsuk-summary-list__row").filter(
+            has_text="Appointment note"
+        )
+        note_row.get_by_role("link", name="Enter appointment note").click()
+
+        self.page.get_by_label("Note").fill("Test appointment note")
+        self.page.get_by_role("button", name="Save note").click()
+
+        self.expect_url("mammograms:check_information", pk=self.appointment.pk)
+        expect(note_row.locator(".nhsuk-summary-list__value")).to_contain_text(
+            "Test appointment note"
+        )
+        expect(
+            note_row.get_by_role("link", name="Change appointment note")
         ).to_be_visible()
 
     def then_i_can_change_ethnicity_details(self):

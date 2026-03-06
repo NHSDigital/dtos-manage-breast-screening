@@ -20,6 +20,7 @@
 
     <form action="{{ request.path }}" method="POST" novalidate>
       {{ csrf_input }}
+      <input type="hidden" name="return_url" value="{{ return_url }}">
       {{ form.content.as_field_group() }}
 
       <div class="nhsuk-button-group">
