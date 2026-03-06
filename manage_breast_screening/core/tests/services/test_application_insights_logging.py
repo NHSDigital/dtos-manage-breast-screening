@@ -1,0 +1,97 @@
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from manage_breast_screening.core.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
+
+
+@patch(
+    "manage_breast_screening.core.services.application_insights_logging.configure_azure_monitor",
+    return_value=MagicMock(),
+)
+@patch("manage_breast_screening.core.services.application_insights_logging.logging")
+@pytest.mark.skip_insights_mock
+class TestApplicationInsightsLogging:
+    @pytest.fixture(autouse=True)
+    def setup(self, monkeypatch):
+        monkeypatch.setenv("APPLICATIONINSIGHTS_LOGGER_NAME", "insights-logger")
+
+    def test_configures_azure_monitor_when_env_correct(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
+        monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_called_with(logger_name="insights-logger")
+
+    def test_does_not_configure_if_flag_not_enabled(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "False")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_not_called()
+
+    def test_does_not_configure_if_connection_string_not_present(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.delenv("APPLICATIONINSIGHTS_CONNECTION_STRING", False)
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_not_called()
+
+    def test_does_not_configure_if_connection_string_is_empty(
+        self, mock_logging, mock_configure_azure, monkeypatch
+    ):
+        monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
+        monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
+        ApplicationInsightsLogging().configure_azure_monitor()
+        mock_configure_azure.assert_not_called()
+
+    def test_getLogger(self, mock_logging, mock_configure_azure):
+        ApplicationInsightsLogging().getLogger()
+        mock_logging.getLogger.assert_called_with("insights-logger")
+
+    def test_raise_exception(self, mock_logging, mock_configure_azure):
+        ApplicationInsightsLogging().exception("CustomError")
+        mock_logging.getLogger.assert_called_with("insights-logger")
+        mock_logging.getLogger.return_value.exception.assert_called_with(
+            "CustomError", stack_info=True, extra={}
+        )
+
+    def test_raise_exception_with_correlation_id(
+        self, mock_logging, mock_configure_azure
+    ):
+        ApplicationInsightsLogging().exception("CustomError", correlation_id="12345")
+        mock_logging.getLogger.assert_called_with("insights-logger")
+        mock_logging.getLogger.return_value.exception.assert_called_with(
+            "CustomError", stack_info=True, extra={"correlation_id": "12345"}
+        )
+
+    def test_custom_event_warning(self, mock_logging, mock_configure_azure):
+        ApplicationInsightsLogging().custom_event_warning(
+            "something went wrong", "custom-event"
+        )
+        mock_logging.getLogger.assert_called_with("insights-logger")
+        mock_logging.getLogger.return_value.warning.assert_called_with(
+            "something went wrong",
+            extra={
+                "microsoft.custom_event.name": "custom-event",
+                "additional_attrs": "something went wrong",
+            },
+        )
+
+    def test_custom_event_info(self, mock_logging, mock_configure_azure):
+        ApplicationInsightsLogging().custom_event_info(
+            "some information", "custom-event"
+        )
+        mock_logging.getLogger.assert_called_with("insights-logger")
+        mock_logging.getLogger.return_value.info.assert_called_with(
+            "some information",
+            extra={
+                "microsoft.custom_event.name": "custom-event",
+                "additional_attrs": "some information",
+            },
+        )
