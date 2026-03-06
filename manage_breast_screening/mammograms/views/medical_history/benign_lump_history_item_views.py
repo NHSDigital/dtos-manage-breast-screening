@@ -10,9 +10,6 @@ from manage_breast_screening.core.views.generic import (
 from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
 )
-from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
-    BenignLumpHistoryItem,
-)
 
 from ..mixins import MedicalInformationMixin
 
@@ -44,12 +41,13 @@ class UpdateBenignLumpHistoryItemView(MedicalInformationMixin, UpdateWithAuditVi
 
     def get_object(self):
         try:
-            return BenignLumpHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+            return self.appointment.benign_lump_history_items.get(
+                pk=self.kwargs["history_item_pk"]
             )
-        except BenignLumpHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+        except AttributeError:
+            logger.exception(
+                "BenignLumpHistoryItem does not exist for kwargs=%s", self.kwargs
+            )
             return None
 
     def get_delete_url(self):

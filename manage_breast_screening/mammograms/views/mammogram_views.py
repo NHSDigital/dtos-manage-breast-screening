@@ -131,10 +131,10 @@ class AppointmentProceedAnywayView(
 
     def get_object(self):
         try:
-            return ParticipantReportedMammogram.objects.get(
-                pk=self.kwargs["participant_reported_mammogram_pk"],
+            return self.appointment.reported_mammograms.get(
+                pk=self.kwargs["participant_reported_mammogram_pk"]
             )
-        except ParticipantReportedMammogram.DoesNotExist:
+        except AttributeError:
             logger.exception(
                 "ParticipantReportedMammogram does not exist for kwargs=%s", self.kwargs
             )
