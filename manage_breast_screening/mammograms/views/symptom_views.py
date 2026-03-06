@@ -10,6 +10,7 @@ from manage_breast_screening.mammograms.presenters.symptom_presenter import (
 from manage_breast_screening.participants.models.symptom import Symptom, SymptomType
 
 from ..forms.symptom_forms import (
+    BreastPainForm,
     LumpForm,
     NippleChangeForm,
     OtherSymptomForm,
@@ -176,6 +177,16 @@ class AddOtherSymptomView(AddSymptomView):
         return context
 
 
+class AddBreastPainView(AddSymptomView):
+    """
+    Add a symptom: breast pain
+    """
+
+    symptom_type_name = "Breast pain"
+    form_class = BreastPainForm
+    template_name = "mammograms/medical_information/symptoms/forms/breast_pain.jinja"
+
+
 class ChangeLumpView(ChangeSymptomView):
     """
     Change a symptom: lump
@@ -244,6 +255,19 @@ class ChangeOtherSymptomView(ChangeSymptomView):
         context = super().get_context_data()
         context["heading"] = "Symptom details"
         return context
+
+
+class ChangeBreastPainView(ChangeSymptomView):
+    """
+    Change a symptom: breast pain
+    """
+
+    symptom_type_name = "Breast pain"
+    form_class = BreastPainForm
+    template_name = "mammograms/medical_information/symptoms/forms/breast_pain.jinja"
+
+    def extra_filters(self):
+        return {"symptom_type_id": SymptomType.BREAST_PAIN}
 
 
 class DeleteSymptomView(DeleteWithAuditView):

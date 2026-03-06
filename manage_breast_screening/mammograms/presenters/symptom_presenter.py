@@ -165,17 +165,7 @@ class SymptomPresenter:
         return result
 
     def change_view(self):
-        match self._symptom.symptom_type_id:
-            case SymptomType.LUMP:
-                return "mammograms:change_symptom_lump"
-            case SymptomType.SWELLING_OR_SHAPE_CHANGE:
-                return "mammograms:change_symptom_swelling_or_shape_change"
-            case SymptomType.SKIN_CHANGE:
-                return "mammograms:change_symptom_skin_change"
-            case SymptomType.NIPPLE_CHANGE:
-                return "mammograms:change_symptom_nipple_change"
-            case _:
-                return "mammograms:change_symptom_other"
+        return f"mammograms:change_symptom_{self._symptom.symptom_type_id.lower()}"
 
     @property
     def delete_message_html(self):
