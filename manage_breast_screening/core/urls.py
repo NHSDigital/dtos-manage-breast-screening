@@ -79,13 +79,6 @@ urlpatterns = [
         ),
     ),
     path(
-        "notifications/",
-        include(
-            "manage_breast_screening.notifications.urls",
-            namespace="notifications",
-        ),
-    ),
-    path(
         "participants/",
         include("manage_breast_screening.participants.urls", namespace="participants"),
     ),
