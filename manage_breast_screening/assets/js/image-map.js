@@ -13,18 +13,19 @@ export class ImageMap extends ConfigurableComponent {
 
   /**
    * @param {Element | null} $root - HTML element to use for component
-   * @param {Partial<Pick<ImageMapConfig, 'selectors'>>} [config] - Image map config
+   * @param {Partial<Pick<ImageMapConfig, 'imageClass' | 'readOnly' | 'selectors'>>} [config] - Image map config
    */
   constructor($root, config = {}) {
     super($root, config)
 
-    const { selectorsQuery, selectorsFormatted } = this.config
+    const { imageClass, readOnly, selectorsQuery, selectorsFormatted } =
+      this.config
 
-    const $image = this.$root.querySelector('svg')
+    const $image = this.$root.querySelector(`.${imageClass}`)
     if (!$image || !($image instanceof SVGSVGElement)) {
       throw new ElementError({
         component: ImageMap,
-        identifier: 'Image (`<svg>`)'
+        identifier: `Image (\`<svg class="${imageClass}">\`)`
       })
     }
 
@@ -43,9 +44,11 @@ export class ImageMap extends ConfigurableComponent {
     this.$paths = Array.from($paths).reverse()
     this.$image = $image
 
-    this.$image.addEventListener('mousemove', this.onMouseMove.bind(this))
-    this.$image.addEventListener('mouseleave', this.onMouseLeave.bind(this))
-    this.$image.addEventListener('click', this.onClick.bind(this))
+    if (!readOnly) {
+      this.$image.addEventListener('mousemove', this.onMouseMove.bind(this))
+      this.$image.addEventListener('mouseleave', this.onMouseLeave.bind(this))
+      this.$image.addEventListener('click', this.onClick.bind(this))
+    }
   }
 
   /**
@@ -65,6 +68,14 @@ export class ImageMap extends ConfigurableComponent {
     }
   }
 
+  get width() {
+    return this.$image.viewBox.baseVal.width
+  }
+
+  get height() {
+    return this.$image.viewBox.baseVal.height
+  }
+
   get onUpdate() {
     return this.onUpdateHandler ?? (() => undefined)
   }
@@ -77,40 +88,62 @@ export class ImageMap extends ConfigurableComponent {
   }
 
   /**
-   * Set state to active path only
+   * Set image map region state
    *
    * - If state is 'active', multiple paths can be active
    * - If state is 'highlight', only one path can be active
    *
-   * @param {ImageMapState} state - State to set, e.g. 'highlight'
-   * @param {ImageMapRegion | undefined} [region] - Image map region
-   * @param {ImageMapStateCallback | null} [callback] - Set state callback
+   * @param {ImageMapRegion | undefined} region - Image map region
+   * @param {ImageMapState} state - State updated, e.g. 'highlight', 'active'
+   * @param {boolean} [value] - Set state value
    */
-  setState(state, region, callback = this.onUpdate) {
+  setState(region, state, value = true) {
     for (const $path of this.$paths) {
-      if ($path === region?.$path) {
-        $path.setAttribute(`data-${state}`, 'true')
-      } else if (state === 'highlight') {
+      if ($path === region?.$path && value) {
+        $path.setAttribute(`data-${state}`, `${value}`)
+      } else if (($path === region?.$path && !value) || state === 'highlight') {
         $path.removeAttribute(`data-${state}`)
       }
     }
 
-    callback?.(state, region)
+    this.onUpdate(region, state, value)
   }
 
   /**
    * Get image map region at SVG point
    *
-   * @param {SVGGeometryElement} [$path] - SVG path at pointer coordinates
-   * @param {DOMPoint} [point] - SVG point at pointer coordinates
+   * @overload
+   * @param {SVGGeometryElement} $path - SVG path at pointer coordinates
+   * @param {DOMPoint} point - SVG point at pointer coordinates
+   * @returns {ImageMapRegion}
+   */
+
+  /**
+   * @overload
+   * @param {SVGGeometryElement | undefined} $path - SVG path at pointer coordinates
+   * @param {DOMPoint} point - SVG point at pointer coordinates
    * @returns {ImageMapRegion | undefined}
    */
-  createRegion($path, point) {
-    const id = $path?.classList.value
-    const label = $path?.querySelector('title')?.textContent
 
-    if (!$path || !point || !id || !label) {
+  /**
+   * @param {SVGGeometryElement | undefined} $path - SVG path at pointer coordinates
+   * @param {DOMPoint} point - SVG point at pointer coordinates
+   */
+  createRegion($path, point) {
+    if (!$path) {
       return
+    }
+
+    const id = $path.classList.value
+    const label = $path.querySelector('title')?.textContent
+
+    if (!id || !label) {
+      throw new ElementError({
+        component: ImageMap,
+        identifier: id
+          ? 'Image path or polygon (`<title>`)'
+          : 'Image path or polygon attribute (`class`)'
+      })
     }
 
     return {
@@ -139,10 +172,18 @@ export class ImageMap extends ConfigurableComponent {
    * Get SVG path by ID
    *
    * @param {string} id - SVG path ID specified in path class attribute
-   * @returns {SVGGeometryElement | undefined}
    */
   getPathById(id) {
-    return this.$paths.find(($path) => $path.classList.value === id)
+    const $path = this.$paths.find(($path) => $path.classList.value === id)
+
+    if (!$path) {
+      throw new ElementError({
+        component: ImageMap,
+        identifier: `Image path or polygon (\`class="${id}"\`)`
+      })
+    }
+
+    return $path
   }
 
   /**
@@ -186,7 +227,7 @@ export class ImageMap extends ConfigurableComponent {
     if (!$path || $path !== this.getPathById(id)) {
       throw new ElementError({
         component: ImageMap,
-        identifier: `Image path or polygon by ID (\`${id}\`) with SVG point (${pointX}, ${pointY})`
+        identifier: `Image path or polygon (\`class="${id}"\`) with SVG point (${pointX}, ${pointY})`
       })
     }
 
@@ -203,11 +244,11 @@ export class ImageMap extends ConfigurableComponent {
     const $path = this.getPath(point)
     const region = this.createRegion($path, point)
 
-    this.setState('highlight', region)
+    this.setState(region, 'highlight')
   }
 
   onMouseLeave() {
-    this.setState('highlight')
+    this.setState(undefined, 'highlight', false)
   }
 
   /**
@@ -222,7 +263,7 @@ export class ImageMap extends ConfigurableComponent {
     const $path = this.getPath(point)
     const region = this.createRegion($path, point)
 
-    this.setState('active', region)
+    this.setState(region, 'active')
   }
 
   /**
@@ -238,6 +279,8 @@ export class ImageMap extends ConfigurableComponent {
    * @type {ImageMapConfig}
    */
   static defaults = Object.freeze({
+    imageClass: 'nhsuk-image__img',
+    readOnly: false,
     selectors: ['path', 'polygon'],
     selectorsQuery: '',
     selectorsFormatted: ''
@@ -251,6 +294,8 @@ export class ImageMap extends ConfigurableComponent {
    */
   static schema = Object.freeze({
     properties: {
+      imageClass: { type: 'string' },
+      readOnly: { type: 'boolean' },
       selectors: { type: 'array' },
       selectorsQuery: { type: 'string' },
       selectorsFormatted: { type: 'string' }
@@ -263,6 +308,8 @@ export class ImageMap extends ConfigurableComponent {
  *
  * @see {@link ImageMap.defaults}
  * @typedef {object} ImageMapConfig
+ * @property {string} imageClass - Image class
+ * @property {boolean} readOnly - Whether image map is read only
  * @property {string[]} selectors - Image map region selectors
  * @property {string} selectorsQuery - Image map region selectors (for DOM query selector)
  * @property {string} selectorsFormatted - Image map region selectors (formatted for error messages)
@@ -288,8 +335,9 @@ export class ImageMap extends ConfigurableComponent {
  * Image map state callback
  *
  * @callback ImageMapStateCallback
- * @param {ImageMapState} state - State to set, e.g. 'highlight'
- * @param {ImageMapRegion} [region] - Image map region
+ * @param {ImageMapRegion | undefined} region - Image map region
+ * @param {ImageMapState} state - State updated, e.g. 'highlight', 'active'
+ * @param {boolean} value - Whether state is being set or unset
  * @returns {void}
  */
 

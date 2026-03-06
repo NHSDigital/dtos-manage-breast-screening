@@ -1,25 +1,47 @@
 import { BreastDiagram } from './breast-diagram.js'
 import { ImageMap } from './image-map.js'
 
-jest.mock('./image-map')
+jest.mock('./image-map', () => {
+  const { Component } = jest.requireActual('nhsuk-frontend')
 
-// Mock out ImageMap so it always returns this dummy region
+  return {
+    ImageMap: class MockImageMap extends Component {
+      static moduleName = 'app-image-map'
+    }
+  }
+})
+
+/**
+ * Mock SVG point
+ *
+ * @type {DOMPoint}
+ */
+const dummyPoint = {
+  x: 0,
+  y: 0,
+  w: null,
+  z: null,
+  matrixTransform: jest.fn(),
+  toJSON: jest.fn()
+}
+
+/**
+ * Mock image map region
+ *
+ * @type {ImageMapRegion}
+ */
 const dummyRegion = {
   id: '123',
   label: 'abc',
-  point: {
-    x: 0,
-    y: 0,
-    w: null,
-    z: null,
-    matrixTransform: jest.fn(),
-    toJSON: jest.fn()
-  },
+  point: dummyPoint,
   $path: null
 }
 
 beforeEach(() => {
+  ImageMap.prototype.createPoint = jest.fn().mockReturnValue(dummyPoint)
   ImageMap.prototype.createRegion = jest.fn().mockReturnValue(dummyRegion)
+  ImageMap.prototype.getPathById = jest.fn().mockReturnValue(null)
+  ImageMap.prototype.setState = jest.fn()
 })
 
 describe('Breast diagram', () => {
@@ -69,7 +91,7 @@ describe('Breast diagram', () => {
 
     const diagram = new BreastDiagram($root)
 
-    diagram.onUpdate('active', dummyRegion)
+    diagram.onUpdate(dummyRegion, 'active', true)
 
     expect(diagram.features).toEqual([
       {
@@ -94,3 +116,7 @@ describe('Breast diagram', () => {
     expect($input.value).toBe('[{"x":0,"y":0,"name":"Pending","id":"abc"}]')
   })
 })
+
+/**
+ * @import { ImageMapRegion } from './image-map.js'
+ */
