@@ -3,7 +3,7 @@ from logging import getLogger
 
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+from manage_breast_screening.core.services.command_handler import (
     CommandHandler,
 )
 from manage_breast_screening.notifications.services.blob_storage import BlobStorage

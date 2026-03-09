@@ -2,11 +2,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
-    CommandHandler,
-)
-from manage_breast_screening.notifications.services.application_insights_logging import (
+from manage_breast_screening.core.services.application_insights_logging import (
     ApplicationInsightsLogging,
+)
+from manage_breast_screening.core.services.command_handler import (
+    CommandHandler,
 )
 
 

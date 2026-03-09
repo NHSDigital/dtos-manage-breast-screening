@@ -4,15 +4,15 @@ from datetime import datetime
 
 from requests import Response
 
+from manage_breast_screening.core.services.application_insights_logging import (
+    ApplicationInsightsLogging,
+)
 from manage_breast_screening.notifications.models import (
     ZONE_INFO,
     Message,
     MessageBatch,
     MessageBatchStatusChoices,
     MessageStatusChoices,
-)
-from manage_breast_screening.notifications.services.application_insights_logging import (
-    ApplicationInsightsLogging,
 )
 
 logger = logging.getLogger(__name__)

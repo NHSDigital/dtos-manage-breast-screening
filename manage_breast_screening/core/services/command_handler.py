@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from django.core.management.base import CommandError
 
-from manage_breast_screening.notifications.services.application_insights_logging import (
+from manage_breast_screening.core.services.application_insights_logging import (
     ApplicationInsightsLogging,
 )
 
