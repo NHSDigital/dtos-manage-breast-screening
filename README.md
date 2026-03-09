@@ -109,15 +109,9 @@ This command wipes the database entirely before populating it with fictitious da
 
 ### Django admin
 
-We'll probably remove it before deploying to production, but currently Django admin is enabled.
+We'll probably remove it before deploying to production, but currently Django admin is enabled at `http://localhost:8000/admin`
 
-To use it, first create a superuser
-
-```sh
-poetry run ./manage.py createsuperuser
-```
-
-Then run the app and navigate to `http://localhost:8000/admin`
+You must be logged in as a superuser to access it.
 
 ## Design
 
