@@ -10,6 +10,7 @@ class SymptomType(ReferenceDataModel):
     SWELLING_OR_SHAPE_CHANGE = "SWELLING_OR_SHAPE_CHANGE"
     SKIN_CHANGE = "SKIN_CHANGE"
     NIPPLE_CHANGE = "NIPPLE_CHANGE"
+    BREAST_PAIN = "BREAST_PAIN"
     OTHER = "OTHER"
 
     name = models.CharField(null=False, blank=False)

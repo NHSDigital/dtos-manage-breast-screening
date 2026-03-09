@@ -10,6 +10,7 @@ from manage_breast_screening.participants.models.symptom import (
     SkinChangeChoices,
     Symptom,
     SymptomAreas,
+    SymptomType,
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
@@ -442,6 +443,95 @@ class TestChangeOtherSymptomView:
             reverse(
                 "mammograms:record_medical_information",
                 kwargs={"pk": other_symptom.appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestAddBreastPainView:
+    def test_renders_response(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:add_symptom_breast_pain",
+                kwargs={"pk": appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_symptom_breast_pain",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+
+@pytest.mark.django_db
+class TestChangeBreastPainView:
+    @pytest.fixture
+    def breast_pain(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        return SymptomFactory.create(
+            symptom_type_id=SymptomType.BREAST_PAIN, appointment=appointment
+        )
+
+    def test_renders_response(self, clinical_user_client, breast_pain):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:change_symptom_breast_pain",
+                kwargs={
+                    "pk": breast_pain.appointment.pk,
+                    "symptom_pk": breast_pain.pk,
+                },
+            )
+        )
+        assert response.status_code == 200
+
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, breast_pain
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_symptom_breast_pain",
+                kwargs={
+                    "pk": breast_pain.appointment.pk,
+                    "symptom_pk": breast_pain.pk,
+                },
+            ),
+            {
+                "area": SymptomAreas.RIGHT_BREAST.value,
+                "area_description_right_breast": "uiq",
+                "when_started": RelativeDateChoices.LESS_THAN_THREE_MONTHS.value,
+                "investigated": YesNo.NO.value,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": breast_pain.appointment.pk},
             ),
         )
 
