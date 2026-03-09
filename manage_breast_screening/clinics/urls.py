@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import participant_csv_upload_view, views
 
 app_name = "clinics"
 
@@ -62,5 +62,10 @@ urlpatterns = [
         "<uuid:pk>/appointments/<uuid:appointment_pk>/check-in/",
         views.check_in_appointment,
         name="check_in_appointment",
+    ),
+    path(
+        "<uuid:pk>/upload/",
+        participant_csv_upload_view.ParticipantCsvUploadView.as_view(),
+        name="participant_csv_upload",
     ),
 ]
