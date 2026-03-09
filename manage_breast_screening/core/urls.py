@@ -16,6 +16,7 @@ Including another URLconf
 """
 
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.auth.decorators import login_not_required
 from django.http import HttpResponse
 from django.urls import include, path
@@ -59,6 +60,7 @@ def robots_txt(request):
 
 
 urlpatterns = [
+    path("admin/", admin.site.urls),
     path("robots.txt", robots_txt),
     path("api/v1/", api.urls),
     path(

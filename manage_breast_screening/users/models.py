@@ -91,3 +91,6 @@ class User(AbstractBaseUser):
 
     def has_perms(self, perm_list, obj=None):
         return all(self.has_perm(perm, obj=obj) for perm in perm_list)
+
+    def has_module_perms(self, package_name, obj=None):
+        return self.is_sysadmin
