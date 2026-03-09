@@ -12,7 +12,7 @@ from .models import (
 )
 
 
-class AddressInline(admin.TabularInline):
+class AddressInline(admin.StackedInline):
     model = ParticipantAddress
 
 
@@ -26,8 +26,15 @@ class SymptomInline(admin.StackedInline):
     extra = 0
 
 
+class ScreeningEpisodeInline(admin.StackedInline):
+    model = ScreeningEpisode
+    fields = ["protocol", "created_at"]
+    readonly_fields = ["created_at"]
+    extra = 0
+
+
 class ParticipantAdmin(admin.ModelAdmin):
-    inlines = [AddressInline]
+    inlines = [AddressInline, ScreeningEpisodeInline]
 
     list_display = ["full_name"]
 
@@ -54,14 +61,5 @@ class AppointmentAdmin(admin.ModelAdmin):
         return obj.screening_episode.participant.full_name
 
 
-class ScreeningEpisodeAdmin(admin.ModelAdmin):
-    list_display = ["name", "created_at", "protocol"]
-
-    @admin.display()
-    def name(self, obj):
-        return obj.participant.full_name
-
-
 admin_site.register(Participant, ParticipantAdmin)
 admin_site.register(Appointment, AppointmentAdmin)
-admin_site.register(ScreeningEpisode, ScreeningEpisodeAdmin)

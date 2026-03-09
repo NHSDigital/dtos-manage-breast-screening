@@ -67,3 +67,6 @@ class ParticipantAddress(models.Model):
     )
     lines = ArrayField(models.CharField(), size=5, blank=True)
     postcode = models.CharField(blank=True, null=True)
+
+    def __str__(self):
+        return ", ".join(self.lines + [self.postcode] if self.postcode else [])

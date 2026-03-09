@@ -1,6 +1,7 @@
 from django.db import models
 
 from ...core.models import BaseModel
+from ...core.utils.date_formatting import format_date_time
 
 
 class ScreeningEpisode(BaseModel):
@@ -40,3 +41,6 @@ class ScreeningEpisode(BaseModel):
             return self.screening_history()[0]
         except IndexError:
             return None
+
+    def __str__(self):
+        return f"{self.participant.full_name} - screening episode created at {format_date_time(self.created_at)}"
