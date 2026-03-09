@@ -7,8 +7,8 @@ from django.test import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML
 
-from manage_breast_screening.auth.models import PERSONAS, Role
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
+from manage_breast_screening.users.models import PERSONAS, Role
 
 
 @pytest.fixture(autouse=True)
