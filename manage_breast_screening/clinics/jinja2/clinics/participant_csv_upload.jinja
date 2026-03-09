@@ -1,0 +1,37 @@
+{% extends "layout-app.jinja" %}
+{% from "django_form_helpers.jinja" import form_error_summary %}
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+
+{% block page_content %}
+    {{ form_error_summary(form) }}
+
+    <h1 class="nhsuk-heading-l app-header">
+        <span class="nhsuk-caption-l">{{ presented_clinic.setting_name }}</span>
+        Upload participant data
+        <div class="app-header__status-tag">
+            {{ tag({
+                "html": presented_clinic.state.text | no_wrap,
+                "classes": presented_clinic.state.classes,
+            })}}
+        </div>
+    </h1>
+    <p>{{ presented_clinic.time_range }} - {{ presented_clinic.starts_at }}</p>
+
+    <form method="post" enctype="multipart/form-data" novalidate>
+        {{ csrf_input }}
+
+        <div class="nhsuk-form-group {% if form.csv_file.errors %}nhsuk-form-group--error{% endif %}">
+            <label class="nhsuk-label" for="{{ form.csv_file.id_for_label }}">
+                Select CSV file to upload
+            </label>
+            <input class="nhsuk-input" type="file" name="csv_file" id="{{ form.csv_file.id_for_label }}" accept=".csv">
+            {% if form.csv_file.errors %}
+                <span class="nhsuk-error-message">
+                    <span class="nhsuk-u-visually-hidden">Error:</span> {{ form.csv_file.errors.0 }}
+                </span>
+            {% endif %}
+        </div>
+
+        <button class="nhsuk-button" type="submit">Upload</button>
+    </form>
+{% endblock %}

@@ -54,6 +54,16 @@ def clinical_user(current_provider):
 
 
 @pytest.fixture
+def superuser(current_provider):
+    user = UserFactory.create(nhs_uid="superuser1", is_superuser=True)
+    assignment = UserAssignmentFactory.create(
+        user=user, administrative=True, provider=current_provider
+    )
+    assignment.make_current()
+    return user
+
+
+@pytest.fixture
 def clinical_user_client(clinical_user, current_provider):
     client = Client()
     force_mbs_login(client, clinical_user)
@@ -74,4 +84,16 @@ def administrative_user_client(administrative_user, current_provider):
     session.save()
     return SimpleNamespace(
         http=client, current_provider=current_provider, user=administrative_user
+    )
+
+
+@pytest.fixture
+def superuser_client(superuser, current_provider):
+    client = Client()
+    force_mbs_login(client, superuser)
+    session = client.session
+    session["current_provider"] = str(current_provider.pk)
+    session.save()
+    return SimpleNamespace(
+        http=client, current_provider=current_provider, user=superuser
     )
