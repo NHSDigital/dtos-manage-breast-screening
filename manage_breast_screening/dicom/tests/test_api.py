@@ -1,6 +1,6 @@
 import io
 import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pydicom
 import pytest
@@ -129,6 +129,21 @@ def test_upload_missing_uids(dataset, monkeypatch):
         response.json()["detail"]
         == "The DICOM file is missing required UID attributes."
     )
+
+
+def test_upload_appointment_not_in_progress(dicom_file, monkeypatch):
+    monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
+
+    with patch.object(DicomRecorder, "appointment_in_progress", return_value=False):
+        response = client.put(
+            "/dicom/abc123",
+            FILES={"file": dicom_file},
+            headers={"Authorization": "Bearer " + os.getenv("API_AUTH_TOKEN", "")},
+        )
+
+        assert response.status_code == 500
+        assert response.json()["title"] == "Internal Server Error"
 
 
 @pytest.mark.django_db
