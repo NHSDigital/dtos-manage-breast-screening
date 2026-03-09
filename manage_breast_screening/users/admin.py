@@ -1,5 +1,5 @@
-from django.contrib import admin
+from manage_breast_screening.core.admin import admin_site
 
 from .models import User
 
-admin.site.register(User)
+admin_site.register(User)

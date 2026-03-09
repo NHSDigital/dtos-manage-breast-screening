@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from manage_breast_screening.core.admin import admin_site
+
 from .models import (
     Appointment,
     Participant,
@@ -84,8 +86,8 @@ class ScreeningEpisodeAdmin(admin.ModelAdmin):
         return obj.participant.full_name
 
 
-admin.site.register(Participant, ParticipantAdmin)
-admin.site.register(Appointment, AppointmentAdmin)
-admin.site.register(ScreeningEpisode, ScreeningEpisodeAdmin)
-admin.site.register(SymptomType, SymptomTypeAdmin)
-admin.site.register(SymptomSubType, SymptomSubTypeAdmin)
+admin_site.register(Participant, ParticipantAdmin)
+admin_site.register(Appointment, AppointmentAdmin)
+admin_site.register(ScreeningEpisode, ScreeningEpisodeAdmin)
+admin_site.register(SymptomType, SymptomTypeAdmin)
+admin_site.register(SymptomSubType, SymptomSubTypeAdmin)

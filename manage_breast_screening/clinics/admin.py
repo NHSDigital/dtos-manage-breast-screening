@@ -1,5 +1,7 @@
 from django.contrib import admin
 
+from manage_breast_screening.core.admin import admin_site
+
 from .models import Clinic, ClinicSlot, Provider, Setting
 
 
@@ -14,7 +16,7 @@ class ClinicAdmin(admin.ModelAdmin):
     current_status_display.short_description = "Current Status"
 
 
-admin.site.register(Clinic, ClinicAdmin)
-admin.site.register(ClinicSlot)
-admin.site.register(Provider)
-admin.site.register(Setting)
+admin_site.register(Clinic, ClinicAdmin)
+admin_site.register(ClinicSlot)
+admin_site.register(Provider)
+admin_site.register(Setting)
