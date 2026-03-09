@@ -61,5 +61,10 @@ class AppointmentAdmin(admin.ModelAdmin):
         return obj.screening_episode.participant.full_name
 
 
+class ScreeningEpisodeAdmin(admin.ModelAdmin):
+    ordering = ["participant__first_name", "participant__last_name", "created_at"]
+
+
 admin_site.register(Participant, ParticipantAdmin)
 admin_site.register(Appointment, AppointmentAdmin)
+admin_site.register(ScreeningEpisode, ScreeningEpisodeAdmin)

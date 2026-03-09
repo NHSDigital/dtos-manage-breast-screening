@@ -31,5 +31,10 @@ class ProviderAdmin(admin.ModelAdmin):
     inlines = [SettingInline]
 
 
+class ClinicSlotAdmin(admin.ModelAdmin):
+    ordering = ["clinic__setting__name", "starts_at"]
+
+
 admin_site.register(Clinic, ClinicAdmin)
+admin_site.register(ClinicSlot, ClinicSlotAdmin)
 admin_site.register(Provider, ProviderAdmin)
