@@ -67,6 +67,7 @@ PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 
 INSTALLED_APPS = [
     "django.contrib.admin",
+    "manage_breast_screening.users",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.postgres",
@@ -78,7 +79,6 @@ INSTALLED_APPS = [
     "django_linear_migrations",
     "manage_breast_screening.core",
     "manage_breast_screening.auth",
-    "manage_breast_screening.users",
     "manage_breast_screening.clinics",
     "manage_breast_screening.dicom",
     "manage_breast_screening.nhsuk_forms",
