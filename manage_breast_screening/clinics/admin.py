@@ -5,7 +5,13 @@ from manage_breast_screening.core.admin import admin_site
 from .models import Clinic, ClinicSlot, Provider, Setting
 
 
+class ClinicSlotInline(admin.StackedInline):
+    model = ClinicSlot
+    extra = 5
+
+
 class ClinicAdmin(admin.ModelAdmin):
+    inlines = [ClinicSlotInline]
     readonly_fields = [
         "current_status_display",
     ]
@@ -17,6 +23,5 @@ class ClinicAdmin(admin.ModelAdmin):
 
 
 admin_site.register(Clinic, ClinicAdmin)
-admin_site.register(ClinicSlot)
 admin_site.register(Provider)
 admin_site.register(Setting)
