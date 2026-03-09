@@ -87,10 +87,15 @@ class User(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         if not self.is_active:
             return False
-        return rules.has_perm(perm, self, obj)
+        return rules.has_perm(perm, self, obj) or self.is_sysadmin
 
     def has_perms(self, perm_list, obj=None):
         return all(self.has_perm(perm, obj=obj) for perm in perm_list)
 
     def has_module_perms(self, package_name, obj=None):
-        return self.is_sysadmin
+        """
+        Check permissions at a module level, instead of using granular permissions.
+
+        This is required to use Django admin.
+        """
+        return self.has_perm(package_name) or self.is_sysadmin
