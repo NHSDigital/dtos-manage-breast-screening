@@ -200,5 +200,7 @@ class TestMammogramWorkflow(SystemTestCase):
         self.page.get_by_text("Complete screening and return to clinic").click()
 
     def then_i_should_be_back_on_the_clinic(self):
-        self.expect_url("clinics:show", pk=self.appointment.clinic_slot.clinic.pk)
+        self.expect_url(
+            "clinics:show_clinic", pk=self.appointment.clinic_slot.clinic.pk
+        )
         self.assert_page_title_contains("Routine risk screening clinic")

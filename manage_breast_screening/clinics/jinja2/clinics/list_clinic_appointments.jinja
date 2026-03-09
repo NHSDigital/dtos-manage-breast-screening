@@ -12,7 +12,7 @@
 
 {% block beforeContent %}
 {{ backLink({
-  "href": url('clinics:index'),
+  "href": url('clinics:list_clinics'),
   "text": "Clinics"
 }) }}
 {% endblock beforeContent %}
@@ -87,7 +87,7 @@
       {{ app_check_in(
         presented_appointment,
         check_in_url=url(
-          'clinics:check_in',
+          'clinics:check_in_appointment',
            kwargs={
             'pk': presented_clinic.pk,
             'appointment_pk': presented_appointment.pk,

@@ -13,19 +13,19 @@ from manage_breast_screening.mammograms.services.appointment_services import (
 from ..core.decorators import current_provider_exempt
 from ..core.utils.relative_redirects import extract_relative_redirect_url
 from ..participants.models import Appointment
-from .forms import ProviderSettingsForm
+from .forms import UpdateProviderSettingsForm
 from .models import Clinic, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 
 
-def clinic_list(request, filter="today"):
+def list_clinics(request, filter="today"):
     provider = request.user.current_provider
     clinics = provider.clinics.by_filter(filter).prefetch_related("setting")
     counts_by_filter = Clinic.filter_counts(provider.pk)
     presenter = ClinicsPresenter(clinics, filter, counts_by_filter)
     return render(
         request,
-        "clinics/index.jinja",
+        "clinics/list_clinics.jinja",
         context={
             "presenter": presenter,
             "page_title": presenter.heading,
@@ -34,7 +34,7 @@ def clinic_list(request, filter="today"):
     )
 
 
-def clinic(request, pk, filter="remaining"):
+def list_clinic_appointments(request, pk, filter="remaining"):
     provider = request.user.current_provider
     clinic = provider.clinics.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
@@ -51,7 +51,7 @@ def clinic(request, pk, filter="remaining"):
     )
     return render(
         request,
-        "clinics/show.jinja",
+        "clinics/list_clinic_appointments.jinja",
         context={
             "presented_clinic": presented_clinic,
             "presented_appointment_list": presented_appointment_list,
@@ -61,7 +61,7 @@ def clinic(request, pk, filter="remaining"):
 
 
 @require_http_methods(["POST"])
-def check_in(request, pk, appointment_pk):
+def check_in_appointment(request, pk, appointment_pk):
     provider = request.user.current_provider
     try:
         appointment = provider.appointments.get(pk=appointment_pk)
@@ -72,7 +72,7 @@ def check_in(request, pk, appointment_pk):
         appointment=appointment, current_user=request.user
     ).check_in()
 
-    return redirect("clinics:show", pk=pk)
+    return redirect("clinics:show_clinic", pk=pk)
 
 
 @current_provider_exempt
@@ -87,7 +87,7 @@ def select_provider(request):
         request.session["current_provider"] = str(user_providers.first().pk)
         if next_path:
             return redirect(next_path)
-        return redirect("clinics:index")
+        return redirect("clinics:list_clinics")
 
     if request.method == "POST":
         provider_id = request.POST.get("provider")
@@ -95,7 +95,7 @@ def select_provider(request):
             request.session["current_provider"] = provider_id
             if next_path:
                 return redirect(next_path)
-            return redirect("clinics:index")
+            return redirect("clinics:list_clinics")
 
     return render(
         request,
@@ -110,22 +110,22 @@ def select_provider(request):
 
 @require_http_methods(["GET", "POST"])
 @permission_required(Permission.MANAGE_PROVIDER_SETTINGS, raise_exception=True)
-def provider_settings(request):
+def update_provider_settings(request):
     provider = request.user.current_provider
     config = provider.get_config()
 
     if request.method == "POST":
-        form = ProviderSettingsForm(request.POST, instance=config)
+        form = UpdateProviderSettingsForm(request.POST, instance=config)
         if form.is_valid():
             form.save()
             messages.success(request, "Settings saved successfully.")
-            return redirect("clinics:settings")
+            return redirect("update_provider_settings")
     else:
-        form = ProviderSettingsForm(instance=config)
+        form = UpdateProviderSettingsForm(instance=config)
 
     return render(
         request,
-        "clinics/provider_settings.jinja",
+        "clinics/update_provider_settings.jinja",
         context={
             "form": form,
             "provider": provider,

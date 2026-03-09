@@ -46,7 +46,7 @@ class CurrentProviderMiddleware:
         if is_current_provider_exempt(view_func):
             return None
 
-        return redirect(reverse("clinics:select_provider"))
+        return redirect(reverse("select_provider"))
 
     def _add_current_provider_property(self, request: HttpRequest) -> None:
         """Add current_provider attribute to request.user.

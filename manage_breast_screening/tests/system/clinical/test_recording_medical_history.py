@@ -383,7 +383,7 @@ class TestRecordingMedicalInformation(SystemTestCase):
 
     def then_i_should_be_on_the_clinic_page(self):
         path = reverse(
-            "clinics:show_in_progress",
+            "clinics:list_clinic_appointments_in_progress",
             kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
         )
         expect(self.page).to_have_url(re.compile(path))

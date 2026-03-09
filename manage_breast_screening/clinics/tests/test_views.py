@@ -17,7 +17,7 @@ class TestSelectProvider:
         force_mbs_login(client, user)
 
         response = client.get(
-            reverse("clinics:select_provider"), {"next": "/clinics/some-target/"}
+            reverse("select_provider"), {"next": "/clinics/some-target/"}
         )
 
         assert response.status_code == 302
@@ -35,7 +35,7 @@ class TestSelectProvider:
         force_mbs_login(client, user)
 
         response = client.post(
-            reverse("clinics:select_provider"),
+            reverse("select_provider"),
             {"provider": provider2.pk, "next": "/clinics/other-target/"},
         )
 
@@ -52,12 +52,12 @@ class TestSelectProvider:
         force_mbs_login(client, user)
 
         response = client.post(
-            reverse("clinics:select_provider"),
+            reverse("select_provider"),
             {"provider": provider.pk, "next": "http://evil.com"},
         )
 
         assert response.status_code == 302
-        assert response.headers["location"] == reverse("clinics:index")
+        assert response.headers["location"] == reverse("clinics:list_clinics")
 
     @pytest.mark.django_db
     def test_excludes_providers_with_no_roles(self, client):
@@ -67,7 +67,7 @@ class TestSelectProvider:
 
         force_mbs_login(client, user)
 
-        response = client.get(reverse("clinics:select_provider"))
+        response = client.get(reverse("select_provider"))
 
         assert response.status_code == 200
         assert "Your account is not recognised" in response.text
@@ -89,7 +89,7 @@ class TestProviderSettings:
 
         login_with_provider(client, user, provider)
 
-        response = client.get(reverse("clinics:settings"))
+        response = client.get(reverse("update_provider_settings"))
 
         assert response.status_code == 403
         assert "You do not have permission" in response.text
@@ -102,7 +102,7 @@ class TestProviderSettings:
 
         login_with_provider(client, user, provider)
 
-        response = client.get(reverse("clinics:settings"))
+        response = client.get(reverse("update_provider_settings"))
 
         assert response.status_code == 200
         assert "Settings" in response.text
@@ -115,7 +115,7 @@ class TestProviderSettings:
 
         login_with_provider(client, user, provider)
 
-        response = client.get(reverse("clinics:settings"))
+        response = client.get(reverse("update_provider_settings"))
 
         assert "Test Hospital Trust" in response.text
 
@@ -130,7 +130,7 @@ class TestProviderSettings:
         login_with_provider(client, user, provider)
 
         response = client.post(
-            reverse("clinics:settings"),
+            reverse("update_provider_settings"),
             {"manual_image_collection": ""},  # unchecked checkbox sends empty
         )
 
@@ -150,7 +150,7 @@ class TestProviderSettings:
         login_with_provider(client, user, provider)
 
         response = client.post(
-            reverse("clinics:settings"),
+            reverse("update_provider_settings"),
             {"manual_image_collection": "true"},
         )
 

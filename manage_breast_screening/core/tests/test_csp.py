@@ -9,7 +9,7 @@ def test_content_security_policy(clinical_user_client):
 
     The policy is configured by CONTENT_SECURITY_POLICY in settings.py
     """
-    response = clinical_user_client.http.get(reverse("clinics:index"))
+    response = clinical_user_client.http.get(reverse("clinics:list_clinics"))
     assert response.status_code == 200
 
     expected_directives = {
