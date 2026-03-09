@@ -19,11 +19,11 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
         self.when_i_click_add_hormone_replacement_therapy()
         self.then_i_see_the_add_hormone_replacement_therapy_form()
 
-        self.when_i_click_save()
+        self.when_i_click_continue()
         self.then_i_see_validation_error_for_missing_status()
 
         self.when_i_select_no()
-        self.and_i_click_save()
+        self.and_i_click_continue()
 
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_message_says_hormone_replacement_therapy_added()
@@ -34,7 +34,7 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
 
         self.when_i_select_yes()
         self.and_enter_a_duration()
-        self.and_i_click_save()
+        self.and_i_click_continue()
 
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_message_says_hormone_replacement_therapy_updated()
@@ -103,10 +103,10 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
             "August 2024"
         )
 
-    def and_i_click_save(self):
-        self.page.get_by_text("Save").click()
+    def and_i_click_continue(self):
+        self.page.get_by_text("Continue").click()
 
-    when_i_click_save = and_i_click_save
+    when_i_click_continue = and_i_click_continue
 
     def then_i_see_validation_error_for_missing_status(self):
         self.expect_validation_error(

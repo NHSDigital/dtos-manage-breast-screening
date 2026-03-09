@@ -23,10 +23,14 @@
 
         <div class="nhsuk-button-group">
           {{ button({
-            "text": "Save"
+            "text": "Continue"
           }) }}
         </div>
       </form>
+
+      <p>
+        <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ appointment_cannot_proceed_href }}">Appointment cannot proceed</a>
+      </p>
     </div>
   </div>
 {% endblock %}
