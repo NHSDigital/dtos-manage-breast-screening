@@ -81,7 +81,8 @@ class TestRelayService:
         mock_ws = AsyncMock(spec=ClientConnection)
         mock_ws.recv.return_value = json.dumps({"status": "created"})
 
-        with patch.object(subject, "_get_connection", return_value=mock_ws):
+        with patch(f"{RelayService.__module__}.connect") as mock_connect:
+            mock_connect.return_value.__aenter__.return_value = mock_ws
             subject.send_action(relay, gateway_action)
 
         mock_ws.send.assert_called_once_with(
@@ -101,7 +102,8 @@ class TestRelayService:
         mock_ws = AsyncMock(spec=ClientConnection)
         mock_ws.recv.side_effect = asyncio.TimeoutError
 
-        with patch.object(subject, "_get_connection", return_value=mock_ws):
+        with patch(f"{RelayService.__module__}.connect") as mock_connect:
+            mock_connect.return_value.__aenter__.return_value = mock_ws
             subject.send_action(
                 relay,
                 gateway_action,
@@ -122,7 +124,8 @@ class TestRelayService:
         mock_ws = AsyncMock(spec=ClientConnection)
         mock_ws.recv.return_value = json.dumps({"unexpected": "data"})
 
-        with patch.object(subject, "_get_connection", return_value=mock_ws):
+        with patch(f"{RelayService.__module__}.connect") as mock_connect:
+            mock_connect.return_value.__aenter__.return_value = mock_ws
             subject.send_action(
                 relay,
                 gateway_action,
@@ -152,21 +155,3 @@ class TestRelayService:
             == "RelayService.async_send_action"
         )
         coro.close()
-
-    @pytest.mark.asyncio
-    async def test_connection_is_cached(self):
-        relay = RelayFactory.build()
-        manager = RelayService()
-
-        fake_connection = AsyncMock()
-
-        with patch.object(
-            manager,
-            "_create_connection",
-            AsyncMock(return_value=fake_connection),
-        ):
-            conn1 = await manager._get_connection(relay)
-            conn2 = await manager._get_connection(relay)
-
-        assert conn1 is conn2
-        assert relay.id in manager._connections
