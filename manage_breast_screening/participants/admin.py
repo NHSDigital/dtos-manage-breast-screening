@@ -69,7 +69,7 @@ class AppointmentAdmin(admin.ModelAdmin):
     readonly_fields = ["current_status_display"]
 
     def current_status_display(self, obj):
-        return obj.current_status.state
+        return obj.current_status.name
 
     current_status_display.short_description = "Current Status"
 
