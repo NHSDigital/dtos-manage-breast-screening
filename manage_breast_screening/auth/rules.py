@@ -20,9 +20,9 @@ def is_administrative(user):
 
 
 @rules.predicate
-def is_sysadmin(user):
-    return getattr(user, "is_sysadmin", False)
+def is_superuser(user):
+    return getattr(user, "is_superuser", False)
 
 
 rules.add_perm(Permission.VIEW_PARTICIPANT_DATA, is_clinical | is_administrative)
-rules.add_perm(Permission.MANAGE_PROVIDER_SETTINGS, is_sysadmin)
+rules.add_perm(Permission.MANAGE_PROVIDER_SETTINGS, is_superuser)

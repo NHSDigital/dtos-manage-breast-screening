@@ -44,7 +44,7 @@ def persona_login(request):
             "auth/persona_login.jinja",
             context={
                 "providers_with_users": _get_providers_with_users(request.user),
-                "sysadmin_users": _get_sysadmin_users(request.user),
+                "superusers": _get_superusers(request.user),
                 "page_title": "Persona logins",
                 "next": next_path,
             },
@@ -71,7 +71,7 @@ def _user_entry(user, current_user):
 
 def _get_providers_with_users(current_user):
     providers = OrderedDict()
-    for user in _persona_users(current_user).filter(is_sysadmin=False):
+    for user in _persona_users(current_user).filter(is_superuser=False):
         entry = _user_entry(user, current_user)
         for assignment in user.assignments.all():
             provider = assignment.provider
@@ -88,9 +88,9 @@ def _get_providers_with_users(current_user):
     ).values()
 
 
-def _get_sysadmin_users(current_user):
+def _get_superusers(current_user):
     return [
         _user_entry(user, current_user)
         for user in _persona_users(current_user)
-        if user.is_sysadmin
+        if user.is_superuser
     ]

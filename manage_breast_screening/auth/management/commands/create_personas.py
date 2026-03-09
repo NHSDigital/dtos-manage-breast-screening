@@ -33,8 +33,8 @@ class Command(BaseCommand):
                     defaults={
                         "first_name": persona.first_name,
                         "last_name": persona.last_name,
-                        "is_sysadmin": persona.is_sysadmin,
-                        "is_staff": persona.is_sysadmin,
+                        "is_superuser": persona.is_superuser,
+                        "is_staff": persona.is_superuser,
                     },
                 )
                 UserAssignment.objects.create(

@@ -83,7 +83,7 @@ def login_with_provider(client, user, provider):
 class TestProviderSettings:
     @pytest.mark.django_db
     def test_requires_sysadmin(self, client):
-        user = UserFactory(is_sysadmin=False)
+        user = UserFactory(is_superuser=False)
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider, administrative=True)
 
@@ -96,7 +96,7 @@ class TestProviderSettings:
 
     @pytest.mark.django_db
     def test_accessible_to_sysadmin(self, client):
-        user = UserFactory(is_sysadmin=True)
+        user = UserFactory(is_superuser=True)
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider)
 
@@ -109,7 +109,7 @@ class TestProviderSettings:
 
     @pytest.mark.django_db
     def test_displays_provider_name(self, client):
-        user = UserFactory(is_sysadmin=True)
+        user = UserFactory(is_superuser=True)
         provider = ProviderFactory(name="Test Hospital Trust")
         UserAssignmentFactory(user=user, provider=provider)
 
@@ -121,7 +121,7 @@ class TestProviderSettings:
 
     @pytest.mark.django_db
     def test_saves_settings(self, client):
-        user = UserFactory(is_sysadmin=True)
+        user = UserFactory(is_superuser=True)
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider)
         config = provider.get_config()
@@ -140,7 +140,7 @@ class TestProviderSettings:
 
     @pytest.mark.django_db
     def test_enables_manual_image_collection(self, client):
-        user = UserFactory(is_sysadmin=True)
+        user = UserFactory(is_superuser=True)
         provider = ProviderFactory()
         UserAssignmentFactory(user=user, provider=provider)
         config = provider.get_config()

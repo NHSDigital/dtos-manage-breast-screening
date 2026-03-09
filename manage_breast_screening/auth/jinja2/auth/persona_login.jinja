@@ -55,9 +55,9 @@
       {% endfor %}
       {% endfor %}
 
-      {% if sysadmin_users %}
-      <h2 class="nhsuk-heading-m">Sysadmin</h2>
-      {{ persona_summary_list(sysadmin_users, "Sysadmin") }}
+      {% if superusers %}
+      <h2 class="nhsuk-heading-m">Superuser</h2>
+      {{ persona_summary_list(superusers, "Superuser") }}
       {% endif %}
     </form>
   </div>
