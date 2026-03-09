@@ -8,7 +8,7 @@ import time
 import urllib.parse
 from datetime import datetime, timezone
 
-from websockets.asyncio.client import ClientConnection, connect
+from websockets.asyncio.client import connect
 
 from .models import GatewayAction, GatewayActionStatus, Relay
 
@@ -80,9 +80,6 @@ class SendActionResult:
 
 
 class RelayService:
-    def __init__(self):
-        self._connections: dict[str, object] = {}
-
     def send_action(self, relay: Relay, action: GatewayAction):
         """
         Synchronous wrapper around async_send_action.
@@ -97,47 +94,33 @@ class RelayService:
         result = SendActionResult()
 
         try:
-            conn = await self._get_connection(relay)
-            if not conn:
-                result.failed(f"No connection available for relay {relay.id}")
-                return result
+            relay_uri = RelayURI(relay)
+            url = relay_uri.connection_url()
+            async with connect(
+                url, compression=None, open_timeout=OPEN_CONNECTION_TIMEOUT_SECONDS
+            ) as conn:
+                await conn.send(json.dumps(action.payload))
+                result.sent(f"Sent action {action.id} to relay {relay.id}")
 
-            await conn.send(json.dumps(action.payload))
-            result.sent(f"Sent action {action.id} to relay {relay.id}")
-
-            response = await asyncio.wait_for(
-                conn.recv(), timeout=RECEIVE_TIMEOUT_SECONDS
-            )
-            response_data = json.loads(response)
-
-            if response_data.get("status") in ("created", "processed"):
-                result.confirmed(f"Action {action.id} confirmed by gateway")
-            else:
-                result.failed(
-                    f"Unexpected response status from gateway: {response_data}"
+                response = await asyncio.wait_for(
+                    conn.recv(), timeout=RECEIVE_TIMEOUT_SECONDS
                 )
+                response_data = json.loads(response)
+
+                if response_data.get("status") in ("created", "processed"):
+                    result.confirmed(f"Action {action.id} confirmed by gateway")
+                else:
+                    result.failed(
+                        f"Unexpected response status from gateway: {response_data}"
+                    )
 
         except asyncio.TimeoutError:
             result.failed(f"Timeout waiting for response from gateway {relay.id}")
 
         except Exception as e:
             result.failed(f"Error sending action to gateway {relay.id}: {e}")
-            self._connections.pop(relay.id, None)
 
         return result
-
-    async def _get_connection(self, relay: Relay) -> ClientConnection:
-        if relay.id not in self._connections:
-            self._connections[relay.id] = await self._create_connection(RelayURI(relay))
-        return self._connections[relay.id]
-
-    async def _create_connection(self, relay_uri: RelayURI) -> ClientConnection:
-        url = relay_uri.connection_url()
-        websocket = await connect(
-            url, compression=None, open_timeout=OPEN_CONNECTION_TIMEOUT_SECONDS
-        )
-        logger.info(f"Created relay connection for relay {relay_uri.relay.id}")
-        return websocket
 
     def update_gateway_action(self, action: GatewayAction, result: SendActionResult):
         """Update the GatewayAction based on the SendActionResult."""
