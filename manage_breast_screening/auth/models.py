@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from enum import StrEnum
 
 
@@ -12,27 +11,3 @@ class Permission(StrEnum):
     VIEW_MAMMOGRAM_APPOINTMENT = "mammograms.view_mammogram_appointment"
     DO_MAMMOGRAM_APPOINTMENT = "mammograms.do_mammogram_appointment"
     MANAGE_PROVIDER_SETTINGS = "clinics.manage_provider_settings"
-
-
-@dataclass
-class Persona:
-    first_name: str
-    last_name: str
-    role: str
-    is_superuser: bool = False
-
-    @property
-    def username(self):
-        return f"{self.first_name.lower()}_{self.last_name.lower()}"
-
-
-ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
-CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
-SYSADMIN_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_superuser=True)
-PERSONAS = [
-    ADMINISTRATIVE_PERSONA,
-    CLINICAL_PERSONA,
-    Persona("Olivia", "Morgan", Role.ADMINISTRATIVE),
-    Persona("Ella", "Foster", Role.CLINICAL),
-    SYSADMIN_PERSONA,
-]
