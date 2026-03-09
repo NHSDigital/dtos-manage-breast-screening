@@ -26,14 +26,5 @@
       {% endfor %}
       <div style="clear:both"></div>
     </div>
-    {% if images | length > 1 %}
-      <div class="nhsuk-u-margin-top-3">
-        {% call details({
-          "summaryText": "Additional image details"
-        }) %}
-        <!-- TODO: Additional image details -->
-        {% endcall %}
-      </div>
-    {% endif %}
   {% endif %}
 </div>
