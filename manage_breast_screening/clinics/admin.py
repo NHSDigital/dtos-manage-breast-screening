@@ -10,6 +10,11 @@ class ClinicSlotInline(admin.StackedInline):
     extra = 5
 
 
+class SettingInline(admin.StackedInline):
+    model = Setting
+    extra = 1
+
+
 class ClinicAdmin(admin.ModelAdmin):
     inlines = [ClinicSlotInline]
     readonly_fields = [
@@ -22,6 +27,9 @@ class ClinicAdmin(admin.ModelAdmin):
     current_status_display.short_description = "Current Status"
 
 
+class ProviderAdmin(admin.ModelAdmin):
+    inlines = [SettingInline]
+
+
 admin_site.register(Clinic, ClinicAdmin)
-admin_site.register(Provider)
-admin_site.register(Setting)
+admin_site.register(Provider, ProviderAdmin)
