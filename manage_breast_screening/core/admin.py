@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.contrib.admin import AdminSite
 from django.contrib.auth.decorators import login_not_required
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -18,7 +20,14 @@ class AdminSiteWithDefaultLogin(AdminSite):
         """
         Bypass Django admin's username/password login form.
         """
-        return redirect(reverse(settings.LOGIN_URL, query=request.GET))
+        if self.has_permission(request):
+            # Already logged-in, redirect to admin index
+            index_path = reverse("admin:index", current_app=self.name)
+            return HttpResponseRedirect(index_path)
+        elif request.user.is_authenticated:
+            raise PermissionDenied
+        else:
+            return redirect(reverse(settings.LOGIN_URL, query=request.GET))
 
 
 admin_site = AdminSiteWithDefaultLogin()
