@@ -109,7 +109,7 @@ This command wipes the database entirely before populating it with fictitious da
 
 ### Django admin
 
-We'll probably remove it before deploying to production, but currently Django admin is enabled at `http://localhost:8000/admin`
+Django admin is enabled at `http://localhost:8000/admin`
 
 You must be logged in as a superuser to access it.
 
