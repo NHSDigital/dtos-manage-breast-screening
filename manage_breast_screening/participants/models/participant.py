@@ -13,18 +13,18 @@ class Participant(BaseModel):
     PREFER_NOT_TO_SAY = "Prefer not to say"
     ETHNIC_BACKGROUND_CHOICES = Ethnicity.ethnic_background_ids_with_display_names()
 
-    first_name = models.TextField()
-    last_name = models.TextField()
-    gender = models.TextField()
-    nhs_number = models.TextField()
-    phone = models.TextField()
+    first_name = models.CharField()
+    last_name = models.CharField()
+    gender = models.CharField()
+    nhs_number = models.CharField()
+    phone = models.CharField()
     email = models.EmailField()
     date_of_birth = models.DateField()
     ethnic_background_id = models.CharField(
         blank=True, null=True, choices=ETHNIC_BACKGROUND_CHOICES
     )
     any_other_background_details = models.TextField(blank=True, null=True)
-    risk_level = models.TextField()
+    risk_level = models.CharField()
     extra_needs = models.JSONField(null=False, default=list, blank=True)
 
     @property
