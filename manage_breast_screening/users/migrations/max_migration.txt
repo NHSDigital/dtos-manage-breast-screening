@@ -1,1 +1,1 @@
-0004_add_is_sysadmin
+0005_rename_is_sysadmin_user_is_superuser

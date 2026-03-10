@@ -19,7 +19,7 @@ class Persona:
     first_name: str
     last_name: str
     role: str
-    is_sysadmin: bool = False
+    is_superuser: bool = False
 
     @property
     def username(self):
@@ -28,7 +28,7 @@ class Persona:
 
 ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
 CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
-SYSADMIN_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_sysadmin=True)
+SYSADMIN_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_superuser=True)
 PERSONAS = [
     ADMINISTRATIVE_PERSONA,
     CLINICAL_PERSONA,

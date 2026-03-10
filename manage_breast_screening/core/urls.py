@@ -25,6 +25,7 @@ from django.views.generic.base import RedirectView
 from manage_breast_screening.core.decorators import basic_auth_exempt
 
 from ..clinics import views as clinic_views
+from .admin import admin_site
 from .api import api
 
 handler403 = "manage_breast_screening.core.views.errors.permission_denied"
@@ -59,6 +60,7 @@ def robots_txt(request):
 
 
 urlpatterns = [
+    path("admin/", admin_site.urls),
     path("robots.txt", robots_txt),
     path("api/v1/", api.urls),
     path(

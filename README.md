@@ -107,6 +107,12 @@ There is a make task to seed a non-production instance of the service with examp
 
 This command wipes the database entirely before populating it with fictitious data. The data is contained in yaml files in the [data directory](/data) and can be amended etc there as required.
 
+### Django admin
+
+Django admin is enabled at `http://localhost:8000/admin`
+
+You must be logged in as a superuser to access it.
+
 ## Design
 
 The service will be deployed as a web application, backed by a postgres database with authentication provided by NHS CIS2. In addtion to these elements we will deploy a gateway application to each breast screening unit that uses the service that will be responsible for interop with local hospital systems. The gateway will be developed in a future phase of this project and is not currently under active development.

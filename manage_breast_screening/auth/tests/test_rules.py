@@ -4,7 +4,7 @@ from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.auth.rules import (
     is_administrative,
     is_clinical,
-    is_sysadmin,
+    is_superuser,
 )
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.users.tests.factories import UserFactory
@@ -91,25 +91,25 @@ class TestViewParticipantDataPermission:
 @pytest.mark.django_db
 class TestIsSysadmin:
     def test_returns_true_for_sysadmin_user(self):
-        user = UserFactory.create(is_sysadmin=True)
+        user = UserFactory.create(is_superuser=True)
 
-        assert is_sysadmin(user)
+        assert is_superuser(user)
 
     def test_returns_false_for_non_sysadmin_user(self):
-        user = UserFactory.create(is_sysadmin=False)
+        user = UserFactory.create(is_superuser=False)
 
-        assert not is_sysadmin(user)
+        assert not is_superuser(user)
 
 
 @pytest.mark.django_db
 class TestManageProviderSettingsPermission:
     def test_returns_true_for_sysadmin(self):
-        user = UserFactory.create(is_sysadmin=True)
+        user = UserFactory.create(is_superuser=True)
 
         assert user.has_perm(Permission.MANAGE_PROVIDER_SETTINGS)
 
     def test_returns_false_for_non_sysadmin(self):
-        user = UserFactory.create(is_sysadmin=False)
+        user = UserFactory.create(is_superuser=False)
 
         assert not user.has_perm(Permission.MANAGE_PROVIDER_SETTINGS)
 

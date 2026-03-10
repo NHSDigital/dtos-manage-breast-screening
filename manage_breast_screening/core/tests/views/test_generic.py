@@ -98,7 +98,7 @@ class TestAddWithAuditView:
             "is_active": True,
             "last_login": None,
             "nhs_uid": "create_uid",
-            "is_sysadmin": False,
+            "is_superuser": False,
         }
         assert last_audit.system_update_id is None
 
@@ -144,6 +144,6 @@ class TestUpdateWithAuditView:
             "is_active": True,
             "last_login": None,
             "nhs_uid": "update_uid",
-            "is_sysadmin": False,
+            "is_superuser": False,
         }
         assert last_audit.system_update_id is None

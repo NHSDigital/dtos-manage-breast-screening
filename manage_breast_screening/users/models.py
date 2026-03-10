@@ -23,7 +23,7 @@ class User(AbstractBaseUser):
     last_name = models.CharField(max_length=150, blank=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_sysadmin = models.BooleanField(
+    is_superuser = models.BooleanField(
         default=False,
         help_text="Grants access to system-wide settings across all providers.",
     )
@@ -74,7 +74,7 @@ class User(AbstractBaseUser):
         labels = list(
             {role for assignment in self.assignments.all() for role in assignment.roles}
         )
-        if self.is_sysadmin:
+        if self.is_superuser:
             labels.append("Sysadmin")
         return labels
 
@@ -87,7 +87,15 @@ class User(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         if not self.is_active:
             return False
-        return rules.has_perm(perm, self, obj)
+        return rules.has_perm(perm, self, obj) or self.is_superuser
 
     def has_perms(self, perm_list, obj=None):
         return all(self.has_perm(perm, obj=obj) for perm in perm_list)
+
+    def has_module_perms(self, package_name, obj=None):
+        """
+        Check permissions at a module level, instead of using granular permissions.
+
+        This is required to use Django admin.
+        """
+        return self.has_perm(package_name) or self.is_superuser

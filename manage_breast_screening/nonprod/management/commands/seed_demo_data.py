@@ -4,63 +4,20 @@ from os import getenv
 
 import yaml
 from django.core.management.base import BaseCommand
+from django.db import connection
 from django.test import override_settings
 
-from manage_breast_screening.clinics.models import (
-    Clinic,
-    ClinicSlot,
-    ClinicStatus,
-    Provider,
-    Setting,
-    UserAssignment,
-)
+from manage_breast_screening.clinics.models import ClinicStatus
 from manage_breast_screening.clinics.tests.factories import (
     ClinicFactory,
     ClinicSlotFactory,
     ProviderFactory,
     SettingFactory,
 )
-from manage_breast_screening.gateway.models import GatewayAction
-from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
 )
-from manage_breast_screening.participants.models import (
-    Appointment,
-    AppointmentNote,
-    AppointmentStatus,
-    BenignLumpHistoryItem,
-    BreastAugmentationHistoryItem,
-    BreastCancerHistoryItem,
-    CystHistoryItem,
-    ImplantedMedicalDeviceHistoryItem,
-    MastectomyOrLumpectomyHistoryItem,
-    OtherProcedureHistoryItem,
-    Participant,
-    ParticipantAddress,
-    ParticipantReportedMammogram,
-    ScreeningEpisode,
-)
-from manage_breast_screening.participants.models.appointment import (
-    AppointmentWorkflowStepCompletion,
-)
-from manage_breast_screening.participants.models.breast_features import (
-    BreastFeatureAnnotation,
-)
-from manage_breast_screening.participants.models.medical_information_review import (
-    MedicalInformationReview,
-)
-from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
-    HormoneReplacementTherapy,
-)
-from manage_breast_screening.participants.models.other_information.other_medical_information import (
-    OtherMedicalInformation,
-)
-from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
-    PregnancyAndBreastfeeding,
-)
-from manage_breast_screening.participants.models.symptom import Symptom
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     AppointmentStatusFactory,
@@ -350,33 +307,7 @@ class Command(BaseCommand):
             )
 
     def reset_db(self):
-        OtherMedicalInformation.objects.all().delete()
-        PregnancyAndBreastfeeding.objects.all().delete()
-        HormoneReplacementTherapy.objects.all().delete()
-        AppointmentWorkflowStepCompletion.objects.all().delete()
-        Series.objects.all().delete()
-        Study.objects.all().delete()
-        MedicalInformationReview.objects.all().delete()
-        AppointmentNote.objects.all().delete()
-        UserAssignment.objects.all().delete()
-        Symptom.objects.all().delete()
-        BreastAugmentationHistoryItem.objects.all().delete()
-        BreastCancerHistoryItem.objects.all().delete()
-        BreastFeatureAnnotation.objects.all().delete()
-        MastectomyOrLumpectomyHistoryItem.objects.all().delete()
-        CystHistoryItem.objects.all().delete()
-        ImplantedMedicalDeviceHistoryItem.objects.all().delete()
-        OtherProcedureHistoryItem.objects.all().delete()
-        BenignLumpHistoryItem.objects.all().delete()
-        AppointmentStatus.objects.all().delete()
-        ParticipantReportedMammogram.objects.all().delete()
-        GatewayAction.objects.all().delete()
-        Appointment.objects.all().delete()
-        ScreeningEpisode.objects.all().delete()
-        ParticipantAddress.objects.all().delete()
-        Participant.objects.all().delete()
-        ClinicSlot.objects.all().delete()
-        ClinicStatus.objects.all().delete()
-        Clinic.objects.all().delete()
-        Setting.objects.all().delete()
-        Provider.objects.all().delete()
+        with connection.cursor() as c:
+            c.execute("TRUNCATE TABLE users_user CASCADE")
+            c.execute("TRUNCATE TABLE clinics_provider CASCADE")
+            c.execute("TRUNCATE TABLE participants_participant CASCADE")
