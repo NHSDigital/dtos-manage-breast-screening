@@ -25,7 +25,11 @@ class Participant(BaseModel):
     )
     any_other_background_details = models.TextField(blank=True, null=True)
     risk_level = models.CharField()
-    extra_needs = models.JSONField(null=False, default=list, blank=True)
+    extra_needs = models.JSONField(
+        null=False,
+        default=list,
+        blank=True,
+    )
 
     @property
     def appointments(self):

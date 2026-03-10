@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 
 from manage_breast_screening.core.admin import admin_site
@@ -12,7 +13,15 @@ from .models import (
 )
 
 
+class AddressForm(forms.ModelForm):
+    class Meta:
+        model = ParticipantAddress
+        fields = "__all__"
+        help_texts = {"lines": "Comma separated lines of the address"}
+
+
 class AddressInline(admin.StackedInline):
+    form = AddressForm
     model = ParticipantAddress
 
 
@@ -33,13 +42,33 @@ class ScreeningEpisodeInline(admin.StackedInline):
     extra = 0
 
 
+class ParticipantForm(forms.ModelForm):
+    class Meta:
+        model = Participant
+        fields = "__all__"
+        help_texts = {
+            "extra_needs": 'JSON array with format [{"label": "...", "details": "...}]'
+        }
+
+
 class ParticipantAdmin(admin.ModelAdmin):
+    form = ParticipantForm
     inlines = [AddressInline, ScreeningEpisodeInline]
 
     list_display = ["full_name"]
 
 
+class AppointmentForm(forms.ModelForm):
+    class Meta:
+        model = Appointment
+        fields = "__all__"
+        help_texts = {
+            "stopped_reasons": 'JSON array of codes e.g. ["failed_idenity_check"]'
+        }
+
+
 class AppointmentAdmin(admin.ModelAdmin):
+    form = AppointmentForm
     inlines = [SymptomInline, ParticipantReportedMammogramInline]
 
     list_display = [
