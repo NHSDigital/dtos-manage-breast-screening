@@ -64,7 +64,7 @@ urlpatterns = [
         name="check_in_appointment",
     ),
     path(
-        "<uuid:pk>/upload/",
+        "<uuid:pk>/upload-csv/",
         participant_csv_upload_view.ParticipantCsvUploadView.as_view(),
         name="participant_csv_upload",
     ),

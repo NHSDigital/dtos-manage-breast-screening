@@ -20,8 +20,8 @@ from manage_breast_screening.participants.models.appointment import (
 @pytest.mark.django_db
 class TestParticipantCsvUploadView:
     @pytest.fixture
-    def superuser_clinic(self, superuser_user_client):
-        setting = SettingFactory.create(provider=superuser_user_client.current_provider)
+    def superuser_clinic(self, superuser_client):
+        setting = SettingFactory.create(provider=superuser_client.current_provider)
         return ClinicFactory.create(setting=setting)
 
     def test_get_denied_when_not_superuser(
@@ -46,8 +46,8 @@ class TestParticipantCsvUploadView:
         )
         assert response.status_code == 403
 
-    def test_renders_response(self, superuser_user_client, superuser_clinic):
-        response = superuser_user_client.http.get(
+    def test_renders_response(self, superuser_client, superuser_clinic):
+        response = superuser_client.http.get(
             reverse(
                 "clinics:participant_csv_upload",
                 kwargs={"pk": superuser_clinic.pk},
@@ -56,9 +56,9 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
 
     def test_invalid_post_renders_response_with_errors(
-        self, superuser_user_client, superuser_clinic
+        self, superuser_client, superuser_clinic
     ):
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload",
                 kwargs={"pk": superuser_clinic.pk},
@@ -75,7 +75,7 @@ class TestParticipantCsvUploadView:
             response.text,
         )
 
-    def test_valid_post_redirects(self, superuser_user_client, superuser_clinic):
+    def test_valid_post_redirects(self, superuser_client, superuser_clinic):
         lines = [
             "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP",
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, AREA, CITY",AA1 2XY,1034567891,1034567891,zxcv@outlook.com,BSS/B81001 - TEST GROUP PRACTICE (PRAC:B81001)',
@@ -87,7 +87,7 @@ class TestParticipantCsvUploadView:
         uploaded_file = SimpleUploadedFile(
             "participants.csv", csv_content, content_type="text/csv"
         )
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload",
                 kwargs={"pk": superuser_clinic.pk},
@@ -120,14 +120,12 @@ class TestParticipantCsvUploadView:
     def _header(self):
         return "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP"
 
-    def test_csv_row_error_missing_forenames(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_csv_row_error_missing_forenames(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,,SMITH,,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -139,14 +137,12 @@ class TestParticipantCsvUploadView:
             response.text,
         )
 
-    def test_csv_row_error_missing_surname(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_csv_row_error_missing_surname(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,999 999 9991,,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -155,14 +151,12 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
         assertInHTML("<li>Row 1: Surname is required</li>", response.text)
 
-    def test_csv_row_error_invalid_nhs_number(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_csv_row_error_invalid_nhs_number(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,BADNHSNUM,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -175,13 +169,13 @@ class TestParticipantCsvUploadView:
         )
 
     def test_csv_row_error_invalid_date_of_birth(
-        self, superuser_user_client, superuser_clinic
+        self, superuser_client, superuser_clinic
     ):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,1980-01-01,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -193,12 +187,12 @@ class TestParticipantCsvUploadView:
             response.text,
         )
 
-    def test_csv_row_error_invalid_sex(self, superuser_user_client, superuser_clinic):
+    def test_csv_row_error_invalid_sex(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,M,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -211,13 +205,13 @@ class TestParticipantCsvUploadView:
         )
 
     def test_csv_row_error_address_too_many_lines(
-        self, superuser_user_client, superuser_clinic
+        self, superuser_client, superuser_clinic
     ):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"a, b, c, d, e, f",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -229,14 +223,12 @@ class TestParticipantCsvUploadView:
             response.text,
         )
 
-    def test_csv_row_error_missing_address(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_csv_row_error_missing_address(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             "1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,,AA1 2XY,1034567890,,test@example.com,BSS",
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -245,14 +237,12 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
         assertInHTML("<li>Row 1: Address is required</li>", response.text)
 
-    def test_csv_row_error_missing_postcode(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_csv_row_error_missing_postcode(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -261,12 +251,12 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
         assertInHTML("<li>Row 1: Postcode is required</li>", response.text)
 
-    def test_csv_row_error_missing_phone(self, superuser_user_client, superuser_clinic):
+    def test_csv_row_error_missing_phone(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -275,12 +265,12 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
         assertInHTML("<li>Row 1: Telephone No.1 is required</li>", response.text)
 
-    def test_csv_row_error_missing_email(self, superuser_user_client, superuser_clinic):
+    def test_csv_row_error_missing_email(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -289,14 +279,12 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
         assertInHTML("<li>Row 1: Email Address is required</li>", response.text)
 
-    def test_multiple_row_errors_all_shown(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_multiple_row_errors_all_shown(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,BADNHS,SMITH,TEST1,MRS,BADDATE,50,M,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -317,14 +305,14 @@ class TestParticipantCsvUploadView:
         )
 
     def test_errors_from_multiple_rows_all_shown(
-        self, superuser_user_client, superuser_clinic
+        self, superuser_client, superuser_clinic
     ):
         lines = [
             self._header(),
             '1,BADNHS1,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test1@example.com,BSS',
             '2,BADNHS2,JONES,TEST2,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",BB2 3XY,1034567891,,test2@example.com,BSS',
         ]
-        response = superuser_user_client.http.post(
+        response = superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -340,15 +328,13 @@ class TestParticipantCsvUploadView:
             response.text,
         )
 
-    def test_valid_post_creates_participants(
-        self, superuser_user_client, superuser_clinic
-    ):
+    def test_valid_post_creates_participants(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001',
             '2,999 999 9992,JONES,TEST2,MRS,31-Dec-1975,50,F,A White - British,"2 BUILDING, STREET, CITY, COUNTY, UK",BB2 3XY,1034567891,,test2@example.com,BSS/B81002',
         ]
-        superuser_user_client.http.post(
+        superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
@@ -407,14 +393,14 @@ class TestParticipantCsvUploadView:
         assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
     def test_valid_post_no_db_changes_when_row_has_errors(
-        self, superuser_user_client, superuser_clinic
+        self, superuser_client, superuser_clinic
     ):
         lines = [
             self._header(),
             '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001',
             '2,BADNHS,JONES,TEST2,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",BB2 3XY,1034567891,,test2@example.com,BSS',
         ]
-        superuser_user_client.http.post(
+        superuser_client.http.post(
             reverse(
                 "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
             ),
