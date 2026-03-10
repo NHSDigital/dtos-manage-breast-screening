@@ -108,7 +108,7 @@ class TestMultipleImagesInformationForm:
                         "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
                         "rmlo_all_repeats_reasons": [
                             RepeatReason.PATIENT_MOVED.value,
-                            RepeatReason.MOTION_BLUR.value,
+                            RepeatReason.TECHNICAL_FAULT.value,
                         ],
                     }
                 ),
@@ -123,7 +123,7 @@ class TestMultipleImagesInformationForm:
             assert series.repeat_type == RepeatType.ALL_REPEATS.value
             assert series.repeat_reasons == [
                 RepeatReason.PATIENT_MOVED.value,
-                RepeatReason.MOTION_BLUR.value,
+                RepeatReason.TECHNICAL_FAULT.value,
             ]
             assert series.repeat_count == 1
 
@@ -159,7 +159,7 @@ class TestMultipleImagesInformationForm:
                     {
                         "series_fingerprint": fingerprint,
                         "lcc_repeat_type": RepeatType.ALL_REPEATS.value,
-                        "lcc_all_repeats_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
+                        "lcc_all_repeats_reasons": [RepeatReason.TECHNICAL_FAULT.value],
                     }
                 ),
                 instance=study,
@@ -178,7 +178,9 @@ class TestMultipleImagesInformationForm:
                         "series_fingerprint": fingerprint,
                         "lcc_repeat_type": RepeatType.SOME_REPEATS.value,
                         "lcc_repeat_count": 2,
-                        "lcc_some_repeats_reasons": [RepeatReason.FOLDED_SKIN.value],
+                        "lcc_some_repeats_reasons": [
+                            RepeatReason.POSITIONING_ERROR.value
+                        ],
                     }
                 ),
                 instance=study,
@@ -191,7 +193,7 @@ class TestMultipleImagesInformationForm:
             series.refresh_from_db()
             assert series.repeat_type == RepeatType.SOME_REPEATS.value
             assert series.repeat_count == 2
-            assert series.repeat_reasons == [RepeatReason.FOLDED_SKIN.value]
+            assert series.repeat_reasons == [RepeatReason.POSITIONING_ERROR.value]
 
         def test_no_repeats_clears_existing_all_repeats_data(self):
             study = StudyFactory()
@@ -231,7 +233,7 @@ class TestMultipleImagesInformationForm:
                 count=4,
                 repeat_type=RepeatType.SOME_REPEATS.value,
                 repeat_count=2,
-                repeat_reasons=[RepeatReason.MOTION_BLUR.value],
+                repeat_reasons=[RepeatReason.TECHNICAL_FAULT.value],
             )
             fingerprint = get_fingerprint(study)
 
@@ -353,7 +355,10 @@ class TestMultipleImagesInformationForm:
             count=3,
             repeat_type=RepeatType.SOME_REPEATS.value,
             repeat_count=1,
-            repeat_reasons=[RepeatReason.MOTION_BLUR.value, RepeatReason.OTHER.value],
+            repeat_reasons=[
+                RepeatReason.TECHNICAL_FAULT.value,
+                RepeatReason.OTHER.value,
+            ],
         )
 
         form = MultipleImagesInformationForm(instance=study)
@@ -361,11 +366,11 @@ class TestMultipleImagesInformationForm:
         assert form.initial["rmlo_repeat_type"] == RepeatType.SOME_REPEATS.value
         assert form.initial["rmlo_repeat_count"] == 1
         assert form.initial["rmlo_all_repeats_reasons"] == [
-            RepeatReason.MOTION_BLUR.value,
+            RepeatReason.TECHNICAL_FAULT.value,
             RepeatReason.OTHER.value,
         ]
         assert form.initial["rmlo_some_repeats_reasons"] == [
-            RepeatReason.MOTION_BLUR.value,
+            RepeatReason.TECHNICAL_FAULT.value,
             RepeatReason.OTHER.value,
         ]
 

@@ -95,22 +95,15 @@ class IncompleteImagesReason(models.TextChoices):
 
 
 class RepeatReason(models.TextChoices):
-    PATIENT_MOVED = "PATIENT_MOVED", "Patient moved during exposure"
-    UNABLE_COMPRESSION = "UNABLE_COMPRESSION", "Unable to maintain compression"
-    INADEQUATE_COMPRESSION = (
-        "INADEQUATE_COMPRESSION",
-        "Inadequate compression achieved",
+    PATIENT_MOVED = "PATIENT_MOVED", "Participant movement"
+    UNABLE_COMPRESSION = "UNABLE_COMPRESSION", "Compression issues"
+    POSITIONING_ERROR = (
+        "POSITIONING_ERROR",
+        "Positioning error",
     )
-    INCORRECT_POSITIONING = (
-        "INCORRECT_POSITIONING",
-        "Incorrect positioning identified",
-    )
-    IMAGE_TOO_LIGHT = "IMAGE_TOO_LIGHT", "Image too light - exposure needs adjustment"
-    IMAGE_TOO_DARK = "IMAGE_TOO_DARK", "Image too dark - exposure needs adjustment"
-    MOTION_BLUR = "MOTION_BLUR", "Motion blur affecting image quality"
-    EQUIPMENT_FAULT = "EQUIPMENT_FAULT", "Equipment technical fault"
-    FOLDED_SKIN = "FOLDED_SKIN", "Folded skin needs smoothing"
-    PECTORAL_MUSCLE = "PECTORAL_MUSCLE", "Pectoral muscle not visualised correctly"
+    POOR_EXPOSURE = "POOR_EXPOSURE", "Poor exposure (image too light or dark)"
+    ARTEFACT_OBSCURE = "ARTEFACT_OBSCURE", "Artefact obscuring image"
+    TECHNICAL_FAULT = "TECHNICAL_FAULT", "Technical Fault"
     OTHER = "OTHER", "Other"
 
 
