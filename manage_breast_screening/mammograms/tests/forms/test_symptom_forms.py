@@ -1,6 +1,8 @@
+from datetime import date
 from urllib.parse import urlencode
 
 import pytest
+import time_machine
 from django.http import QueryDict
 from django.test import RequestFactory
 
@@ -30,6 +32,11 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 class TestLumpForm:
+    @time_machine.travel(date(2026, 3, 1))
+    def test_dynamic_hint_text(self):
+        form = LumpForm()
+        assert form.fields["when_resolved"].hint == "For example, February 2026"
+
     def test_valid_form(self):
         form = LumpForm(
             data=QueryDict(
