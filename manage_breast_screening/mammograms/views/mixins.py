@@ -77,6 +77,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     """
 
     permission_required = Permission.DO_MAMMOGRAM_APPOINTMENT
+    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore

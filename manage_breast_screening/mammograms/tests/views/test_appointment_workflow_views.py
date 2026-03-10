@@ -11,7 +11,6 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
-from manage_breast_screening.config.settings import LOGIN_URL
 from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.dicom.models import Study as DicomStudy
 from manage_breast_screening.dicom.tests.factories import (
@@ -532,7 +531,7 @@ class TestStartAppointment:
         )
         url = reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
         response = administrative_user_client.http.post(url)
-        assertRedirects(response, reverse(LOGIN_URL, query={"next": url}))
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db
@@ -792,7 +791,7 @@ class TestResumeAppointment:
             "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
         )
         response = administrative_user_client.http.post(url)
-        assertRedirects(response, reverse(LOGIN_URL, query={"next": url}))
+        assert response.status_code == 403
 
 
 @pytest.mark.django_db
