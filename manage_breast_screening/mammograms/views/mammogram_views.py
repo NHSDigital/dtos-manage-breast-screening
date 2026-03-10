@@ -40,7 +40,7 @@ APPOINTMENT_NOT_FOUND = "Appointment not found"
 logger = logging.getLogger(__name__)
 
 
-@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def appointment_should_not_proceed(
     request, appointment_pk, participant_reported_mammogram_pk
 ):
@@ -103,7 +103,7 @@ def appointment_should_not_proceed(
 
 
 @require_http_methods(["POST"])
-@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def attended_not_screened(request, appointment_pk):
     provider = request.user.current_provider
     try:
@@ -125,6 +125,7 @@ class AppointmentProceedAnywayView(
     template_name = "mammograms/proceed_anyway.jinja"
     thing_name = "a previous mammogram"
     permission_required = Permission.DO_MAMMOGRAM_APPOINTMENT
+    raise_exception = True
 
     def update_title(self, thing_name):
         return "You are continuing despite a recent mammogram"
@@ -188,7 +189,7 @@ class AppointmentProceedAnywayView(
 
 
 @require_http_methods(["GET"])
-@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def check_information(request, pk):
     provider = request.user.current_provider
     try:
@@ -216,7 +217,7 @@ def check_information(request, pk):
 
 
 @require_http_methods(["POST"])
-@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT)
+@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def complete_screening(request, pk):
     provider = request.user.current_provider
     try:
