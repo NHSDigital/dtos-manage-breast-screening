@@ -58,7 +58,7 @@ def test_appointment_details_empty(template, appointment):
                         </dd>
                         <dd class="nhsuk-summary-list__actions">
                             <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/special-appointment/?return_url=">
-                                Add special appointment
+                                Change<span class="nhsuk-u-visually-hidden"> special appointment</span>
                             </a>
                         </dd>
                     </div>
@@ -169,7 +169,7 @@ def test_appointment_details_has_appointment_note(template, appointment):
                         </dd>
                         <dd class="nhsuk-summary-list__actions">
                             <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/special-appointment/?return_url=">
-                                Add special appointment
+                                Change<span class="nhsuk-u-visually-hidden"> special appointment</span>
                             </a>
                         </dd>
                     </div>
