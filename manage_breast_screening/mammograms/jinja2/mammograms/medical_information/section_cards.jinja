@@ -129,13 +129,15 @@
     }) }}
   {% endif %}
 
-  <div class="nhsuk-form-group">
-    {{ button({
-      "text": presented_medical_info.add_or_update_breast_features_button.text,
-      "href": presented_medical_info.add_or_update_breast_features_button.href,
-      "classes": "nhsuk-button--secondary nhsuk-button--small"
-    }) }}
-  </div>
+  {% if not read_only %}
+    <div class="nhsuk-form-group">
+      {{ button({
+        "text": presented_medical_info.add_or_update_breast_features_button.text,
+        "href": presented_medical_info.add_or_update_breast_features_button.href,
+        "classes": "nhsuk-button--secondary nhsuk-button--small"
+      }) }}
+    </div>
+  {% endif %}
 {% endmacro %}
 
 {% macro other_information_content(presented_medical_info, read_only=false) %}
