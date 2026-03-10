@@ -2,6 +2,7 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "mammograms/components/card_with_status.jinja" import card_with_status %}
 {% from "mammograms/medical_information/section_cards.jinja" import mammogram_history_content, symptoms_content, medical_history_content, breast_features_content, other_information_content %}
+{% from "mammograms/macros.jinja" import appointment_cannot_proceed_link %}
 
 {% set active_workflow_step = 'REVIEW_MEDICAL_INFORMATION' %}
 
@@ -58,9 +59,7 @@
 
 {{ complete_all_button }}
 
-<p>
-  <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ appointment_cannot_proceed_href }}">Appointment cannot proceed</a>
-</p>
+{{ appointment_cannot_proceed_link(presented_appointment) }}
 
 {% endblock %}
 

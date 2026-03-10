@@ -2,6 +2,7 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
 {% from "django_form_helpers.jinja" import form_error_summary %}
+{% from "mammograms/macros.jinja" import appointment_cannot_proceed_link %}
 
 {% block page_content %}
   <div class="nhsuk-grid-row">
@@ -28,9 +29,7 @@
         </div>
       </form>
 
-      <p>
-        <a class="nhsuk-link nhsuk-link--no-visited-state" href="{{ appointment_cannot_proceed_href }}">Appointment cannot proceed</a>
-      </p>
+      {{ appointment_cannot_proceed_link(presented_appointment) }}
     </div>
   </div>
 {% endblock %}

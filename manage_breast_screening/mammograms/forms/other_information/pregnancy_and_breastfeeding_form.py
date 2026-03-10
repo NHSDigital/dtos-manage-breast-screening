@@ -1,3 +1,4 @@
+from manage_breast_screening.core.utils.date_formatting import format_relative_months
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.participants.models.other_information.pregnancy_and_breastfeeding import (
@@ -24,14 +25,14 @@ class PregnancyAndBreastfeedingForm(FormWithConditionalFields):
         self.fields["approx_pregnancy_due_date"] = CharField(
             required=False,
             label="Approximate due date",
-            hint="For example, May 2026",
+            hint=f"For example, {format_relative_months(3)}",
             error_messages={"required": "Provide approximate due date"},
             classes="nhsuk-u-width-two-thirds",
         )
         self.fields["approx_pregnancy_end_date"] = CharField(
             required=False,
             label="Approximate date pregnancy ended",
-            hint="For example, December 2025",
+            hint=f"For example, {format_relative_months(-2)}",
             error_messages={"required": "Provide approximate date pregnancy ended"},
             classes="nhsuk-u-width-two-thirds",
         )
@@ -53,7 +54,7 @@ class PregnancyAndBreastfeedingForm(FormWithConditionalFields):
         self.fields["approx_breastfeeding_start_date"] = CharField(
             required=False,
             label="Approximate date started",
-            hint="For example, since December 2025",
+            hint=f"For example, since {format_relative_months(-2)}",
             error_messages={
                 "required": "Provide details of when they started breastfeeding"
             },
@@ -62,7 +63,7 @@ class PregnancyAndBreastfeedingForm(FormWithConditionalFields):
         self.fields["approx_breastfeeding_end_date"] = CharField(
             required=False,
             label="Approximate date stopped",
-            hint="For example, November 2025",
+            hint=f"For example, {format_relative_months(-3)}",
             error_messages={
                 "required": "Provide details of when they stopped breastfeeding"
             },
