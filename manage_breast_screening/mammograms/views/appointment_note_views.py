@@ -94,7 +94,12 @@ class DeleteAppointmentNoteView(DeleteWithAuditView):
         return appointment.note
 
     def get_success_url(self):
-        return reverse("mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]})
+        return extract_relative_redirect_url(
+            self.request,
+            default=reverse(
+                "mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]}
+            ),
+        )
 
     def get(self, request, *args, **kwargs):
         try:
