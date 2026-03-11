@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, call
 import pytest
 from django.core.management.base import CommandError
 
-from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+from manage_breast_screening.core.services.command_handler import (
     CommandHandler,
 )
 

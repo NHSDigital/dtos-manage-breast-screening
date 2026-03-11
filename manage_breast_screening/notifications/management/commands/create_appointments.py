@@ -6,7 +6,7 @@ from logging import getLogger
 import pandas
 from django.core.management.base import BaseCommand
 
-from manage_breast_screening.notifications.management.commands.helpers.command_handler import (
+from manage_breast_screening.core.services.command_handler import (
     CommandHandler,
 )
 from manage_breast_screening.notifications.models import (
@@ -25,6 +25,7 @@ logger = getLogger(__name__)
 
 class ExtractValidationError(Exception):
     pass
+
 
 class Command(BaseCommand):
     """
@@ -59,11 +60,11 @@ class Command(BaseCommand):
                 ).readall()
 
                 data_frame = self.raw_data_to_data_frame(blob_content)
-                
+
                 self.validate_extract(blob.name, blob_content)
 
                 extract = self.create_extract(blob.name, blob_content)
-                
+
                 for idx, row in data_frame.iterrows():
                     if self.is_not_holding_clinic(row):
                         clinic, clinic_created = self.find_or_create_clinic(row)
@@ -77,24 +78,25 @@ class Command(BaseCommand):
                         extract.appointments.add(appt) if appt is not None else None
 
                 logger.info("Processed %s rows from %s", len(data_frame), blob.name)
-                
+
     def validate_extract(self, filename: str, raw_data: str) -> None:
         bso_code = filename.split("/")[1].split("_")[0]
         type_id, extract_id, start_date, start_time, record_count = raw_data.split(
             "\n"
         )[0].split("|")
         formatted_extract_id = int(extract_id.replace('"', "").replace("\r", ""))
-        
-        latest_extract = Extract.objects.filter(bso_code = bso_code).order_by("sequence_number").last()
-        
-        if latest_extract:            
+
+        latest_extract = (
+            Extract.objects.filter(bso_code=bso_code).order_by("sequence_number").last()
+        )
+
+        if latest_extract:
             if formatted_extract_id != (latest_extract.sequence_number + 1):
-                
                 log_msg = "Extract ID %s is not sequential to last extract ID %s." % (
                     formatted_extract_id,
                     latest_extract.sequence_number,
                 )
-                
+
                 raise ExtractValidationError(log_msg)
 
     def create_extract(self, filename: str, raw_data: str) -> Extract:
@@ -103,7 +105,7 @@ class Command(BaseCommand):
             "\n"
         )[0].split("|")
         formatted_extract_id = int(extract_id.replace('"', "").replace("\r", ""))
-        
+
         formatted_record_count = int(record_count.replace('"', "").replace("\r", ""))
 
         return Extract.objects.create(

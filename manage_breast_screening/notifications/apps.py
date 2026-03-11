@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
-from manage_breast_screening.notifications.services.application_insights_logging import (
+from manage_breast_screening.core.services.application_insights_logging import (
     ApplicationInsightsLogging,
 )
 
