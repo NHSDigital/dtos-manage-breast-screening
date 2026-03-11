@@ -19,11 +19,11 @@ class TestAddPregnancyAndBreastfeeding(SystemTestCase):
         self.when_i_click_add_pregnancy_and_breastfeeding()
         self.then_i_see_the_pregnancy_and_breastfeeding_form()
 
-        self.when_i_click_save()
+        self.when_i_click_continue()
         self.then_i_see_validation_error_for_missing_statuses()
 
         self.when_i_select_no_for_pregnancy_and_breastfeeding()
-        self.and_i_click_save()
+        self.and_i_click_continue()
 
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_message_says_pregnancy_and_breastfeeding_added()
@@ -34,7 +34,7 @@ class TestAddPregnancyAndBreastfeeding(SystemTestCase):
 
         self.when_i_select_yes_for_pregnancy()
         self.and_enter_a_due_date()
-        self.and_i_click_save()
+        self.and_i_click_continue()
 
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_message_says_pregnancy_and_breastfeeding_updated()
@@ -101,10 +101,10 @@ class TestAddPregnancyAndBreastfeeding(SystemTestCase):
             "due in November"
         )
 
-    def and_i_click_save(self):
-        self.page.get_by_text("Save").click()
+    def and_i_click_continue(self):
+        self.page.get_by_text("Continue").click()
 
-    when_i_click_save = and_i_click_save
+    when_i_click_continue = and_i_click_continue
 
     def then_i_see_validation_error_for_missing_statuses(self):
         self.expect_validation_error(

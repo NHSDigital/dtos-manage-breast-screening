@@ -162,3 +162,16 @@ def format_time_range(value):
     start_time = format_time(value["start_time"])
     end_time = format_time(value["end_time"])
     return f"{start_time} to {end_time}"
+
+
+def format_relative_months(months: int) -> str:
+    """
+    Returns the current date plus the specified number of months.
+
+    Args:
+        months (int): Number of months to add.
+
+    Returns:
+        str: The resulting date in the form "Month Year".
+    """
+    return (date.today() + relativedelta(months=months)).strftime("%B %Y")

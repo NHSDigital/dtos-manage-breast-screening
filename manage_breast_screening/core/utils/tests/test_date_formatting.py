@@ -7,6 +7,7 @@ import time_machine
 from ..date_formatting import (
     format_approximate_date,
     format_relative_date,
+    format_relative_months,
     format_relative_year,
     format_year_with_relative,
 )
@@ -93,3 +94,38 @@ def test_approximate_dates(time_machine, today, year, month, output):
 def test_approximate_future_date_raises_error():
     with pytest.raises(ValueError):
         format_approximate_date(3000, 1)
+
+
+@pytest.mark.parametrize(
+    ("today", "month", "output"),
+    (
+        (
+            datetime(2025, 1, 31, tzinfo=ZoneInfo("Europe/London")),
+            -4,
+            "September 2024",
+        ),
+        (
+            datetime(2026, 4, 1, tzinfo=ZoneInfo("Europe/London")),
+            18,
+            "October 2027",
+        ),
+        (
+            datetime(2029, 6, 15, tzinfo=ZoneInfo("Europe/London")),
+            -1,
+            "May 2029",
+        ),
+        (
+            datetime(2050, 6, 15, tzinfo=ZoneInfo("Europe/London")),
+            1,
+            "July 2050",
+        ),
+        (
+            datetime(2035, 2, 1, tzinfo=ZoneInfo("Europe/London")),
+            0,
+            "February 2035",
+        ),
+    ),
+)
+def test_format_relative_months(time_machine, today, month, output):
+    time_machine.move_to(today)
+    assert format_relative_months(month) == output

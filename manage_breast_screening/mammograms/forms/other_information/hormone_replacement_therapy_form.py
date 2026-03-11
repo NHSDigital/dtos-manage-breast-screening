@@ -1,3 +1,4 @@
+from manage_breast_screening.core.utils.date_formatting import format_relative_months
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
@@ -26,7 +27,7 @@ class HormoneReplacementTherapyForm(FormWithConditionalFields):
         self.fields["approx_start_date"] = CharField(
             required=False,
             label="Approximate date started",
-            hint="For example, August 2024",
+            hint=f"For example, {format_relative_months(-18)}",
             error_messages={
                 "required": "Provide approximate date when they started taking HRT"
             },
@@ -35,7 +36,7 @@ class HormoneReplacementTherapyForm(FormWithConditionalFields):
         self.fields["approx_end_date"] = CharField(
             required=False,
             label="Approximate date stopped",
-            hint="For example, December 2025",
+            hint=f"For example, {format_relative_months(-2)}",
             error_messages={
                 "required": "Provide approximate date when they stopped taking HRT"
             },

@@ -1,15 +1,21 @@
 {% extends "layout-form.jinja" %}
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+{% from "nhsuk/components/fieldset/macro.jinja" import fieldset %}
+{% from "mammograms/macros.jinja" import appointment_cannot_proceed_link %}
 
 {% block form %}
+  {% do form.pregnancy_status.add_divider_after("NO_BUT_HAS_BEEN_RECENTLY", "or") %}
   {{ form.pregnancy_status.as_field_group() }}
 
+  {% do form.breastfeeding_status.add_divider_after("NO_BUT_STOPPED_RECENTLY", "or") %}
   {{ form.breastfeeding_status.as_field_group() }}
 
   <div class="nhsuk-button-group">
     {{ button({
-      "text": "Save"
+      "text": "Continue"
     }) }}
   </div>
+
+  {{ appointment_cannot_proceed_link(presented_appointment) }}
 {% endblock %}

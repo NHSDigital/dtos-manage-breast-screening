@@ -1,7 +1,6 @@
 import logging
 
 from django.shortcuts import redirect
-from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
@@ -23,20 +22,6 @@ class AddHormoneReplacementTherapyView(MedicalInformationMixin, AddWithAuditView
     form_class = HormoneReplacementTherapyForm
     template_name = TEMPLATE_NAME
     thing_name = THING_NAME
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context.update(
-            {
-                "appointment_cannot_proceed_href": reverse(
-                    "mammograms:appointment_cannot_go_ahead",
-                    kwargs={"pk": self.appointment.pk},
-                )
-            }
-        )
-
-        return context
 
     def dispatch(self, request, *args, **kwargs):
         if hasattr(self.appointment, "hormone_replacement_therapy"):
