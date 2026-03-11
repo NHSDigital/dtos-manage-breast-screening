@@ -169,9 +169,7 @@ class TestCheckInformation(SystemTestCase):
         special_appointment_row = section.locator(".nhsuk-summary-list__row").filter(
             has_text="Special appointment"
         )
-        special_appointment_row.get_by_role(
-            "link", name="Add special appointment"
-        ).click()
+        special_appointment_row.get_by_role("link", name="Change").click()
 
         self.page.get_by_label("Language").check()
         self.page.locator("#id_language_details").fill("Needs interpreter")

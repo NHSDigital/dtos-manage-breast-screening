@@ -239,12 +239,12 @@ class TestAppointmentPresenter:
         presenter = AppointmentPresenter(mock_appointment)
 
         [action] = presenter.special_appointment_action("/return/")["items"]
-        assert action["text"] == "Add special appointment"
+        assert action["text"] == "Change"
         assert (
             action["href"]
             == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=/return/"
         )
-        assert "visuallyHiddenText" not in action
+        assert action["visuallyHiddenText"] == "special appointment"
 
     def test_special_appointment_action_with_special_appointment(
         self, mock_appointment

@@ -74,11 +74,8 @@ class AppointmentPresenter:
             "href": self.special_appointment_url + f"?return_url={return_url}",
             "classes": "nhsuk-link--no-visited-state",
         }
-        if self.is_special_appointment:
-            item["text"] = "Change"
-            item["visuallyHiddenText"] = "special appointment"
-        else:
-            item["text"] = "Add special appointment"
+        item["text"] = "Change"
+        item["visuallyHiddenText"] = "special appointment"
         return {"items": [item]}
 
     def appointment_note_action(self, return_url):
