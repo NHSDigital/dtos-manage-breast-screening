@@ -193,7 +193,7 @@ def test_report_failure(monkeypatch):
     assert response.json()["status"] == "failure recorded"
 
     action.refresh_from_db()
-    assert action.status == GatewayActionStatus.FAILED
+    assert action.status == GatewayActionStatus.IMAGE_FAILED
     assert action.last_error == "Missing PatientID"
     assert action.failed_at is not None
 

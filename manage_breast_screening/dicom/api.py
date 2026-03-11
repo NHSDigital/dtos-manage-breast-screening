@@ -110,7 +110,7 @@ def report_failure(request, source_message_id: str, payload: FailurePayload):
             "detail": f"GatewayAction {source_message_id!r} not found.",
         }
 
-    action.status = GatewayActionStatus.FAILED
+    action.status = GatewayActionStatus.IMAGE_FAILED
     action.last_error = payload.error
     action.failed_at = timezone.now()
     action.save(update_fields=["status", "last_error", "failed_at", "updated_at"])
