@@ -4,6 +4,10 @@ from django import forms
 from django.db.models import TextChoices
 from django.forms.widgets import Textarea
 
+from manage_breast_screening.core.utils.date_formatting import (
+    format_relative_months,
+    format_relative_seasons,
+)
 from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.nhsuk_forms.fields.split_date_field import SplitDateField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
@@ -156,7 +160,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             required=False,
             label="Enter an approximate date",
             label_classes="nhsuk-u-visually-hidden",
-            hint="For example, 9 months ago",
+            hint=f"For example, {format_relative_months(-9)} or {format_relative_seasons(-12)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
                 "required": "Enter the approximate date when the x-rays were taken"
@@ -166,7 +170,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             required=False,
             label="Enter an approximate date",
             label_classes="nhsuk-u-visually-hidden",
-            hint="For example, 3 months ago",
+            hint=f"For example, {format_relative_months(-3)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
                 "required": "Enter the approximate date when the x-rays were taken"
