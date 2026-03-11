@@ -18,7 +18,9 @@ from manage_breast_screening.users.models import PERSONAS
 @csrf_exempt
 @login_not_required
 def persona_login(request):
-    next_path = extract_relative_redirect_url(request, parameter_name="next")
+    next_path = extract_relative_redirect_url(
+        request, parameter_name="next", default="/"
+    )
 
     if request.method == "POST":
         try:
@@ -32,9 +34,12 @@ def persona_login(request):
         now = timezone.now()
         request.session["login_time"] = now.isoformat()
 
-        redirect_url = reverse("select_provider")
-        if next_path:
-            redirect_url = f"{redirect_url}?{urlencode({'next': next_path})}"
+        if request.user.is_superuser:
+            redirect_url = next_path
+        else:
+            redirect_url = reverse("select_provider")
+            if next_path:
+                redirect_url = f"{redirect_url}?{urlencode({'next': next_path})}"
 
         return redirect(redirect_url)
     else:

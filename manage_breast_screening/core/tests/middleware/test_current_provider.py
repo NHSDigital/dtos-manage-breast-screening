@@ -77,6 +77,19 @@ class TestCurrentProviderMiddleware:
         assert request.user.current_provider == assignment.provider
         assert request.user.current_provider.name == assignment.provider.name
 
+    def test_adds_current_provider_to_request_when_in_session_and_superuser(self):
+        user = UserFactory(is_superuser=True)
+        provider = ProviderFactory()
+        request = RequestFactory().get("/")
+        request.session = {"current_provider": str(provider.pk)}
+        request.user = user
+
+        mw = _make_middleware()
+        mw(request)
+
+        assert request.user.current_provider == provider
+        assert request.user.current_provider.name == provider.name
+
     def test_sets_current_provider_to_none_when_not_in_session(self):
         request = RequestFactory().get("/")
         request.session = {}

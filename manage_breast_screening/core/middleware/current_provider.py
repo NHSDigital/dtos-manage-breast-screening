@@ -6,7 +6,8 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from manage_breast_screening.clinics.models import UserAssignment
+from manage_breast_screening.clinics.models import Provider
+from manage_breast_screening.clinics.services import get_user_providers
 from manage_breast_screening.core.decorators import is_current_provider_exempt
 
 logger = logging.getLogger(__name__)
@@ -59,13 +60,12 @@ class CurrentProviderMiddleware:
         redirected to provider selection on the next process_view call.
         """
         provider_id = request.session.get("current_provider")
+
         if provider_id and request.user.is_authenticated:
             try:
-                assignment = request.user.assignments.select_related("provider").get(
-                    provider_id=provider_id
-                )
-                request.user.current_provider = assignment.provider
-            except UserAssignment.DoesNotExist:
+                provider = get_user_providers(request.user).get(pk=provider_id)
+                request.user.current_provider = provider
+            except Provider.DoesNotExist:
                 logger.info(
                     "User %s no longer assigned to provider %s — clearing session",
                     request.user.pk,

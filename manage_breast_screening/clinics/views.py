@@ -14,8 +14,9 @@ from ..core.decorators import current_provider_exempt
 from ..core.utils.relative_redirects import extract_relative_redirect_url
 from ..participants.models import Appointment
 from .forms import UpdateProviderSettingsForm
-from .models import Clinic, Provider
+from .models import Clinic
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
+from .services import get_user_providers_with_roles
 
 
 def list_clinics(request, filter="today"):
@@ -79,9 +80,8 @@ def check_in_appointment(request, pk, appointment_pk):
 @login_required
 def select_provider(request):
     next_path = extract_relative_redirect_url(request, parameter_name="next")
-    user_providers = Provider.objects.filter(
-        assignments__user=request.user, assignments__roles__len__gt=0
-    )
+
+    user_providers = get_user_providers_with_roles(request.user)
 
     if len(user_providers) == 1:
         request.session["current_provider"] = str(user_providers.first().pk)
