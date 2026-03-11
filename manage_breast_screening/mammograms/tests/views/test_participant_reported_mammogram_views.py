@@ -41,7 +41,7 @@ def build_exact_date_form_data(exact_date, return_url=None):
     """Build form data for submitting an exact mammogram date."""
     data = {
         "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-        "when_taken": ParticipantReportedMammogramForm.WhenTaken.EXACT,
+        "date_type": ParticipantReportedMammogram.DateType.EXACT,
         "exact_date_0": exact_date.day,
         "exact_date_1": exact_date.month,
         "exact_date_2": exact_date.year,
@@ -59,7 +59,7 @@ def assert_mammogram_validation_errors(response):
         """
         <ul class="nhsuk-list nhsuk-error-summary__list">
             <li><a href="#id_location_type">Select where the breast x-rays were taken</a></li>
-            <li><a href="#id_when_taken">Select when the x-rays were taken</a></li>
+            <li><a href="#id_date_type">Select when the x-rays were taken</a></li>
             <li><a href="#id_name_is_the_same">Select if the x-rays were taken with the same name</a></li>
         </ul>
         """,
@@ -113,7 +113,8 @@ def valid_mammogram_form_data():
     """Basic valid form data for mammogram submission."""
     return {
         "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
-        "when_taken": ParticipantReportedMammogramForm.WhenTaken.NOT_SURE,
+        "date_type": ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS,
+        "approx_date_MORE_THAN_SIX_MONTHS": "2000",
         "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
     }
 
