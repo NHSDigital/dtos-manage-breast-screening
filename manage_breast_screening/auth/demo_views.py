@@ -12,8 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
 )
-
-from .models import PERSONAS
+from manage_breast_screening.users.models import PERSONAS
 
 
 @csrf_exempt
