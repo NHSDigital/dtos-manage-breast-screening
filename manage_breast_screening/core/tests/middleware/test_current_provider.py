@@ -5,11 +5,15 @@ import pytest
 from django.http import HttpResponse
 from django.test import RequestFactory
 
-from manage_breast_screening.clinics.tests.factories import ProviderFactory
+from manage_breast_screening.clinics.tests.factories import (
+    ProviderFactory,
+    UserAssignmentFactory,
+)
 from manage_breast_screening.core.decorators import current_provider_exempt
 from manage_breast_screening.core.middleware.current_provider import (
     CurrentProviderMiddleware,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 
 def _make_middleware(get_response: Callable | None = None) -> CurrentProviderMiddleware:
@@ -61,16 +65,17 @@ class TestCurrentProviderMiddleware:
         assert response.url == "/current-provider/select/"
 
     def test_adds_current_provider_to_request_when_in_session(self):
-        provider = ProviderFactory(name="Test Provider")
+        user = UserFactory()
+        assignment = UserAssignmentFactory(user=user)
         request = RequestFactory().get("/")
-        request.session = {"current_provider": str(provider.pk)}
-        request.user = Mock(is_authenticated=True)
+        request.session = {"current_provider": str(assignment.provider.pk)}
+        request.user = user
 
         mw = _make_middleware()
         mw(request)
 
-        assert request.user.current_provider == provider
-        assert request.user.current_provider.name == "Test Provider"
+        assert request.user.current_provider == assignment.provider
+        assert request.user.current_provider.name == assignment.provider.name
 
     def test_sets_current_provider_to_none_when_not_in_session(self):
         request = RequestFactory().get("/")
@@ -93,3 +98,30 @@ class TestCurrentProviderMiddleware:
         mw = _make_middleware()
 
         assert mw.process_view(request, view, (), {}) is None
+
+    def test_clears_session_and_sets_none_when_assignment_removed(self):
+        user = UserFactory()
+        provider = ProviderFactory()
+        user.current_provider = provider
+        # No UserAssignment created — simulates a removed assignment
+        request = RequestFactory().get("/")
+        request.session = {"current_provider": str(provider.pk)}
+        request.user = user
+
+        mw = _make_middleware()
+        mw(request)
+
+        assert request.user.current_provider is None
+        assert "current_provider" not in request.session
+
+    def test_sets_current_provider_via_assignment_when_valid(self):
+        user = UserFactory()
+        assignment = UserAssignmentFactory(user=user)
+        request = RequestFactory().get("/")
+        request.session = {"current_provider": str(assignment.provider.pk)}
+        request.user = user
+
+        mw = _make_middleware()
+        mw(request)
+
+        assert request.user.current_provider == assignment.provider

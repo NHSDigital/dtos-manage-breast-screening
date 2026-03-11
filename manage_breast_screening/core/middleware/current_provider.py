@@ -6,7 +6,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from manage_breast_screening.clinics.models import Provider
+from manage_breast_screening.clinics.models import UserAssignment
 from manage_breast_screening.core.decorators import is_current_provider_exempt
 
 logger = logging.getLogger(__name__)
@@ -51,11 +51,25 @@ class CurrentProviderMiddleware:
     def _add_current_provider_property(self, request: HttpRequest) -> None:
         """Add current_provider attribute to request.user.
 
-        Loads the Provider instance from the database based on the
-        current_provider session value.
+        Loads the Provider instance from the database via UserAssignment,
+        confirming the user is still assigned to that provider. If the
+        assignment no longer exists, clears the session so the user is
+        redirected to provider selection on the next process_view call.
         """
         provider_id = request.session.get("current_provider")
-        if provider_id:
-            request.user.current_provider = Provider.objects.get(pk=provider_id)
+        if provider_id and request.user.is_authenticated:
+            try:
+                assignment = request.user.assignments.select_related("provider").get(
+                    provider_id=provider_id
+                )
+                request.user.current_provider = assignment.provider
+            except UserAssignment.DoesNotExist:
+                logger.info(
+                    "User %s no longer assigned to provider %s — clearing session",
+                    request.user.pk,
+                    provider_id,
+                )
+                del request.session["current_provider"]
+                request.user.current_provider = None
         else:
             request.user.current_provider = None
