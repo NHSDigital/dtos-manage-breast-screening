@@ -118,11 +118,11 @@ class Persona:
 
 ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
 CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
-SYSADMIN_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_superuser=True)
+SUPERUSER_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_superuser=True)
 PERSONAS = [
     ADMINISTRATIVE_PERSONA,
     CLINICAL_PERSONA,
     Persona("Olivia", "Morgan", Role.ADMINISTRATIVE),
     Persona("Ella", "Foster", Role.CLINICAL),
-    SYSADMIN_PERSONA,
+    SUPERUSER_PERSONA,
 ]
