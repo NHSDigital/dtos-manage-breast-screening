@@ -4,10 +4,11 @@ from django import forms
 from django.db.models import TextChoices
 from django.forms.widgets import Textarea
 
-from manage_breast_screening.nhsuk_forms.fields import (
-    CharField,
-    ChoiceField,
+from manage_breast_screening.core.utils.date_formatting import (
+    format_relative_months,
+    format_relative_seasons,
 )
+from manage_breast_screening.nhsuk_forms.fields import CharField, ChoiceField
 from manage_breast_screening.nhsuk_forms.fields.split_date_field import SplitDateField
 from manage_breast_screening.nhsuk_forms.forms import FormWithConditionalFields
 
@@ -64,14 +65,6 @@ class EthnicityForm(forms.Form):
 
 
 class ParticipantReportedMammogramForm(FormWithConditionalFields):
-    class WhenTaken(TextChoices):
-        EXACT = (
-            "EXACT",
-            "Enter an exact date",
-        )
-        APPROX = "APPROX", "Enter an approximate date"
-        NOT_SURE = "NOT_SURE", "Not sure"
-
     class NameIsTheSame(TextChoices):
         YES = "YES", "Yes"
         NO = "NO", "No, under a different name"
@@ -91,20 +84,14 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
                 "location_type": instance.location_type,
                 "somewhere_in_the_uk_details": instance.location_details,
                 "outside_the_uk_details": instance.location_details,
-                "when_taken": (
-                    self.WhenTaken.EXACT
-                    if instance.exact_date
-                    else self.WhenTaken.APPROX
-                    if instance.approx_date
-                    else self.WhenTaken.NOT_SURE
-                ),
+                "date_type": instance.date_type,
                 "name_is_the_same": (
                     self.NameIsTheSame.YES
                     if not instance.different_name
                     else self.NameIsTheSame.NO
                 ),
                 "exact_date": instance.exact_date,
-                "approx_date": instance.approx_date,
+                f"approx_date_{instance.date_type}": instance.approx_date,
                 "different_name": instance.different_name,
                 "additional_information": instance.additional_information,
             }
@@ -153,8 +140,8 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             "location_type", ParticipantReportedMammogram.LocationType.OUTSIDE_UK
         ).require_field("outside_the_uk_details")
 
-        self.fields["when_taken"] = ChoiceField(
-            choices=self.WhenTaken,
+        self.fields["date_type"] = ChoiceField(
+            choices=ParticipantReportedMammogram.DateType,
             label="When were the x-rays taken?",
             error_messages={"required": "Select when the x-rays were taken"},
         )
@@ -166,22 +153,35 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             label_classes="nhsuk-u-visually-hidden",
             error_messages={"required": "Enter the date when the x-rays were taken"},
         )
-        self.given_field_value("when_taken", self.WhenTaken.EXACT).require_field(
-            "exact_date"
-        )
-        self.fields["approx_date"] = CharField(
+        self.given_field_value(
+            "date_type", ParticipantReportedMammogram.DateType.EXACT
+        ).require_field("exact_date")
+        self.fields["approx_date_MORE_THAN_SIX_MONTHS"] = CharField(
             required=False,
-            label="Enter an approximate date",
-            label_classes="nhsuk-u-visually-hidden",
-            hint="For example, 9 months ago",
+            label="Approximate date",
+            visually_hidden_label_suffix=" (at least 6 months ago)",
+            hint=f"For example, {format_relative_months(-9)} or {format_relative_seasons(-12)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
                 "required": "Enter the approximate date when the x-rays were taken"
             },
         )
-        self.given_field_value("when_taken", self.WhenTaken.APPROX).require_field(
-            "approx_date"
+        self.fields["approx_date_LESS_THAN_SIX_MONTHS"] = CharField(
+            required=False,
+            label="Approximate date",
+            visually_hidden_label_suffix=" (less than 6 months ago)",
+            hint=f"For example, {format_relative_months(-3)}",
+            classes="nhsuk-u-width-two-thirds",
+            error_messages={
+                "required": "Enter the approximate date when the x-rays were taken"
+            },
         )
+        self.given_field_value(
+            "date_type", ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS
+        ).require_field("approx_date_MORE_THAN_SIX_MONTHS")
+        self.given_field_value(
+            "date_type", ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        ).require_field("approx_date_LESS_THAN_SIX_MONTHS")
 
         self.fields["name_is_the_same"] = ChoiceField(
             label=f"Were they taken with the name {participant.full_name}?",
@@ -213,9 +213,12 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         )
 
     def model_values(self):
+        date_type = self.cleaned_data["date_type"]
+
         return dict(
+            date_type=date_type,
             exact_date=self.cleaned_data.get("exact_date"),
-            approx_date=self.cleaned_data.get("approx_date"),
+            approx_date=self.cleaned_data.get(f"approx_date_{date_type}", ""),
             different_name=self.cleaned_data.get("different_name"),
             additional_information=self.cleaned_data.get("additional_information", ""),
         )
@@ -264,9 +267,15 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         if self.instance is None:
             raise ValueError("Form has no instance")
 
+        date_type = self.cleaned_data["date_type"]
+
         self.set_location_fields(self.instance)
+        self.instance.date_type = date_type
         self.instance.exact_date = self.cleaned_data.get("exact_date")
-        self.instance.approx_date = self.cleaned_data.get("approx_date")
+        self.instance.approx_date = self.cleaned_data.get(
+            f"approx_date_{date_type}", ""
+        )
+
         self.instance.different_name = self.cleaned_data.get("different_name")
         self.instance.additional_information = self.cleaned_data.get(
             "additional_information", ""

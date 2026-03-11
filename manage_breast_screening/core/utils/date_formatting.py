@@ -175,3 +175,30 @@ def format_relative_months(months: int) -> str:
         str: The resulting date in the form "Month Year".
     """
     return (date.today() + relativedelta(months=months)).strftime("%B %Y")
+
+
+def format_relative_seasons(seasons: int) -> str:
+    """
+    Returns the current date plus the specified number of seasons.
+    as a string like "spring 2025".
+
+    In the case of winter, which goes over the new year, the year
+    is the one at the start of winter.
+
+    Args:
+        seasons (int): Number of seasons to add.
+
+    Returns:
+        str: The date in the form "Season Year".
+    """
+    new_date = date.today() + relativedelta(months=seasons * 3)
+    if new_date.month == 12:
+        return f"winter {new_date.year}"
+    elif new_date.month in (1, 2):
+        return f"winter {new_date.year - 1}"
+    elif new_date.month in (3, 4, 5):
+        return f"spring {new_date.year}"
+    elif new_date.month in (6, 7, 8):
+        return f"summer {new_date.year}"
+    else:
+        return f"autumn {new_date.year}"
