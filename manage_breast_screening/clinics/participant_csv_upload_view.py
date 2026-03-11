@@ -1,6 +1,6 @@
 import csv
 import io
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import cached_property
 
 from django.contrib import messages
@@ -9,9 +9,13 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import redirect
+from django.utils import timezone
 from django.views.generic.edit import FormView
 
-from manage_breast_screening.participants.models import ParticipantAddress
+from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.participants.models import (
+    ParticipantAddress,
+)
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatus,
     AppointmentStatusNames,
@@ -109,23 +113,23 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
         errors = []
         output = {}
 
-        first_name = row.get("Forenames", "").strip()
+        first_name = self.get_stripped_value(row, "Forenames")
         if not first_name:
             errors.append("Forenames is required")
         output["first_name"] = first_name
 
-        last_name = row.get("Surname", "").strip()
+        last_name = self.get_stripped_value(row, "Surname")
         if not last_name:
             errors.append("Surname is required")
         output["last_name"] = last_name
 
-        gender = row.get("Sex", "").strip()
+        gender = self.get_stripped_value(row, "Sex")
         if gender != "F":
             errors.append(f'Invalid value for "Sex": "{gender}". Only "F" is accepted.')
         output["gender"] = "Female"
 
-        nhs_number = row.get("NHS Number", "").replace(" ", "")
-        if not nhs_number.isdigit() or len(nhs_number) != 10:
+        nhs_number = self.get_stripped_value(row, "NHS Number").replace(" ", "")
+        if not self.is_valid_nhs_number(nhs_number):
             errors.append(
                 "NHS Number must be 10 digits (spaces are ignored, e.g., 1234567890 or 123 456 7890)"
             )
@@ -133,17 +137,17 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
             errors.append("NHS Number already exists in the database")
         output["nhs_number"] = nhs_number
 
-        phone = row.get("Telephone No.1", "").strip()
+        phone = self.get_stripped_value(row, "Telephone No.1")
         if not phone:
             errors.append("Telephone No.1 is required")
         output["phone"] = phone
 
-        email = row.get("Email Address", "").strip()
+        email = self.get_stripped_value(row, "Email Address")
         if not email:
             errors.append("Email Address is required")
         output["email"] = email
 
-        date_of_birth = row.get("Date of Birth", "").strip()
+        date_of_birth = self.get_stripped_value(row, "Date of Birth")
         try:
             output["date_of_birth"] = datetime.strptime(
                 date_of_birth, "%d-%b-%Y"
@@ -153,7 +157,7 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
                 "Date of Birth must be in format DD-MMM-YYYY (e.g., 01-Jan-1980)"
             )
 
-        address = row.get("Address", "").strip()
+        address = self.get_stripped_value(row, "Address")
         address_lines = [line.strip() for line in address.split(",") if line.strip()]
         if len(address_lines) == 0:
             errors.append("Address is required")
@@ -161,10 +165,16 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
             errors.append("Address must have at most 5 lines")
         output["address_lines"] = address_lines
 
-        postcode = row.get("Postcode", "").strip()
+        postcode = self.get_stripped_value(row, "Postcode")
         if not postcode:
             errors.append("Postcode is required")
         output["postcode"] = postcode
+
+        start_time = self.get_stripped_value(row, "Start Time")
+        try:
+            output["start_time"] = datetime.strptime(start_time, "%H:%M").time()
+        except ValueError:
+            errors.append("Start Time must be in format HH:MM (e.g., 09:30 or 14:45)")
 
         if errors:
             return None, errors
@@ -172,7 +182,8 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
         return output, []
 
     def insert_data(self, transformed_rows):
-        slot_start_time = self.clinic.starts_at
+        auditor = Auditor.from_request(self.request)
+        clinic_date = self.clinic.starts_at.date()
 
         with transaction.atomic():
             for row in transformed_rows:
@@ -186,35 +197,49 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
                     date_of_birth=row["date_of_birth"],
                     risk_level="Routine",
                 )
-                participant.save()
+                self.save(auditor, participant)
 
-                ParticipantAddress(
+                participant_address = ParticipantAddress(
                     participant=participant,
                     lines=row["address_lines"],
                     postcode=row["postcode"],
-                ).save()
+                )
+                self.save(auditor, participant_address)
 
                 clinic_slot = ClinicSlot(
                     clinic=self.clinic,
-                    starts_at=slot_start_time,
+                    starts_at=timezone.make_aware(
+                        datetime.combine(clinic_date, row["start_time"])
+                    ),
                     duration_in_minutes=self.SLOT_DURATION_IN_MINUTES,
                 )
-                clinic_slot.save()
-                slot_start_time += timedelta(minutes=self.SLOT_DURATION_IN_MINUTES)
+                self.save(auditor, clinic_slot)
 
                 screening_episode = ScreeningEpisode(
                     participant=participant,
                 )
-                screening_episode.save()
+                self.save(auditor, screening_episode)
 
                 appointment = Appointment(
                     screening_episode=screening_episode,
                     clinic_slot=clinic_slot,
                 )
-                appointment.save()
+                self.save(auditor, appointment)
 
-                AppointmentStatus(
+                appointment_status = AppointmentStatus(
                     appointment=appointment,
                     name=AppointmentStatusNames.SCHEDULED,
                     created_by=self.request.user,
-                ).save()
+                )
+                self.save(auditor, appointment_status)
+
+    def get_stripped_value(self, row, key):
+        value = row.get(key)
+        return value.strip() if value else ""
+
+    def is_valid_nhs_number(self, nhs_number):
+        return nhs_number.isdigit() and len(nhs_number) == 10
+
+    def save(self, auditor, obj):
+        obj.save()
+        auditor.audit_create(obj)

@@ -1,5 +1,5 @@
 import uuid
-from datetime import timedelta
+from datetime import time
 
 import pytest
 from django.contrib import messages
@@ -12,6 +12,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicFactory,
     SettingFactory,
 )
+from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.participants.models import Appointment
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
@@ -117,10 +118,10 @@ class TestParticipantCsvUploadView:
 
     def test_valid_post_redirects(self, superuser_client, superuser_clinic):
         lines = [
-            "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP",
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, AREA, CITY",AA1 2XY,1034567891,1034567891,zxcv@outlook.com,BSS/B81001 - TEST GROUP PRACTICE (PRAC:B81001)',
-            '2,999 999 9992,JONES,TEST2,MRS,15-Jun-1970,50,F,A White - British,"q, w, e, r, t",BB9 3ED,1034567892,,asdf@outlook.com,BSS/B81002 - TEST PARTNERSHIP (PRAC:B81002)',
-            '3,999 999 9993,JOHNSON,TEST3 MIDDLENAME,MRS,31-Dec-1960,50,F,A White - British,"22 FAKE STREET, CITY",CC3 3PK,1034567893,,qwerty@gmail.com,BSS/B81003 - TEST FAMILY PRACTICE (PRAC:B81003)',
+            "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP,Start Time",
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, AREA, CITY",AA1 2XY,1034567891,1034567891,zxcv@outlook.com,BSS/B81001 - TEST GROUP PRACTICE (PRAC:B81001),09:00',
+            '2,999 999 9992,JONES,TEST2,MRS,15-Jun-1970,50,F,A White - British,"q, w, e, r, t",BB9 3ED,1034567892,,asdf@outlook.com,BSS/B81002 - TEST PARTNERSHIP (PRAC:B81002),10:00',
+            '3,999 999 9993,JOHNSON,TEST3 MIDDLENAME,MRS,31-Dec-1960,50,F,A White - British,"22 FAKE STREET, CITY",CC3 3PK,1034567893,,qwerty@gmail.com,BSS/B81003 - TEST FAMILY PRACTICE (PRAC:B81003),11:00',
         ]
 
         csv_content = ("\n".join(lines)).encode("utf-8")
@@ -158,12 +159,12 @@ class TestParticipantCsvUploadView:
         )
 
     def _header(self):
-        return "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP"
+        return "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP,Start Time"
 
     def test_csv_row_error_missing_forenames(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,,SMITH,,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,,SMITH,,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -180,7 +181,7 @@ class TestParticipantCsvUploadView:
     def test_csv_row_error_missing_surname(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,999 999 9991,,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,999 999 9991,,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -214,7 +215,7 @@ class TestParticipantCsvUploadView:
     ):
         lines = [
             self._header(),
-            f'1,{nhs_number},SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            f'1,{nhs_number},SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -236,7 +237,7 @@ class TestParticipantCsvUploadView:
 
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -255,7 +256,7 @@ class TestParticipantCsvUploadView:
     ):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,1980-01-01,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,1980-01-01,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -272,7 +273,7 @@ class TestParticipantCsvUploadView:
     def test_csv_row_error_invalid_sex(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,M,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,M,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -291,7 +292,7 @@ class TestParticipantCsvUploadView:
     ):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"a, b, c, d, e, f",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"a, b, c, d, e, f",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -308,7 +309,7 @@ class TestParticipantCsvUploadView:
     def test_csv_row_error_missing_address(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            "1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,,AA1 2XY,1034567890,,test@example.com,BSS",
+            "1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,,AA1 2XY,1034567890,,test@example.com,BSS,9:00",
         ]
         response = superuser_client.http.post(
             reverse(
@@ -322,7 +323,7 @@ class TestParticipantCsvUploadView:
     def test_csv_row_error_missing_postcode(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",,1034567890,,test@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -336,7 +337,7 @@ class TestParticipantCsvUploadView:
     def test_csv_row_error_missing_phone(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,,,test@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -350,7 +351,7 @@ class TestParticipantCsvUploadView:
     def test_csv_row_error_missing_email(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -364,7 +365,7 @@ class TestParticipantCsvUploadView:
     def test_multiple_row_errors_all_shown(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,BADNHS,SMITH,TEST1,MRS,BADDATE,50,M,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            '1,BADNHS,SMITH,TEST1,MRS,BADDATE,50,M,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -391,8 +392,8 @@ class TestParticipantCsvUploadView:
     ):
         lines = [
             self._header(),
-            '1,BADNHS1,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test1@example.com,BSS',
-            '2,BADNHS2,JONES,TEST2,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",BB2 3XY,1034567891,,test2@example.com,BSS',
+            '1,BADNHS1,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test1@example.com,BSS,9:00',
+            '2,BADNHS2,JONES,TEST2,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",BB2 3XY,1034567891,,test2@example.com,BSS,9:00',
         ]
         response = superuser_client.http.post(
             reverse(
@@ -413,8 +414,8 @@ class TestParticipantCsvUploadView:
     def test_valid_post_creates_participants(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001',
-            '2,9999999992,JONES,TEST2,MRS,31-Dec-1975,50,F,A White - British,"2 BUILDING, STREET, CITY, COUNTY, UK",BB2 3XY,1034567891,,test2@example.com,BSS/B81002',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001,09:07',
+            '2,9999999992,JONES,TEST2,MRS,31-Dec-1975,50,F,A White - British,"2 BUILDING, STREET, CITY, COUNTY, UK",BB2 3XY,1034567891,,test2@example.com,BSS/B81002,15:34',
         ]
         superuser_client.http.post(
             reverse(
@@ -442,7 +443,11 @@ class TestParticipantCsvUploadView:
         assert participant.appointments.count() == 1
         appointment = participant.appointments.first()
         assert appointment.clinic_slot.clinic == superuser_clinic
-        assert appointment.clinic_slot.starts_at == superuser_clinic.starts_at
+        assert (
+            appointment.clinic_slot.starts_at.date()
+            == superuser_clinic.starts_at.date()
+        )
+        assert appointment.clinic_slot.starts_at.time() == time(9, 7)
         assert appointment.clinic_slot.duration_in_minutes == 15
         assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
@@ -468,19 +473,23 @@ class TestParticipantCsvUploadView:
         appointment = participant.appointments.first()
         assert appointment.clinic_slot.clinic == superuser_clinic
         assert (
-            appointment.clinic_slot.starts_at
-            == superuser_clinic.starts_at + timedelta(minutes=15)
+            appointment.clinic_slot.starts_at.date()
+            == superuser_clinic.starts_at.date()
         )
+        assert appointment.clinic_slot.starts_at.time() == time(15, 34)
         assert appointment.clinic_slot.duration_in_minutes == 15
         assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+
+        # Expect 12 audit logs: 2 participants + 2 addresses + 2 clinic slots + 2 screening episodes + 2 appointments + 2 appointment statuses
+        assert AuditLog.objects.count() == 12
 
     def test_valid_post_no_db_changes_when_row_has_errors(
         self, superuser_client, superuser_clinic
     ):
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001',
-            '2,BADNHS,JONES,TEST2,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",BB2 3XY,1034567891,,test2@example.com,BSS',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001,9:00',
+            '2,BADNHS,JONES,TEST2,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",BB2 3XY,1034567891,,test2@example.com,BSS,9:00',
         ]
         superuser_client.http.post(
             reverse(
@@ -491,3 +500,4 @@ class TestParticipantCsvUploadView:
         assert Participant.objects.count() == 0
         assert ClinicSlot.objects.filter(clinic=superuser_clinic).count() == 0
         assert Appointment.objects.count() == 0
+        assert AuditLog.objects.count() == 0
