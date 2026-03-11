@@ -89,7 +89,7 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
     }
 
 
-@router.post(
+@router.patch(
     "/{source_message_id}/failure",
     response={
         200: StatusResponse,

@@ -183,7 +183,7 @@ def test_report_failure(monkeypatch):
 
     action = GatewayActionFactory()
 
-    response = client.post(
+    response = client.patch(
         f"/dicom/{action.id}/failure",
         json={"error": "Missing PatientID"},
         headers={"Authorization": "Bearer testtoken"},
@@ -203,7 +203,7 @@ def test_report_failure_action_not_found(monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
     monkeypatch.setenv("API_AUTH_TOKEN", "testtoken")
 
-    response = client.post(
+    response = client.patch(
         "/dicom/00000000-0000-0000-0000-000000000000/failure",
         json={"error": "Missing PatientID"},
         headers={"Authorization": "Bearer testtoken"},
