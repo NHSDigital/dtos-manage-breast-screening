@@ -161,6 +161,53 @@ class TestParticipantCsvUploadView:
     def _header(self):
         return "Row,NHS Number,Surname,Forenames,Title,Date of Birth,Age,Sex,Ethnic Origin,Address,Postcode,Telephone No.1,Tel No.2,Email Address,GP,Start Time"
 
+    def test_missing_headings(self, superuser_client, superuser_clinic):
+        lines = [
+            "a,b,c",
+            "1,2,3",
+        ]
+        response = superuser_client.http.post(
+            reverse(
+                "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
+            ),
+            {"csv_file": self._make_csv(lines)},
+        )
+        assert response.status_code == 200
+        assertInHTML("<li>Missing column: NHS Number</li>", response.text)
+        assertInHTML("<li>Missing column: Surname</li>", response.text)
+        assertInHTML("<li>Missing column: Forenames</li>", response.text)
+        assertInHTML("<li>Missing column: Date of Birth</li>", response.text)
+        assertInHTML("<li>Missing column: Sex</li>", response.text)
+        assertInHTML("<li>Missing column: Address</li>", response.text)
+        assertInHTML("<li>Missing column: Postcode</li>", response.text)
+        assertInHTML("<li>Missing column: Telephone No.1</li>", response.text)
+        assertInHTML("<li>Missing column: Email Address</li>", response.text)
+        assertInHTML("<li>Missing column: Start Time</li>", response.text)
+
+    def test_rows_missing_columns(self, superuser_client, superuser_clinic):
+        lines = [
+            self._header(),
+            '1,,SMITH,,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,test@example.com,BSS',
+            "2,",
+            '3,,SMITH,,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",',
+        ]
+        response = superuser_client.http.post(
+            reverse(
+                "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
+            ),
+            {"csv_file": self._make_csv(lines)},
+        )
+        assert response.status_code == 200
+        assertInHTML("<li>Row 1: Missing columns: Start Time</li>", response.text)
+        assertInHTML(
+            "<li>Row 2: Missing columns: Surname, Forenames, Title, Date of Birth, Age, Sex, Ethnic Origin, Address, Postcode, Telephone No.1, Tel No.2, Email Address, GP, Start Time</li>",
+            response.text,
+        )
+        assertInHTML(
+            "<li>Row 3: Missing columns: Telephone No.1, Tel No.2, Email Address, GP, Start Time</li>",
+            response.text,
+        )
+
     def test_csv_row_error_missing_forenames(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),

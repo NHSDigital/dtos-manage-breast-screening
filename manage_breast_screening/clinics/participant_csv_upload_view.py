@@ -38,6 +38,19 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
     """
 
     SLOT_DURATION_IN_MINUTES = 15
+    REQUIRED_HEADINGS = [
+        "NHS Number",
+        "Surname",
+        "Forenames",
+        "Date of Birth",
+        "Sex",
+        "Address",
+        "Postcode",
+        "Telephone No.1",
+        "Email Address",
+        "Start Time",
+    ]
+
     template_name = "clinics/participant_csv_upload.jinja"
     form_class = ParticipantCsvUploadForm
 
@@ -67,12 +80,10 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
             form.add_error("csv_file", "The file could not be read as UTF-8")
             return self.form_invalid(form)
 
-        reader = csv.DictReader(io.StringIO(decoded_file))
+        transformed_rows, csv_errors = self.parse_csv(decoded_file)
 
-        transformed_rows, row_errors = self.transform_rows(reader)
-
-        if row_errors:
-            for error in row_errors:
+        if csv_errors:
+            for error in csv_errors:
                 form.add_error(None, error)
             return self.form_invalid(form)
 
@@ -83,6 +94,25 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
             f"{len(transformed_rows)} participants uploaded successfully.",
         )
         return redirect("clinics:show_clinic", pk=self.clinic.pk)
+
+    def parse_csv(self, decoded_file):
+        reader = csv.DictReader(io.StringIO(decoded_file))
+
+        if len(reader.fieldnames) != len(set(reader.fieldnames)):
+            duplicates = set(
+                [x for x in reader.fieldnames if reader.fieldnames.count(x) > 1]
+            )
+            return (None, [f"Duplicate columns found: {', '.join(duplicates)}"])
+
+        column_errors = [
+            f"Missing column: {heading}"
+            for heading in self.REQUIRED_HEADINGS
+            if heading not in reader.fieldnames
+        ]
+        if column_errors:
+            return (None, column_errors)
+
+        return self.transform_rows(reader)
 
     def transform_rows(self, reader: csv.DictReader) -> tuple[list[dict], list[str]]:
         """
@@ -109,6 +139,10 @@ class ParticipantCsvUploadView(LoginRequiredMixin, FormView):
         or None if there are validation errors.
         The errors element is a list of error messages describing any validation issues with the row.
         """
+
+        none_keys = [k for k, v in row.items() if v is None]
+        if none_keys:
+            return (None, [f"Missing columns: {', '.join(none_keys)}"])
 
         errors = []
         output = {}
