@@ -158,8 +158,8 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         ).require_field("exact_date")
         self.fields["approx_date_MORE_THAN_SIX_MONTHS"] = CharField(
             required=False,
-            label="Enter an approximate date",
-            label_classes="nhsuk-u-visually-hidden",
+            label="Approximate date",
+            visually_hidden_label_suffix=" (at least 6 months ago)",
             hint=f"For example, {format_relative_months(-9)} or {format_relative_seasons(-12)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
@@ -168,8 +168,8 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         )
         self.fields["approx_date_LESS_THAN_SIX_MONTHS"] = CharField(
             required=False,
-            label="Enter an approximate date",
-            label_classes="nhsuk-u-visually-hidden",
+            label="Approximate date",
+            visually_hidden_label_suffix=" (less than 6 months ago)",
             hint=f"For example, {format_relative_months(-3)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
