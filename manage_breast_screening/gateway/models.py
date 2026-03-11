@@ -11,6 +11,7 @@ class GatewayActionStatus(models.TextChoices):
     SENT = "sent", "Sent"
     CONFIRMED = "confirmed", "Confirmed"
     FAILED = "failed", "Failed"
+    IMAGE_FAILED = "image_failed", "Image Failed"
 
 
 class GatewayActionType(models.TextChoices):

@@ -3,10 +3,12 @@ from typing import Any
 
 import ninja
 import pydicom
+from django.utils import timezone
 from ninja import File, Router
 from ninja.files import UploadedFile
 
 from manage_breast_screening.core.api_schema import ErrorResponse, StatusResponse
+from manage_breast_screening.gateway.models import GatewayAction, GatewayActionStatus
 
 from .dicom_recorder import DicomRecorder
 
@@ -20,6 +22,10 @@ class SuccessResponse(ninja.Schema):
     series_instance_uid: str
     sop_instance_uid: str
     instance_id: Any
+
+
+class FailurePayload(ninja.Schema):
+    error: str
 
 
 @router.put(
@@ -81,3 +87,32 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
         "sop_instance_uid": image.sop_instance_uid,
         "instance_id": image.id,
     }
+
+
+@router.patch(
+    "/{source_message_id}/failure",
+    response={
+        200: StatusResponse,
+        403: StatusResponse,
+        404: ErrorResponse,
+    },
+)
+def report_failure(request, source_message_id: str, payload: FailurePayload):
+    """
+    Report a C-STORE validation failure for a gateway action.
+    """
+    try:
+        action = GatewayAction.objects.get(id=source_message_id)
+    except (GatewayAction.DoesNotExist, ValueError):
+        return 404, {
+            "title": "Not Found",
+            "status": 404,
+            "detail": f"GatewayAction {source_message_id!r} not found.",
+        }
+
+    action.status = GatewayActionStatus.IMAGE_FAILED
+    action.last_error = payload.error
+    action.failed_at = timezone.now()
+    action.save(update_fields=["status", "last_error", "failed_at", "updated_at"])
+
+    return 200, {"status": "failure recorded"}
