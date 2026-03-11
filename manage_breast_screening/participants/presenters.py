@@ -34,6 +34,7 @@ def status_colour(status):
         case (
             AppointmentStatusNames.ATTENDED_NOT_SCREENED
             | AppointmentStatusNames.PARTIALLY_SCREENED
+            | AppointmentStatusNames.PAUSED
         ):
             return "orange"
         case _:

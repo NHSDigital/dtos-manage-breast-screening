@@ -312,6 +312,14 @@ class TestAppointmentPresenter:
                     False,
                 ),
                 (
+                    AppointmentStatusNames.PAUSED,
+                    "nhsuk-tag--orange app-u-nowrap",
+                    "Paused",
+                    "PAUSED",
+                    False,
+                    False,
+                ),
+                (
                     AppointmentStatusNames.CANCELLED,
                     "nhsuk-tag--red app-u-nowrap",
                     "Cancelled",
