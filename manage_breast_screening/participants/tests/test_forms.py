@@ -137,7 +137,7 @@ class TestParticipantReportedMammogramForm:
         assert not form.is_valid()
         assert form.errors == {
             "location_type": ["Select where the breast x-rays were taken"],
-            "when_taken": ["Select when the x-rays were taken"],
+            "date_type": ["Select when the x-rays were taken"],
             "name_is_the_same": ["Select if the x-rays were taken with the same name"],
         }
 
@@ -147,7 +147,7 @@ class TestParticipantReportedMammogramForm:
                 urlencode(
                     {
                         "location_type": ParticipantReportedMammogram.LocationType.ELSEWHERE_UK.value,
-                        "when_taken": "APPROX",
+                        "date_type": "MORE_THAN_SIX_MONTHS",
                         "name_is_the_same": "NO",
                     },
                     doseq=True,
@@ -158,7 +158,9 @@ class TestParticipantReportedMammogramForm:
         )
         assert not form.is_valid()
         assert form.errors == {
-            "approx_date": ["Enter the approximate date when the x-rays were taken"],
+            "approx_date_MORE_THAN_SIX_MONTHS": [
+                "Enter the approximate date when the x-rays were taken"
+            ],
             "different_name": ["Enter the name the x-rays were taken with"],
             "somewhere_in_the_uk_details": [
                 "Enter the clinic or hospital name, or any location details"
@@ -170,7 +172,7 @@ class TestParticipantReportedMammogramForm:
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             "somewhere_in_the_uk_details": "XYZ provider",
-            "when_taken": "EXACT",
+            "date_type": "EXACT",
             "name_is_the_same": "YES",
             "exact_date_0": "2",
             "exact_date_1": "5",
@@ -193,7 +195,8 @@ class TestParticipantReportedMammogramForm:
     def test_mammogram_in_same_provider(self, appointment, most_recent_provider):
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT.value,
-            "when_taken": "NOT_SURE",
+            "date_type": "LESS_THAN_SIX_MONTHS",
+            "approx_date_LESS_THAN_SIX_MONTHS": "January",
             "name_is_the_same": "YES",
         }
 
@@ -210,8 +213,12 @@ class TestParticipantReportedMammogramForm:
         assert instance.provider == most_recent_provider
         assert instance.location_type == "NHS_BREAST_SCREENING_UNIT"
         assert instance.location_details == ""
+        assert (
+            instance.date_type
+            == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        )
         assert instance.exact_date is None
-        assert instance.approx_date == ""
+        assert instance.approx_date == "January"
         assert instance.different_name == ""
         assert instance.additional_information == ""
 
@@ -219,7 +226,8 @@ class TestParticipantReportedMammogramForm:
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             "somewhere_in_the_uk_details": "XYZ provider",
-            "when_taken": "NOT_SURE",
+            "date_type": "LESS_THAN_SIX_MONTHS",
+            "approx_date_LESS_THAN_SIX_MONTHS": "January",
             "name_is_the_same": "YES",
         }
 
@@ -236,8 +244,12 @@ class TestParticipantReportedMammogramForm:
         assert instance.provider is None
         assert instance.location_type == "ELSEWHERE_UK"
         assert instance.location_details == "XYZ provider"
+        assert (
+            instance.date_type
+            == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        )
         assert instance.exact_date is None
-        assert instance.approx_date == ""
+        assert instance.approx_date == "January"
         assert instance.different_name == ""
         assert instance.additional_information == ""
 
@@ -245,7 +257,8 @@ class TestParticipantReportedMammogramForm:
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
             "outside_the_uk_details": "XYZ provider",
-            "when_taken": "NOT_SURE",
+            "date_type": "LESS_THAN_SIX_MONTHS",
+            "approx_date_LESS_THAN_SIX_MONTHS": "January",
             "name_is_the_same": "YES",
         }
 
@@ -262,15 +275,20 @@ class TestParticipantReportedMammogramForm:
         assert instance.provider is None
         assert instance.location_type == "OUTSIDE_UK"
         assert instance.location_details == "XYZ provider"
+        assert (
+            instance.date_type
+            == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        )
         assert instance.exact_date is None
-        assert instance.approx_date == ""
+        assert instance.approx_date == "January"
         assert instance.different_name == ""
         assert instance.additional_information == ""
 
     def test_mammogram_prefer_not_to_say(self, appointment, most_recent_provider):
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY,
-            "when_taken": "NOT_SURE",
+            "date_type": "LESS_THAN_SIX_MONTHS",
+            "approx_date_LESS_THAN_SIX_MONTHS": "January",
             "name_is_the_same": "YES",
         }
 
@@ -287,8 +305,12 @@ class TestParticipantReportedMammogramForm:
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
+        assert (
+            instance.date_type
+            == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        )
         assert instance.exact_date is None
-        assert instance.approx_date == ""
+        assert instance.approx_date == "January"
         assert instance.different_name == ""
         assert instance.additional_information == ""
 
@@ -306,7 +328,7 @@ class TestParticipantReportedMammogramForm:
     def test_mammogram_exact_date(self, appointment, most_recent_provider, exact_date):
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY,
-            "when_taken": "EXACT",
+            "date_type": "EXACT",
             "exact_date_0": exact_date.day,
             "exact_date_1": exact_date.month,
             "exact_date_2": exact_date.year,
@@ -327,15 +349,17 @@ class TestParticipantReportedMammogramForm:
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
         assert instance.exact_date == exact_date
-        assert instance.approx_date == ""
+        assert instance.date_type == "EXACT"
         assert instance.different_name == ""
         assert instance.additional_information == ""
 
-    def test_mammogram_approx_date(self, appointment, most_recent_provider):
+    def test_mammogram_more_than_six_months_ago(
+        self, appointment, most_recent_provider
+    ):
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY,
-            "when_taken": "APPROX",
-            "approx_date": "5 years ago",
+            "date_type": "MORE_THAN_SIX_MONTHS",
+            "approx_date_MORE_THAN_SIX_MONTHS": "5 years ago",
             "name_is_the_same": "YES",
         }
 
@@ -360,7 +384,8 @@ class TestParticipantReportedMammogramForm:
     def test_mammogram_different_name(self, appointment, most_recent_provider):
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY,
-            "when_taken": "NOT_SURE",
+            "date_type": "LESS_THAN_SIX_MONTHS",
+            "approx_date_LESS_THAN_SIX_MONTHS": "February",
             "name_is_the_same": "NO",
             "different_name": "Jane Newname",
         }
@@ -378,8 +403,12 @@ class TestParticipantReportedMammogramForm:
         assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
+        assert (
+            instance.date_type
+            == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        )
         assert instance.exact_date is None
-        assert instance.approx_date == ""
+        assert instance.approx_date == "February"
         assert instance.different_name == "Jane Newname"
         assert instance.additional_information == ""
 
@@ -387,8 +416,8 @@ class TestParticipantReportedMammogramForm:
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
             "outside_the_uk_details": "XYZ provider",
-            "when_taken": "APPROX",
-            "approx_date": "5 years ago",
+            "date_type": "MORE_THAN_SIX_MONTHS",
+            "approx_date_MORE_THAN_SIX_MONTHS": "5 years ago",
             "name_is_the_same": "NO",
             "different_name": "Jane Newname",
             "additional_information": "abcdef",
@@ -416,12 +445,14 @@ class TestParticipantReportedMammogramForm:
         original_instance = ParticipantReportedMammogram.objects.create(
             appointment=appointment,
             location_type=ParticipantReportedMammogram.LocationType.PREFER_NOT_TO_SAY,
+            date_type="LESS_THAN_SIX_MONTHS",
+            approx_date="January",
         )
         data = {
             "location_type": ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
             "outside_the_uk_details": "XYZ provider",
-            "when_taken": "APPROX",
-            "approx_date": "5 years ago",
+            "date_type": "MORE_THAN_SIX_MONTHS",
+            "approx_date_MORE_THAN_SIX_MONTHS": "5 years ago",
             "name_is_the_same": "NO",
             "different_name": "Jane Newname",
             "additional_information": "abcdef",

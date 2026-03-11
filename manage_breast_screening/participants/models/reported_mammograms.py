@@ -31,6 +31,20 @@ class ParticipantReportedMammogram(BaseModel):
         OUTSIDE_UK = "OUTSIDE_UK", "Outside the UK"
         PREFER_NOT_TO_SAY = "PREFER_NOT_TO_SAY", "Prefer not to say"
 
+    class DateType(TextChoices):
+        EXACT = (
+            "EXACT",
+            "Enter an exact date",
+        )
+        MORE_THAN_SIX_MONTHS = (
+            "MORE_THAN_SIX_MONTHS",
+            "Not sure (at least 6 months ago)",
+        )
+        LESS_THAN_SIX_MONTHS = (
+            "LESS_THAN_SIX_MONTHS",
+            "Not sure (less than 6 months ago)",
+        )
+
     appointment = models.ForeignKey(
         Appointment,
         on_delete=models.PROTECT,
@@ -41,6 +55,7 @@ class ParticipantReportedMammogram(BaseModel):
         "clinics.Provider", on_delete=models.PROTECT, null=True, blank=True
     )
     location_details = models.TextField(null=False, default="", blank=True)
+    date_type = models.CharField(choices=DateType)
     exact_date = models.DateField(null=True, blank=True)
     approx_date = models.CharField(null=False, default="", blank=True)
     different_name = models.CharField(null=False, default="", blank=True)
