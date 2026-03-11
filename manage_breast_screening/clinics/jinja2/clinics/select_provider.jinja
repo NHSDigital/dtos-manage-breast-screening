@@ -46,7 +46,8 @@
               "classes": "nhsuk-fieldset__legend--m"
             }
           },
-          "items": radioItems
+          "items": radioItems,
+          "value": request.user.current_provider.id|string
         }) }}
 
         {{ button({
