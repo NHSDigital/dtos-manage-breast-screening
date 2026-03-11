@@ -99,6 +99,18 @@ class TestCurrentProviderMiddleware:
 
         assert mw.process_view(request, view, (), {}) is None
 
+    def test_skips_admin_path_in_call(self):
+        request = RequestFactory().get("/admin/")
+        request.session = {}
+        request.user = Mock(is_authenticated=True)
+
+        def view(_request):
+            return HttpResponse("OK")
+
+        mw = _make_middleware()
+
+        assert mw.process_view(request, view, (), {}) is None
+
     def test_clears_session_and_sets_none_when_assignment_removed(self):
         user = UserFactory()
         provider = ProviderFactory()

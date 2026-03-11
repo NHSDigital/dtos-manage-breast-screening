@@ -33,7 +33,9 @@ class CurrentProviderMiddleware:
     def process_view(
         self, request: HttpRequest, view_func, _view_args, _view_kwargs
     ) -> Optional[HttpResponse]:
-        if request.path.startswith(settings.API_PATH_PREFIX):
+        if request.path.startswith(settings.API_PATH_PREFIX) or request.path.startswith(
+            settings.ADMIN_PATH_PREFIX
+        ):
             return None
 
         if not request.user.is_authenticated:

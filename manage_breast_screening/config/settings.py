@@ -363,6 +363,7 @@ BASIC_AUTH_PASSWORD = environ.get("BASIC_AUTH_PASSWORD")
 BASIC_AUTH_REALM = environ.get("BASIC_AUTH_REALM", "Restricted")
 
 API_PATH_PREFIX = "/api/"
+ADMIN_PATH_PREFIX = "/admin/"
 
 # HTTP Strict Transport Security (HSTS)
 SECURE_HSTS_SECONDS = 31536000
