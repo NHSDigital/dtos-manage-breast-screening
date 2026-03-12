@@ -412,11 +412,12 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
 
     def _handle_html(self, request, section, existing_review):
         if existing_review:
-            messages.add_message(
-                request,
-                messages.WARNING,
-                f"This section has already been reviewed by {existing_review.reviewed_by.get_full_name()}",
-            )
+            if existing_review.reviewed_by != request.user:
+                messages.add_message(
+                    request,
+                    messages.WARNING,
+                    f"This section has already been reviewed by {existing_review.reviewed_by.get_full_name()}",
+                )
         else:
             self.appointment.medical_information_reviews.create(
                 section=section,

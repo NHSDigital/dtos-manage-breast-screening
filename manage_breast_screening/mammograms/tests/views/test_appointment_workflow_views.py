@@ -7,6 +7,7 @@ from django.urls import reverse
 from pytest_django.asserts import (
     assertContains,
     assertInHTML,
+    assertNotContains,
     assertQuerySetEqual,
     assertRedirects,
 )
@@ -893,6 +894,44 @@ class TestMarkSectionReviewed:
         assertContains(
             response,
             "This section has already been reviewed by Jane Doe",
+        )
+
+    def test_noop_if_already_reviewed_by_same_user(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        MedicalInformationReviewFactory.create(
+            appointment=appointment,
+            section="SYMPTOMS",
+            reviewed_by=clinical_user_client.user,
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:mark_section_reviewed",
+                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+            ),
+            follow=True,
+        )
+
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": appointment.pk},
+            ),
+        )
+
+        assert (
+            MedicalInformationReview.objects.filter(
+                appointment=appointment, section="SYMPTOMS"
+            ).count()
+            == 1
+        )
+
+        assertNotContains(
+            response,
+            "This section has already been reviewed by",
         )
 
     def test_does_not_update_reviewed_by_if_already_reviewed_with_plain_response(
