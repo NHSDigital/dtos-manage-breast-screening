@@ -791,3 +791,6 @@ clinic:
                 - 921 Clinic Road
                 - Brighton
               postcode: N9 2M6
+    - id: b1c2d3e4-f5a6-7b8c-9d0e-1f2a3b4c5d6e
+      duration_in_minutes: 8
+      starts_at_time: '12:35'

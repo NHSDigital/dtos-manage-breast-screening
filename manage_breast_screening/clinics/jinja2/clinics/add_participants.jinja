@@ -1,12 +1,15 @@
 {% extends 'layout-form.jinja' %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
 
 {% block page_content %}
-  <h2>Participants</h2>
-  {% if new_participants_count != 0 %}
-    <p>NEW PARTICIPANTS ADDED</p>
-  {% endif %}
+  <h2>Add Participants</h2>
   {% if participants | length == 0 %}
   <p>No participants found.</p>
+  {{ button({
+    "text": "Upload a batch",
+    "href": url('participants:upload_bss_batch')
+  }) }}</p>
+
   {% else %}
       <table class="nhsuk-table">
       <thead class="nhsuk-table__head">
@@ -15,6 +18,7 @@
           <th class="nhsuk-table__header">Postcode</th>
           <th class="nhsuk-table__header">NHS number</th>
           <th class="nhsuk-table__header">Birth date</th>
+          <th class="nhsuk-table__header">Add to Clinic</th>
         </tr>
       </thead>
       <tbody class="nhsuk-table__body">
@@ -31,7 +35,17 @@
              </td>
             <td class="nhsuk-table__cell">
               <p>{{participant.date_of_birth}}</p>
-             </td>
+            </td>
+            <td class="nhsuk-table__cell">
+              <p>
+              <form action="{{ request.path }}" method="POST" novalidate>
+              {{ csrf_input }}
+              <input type="hidden" name="participant" value="{{ participant.id }}">
+                {{ button({
+                  "text": "Add to Clinic"
+                }) }}</p>
+              </form>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

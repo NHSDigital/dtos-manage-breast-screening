@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
@@ -5,14 +7,18 @@ from django.views.decorators.http import require_http_methods
 from rules.contrib.views import permission_required
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.participants.models.appointment import AppointmentStatus
+from manage_breast_screening.participants.models.participant import Participant
 
 from ..core.decorators import current_provider_exempt
 from ..core.utils.relative_redirects import extract_relative_redirect_url
-from ..participants.models import Appointment
+from ..participants.models import Appointment, ScreeningEpisode
 from .forms import UpdateProviderSettingsForm
-from .models import Clinic
+from .models import Clinic, ClinicSlot, Provider
 from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresenter
 from .services import get_user_providers_with_roles
+
+logger = logging.getLogger(__name__)
 
 
 def list_clinics(request, filter="today"):
@@ -111,5 +117,35 @@ def update_provider_settings(request):
             "form": form,
             "provider": provider,
             "page_title": "Provider settings",
+        },
+    )
+
+
+def add_participants(request, pk):
+    if request.method == "POST":
+        participant = Participant.objects.get(pk=request.POST.get("participant"))
+        clinic = Clinic.objects.get(pk=pk)
+        clinic_slots = ClinicSlot.objects.filter(clinic=clinic).order_by("starts_at")
+        screening_episode = ScreeningEpisode.objects.create(participant=participant)
+        appt = Appointment.objects.create(
+            screening_episode_id=screening_episode.id, clinic_slot=clinic_slots.last()
+        )
+        appt.set_status(
+            status_name=AppointmentStatus.YET_TO_BEGIN_STATUSES[0],
+            created_by=request.user,
+        )
+        appt.save()
+
+        return redirect("clinics:show_clinic", pk=pk)
+
+    participants = Participant.objects.filter(first_name__icontains="bss").order_by(
+        "first_name"
+    )
+    return render(
+        request,
+        "clinics/add_participants.jinja",
+        context={
+            "participants": participants,
+            "clinic_pk": pk,
         },
     )
