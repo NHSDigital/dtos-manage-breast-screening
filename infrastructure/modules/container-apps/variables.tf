@@ -1,9 +1,3 @@
-variable "api_oauth_token_url" {
-  description = "The OAuth API endpoint URL used to request client credentials for NHS Notify API"
-  type        = string
-  default     = null
-}
-
 variable "deploy_infra" {
   description = "Whether foundational infrastructure is being deployed; false for ephemeral PR review apps"
   type        = bool
@@ -206,17 +200,6 @@ variable "app_insights_id" {
 }
 
 
-variable "enable_notifications_jobs_schedule" {
-  description = "Whether we apply the cron schedules for the notifications container app jobs"
-  type        = bool
-  default     = false
-}
-
-variable "run_notifications_smoke_test" {
-  description = "Whether we run the smoke test for the notifications container app jobs"
-  type        = bool
-}
-
 variable "container_memory" {
   description = "Memory allocated to the webapp container in Gi. CPU is automatically set to half the memory value by the container-app module."
   type        = string
@@ -262,16 +245,6 @@ locals {
   }
 
   storage_account_name = "st${var.app_short_name}${var.environment}uks"
-  storage_containers = {
-    notifications-mesh-data = {
-      container_name        = "notifications-mesh-data"
-      container_access_type = "private"
-    }
-    notifications-reports = {
-      container_name        = "notifications-reports"
-      container_access_type = "private"
-    }
-  }
 
   always_allowed_paths = ["/sha", "/healthcheck"]
   # If allowed_paths is not set, use the module default which allows any pattern

@@ -75,15 +75,12 @@ module "container-apps" {
   postgres_subnet_id                    = var.deploy_infra ? module.infra[0].postgres_subnet_id : data.azurerm_subnet.postgres[0].id
   postgres_enable_high_availability     = var.postgres_enable_high_availability
   main_subnet_id                        = var.deploy_infra ? module.infra[0].main_subnet_id : data.azurerm_subnet.main[0].id
-  run_notifications_smoke_test          = var.run_notifications_smoke_test
   seed_demo_data                        = var.seed_demo_data
   use_apex_domain                       = var.use_apex_domain
   infra_key_vault_name                  = local.infra_key_vault_name
   infra_key_vault_rg                    = local.infra_key_vault_rg
-  api_oauth_token_url                   = var.api_oauth_token_url
   target_url                            = var.deploy_container_apps ? "${module.container-apps[0].external_url}healthcheck" : null
   resource_group_name_infra             = local.resource_group_name
-  enable_notifications_jobs_schedule    = var.enable_notifications_jobs_schedule
   container_memory                      = var.container_memory
   min_replicas                          = var.min_replicas
   relay_namespace_name                  = var.deploy_infra ? module.infra[0].relay_namespace_name : null
