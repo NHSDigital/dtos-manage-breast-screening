@@ -37,8 +37,9 @@ class Command(BaseCommand):
                         "is_staff": persona.is_superuser,
                     },
                 )
-                UserAssignment.objects.create(
-                    user=user, provider=provider, roles=[persona.role.value]
-                )
+                if not persona.is_superuser:
+                    UserAssignment.objects.create(
+                        user=user, provider=provider, roles=[persona.role.value]
+                    )
         except Exception as e:
             raise CommandError(e)

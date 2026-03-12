@@ -134,6 +134,11 @@ def header_account_items(user):
         if user.current_provider:
             items.append({"text": user.current_provider.name, "icon": False})
 
+            if user.is_superuser:
+                items.append(
+                    {"text": "Change provider", "href": reverse("select_provider")}
+                )
+
     user_name_and_role = _user_name_and_role_item(user)
     if user_name_and_role:
         items.append(user_name_and_role)

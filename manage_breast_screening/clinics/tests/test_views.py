@@ -44,6 +44,23 @@ class TestSelectProvider:
         assert client.session["current_provider"] == str(provider2.pk)
 
     @pytest.mark.django_db
+    def test_superuser_selects_any_provider(self, client):
+        user = UserFactory(is_superuser=True)
+        ProviderFactory()
+        provider2 = ProviderFactory()
+
+        force_mbs_login(client, user)
+
+        response = client.post(
+            reverse("select_provider"),
+            {"provider": provider2.pk, "next": "/clinics/other-target/"},
+        )
+
+        assert response.status_code == 302
+        assert response["Location"] == "/clinics/other-target/"
+        assert client.session["current_provider"] == str(provider2.pk)
+
+    @pytest.mark.django_db
     def test_safely_handles_bad_redirect(self, client):
         user = UserFactory()
         provider = ProviderFactory()
