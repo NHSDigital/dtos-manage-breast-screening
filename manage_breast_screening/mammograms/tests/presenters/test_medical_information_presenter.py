@@ -471,7 +471,7 @@ class TestSectionPresenter:
             MedicalInformationPresenter(in_progress_appointment)
             .get_section(MedicalInformationSection.MAMMOGRAM_HISTORY)
             .next_anchor
-            == "symptoms"
+            == "medical-history"
         )
 
         assert (
@@ -484,7 +484,7 @@ class TestSectionPresenter:
     def test_next_section_link(self, in_progress_appointment):
         assert MedicalInformationPresenter(in_progress_appointment).get_section(
             MedicalInformationSection.MAMMOGRAM_HISTORY
-        ).next_section_link == {"href": "#symptoms", "text": "Next section"}
+        ).next_section_link == {"href": "#medical-history", "text": "Next section"}
 
         assert (
             MedicalInformationPresenter(in_progress_appointment)
