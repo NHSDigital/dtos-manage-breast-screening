@@ -36,18 +36,20 @@ class DicomRecorder:
         study_uid = ds.StudyInstanceUID
         series_uid = ds.SeriesInstanceUID
         sop_uid = ds.SOPInstanceUID
+        patient_id = getattr(ds, "PatientID", "")
+        anonymised_patient_id = f"*******{patient_id[7:]}"
 
         logger.info(
             f"Processing DICOM file with StudyInstanceUID={study_uid}, "
             f"SeriesInstanceUID={series_uid}, SOPInstanceUID={sop_uid}, "
-            f"PatientID={getattr(ds, 'PatientID', '')}, "
+            f"PatientID={anonymised_patient_id}, source_message_id={source_message_id}"
         )
 
         study, _ = Study.objects.get_or_create(
             study_instance_uid=study_uid,
             source_message_id=source_message_id,
             defaults={
-                "patient_id": getattr(ds, "PatientID", ""),
+                "patient_id": patient_id,
                 "date_and_time": __class__.study_date_and_time(ds),
                 "description": getattr(ds, "StudyDescription", ""),
             },
