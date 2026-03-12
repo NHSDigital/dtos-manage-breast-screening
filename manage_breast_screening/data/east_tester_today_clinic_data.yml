@@ -282,6 +282,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2019-09-27'
     - id: d1a81c62-a236-4d2b-af04-f3ca24a4500d
       duration_in_minutes: 8
@@ -368,6 +369,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-02-14'
     - id: 13b6af01-8d02-4b30-a32a-060432bcfeae
       duration_in_minutes: 8
@@ -402,6 +404,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-03-17'
     - id: 7e434f3e-b325-4ae0-b023-30ee32e1ebef
       duration_in_minutes: 8
@@ -462,6 +465,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-01-18'
     - id: 47089669-e102-44c4-bcaa-8b541756bcfb
       duration_in_minutes: 8
@@ -496,6 +500,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2019-11-24'
     - id: 5c1aeebd-8256-49e5-9c28-a94a145afacf
       duration_in_minutes: 8
@@ -556,6 +561,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-03-17'
     - id: f181a6b9-2067-450f-bd0b-f8e7cd61d719
       duration_in_minutes: 8
@@ -668,6 +674,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-01-01'
     - id: 7fbb98de-7dbd-4f9c-9126-b9cf07e73579
       duration_in_minutes: 8
@@ -780,6 +787,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-07-03'
     - id: 8b2476ad-f3d5-44c4-a95f-87d4acef32dc
       duration_in_minutes: 8
