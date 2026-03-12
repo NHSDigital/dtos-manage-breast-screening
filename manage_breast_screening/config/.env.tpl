@@ -42,20 +42,7 @@ API_DOCS_ENABLED=true
 # Automatic loading of PACS images from gateway
 GATEWAY_IMAGES_ENABLED=False
 
-# Notifications specific env vars
-API_OAUTH_API_KEY=""
-API_OAUTH_API_KID=""
-API_OAUTH_PRIVATE_KEY=""
-API_OAUTH_TOKEN_URL=""
-BLOB_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;"
-BLOB_CONTAINER_NAME="notifications-mesh-data"
-NBSS_MESH_INBOX_NAME="paste-mesh-inbox-name-here"
-NBSS_MESH_PASSWORD="paste-mesh-password-here"
-NBSS_MESH_CERT="paste-pem-mesh-cert-here"
-NBSS_MESH_PRIVATE_KEY="paste-pem-private-key-here"
-REPORTS_CONTAINER_NAME="notifications-reports"
-
 APPLICATIONINSIGHTS_CONNECTION_STRING=""
 APPLICATIONINSIGHTS_STATSBEAT_DISABLED_ALL=True
-APPLICATIONINSIGHTS_LOGGER_NAME="manbrs-notifications"
+APPLICATIONINSIGHTS_LOGGER_NAME="insights-logger"
 APPLICATIONINSIGHTS_IS_ENABLED=False
