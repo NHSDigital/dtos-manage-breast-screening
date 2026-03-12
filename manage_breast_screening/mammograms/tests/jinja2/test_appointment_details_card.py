@@ -1,6 +1,4 @@
 from textwrap import dedent
-from unittest.mock import MagicMock
-from uuid import uuid4
 
 import pytest
 from pytest_django.asserts import assertHTMLEqual
@@ -8,17 +6,6 @@ from pytest_django.asserts import assertHTMLEqual
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
 )
-from manage_breast_screening.participants.models.appointment import Appointment
-
-
-@pytest.fixture
-def appointment():
-    mock_appointment = MagicMock(spec=Appointment)
-    mock_appointment.pk = "53ce8d3b-9e65-471a-b906-73809c0475d0"
-    mock_appointment.screening_episode.participant.nhs_number = "99900900829"
-    mock_appointment.screening_episode.participant.pk = uuid4()
-    mock_appointment.screening_episode.participant.phone = "01234123456"
-    return mock_appointment
 
 
 @pytest.fixture
@@ -33,9 +20,9 @@ def template(jinja_env):
     )
 
 
-def test_appointment_details_empty(template, appointment):
-    appointment.screening_episode.participant.extra_needs = {}
-    presenter = AppointmentPresenter(appointment)
+def test_appointment_details_empty(template, mock_appointment):
+    mock_appointment.screening_episode.participant.extra_needs = {}
+    presenter = AppointmentPresenter(mock_appointment)
     presenter.__dict__["has_appointment_note"] = False
 
     response = template.render({"presenter": presenter})
@@ -79,15 +66,15 @@ def test_appointment_details_empty(template, appointment):
     )
 
 
-def test_appointment_details_is_special_appointmet(template, appointment):
-    appointment.screening_episode.participant.extra_needs = {
+def test_appointment_details_is_special_appointmet(template, mock_appointment):
+    mock_appointment.screening_episode.participant.extra_needs = {
         "BREAST_IMPLANTS": {
             "details": "details of\nbreast implants",
         },
         "MEDICAL_DEVICES": {"details": "has pacemaker"},
         "OTHER": {"details": "Other details."},
     }
-    presenter = AppointmentPresenter(appointment)
+    presenter = AppointmentPresenter(mock_appointment)
     presenter.__dict__["has_appointment_note"] = False
 
     response = template.render({"presenter": presenter})
@@ -145,11 +132,11 @@ def test_appointment_details_is_special_appointmet(template, appointment):
     )
 
 
-def test_appointment_details_has_appointment_note(template, appointment):
-    appointment.screening_episode.participant.extra_needs = {}
-    appointment.note.content = "a note about\nthe appointment"
+def test_appointment_details_has_appointment_note(template, mock_appointment):
+    mock_appointment.screening_episode.participant.extra_needs = {}
+    mock_appointment.note.content = "a note about\nthe appointment"
 
-    response = template.render({"presenter": AppointmentPresenter(appointment)})
+    response = template.render({"presenter": AppointmentPresenter(mock_appointment)})
 
     assertHTMLEqual(
         response,
@@ -193,15 +180,17 @@ def test_appointment_details_has_appointment_note(template, appointment):
     )
 
 
-def test_appointment_details_special_appointment_with_note(template, appointment):
-    appointment.screening_episode.participant.extra_needs = {
+def test_appointment_details_special_appointment_with_note(template, mock_appointment):
+    mock_appointment.screening_episode.participant.extra_needs = {
         "SOCIAL_EMOTIONAL_MENTAL_HEALTH": {
             "details": "Social, emotional & mental health",
         },
     }
-    appointment.note.content = "Things to consider before & during the appointment."
+    mock_appointment.note.content = (
+        "Things to consider before & during the appointment."
+    )
 
-    response = template.render({"presenter": AppointmentPresenter(appointment)})
+    response = template.render({"presenter": AppointmentPresenter(mock_appointment)})
 
     assertHTMLEqual(
         response,

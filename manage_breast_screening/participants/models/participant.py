@@ -16,7 +16,7 @@ class Participant(BaseModel):
     first_name = models.CharField()
     last_name = models.CharField()
     gender = models.CharField()
-    nhs_number = models.CharField()
+    nhs_number = models.CharField(unique=True, max_length=10)
     phone = models.CharField()
     email = models.EmailField()
     date_of_birth = models.DateField()
