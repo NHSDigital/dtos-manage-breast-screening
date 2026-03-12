@@ -25,12 +25,6 @@ class TestReviewingMedicalInformation(SystemTestCase):
         self.when_i_mark_section_as_reviewed("Mammogram history")
         self.then_section_has_reviewed_tag("Mammogram history")
         self.when_i_click_next_section("Mammogram history")
-        self.then_the_next_section_is_in_focus("Symptoms", anchor="symptoms")
-
-        self.then_section_has_to_review_tag("Symptoms")
-        self.when_i_mark_section_as_reviewed("Symptoms")
-        self.then_section_has_reviewed_tag("Symptoms")
-        self.when_i_click_next_section("Symptoms")
         self.then_the_next_section_is_in_focus(
             "Medical history", anchor="medical-history"
         )
@@ -39,6 +33,12 @@ class TestReviewingMedicalInformation(SystemTestCase):
         self.when_i_mark_section_as_reviewed("Medical history")
         self.then_section_has_reviewed_tag("Medical history")
         self.when_i_click_next_section("Medical history")
+        self.then_the_next_section_is_in_focus("Symptoms", anchor="symptoms")
+
+        self.then_section_has_to_review_tag("Symptoms")
+        self.when_i_mark_section_as_reviewed("Symptoms")
+        self.then_section_has_reviewed_tag("Symptoms")
+        self.when_i_click_next_section("Symptoms")
         self.then_the_next_section_is_in_focus(
             "Breast features", anchor="breast-features"
         )

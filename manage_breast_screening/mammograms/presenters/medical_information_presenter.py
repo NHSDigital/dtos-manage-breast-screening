@@ -35,9 +35,9 @@ from .appointment_presenters import AppointmentPresenter
 
 # Section order for "Next section" navigation
 SECTION_ORDER = {
-    MedicalInformationSection.MAMMOGRAM_HISTORY: MedicalInformationSection.SYMPTOMS,
-    MedicalInformationSection.SYMPTOMS: MedicalInformationSection.MEDICAL_HISTORY,
-    MedicalInformationSection.MEDICAL_HISTORY: MedicalInformationSection.BREAST_FEATURES,
+    MedicalInformationSection.MAMMOGRAM_HISTORY: MedicalInformationSection.MEDICAL_HISTORY,
+    MedicalInformationSection.MEDICAL_HISTORY: MedicalInformationSection.SYMPTOMS,
+    MedicalInformationSection.SYMPTOMS: MedicalInformationSection.BREAST_FEATURES,
     MedicalInformationSection.BREAST_FEATURES: MedicalInformationSection.OTHER_INFORMATION,
     MedicalInformationSection.OTHER_INFORMATION: None,
 }
