@@ -29,6 +29,9 @@ urlpatterns = [
     # Clinic appointments
     path("<uuid:pk>/", views.list_clinic_appointments, name="show_clinic"),
     path(
+        "<uuid:pk>/add_participants/", views.add_participants, name="add_participants"
+    ),
+    path(
         "<uuid:pk>/appointments/",
         views.list_clinic_appointments,
         name="list_clinic_appointments_all",

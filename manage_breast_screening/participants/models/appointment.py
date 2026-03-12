@@ -150,7 +150,7 @@ class Appointment(BaseModel):
     def set_status(self, status_name, created_by):
         current_status = self.current_status
 
-        if status_name == current_status.name:
+        if status_name == current_status.name and self.statuses.count() > 0:
             if current_status.created_by != created_by:
                 raise ActionPerformedByDifferentUser(status_name)
             else:

@@ -9,6 +9,7 @@
 {% from 'components/check-in/macro.jinja' import app_check_in %}
 {% from 'components/start-appointment/macro.jinja' import app_start_appointment %}
 {% from 'components/resume-appointment/macro.jinja' import app_resume_appointment %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
 
 {% block beforeContent %}
 {{ backLink({
@@ -39,6 +40,11 @@
       "current": nav_data.current
     }) %}
   {% endfor %}
+
+  {{ button({
+    "text": "Add participants",
+    "href": url('clinics:add_participants', kwargs={"pk": presented_clinic.pk})
+  }) }}
 
   {{ app_secondary_navigation({
     "visuallyHiddenTitle": "Secondary menu",
