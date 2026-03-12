@@ -40,6 +40,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-02-26'
     - id: 648509e1-0f57-46a6-a6ab-13be655d1975
       duration_in_minutes: 8
@@ -104,6 +105,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2019-12-30'
     - id: effddd1a-49f9-47ad-bcc9-4364707f8079
       duration_in_minutes: 8
@@ -448,6 +450,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-01-25'
     - id: 21b14d3d-3bb7-43cc-b0c5-79b41f26c7ae
       duration_in_minutes: 8
@@ -512,6 +515,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-07-09'
     - id: 3099e150-0ed5-4fe5-9b63-690c4048abc6
       duration_in_minutes: 8
@@ -576,6 +580,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2019-09-20'
     - id: 4ddb6492-08c8-4579-9e08-7c3c579caaf2
       duration_in_minutes: 8
@@ -612,6 +617,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-01-29'
     - id: c94349a0-d680-4985-bd8e-7f7c69e4382e
       duration_in_minutes: 8
@@ -788,6 +794,7 @@ clinic:
               name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
+            date_type: EXACT
             created_at: '2020-04-24'
     - id: eb52ef67-8854-4234-b9c0-7bb3d7720d0b
       duration_in_minutes: 8
