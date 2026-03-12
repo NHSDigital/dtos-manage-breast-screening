@@ -367,48 +367,6 @@ class TestParticipantCsvUploadView:
         assert response.status_code == 200
         assertInHTML("<li>Row 1: Address is required</li>", response.text)
 
-    def test_csv_row_error_missing_postcode(self, superuser_client, superuser_clinic):
-        lines = [
-            self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",,1034567890,,test@example.com,BSS,9:00',
-        ]
-        response = superuser_client.http.post(
-            reverse(
-                "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
-            ),
-            {"csv_file": self._make_csv(lines)},
-        )
-        assert response.status_code == 200
-        assertInHTML("<li>Row 1: Postcode is required</li>", response.text)
-
-    def test_csv_row_error_missing_phone(self, superuser_client, superuser_clinic):
-        lines = [
-            self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,,,test@example.com,BSS,9:00',
-        ]
-        response = superuser_client.http.post(
-            reverse(
-                "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
-            ),
-            {"csv_file": self._make_csv(lines)},
-        )
-        assert response.status_code == 200
-        assertInHTML("<li>Row 1: Telephone No.1 is required</li>", response.text)
-
-    def test_csv_row_error_missing_email(self, superuser_client, superuser_clinic):
-        lines = [
-            self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET",AA1 2XY,1034567890,,,BSS,9:00',
-        ]
-        response = superuser_client.http.post(
-            reverse(
-                "clinics:participant_csv_upload", kwargs={"pk": superuser_clinic.pk}
-            ),
-            {"csv_file": self._make_csv(lines)},
-        )
-        assert response.status_code == 200
-        assertInHTML("<li>Row 1: Email Address is required</li>", response.text)
-
     def test_multiple_row_errors_all_shown(self, superuser_client, superuser_clinic):
         lines = [
             self._header(),
@@ -459,10 +417,16 @@ class TestParticipantCsvUploadView:
         )
 
     def test_valid_post_creates_participants(self, superuser_client, superuser_clinic):
+        """
+        Test valid CSV creates records with correct data, and that audit logs are created for all changes.
+
+        Creates on participant with all fields populated, and another participant with only required fields populated.
+        """
+
         lines = [
             self._header(),
-            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, CITY",AA1 2XY,1034567890,,test1@example.com,BSS/B81001,09:07',
-            '2,9999999992,JONES,TEST2,MRS,31-Dec-1975,50,F,A White - British,"2 BUILDING, STREET, CITY, COUNTY, UK",BB2 3XY,1034567891,,test2@example.com,BSS/B81002,15:34',
+            '1,999 999 9991,SMITH,TEST1,MRS,01-Jan-1980,50,F,A White - British,"1 BUILDING, STREET, CITY, COUNTY, UK",AA1 2XY,1034567890,,test1@example.com,BSS/B81001,09:07',
+            '2,9999999992,JONES,TEST2,,31-Dec-1975,,F,,"2 BUILDING",,,,,,15:34',
         ]
         superuser_client.http.post(
             reverse(
@@ -484,7 +448,13 @@ class TestParticipantCsvUploadView:
         assert participant.email == "test1@example.com"
         assert participant.date_of_birth.strftime("%Y-%m-%d") == "1980-01-01"
         assert participant.risk_level == "Routine"
-        assert participant.address.lines == ["1 BUILDING", "CITY"]
+        assert participant.address.lines == [
+            "1 BUILDING",
+            "STREET",
+            "CITY",
+            "COUNTY",
+            "UK",
+        ]
         assert participant.address.postcode == "AA1 2XY"
 
         assert participant.appointments.count() == 1
@@ -503,18 +473,12 @@ class TestParticipantCsvUploadView:
         assert participant.last_name == "JONES"
         assert participant.gender == "Female"
         assert participant.nhs_number == "9999999992"
-        assert participant.phone == "1034567891"
-        assert participant.email == "test2@example.com"
+        assert participant.phone == ""
+        assert participant.email == ""
         assert participant.date_of_birth.strftime("%Y-%m-%d") == "1975-12-31"
         assert participant.risk_level == "Routine"
-        assert participant.address.lines == [
-            "2 BUILDING",
-            "STREET",
-            "CITY",
-            "COUNTY",
-            "UK",
-        ]
-        assert participant.address.postcode == "BB2 3XY"
+        assert participant.address.lines == ["2 BUILDING"]
+        assert participant.address.postcode == ""
 
         assert participant.appointments.count() == 1
         appointment = participant.appointments.first()
