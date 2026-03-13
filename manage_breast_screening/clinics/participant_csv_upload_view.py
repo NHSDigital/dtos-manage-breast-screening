@@ -95,11 +95,11 @@ class ParticipantCsvTransformService:
             ("last_name", "Surname", self.validate_required),
             ("gender", "Sex", self.validate_gender),
             ("nhs_number", "NHS Number", self.validate_nhs_number),
-            ("phone", "Telephone No.1", self.validate_required),
-            ("email", "Email Address", self.validate_required),
+            ("phone", "Telephone No.1", self.optional),
+            ("email", "Email Address", self.optional),
             ("date_of_birth", "Date of Birth", self.validate_date_of_birth),
             ("address_lines", "Address", self.validate_address),
-            ("postcode", "Postcode", self.validate_required),
+            ("postcode", "Postcode", self.optional),
             ("start_time", "Start Time", self.validate_start_time),
         ]
         self.required_headings = [
@@ -173,6 +173,10 @@ class ParticipantCsvTransformService:
         if errors:
             return None, errors
         return output, []
+
+    def optional(self, row, key):
+        """Used to map fields from CSV to database that are optional and require no validation."""
+        return row.get(key), None
 
     def validate_required(self, row, key):
         value = row.get(key)
