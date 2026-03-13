@@ -6,9 +6,12 @@
       <a href="{{ presenter.add_hormone_replacement_therapy_link }}">Enter hormone replacement therapy (HRT) details</a>
     {% endif %}
   {% elif presenter.hormone_replacement_therapy.status == 'YES' %}
-    <p>Taking HRT ({{ presenter.hormone_replacement_therapy.approx_start_date }})</p>
+    <p>Currently taking HRT</p>
+    <p>Started: {{ presenter.hormone_replacement_therapy.approx_start_date }}</p>
   {% elif presenter.hormone_replacement_therapy.status == 'NO_BUT_STOPPED_RECENTLY' %}
-    <p>Recently stopped HRT ({{ presenter.hormone_replacement_therapy.approx_end_date }})</p>
+    <p>Recently stopped HRT</p>
+    <p>Duration taken: {{ presenter.hormone_replacement_therapy.approx_previous_duration }}<br>
+       Stopped: {{ presenter.hormone_replacement_therapy.approx_end_date }}</p>
   {% elif presenter.hormone_replacement_therapy.status == 'NO' -%}
     <p>Not taking HRT</p>
   {% else %}
