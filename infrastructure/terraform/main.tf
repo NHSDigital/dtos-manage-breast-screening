@@ -19,7 +19,6 @@ module "infra" {
   vnet_address_space                        = var.vnet_address_space
   cae_zone_redundancy_enabled               = var.cae_zone_redundancy_enabled
   enable_alerting                           = var.enable_alerting
-  action_group_id                           = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
   enable_relay                              = var.enable_relay
   enable_service_bus                        = var.enable_service_bus
   service_bus_public_network_access_enabled = var.service_bus_public_network_access_enabled
