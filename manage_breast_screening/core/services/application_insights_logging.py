@@ -9,8 +9,9 @@ from manage_breast_screening.config.settings import boolean_env
 class ApplicationInsightsLogging:
     def __init__(self) -> None:
         self.logger_name = os.getenv(
-            "APPLICATIONINSIGHTS_LOGGER_NAME", "manbrs-notifications"
+            "APPLICATIONINSIGHTS_LOGGER_NAME", "manage-breast-screening"
         )
+        os.environ.setdefault("OTEL_SERVICE_NAME", self.logger_name)
         self.logger = self.getLogger()
 
     def configure_azure_monitor(self):
@@ -30,9 +31,12 @@ class ApplicationInsightsLogging:
     def getLogger(self):
         return logging.getLogger(self.logger_name)
 
-    def exception(self, exception_name: str):
-        self.logger.exception(exception_name, stack_info=True)
+    def exception(self, message: str, extra: dict = None):
+        # Keys in extra are forwarded to Application Insights
+        # as customDimensions and become filterable in the Logs blade and alerting rules.
+        self.logger.exception(message, extra=extra)
 
+    # can remove once notifications app is removed
     def custom_event_warning(self, message: str, event_name: str):
         self.logger.warning(
             message,
@@ -42,6 +46,7 @@ class ApplicationInsightsLogging:
             },
         )
 
+    # can remove once notifications app is removed
     def custom_event_info(self, message: str, event_name: str):
         self.logger.info(
             message,

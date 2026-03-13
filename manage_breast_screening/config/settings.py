@@ -97,6 +97,8 @@ if DJANGO_ENV != "production":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "manage_breast_screening.core.middleware.exception_logging.CorrelationIdMiddleware",
+    "manage_breast_screening.core.middleware.exception_logging.ExceptionLoggingMiddleware",
     "manage_breast_screening.core.middleware.robots.RobotsTagMiddleware",
     "manage_breast_screening.core.middleware.basic_auth.BasicAuthMiddleware",
     "qsessions.middleware.SessionMiddleware",
@@ -278,18 +280,27 @@ LOG_QUERIES = boolean_env("LOG_QUERIES")
 LOGGING = {
     "version": 1,  # the dictConfig format version
     "disable_existing_loggers": False,  # retain the default loggers
+    "filters": {
+        "correlation_id": {
+            "()": "manage_breast_screening.core.middleware.exception_logging.CorrelationIdFilter",
+        },
+        "suppress_duplicate_exceptions": {
+            "()": "manage_breast_screening.core.middleware.exception_logging.SuppressDuplicateExceptionFilter",
+        },
+    },
     "formatters": {
         "verbose": {
-            "format": "%(asctime)s [%(process)d] [%(levelname)s] [%(module)s] %(message)s",
+            "format": "%(asctime)s [%(process)d] [%(levelname)s] [%(correlation_id)s] [%(module)s] %(message)s",
             "datefmt": "[%Y-%m-%d %H:%M:%S %z]",
             "class": "logging.Formatter",
-        }
+        },
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
             "stream": sys.stdout,
+            "filters": ["correlation_id"],
         },
     },
     "root": {
@@ -301,6 +312,12 @@ LOGGING = {
             "level": "INFO",
             "handlers": ["console"],
             "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+            "filters": ["suppress_duplicate_exceptions"],
         },
         "django.db.backends": {
             "level": "DEBUG" if LOG_QUERIES else "INFO",
