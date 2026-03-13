@@ -168,23 +168,6 @@ variable "enable_alerting" {
   default     = false
 }
 
-variable "api_oauth_token_url" {
-  description = "API OAuth provider endpoint URL used to obtain bearer token for NHS Notify API requests"
-  type        = string
-}
-
-variable "enable_notifications_jobs_schedule" {
-  description = "Whether we apply the cron schedules for the notifications container app jobs"
-  type        = bool
-  default     = false
-}
-
-variable "run_notifications_smoke_test" {
-  description = "Whether we run the smoke test for the notifications container app jobs"
-  default     = false
-  type        = bool
-}
-
 variable "container_memory" {
   description = "Memory allocated to the webapp container in Gi. CPU is automatically set to half the memory value by the container-app module."
   type        = string

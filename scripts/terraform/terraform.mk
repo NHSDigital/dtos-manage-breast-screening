@@ -61,7 +61,6 @@ terraform-init: set-azure-account get-subscription-ids # Initialise Terraform - 
 	$(eval export TF_VAR_env_config=${ENV_CONFIG})
 	$(eval export TF_VAR_hub=${HUB})
 	$(eval export TF_VAR_hub_subscription_id=${HUB_SUBSCRIPTION_ID})
-	$(eval export TF_VAR_run_notifications_smoke_test=${RUN_NOTIFICATIONS_SMOKE_TEST})
 
 terraform-plan: terraform-init # Plan Terraform changes - make <env> terraform-plan DOCKER_IMAGE_TAG=abcd123
 	terraform -chdir=infrastructure/terraform plan -var-file ../environments/${ENV_CONFIG}/variables.tfvars
@@ -75,11 +74,3 @@ terraform-destroy: terraform-init # Destroy Terraform resources - make <env> ter
 terraform-validate: terraform-init-no-backend # Validate Terraform changes - make <env> terraform-validate
 	terraform -chdir=infrastructure/terraform validate
 
-notifications-smoke-test:
-	if test "${RUN_NOTIFICATIONS_SMOKE_TEST}" == "true"; then
-		$(eval export ENVIRONMENT=${ENVIRONMENT})
-		pip install pytest mesh-client
-		pytest -vv scripts/python/smoke_test/notifications_smoke_test.py
-	else
-		echo "Skipping notifications smoke test"
-	fi

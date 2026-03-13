@@ -10,6 +10,5 @@ deploy_database_as_container          = false
 vnet_address_space                    = "10.10.0.0/16"
 seed_demo_data                        = false
 enable_alerting                       = true
-enable_notifications_jobs_schedule    = false
 min_replicas                          = 2
 container_memory                      = "1"
