@@ -44,7 +44,7 @@ def test_hormone_replacement_therapy_yes(template, mock_appointment):
         {"presenter": MedicalInformationPresenter(mock_appointment)}
     )
 
-    assertHTMLEqual(response, "<p>Taking HRT (Early 2010)</p>")
+    assertHTMLEqual(response, "<p>Currently taking HRT</p><p>Started: Early 2010</p>")
 
 
 def test_hormone_replacement_therapy_no_but_stopped_recently(
@@ -60,7 +60,10 @@ def test_hormone_replacement_therapy_no_but_stopped_recently(
         {"presenter": MedicalInformationPresenter(mock_appointment)}
     )
 
-    assertHTMLEqual(response, "<p>Recently stopped HRT (2024-05-01)</p>")
+    assertHTMLEqual(
+        response,
+        "<p>Recently stopped HRT</p><p>Stopped: 2024-05-01</p><p>Duration taken: 6 months</p>",
+    )
 
 
 def test_hormone_replacement_therapy_no(template, mock_appointment):
