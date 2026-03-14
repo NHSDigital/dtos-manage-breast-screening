@@ -108,9 +108,9 @@
 
       const updateVisibility = () => {
         if (hasRepeats()) {
-          insetText.style.display = ''
+          insetText.classList.remove('app-u-display-none')
         } else {
-          insetText.style.display = 'none'
+          insetText.classList.add('app-u-display-none')
         }
       }
 
