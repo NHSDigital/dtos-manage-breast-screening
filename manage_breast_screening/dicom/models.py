@@ -86,6 +86,7 @@ class Image(models.Model):
     image_file = models.FileField(storage=dicom_storage, null=True, blank=True)
     laterality = models.CharField(max_length=16, blank=True)
     view_position = models.CharField(max_length=16, blank=True)
+    implant_present = models.BooleanField(default=False)
 
     def laterality_and_view(self):
         if self.laterality and self.view_position:
