@@ -2,6 +2,7 @@ import os
 import re
 from collections import Counter
 
+import allure
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -128,9 +129,11 @@ class SystemTestCase(StaticLiveServerTestCase):
         url = re.compile(f"^{self.live_server_url}{re.escape(path)}$")
         expect(self.page).to_have_url(url)
 
+    @allure.step("Given I am logged in as a clinical user")
     def given_i_am_logged_in_as_a_clinical_user(self):
         self.login_as_role(Role.CLINICAL)
 
+    @allure.step("Given I am logged in as an administrative user")
     def given_i_am_logged_in_as_an_administrative_user(self):
         self.login_as_role(Role.ADMINISTRATIVE)
 

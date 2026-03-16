@@ -118,7 +118,7 @@ test-lint-templates: # Lint just the templates @Testing
 	uv run djlint -e jinja --lint --profile jinja manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	uv run pytest -m system --junit-xml=reports/test-ui.xml
+	uv run pytest -m system --alluredir allure-results
 
 # ---------------------------------------------------------------------------
 # Build & Deploy

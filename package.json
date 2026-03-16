@@ -6,6 +6,7 @@
     "!**/*.test.*"
   ],
   "scripts": {
+    "allure": "allure",
     "breast-diagram": "node manage_breast_screening/assets/breast-diagram/process-exported-svg.js",
     "compile": "concurrently npm:compile:js npm:compile:css --group --prefix none",
     "compile:css": "sass --color --quiet-deps --load-path=node_modules manage_breast_screening/assets/sass:manage_breast_screening/assets/compiled/css",
@@ -39,6 +40,7 @@
     "@types/eslint": "^9.6.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.3.5",
+    "allure": "^3.3.1",
     "babel-jest": "^30.2.0",
     "concurrently": "^9.2.1",
     "eslint": "^9.39.4",
