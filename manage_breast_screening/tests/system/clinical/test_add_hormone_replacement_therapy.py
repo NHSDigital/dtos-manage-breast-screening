@@ -130,7 +130,7 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
         expect(alert).to_contain_text("Success")
         expect(alert).to_contain_text("Updated hormone replacement therapy")
 
-    def and_the_hormone_replacement_therapy_is_displayed_as_not_taken(self):
+    def and_the_hormone_replacement_therapy_is_displayed_as_not_taking_HRT(self):
         self.and_the_hormone_replacement_therapy_is_displayed("Not taking HRT")
 
     def and_the_hormone_replacement_therapy_is_displayed_as_taken(self):
