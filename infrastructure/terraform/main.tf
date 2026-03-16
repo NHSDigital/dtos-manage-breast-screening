@@ -78,7 +78,6 @@ module "container-apps" {
   use_apex_domain                       = var.use_apex_domain
   infra_key_vault_name                  = local.infra_key_vault_name
   infra_key_vault_rg                    = local.infra_key_vault_rg
-  target_url                            = var.deploy_container_apps ? "${module.container-apps[0].external_url}healthcheck" : null
   resource_group_name_infra             = local.resource_group_name
   container_memory                      = var.container_memory
   min_replicas                          = var.min_replicas

@@ -159,11 +159,6 @@ variable "enable_alerting" {
   type        = bool
 }
 
-variable "target_url" {
-  description = "The external url"
-  type        = string
-}
-
 variable "alert_window_size" {
   type     = string
   nullable = false
@@ -223,6 +218,7 @@ locals {
   env_vars_from_yaml = yamldecode(
     file("${path.module}/../../environments/${var.env_config}/variables.yml")
   )
+  external_url = "https://${module.frontdoor_endpoint.custom_domains["${var.environment}-domain"].host_name}/"
   common_env = merge(
     local.env_vars_from_yaml,
     {
@@ -239,9 +235,9 @@ locals {
 
   azure_db_env = {
     AZURE_DB_CLIENT_ID = var.deploy_database_as_container ? null : module.db_connect_identity[0].client_id
-    DATABASE_HOST   = var.deploy_database_as_container ? null : module.postgres[0].host
-    DATABASE_NAME   = var.deploy_database_as_container ? null : module.postgres[0].database_names[0]
-    DATABASE_USER   = var.deploy_database_as_container ? null : module.db_connect_identity[0].name
+    DATABASE_HOST      = var.deploy_database_as_container ? null : module.postgres[0].host
+    DATABASE_NAME      = var.deploy_database_as_container ? null : module.postgres[0].database_names[0]
+    DATABASE_USER      = var.deploy_database_as_container ? null : module.db_connect_identity[0].name
   }
 
   storage_account_name = "st${var.app_short_name}${var.environment}uks"
