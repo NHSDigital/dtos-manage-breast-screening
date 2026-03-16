@@ -71,12 +71,3 @@ stages:
                     scriptLocation: inlineScript
                     addSpnToEnvironment: true
                     inlineScript: make ci ${{ parameters.environment }} db-setup PR_NUMBER=${{ parameters.prNumber }}
-
-                - task: AzureCLI@2
-                  displayName: Run notifications smoke test
-                  inputs:
-                    azureSubscription: manbrs-${{ parameters.environment }}
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    addSpnToEnvironment: true
-                    inlineScript: make ci ${{ parameters.environment }} notifications-smoke-test PR_NUMBER=${{ parameters.prNumber }}

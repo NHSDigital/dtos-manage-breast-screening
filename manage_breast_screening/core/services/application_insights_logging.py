@@ -9,7 +9,7 @@ from manage_breast_screening.config.settings import boolean_env
 class ApplicationInsightsLogging:
     def __init__(self) -> None:
         self.logger_name = os.getenv(
-            "APPLICATIONINSIGHTS_LOGGER_NAME", "manbrs-notifications"
+            "APPLICATIONINSIGHTS_LOGGER_NAME", "insights-logger"
         )
         self.logger = self.getLogger()
 
