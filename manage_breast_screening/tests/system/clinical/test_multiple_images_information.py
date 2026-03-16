@@ -92,12 +92,12 @@ class TestMultipleImagesInformation(SystemTestCase):
         self.fill_in_series(
             self.LCC_LEGEND,
             "Yes, all images were repeats",
-            "Patient moved during exposure",
+            "Participant movement",
         )
         self.fill_in_series(
             self.RMLO_LEGEND,
             "Yes, it was a repeat",
-            "Motion blur affecting image quality",
+            "Positioning error",
         )
 
     def fill_in_series(self, legend_text, repeat_type_label, reason_label):

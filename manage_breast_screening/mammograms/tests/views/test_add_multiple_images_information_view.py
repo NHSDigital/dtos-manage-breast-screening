@@ -101,7 +101,7 @@ class TestAddMultipleImagesInformationView:
                 "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
                 "rmlo_all_repeats_reasons": [
                     RepeatReason.PATIENT_MOVED.value,
-                    RepeatReason.MOTION_BLUR.value,
+                    RepeatReason.TECHNICAL_FAULT.value,
                 ],
             },
         )
@@ -117,7 +117,7 @@ class TestAddMultipleImagesInformationView:
         assert series.repeat_type == RepeatType.ALL_REPEATS.value
         assert series.repeat_reasons == [
             RepeatReason.PATIENT_MOVED.value,
-            RepeatReason.MOTION_BLUR.value,
+            RepeatReason.TECHNICAL_FAULT.value,
         ]
 
         assertQuerySetEqual(
@@ -221,7 +221,7 @@ class TestAddMultipleImagesInformationView:
                 "series_fingerprint": _fingerprint_for(study),
                 "lmlo_repeat_type": RepeatType.SOME_REPEATS.value,
                 "lmlo_repeat_count": "2",
-                "lmlo_some_repeats_reasons": [RepeatReason.EQUIPMENT_FAULT.value],
+                "lmlo_some_repeats_reasons": [RepeatReason.TECHNICAL_FAULT.value],
             },
         )
 
@@ -236,7 +236,7 @@ class TestAddMultipleImagesInformationView:
         series.refresh_from_db()
         assert series.repeat_type == RepeatType.SOME_REPEATS.value
         assert series.repeat_count == 2
-        assert series.repeat_reasons == [RepeatReason.EQUIPMENT_FAULT.value]
+        assert series.repeat_reasons == [RepeatReason.TECHNICAL_FAULT.value]
 
     class TestStaleFormProtection:
         """Tests for stale form detection and redirection."""
