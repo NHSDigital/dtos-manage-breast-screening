@@ -2,7 +2,7 @@ from django.contrib import admin
 
 from manage_breast_screening.core.admin import admin_site
 
-from .models import Clinic, ClinicSlot, Provider, Setting
+from .models import Clinic, ClinicSlot, ClinicStatus, Provider, Setting
 
 
 class ClinicSlotInline(admin.StackedInline):
@@ -15,8 +15,14 @@ class SettingInline(admin.StackedInline):
     extra = 1
 
 
+class ClinicStatusInline(admin.StackedInline):
+    model = ClinicStatus
+    extra = 1
+    ordering = ["created_at"]
+
+
 class ClinicAdmin(admin.ModelAdmin):
-    inlines = [ClinicSlotInline]
+    inlines = [ClinicSlotInline, ClinicStatusInline]
     readonly_fields = [
         "current_status_display",
     ]
