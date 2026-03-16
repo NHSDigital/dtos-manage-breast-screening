@@ -235,6 +235,7 @@ class ClinicStatus(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+        verbose_name_plural = "Clinic statuses"
 
     id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
