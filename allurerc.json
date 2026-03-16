@@ -1,0 +1,15 @@
+{
+  "name": "Manage breast screening tests",
+  "output": "./allure-report",
+  "historyPath": "./history.jsonl",
+  "plugins": {
+    "awesome": {
+      "options": {
+        "singleFile": true,
+        "reportLanguage": "en",
+        "reportName": "Manage breast screening UI tests",
+        "groupBy": ["epic", "feature", "story"]
+      }
+    }
+  }
+}
