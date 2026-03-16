@@ -245,6 +245,13 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_HOST: localhost
 
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './ctrf/*.json'
+          github-report: true
+        if: always()
+
   test-lint:
     name: 'Linting'
     runs-on: ubuntu-latest

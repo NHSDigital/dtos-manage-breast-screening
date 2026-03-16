@@ -118,7 +118,7 @@ test-lint-templates: # Lint just the templates @Testing
 	uv run djlint -e jinja --lint --profile jinja manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	uv run pytest -m system --ignore manage_breast_screening/notifications
+	uv run pytest -m system --ignore manage_breast_screening/notifications --ctrf ctrf/ui-report.json
 
 test-integration:
 	cd manage_breast_screening/notifications && ./tests/integration/run.sh

@@ -854,6 +854,7 @@ dependencies = [
     { name = "psycopg", extra = ["binary"] },
     { name = "pydicom" },
     { name = "pynetdicom" },
+    { name = "pytest-json-ctrf" },
     { name = "python-dateutil" },
     { name = "python-statemachine" },
     { name = "pyyaml" },
@@ -909,6 +910,7 @@ requires-dist = [
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.7,<4.0.0" },
     { name = "pydicom", specifier = ">=3.0.1" },
     { name = "pynetdicom", specifier = ">=3.0.4" },
+    { name = "pytest-json-ctrf", specifier = ">=0.3.6" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0,<3.0.0" },
     { name = "python-statemachine", specifier = ">=2.5.0" },
     { name = "pyyaml", specifier = ">=6.0.2,<7.0.0" },
@@ -1743,6 +1745,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/13/2b/db9a193df89e5660137f5428063bcc2ced7ad790003b26974adf5c5ceb3b/pytest_django-4.12.0.tar.gz", hash = "sha256:df94ec819a83c8979c8f6de13d9cdfbe76e8c21d39473cfe2b40c9fc9be3c758", size = 91156, upload-time = "2026-02-14T18:40:49.235Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/83/a5/41d091f697c09609e7ef1d5d61925494e0454ebf51de7de05f0f0a728f1d/pytest_django-4.12.0-py3-none-any.whl", hash = "sha256:3ff300c49f8350ba2953b90297d23bf5f589db69545f56f1ec5f8cff5da83e85", size = 26123, upload-time = "2026-02-14T18:40:47.381Z" },
+]
+
+[[package]]
+name = "pytest-json-ctrf"
+version = "0.3.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7a/3d/55e1de95b82b7630e9112191d7b8b8c5a466a25591c284ccd12f6f0b6a28/pytest_json_ctrf-0.3.6.tar.gz", hash = "sha256:750f7d00d2519212271227d8e7c5870beb8d31f72f7608c0ed459a43b1e71e02", size = 6707, upload-time = "2025-12-28T11:04:59.63Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/57/60/d1b84bc0a5cc5d73e0807fe799d9a3c3dfde3abf7907667882b3c74ba4c9/pytest_json_ctrf-0.3.6-py3-none-any.whl", hash = "sha256:82231614ff52b5eec14e214761eb2d785b45c062775b315a67b44659a42f5a2d", size = 6877, upload-time = "2025-12-28T11:04:58.497Z" },
 ]
 
 [[package]]
