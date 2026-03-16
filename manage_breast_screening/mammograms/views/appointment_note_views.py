@@ -1,5 +1,3 @@
-import logging
-
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -14,43 +12,10 @@ from manage_breast_screening.participants.models import AppointmentNote
 
 from ..forms import AppointmentNoteForm
 from ..presenters import AppointmentPresenter, present_secondary_nav
-from .mixins import AppointmentTabMixin
-
-logger = logging.getLogger(__name__)
+from .mixins import AppointmentTabMixin, InProgressAppointmentMixin
 
 
-class AppointmentNoteView(AppointmentTabMixin, FormView):
-    template_name = "mammograms/show/appointment_note.jinja"
-    form_class = AppointmentNoteForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        appointment = self.appointment
-        appointment_presenter = AppointmentPresenter(
-            appointment, tab_description="Note"
-        )
-
-        context.update(
-            {
-                "heading": appointment_presenter.participant.full_name,
-                "caption": appointment_presenter.caption,
-                "page_title": appointment_presenter.page_title,
-                "presented_appointment": appointment_presenter,
-                "secondary_nav_items": present_secondary_nav(
-                    appointment.pk,
-                    current_tab="note",
-                    appointment_complete=not appointment.active,
-                ),
-                "return_url": extract_relative_redirect_url(
-                    self.request,
-                    default=reverse(
-                        "mammograms:appointment_note", kwargs={"pk": appointment.pk}
-                    ),
-                ),
-            }
-        )
-        return context
-
+class AppointmentNoteMixin:
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         try:
@@ -72,13 +37,83 @@ class AppointmentNoteView(AppointmentTabMixin, FormView):
             messages.SUCCESS,
             "Appointment note saved",
         )
-        return_url = extract_relative_redirect_url(
+        return_url = self.get_success_url()
+        return redirect(return_url)
+
+
+class AppointmentNoteView(AppointmentNoteMixin, AppointmentTabMixin, FormView):
+    template_name = "mammograms/show/appointment_note.jinja"
+    form_class = AppointmentNoteForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(
+            appointment, tab_description="Note"
+        )
+
+        context.update(
+            {
+                "heading": appointment_presenter.participant.full_name,
+                "caption": appointment_presenter.caption,
+                "page_title": appointment_presenter.page_title,
+                "presented_appointment": appointment_presenter,
+                "secondary_nav_items": present_secondary_nav(
+                    appointment.pk,
+                    current_tab="note",
+                    appointment_complete=not appointment.active,
+                ),
+                "return_url": self.get_success_url(),
+            }
+        )
+        return context
+
+    def get_success_url(self):
+        return extract_relative_redirect_url(
             self.request,
             default=reverse(
-                "mammograms:appointment_note", kwargs={"pk": self.appointment.pk}
+                "mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]}
             ),
         )
-        return redirect(return_url)
+
+
+class AppointmentNoteReviewView(
+    AppointmentNoteMixin, InProgressAppointmentMixin, FormView
+):
+    template_name = "mammograms/show/appointment_note_review.jinja"
+    form_class = AppointmentNoteForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(
+            appointment, tab_description="Note"
+        )
+
+        context.update(
+            {
+                "heading": "Appointment note",
+                "caption": appointment_presenter.participant.full_name,
+                "page_title": appointment_presenter.page_title,
+                "presented_appointment": appointment_presenter,
+                "secondary_nav_items": present_secondary_nav(
+                    appointment.pk,
+                    current_tab="note",
+                    appointment_complete=not appointment.active,
+                ),
+                "return_url": self.get_success_url(),
+                "back_link_params": {"href": self.request.GET.get("return_url")},
+            }
+        )
+        return context
+
+    def get_success_url(self):
+        return extract_relative_redirect_url(
+            self.request,
+            default=reverse(
+                "mammograms:check_information", kwargs={"pk": self.kwargs["pk"]}
+            ),
+        )
 
 
 class DeleteAppointmentNoteView(DeleteWithAuditView):

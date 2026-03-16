@@ -279,7 +279,7 @@ class TestAppointmentPresenter:
         assert action["text"] == "Change"
         assert (
             action["href"]
-            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/note/?return_url=/return/"
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/note-review/?return_url=/return/"
         )
         assert action["visuallyHiddenText"] == "appointment note"
 
