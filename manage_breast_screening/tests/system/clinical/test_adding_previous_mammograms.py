@@ -190,9 +190,9 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def and_i_enter_an_exact_date(self, exact_date=date(2023, 12, 1)):
         self.page.get_by_label("Enter an exact date").click()
-        self.page.get_by_label("Day").fill(str(exact_date.day))
-        self.page.get_by_label("Month").fill(str(exact_date.month))
-        self.page.get_by_label("Year").fill(str(exact_date.year))
+        self.page.get_by_label("Day", exact=True).fill(str(exact_date.day))
+        self.page.get_by_label("Month", exact=True).fill(str(exact_date.month))
+        self.page.get_by_label("Year", exact=True).fill(str(exact_date.year))
 
     def and_i_select_yes_same_name(self):
         self.page.get_by_label("Yes").click()
@@ -219,10 +219,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.get_by_label("Location").first.fill("other place")
 
     def and_i_enter_an_approximate_date(self):
-        self.page.get_by_label("Enter an approximate date").and_(
+        self.page.get_by_label("Not sure (at least 6 months ago)").and_(
             self.page.get_by_role("radio")
         ).click()
-        self.page.get_by_label("Enter an approximate date").and_(
+        self.page.get_by_label("Approximate date (at least 6 months ago)").and_(
             self.page.get_by_role("textbox")
         ).fill("a year ago")
 

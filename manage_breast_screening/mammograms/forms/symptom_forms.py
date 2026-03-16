@@ -5,6 +5,7 @@ from django.forms import CheckboxSelectMultiple
 from django.forms.widgets import Textarea
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.utils.date_formatting import format_relative_months
 from manage_breast_screening.nhsuk_forms.fields import (
     BooleanField,
     CharField,
@@ -62,8 +63,7 @@ class CommonFields:
     )
     when_resolved = CharField(
         required=False,
-        label="Describe when",
-        hint="For example, 3 days ago",
+        label="Approximate date symptom stopped",
         classes="nhsuk-u-width-two-thirds",
         error_messages={"required": "Enter when the symptom was resolved"},
     )
@@ -129,6 +129,11 @@ class SymptomForm(FormWithConditionalFields):
             kwargs["initial"] = self.initial_values(instance)
 
         super().__init__(**kwargs)
+
+        if "when_resolved" in self.fields:
+            self.fields[
+                "when_resolved"
+            ].hint = f"For example, {format_relative_months(-1)}"
 
     def initial_values(self, instance):
         """

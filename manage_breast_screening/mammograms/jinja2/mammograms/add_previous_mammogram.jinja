@@ -8,7 +8,14 @@
   {% do form.location_type.add_divider_after("OUTSIDE_UK", "or") %}
   {{ form.location_type.as_field_group() }}
 
-  {{ form.when_taken.as_field_group() }}
+  {% set less_than_six_months_ago_html %}
+  <p>This appointment will need to stop and you will be prompted to reschedule once 6 months has passed.</p>
+  {{ form.approx_date_LESS_THAN_SIX_MONTHS.as_field_group() }}
+  {% endset %}
+
+  {% do form.date_type.add_conditional_html("LESS_THAN_SIX_MONTHS", less_than_six_months_ago_html) %}
+
+  {{ form.date_type.as_field_group() }}
 
   {{ form.name_is_the_same.as_field_group() }}
 
