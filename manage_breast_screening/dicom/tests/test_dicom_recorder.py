@@ -127,6 +127,30 @@ class TestDicomRecorder:
                 with pytest.raises(DicomProcessingError):
                     DicomRecorder.get_or_create_records(source_message_id, dicom_file)
 
+    @pytest.mark.parametrize(
+        "cs_value, expected",
+        [
+            ("YES", True),
+            ("NO", False),
+            ("UNKNOWN", False),
+            ("", False),
+        ],
+    )
+    def test_get_or_create_implant_presence(
+        self, source_message_id, dataset, gateway_action, cs_value, expected
+    ):
+        dataset.add_new("BreastImplantPresent", "CS", cs_value)
+        with tempfile.NamedTemporaryFile() as temp_file:
+            pydicom.filewriter.dcmwrite(
+                temp_file.name, dataset, write_like_original=False
+            )
+            with open(temp_file.name, "rb") as dicom_file:
+                _, _, image = DicomRecorder.get_or_create_records(
+                    source_message_id, dicom_file
+                )
+
+        assert image.implant_present is expected
+
 
 class TestJpegConversion:
     def test_dataset_to_jpeg(self, dataset):

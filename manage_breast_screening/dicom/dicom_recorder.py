@@ -71,6 +71,8 @@ class DicomRecorder:
                 "instance_number": getattr(ds, "InstanceNumber", None),
                 "laterality": getattr(ds, "ImageLaterality", ""),
                 "view_position": getattr(ds, "ViewPosition", ""),
+                "implant_present": getattr(ds, "BreastImplantPresent", "").upper()
+                == "YES",
             },
         )
         if created:
