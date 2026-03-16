@@ -114,6 +114,26 @@ describe('Check in', () => {
     expect(startAppointmentContainer).not.toHaveAttribute('hidden')
   })
 
+  it('succeeds when start-appointment container is absent (admin user)', async () => {
+    // Simulate admin user's page — no start-appointment container in DOM
+    startAppointmentContainer.remove()
+
+    jest.mocked(fetch).mockResolvedValue(
+      /** @type {Response} */ ({
+        ok: true,
+        status: 200
+      })
+    )
+
+    createAll(CheckIn)
+
+    await user.click(button)
+
+    expect(console.error).not.toHaveBeenCalled()
+    expect(currentStatus).toHaveAttribute('hidden')
+    expect(checkedInStatus).not.toHaveAttribute('hidden')
+  })
+
   it('does not change the DOM if the request fails', async () => {
     jest.mocked(fetch).mockResolvedValue(
       /** @type {Response} */ ({
