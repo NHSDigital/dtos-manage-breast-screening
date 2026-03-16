@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from functools import cache
+from functools import cached_property
 
 import rules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -38,13 +38,15 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "nhs_uid"
     REQUIRED_FIELDS = []
 
-    @cache
-    def has_role(self, role):
+    @cached_property
+    def _current_provider_roles(self):
         if not self.current_provider:
-            return False
-        return self.assignments.filter(
-            provider_id=self.current_provider, roles__contains=[role]
-        ).exists()
+            return []
+        assignment = self.assignments.filter(provider=self.current_provider).first()
+        return assignment.roles if assignment else []
+
+    def has_role(self, role):
+        return role in self._current_provider_roles
 
     @property
     def current_provider(self):
