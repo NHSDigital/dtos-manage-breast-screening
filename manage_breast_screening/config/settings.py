@@ -14,7 +14,6 @@ import sys
 from os import environ
 from pathlib import Path
 
-from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from jinja2 import ChainableUndefined
 
@@ -210,13 +209,10 @@ if DJANGO_ENV != "production":
             },
         }
 else:
-    # In production, use DefaultAzureCredential for authentication
+    # In production, authenticate to Azure Blob Storage using managed identity.
     dicom_storage_options = {
-        "BACKEND": "storages.backends.azure_storage.AzureStorage",
+        "BACKEND": "manage_breast_screening.config.azure_blob_storage.ManagedIdentityAzureStorage",
         "OPTIONS": {
-            "token_credential": DefaultAzureCredential(
-                managed_identity_client_id=environ.get("BLOB_MI_CLIENT_ID")
-            ),
             "account_name": environ.get("STORAGE_ACCOUNT_NAME"),
             "azure_container": "dicom",
         },

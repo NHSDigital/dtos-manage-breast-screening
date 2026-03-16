@@ -1,3 +1,5 @@
+from os import environ
+
 from azure.identity import DefaultAzureCredential
 from django.db.backends.postgresql import base
 
@@ -24,7 +26,9 @@ class DatabaseWrapper(base.DatabaseWrapper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.azure_credential = DefaultAzureCredential()
+        self.azure_credential = DefaultAzureCredential(
+            managed_identity_client_id=environ.get("AZURE_DB_CLIENT_ID")
+        )
 
     def _get_azure_connection_password(self) -> str:
         # This makes use of in-memory token caching
