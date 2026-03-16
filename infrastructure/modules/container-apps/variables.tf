@@ -255,7 +255,7 @@ locals {
   }
 
   azure_db_env = {
-    AZURE_CLIENT_ID = var.deploy_database_as_container ? null : module.db_connect_identity[0].client_id
+    AZURE_DB_CLIENT_ID = var.deploy_database_as_container ? null : module.db_connect_identity[0].client_id
     DATABASE_HOST   = var.deploy_database_as_container ? null : module.postgres[0].host
     DATABASE_NAME   = var.deploy_database_as_container ? null : module.postgres[0].database_names[0]
     DATABASE_USER   = var.deploy_database_as_container ? null : module.db_connect_identity[0].name

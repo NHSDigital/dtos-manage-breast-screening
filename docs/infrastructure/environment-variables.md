@@ -30,7 +30,7 @@ Description: Private key used to sign JWT and sent to API OAuth2 provider. Used 
 
 To rotate: [Generate a new keypair](https://digital.nhs.uk/developer/guides-and-documentation/security-and-authorisation/application-restricted-restful-apis-signed-jwt-authentication#step-2-generate-a-key-pair) and contact the NHS Notify onboarding team so they can update the public key.
 
-## AZURE_CLIENT_ID
+## AZURE_DB_CLIENT_ID
 
 Client ID of the database managed identity, when using.
 
