@@ -80,19 +80,15 @@ class TestNotificationBannerParamsForStringMessages:
 
     def test_info_banner_with_text_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "info")
-        assert result == {"text": "abc", "type": "info", "disableAutoFocus": True}
+        assert result == {"text": "abc", "type": "info"}
 
     def test_success_banner_with_text_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "success")
-        assert result == {"text": "def", "type": "success", "disableAutoFocus": True}
+        assert result == {"text": "def", "type": "success"}
 
     def test_warning_banner_with_text_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "warning")
-        assert result == {
-            "text": "warning!",
-            "type": "warning",
-            "disableAutoFocus": True,
-        }
+        assert result == {"text": "warning!", "type": "warning"}
 
     def test_invalid_message_type(self, dummy_request):
         with pytest.raises(
@@ -101,11 +97,11 @@ class TestNotificationBannerParamsForStringMessages:
         ):
             get_notification_banner_params(dummy_request, "error")
 
-    def test_autofocus_param(self, dummy_request):
+    def test_autofocus_can_be_disabled(self, dummy_request):
         result = get_notification_banner_params(
-            dummy_request, "info", disable_auto_focus=False
+            dummy_request, "info", disable_auto_focus=True
         )
-        assert result == {"text": "abc", "type": "info", "disableAutoFocus": False}
+        assert result == {"text": "abc", "type": "info", "disableAutoFocus": True}
 
 
 class TestNotificationBannerParamsForHTMLMessages:
@@ -120,16 +116,8 @@ class TestNotificationBannerParamsForHTMLMessages:
 
     def test_info_banner_with_html_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "info")
-        assert result == {
-            "html": mark_safe("abc"),
-            "type": "info",
-            "disableAutoFocus": True,
-        }
+        assert result == {"html": mark_safe("abc"), "type": "info"}
 
     def test_success_banner_with_html_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "success")
-        assert result == {
-            "html": mark_safe("def"),
-            "type": "success",
-            "disableAutoFocus": True,
-        }
+        assert result == {"html": mark_safe("def"), "type": "success"}

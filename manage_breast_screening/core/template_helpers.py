@@ -86,7 +86,7 @@ def message_with_heading(heading: str, html=None) -> SafeString:
 
 
 def get_notification_banner_params(
-    request, message_type="info", disable_auto_focus=True
+    request, message_type="info", disable_auto_focus=False
 ):
     levels = {"info": INFO, "warning": WARNING, "success": SUCCESS}
     try:
@@ -102,18 +102,14 @@ def get_notification_banner_params(
 
     message = messages[0].message
 
+    params = {"type": message_type}
+    if disable_auto_focus:
+        params["disableAutoFocus"] = True
     if _is_safe_message(message):
-        return {
-            "html": Markup(message),
-            "type": message_type,
-            "disableAutoFocus": disable_auto_focus,
-        }
+        params["html"] = Markup(message)
     else:
-        return {
-            "text": message,
-            "type": message_type,
-            "disableAutoFocus": disable_auto_focus,
-        }
+        params["text"] = message
+    return params
 
 
 def _user_name_and_role_item(user):
