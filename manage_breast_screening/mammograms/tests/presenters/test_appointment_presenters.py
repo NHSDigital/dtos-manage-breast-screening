@@ -757,7 +757,7 @@ class TestClinicSlotPresenter:
 
         assert (
             ClinicSlotPresenter(clinic_slot_mock).slot_timestamp_multi_line
-            == "9:30am (30 minutes) - 2 January 2025 (4 months, 17 days ago)"
+            == "9:30am (30 minutes) - 2 January 2025 (4 months ago)"
         )
 
     @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
