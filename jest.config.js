@@ -38,8 +38,17 @@ export default {
   restoreMocks: true,
   clearMocks: true,
 
-  // Enable GitHub Actions reporter UI
-  reporters: ['default', 'github-actions']
+  // Enable GitHub Actions reporter UI and xunit
+  reporters: [
+    'default',
+    'github-actions',
+    [
+      'jest-junit',
+      {
+        outputFile: 'reports/test-js-units.xml'
+      }
+    ]
+  ]
 }
 
 /**
