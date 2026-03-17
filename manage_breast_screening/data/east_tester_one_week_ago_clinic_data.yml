@@ -494,7 +494,7 @@ clinic:
                 - Brighton
               postcode: N4 6J2
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 543868c3-0c02-4dbb-b6b3-d35b689de613
               name: West Tester Hospital Trust
@@ -531,7 +531,7 @@ clinic:
                 - Birmingham
               postcode: B6 9P2
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 9a7d90d5-d0a0-43a0-9c52-2637192fbc77
               name: West Tester Hospital Trust
@@ -596,7 +596,7 @@ clinic:
                 - Birmingham
               postcode: L2 4X5
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: a348b48f-177e-461f-ad33-5af1af53d984
               name: West Tester Hospital Trust
@@ -633,7 +633,7 @@ clinic:
                 - Birmingham
               postcode: N8 2U2
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: ce01076b-924e-44b9-9927-6ce411d97521
               name: West Tester Hospital Trust
@@ -754,7 +754,7 @@ clinic:
                 - Leeds
               postcode: N5 2S4
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 799d4ecb-5493-461d-9601-0be573834a43
               name: West Tester Hospital Trust
@@ -791,7 +791,7 @@ clinic:
                 - Brighton
               postcode: L7 1Y4
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 4c399bd1-1b38-4406-b229-dd849dea7ef7
               name: West Tester Hospital Trust

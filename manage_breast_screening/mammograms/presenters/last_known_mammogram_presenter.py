@@ -29,13 +29,12 @@ class LastKnownMammogramPresenter:
         return result
 
     def _present_mammogram(self, mammogram, item_index):
-        location = (
-            mammogram.provider.name
-            if mammogram.provider
-            else mammogram.location_details
-        )
-        if mammogram.provider:
-            location = mammogram.provider.name
+        if mammogram.location_type == mammogram.LocationType.SAME_PROVIDER:
+            location = mammogram.appointment.provider.name
+        elif mammogram.location_type == mammogram.LocationType.ANOTHER_NHS_PROVIDER:
+            location = (
+                f"Another NHS breast screening unit: {mammogram.location_details}"
+            )
         elif (
             mammogram.location_details
             and mammogram.location_type == mammogram.LocationType.ELSEWHERE_UK

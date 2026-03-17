@@ -42,7 +42,7 @@ DATES_WITHIN_LAST_SIX_MONTHS = [
 def build_exact_date_form_data(exact_date, return_url=None):
     """Build form data for submitting an exact mammogram date."""
     data = {
-        "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         "date_type": ParticipantReportedMammogram.DateType.EXACT,
         "exact_date_0": exact_date.day,
         "exact_date_1": exact_date.month,
@@ -106,7 +106,7 @@ def assert_success_message(response, message_text):
 def participant_reported_mammogram(appointment):
     return ParticipantReportedMammogramFactory.create(
         appointment=appointment,
-        location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
     )
 
 
@@ -114,7 +114,7 @@ def participant_reported_mammogram(appointment):
 def valid_mammogram_form_data():
     """Basic valid form data for mammogram submission."""
     return {
-        "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+        "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         "date_type": ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS,
         "approx_date_MORE_THAN_SIX_MONTHS": "2000",
         "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
@@ -247,7 +247,7 @@ class TestChangeParticipantReportedMammogram:
     def participant_reported_mammogram(self, appointment):
         return ParticipantReportedMammogramFactory.create(
             appointment=appointment,
-            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         )
 
     def test_renders_response(
@@ -419,7 +419,7 @@ class TestAppointmentProceedAnywayView:
     def participant_reported_mammogram(self, appointment):
         return ParticipantReportedMammogramFactory.create(
             appointment=appointment,
-            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         )
 
     def test_renders_response(

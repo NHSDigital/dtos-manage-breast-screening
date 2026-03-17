@@ -94,7 +94,7 @@ class TestParticipantReportedMammogramForm:
 
     def test_mammogram_in_same_provider(self, appointment, most_recent_provider):
         data = {
-            "location_type": ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT.value,
+            "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER.value,
             "date_type": "LESS_THAN_SIX_MONTHS",
             "approx_date_LESS_THAN_SIX_MONTHS": "January",
             "name_is_the_same": "YES",
@@ -110,8 +110,7 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider == most_recent_provider
-        assert instance.location_type == "NHS_BREAST_SCREENING_UNIT"
+        assert instance.location_type == "SAME_PROVIDER"
         assert instance.location_details == ""
         assert (
             instance.date_type
@@ -121,6 +120,27 @@ class TestParticipantReportedMammogramForm:
         assert instance.approx_date == "January"
         assert instance.different_name == ""
         assert instance.additional_information == ""
+
+    def test_mammogram_in_another_nhs_provider(self, appointment, most_recent_provider):
+        data = {
+            "location_type": ParticipantReportedMammogram.LocationType.ANOTHER_NHS_PROVIDER.value,
+            "another_nhs_provider_details": "Another BSU",
+            "date_type": "LESS_THAN_SIX_MONTHS",
+            "approx_date_LESS_THAN_SIX_MONTHS": "January",
+            "name_is_the_same": "YES",
+        }
+
+        form = ParticipantReportedMammogramForm(
+            QueryDict(urlencode(data, doseq=True)),
+            participant=appointment.screening_episode.participant,
+            most_recent_provider=most_recent_provider,
+        )
+        assert form.is_valid(), form.errors
+
+        instance = form.create(appointment)
+
+        assert instance.location_type == "ANOTHER_NHS_PROVIDER"
+        assert instance.location_details == "Another BSU"
 
     def test_mammogram_in_uk(self, appointment, most_recent_provider):
         data = {
@@ -141,7 +161,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "ELSEWHERE_UK"
         assert instance.location_details == "XYZ provider"
         assert (
@@ -172,7 +191,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "OUTSIDE_UK"
         assert instance.location_details == "XYZ provider"
         assert (
@@ -202,7 +220,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
         assert (
@@ -245,7 +262,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
         assert instance.exact_date == exact_date
@@ -273,7 +289,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
         assert instance.exact_date is None
@@ -300,7 +315,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "PREFER_NOT_TO_SAY"
         assert instance.location_details == ""
         assert (
@@ -333,7 +347,6 @@ class TestParticipantReportedMammogramForm:
         instance = form.create(appointment)
 
         assert instance.appointment == appointment
-        assert instance.provider is None
         assert instance.location_type == "OUTSIDE_UK"
         assert instance.location_details == "XYZ provider"
         assert instance.exact_date is None
@@ -370,7 +383,6 @@ class TestParticipantReportedMammogramForm:
 
         assert updated_instance.pk == original_instance.pk
         assert updated_instance.appointment == appointment
-        assert updated_instance.provider is None
         assert updated_instance.location_type == "OUTSIDE_UK"
         assert updated_instance.location_details == "XYZ provider"
         assert updated_instance.exact_date is None

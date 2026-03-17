@@ -23,9 +23,13 @@ class SupportReasons(TextChoices):
 
 class ParticipantReportedMammogram(BaseModel):
     class LocationType(models.TextChoices):
-        NHS_BREAST_SCREENING_UNIT = (
-            "NHS_BREAST_SCREENING_UNIT",
-            "At an NHS breast screening unit",
+        SAME_PROVIDER = (
+            "SAME_PROVIDER",
+            "At this NHS breast screening unit",
+        )
+        ANOTHER_NHS_PROVIDER = (
+            "ANOTHER_NHS_PROVIDER",
+            "At another NHS breast screening unit",
         )
         ELSEWHERE_UK = "ELSEWHERE_UK", "Elsewhere in the UK"
         OUTSIDE_UK = "OUTSIDE_UK", "Outside the UK"
@@ -51,9 +55,6 @@ class ParticipantReportedMammogram(BaseModel):
         related_name="reported_mammograms",
     )
     location_type = models.CharField(choices=LocationType)
-    provider = models.ForeignKey(
-        "clinics.Provider", on_delete=models.PROTECT, null=True, blank=True
-    )
     location_details = models.TextField(null=False, default="", blank=True)
     date_type = models.CharField(choices=DateType)
     exact_date = models.DateField(null=True, blank=True)

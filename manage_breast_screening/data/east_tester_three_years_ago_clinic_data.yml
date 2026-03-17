@@ -34,7 +34,7 @@ clinic:
                 - Brighton
               postcode: N2 8M5
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 1fd2842e-5af5-462b-a83c-3c4380b62ca4
               name: West Tester Hospital Trust
@@ -99,7 +99,7 @@ clinic:
                 - Brighton
               postcode: L5 5U1
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: a918df78-d4eb-4bbe-9a35-3a650208c765
               name: West Tester Hospital Trust
@@ -444,7 +444,7 @@ clinic:
                 - Brighton
               postcode: B2 5N7
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 70bb7af4-a58e-44ed-ac86-bb2cf11192c3
               name: West Tester Hospital Trust
@@ -509,7 +509,7 @@ clinic:
                 - Leeds
               postcode: L6 1C6
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 6b226f00-6035-4914-a4f1-ca2873de1fff
               name: West Tester Hospital Trust
@@ -574,7 +574,7 @@ clinic:
                 - Leeds
               postcode: N6 9B4
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 7e8e1649-6f0a-411d-b818-48666ee611c5
               name: West Tester Hospital Trust
@@ -611,7 +611,7 @@ clinic:
                 - Birmingham
               postcode: N4 6L8
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: 981dfbba-8cf8-4cc1-b3d2-147c281720aa
               name: West Tester Hospital Trust
@@ -788,7 +788,7 @@ clinic:
                 - Brighton
               postcode: B1 3U3
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
+          - location_type: SAME_PROVIDER
             provider:
               id: c2f4891d-6011-409f-8a7f-f46944803801
               name: West Tester Hospital Trust

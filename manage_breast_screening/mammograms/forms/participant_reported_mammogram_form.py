@@ -52,10 +52,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         location_choices = []
         for value, label in ParticipantReportedMammogram.LocationType.choices:
-            if (
-                value
-                == ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
-            ):
+            if value == ParticipantReportedMammogram.LocationType.SAME_PROVIDER:
                 label = f"At {most_recent_provider.name}"
             elif value == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK:
                 label = "Somewhere in the UK"
@@ -66,6 +63,17 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             label="Where were the breast x-rays taken?",
             error_messages={"required": "Select where the breast x-rays were taken"},
         )
+
+        self.fields["another_nhs_provider_details"] = CharField(
+            required=False,
+            label="Enter the unit",
+            error_messages={"required": "Enter the breast screening unit"},
+        )
+        self.given_field_value(
+            "location_type",
+            ParticipantReportedMammogram.LocationType.ANOTHER_NHS_PROVIDER,
+        ).require_field("another_nhs_provider_details")
+
         self.fields["somewhere_in_the_uk_details"] = CharField(
             required=False,
             label="Location",
@@ -77,6 +85,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
         self.given_field_value(
             "location_type", ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
         ).require_field("somewhere_in_the_uk_details")
+
         self.fields["outside_the_uk_details"] = CharField(
             required=False,
             label="Location",
@@ -177,13 +186,12 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         if (
             instance.location_type
-            == ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
+            == ParticipantReportedMammogram.LocationType.ANOTHER_NHS_PROVIDER
         ):
-            instance.provider = self.most_recent_provider
-        else:
-            instance.provider = None
-
-        if (
+            instance.location_details = self.cleaned_data[
+                "another_nhs_provider_details"
+            ]
+        elif (
             instance.location_type
             == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK
         ):
