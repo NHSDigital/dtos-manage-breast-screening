@@ -20,7 +20,7 @@ def format_date(value):
     return value.strftime("%-d %B %Y")
 
 
-def format_relative_date(value: datetime | date):
+def format_relative_date(value: datetime | date, round_days=True):
     """
     Format a date relative to today as a number of days.
     """
@@ -30,7 +30,7 @@ def format_relative_date(value: datetime | date):
     today = date.today()
     days = (value - today).days
 
-    amount = _format_date_difference(value, today)
+    amount = _format_date_difference(value, today, round_days=round_days)
 
     if days < -1:
         return f"{amount} ago"
@@ -80,8 +80,24 @@ def format_year_with_relative(value: int | None):
         return str(value)
 
 
-def _format_date_difference(date1, date2):
+def _format_date_difference(date1, date2, round_days=True):
     diff = relativedelta(date1, date2) if date1 > date2 else relativedelta(date2, date1)
+
+    if round_days and diff.days and (diff.months or diff.years):
+        # If the delta is at least 1 month, and we don't want the exact days,
+        # then pretend that date1 is more recent than the true value so that
+        # the month aligns with date2.
+        #
+        # If the delta is positive (date1 is in the future of date2) then
+        # the formatted delta will be bigger than the true delta.
+        #
+        # If the delta is negative (date1 is in the past of date2) then
+        # the formatted delta will be smaller than the true delta.
+        diff.days = 0
+        if date1 > date2:
+            months = diff.months
+            diff.months = (months + 1) % 12
+            diff.years += (months + 1) // 12
 
     parts = []
     if diff.years:
