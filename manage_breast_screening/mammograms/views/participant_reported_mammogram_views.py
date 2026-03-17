@@ -12,10 +12,10 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.services import fetch_most_recent_provider
 
+from ..forms.participant_reported_mammogram_form import ParticipantReportedMammogramForm
 from .mixins import InProgressAppointmentMixin
 
 logger = logging.getLogger(__name__)

@@ -11,8 +11,10 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
+from manage_breast_screening.mammograms.forms.participant_reported_mammogram_form import (
+    ParticipantReportedMammogramForm,
+)
 from manage_breast_screening.manual_images.models import Study
-from manage_breast_screening.participants.forms import ParticipantReportedMammogramForm
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
