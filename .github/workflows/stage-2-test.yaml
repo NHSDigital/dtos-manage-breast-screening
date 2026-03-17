@@ -99,7 +99,7 @@ jobs:
           DATABASE_HOST: localhost
 
       - name: Test Report
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
         if: ${{ !cancelled() }} # run this step even if previous step failed
         with:
           name: Report python unit tests
@@ -107,7 +107,7 @@ jobs:
           reporter: python-xunit
 
       - name: Report javascript unit tests
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
         if: ${{ !cancelled() }} # run this step even if previous step failed
         with:
           name: Unit tests (javascript)
@@ -167,12 +167,12 @@ jobs:
           DATABASE_HOST: localhost
 
       - name: Report UI tests
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
         if: ${{ !cancelled() }} # run this step even if previous step failed
         with:
           name: UI tests
           path: reports/test-ui.xml
-          reporter: pytest-xunit
+          reporter: python-xunit
 
   test-lint:
     name: 'Linting'

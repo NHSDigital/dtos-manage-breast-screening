@@ -9,6 +9,10 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestPersonaLogin(SystemTestCase):
+    """
+    Test the persona login (used on non-prod environments)
+    """
+
     def test_user_views_clinic_show_page(self):
         self.given_a_persona_exists()
         self.when_i_visit_the_clinics_page()
