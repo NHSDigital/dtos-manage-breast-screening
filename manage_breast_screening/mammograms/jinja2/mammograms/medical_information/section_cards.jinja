@@ -1,7 +1,7 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
-{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
+{% from "components/participant-details/summary_list_rows.jinja" import reported_mammogram_html %}
 {% from "mammograms/medical_information/medical_history/cards/benign_lump_history_card.jinja" import benign_lump_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/breast_augmentation_history_card.jinja" import breast_augmentation_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
@@ -15,18 +15,41 @@
 {% macro mammogram_history_content(presented_medical_info, presented_mammograms, read_only=false) %}
   <p>The last confirmed mammogram and any added manually since then</p>
 
+  <h3 class="nhsuk-heading-s">From screening records</h3>
   {{ summaryList({
     "rows": [
       {
         "key": {
-          "text": "Last known mammograms"
+          "text": "Last known mammogram"
         },
         "value": {
-          "html": last_mammogram_html(presented_mammograms, read_only=read_only)
+          "html": "Not known"
         }
-      },
+      }
     ]
   }) }}
+
+  {% set mammogram_rows = [] %}
+  {% for key, mammogram in presented_mammograms.reported_mammograms.items() %}
+    {% set _ = mammogram_rows.append({
+      "key": {
+        "html": key
+      },
+      "value": {
+        "html": reported_mammogram_html(mammogram)
+      },
+      "actions": {
+        "items": [mammogram.change_link] if not read_only else []
+      },
+    }) %}
+  {% endfor %}
+
+  {% if mammogram_rows %}
+    <h3 class="nhsuk-heading-s">Reported mammograms</h3>
+    {{ summaryList({
+      "rows": mammogram_rows
+    }) }}
+  {% endif %}
 
   {% if not read_only %}
     {{ button({

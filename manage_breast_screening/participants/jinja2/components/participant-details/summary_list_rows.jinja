@@ -33,37 +33,24 @@
   {% endif %}
 {% endmacro %}
 
-{% macro last_mammogram_html(presented_mammograms, read_only=false) %}
-  {% set mammograms_by_date_added = presented_mammograms.last_known_mammograms %}
-  <div data-testid="mammograms">
-  {% if mammograms_by_date_added %}
-    {% for mammogram in mammograms_by_date_added %}
-      <p>
-      {% if not read_only %}
-      <a class="nhsuk-link nhsuk-link--no-visited-state nhsuk-u-float-right" href="{{ mammogram.change_link.href}}">
-        {{ mammogram.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ mammogram.change_link.visually_hidden_text }}</span>
-      </a>
-      {% endif %}
-
-      <span class="nhsuk-u-font-weight-bold">Added {{ mammogram.date_added }}</span>
-      <br>{% if mammogram.date.is_exact %}{{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-colour">({{ mammogram.date.relative }})</span>{% else %}{{ mammogram.date.value }}{% endif %}
-      <br>{{ mammogram.location }}
-
-      {% if mammogram.different_name %}
-        <br>Previous name: {{ mammogram.different_name }}
-      {% endif %}
-
-      {% if mammogram.additional_information %}
-        <br>Additional information: {{ mammogram.additional_information | nl2br }}
-      {% endif %}
-
-      {% if mammogram.reason_for_continuing %}
-        <br>Reason for continuing: {{ mammogram.reason_for_continuing | nl2br }}
-      {% endif %}
-      </p>
-    {% endfor %}
+{% macro reported_mammogram_html(mammogram) %}
+  {% if mammogram.date.is_exact %}
+    {{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-colour">({{ mammogram.date.relative }})</span>
   {% else %}
-  {{ "Not known" | as_hint }}
+    {{ mammogram.date.value }}
   {% endif %}
-  </div>
+
+  <br>{{ mammogram.location }}
+
+  {% if mammogram.reason_for_continuing %}
+    <br>Reason for continuing with mammograms: {{ mammogram.reason_for_continuing | nl2br }}
+  {% endif %}
+
+  {% if mammogram.different_name %}
+    <br>Previous name: {{ mammogram.different_name }}
+  {% endif %}
+
+  {% if mammogram.additional_information %}
+    <br>Additional information: {{ mammogram.additional_information | nl2br }}
+  {% endif %}
 {% endmacro %}

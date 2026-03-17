@@ -6,16 +6,50 @@ from manage_breast_screening.core.utils.date_formatting import (
     format_date,
     format_relative_date,
 )
+from manage_breast_screening.participants.models.reported_mammograms import (
+    ParticipantReportedMammogram,
+)
 
 
 class LastKnownMammogramPresenter:
-    def __init__(self, last_known_mammograms, appointment_pk, current_url):
+    def __init__(
+        self,
+        user,
+        last_known_mammograms,
+        last_confirmed_mammogram,
+        appointment_pk,
+        current_url,
+    ):
+        self._user = user
         self._last_known_mammograms = last_known_mammograms
+        self._last_confirmed_mammogram = last_confirmed_mammogram
         self.appointment_pk = appointment_pk
         self.current_url = current_url
 
+    def _format_created_at(self, mammogram):
+        label = f"Recorded {format_date(mammogram.created_at)}"
+        if mammogram.created_by:
+            attribution = " (you)" if self._user.pk == mammogram.created_by.pk else ""
+            label += f"""
+            <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0 ">
+                by {mammogram.created_by.get_short_name()}{attribution}
+            </span>
+            """
+        return label
+
     @cached_property
-    def last_known_mammograms(self):
+    def reported_mammograms(self):
+        return {
+            self._format_created_at(mammogram): self._present_mammogram(mammogram, None)
+            for mammogram in self._last_known_mammograms
+        }
+
+    @cached_property
+    def last_confirmed_mammogram(self):
+        return self._last_confirmed_mammogram
+
+    @cached_property
+    def last_known_mammograms(self):  # TODO remove?
         result = []
 
         if len(self._last_known_mammograms) == 1:
@@ -34,6 +68,7 @@ class LastKnownMammogramPresenter:
             if mammogram.provider
             else mammogram.location_details
         )
+
         if mammogram.provider:
             location = mammogram.provider.name
         elif (
@@ -49,14 +84,26 @@ class LastKnownMammogramPresenter:
         elif mammogram.location_type == mammogram.LocationType.PREFER_NOT_TO_SAY:
             location = "Location: prefer not to say"
         else:
-            location = "Location unknown"
+            location = "Unknown location"
 
         if mammogram.exact_date:
             absolute = format_date(mammogram.exact_date)
             relative = format_relative_date(mammogram.exact_date)
             date = {"absolute": absolute, "relative": relative, "is_exact": True}
-        elif mammogram.approx_date:
-            date = {"value": f"Approximate date: {mammogram.approx_date}"}
+        elif (
+            mammogram.date_type
+            == ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS
+        ):
+            date = {
+                "value": f"Approximately taken 6 months or more ago: {mammogram.approx_date}"
+            }
+        elif (
+            mammogram.date_type
+            == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS
+        ):
+            date = {
+                "value": f"Approximately taken less than 6 months ago: {mammogram.approx_date}"
+            }
         else:
             date = {"value": "Date unknown"}
 

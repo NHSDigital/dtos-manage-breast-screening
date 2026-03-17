@@ -29,6 +29,7 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
         kwargs["participant"] = self.participant
         kwargs["most_recent_provider"] = fetch_most_recent_provider(self.participant.pk)
         return kwargs

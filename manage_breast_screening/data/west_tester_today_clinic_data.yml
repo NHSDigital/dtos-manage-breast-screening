@@ -32,6 +32,20 @@ clinic:
                 - 216 Clinic Road
                 - Sheffield
               postcode: L3 4N8
+        previous_mammograms:
+          - location_type: NHS_BREAST_SCREENING_UNIT
+            provider:
+              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+              name: West Tester Hospital Trust
+            location_details: In the radiology department
+            exact_date: '2025-07-25'
+            date_type: EXACT
+        confirmed_previous_mammograms:
+          - provider:
+              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+              name: West Tester Hospital Trust
+            location_details: In the radiology department
+            exact_date: '2025-07-25'
     - id: 85c73ada-3a17-4df3-91fe-1b0ee0648670
       duration_in_minutes: 8
       starts_at_time: 09:08

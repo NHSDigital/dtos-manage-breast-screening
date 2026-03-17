@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models import TextChoices
 
 from manage_breast_screening.participants.models.appointment import Appointment
+from manage_breast_screening.users.models import User
 
 from ...core.models import BaseModel
 
@@ -61,3 +62,4 @@ class ParticipantReportedMammogram(BaseModel):
     different_name = models.CharField(null=False, default="", blank=True)
     additional_information = models.TextField(null=False, default="", blank=True)
     reason_for_continuing = models.TextField(null=False, default="", blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)

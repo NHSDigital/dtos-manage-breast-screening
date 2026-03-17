@@ -45,6 +45,9 @@ from manage_breast_screening.participants.models import (
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
+from manage_breast_screening.participants.models.confirmed_mammograms import (
+    ConfirmedPreviousMammogram,
+)
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
 from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
@@ -105,9 +108,17 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         last_known_mammograms = ParticipantReportedMammogram.objects.filter(
             appointment_id=self.appointment.pk
         ).order_by("-created_at")
-
+        last_confirmed_mammogram = (
+            ConfirmedPreviousMammogram.objects.filter(
+                appointment_id=self.appointment.pk
+            )
+            .order_by("-created_at")
+            .first()
+        )
         presented_mammograms = LastKnownMammogramPresenter(
+            self.request.user,
             last_known_mammograms,
+            last_confirmed_mammogram,
             appointment_pk=self.appointment.pk,
             current_url=self.request.path,
         )

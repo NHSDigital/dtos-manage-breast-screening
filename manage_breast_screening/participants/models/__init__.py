@@ -1,5 +1,6 @@
 from .appointment import Appointment, AppointmentNote, AppointmentStatus
 from .breast_features import BreastFeatureAnnotation
+from .confirmed_mammograms import ConfirmedPreviousMammogram
 from .ethnicity import Ethnicity
 from .medical_history.benign_lump_history_item import BenignLumpHistoryItem
 from .medical_history.breast_augmentation_history_item import (
@@ -32,6 +33,7 @@ __all__ = [
     "BreastCancerHistoryItem",
     "BreastFeatureAnnotation",
     "MastectomyOrLumpectomyHistoryItem",
+    "ConfirmedPreviousMammogram",
     "CystHistoryItem",
     "ImplantedMedicalDeviceHistoryItem",
     "MedicalInformationReview",
