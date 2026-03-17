@@ -135,7 +135,7 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
 
     def and_the_hormone_replacement_therapy_is_displayed_as_taken(self):
         self.and_the_hormone_replacement_therapy_is_displayed(
-            "Taking HRT (August 2024)"
+            "Currently taking HRT Started: August 2024"
         )
 
     def and_the_hormone_replacement_therapy_is_displayed(self, expected_text):
