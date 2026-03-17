@@ -20,7 +20,7 @@ def format_date(value):
     return value.strftime("%-d %B %Y")
 
 
-def format_relative_date(value: datetime | date):
+def format_relative_date(value: datetime | date, include_days=False):
     """
     Format a date relative to today as a number of days.
     """
@@ -30,7 +30,7 @@ def format_relative_date(value: datetime | date):
     today = date.today()
     days = (value - today).days
 
-    amount = _format_date_difference(value, today)
+    amount = _format_date_difference(value, today, include_days=include_days)
 
     if days < -1:
         return f"{amount} ago"
@@ -80,7 +80,7 @@ def format_year_with_relative(value: int | None):
         return str(value)
 
 
-def _format_date_difference(date1, date2):
+def _format_date_difference(date1, date2, include_days=False):
     diff = relativedelta(date1, date2) if date1 > date2 else relativedelta(date2, date1)
 
     parts = []
@@ -88,7 +88,7 @@ def _format_date_difference(date1, date2):
         parts.append("1 year" if diff.years == 1 else f"{diff.years} years")
     if diff.months:
         parts.append("1 month" if diff.months == 1 else f"{diff.months} months")
-    if diff.days:
+    if diff.days and (include_days or not parts):
         parts.append("1 day" if diff.days == 1 else f"{diff.days} days")
 
     return ", ".join(parts) if parts else ""

@@ -15,22 +15,29 @@ from ..date_formatting import (
 
 @time_machine.travel(datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")))
 @pytest.mark.parametrize(
-    ("dateiso", "output"),
+    ("dateiso", "include_days", "output"),
     (
-        ("2025-05-02T09:00:00", "today"),
-        ("2025-05-01T09:00:00", "yesterday"),
-        ("2025-05-01T11:59:00", "yesterday"),
-        ("2025-04-30T08:00:00", "2 days ago"),
-        ("2025-05-03T07:00:00", "tomorrow"),
-        ("2025-05-04T12:00:00", "in 2 days"),
-        ("2024-05-02T12:00:00", "1 year ago"),
-        ("2024-04-02T12:00:00", "1 year, 1 month ago"),
-        ("2024-03-31T12:00:00", "1 year, 1 month, 2 days ago"),
-        ("2026-03-31T12:00:00", "in 10 months, 29 days"),
+        ("2025-05-02T09:00:00", False, "today"),
+        ("2025-05-02T09:00:00", True, "today"),
+        ("2025-05-01T09:00:00", False, "yesterday"),
+        ("2025-05-01T11:59:00", False, "yesterday"),
+        ("2025-04-30T08:00:00", False, "2 days ago"),
+        ("2025-04-30T08:00:00", True, "2 days ago"),
+        ("2025-05-03T07:00:00", False, "tomorrow"),
+        ("2025-05-04T12:00:00", False, "in 2 days"),
+        ("2024-05-02T12:00:00", False, "1 year ago"),
+        ("2024-04-02T12:00:00", False, "1 year, 1 month ago"),
+        ("2024-03-31T12:00:00", True, "1 year, 1 month, 2 days ago"),
+        ("2024-03-31T12:00:00", False, "1 year, 1 month ago"),
+        ("2026-03-31T12:00:00", False, "in 10 months"),
+        ("2026-03-31T12:00:00", True, "in 10 months, 29 days"),
     ),
 )
-def test_relative_dates(dateiso, output):
-    assert format_relative_date(datetime.fromisoformat(dateiso)) == output
+def test_relative_dates(dateiso, include_days, output):
+    assert (
+        format_relative_date(datetime.fromisoformat(dateiso), include_days=include_days)
+        == output
+    )
 
 
 @time_machine.travel(datetime(2025, 5, 2, 10, tzinfo=ZoneInfo("Europe/London")))
