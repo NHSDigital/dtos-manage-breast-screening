@@ -99,10 +99,10 @@ def superuser_client(superuser, current_provider):
     )
 
 
-# Pytest HTML Report customization for Jira markers
+# Pytest HTML Report customization for Jira and Risk markers
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    """Store JIRA marker information in the test report."""
+    """Store JIRA and Risk marker information in the test report."""
     outcome = yield
     report = outcome.get_result()
 
@@ -113,17 +113,50 @@ def pytest_runtest_makereport(item, call):
             jira_ticket = marker.kwargs["ticket"]
             break
 
-    # Add JIRA ticket as extra information in the HTML report
-    if jira_ticket and report.when == "call":
-        from pytest_html import extras
+    # Add Risk ID to the report for display in HTML report
+    risk_id = None
+    for marker in item.iter_markers(name="risk"):
+        if "id" in marker.kwargs:
+            risk_id = marker.kwargs["id"]
+            break
 
-        # Store jira info in user_properties for the report
+    # Store jira and risk info in user_properties
+    if jira_ticket:
         report.user_properties.append(("jira_ticket", jira_ticket))
+    if risk_id:
+        report.user_properties.append(("risk_id", risk_id))
 
-        # Add extras for HTML display
-        if not hasattr(report, "extras"):
-            report.extras = []
 
-        report.extras.append(
-            extras.html(f"<div><strong>JIRA Ticket:</strong> {jira_ticket}</div>")
+def pytest_html_results_table_row(report, cells):
+    """Modify table row to show JIRA ticket and Risk ID in the Test column."""
+    # Find jira ticket and risk id from user_properties
+    jira_ticket = None
+    risk_id = None
+    for name, value in report.user_properties:
+        if name == "jira_ticket":
+            jira_ticket = value
+        elif name == "risk_id":
+            risk_id = value
+
+    # Build badges for any markers present
+    if (jira_ticket or risk_id) and len(cells) > 1:
+        test_cell = cells[1]
+        badges = []
+
+        # Add JIRA badge if present
+        if jira_ticket:
+            badges.append(
+                f'<span class="jira-badge" style="background: #0052CC; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; margin-right: 8px;">{jira_ticket}</span>'
+            )
+
+        # Add Risk badge if present
+        if risk_id:
+            badges.append(
+                f'<span class="risk-badge" style="background: #DC3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; margin-right: 8px;">⚠️ {risk_id}</span>'
+            )
+
+        # Insert badges into the cell
+        badges_html = "".join(badges)
+        cells[1] = test_cell.replace(
+            '<td class="col-testId">', f'<td class="col-testId">{badges_html}'
         )

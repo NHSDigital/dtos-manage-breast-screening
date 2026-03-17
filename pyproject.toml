@@ -78,6 +78,7 @@ markers = [
   "integration: mark a test as an integration test",
   "skip_insights_mock: don't auto use the mock_insights_logging fixture",
   "jira(ticket): mark a test with a JIRA ticket number",
+  "risk(id): mark a test with a risk identifier",
   "focus: mark a test to focus on during development",
 ]
 

@@ -25,6 +25,7 @@ class TestParticipantRecord(SystemTestCase):
         time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 
     @pytest.mark.jira(ticket="DTOSS-1234")
+    @pytest.mark.risk(id="MANBRS0001")
     def test_viewing_participant_record_from_an_appointment(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
@@ -36,6 +37,7 @@ class TestParticipantRecord(SystemTestCase):
         self.then_i_should_be_back_on_the_appointment()
 
     @pytest.mark.jira(ticket="DTOSS-2345")
+    @pytest.mark.risk(id="MANBRS0002")
     def test_accessibility(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
