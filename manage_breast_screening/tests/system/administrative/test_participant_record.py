@@ -16,6 +16,7 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@pytest.mark.focus
 class TestParticipantRecord(SystemTestCase):
     @pytest.fixture(autouse=True)
     def before(self, time_machine):
@@ -23,6 +24,7 @@ class TestParticipantRecord(SystemTestCase):
 
         time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
 
+    @pytest.mark.jira(ticket="DTOSS-1234")
     def test_viewing_participant_record_from_an_appointment(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
@@ -33,6 +35,7 @@ class TestParticipantRecord(SystemTestCase):
         self.when_i_click_on_the_back_link()
         self.then_i_should_be_back_on_the_appointment()
 
+    @pytest.mark.jira(ticket="DTOSS-2345")
     def test_accessibility(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()

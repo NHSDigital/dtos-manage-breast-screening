@@ -97,3 +97,33 @@ def superuser_client(superuser, current_provider):
     return SimpleNamespace(
         http=client, current_provider=current_provider, user=superuser
     )
+
+
+# Pytest HTML Report customization for Jira markers
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Store JIRA marker information in the test report."""
+    outcome = yield
+    report = outcome.get_result()
+
+    # Add JIRA ticket to the report for display in HTML report
+    jira_ticket = None
+    for marker in item.iter_markers(name="jira"):
+        if "ticket" in marker.kwargs:
+            jira_ticket = marker.kwargs["ticket"]
+            break
+
+    # Add JIRA ticket as extra information in the HTML report
+    if jira_ticket and report.when == "call":
+        from pytest_html import extras
+
+        # Store jira info in user_properties for the report
+        report.user_properties.append(("jira_ticket", jira_ticket))
+
+        # Add extras for HTML display
+        if not hasattr(report, "extras"):
+            report.extras = []
+
+        report.extras.append(
+            extras.html(f"<div><strong>JIRA Ticket:</strong> {jira_ticket}</div>")
+        )

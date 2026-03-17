@@ -69,6 +69,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
+generate_report_on_test = true
 DJANGO_SETTINGS_MODULE = "manage_breast_screening.config.settings_test"
 python_files = "tests.py test_*.py *_tests.py"
 addopts = "--doctest-modules"
@@ -76,6 +77,8 @@ markers = [
   "system: mark a test as a system test",
   "integration: mark a test as an integration test",
   "skip_insights_mock: don't auto use the mock_insights_logging fixture",
+  "jira(ticket): mark a test with a JIRA ticket number",
+  "focus: mark a test to focus on during development",
 ]
 
 [tool.ruff]
