@@ -40,7 +40,7 @@
     {% for mammogram in mammograms_by_date_added %}
       <p>
       {% if not read_only %}
-      <a style="float: right" class="nhsuk-link nhsuk-link--no-visited-state" href="{{ mammogram.change_link.href}}">
+      <a class="nhsuk-link nhsuk-link--no-visited-state nhsuk-u-float-right" href="{{ mammogram.change_link.href}}">
         {{ mammogram.change_link.text }}<span class="nhsuk-u-visually-hidden">{{ mammogram.change_link.visually_hidden_text }}</span>
       </a>
       {% endif %}

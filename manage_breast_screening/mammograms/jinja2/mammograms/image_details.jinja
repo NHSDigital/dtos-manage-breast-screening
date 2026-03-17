@@ -37,7 +37,7 @@
     Images taken: <span data-total-count></span>
   </p>
 
-  <div class="nhsuk-inset-text" id="repeat-images-inset" data-module="repeat-images-notice" style="display: none;">
+  <div class="nhsuk-inset-text" id="repeat-images-inset" data-module="repeat-images-notice" hidden>
     <span class="nhsuk-u-visually-hidden">Information: </span>
     <p>Repeat or extra image details captured on the next screen</p>
   </div>
@@ -108,9 +108,9 @@
 
       const updateVisibility = () => {
         if (hasRepeats()) {
-          insetText.style.display = ''
+          insetText.removeAttribute('hidden')
         } else {
-          insetText.style.display = 'none'
+          insetText.setAttribute('hidden', '')
         }
       }
 
