@@ -27,6 +27,12 @@ class TestParticipantRecord(SystemTestCase):
     @pytest.mark.jira(ticket="DTOSS-1234")
     @pytest.mark.risk(id="MANBRS0001")
     def test_viewing_participant_record_from_an_appointment(self):
+        """
+        This test views a participant from an apppointment
+        The documentation
+        is
+        multiline
+        """
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
         self.and_i_am_viewing_the_upcoming_appointment()
@@ -39,6 +45,9 @@ class TestParticipantRecord(SystemTestCase):
     @pytest.mark.jira(ticket="DTOSS-2345")
     @pytest.mark.risk(id="MANBRS0002")
     def test_accessibility(self):
+        """
+        This test checks the accessibility
+        """
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
         self.and_i_am_on_the_participant_details_tab()

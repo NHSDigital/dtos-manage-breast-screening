@@ -1,3 +1,5 @@
+import inspect
+from html import escape
 from types import SimpleNamespace
 from unittest import TestCase
 
@@ -126,17 +128,24 @@ def pytest_runtest_makereport(item, call):
     if risk_id:
         report.user_properties.append(("risk_id", risk_id))
 
+    test_docstring = inspect.cleandoc(item.obj.__doc__ or "")
+    if test_docstring:
+        report.user_properties.append(("test_docstring", test_docstring))
+
 
 def pytest_html_results_table_row(report, cells):
     """Modify table row to show JIRA ticket and Risk ID in the Test column."""
     # Find jira ticket and risk id from user_properties
     jira_ticket = None
     risk_id = None
+    test_docstring = None
     for name, value in report.user_properties:
         if name == "jira_ticket":
             jira_ticket = value
         elif name == "risk_id":
             risk_id = value
+        elif name == "test_docstring":
+            test_docstring = value
 
     if len(cells) <= 1:
         return
@@ -149,7 +158,13 @@ def pytest_html_results_table_row(report, cells):
     else:
         display_test_id = report.nodeid
 
-    test_cell = cells[1].replace(report.nodeid, display_test_id)
+    display_test_html = f'<div class="test-name">{escape(display_test_id)}</div>'
+    if test_docstring:
+        display_test_html += (
+            f'<div class="test-docstring">{escape(test_docstring)}</div>'
+        )
+
+    test_cell = cells[1].replace(report.nodeid, display_test_html)
     badges = []
 
     # Add JIRA badge if present

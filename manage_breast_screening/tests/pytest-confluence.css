@@ -133,6 +133,17 @@ p {
     background: #c9372c;
 }
 
+.test-name {
+    font-weight: 600;
+}
+
+.test-docstring {
+    color: #5e6c84;
+    font-size: 12px;
+    margin-top: 4px;
+    white-space: pre-line;
+}
+
 .logwrapper {
     border-top: 1px solid #dfe1e6;
 }
