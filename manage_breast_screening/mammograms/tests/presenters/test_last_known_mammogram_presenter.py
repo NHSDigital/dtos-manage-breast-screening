@@ -18,6 +18,7 @@ class TestLastKnownMammogramPresenter:
             appointment=in_progress_appointment,
             location_type=ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             location_details="Somewhere",
+            date_type=ParticipantReportedMammogram.DateType.EXACT,
             exact_date=date(2022, 1, 1),
         )
 
@@ -27,6 +28,7 @@ class TestLastKnownMammogramPresenter:
             created_at=datetime(2022, 1, 1),
             appointment=in_progress_appointment,
             location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+            date_type=ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS,
             approx_date="3 years ago",
             additional_information="Abcd",
             different_name="Janet Williams",
@@ -80,6 +82,7 @@ class TestLastKnownMammogramPresenter:
             appointment=in_progress_appointment,
             location_type=ParticipantReportedMammogram.LocationType.ANOTHER_NHS_PROVIDER,
             location_details="Old provider",
+            date_type=ParticipantReportedMammogram.DateType.EXACT,
             exact_date=date(2022, 1, 1),
         )
         result = LastKnownMammogramPresenter(
@@ -141,7 +144,7 @@ class TestLastKnownMammogramPresenter:
                 "date_added": "3 years ago",
                 "additional_information": "Abcd",
                 "date": {
-                    "value": "Approximate date: 3 years ago",
+                    "value": "Taken 6 months or more ago: 3 years ago",
                 },
                 "different_name": "Janet Williams",
                 "location": in_progress_appointment.provider.name,
