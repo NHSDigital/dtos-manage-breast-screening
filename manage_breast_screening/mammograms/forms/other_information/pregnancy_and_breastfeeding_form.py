@@ -54,7 +54,7 @@ class PregnancyAndBreastfeedingForm(FormWithConditionalFields):
         self.fields["approx_breastfeeding_start_date"] = CharField(
             required=False,
             label="Approximate date started",
-            hint=f"For example, since {format_relative_months(-2)}",
+            hint=f"For example, {format_relative_months(-2)}",
             error_messages={
                 "required": "Provide details of when they started breastfeeding"
             },
