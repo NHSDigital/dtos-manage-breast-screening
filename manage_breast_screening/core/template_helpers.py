@@ -109,6 +109,7 @@ def get_notification_banner_params(
         params["html"] = Markup(message)
     else:
         params["text"] = message
+    params["role"] = "alert"
     return params
 
 

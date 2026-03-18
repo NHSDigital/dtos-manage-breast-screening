@@ -80,15 +80,15 @@ class TestNotificationBannerParamsForStringMessages:
 
     def test_info_banner_with_text_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "info")
-        assert result == {"text": "abc", "type": "info"}
+        assert result == {"text": "abc", "type": "info", "role": "alert"}
 
     def test_success_banner_with_text_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "success")
-        assert result == {"text": "def", "type": "success"}
+        assert result == {"text": "def", "type": "success", "role": "alert"}
 
     def test_warning_banner_with_text_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "warning")
-        assert result == {"text": "warning!", "type": "warning"}
+        assert result == {"text": "warning!", "type": "warning", "role": "alert"}
 
     def test_invalid_message_type(self, dummy_request):
         with pytest.raises(
@@ -101,7 +101,12 @@ class TestNotificationBannerParamsForStringMessages:
         result = get_notification_banner_params(
             dummy_request, "info", disable_auto_focus=True
         )
-        assert result == {"text": "abc", "type": "info", "disableAutoFocus": True}
+        assert result == {
+            "text": "abc",
+            "type": "info",
+            "disableAutoFocus": True,
+            "role": "alert",
+        }
 
 
 class TestNotificationBannerParamsForHTMLMessages:
@@ -116,8 +121,8 @@ class TestNotificationBannerParamsForHTMLMessages:
 
     def test_info_banner_with_html_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "info")
-        assert result == {"html": mark_safe("abc"), "type": "info"}
+        assert result == {"html": mark_safe("abc"), "type": "info", "role": "alert"}
 
     def test_success_banner_with_html_message(self, dummy_request):
         result = get_notification_banner_params(dummy_request, "success")
-        assert result == {"html": mark_safe("def"), "type": "success"}
+        assert result == {"html": mark_safe("def"), "type": "success", "role": "alert"}
