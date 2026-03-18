@@ -13,7 +13,6 @@ from manage_breast_screening.core.views.generic import (
     UpdateWithAuditView,
 )
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
-from manage_breast_screening.participants.services import fetch_most_recent_provider
 
 from ..forms.participant_reported_mammogram_form import ParticipantReportedMammogramForm
 from .mixins import InProgressAppointmentMixin
@@ -29,8 +28,7 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["participant"] = self.participant
-        kwargs["most_recent_provider"] = fetch_most_recent_provider(self.participant.pk)
+        kwargs["appointment"] = self.appointment
         return kwargs
 
     def get_context_data(self, **kwargs):

@@ -21,12 +21,14 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
     def __init__(
         self,
         *args,
-        participant,
-        most_recent_provider,
+        appointment,
         instance=None,
         **kwargs,
     ):
         self.instance = instance
+
+        participant = appointment.screening_episode.participant
+        current_provider = appointment.provider
 
         if instance:
             kwargs["initial"] = {
@@ -47,13 +49,10 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         super().__init__(*args, **kwargs)
 
-        self.participant = participant
-        self.most_recent_provider = most_recent_provider
-
         location_choices = []
         for value, label in ParticipantReportedMammogram.LocationType.choices:
             if value == ParticipantReportedMammogram.LocationType.SAME_PROVIDER:
-                label = f"At {most_recent_provider.name}"
+                label = f"At {current_provider.name}"
             elif value == ParticipantReportedMammogram.LocationType.ELSEWHERE_UK:
                 label = "Somewhere in the UK"
             location_choices.append((value, label))
