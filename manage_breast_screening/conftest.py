@@ -152,7 +152,7 @@ def pytest_html_results_table_row(report, cells):
         # Add Risk badge if present
         if risk_id:
             badges.append(
-                f'<span class="risk-badge" style="background: #DC3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; margin-right: 8px;">⚠️ {risk_id}</span>'
+                f'<span class="risk-badge" style="background: #DC3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; margin-right: 8px;">{risk_id}</span>'
             )
 
         # Insert badges into the cell
