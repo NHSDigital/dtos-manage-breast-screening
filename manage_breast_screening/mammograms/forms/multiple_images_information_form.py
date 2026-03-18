@@ -208,7 +208,9 @@ class MultipleImagesInformationForm(FormWithConditionalFields):
         self.fields[all_repeats_reasons_field_name] = MultipleChoiceField(
             choices=RepeatReason.choices,
             required=False,
-            label="Why were repeats needed?",
+            label="Why was a repeat needed?"
+            if series.count == 2
+            else "Why were repeats needed?",
             hint="Select all that apply",
             label_classes="nhsuk-fieldset__legend--s",
             error_messages={"required": reasons_error_message},
