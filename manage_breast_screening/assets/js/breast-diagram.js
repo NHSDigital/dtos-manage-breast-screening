@@ -22,7 +22,7 @@ export class BreastDiagram extends Component {
   markers
 
   /**
-   * @type {BreastFeatureValue[]}
+   * @type {BreastFeature[]}
    */
   values
 
@@ -44,18 +44,7 @@ export class BreastDiagram extends Component {
 
     this.$input = $input
     this.markers = []
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      this.values = /** @type {BreastFeatureValue[]} */ (
-        JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
-      )
-    } catch {
-      throw new ElementError({
-        component: BreastDiagram,
-        identifier: 'Breast diagram feature JSON (`input[name="features"]`)'
-      })
-    }
+    this.values = []
 
     const $imageMaps = createAll(
       ImageMap,
@@ -78,49 +67,57 @@ export class BreastDiagram extends Component {
     }
 
     this.$imageMap = $imageMaps[0]
-    this.$imageMap.onUpdate = this.onUpdate.bind(this)
+    this.$imageMap.addEventListener('click', (event) => this.onClick(event))
+    this.$imageMap.addEventListener('hover', (event) => this.debug(event))
 
     // Render diagram features
+    this.read()
     this.render()
     this.debug()
-  }
-
-  /**
-   * Get diagram features
-   *
-   * @returns {BreastFeature[]}
-   */
-  get features() {
-    return this.values.map(({ id, name, x, y }, index) => {
-      const $path = this.$imageMap.getPathById(id)
-      const point = this.$imageMap.createPoint(x, y, id)
-      const region = this.$imageMap.createRegion($path, point)
-
-      this.setMarker(region, index)
-
-      return { name, region }
-    })
   }
 
   /**
    * Render diagram features
    */
   render() {
-    const { $imageMap, features, markers } = this
+    const { $imageMap, markers, values } = this
+
+    values.forEach(({ id, x, y }, index) => {
+      const $path = $imageMap.getPathById(id)
+      const point = $imageMap.createPoint(x, y, id)
+
+      // Render active region
+      $imageMap.setState('active', $path)
+
+      // Set marker position
+      this.setMarker(point, index)
+    })
 
     // Remove excess markers
-    for (const marker of markers.splice(features.length)) {
+    for (const marker of markers.splice(values.length)) {
       marker.$root.remove()
-    }
-
-    // Set active regions
-    for (const feature of features) {
-      $imageMap.setState(feature.region, 'active')
     }
   }
 
   /**
-   * Write diagram features to hidden input
+   * Read diagram values from hidden input
+   */
+  read() {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      this.values = /** @type {BreastFeature[]} */ (
+        JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
+      )
+    } catch {
+      throw new ElementError({
+        component: BreastDiagram,
+        identifier: 'Breast diagram feature JSON (`input[name="features"]`)'
+      })
+    }
+  }
+
+  /**
+   * Write diagram values to hidden input
    */
   write() {
     this.$input.value = JSON.stringify(this.values)
@@ -129,9 +126,11 @@ export class BreastDiagram extends Component {
   /**
    * Update status messages
    *
-   * @param {Partial<ImageMapRegion>} [region] - Image map region
+   * @param {CustomEvent<ImageMapPayload>} [event] - Image map event
    */
-  debug({ point, label } = {}) {
+  debug(event) {
+    const { point, $path } = event?.detail ?? {}
+
     /** @type {Element | null} */
     this.$debugX = this.$debugX ?? this.$root.querySelector('.app-js-image-x')
 
@@ -153,65 +152,86 @@ export class BreastDiagram extends Component {
 
     $debugX.textContent = point?.x.toString() ?? 'N/A'
     $debugY.textContent = point?.y.toString() ?? 'N/A'
-    $debugRegion.textContent = label ?? 'N/A'
+
+    $debugRegion.textContent =
+      $path?.querySelector('title')?.textContent ?? 'N/A'
+
     $debugInput.textContent =
       this.values.map(({ id }) => id).join(', ') || 'N/A'
   }
 
   /**
-   * Update region state and write to form input
+   * Handle image map click
    *
-   * @type {ImageMapStateCallback}
+   * @type {ImageMapListener}
    */
-  onUpdate(region, state, value) {
-    const { markers, values } = this
-    if (!region) {
+  onClick(event) {
+    const { $path, point } = event.detail
+    if (!$path || !point) {
       return
     }
 
-    if (state === 'active') {
-      const entry = values.find(
-        (value) =>
-          value.id === region.id &&
-          value.x === region.point.x &&
-          value.y === region.point.y
-      )
+    this.add({
+      id: $path.classList.value,
+      name: 'Pending',
+      x: point.x,
+      y: point.y
+    })
 
-      if (value && !entry) {
-        values.push({
-          id: region.id,
-          name: 'Pending',
-          x: region.point.x,
-          y: region.point.y
-        })
-
-        this.setMarker(region, values.length - 1)
-      } else if (!value && entry) {
-        const index = values.indexOf(entry)
-
-        markers[index].$root.remove()
-        markers.splice(index, 1)
-        values.splice(index, 1)
-      }
-
-      this.write()
-      this.debug(region)
-    }
+    this.debug(event)
   }
 
   /**
-   * Set marker for image map region
+   * Add breast feature
    *
-   * @param {ImageMapRegion} region - Image map region
+   * @param {BreastFeature} feature
+   */
+  add(feature) {
+    this.values.push(feature)
+    this.render()
+    this.write()
+  }
+
+  /**
+   * Remove breast feature
+   *
+   * @param {Pick<BreastFeature, 'x' | 'y'>} feature
+   */
+  remove(feature) {
+    const { $imageMap, values } = this
+
+    const entry = values.find(({ x, y }) => {
+      return x === feature.x && y === feature.y
+    })
+
+    if (!entry) {
+      return
+    }
+
+    const index = values.indexOf(entry)
+    const $path = $imageMap.getPathById(entry.id)
+
+    $imageMap.setState('active', $path, false)
+    values.splice(index, 1)
+
+    this.render()
+    this.write()
+    this.debug()
+  }
+
+  /**
+   * Set marker for image map
+   *
+   * @param {DOMPoint} point - SVG point at pointer coordinates
    * @param {number} index - Image marker index
    */
-  setMarker(region, index) {
+  setMarker(point, index) {
     const { $imageMap, $input, markers } = this
     const { width, height } = $imageMap
 
     if (!markers[index]) {
       markers[index] = new ImageMarker(null, {
-        href: $input.readOnly ? undefined : `#${region.id}`,
+        href: $input.readOnly ? undefined : `#marker-${index + 1}`,
         width: width,
         height: height
       })
@@ -221,7 +241,7 @@ export class BreastDiagram extends Component {
 
     // Set marker properties
     marker.textContent = `${index + 1}`
-    marker.point = region.point
+    marker.point = point
 
     // Append new markers only
     if (!marker.$root.parentElement) {
@@ -257,8 +277,8 @@ function getArrayValue(key, value) {
 /**
  * Whether feature object is valid
  *
- * @param {unknown | BreastFeatureValue} value
- * @returns {value is BreastFeatureValue}
+ * @param {unknown | BreastFeature} value
+ * @returns {value is BreastFeature}
  */
 function isValidObject(value) {
   if (!isObject(value)) {
@@ -288,17 +308,9 @@ function isValid(value) {
 }
 
 /**
- * Breast feature with image map region
- *
- * @typedef {object} BreastFeature
- * @property {string} name - Breast feature name
- * @property {ImageMapRegion} region - Image map region
- */
-
-/**
  * Breast feature input value
  *
- * @typedef {object} BreastFeatureValue
+ * @typedef {object} BreastFeature
  * @property {string} id - Image map region ID
  * @property {string} name - Breast feature name
  * @property {number} x - X coordinate of breast feature
@@ -306,5 +318,5 @@ function isValid(value) {
  */
 
 /**
- * @import { ImageMapRegion, ImageMapStateCallback } from './image-map.js'
+ * @import { ImageMapPayload, ImageMapListener } from './image-map.js'
  */

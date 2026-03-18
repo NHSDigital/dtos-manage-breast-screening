@@ -58,13 +58,10 @@ describe('Image map', () => {
     })
 
     const callback = jest.fn()
-    map.onUpdate = callback
+    map.addEventListener('hover', callback)
 
     await user.hover(map.$paths[0])
-
     expect(callback).toHaveBeenCalled()
-    expect(callback.mock.calls).toHaveLength(1)
-    expect(callback.mock.calls[0][1]).toBe('highlight')
   })
 
   it('notifies on click', async () => {
@@ -76,12 +73,9 @@ describe('Image map', () => {
     })
 
     const callback = jest.fn()
-    map.onUpdate = callback
+    map.addEventListener('click', callback)
 
     await user.click(map.$paths[0])
-
     expect(callback).toHaveBeenCalled()
-    expect(callback.mock.calls).toHaveLength(2)
-    expect(callback.mock.calls[1][1]).toBe('active')
   })
 })
