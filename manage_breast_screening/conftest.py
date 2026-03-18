@@ -138,25 +138,34 @@ def pytest_html_results_table_row(report, cells):
         elif name == "risk_id":
             risk_id = value
 
-    # Build badges for any markers present
-    if (jira_ticket or risk_id) and len(cells) > 1:
-        test_cell = cells[1]
-        badges = []
+    if len(cells) <= 1:
+        return
 
-        # Add JIRA badge if present
-        if jira_ticket:
-            badges.append(
-                f'<span class="jira-badge report-marker-badge">{jira_ticket}</span>'
-            )
+    node_parts = report.nodeid.split("::")
+    if len(node_parts) >= 3:
+        display_test_id = "::".join(node_parts[-2:])
+    elif len(node_parts) >= 2:
+        display_test_id = node_parts[-1]
+    else:
+        display_test_id = report.nodeid
 
-        # Add Risk badge if present
-        if risk_id:
-            badges.append(
-                f'<span class="risk-badge report-marker-badge">{risk_id}</span>'
-            )
+    test_cell = cells[1].replace(report.nodeid, display_test_id)
+    badges = []
 
-        # Insert badges into the cell
+    # Add JIRA badge if present
+    if jira_ticket:
+        badges.append(
+            f'<span class="jira-badge report-marker-badge">{jira_ticket}</span>'
+        )
+
+    # Add Risk badge if present
+    if risk_id:
+        badges.append(f'<span class="risk-badge report-marker-badge">{risk_id}</span>')
+
+    if badges:
         badges_html = "".join(badges)
-        cells[1] = test_cell.replace(
+        test_cell = test_cell.replace(
             '<td class="col-testId">', f'<td class="col-testId">{badges_html}'
         )
+
+    cells[1] = test_cell
