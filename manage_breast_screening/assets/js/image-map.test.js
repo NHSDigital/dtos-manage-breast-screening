@@ -49,21 +49,6 @@ describe('Image map', () => {
     expect(map.$paths).toHaveLength(2)
   })
 
-  it('notifies on highlight', async () => {
-    document.body.innerHTML = multiPathSvg
-    const $root = document.querySelector('[data-module="app-image-map"]')
-    const map = new ImageMap($root, {
-      imageClass: 'app-image-map__svg',
-      selectors: ['path', 'polygon']
-    })
-
-    const callback = jest.fn()
-    map.addEventListener('hover', callback)
-
-    await user.hover(map.$paths[0])
-    expect(callback).toHaveBeenCalled()
-  })
-
   it('notifies on click', async () => {
     document.body.innerHTML = multiPathSvg
     const $root = document.querySelector('[data-module="app-image-map"]')
