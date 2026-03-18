@@ -1,5 +1,6 @@
 from datetime import date
 
+from dateutil.relativedelta import relativedelta
 from django.db.models import TextChoices
 from django.forms.widgets import Textarea
 
@@ -102,10 +103,12 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             label="When were the x-rays taken?",
             error_messages={"required": "Select when the x-rays were taken"},
         )
+
+        example_date = date.today() - relativedelta(months=9)
         self.fields["exact_date"] = SplitDateField(
             required=False,
             max_value=date.today(),
-            hint="For example, 15 3 2025",
+            hint=f"For example, {example_date.day} {example_date.month} {example_date.year}",
             label="Date of mammogram",
             label_classes="nhsuk-u-visually-hidden",
             error_messages={"required": "Enter the date when the x-rays were taken"},
