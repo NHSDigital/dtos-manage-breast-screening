@@ -113,6 +113,17 @@ p {
     white-space: nowrap;
 }
 
+.test-source-link {
+    color: #0052cc;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.test-source-link:hover {
+    text-decoration: underline;
+}
+
 .report-marker-badge {
     border-radius: 4px;
     color: #ffffff;

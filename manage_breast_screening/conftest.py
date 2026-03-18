@@ -15,6 +15,7 @@ from manage_breast_screening.users.tests.factories import UserFactory
 
 # Show long diffs in failed test output
 TestCase.maxDiff = None
+GITHUB_REPOSITORY_URL = "https://github.com/nhsdigital/dtos-manage-breast-screening"
 
 
 def force_mbs_login(client, user):
@@ -149,6 +150,16 @@ def pytest_html_results_table_row(report, cells):
 
     if len(cells) <= 1:
         return
+
+    test_file_path = report.nodeid.split("::")[0]
+    source_url = f"{GITHUB_REPOSITORY_URL}/blob/main/{test_file_path}"
+    source_link_html = (
+        '<a class="test-source-link" '
+        f'href="{escape(source_url)}" '
+        'target="_blank" rel="noopener noreferrer">source</a>'
+    )
+    if len(cells) > 3:
+        cells[3] = '<td class="col-links">' + source_link_html + "</td>"
 
     node_parts = report.nodeid.split("::")
     if len(node_parts) >= 3:
