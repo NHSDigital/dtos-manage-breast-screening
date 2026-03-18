@@ -1,0 +1,142 @@
+body {
+    background: #f7f8fa;
+    color: #172b4d;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.45;
+    margin: 0;
+    padding: 28px;
+}
+
+h1 {
+    border-bottom: 1px solid #dfe1e6;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+}
+
+h2 {
+    border-bottom: 1px solid #ebecf0;
+    color: #253858;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 24px 0 10px;
+    padding-bottom: 6px;
+}
+
+p {
+    margin: 8px 0;
+}
+
+#environment {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#environment td {
+    padding: 10px 12px;
+}
+
+.summary,
+#environment,
+#results-table {
+    background: #ffffff;
+    border: 1px solid #dfe1e6;
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(9, 30, 66, 0.12);
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.summary {
+    padding: 12px 16px;
+}
+
+.summary__data {
+    font-size: 14px;
+}
+
+.summary__data .failed {
+    color: #de350b;
+    font-weight: 600;
+}
+
+.summary__data .passed {
+    color: #006644;
+    font-weight: 600;
+}
+
+.summary__data .xfailed,
+.summary__data .xpassed,
+.summary__data .skipped,
+.summary__data .error {
+    font-weight: 600;
+}
+
+#results-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+#results-table th {
+    background: #f4f5f7;
+    border-bottom: 1px solid #dfe1e6;
+    color: #44546f;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 11px 12px;
+    text-transform: uppercase;
+}
+
+#results-table td {
+    border-bottom: 1px solid #ebecf0;
+    font-size: 14px;
+    padding: 10px 12px;
+    vertical-align: top;
+}
+
+#results-table tr:last-child td {
+    border-bottom: none;
+}
+
+#results-table tbody tr:hover td {
+    background: #f7faff;
+}
+
+.col-result {
+    font-weight: 600;
+}
+
+.col-links {
+    white-space: nowrap;
+}
+
+.report-marker-badge {
+    border-radius: 4px;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    margin-right: 8px;
+    padding: 4px 8px;
+}
+
+.jira-badge {
+    background: #0052cc;
+}
+
+.risk-badge {
+    background: #c9372c;
+}
+
+.logwrapper {
+    border-top: 1px solid #dfe1e6;
+}
+
+.collapsible {
+    font-size: 12px;
+}

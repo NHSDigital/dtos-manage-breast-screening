@@ -118,7 +118,7 @@ test-lint-templates: # Lint just the templates @Testing
 	uv run djlint -e jinja --lint --profile jinja manage_breast_screening
 
 test-ui: # Run UI tests @Testing
-	uv run pytest -m focus --junit-xml=reports/test-ui.xml --html=reports/report.html
+	uv run pytest -m focus --junit-xml=reports/test-ui.xml --html=reports/report.html --css=manage_breast_screening/tests/pytest-confluence.css
 
 # ---------------------------------------------------------------------------
 # Build & Deploy

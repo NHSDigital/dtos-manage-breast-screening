@@ -146,13 +146,13 @@ def pytest_html_results_table_row(report, cells):
         # Add JIRA badge if present
         if jira_ticket:
             badges.append(
-                f'<span class="jira-badge" style="background: #0052CC; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; margin-right: 8px;">{jira_ticket}</span>'
+                f'<span class="jira-badge report-marker-badge">{jira_ticket}</span>'
             )
 
         # Add Risk badge if present
         if risk_id:
             badges.append(
-                f'<span class="risk-badge" style="background: #DC3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85em; margin-right: 8px;">{risk_id}</span>'
+                f'<span class="risk-badge report-marker-badge">{risk_id}</span>'
             )
 
         # Insert badges into the cell
