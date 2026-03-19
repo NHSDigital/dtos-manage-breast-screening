@@ -1,3 +1,4 @@
+import allure
 import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -20,6 +21,10 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-8899", "DTOSS-8899")
+@allure.epic("DTOSS-8899 - Mammogram Appointment v1")
+@allure.feature("Medical information")
+@allure.story("Symptoms")
 class TestRecordingSymptoms(SystemTestCase):
     @pytest.fixture(autouse=True)
     def setup_symptom_types(self):

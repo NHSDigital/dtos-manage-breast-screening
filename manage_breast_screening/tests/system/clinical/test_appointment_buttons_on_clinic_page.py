@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+import allure
 import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -16,6 +17,8 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("Check in and start appointment")
 class TestAppointmentButtons(SystemTestCase):
     @pytest.fixture(autouse=True)
     def before(self):

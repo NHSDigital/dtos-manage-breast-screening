@@ -1,5 +1,6 @@
 import re
 
+import allure
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -8,6 +9,10 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-8899", "DTOSS-8899")
+@allure.epic("DTOSS-8899 - Mammogram Appointment v1")
+@allure.feature("Image details")
+@allure.story("Add image details")
 class TestAddImageDetails(SystemTestCase):
     def test_add_image_details(self):
         self.given_i_am_logged_in_as_a_clinical_user()
