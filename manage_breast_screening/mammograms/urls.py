@@ -86,6 +86,11 @@ urlpatterns = [
         name="appointment_note",
     ),
     path(
+        "<uuid:pk>/note-review/",
+        appointment_note_views.AppointmentNoteReviewView.as_view(),
+        name="appointment_note_review",
+    ),
+    path(
         "<uuid:pk>/note/delete/",
         appointment_note_views.DeleteAppointmentNoteView.as_view(),
         name="delete_appointment_note",

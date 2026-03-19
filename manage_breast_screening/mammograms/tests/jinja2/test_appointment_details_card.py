@@ -54,7 +54,7 @@ def test_appointment_details_empty(template, mock_appointment):
                             Appointment note
                         </dt>
                         <dd class="nhsuk-summary-list__value">
-                            <a href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note/?return_url=" class="nhsuk-link">
+                            <a href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note-review/?return_url=" class="nhsuk-link">
                                 Enter appointment note
                             </a>
                         </dd>
@@ -120,7 +120,7 @@ def test_appointment_details_is_special_appointmet(template, mock_appointment):
                             Appointment note
                         </dt>
                         <dd class="nhsuk-summary-list__value">
-                            <a href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note/?return_url=" class="nhsuk-link">
+                            <a href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note-review/?return_url=" class="nhsuk-link">
                                 Enter appointment note
                             </a>
                         </dd>
@@ -168,7 +168,7 @@ def test_appointment_details_has_appointment_note(template, mock_appointment):
                             a note about<br>the appointment
                         </dd>
                         <dd class="nhsuk-summary-list__actions">
-                            <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note/?return_url=">
+                            <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note-review/?return_url=">
                                 Change<span class="nhsuk-u-visually-hidden"> appointment note</span>
                             </a>
                         </dd>
@@ -228,7 +228,7 @@ def test_appointment_details_special_appointment_with_note(template, mock_appoin
                             Things to consider before &amp; during the appointment.
                         </dd>
                         <dd class="nhsuk-summary-list__actions">
-                            <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note/?return_url=">
+                            <a class="nhsuk-link nhsuk-link--no-visited-state" href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/note-review/?return_url=">
                                 Change<span class="nhsuk-u-visually-hidden"> appointment note</span>
                             </a>
                         </dd>

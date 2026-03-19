@@ -1,0 +1,33 @@
+{% extends "layout-form.jinja" %}
+{% from 'nhsuk/components/button/macro.jinja' import button %}
+{% from 'nhsuk/components/inset-text/macro.jinja' import insetText %}
+
+{% block form %}
+    {% set inset_html %}
+      <p>
+        If adjustments are required,
+        <a href="{{ presented_appointment.special_appointment_url }}?return_url={{ return_url }}" class="nhsuk-link nhsuk-link--no-visited-state">
+          provide special appointment details instead
+        </a>
+      </p>
+    {% endset %}
+    {{ insetText({
+      "html": inset_html
+    }) }}
+
+    <input type="hidden" name="return_url" value="{{ return_url }}">
+    {{ form.content.as_field_group() }}
+
+    <div class="nhsuk-button-group">
+      {{ button({
+        "text": "Save note"
+      }) }}
+      {% if form.instance_is_saved %}
+        <p>
+          <a href="{{ url('mammograms:delete_appointment_note', kwargs={'pk': presented_appointment.pk}) }}?return_url={{ return_url}}" class="nhsuk-link nhsuk-link--no-visited-state app-link--warning">
+            Delete appointment note
+          </a>
+        </p>
+      {% endif %}
+    </div>
+{% endblock %}

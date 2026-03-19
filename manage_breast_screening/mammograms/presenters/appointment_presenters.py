@@ -63,7 +63,7 @@ class AppointmentPresenter:
     def appointment_note_url(self, return_url):
         return (
             reverse(
-                "mammograms:appointment_note",
+                "mammograms:appointment_note_review",
                 kwargs={"pk": self._appointment.pk},
             )
             + f"?return_url={return_url}"
