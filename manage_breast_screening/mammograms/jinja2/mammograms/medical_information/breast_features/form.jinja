@@ -49,6 +49,7 @@
       </div>
 
       {{ app_breast_diagram({
+        "debug": "debug" in request.GET,
         "read_only": false,
         "version": diagram_version,
         "attributes": {
@@ -57,50 +58,6 @@
       }) }}
 
       {{ form.features }}
-
-      {% if "debug" in request.GET %}
-        {{ summaryList({
-          "rows": [
-            {
-              "key": {
-                "text": "Image X"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-x"
-              }
-            },
-            {
-              "key": {
-                "text": "Image Y"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-y"
-              }
-            },
-            {
-              "key": {
-                "text": "Image region"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-region"
-              }
-            },
-            {
-              "key": {
-                "text": "Input values"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-input"
-              },
-              "classes": "nhsuk-summary-list__row--no-border"
-            }
-          ]
-        }) }}
-      {% endif %}
 
       <div class="nhsuk-button-group">
         {{ button({

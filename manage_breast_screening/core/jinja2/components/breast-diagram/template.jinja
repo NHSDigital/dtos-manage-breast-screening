@@ -19,4 +19,48 @@
 {% if params.version == 1 %}
 {% include "components/breast-diagram/v1.svg" %}
 {% endif %}
+
+{% if params.debug %}
+  {{ summaryList({
+    "rows": [
+      {
+        "key": {
+          "text": "Image X"
+        },
+        "value": {
+          "text": "N/A",
+          "classes": "app-js-image-x"
+        }
+      },
+      {
+        "key": {
+          "text": "Image Y"
+        },
+        "value": {
+          "text": "N/A",
+          "classes": "app-js-image-y"
+        }
+      },
+      {
+        "key": {
+          "text": "Image region"
+        },
+        "value": {
+          "text": "N/A",
+          "classes": "app-js-image-region"
+        }
+      },
+      {
+        "key": {
+          "text": "Input values"
+        },
+        "value": {
+          "text": "N/A",
+          "classes": "app-js-image-input"
+        },
+        "classes": "nhsuk-summary-list__row--no-border"
+      }
+    ]
+  }) }}
+{% endif %}
 </figure>
