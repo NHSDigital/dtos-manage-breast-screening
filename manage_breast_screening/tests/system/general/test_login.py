@@ -1,6 +1,7 @@
 import re
 from datetime import timedelta
 
+import allure
 import pytest
 import time_machine
 from django.conf import settings
@@ -20,6 +21,9 @@ from manage_breast_screening.users.tests.factories import UserFactory
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-10306", "DTOSS-10306")
+@allure.epic("DTOSS-1030 - Permissions & Settings V1")
+@allure.feature("CIS2 integration")
 class TestLogin(SystemTestCase):
     """
     System test for CIS2 login flow. This test uses a fake CIS2 OAuth client

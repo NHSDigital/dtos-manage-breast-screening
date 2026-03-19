@@ -1,5 +1,6 @@
 import re
 
+import allure
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -12,6 +13,8 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("Edit ethnicity details")
 class TestEthnicityDetailsForm(SystemTestCase):
     def test_entering_ethnicity_details_for_a_participant(self):
         self.given_i_am_logged_in_as_a_clinical_user()

@@ -11,8 +11,10 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
-@allure.epic("Mammogram appointment")
-@allure.feature("Add hormone replacement therapy to medical history")
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-8899", "DTOSS-8899")
+@allure.epic("DTOSS-8899 - Mammogram Appointment v1")
+@allure.feature("Medical information")
+@allure.story("Hormone replacement therapy")
 class TestAddHormoneReplacementTherapy(SystemTestCase):
     def test_adding_hormone_replacement_therapy(self):
         self.given_i_am_logged_in_as_a_clinical_user()

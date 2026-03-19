@@ -1,3 +1,4 @@
+import allure
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -6,6 +7,8 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("Appointment notes")
 class TestAppointmentNote(SystemTestCase):
     def test_clinical_user_adds_and_updates_an_appointment_note(self):
         self.initial_note_text = "Participant prefers an evening appointment."
