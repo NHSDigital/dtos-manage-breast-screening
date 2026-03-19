@@ -9,10 +9,23 @@
 
 {% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
-{% set form_attributes = { "data-module": "app-breast-diagram" } %}
+{% set form_attributes = {
+  "class": "app-breast-diagram",
+  "action": request.path,
+  "method": "post",
+  "data-module": "app-breast-diagram",
+  "data-debug": {
+    "value": "true" if "debug" in request.GET else false,
+    "optional": true
+  },
+  "novalidate": {
+    "value": true,
+    "optional": true
+  }
+} %}
 
 {% block page_content %}
-<div class="nhsuk-u-reading-width">
+  <div class="nhsuk-u-reading-width">
     {{ form_error_summary(form) }}
 
     <h1 class="nhsuk-heading-l">
@@ -24,7 +37,7 @@
       {{ heading }}
     </h1>
 
-    <form class="app-breast-diagram" action="{{ request.path }}" method="post" novalidate {{ nhsukAttributes(form_attributes) }}>
+    <form {{- nhsukAttributes(form_attributes) }}>
       {{ csrf_input }}
 
       <p class="nhsuk-body" id="breast-diagram-description">
@@ -35,12 +48,13 @@
         <h2 class="nhsuk-heading-m">Where is the feature?</h2>
       </div>
 
-      {{ app_breast_diagram(
-        version=diagram_version,
-        attributes={
+      {{ app_breast_diagram({
+        "read_only": false,
+        "version": diagram_version,
+        "attributes": {
           "aria-labelledby": "breast-diagram-description"
         }
-      ) }}
+      }) }}
 
       {{ form.features }}
 
@@ -100,5 +114,5 @@
         </a>
       </p>
     </form>
-</div>
+  </div>
 {% endblock %}

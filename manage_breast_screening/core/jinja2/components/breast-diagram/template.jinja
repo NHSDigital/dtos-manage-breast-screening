@@ -5,8 +5,18 @@
   <span>Left</span>
 </div>
 
-<figure class="app-breast-diagram__image-map nhsuk-u-width-full" data-module="app-image-map" {{- nhsukAttributes(attributes) }}>
-{% if version == 1 %}
+<figure
+  {{- nhsukAttributes({
+    "class": "app-breast-diagram__image-map nhsuk-u-width-full",
+    "data-module": "app-image-map",
+    "data-read-only": {
+      "value": "true" if params.read_only else false,
+      "optional": true
+    }
+  }) -}}
+
+  {{- nhsukAttributes(params.attributes) -}}>
+{% if params.version == 1 %}
 {% include "components/breast-diagram/v1.svg" %}
 {% endif %}
 </figure>
