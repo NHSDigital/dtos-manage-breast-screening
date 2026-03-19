@@ -97,7 +97,11 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.page.locator("#id_other_details").fill("Explain other choice")
 
     def then_i_see_the_clinics_page(self):
-        expect(self.page).to_have_url(re.compile(reverse("clinics:list_clinics")))
+        path = reverse(
+            "clinics:show_clinic",
+            kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))
 
     def and_the_appointment_is_updated(self):
         self.appointment.refresh_from_db()

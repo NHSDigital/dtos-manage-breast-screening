@@ -9,7 +9,7 @@ from django.forms import Form
 from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
@@ -159,7 +159,11 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
 class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/appointment_cannot_go_ahead.jinja"
     form_class = AppointmentCannotGoAheadForm
-    success_url = reverse_lazy("clinics:list_clinics")
+
+    def get_success_url(self):
+        return reverse(
+            "clinics:show_clinic", kwargs={"pk": self.appointment.clinic_slot.clinic.pk}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
