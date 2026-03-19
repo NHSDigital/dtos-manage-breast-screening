@@ -34,21 +34,6 @@ class ImageDetailsForm(FormWithConditionalFields):
             "No, record as 'partial mammography'",
         )
 
-    rmlo_count = IntegerField(
-        label="RMLO",
-        classes="nhsuk-input--width-4",
-        required=True,
-        min_value=0,
-        max_value=20,
-        initial=1,
-        error_messages={
-            "min_value": "Number of RMLO images must be at least 0",
-            "max_value": "Number of RMLO images must be at most 20",
-            "invalid": "Enter a valid number of RMLO images",
-            "required": "Enter the number of RMLO images",
-        },
-        widget=StepperInput,
-    )
     rcc_count = IntegerField(
         label="RCC",
         classes="nhsuk-input--width-4",
@@ -61,6 +46,21 @@ class ImageDetailsForm(FormWithConditionalFields):
             "max_value": "Number of RCC images must be at most 20",
             "invalid": "Enter a valid number of RCC images",
             "required": "Enter the number of RCC images",
+        },
+        widget=StepperInput,
+    )
+    rmlo_count = IntegerField(
+        label="RMLO",
+        classes="nhsuk-input--width-4",
+        required=True,
+        min_value=0,
+        max_value=20,
+        initial=1,
+        error_messages={
+            "min_value": "Number of RMLO images must be at least 0",
+            "max_value": "Number of RMLO images must be at most 20",
+            "invalid": "Enter a valid number of RMLO images",
+            "required": "Enter the number of RMLO images",
         },
         widget=StepperInput,
     )
@@ -80,21 +80,6 @@ class ImageDetailsForm(FormWithConditionalFields):
         },
         widget=StepperInput,
     )
-    lmlo_count = IntegerField(
-        label="LMLO",
-        classes="nhsuk-input--width-4",
-        required=True,
-        min_value=0,
-        max_value=20,
-        initial=1,
-        error_messages={
-            "min_value": "Number of LMLO images must be at least 0",
-            "max_value": "Number of LMLO images must be at most 20",
-            "invalid": "Enter a valid number of LMLO images",
-            "required": "Enter the number of LMLO images",
-        },
-        widget=StepperInput,
-    )
     lcc_count = IntegerField(
         label="LCC",
         classes="nhsuk-input--width-4",
@@ -107,6 +92,21 @@ class ImageDetailsForm(FormWithConditionalFields):
             "max_value": "Number of LCC images must be at most 20",
             "invalid": "Enter a valid number of LCC images",
             "required": "Enter the number of LCC images",
+        },
+        widget=StepperInput,
+    )
+    lmlo_count = IntegerField(
+        label="LMLO",
+        classes="nhsuk-input--width-4",
+        required=True,
+        min_value=0,
+        max_value=20,
+        initial=1,
+        error_messages={
+            "min_value": "Number of LMLO images must be at least 0",
+            "max_value": "Number of LMLO images must be at most 20",
+            "invalid": "Enter a valid number of LMLO images",
+            "required": "Enter the number of LMLO images",
         },
         widget=StepperInput,
     )
