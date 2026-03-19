@@ -1,4 +1,9 @@
-import { createAll, isObject, Component, ElementError } from 'nhsuk-frontend'
+import {
+  createAll,
+  isObject,
+  ConfigurableComponent,
+  ElementError
+} from 'nhsuk-frontend'
 
 import { ImageMap } from './image-map.js'
 import { ImageMarker } from './image-marker.js'
@@ -6,9 +11,9 @@ import { ImageMarker } from './image-marker.js'
 /**
  * Breast diagram component
  *
- * @augments {Component<HTMLFormElement>}
+ * @augments {ConfigurableComponent<BreastDiagramConfig, HTMLFormElement>}
  */
-export class BreastDiagram extends Component {
+export class BreastDiagram extends ConfigurableComponent {
   static elementType = HTMLFormElement
 
   /**
@@ -28,9 +33,10 @@ export class BreastDiagram extends Component {
 
   /**
    * @param {Element | null} $root - HTML element to use for component
+   * @param {Partial<BreastDiagramConfig>} [config] - Breast diagram config
    */
-  constructor($root) {
-    super($root)
+  constructor($root, config = {}) {
+    super($root, config)
 
     const $input = this.$root.querySelector('input[name="features"]')
     if (!($input instanceof HTMLInputElement)) {
@@ -255,6 +261,29 @@ export class BreastDiagram extends Component {
    * Name for the component used when initialising using data-module attributes
    */
   static moduleName = 'app-breast-diagram'
+
+  /**
+   * Breast diagram default config
+   *
+   * @see {@link BreastDiagramConfig}
+   * @constant
+   * @type {BreastDiagramConfig}
+   */
+  static defaults = Object.freeze({
+    debug: false
+  })
+
+  /**
+   * Breast diagram config schema
+   *
+   * @constant
+   * @satisfies {Schema<BreastDiagramConfig>}
+   */
+  static schema = Object.freeze({
+    properties: {
+      debug: { type: 'boolean' }
+    }
+  })
 }
 
 /**
@@ -308,6 +337,14 @@ function isValid(value) {
 }
 
 /**
+ * Breast diagram config
+ *
+ * @see {@link BreastDiagram.defaults}
+ * @typedef {object} BreastDiagramConfig
+ * @property {boolean} debug - Whether to show debug information
+ */
+
+/**
  * Breast feature input value
  *
  * @typedef {object} BreastFeature
@@ -318,5 +355,6 @@ function isValid(value) {
  */
 
 /**
+ * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
  * @import { ImageMapPayload, ImageMapListener } from './image-map.js'
  */
