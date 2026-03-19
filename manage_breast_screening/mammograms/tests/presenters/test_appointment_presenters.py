@@ -771,6 +771,17 @@ class TestClinicSlotPresenter:
             == "2 January 2025 at 9:30am"
         )
 
+    @time_machine.travel(datetime(2025, 5, 19, tzinfo=tz.utc))
+    def test_slot_timestamp_single_line(self, clinic_slot_mock):
+        clinic_slot_mock.starts_at = datetime(2025, 1, 2, 10, 30)
+        clinic_slot_mock.duration_in_minutes = 30
+        clinic_slot_mock.clinic.starts_at = datetime(2025, 1, 2, 9, 0)
+
+        assert (
+            ClinicSlotPresenter(clinic_slot_mock).slot_timestamp_single_line
+            == "2 January 2025 (4 months ago) \n 10:30am (30 minutes)"
+        )
+
 
 class TestSpecialAppointmentPresenter:
     def test_change_url(self):
