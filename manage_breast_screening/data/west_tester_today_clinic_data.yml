@@ -61,9 +61,6 @@ clinic:
               postcode: DN4 5PH
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -97,9 +94,6 @@ clinic:
               postcode: N4B 3AF
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -132,9 +126,6 @@ clinic:
               postcode: E0 9ST
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 9150816a-1bd1-4bb3-abdd-3670016e0d2a
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -168,9 +159,6 @@ clinic:
               postcode: W8 9GZ
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 071ae2e4-3750-46f6-88ae-f0f2ae828fa9
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -295,9 +283,6 @@ clinic:
               postcode: M5 4D4
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: e4c7dc12-0062-4ab0-8d93-247d012b20d1
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -330,9 +315,6 @@ clinic:
               postcode: N6 6R7
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 25828dd3-13ce-4099-afc8-68cb5f25ca97
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -365,9 +347,6 @@ clinic:
               postcode: M5 9T3
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 462f5422-729c-46bd-acda-f1efbfef004f
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -478,9 +457,6 @@ clinic:
               postcode: N5 2M9
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 05ce8efc-1bb5-41fe-8660-a466f7759dfb
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -513,9 +489,6 @@ clinic:
               postcode: E4 6HL
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -547,9 +520,6 @@ clinic:
               postcode: L1 5L2
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 44a51eb0-00a5-41a0-966f-7de17693065a
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -606,9 +576,6 @@ clinic:
               postcode: GY7Y 5AP
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 5426770d-68b3-4208-bdb8-6e1f73fedc3f
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT
@@ -666,9 +633,6 @@ clinic:
               postcode: G8 2LA
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -700,9 +664,6 @@ clinic:
               postcode: M1 3X1
         previous_mammograms:
           - location_type: SAME_PROVIDER
-            provider:
-              id: f772c980-3ae8-4ce3-ad11-558dc1f9a43b
-              name: West Tester Hospital Trust
             location_details: Radiology department
             exact_date: '2025-01-17'
             date_type: EXACT

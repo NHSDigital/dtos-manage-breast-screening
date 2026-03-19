@@ -276,11 +276,6 @@ class Command(BaseCommand):
     def create_reported_mammograms(self, appointment, mammograms):
         for mammogram in mammograms:
             created_at_date = mammogram.pop("created_at", None)
-            if mammogram["provider"] is not None:
-                mammogram["provider"] = ProviderFactory(
-                    id=mammogram["provider"]["id"],
-                    name=mammogram["provider"]["name"],
-                )
             appointment_mammogram = ParticipantReportedMammogramFactory(
                 appointment=appointment,
                 **mammogram,
