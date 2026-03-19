@@ -7,6 +7,7 @@ jest.mock('./image-map', () => {
   return {
     ImageMap: class MockImageMap extends Component {
       addEventListener() {}
+      config = { readOnly: false }
       static moduleName = 'app-image-map'
     }
   }
