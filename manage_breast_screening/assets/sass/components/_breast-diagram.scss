@@ -1,34 +1,68 @@
 @use "sass:color";
-@use "nhsuk-frontend/dist/nhsuk/core/helpers" as *;
+@use "../vendor/nhsuk-frontend" as *;
 
 $state-highlight: nhsuk-tint(nhsuk-colour("yellow"), 50%);
 $state-active: nhsuk-tint(nhsuk-colour("blue"), 50%);
 
+.app-breast-diagram__image-map {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border: 3px solid $nhsuk-text-colour;
+  background: nhsuk-colour("white");
+
+  @include nhsuk-responsive-margin(4, "bottom");
+}
+
+.app-breast-diagram__side-labels {
+  display: flex;
+  justify-content: space-between;
+
+  @include nhsuk-text-colour;
+  @include nhsuk-font($size: 19, $weight: bold);
+  @include nhsuk-responsive-margin(2, "bottom");
+}
+
 .app-breast-diagram__svg {
-  cursor: pointer;
+  display: block;
+
+  .app-breast-diagram:not([data-read-only]) & {
+    pointer-events: all;
+    cursor: crosshair;
+  }
 }
 
-.app-breast-diagram__regions path,
-.app-breast-diagram__regions polygon {
-  // Slow fade out (default)
-  transition: fill 0.3s ease-in;
+.app-breast-diagram__diagram {
+  pointer-events: none;
 }
 
-.app-breast-diagram__regions [data-highlight],
-.app-breast-diagram__regions [data-active] {
-  // Fast fade in (on hover)
-  transition-duration: 0.05s;
-  transition-timing-function: ease-out;
+.app-breast-diagram[data-debug] {
+  .app-breast-diagram__regions [data-active] {
+    fill: $state-active;
+  }
 }
 
-.app-breast-diagram__regions [data-highlight] {
-  fill: $state-highlight;
-}
+.app-breast-diagram[data-debug]:not([data-read-only]) {
+  .app-breast-diagram__regions path,
+  .app-breast-diagram__regions polygon {
+    // Slow fade out (default)
+    transition: fill 0.3s ease-in;
+  }
 
-.app-breast-diagram__regions [data-active] {
-  fill: $state-active;
-}
+  .app-breast-diagram__regions path:hover,
+  .app-breast-diagram__regions polygon:hover,
+  .app-breast-diagram__regions [data-active] {
+    // Fast fade in (on hover)
+    transition-duration: 0.05s;
+    transition-timing-function: ease-out;
+  }
 
-.app-breast-diagram__regions [data-active][data-highlight] {
-  fill: color.adjust(color.mix($state-active, $state-highlight, 75%), $lightness: 10%, $saturation: 25%);
+  .app-breast-diagram__regions path:hover,
+  .app-breast-diagram__regions polygon:hover {
+    fill: $state-highlight;
+  }
+
+  .app-breast-diagram__regions [data-active]:hover {
+    fill: color.adjust(color.mix($state-active, $state-highlight, 75%), $lightness: 10%, $saturation: 25%);
+  }
 }

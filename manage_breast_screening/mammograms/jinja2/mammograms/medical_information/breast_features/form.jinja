@@ -5,14 +5,34 @@
 {% from "nhsuk/components/input/macro.jinja" import input %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
-{% from 'django_form_helpers.jinja' import form_error_summary %}
+{% from "django_form_helpers.jinja" import form_error_summary %}
 
 {% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
-{% set form_attributes = {'data-module': 'app-breast-diagram'} %}
+{% set diagram_debug = "debug" in request.GET %}
+{% set diagram_read_only = false %}
+
+{% set form_attributes = {
+  "class": "app-breast-diagram",
+  "action": request.path,
+  "method": "post",
+  "data-module": "app-breast-diagram",
+  "data-debug": {
+    "value": "true" if diagram_debug else false,
+    "optional": true
+  },
+  "data-read-only": {
+    "value": "true" if diagram_read_only else false,
+    "optional": true
+  },
+  "novalidate": {
+    "value": true,
+    "optional": true
+  }
+} %}
 
 {% block page_content %}
-<div class="nhsuk-u-reading-width">
+  <div class="nhsuk-u-reading-width">
     {{ form_error_summary(form) }}
 
     <h1 class="nhsuk-heading-l">
@@ -24,7 +44,7 @@
       {{ heading }}
     </h1>
 
-    <form action="{{ request.path }}" method="post" novalidate {{ nhsukAttributes(form_attributes) }}>
+    <form {{- nhsukAttributes(form_attributes) }}>
       {{ csrf_input }}
 
       <p class="nhsuk-body" id="breast-diagram-description">
@@ -32,75 +52,19 @@
       </p>
 
       <div class="breast-features-diagram-header">
-          <h2 class="nhsuk-heading-m">Where is the feature?</h2>
+        <h2 class="nhsuk-heading-m">Where is the feature?</h2>
       </div>
 
-      {% set diagram_html = app_breast_diagram(
-        version=diagram_version,
-        attributes={
-          'aria-labelledby': 'breast-diagram-description'
+      {{ app_breast_diagram({
+        "debug": diagram_debug,
+        "read_only": diagram_read_only,
+        "version": diagram_version,
+        "attributes": {
+          "aria-labelledby": "breast-diagram-description"
         }
-      ) %}
+      }) }}
 
       {{ form.features }}
-
-      {% if 'debug' in request.GET %}
-        {{ summaryList({
-          "card": {
-            "image": {
-              "html": diagram_html
-            }
-          },
-          "rows": [
-            {
-              "key": {
-                "text": "Image X"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-x"
-              }
-            },
-            {
-              "key": {
-                "text": "Image Y"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-y"
-              }
-            },
-            {
-              "key": {
-                "text": "Image region"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-region"
-              }
-            },
-            {
-              "key": {
-                "text": "Input values"
-              },
-              "value": {
-                "text": "N/A",
-                "classes": "app-js-image-input"
-              },
-              "classes": "nhsuk-summary-list__row--no-border"
-            }
-          ]
-        }) }}
-      {% else %}
-        {{ card({
-          "image": {
-            "html": diagram_html
-          },
-          "classes": "nhsuk-u-margin-bottom-6"
-        }) }}
-      {% endif %}
-
-
 
       <div class="nhsuk-button-group">
         {{ button({
@@ -114,5 +78,5 @@
         </a>
       </p>
     </form>
-</div>
+  </div>
 {% endblock %}

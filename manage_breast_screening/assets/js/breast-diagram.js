@@ -1,13 +1,19 @@
-import { createAll, isObject, Component, ElementError } from 'nhsuk-frontend'
+import {
+  createAll,
+  isObject,
+  ConfigurableComponent,
+  ElementError
+} from 'nhsuk-frontend'
 
 import { ImageMap } from './image-map.js'
+import { ImageMarker } from './image-marker.js'
 
 /**
  * Breast diagram component
  *
- * @augments {Component<HTMLFormElement>}
+ * @augments {ConfigurableComponent<BreastDiagramConfig, HTMLFormElement>}
  */
-export class BreastDiagram extends Component {
+export class BreastDiagram extends ConfigurableComponent {
   static elementType = HTMLFormElement
 
   /**
@@ -16,15 +22,23 @@ export class BreastDiagram extends Component {
   $input
 
   /**
-   * @type {BreastFeatureValue[]}
+   * @type {ImageMarker[]}
+   */
+  markers
+
+  /**
+   * @type {BreastFeature[]}
    */
   values
 
   /**
    * @param {Element | null} $root - HTML element to use for component
+   * @param {Partial<BreastDiagramConfig>} [config] - Breast diagram config
    */
-  constructor($root) {
-    super($root)
+  constructor($root, config = {}) {
+    super($root, config)
+
+    const { readOnly } = this.config
 
     const $input = this.$root.querySelector('input[name="features"]')
     if (!($input instanceof HTMLInputElement)) {
@@ -37,24 +51,13 @@ export class BreastDiagram extends Component {
     }
 
     this.$input = $input
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      this.values = /** @type {BreastFeatureValue[]} */ (
-        JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
-      )
-    } catch (error) {
-      console.error(error)
-
-      throw new ElementError({
-        component: BreastDiagram,
-        identifier: 'Breast diagram feature JSON (`input[name="features"]`)'
-      })
-    }
+    this.markers = []
+    this.values = []
 
     const $imageMaps = createAll(
       ImageMap,
       {
+        imageClass: 'app-breast-diagram__svg',
         selectors: [
           '.app-breast-diagram__regions path',
           '.app-breast-diagram__regions polygon'
@@ -63,7 +66,7 @@ export class BreastDiagram extends Component {
       { scope: this.$root }
     )
 
-    if (!$imageMaps.length) {
+    if (!$imageMaps.length || !($imageMaps[0].$root instanceof HTMLElement)) {
       throw new ElementError({
         component: BreastDiagram,
         identifier: `Image map (\`[data-module="${ImageMap.moduleName}"]\`)`
@@ -71,40 +74,60 @@ export class BreastDiagram extends Component {
     }
 
     this.$imageMap = $imageMaps[0]
-    this.$imageMap.onUpdate = this.onUpdate.bind(this)
+
+    if (!readOnly) {
+      this.$imageMap.addEventListener('click', (event) => this.onClick(event))
+      this.$imageMap.addEventListener('hover', (event) => this.log(event))
+    }
 
     // Render diagram features
+    this.read()
     this.render()
-    this.debug()
-  }
-
-  /**
-   * Get diagram features
-   */
-  get features() {
-    return this.values
-      .map(({ id, name, x, y }) => {
-        const $path = this.$imageMap.getPathById(id)
-        const point = this.$imageMap.createPoint(x, y, id)
-        return { name, region: this.$imageMap.createRegion($path, point) }
-      })
-      .filter(
-        /** @returns {feature is BreastFeature} */
-        (feature) => !!feature.region
-      )
+    this.log()
   }
 
   /**
    * Render diagram features
    */
   render() {
-    for (const feature of this.features) {
-      this.$imageMap.setState('active', feature.region, null)
+    const { $imageMap, markers, values } = this
+
+    values.forEach(({ id, x, y }, index) => {
+      const $path = $imageMap.getPathById(id)
+      const point = $imageMap.createPoint(x, y, id)
+
+      // Render active region
+      $imageMap.setState('active', $path)
+
+      // Set marker position
+      this.setMarker(point, index)
+    })
+
+    // Remove excess markers
+    for (const marker of markers.splice(values.length)) {
+      marker.$root.remove()
     }
   }
 
   /**
-   * Write diagram features to hidden input
+   * Read diagram values from hidden input
+   */
+  read() {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      this.values = /** @type {BreastFeature[]} */ (
+        JSON.parse(decodeURIComponent(this.$input.value), getArrayValue) ?? []
+      )
+    } catch {
+      throw new ElementError({
+        component: BreastDiagram,
+        identifier: 'Breast diagram feature JSON (`input[name="features"]`)'
+      })
+    }
+  }
+
+  /**
+   * Write diagram values to hidden input
    */
   write() {
     this.$input.value = JSON.stringify(this.values)
@@ -113,9 +136,16 @@ export class BreastDiagram extends Component {
   /**
    * Update status messages
    *
-   * @param {Partial<ImageMapRegion>} [region] - Image map region
+   * @param {CustomEvent<ImageMapPayload>} [event] - Image map event
    */
-  debug({ point, label } = {}) {
+  log(event) {
+    const { debug } = this.config
+    const { point, $path } = event?.detail ?? {}
+
+    if (!debug) {
+      return
+    }
+
     /** @type {Element | null} */
     this.$debugX = this.$debugX ?? this.$root.querySelector('.app-js-image-x')
 
@@ -131,50 +161,144 @@ export class BreastDiagram extends Component {
       this.$debugInput ?? this.$root.querySelector('.app-js-image-input')
 
     const { $debugX, $debugY, $debugRegion, $debugInput } = this
-    if (!$debugX || !$debugY || !$debugRegion || !$debugInput) {
+    if (!$debugInput) {
+      return
+    }
+
+    $debugInput.textContent =
+      this.values.map(({ id }) => id).join(', ') || 'N/A'
+
+    if (!$debugX || !$debugY || !$debugRegion) {
       return
     }
 
     $debugX.textContent = point?.x.toString() ?? 'N/A'
     $debugY.textContent = point?.y.toString() ?? 'N/A'
-    $debugRegion.textContent = label ?? 'N/A'
-    $debugInput.textContent =
-      this.values.map(({ id }) => id).join(', ') || 'N/A'
+
+    $debugRegion.textContent =
+      $path?.querySelector('title')?.textContent ?? 'N/A'
   }
 
   /**
-   * Update form inputs
+   * Handle image map click
    *
-   * @param {ImageMapState} state - State to set, e.g. 'highlight'
-   * @param {ImageMapRegion} [region] - Image map region
+   * @type {ImageMapListener}
    */
-  onUpdate(state, region) {
-    this.debug(region)
-
-    if (!region) {
+  onClick(event) {
+    const { $path, point } = event.detail
+    if (!$path || !point) {
       return
     }
 
-    switch (state) {
-      case 'active':
-        this.values.push({
-          id: region.id,
-          name: 'Pending',
-          x: region.point.x,
-          y: region.point.y
-        })
+    this.add({
+      id: $path.classList.value,
+      name: 'Pending',
+      x: point.x,
+      y: point.y
+    })
 
-        this.write()
-        this.debug(region)
+    this.log(event)
+  }
 
-        break
+  /**
+   * Add breast feature
+   *
+   * @param {BreastFeature} feature
+   */
+  add(feature) {
+    this.values.push(feature)
+    this.render()
+    this.write()
+  }
+
+  /**
+   * Remove breast feature
+   *
+   * @param {Pick<BreastFeature, 'x' | 'y'>} feature
+   */
+  remove(feature) {
+    const { $imageMap, values } = this
+
+    const entry = values.find(({ x, y }) => {
+      return x === feature.x && y === feature.y
+    })
+
+    if (!entry) {
+      return
     }
+
+    const index = values.indexOf(entry)
+    const $path = $imageMap.getPathById(entry.id)
+
+    $imageMap.setState('active', $path, false)
+    values.splice(index, 1)
+
+    this.render()
+    this.write()
+    this.log()
+  }
+
+  /**
+   * Set marker for image map
+   *
+   * @param {DOMPoint} point - SVG point at pointer coordinates
+   * @param {number} index - Image marker index
+   */
+  setMarker(point, index) {
+    const { $imageMap, $input, markers } = this
+    const { width, height } = $imageMap
+
+    if (!markers[index]) {
+      markers[index] = new ImageMarker(null, {
+        href: $input.readOnly ? undefined : `#marker-${index + 1}`,
+        width: width,
+        height: height
+      })
+    }
+
+    const marker = markers[index]
+
+    // Set marker properties
+    marker.textContent = `${index + 1}`
+    marker.point = point
+
+    // Append new markers only
+    if (!marker.$root.parentElement) {
+      $imageMap.$root.appendChild(marker.$root)
+    }
+
+    return marker
   }
 
   /**
    * Name for the component used when initialising using data-module attributes
    */
   static moduleName = 'app-breast-diagram'
+
+  /**
+   * Breast diagram default config
+   *
+   * @see {@link BreastDiagramConfig}
+   * @constant
+   * @type {BreastDiagramConfig}
+   */
+  static defaults = Object.freeze({
+    debug: false,
+    readOnly: false
+  })
+
+  /**
+   * Breast diagram config schema
+   *
+   * @constant
+   * @satisfies {Schema<BreastDiagramConfig>}
+   */
+  static schema = Object.freeze({
+    properties: {
+      debug: { type: 'boolean' },
+      readOnly: { type: 'boolean' }
+    }
+  })
 }
 
 /**
@@ -197,8 +321,8 @@ function getArrayValue(key, value) {
 /**
  * Whether feature object is valid
  *
- * @param {unknown | BreastFeatureValue} value
- * @returns {value is BreastFeatureValue}
+ * @param {unknown | BreastFeature} value
+ * @returns {value is BreastFeature}
  */
 function isValidObject(value) {
   if (!isObject(value)) {
@@ -228,17 +352,18 @@ function isValid(value) {
 }
 
 /**
- * Breast feature with image map region
+ * Breast diagram config
  *
- * @typedef {object} BreastFeature
- * @property {string} name - Breast feature name
- * @property {ImageMapRegion} region - Image map region
+ * @see {@link BreastDiagram.defaults}
+ * @typedef {object} BreastDiagramConfig
+ * @property {boolean} debug - Whether to show debug information
+ * @property {boolean} readOnly - Whether image map is read only
  */
 
 /**
  * Breast feature input value
  *
- * @typedef {object} BreastFeatureValue
+ * @typedef {object} BreastFeature
  * @property {string} id - Image map region ID
  * @property {string} name - Breast feature name
  * @property {number} x - X coordinate of breast feature
@@ -246,5 +371,6 @@ function isValid(value) {
  */
 
 /**
- * @import { ImageMapRegion, ImageMapState } from './image-map.js'
+ * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
+ * @import { ImageMapPayload, ImageMapListener } from './image-map.js'
  */
