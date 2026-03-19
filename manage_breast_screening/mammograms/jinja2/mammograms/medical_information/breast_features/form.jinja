@@ -9,13 +9,20 @@
 
 {% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
+{% set diagram_debug = "debug" in request.GET %}
+{% set diagram_read_only = false %}
+
 {% set form_attributes = {
   "class": "app-breast-diagram",
   "action": request.path,
   "method": "post",
   "data-module": "app-breast-diagram",
   "data-debug": {
-    "value": "true" if "debug" in request.GET else false,
+    "value": "true" if diagram_debug else false,
+    "optional": true
+  },
+  "data-read-only": {
+    "value": "true" if diagram_read_only else false,
     "optional": true
   },
   "novalidate": {
@@ -49,8 +56,8 @@
       </div>
 
       {{ app_breast_diagram({
-        "debug": "debug" in request.GET,
-        "read_only": false,
+        "debug": diagram_debug,
+        "read_only": diagram_read_only,
         "version": diagram_version,
         "attributes": {
           "aria-labelledby": "breast-diagram-description"

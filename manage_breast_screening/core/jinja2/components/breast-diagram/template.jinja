@@ -8,11 +8,7 @@
 <figure
   {{- nhsukAttributes({
     "class": "app-breast-diagram__image-map nhsuk-u-width-full",
-    "data-module": "app-image-map",
-    "data-read-only": {
-      "value": "true" if params.read_only else false,
-      "optional": true
-    }
+    "data-module": "app-image-map"
   }) -}}
 
   {{- nhsukAttributes(params.attributes) -}}>
