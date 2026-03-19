@@ -53,11 +53,6 @@ variable "enable_alerting" {
   type        = bool
 }
 
-variable "action_group_id" {
-  type        = string
-  description = "ID of the action group to notify."
-}
-
 variable "enable_relay" {
   description = "Whether to create Azure Relay resources."
   type        = bool

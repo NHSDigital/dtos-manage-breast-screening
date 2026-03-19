@@ -63,5 +63,5 @@ module "azurerm_application_insights_standard_web_test" {
   location                = var.region
   action_group_id         = var.action_group_id
   application_insights_id = var.app_insights_id
-  target_url              = var.target_url
+  target_url              = "${local.external_url}healthcheck"
 }

@@ -19,7 +19,6 @@ module "infra" {
   vnet_address_space                        = var.vnet_address_space
   cae_zone_redundancy_enabled               = var.cae_zone_redundancy_enabled
   enable_alerting                           = var.enable_alerting
-  action_group_id                           = var.deploy_infra ? module.infra[0].monitor_action_group_id : data.azurerm_monitor_action_group.main[0].id
   enable_relay                              = var.enable_relay
   enable_service_bus                        = var.enable_service_bus
   service_bus_public_network_access_enabled = var.service_bus_public_network_access_enabled
@@ -79,7 +78,6 @@ module "container-apps" {
   use_apex_domain                       = var.use_apex_domain
   infra_key_vault_name                  = local.infra_key_vault_name
   infra_key_vault_rg                    = local.infra_key_vault_rg
-  target_url                            = var.deploy_container_apps ? "${module.container-apps[0].external_url}healthcheck" : null
   resource_group_name_infra             = local.resource_group_name
   container_memory                      = var.container_memory
   min_replicas                          = var.min_replicas
