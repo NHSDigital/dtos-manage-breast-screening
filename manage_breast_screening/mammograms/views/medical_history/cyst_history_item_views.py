@@ -8,9 +8,6 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
-    CystHistoryItem,
-)
 
 from ...forms.medical_history.cyst_history_item_form import CystHistoryItemForm
 from ..mixins import MedicalInformationMixin
@@ -60,12 +57,13 @@ class UpdateCystHistoryView(MedicalInformationMixin, UpdateWithAuditView):
 
     def get_object(self):
         try:
-            return CystHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
+            return self.appointment.cyst_history_items.get(
+                pk=self.kwargs["history_item_pk"]
             )
-        except CystHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
+        except AttributeError:
+            logger.exception(
+                "CystHistoryItem does not exist for kwargs=%s", self.kwargs
+            )
             return None
 
     def get_form_kwargs(self):
