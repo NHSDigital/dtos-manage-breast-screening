@@ -7,6 +7,6 @@ postgres_backup_retention_days            = 7
 postgres_geo_redundant_backup_enabled     = false
 protect_keyvault                          = false
 vnet_address_space                        = "10.142.0.0/16"
-deploy_database_as_container              = true
+deploy_database_as_container              = false #TODO: set to true and remove Azure Database for PostgreSQL resources once containerised DB is in place
 seed_demo_data                            = true
 enable_relay                              = true
