@@ -29,13 +29,12 @@ class LastKnownMammogramPresenter:
         return result
 
     def _present_mammogram(self, mammogram, item_index):
-        location = (
-            mammogram.provider.name
-            if mammogram.provider
-            else mammogram.location_details
-        )
-        if mammogram.provider:
-            location = mammogram.provider.name
+        if mammogram.location_type == mammogram.LocationType.SAME_PROVIDER:
+            location = mammogram.appointment.provider.name
+        elif mammogram.location_type == mammogram.LocationType.ANOTHER_NHS_PROVIDER:
+            location = (
+                f"Another NHS breast screening unit: {mammogram.location_details}"
+            )
         elif (
             mammogram.location_details
             and mammogram.location_type == mammogram.LocationType.ELSEWHERE_UK
@@ -51,12 +50,14 @@ class LastKnownMammogramPresenter:
         else:
             location = "Location unknown"
 
-        if mammogram.exact_date:
+        if mammogram.date_type == mammogram.DateType.EXACT:
             absolute = format_date(mammogram.exact_date)
             relative = format_relative_date(mammogram.exact_date)
             date = {"absolute": absolute, "relative": relative, "is_exact": True}
-        elif mammogram.approx_date:
-            date = {"value": f"Approximate date: {mammogram.approx_date}"}
+        elif mammogram.date_type == mammogram.DateType.MORE_THAN_SIX_MONTHS:
+            date = {"value": f"Taken 6 months or more ago: {mammogram.approx_date}"}
+        elif mammogram.date_type == mammogram.DateType.LESS_THAN_SIX_MONTHS:
+            date = {"value": f"Taken less than 6 months ago: {mammogram.approx_date}"}
         else:
             date = {"value": "Date unknown"}
 

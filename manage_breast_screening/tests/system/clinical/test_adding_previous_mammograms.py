@@ -232,7 +232,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def and_i_should_see_the_mammogram_with_the_other_provider_and_name(self):
         expected_inner_text = re.compile(
-            r"Added today\nApproximate date: a year ago\nIn the UK: other place\nPrevious name: Taylor Swift\nAdditional information: RR"
+            r"Added today\nTaken 6 months or more ago: a year ago\nIn the UK: other place\nPrevious name: Taylor Swift\nAdditional information: RR"
         )
         expect(self.page.get_by_test_id("mammograms")).to_contain_text(
             expected_inner_text,
