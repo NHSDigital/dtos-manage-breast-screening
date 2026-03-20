@@ -18,6 +18,7 @@ def personas():
             nhs_uid=persona.username,
             first_name=persona.first_name,
             last_name=persona.last_name,
+            is_superuser=persona.is_superuser,
         )
         UserAssignmentFactory(
             user=user,
@@ -46,6 +47,36 @@ def test_post_persona_login(client):
     response = client.post(
         reverse("auth:persona_login"),
         {"username": "anna_davies", "next": "/some-url"},
+    )
+    assert response.status_code == 302
+    assert response.headers["location"] == "/current-provider/select/?next=%2Fsome-url"
+
+
+@pytest.mark.django_db
+def test_post_persona_login_superuser_redirects_to_admin(client):
+    response = client.post(
+        reverse("auth:persona_login"),
+        {"username": "priya_bains"},
+    )
+    assert response.status_code == 302
+    assert response.headers["location"] == "/admin/"
+
+
+@pytest.mark.django_db
+def test_post_persona_login_superuser_with_root_next_redirects_to_admin(client):
+    response = client.post(
+        reverse("auth:persona_login"),
+        {"username": "priya_bains", "next": "/"},
+    )
+    assert response.status_code == 302
+    assert response.headers["location"] == "/admin/"
+
+
+@pytest.mark.django_db
+def test_post_persona_login_superuser_with_next_redirects_to_select_provider(client):
+    response = client.post(
+        reverse("auth:persona_login"),
+        {"username": "priya_bains", "next": "/some-url"},
     )
     assert response.status_code == 302
     assert response.headers["location"] == "/current-provider/select/?next=%2Fsome-url"
@@ -187,6 +218,7 @@ class TestCis2Callback:
 
             mock_user = Mock()
             mock_user.nhs_uid = "user-123"
+            mock_user.is_superuser = False
             mock_authenticate = Mock(return_value=mock_user)
             mock_login = Mock()
 
@@ -208,3 +240,24 @@ class TestCis2Callback:
                 ANY, cis2_sub="user-123", cis2_userinfo={"sub": "user-123"}
             )
             mock_login.assert_called_once_with(ANY, mock_user)
+
+    def test_superuser_redirects_to_admin(
+        self, client, monkeypatch, mock_cis2_client_factory
+    ):
+        """Superusers should always be sent to the admin site after login."""
+        mock_cis2_client_factory()
+
+        mock_user = Mock()
+        mock_user.nhs_uid = "user-123"
+        mock_user.is_superuser = True
+
+        monkeypatch.setattr(
+            "manage_breast_screening.auth.views.authenticate",
+            Mock(return_value=mock_user),
+        )
+        monkeypatch.setattr("manage_breast_screening.auth.views.auth_login", Mock())
+
+        response = client.get(reverse("auth:cis2_callback"))
+
+        assert response.status_code == 302
+        assert response.headers["location"] == "/admin/"

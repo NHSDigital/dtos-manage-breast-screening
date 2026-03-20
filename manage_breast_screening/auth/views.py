@@ -115,6 +115,9 @@ def cis2_callback(request):
     request.session["login_time"] = now.isoformat()
     request.session["last_activity"] = now.isoformat()
 
+    if user.is_superuser:
+        return redirect(reverse("admin:index"))
+
     return redirect(reverse("select_provider"))
 
 
