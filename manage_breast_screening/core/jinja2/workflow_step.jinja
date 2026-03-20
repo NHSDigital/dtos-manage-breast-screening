@@ -21,18 +21,15 @@
     </div>
     <div class="nhsuk-grid-column-three-quarters app-workflow-container__main" id="workflow_content">
       {% set info_notification_params = get_notification_banner_params(
-          request, message_type='info',
-          disable_auto_focus=disable_auto_focus|default(true)
+          request, message_type='info'
         ) %}
 
       {% set success_notification_params = get_notification_banner_params(
-          request, message_type='success',
-          disable_auto_focus=disable_auto_focus|default(true)
+          request, message_type='success'
         ) %}
 
       {% set warning_notification_params = get_notification_banner_params(
-          request, message_type='warning',
-          disable_auto_focus=disable_auto_focus|default(true)
+          request, message_type='warning'
         ) %}
 
       {% if success_notification_params %}

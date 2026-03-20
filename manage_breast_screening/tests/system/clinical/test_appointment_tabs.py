@@ -180,14 +180,14 @@ class TestAppointmentTabs(SystemTestCase):
         expect(self.page.get_by_text("NHS Number")).to_be_visible()
 
     def and_the_message_says_in_progress_with_someone_else(self):
-        alert = self.page.get_by_role("region")
+        alert = self.page.get_by_role("alert")
         expect(alert).to_contain_text("Important")
         expect(alert).to_contain_text(
             "This appointment is currently being run by F. Lastname."
         )
 
     def and_no_message_says_in_progress_with_someone_else(self):
-        expect(self.page.get_by_role("region")).not_to_be_attached()
+        expect(self.page.get_by_role("alert")).not_to_be_attached()
 
     def when_i_change_to_the_participant_details_tab(self):
         self.when_i_change_to_an_appointment_tab("Participant")
