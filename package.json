@@ -58,7 +58,7 @@
     "outdent": "^0.8.0",
     "prettier": "^3.8.1",
     "rollup": "^4.59.0",
-    "sass-embedded": "^1.97.3",
+    "sass-embedded": "^1.98.0",
     "typed-query-selector": "^2.12.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
