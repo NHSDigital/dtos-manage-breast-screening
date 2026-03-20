@@ -180,11 +180,27 @@ DATABASES = {
         "PASSWORD": environ.get("DATABASE_PASSWORD", ""),
         "HOST": environ.get("DATABASE_HOST", ""),
         "PORT": environ.get("DATABASE_PORT", "5432"),
-        "OPTIONS": {"sslmode": environ.get("DATABASE_SSLMODE", "prefer")},
+        "OPTIONS": {
+            "sslmode": environ.get("DATABASE_SSLMODE", "prefer"),
+            # psycopg3 process-level connection pool. min_size=1 keeps one warm
+            # authenticated connection alive so the first request after an idle
+            # period does not pay the TCP+TLS+Azure AD authentication cost.
+            # get_connection_params() (and therefore the IMDS token call) is only
+            # invoked when the pool creates a new physical connection, not on every
+            # request checkout. Token expiry is not a concern: once authenticated,
+            # PostgreSQL does not re-check the token on an open connection.
+            # https://docs.djangoproject.com/en/6.0/ref/databases/#connection-pool
+            "pool": {
+                "min_size": 1,
+                "max_size": 10,
+            },
+        },
         "TIME_ZONE": "Europe/London",
-        # The pod authenticates to PostgreSQL via Azure AD managed identity (DefaultAzureCredential).
-        # Tokens last ~60-75 minutes. CONN_MAX_AGE must be shorter than the token lifetime to avoid reusing connections with expired tokens.
-        "CONN_MAX_AGE": int(environ.get("DATABASE_CONN_MAX_AGE", "0")),
+        # The pod authenticates to PostgreSQL via Azure AD managed identity (ManagedIdentityCredential).
+        # CONN_MAX_AGE must be 0 when using psycopg3 connection pooling — the pool
+        # manages connection lifetime independently of Django's thread-local mechanism.
+        # https://docs.djangoproject.com/en/6.0/ref/settings/#conn-max-age
+        "CONN_MAX_AGE": 0,
         "CONN_HEALTH_CHECKS": True,
     }
 }
