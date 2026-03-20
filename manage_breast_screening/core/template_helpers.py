@@ -1,4 +1,4 @@
-from django.contrib.messages import INFO, SUCCESS, WARNING, get_messages
+from django.contrib.messages import INFO, SUCCESS, get_messages
 from django.urls import reverse
 from django.utils.html import conditional_escape as django_html_escape
 from django.utils.safestring import SafeData, SafeString, mark_safe
@@ -88,12 +88,12 @@ def message_with_heading(heading: str, html=None) -> SafeString:
 def get_notification_banner_params(
     request, message_type="info", disable_auto_focus=False
 ):
-    levels = {"info": INFO, "warning": WARNING, "success": SUCCESS}
+    levels = {"info": INFO, "success": SUCCESS}
     try:
         level = levels[message_type]
     except KeyError:
         raise ValueError(
-            f"message_type must be one of {{info, warning, success}}; got {message_type}"
+            f"message_type must be one of {{info, success}}; got {message_type}"
         )
 
     messages = [message for message in get_messages(request) if message.level == level]

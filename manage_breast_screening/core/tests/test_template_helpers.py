@@ -1,6 +1,6 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
-from django.contrib.messages import ERROR, INFO, SUCCESS, WARNING
+from django.contrib.messages import ERROR, INFO, SUCCESS
 from django.contrib.messages.storage.base import Message
 from django.test import RequestFactory
 from django.utils.safestring import mark_safe
@@ -73,7 +73,6 @@ class TestNotificationBannerParamsForStringMessages:
         request._messages = [
             Message(message="abc", level=INFO),
             Message(message="def", level=SUCCESS),
-            Message(message="warning!", level=WARNING),
             Message(message="error!!!", level=ERROR),
         ]
         return request
@@ -86,14 +85,10 @@ class TestNotificationBannerParamsForStringMessages:
         result = get_notification_banner_params(dummy_request, "success")
         assert result == {"text": "def", "type": "success", "role": "alert"}
 
-    def test_warning_banner_with_text_message(self, dummy_request):
-        result = get_notification_banner_params(dummy_request, "warning")
-        assert result == {"text": "warning!", "type": "warning", "role": "alert"}
-
     def test_invalid_message_type(self, dummy_request):
         with pytest.raises(
             ValueError,
-            match="message_type must be one of {info, warning, success}; got error",
+            match="message_type must be one of {info, success}; got error",
         ):
             get_notification_banner_params(dummy_request, "error")
 

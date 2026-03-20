@@ -71,7 +71,7 @@ def cis2_callback(request):
         token = client.authorize_access_token(request)
     except MismatchingStateError:
         logger.exception("CIS2 callback failed: OAuth state mismatch")
-        messages.warning(request, "Your login session expired. Please try again.")
+        messages.info(request, "Your login session expired. Please try again.")
         return redirect(reverse("auth:login"))
     except OAuthError as e:
         if e.error == "invalid_client" and e.description == "JWT is not valid":
@@ -80,7 +80,7 @@ def cis2_callback(request):
             )
         else:
             logger.exception("CIS2 callback failed: OAuth error")
-        messages.warning(request, "There was a problem logging in. Please try again.")
+        messages.info(request, "There was a problem logging in. Please try again.")
         return redirect(reverse("auth:login"))
 
     id_token_userinfo = token.get("userinfo")

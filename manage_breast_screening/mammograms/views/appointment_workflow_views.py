@@ -140,7 +140,7 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         except (IntegrityError, DatabaseError):
             messages.add_message(
                 self.request,
-                messages.WARNING,
+                messages.INFO,
                 "Unable to complete all sections. Please try again.",
             )
             return redirect(
@@ -419,7 +419,7 @@ class MarkSectionReviewed(InProgressAppointmentMixin, View):
             if existing_review.reviewed_by != request.user:
                 messages.add_message(
                     request,
-                    messages.WARNING,
+                    messages.INFO,
                     f"This section has already been reviewed by {existing_review.reviewed_by.get_full_name()}",
                 )
         else:
