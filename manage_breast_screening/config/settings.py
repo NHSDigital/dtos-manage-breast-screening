@@ -59,6 +59,8 @@ SESSION_COOKIE_SECURE = True
 # SECURE_SSL_REDIRECT is set to False because TLS termination is handled at the Azure Container Apps layer
 SECURE_SSL_REDIRECT = False
 
+SERVICE_ENABLED = boolean_env("SERVICE_ENABLED", default=True)
+
 # SECURITY WARNING: don't run with PERSONAS_ENABLED turned on in production!
 PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 
@@ -95,6 +97,7 @@ if DJANGO_ENV != "production":
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "manage_breast_screening.core.middleware.service_enabled.ServiceEnabledMiddleware",
     "manage_breast_screening.core.middleware.exception_logging.CorrelationIdMiddleware",
     "manage_breast_screening.core.middleware.exception_logging.ExceptionLoggingMiddleware",
     "manage_breast_screening.core.middleware.robots.RobotsTagMiddleware",
