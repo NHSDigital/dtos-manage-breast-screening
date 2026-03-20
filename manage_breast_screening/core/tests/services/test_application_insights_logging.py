@@ -24,7 +24,7 @@ class TestApplicationInsightsLogging:
         monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
         ApplicationInsightsLogging().configure_azure_monitor()
-        mock_configure_azure.assert_called_with(logger_name="insights-logger")
+        mock_configure_azure.assert_called_with()
 
     def test_does_not_configure_if_flag_not_enabled(
         self, mock_logging, mock_configure_azure, monkeypatch
