@@ -130,9 +130,9 @@ class SymptomPresenter:
                     self.change_type_line,
                     self.area_line,
                     self.started_line,
-                    self.investigated_line,
                     self.intermittent_line,
                     self.stopped_line,
+                    self.investigated_line,
                     self.additional_information_line,
                 ]
                 if line

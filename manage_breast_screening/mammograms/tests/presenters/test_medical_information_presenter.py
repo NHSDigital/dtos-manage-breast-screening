@@ -69,7 +69,7 @@ class TestRecordMedicalInformationPresenter:
                     "text": "Lump",
                 },
                 "value": {
-                    "html": "Left breast<br>Not sure<br>Not investigated<br>Symptom is intermittent<br>Stopped: resolved date<br>Additional information: abc",
+                    "html": "Left breast<br>Not sure<br>Symptom is intermittent<br>Stopped: resolved date<br>Not investigated<br>Additional information: abc",
                 },
             },
             {
