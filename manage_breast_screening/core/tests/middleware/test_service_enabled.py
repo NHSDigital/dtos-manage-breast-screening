@@ -31,6 +31,7 @@ class TestServiceEnabledMiddleware:
         resp = mw.process_view(request, lambda r: None, (), {})
         assert resp is not None
         assert resp.status_code == 503
+        assert b"Sorry, this service is unavailable" in resp.content
 
     def test_service_disabled_exempt_view_allows_request(self, settings):
         settings.SERVICE_ENABLED = False

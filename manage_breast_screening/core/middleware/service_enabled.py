@@ -2,6 +2,7 @@ from typing import Callable, Optional
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.shortcuts import render
 
 from manage_breast_screening.core.decorators import is_service_enabled_exempt
 
@@ -29,4 +30,4 @@ class ServiceEnabledMiddleware:
         if is_service_enabled_exempt(view_func):
             return None
 
-        return HttpResponse("Service unavailable", status=503)
+        return render(request, "503.jinja", status=503)
