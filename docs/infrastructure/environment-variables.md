@@ -173,6 +173,10 @@ This value [the SECRET_KEY setting] is the key to securing signed data – it is
 
 To rotate: generate a new random key
 
+## SERVICE_ENABLED
+
+When set to False disables all URLS except those decorated with `service_enabled_exempt`, e.g. /sha and /healthcheck
+
 ## SSL_MODE
 
 [SSL mode](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) of the client connection to the Postgres server. Set to "require" on deployed environments.
