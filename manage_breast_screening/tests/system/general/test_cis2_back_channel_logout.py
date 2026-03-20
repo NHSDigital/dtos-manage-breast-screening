@@ -1,5 +1,6 @@
 import time
 
+import allure
 import pytest
 import requests_mock
 from authlib.jose import JsonWebKey, jwt
@@ -14,6 +15,9 @@ from manage_breast_screening.auth.oauth import oauth
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-10306", "DTOSS-10306")
+@allure.epic("DTOSS-1030 - Permissions & Settings V1")
+@allure.feature("CIS2 back channel logout")
 class TestCIS2BackChannelLogout(SystemTestCase):
     """
     System test for CIS2 back-channel logout endpoint. This test uses an

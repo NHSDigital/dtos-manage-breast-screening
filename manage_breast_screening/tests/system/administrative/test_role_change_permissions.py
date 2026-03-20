@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+import allure
 import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -16,6 +17,9 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-10306", "DTOSS-10306")
+@allure.epic("DTOSS-1030 - Permissions & Settings V1")
+@allure.feature("Clinical and administrative roles")
 class TestRoleChangePermissions(SystemTestCase):
     @pytest.fixture(autouse=True)
     def before(self):

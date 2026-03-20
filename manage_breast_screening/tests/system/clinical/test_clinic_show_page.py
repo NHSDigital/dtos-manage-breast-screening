@@ -2,6 +2,7 @@ import re
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+import allure
 import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -25,6 +26,8 @@ from manage_breast_screening.users.tests.factories import UserFactory
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("Clinic show page")
 class TestUserViewsClinicShowPage(SystemTestCase):
     @pytest.fixture(autouse=True)
     def before(self):

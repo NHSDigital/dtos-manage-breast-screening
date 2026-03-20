@@ -1,6 +1,7 @@
 import re
 from datetime import date
 
+import allure
 import time_machine
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -17,6 +18,10 @@ from manage_breast_screening.participants.tests.factories import (
 from manage_breast_screening.tests.system.system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-8899", "DTOSS-8899")
+@allure.epic("DTOSS-8899 - Mammogram Appointment v1")
+@allure.feature("Medical information")
+@allure.story("Medical history")
 @time_machine.travel(date(2025, 1, 1))
 class TestRecordingMedicalInformation(SystemTestCase):
     def test_adding_medical_history(self):

@@ -1,23 +1,21 @@
 import os
 
+import allure
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.dicom.tests.factories import (
-    ImageFactory,
-    StudyFactory,
-)
+from manage_breast_screening.dicom.tests.factories import ImageFactory, StudyFactory
 from manage_breast_screening.gateway.tests.factories import (
     GatewayActionFactory,
     RelayFactory,
 )
-from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
-)
+from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("Load images from the gateway")
 class TestGatewayImages(SystemTestCase):
     def test_renders_no_images_content(self):
         self.given_i_am_logged_in_as_a_clinical_user()

@@ -1,6 +1,7 @@
 import re
 from datetime import date
 
+import allure
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -15,6 +16,10 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-8899", "DTOSS-8899")
+@allure.epic("DTOSS-8899 - Mammogram Appointment v1")
+@allure.feature("Medical information")
+@allure.story("Previous mammograms")
 class TestAddingPreviousMammograms(SystemTestCase):
     def test_adding_and_updating_a_mammogram_at_the_same_provider(self):
         """

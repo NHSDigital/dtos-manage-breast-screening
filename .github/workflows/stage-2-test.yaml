@@ -98,22 +98,6 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_HOST: localhost
 
-      - name: Test Report
-        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
-        if: ${{ !cancelled() }} # run this step even if previous step failed
-        with:
-          name: Report python unit tests
-          path: reports/test-python-units.xml
-          reporter: python-xunit
-
-      - name: Report javascript unit tests
-        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
-        if: ${{ !cancelled() }} # run this step even if previous step failed
-        with:
-          name: Unit tests (javascript)
-          path: reports/test-js-units.xml
-          reporter: jest-junit
-
   frontend-integration-test:
     needs: test
     if: github.ref == 'refs/heads/main' || needs.test.outputs.frontend-changed == 'true'
@@ -166,13 +150,33 @@ jobs:
           DATABASE_USER: postgres
           DATABASE_HOST: localhost
 
-      - name: Report UI tests
-        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
+      - name: 'Generate Allure reports'
         if: ${{ !cancelled() }} # run this step even if previous step failed
+        run: npm run allure -- generate
+
+      - name: Upload HTML report as artifact
+        id: allure-report-artefact
+        if: ${{ !cancelled() }} # run this step even if previous step failed
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
-          name: UI tests
-          path: reports/test-ui.xml
-          reporter: python-xunit
+          path: allure-report/
+
+  deploy-github-pages:
+    needs: frontend-integration-test
+
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
 
   test-lint:
     name: 'Linting'

@@ -1,5 +1,6 @@
 import re
 
+import allure
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -8,6 +9,10 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@allure.link("https://nhsd-jira.digital.nhs.uk/browse/DTOSS-8899", "DTOSS-8899")
+@allure.epic("DTOSS-8899 - Mammogram Appointment v1")
+@allure.feature("Add image details")
+@allure.story("Multiple images")
 class TestMultipleImagesInformation(SystemTestCase):
     LCC_LEGEND = "3 LCC images were taken. Were the additional images repeats?"
     RMLO_LEGEND = "2 RMLO images were taken. Was the additional image a repeat?"

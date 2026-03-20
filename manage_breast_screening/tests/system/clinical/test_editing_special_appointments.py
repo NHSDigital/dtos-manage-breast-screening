@@ -1,5 +1,6 @@
 import re
 
+import allure
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -15,6 +16,8 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("Special appointments")
 class TestEditingSpecialAppointments(SystemTestCase):
     def test_setting_up_a_special_appointment(self):
         self.given_i_am_logged_in_as_a_clinical_user()

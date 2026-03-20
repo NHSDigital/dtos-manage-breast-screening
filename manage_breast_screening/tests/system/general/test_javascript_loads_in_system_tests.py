@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
+import allure
 from django.urls import reverse
 
 from manage_breast_screening.clinics.tests.factories import ClinicFactory
@@ -12,6 +13,8 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@allure.epic("Unknown epic")
+@allure.feature("System tests")
 class TestJavascriptLoadsInSystemTests(SystemTestCase):
     def test_check_in_component_initialised(self):
         self.given_i_am_logged_in_as_a_clinical_user()
