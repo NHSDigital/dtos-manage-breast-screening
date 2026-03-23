@@ -19,7 +19,6 @@ load_dotenv(_CONFIG_DIR / ".env.test")
 
 from .base import *
 
-# STORAGES is a Python dict — can't be expressed in .env.test
 STORAGES = {
     "staticfiles": {
         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
@@ -30,5 +29,4 @@ STORAGES = {
     },
 }
 
-# List mutation — can't be done in .env.test
 MIDDLEWARE.remove("whitenoise.middleware.WhiteNoiseMiddleware")

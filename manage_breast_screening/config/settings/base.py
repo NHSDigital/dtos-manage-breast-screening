@@ -1,6 +1,5 @@
 # Base settings shared across all environments.
-# Do not import this directly — use local.py, test.py, or production.py instead.
-# This module does not call load_dotenv; env vars must be populated before it is imported.
+# This file does not call load_dotenv; env vars must be populated before it is imported.
 
 import sys
 from os import environ
@@ -21,17 +20,11 @@ def list_env(key):
     return value.split(",") if value else []
 
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-# base.py lives at manage_breast_screening/config/settings/base.py,
-# so we need three .parent calls to reach manage_breast_screening/.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Strip whitespace from all env vars to avoid issues with stray \r\n from Key Vault
 for key in environ:
     environ[key] = environ[key].strip()
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = environ.get("SECRET_KEY")
