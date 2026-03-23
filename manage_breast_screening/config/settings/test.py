@@ -1,10 +1,9 @@
 # ruff: noqa: E402, F401, F403, F405
 # Settings for running the test suite.
-# Loads .env.test with override=True to guarantee deterministic values
-# regardless of any env vars the developer has set in their shell.
+# Loads .env.test as the baseline config. Any env vars already set in the
+# environment take precedence (e.g. CI sets DATABASE_* via workflow env vars).
 # .env is never loaded here — only .env.test.
 #
-# All simple string/boolean config should be specified in .env.test, not here.
 # Add overrides here only when the value is a data structure (e.g. STORAGES)
 # or requires programmatic modification (e.g. MIDDLEWARE.remove(...)).
 
@@ -16,7 +15,7 @@ _CONFIG_DIR = (
     Path(__file__).resolve().parent.parent
 )  # = manage_breast_screening/config/
 
-load_dotenv(_CONFIG_DIR / ".env.test", override=True)
+load_dotenv(_CONFIG_DIR / ".env.test")
 
 from .base import *
 
