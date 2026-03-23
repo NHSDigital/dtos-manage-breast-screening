@@ -67,7 +67,7 @@ def persona_login(request):
         )
         t3 = time.perf_counter()
 
-        logger.debug(
+        logger.info(
             "persona_login GET timings: providers=%.3fs superusers=%.3fs render=%.3fs total=%.3fs",
             t1 - t0,
             t2 - t1,
