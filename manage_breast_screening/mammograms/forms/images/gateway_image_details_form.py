@@ -56,6 +56,18 @@ class GatewayImageDetailsForm(FormWithConditionalFields):
             "required": "Enter the number of RCC images",
         },
     )
+    right_eklund_count = IntegerField(
+        required=False,
+        min_value=0,
+        max_value=20,
+        initial=0,
+        error_messages={
+            "min_value": "Number of right Eklund images must be at least 0",
+            "max_value": "Number of right Eklund images must be at most 20",
+            "invalid": "Enter a valid number of right Eklund images",
+            "required": "Enter the number of right Eklund images",
+        },
+    )
     lmlo_count = IntegerField(
         required=True,
         min_value=0,
@@ -78,6 +90,18 @@ class GatewayImageDetailsForm(FormWithConditionalFields):
             "max_value": "Number of LCC images must be at most 20",
             "invalid": "Enter a valid number of LCC images",
             "required": "Enter the number of LCC images",
+        },
+    )
+    left_eklund_count = IntegerField(
+        required=False,
+        min_value=0,
+        max_value=20,
+        initial=0,
+        error_messages={
+            "min_value": "Number of left Eklund images must be at least 0",
+            "max_value": "Number of left Eklund images must be at most 20",
+            "invalid": "Enter a valid number of left Eklund images",
+            "required": "Enter the number of left Eklund images",
         },
     )
 
@@ -156,8 +180,10 @@ class GatewayImageDetailsForm(FormWithConditionalFields):
                 "additional_details": instance.additional_details,
                 "lmlo_count": len(grouped_images["LMLO"]),
                 "lcc_count": len(grouped_images["LCC"]),
+                "left_eklund_count": len(grouped_images["Left Eklund"]),
                 "rmlo_count": len(grouped_images["RMLO"]),
                 "rcc_count": len(grouped_images["RCC"]),
+                "right_eklund_count": len(grouped_images["Right Eklund"]),
             }
 
         super().__init__(*args, **kwargs)

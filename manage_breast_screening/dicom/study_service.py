@@ -59,7 +59,14 @@ class StudyService:
         images: list["Image"],
     ) -> dict[str, list["Image"]]:
         """Group images by their laterality and view position."""
-        grouped_images = {"LCC": [], "LMLO": [], "RCC": [], "RMLO": []}
+        grouped_images = {
+            "LCC": [],
+            "LMLO": [],
+            "Left Eklund": [],
+            "RCC": [],
+            "RMLO": [],
+            "Right Eklund": [],
+        }
         for image in images:
             if image.laterality_and_view in grouped_images:
                 grouped_images[image.laterality_and_view].append(image)

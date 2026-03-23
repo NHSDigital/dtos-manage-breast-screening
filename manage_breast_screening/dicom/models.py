@@ -140,7 +140,10 @@ class Image(models.Model):
 
     @property
     def laterality_and_view(self):
-        if self.laterality and self.view_position:
+        if self.laterality and self.implant_present:
+            laterality = "Left" if self.laterality == "L" else "Right"
+            return f"{laterality} Eklund"
+        elif self.laterality and self.view_position:
             return f"{self.laterality}{self.view_position}".upper()
         return ""
 
