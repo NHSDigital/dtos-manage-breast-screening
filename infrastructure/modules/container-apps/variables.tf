@@ -225,6 +225,7 @@ locals {
       SSL_MODE                                   = "require"
       DJANGO_ENV                                 = var.env_config
       APPLICATIONINSIGHTS_STATSBEAT_DISABLED_ALL = true
+      OTEL_PYTHON_PSYCOPG_ENABLE_SQLCOMMENTER    = true
     }
   )
   container_db_env = {
