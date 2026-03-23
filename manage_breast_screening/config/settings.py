@@ -186,7 +186,7 @@ DATABASES = {
             # timeout); without this the first post-idle request stalls ~10 s
             # waiting for TCP retransmits against a dead connection.
             "keepalives": 1,
-            "keepalives_idle": 60,
+            "keepalives_idle": 10,
             "keepalives_interval": 10,
             "keepalives_count": 5,
             # https://docs.djangoproject.com/en/6.0/ref/databases/#connection-pool
@@ -330,7 +330,7 @@ LOGGING = {
         },
         "faker": {"level": "INFO"},
         "msal": {"level": "INFO"},
-        "azure.monitor.opentelemetry": {"level": "INFO"},
+        "azure.monitor.opentelemetry": {"level": "WARNING"},
         "azure.core.pipeline.policies.http_logging_policy": {"level": "WARNING"},
     },
 }
