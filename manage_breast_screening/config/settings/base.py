@@ -168,13 +168,13 @@ DATABASES = {
         "PORT": environ.get("DATABASE_PORT", "5432"),
         "OPTIONS": {
             "sslmode": environ.get("DATABASE_SSLMODE", "prefer"),
-            # psycopg3 process-level connection pool. min_size=1 keeps one warm
-            # authenticated connection alive so the first request after an idle
-            # period does not pay the TCP+TLS+Azure AD authentication cost.
-            # get_connection_params() (and therefore the IMDS token call) is only
-            # invoked when the pool creates a new physical connection, not on every
-            # request checkout. Token expiry is not a concern: once authenticated,
-            # PostgreSQL does not re-check the token on an open connection.
+            # Prevent Azure NAT from silently dropping idle connections (~4-min
+            # timeout); without this the first post-idle request stalls ~10 s
+            # waiting for TCP retransmits against a dead connection.
+            "keepalives": 1,
+            "keepalives_idle": 60,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
             # https://docs.djangoproject.com/en/6.0/ref/databases/#connection-pool
             "pool": {
                 "min_size": 1,
