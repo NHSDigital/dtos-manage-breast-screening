@@ -151,12 +151,12 @@ jobs:
           DATABASE_HOST: localhost
 
       - name: 'Generate Allure reports'
-        if: ${{ !cancelled() }} # run this step even if previous step failed
+        if: !cancelled() && github.ref == 'refs/heads/main' # run this step even if previous step failed
         run: npm run allure -- generate
 
       - name: Upload HTML report as artifact
         id: allure-report-artefact
-        if: ${{ !cancelled() }} # run this step even if previous step failed
+        if: github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b
         with:
           path: allure-report/
