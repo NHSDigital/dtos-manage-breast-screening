@@ -19,14 +19,13 @@ class DatabaseWrapper(base.DatabaseWrapper):
     This involves fetching a token at runtime to use as the database password.
 
     The consequence of this is our database credentials aren't static - they
-    expire. We therefore need to ensure that every new connection
-    checks the expiry date, and fetches a new one if necessary.
+    expire after ~1 hour. We therefore need to fetch a fresh token for every
+    new connection. get_connection_params() is overridden to do this.
 
-    Unless you disable persistent connections, each thread will maintain its own
-    connection.
-    Since Django 5.1 it is possible to configure a connection pool
-    instead of using persistent connections, but that would require us to
-    fix the credentials.
+    We use persistent connections (CONN_MAX_AGE=180) so Django reuses each
+    connection for up to 3 minutes and then closes it. This ensures tokens are
+    always fresh (connections are recycled well before the ~1 hour token TTL)
+    and keeps connections alive within Azure's NAT idle timeout (~4 minutes).
     See https://docs.djangoproject.com/en/5.2/ref/databases/#persistent-connections
     for more details of how this works.
 
@@ -44,10 +43,10 @@ class DatabaseWrapper(base.DatabaseWrapper):
         self.azure_credential: AzureCredential = ManagedIdentityCredential(client_id=client_id) if client_id else None
 
     def _get_azure_connection_password(self) -> str:
-        # Called by the psycopg3 connection pool when creating a new physical
-        # connection, not on every request. The timing log below is therefore
-        # expected to appear only at pool initialisation and when the pool expands.
-        # https://docs.djangoproject.com/en/6.0/ref/databases/#connection-pool
+        # Called by get_connection_params() whenever Django opens a new connection.
+        # With CONN_MAX_AGE=180, connections are reused for up to 3 minutes, so
+        # this is called once per worker at startup and again every ~3 minutes —
+        # never on every request.
         if self.azure_credential is None:
             raise RuntimeError(
                 "Azure credential is not configured but an Azure DB host was detected. "
@@ -66,20 +65,3 @@ class DatabaseWrapper(base.DatabaseWrapper):
             params["password"] = self._get_azure_connection_password()
         return params
 
-    @property
-    def pool(self):
-        pool = super().pool
-        if pool is not None and self.azure_credential and not callable(pool.kwargs):
-            # Django passes a static dict from get_connection_params() to
-            # ConnectionPool(kwargs=...), which means the Azure AD token is fixed
-            # at pool creation time and expires after ~1 hour causing new
-            # connections to fail. psycopg_pool supports a callable for kwargs
-            # that is invoked for each new physical connection, so we replace the
-            # static dict with a callable that always fetches a fresh token.
-            def _get_fresh_kwargs():
-                kwargs = self.get_connection_params()
-                kwargs["autocommit"] = True
-                return kwargs
-
-            pool.kwargs = _get_fresh_kwargs
-        return pool
