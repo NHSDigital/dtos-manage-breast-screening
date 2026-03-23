@@ -48,7 +48,11 @@ class DatabaseWrapper(base.DatabaseWrapper):
         # connection, not on every request. The timing log below is therefore
         # expected to appear only at pool initialisation and when the pool expands.
         # https://docs.djangoproject.com/en/6.0/ref/databases/#connection-pool
-        assert self.azure_credential is not None
+        if self.azure_credential is None:
+            raise RuntimeError(
+                "Azure credential is not configured but an Azure DB host was detected. "
+                "Ensure AZURE_DB_CLIENT_ID is set."
+            )
         t0 = time.perf_counter()
         token = self.azure_credential.get_token(
             "https://ossrdbms-aad.database.windows.net/.default"
@@ -61,3 +65,21 @@ class DatabaseWrapper(base.DatabaseWrapper):
         if params.get("host", "").endswith(".database.azure.com") and self.azure_credential:
             params["password"] = self._get_azure_connection_password()
         return params
+
+    @property
+    def pool(self):
+        pool = super().pool
+        if pool is not None and self.azure_credential and not callable(pool.kwargs):
+            # Django passes a static dict from get_connection_params() to
+            # ConnectionPool(kwargs=...), which means the Azure AD token is fixed
+            # at pool creation time and expires after ~1 hour causing new
+            # connections to fail. psycopg_pool supports a callable for kwargs
+            # that is invoked for each new physical connection, so we replace the
+            # static dict with a callable that always fetches a fresh token.
+            def _get_fresh_kwargs():
+                kwargs = self.get_connection_params()
+                kwargs["autocommit"] = True
+                return kwargs
+
+            pool.kwargs = _get_fresh_kwargs
+        return pool
