@@ -295,29 +295,12 @@ LOGGING = {
     "loggers": {
         "django": {
             "level": "INFO",
-            "handlers": ["console"],
-            "propagate": False,
         },
         "django.request": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
             "filters": ["suppress_duplicate_exceptions"],
         },
         "django.db.backends": {
             "level": "DEBUG" if LOG_QUERIES else "INFO",
-            "handlers": ["console"],
-            "propagate": False,
-        },
-        "django.server": {
-            "level": "INFO",
-            "handlers": ["console"],
-            "propagate": False,
-        },
-        "django.utils.autoreload": {
-            "level": "INFO",
-            "handlers": ["console"],
-            "propagate": False,
         },
         "faker": {"level": "INFO"},
         "msal": {"level": "INFO"},
