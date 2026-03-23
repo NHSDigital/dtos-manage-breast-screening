@@ -11,7 +11,7 @@ class ApplicationInsightsLogging:
         self.logger_name = os.getenv(
             "APPLICATIONINSIGHTS_LOGGER_NAME", "insights-logger"
         )
-        os.environ.setdefault("OTEL_SERVICE_NAME", self.logger_name)
+        os.environ.setdefault("OTEL_SERVICE_NAME", "manage-breast-screening")
         self.logger = self.getLogger()
 
     def configure_azure_monitor(self):
@@ -20,10 +20,7 @@ class ApplicationInsightsLogging:
         ):
             # Configure OpenTelemetry to use Azure Monitor with the
             # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
-            configure_azure_monitor(
-                # Set the namespace for the logger in which you would like to collect telemetry for if you are collecting logging telemetry. This is imperative so you do not collect logging telemetry from the SDK itself.
-                logger_name=self.logger_name,
-            )
+            configure_azure_monitor()
         else:
             default_logger = logging.getLogger(__name__)
             default_logger.info("Application Insights logging not enabled")
