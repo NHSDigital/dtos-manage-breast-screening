@@ -849,6 +849,7 @@ dependencies = [
     { name = "mesh-client" },
     { name = "nhsuk-frontend-jinja" },
     { name = "ninja-put-patch-file-upload-middleware" },
+    { name = "opentelemetry-instrumentation-psycopg" },
     { name = "pandas" },
     { name = "phonenumbers" },
     { name = "pillow" },
@@ -904,6 +905,7 @@ requires-dist = [
     { name = "mesh-client", specifier = ">=3.2.3,<6.0.0" },
     { name = "nhsuk-frontend-jinja", specifier = "==0.7.2" },
     { name = "ninja-put-patch-file-upload-middleware", specifier = ">=0.1.4" },
+    { name = "opentelemetry-instrumentation-psycopg", specifier = ">=0.60b0" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
     { name = "phonenumbers", specifier = ">=9.0.22" },
     { name = "pillow", specifier = ">=12.1.0" },
@@ -1223,6 +1225,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ae/e0/69473f925acfe2d4edf5c23bcced36906ac3627aa7c5722a8e3f60825f3b/opentelemetry_instrumentation_logging-0.61b0.tar.gz", hash = "sha256:feaa30b700acd2a37cc81db5f562ab0c3a5b6cc2453595e98b72c01dcf649584", size = 17906, upload-time = "2026-03-04T14:20:37.398Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/e0/0e/2137db5239cc5e564495549a4d11488a7af9b48fc76520a0eea20e69ddae/opentelemetry_instrumentation_logging-0.61b0-py3-none-any.whl", hash = "sha256:6d87e5ded6a0128d775d41511f8380910a1b610671081d16efb05ac3711c0074", size = 17076, upload-time = "2026-03-04T14:19:36.765Z" },
+]
+
+[[package]]
+name = "opentelemetry-instrumentation-psycopg"
+version = "0.60b0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-instrumentation-dbapi" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/30/cb/b6622cbe99bf0c7ac9c0524683ac1813089cf53e25b81717e45791543c8d/opentelemetry_instrumentation_psycopg-0.60b0.tar.gz", hash = "sha256:3bc1dcc8a7c978fc42ef2f0ea105549fe2e232c846a84dbda2eb29505a96a2aa", size = 11522, upload-time = "2025-12-03T13:22:25.101Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/42/0f/dd2eef63f74e24582410c4cc2a08c5865f3389766abb053fdec4626057d4/opentelemetry_instrumentation_psycopg-0.60b0-py3-none-any.whl", hash = "sha256:48ba9c689aac490fde9f4133e3e241edf39c89ebf2b4682d23d2da265126f0ab", size = 11630, upload-time = "2025-12-03T13:21:29.033Z" },
 ]
 
 [[package]]
