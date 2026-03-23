@@ -267,6 +267,7 @@ class TestGatewayImageDetailsForm:
             "imperfect_but_best_possible": False,
             "lmlo_count": 1,
             "lcc_count": 0,
+            "left_eklund_count": 0,
             "not_all_mammograms_taken": True,
             "reasons_incomplete": [
                 IncompleteImagesReason.TECHNICAL_ISSUES,
@@ -274,5 +275,6 @@ class TestGatewayImageDetailsForm:
             "reasons_incomplete_details": "",
             "rmlo_count": 1,
             "rcc_count": 0,
+            "right_eklund_count": 0,
             "should_recall": GatewayImageDetailsForm.RecallChoices.TO_BE_RECALLED,
         }

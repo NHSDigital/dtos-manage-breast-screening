@@ -33,6 +33,11 @@
           {% with images=images["RCC"], laterality="RCC", side="right" %}
             {% include "mammograms/_image_set.jinja" %}
           {% endwith %}
+          {% if images["Right Eklund"] | length > 0 %}
+            {% with images=images["Right Eklund"], laterality="Right Eklund", side="right" %}
+              {% include "mammograms/_image_set.jinja" %}
+            {% endwith %}
+          {% endif %}
         </div>
       {% endset %}
       {{ card({
@@ -52,6 +57,11 @@
           {% with images=images["LCC"], laterality="LCC", side="left" %}
             {% include "mammograms/_image_set.jinja" %}
           {% endwith %}
+          {% if images["Left Eklund"] | length > 0 %}
+            {% with images=images["Left Eklund"], laterality="Left Eklund", side="left" %}
+              {% include "mammograms/_image_set.jinja" %}
+            {% endwith %}
+          {% endif %}
         </div>
       {% endset %}
       {{ card({
@@ -72,5 +82,7 @@
 
 <input type="hidden" name="lmlo_count" value="{{ images["LMLO"]|length }}" />
 <input type="hidden" name="lcc_count" value="{{ images["LCC"]|length }}" />
+<input type="hidden" name="left_eklund_count" value="{{ images["Left Eklund"]|length }}" />
 <input type="hidden" name="rmlo_count" value="{{ images["RMLO"]|length }}" />
 <input type="hidden" name="rcc_count" value="{{ images["RCC"]|length }}" />
+<input type="hidden" name="right_eklund_count" value="{{ images["Right Eklund"]|length }}" />
