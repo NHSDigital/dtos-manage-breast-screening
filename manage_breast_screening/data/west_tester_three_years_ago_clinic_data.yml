@@ -57,10 +57,7 @@ clinic:
                 - 8 Joanna mill
               postcode: DN4 5PH
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -120,10 +117,7 @@ clinic:
                 - Johnston light
               postcode: E4 6HL
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -155,10 +149,7 @@ clinic:
                 - 96 Ann court
               postcode: G8 2LA
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -221,10 +212,7 @@ clinic:
                 - 7 Sheppard groves
               postcode: NW6 2XG
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -257,10 +245,7 @@ clinic:
                 - Porter branch
               postcode: ME9B 4XW
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -292,10 +277,7 @@ clinic:
                 - 63 Christian mall
               postcode: GY7Y 5AP
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -383,10 +365,7 @@ clinic:
                 - Stacey drive
               postcode: N4B 3AF
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -449,10 +428,7 @@ clinic:
                 - 503 Chamberlain village
               postcode: M4U 3XA
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
@@ -594,10 +570,7 @@ clinic:
                 - Cooper lodge
               postcode: WV1 6UZ
         previous_mammograms:
-          - location_type: NHS_BREAST_SCREENING_UNIT
-            provider:
-              id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-              name: West Tester Hospital Trust
+          - location_type: SAME_PROVIDER
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT

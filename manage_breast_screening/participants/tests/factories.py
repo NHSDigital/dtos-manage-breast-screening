@@ -15,7 +15,6 @@ from factory.fuzzy import FuzzyChoice
 
 from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
-    ProviderFactory,
 )
 from manage_breast_screening.participants.models import (
     BenignLumpHistoryItem,
@@ -170,21 +169,16 @@ class ParticipantReportedMammogramFactory(DjangoModelFactory):
         model = models.ParticipantReportedMammogram
 
     appointment = SubFactory(AppointmentFactory)
-    location_type = (
-        models.ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT
-    )
-    provider = SubFactory(ProviderFactory)
+    location_type = models.ParticipantReportedMammogram.LocationType.SAME_PROVIDER
 
     class Params:
         outside_uk = Trait(
             location_type=models.ParticipantReportedMammogram.LocationType.OUTSIDE_UK,
             location_details="france",
-            provider=None,
         )
         elsewhere_uk = Trait(
             location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             location_details="private provider",
-            provider=None,
         )
 
 

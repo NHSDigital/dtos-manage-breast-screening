@@ -6,6 +6,9 @@ import pytest
 from pytest_django.asserts import assertInHTML
 
 from manage_breast_screening.mammograms.presenters import LastKnownMammogramPresenter
+from manage_breast_screening.participants.models.reported_mammograms import (
+    ParticipantReportedMammogram,
+)
 
 from ..factories import ParticipantReportedMammogramFactory
 
@@ -15,6 +18,7 @@ class TestScreeningDetails:
     def presented_mammograms(self):
         mammogram = ParticipantReportedMammogramFactory.build(
             outside_uk=True,
+            date_type=ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS,
             location_details="france",
             approx_date="2021",
             created_at=datetime(2025, 1, 1, tzinfo=timezone.utc),
@@ -59,7 +63,7 @@ class TestScreeningDetails:
                 <div data-testid="mammograms">
                     <p>
                         <span class="nhsuk-u-font-weight-bold">Added today</span><br>
-                        Approximate date: 2021<br>
+                        Taken 6 months or more ago: 2021<br>
                         Outside the UK: france
                     </p>
                 </div>

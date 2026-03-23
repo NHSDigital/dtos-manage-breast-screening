@@ -24,7 +24,7 @@ class TestAppointmentProceedAnywayForm:
     def participant_reported_mammogram(self, appointment):
         return ParticipantReportedMammogramFactory.create(
             appointment=appointment,
-            location_type=ParticipantReportedMammogram.LocationType.NHS_BREAST_SCREENING_UNIT,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         )
 
     def test_missing_reason_for_continuing(
