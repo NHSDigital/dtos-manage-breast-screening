@@ -168,25 +168,22 @@ DATABASES = {
         "PORT": environ.get("DATABASE_PORT", "5432"),
         "OPTIONS": {
             "sslmode": environ.get("DATABASE_SSLMODE", "prefer"),
-            # Prevent Azure NAT from silently dropping idle connections (~4-min
-            # timeout); without this the first post-idle request stalls ~10 s
-            # waiting for TCP retransmits against a dead connection.
+            # Prevent Azure NAT from silently dropping idle connections.
+            # Azure's NAT idle timeout is ~4 minutes; keepalives ensure the OS
+            # detects a dead connection quickly rather than waiting for TCP
+            # retransmit timeout (~10 s) on the next request.
             "keepalives": 1,
-            "keepalives_idle": 10,
+            "keepalives_idle": 60,
             "keepalives_interval": 10,
             "keepalives_count": 5,
-            # https://docs.djangoproject.com/en/6.0/ref/databases/#connection-pool
-            "pool": {
-                "min_size": 1,
-                "max_size": 10,
-            },
         },
         "TIME_ZONE": "Europe/London",
-        # The pod authenticates to PostgreSQL via Azure AD managed identity (ManagedIdentityCredential).
-        # CONN_MAX_AGE must be 0 when using psycopg3 connection pooling — the pool
-        # manages connection lifetime independently of Django's thread-local mechanism.
-        # https://docs.djangoproject.com/en/6.0/ref/settings/#conn-max-age
-        "CONN_MAX_AGE": 0,
+        # Persistent connections: Django reuses the connection for up to 3 minutes,
+        # then closes and reopens it on the next request. This keeps connections
+        # alive well within Azure's NAT idle timeout (~4 min) so they are never
+        # silently dropped, and ensures get_connection_params() is called for each
+        # new connection so a fresh Azure AD token is always used.
+        "CONN_MAX_AGE": 180,
         "CONN_HEALTH_CHECKS": True,
     }
 }
