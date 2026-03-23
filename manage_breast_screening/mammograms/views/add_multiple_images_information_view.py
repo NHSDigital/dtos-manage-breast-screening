@@ -51,7 +51,7 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
         if form.is_stale():
             messages.add_message(
                 request,
-                messages.WARNING,
+                messages.INFO,
                 "The image details have changed. Please review and continue.",
             )
             return redirect(

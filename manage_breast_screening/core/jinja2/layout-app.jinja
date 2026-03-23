@@ -68,20 +68,12 @@
         request, message_type='success'
       ) %}
 
-    {% set warning_notification_params = get_notification_banner_params(
-        request, message_type='warning'
-      ) %}
-
     {% if success_notification_params %}
       {{ notificationBanner(success_notification_params) }}
     {% endif %}
 
     {% if info_notification_params %}
       {{ notificationBanner(info_notification_params) }}
-    {% endif %}
-
-    {% if warning_notification_params %}
-      {{ notificationBanner(warning_notification_params) }}
     {% endif %}
   {% endblock flash_messages %}
 
