@@ -104,5 +104,13 @@ class TestRecordingBreastFeatures(SystemTestCase):
         card = self.page.locator("#breast-features")
         expect(card).to_contain_text("1 breast feature recorded")
 
+        # Check the diagram is there
+        figure = card.get_by_role("figure")
+        expect(figure).to_be_attached()
+
+        # Check the region is considered selected by the image map
+        region = figure.locator(".app-breast-diagram__regions-right .right_central")
+        expect(region).to_have_attribute("data-active", "true")
+
     def when_i_click_on_the_view_or_edit_button(self):
         self.page.get_by_text("View or edit breast features").click()

@@ -1,20 +1,41 @@
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
 
-<div class="app-breast-diagram__side-labels">
-  <span>Right</span>
-  <span>Left</span>
-</div>
+<div {{- nhsukAttributes({
+  "class": "app-breast-diagram",
+  "data-module": "app-breast-diagram",
+  "data-debug": {
+    "value": "true" if params.debug else false,
+    "optional": true
+  },
+  "data-read-only": {
+    "value": "true" if params.read_only else false,
+    "optional": true
+  }
+}) -}}>
+  {% if caller or params.html %}
+    {{ caller() if caller else params.html | safe | trim | indent(4) }}
+  {% elif params.text %}
+    <p class="nhsuk-body">
+      {{ params.text | trim | indent(6) }}
+    </p>
+  {% endif %}
 
-<figure
-  {{- nhsukAttributes({
-    "class": "app-breast-diagram__image-map nhsuk-u-width-full",
-    "data-module": "app-image-map"
-  }) -}}
+  <div class="app-breast-diagram__side-labels">
+    <span>Right</span>
+    <span>Left</span>
+  </div>
 
-  {{- nhsukAttributes(params.attributes) -}}>
-{% if params.version == 1 %}
-{% include "components/breast-diagram/v1.svg" %}
-{% endif %}
+  <figure
+    {{- nhsukAttributes({
+      "class": "app-breast-diagram__image-map nhsuk-u-width-full",
+      "data-module": "app-image-map"
+    }) -}}
+
+    {{- nhsukAttributes(params.image_map.attributes) -}}>
+  {% if params.version == 1 %}
+    {% include "components/breast-diagram/v1.svg" %}
+  {% endif %}
+  </figure>
 
 {% if params.debug %}
   {{ summaryList({
@@ -59,4 +80,4 @@
     ]
   }) }}
 {% endif %}
-</figure>
+</div>

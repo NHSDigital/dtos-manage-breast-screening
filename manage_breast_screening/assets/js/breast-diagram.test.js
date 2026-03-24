@@ -1,3 +1,5 @@
+import { createAll } from 'nhsuk-frontend'
+
 import { BreastDiagram } from './breast-diagram.js'
 import { ImageMap } from './image-map.js'
 
@@ -47,77 +49,64 @@ beforeEach(() => {
 
 describe('Breast diagram', () => {
   const diagramWithNoFeatures = `
-    <form data-module="app-breast-diagram">
-      <div data-module="app-image-map"></div>
+    <form>
       <input name="features" type="hidden" value="[]">
+      <div data-module="app-breast-diagram">
+        <div data-module="app-image-map"></div>
+      </div>
     </form>`
 
   const diagramWithAFeatureMarked = `
-    <form data-module="app-breast-diagram">
-      <div data-module="app-image-map"></div>
+    <form>
       <input name="features" type="hidden" value='[{"x": 0, "y": 0, "name": "Pending", "id": "abc"}]'>
+      <div data-module="app-breast-diagram">
+        <div data-module="app-image-map"></div>
+      </div>
     </form>`
 
   it('parses an empty list of values when the feature JSON is empty', () => {
     document.body.innerHTML = diagramWithNoFeatures
-    const $root = document.querySelector(
-      `[data-module='${BreastDiagram.moduleName}']`
-    )
 
-    const diagram = new BreastDiagram($root)
-    expect(diagram.values).toHaveLength(0)
+    const [component] = createAll(BreastDiagram)
+
+    expect(component.values).toHaveLength(0)
   })
 
   it('parses a feature when the feature JSON is non-empty', () => {
     document.body.innerHTML = diagramWithAFeatureMarked
-    const $root = document.querySelector(
-      `[data-module='${BreastDiagram.moduleName}']`
-    )
 
-    const diagram = new BreastDiagram($root)
+    const [component] = createAll(BreastDiagram)
 
-    expect(diagram.values).toEqual([dummyFeature])
+    expect(component.values).toEqual([dummyFeature])
   })
 
   it('adds a feature', () => {
     document.body.innerHTML = diagramWithNoFeatures
-    const $root = document.querySelector(
-      `[data-module='${BreastDiagram.moduleName}']`
-    )
 
-    const diagram = new BreastDiagram($root)
+    const [component] = createAll(BreastDiagram)
+    component.add(dummyFeature)
 
-    diagram.add(dummyFeature)
-
-    expect(diagram.values).toEqual([dummyFeature])
+    expect(component.values).toEqual([dummyFeature])
   })
 
   it('removes a feature', () => {
     document.body.innerHTML = diagramWithAFeatureMarked
-    const $root = document.querySelector(
-      `[data-module='${BreastDiagram.moduleName}']`
-    )
 
-    const diagram = new BreastDiagram($root)
+    const [component] = createAll(BreastDiagram)
+    component.remove(dummyFeature)
 
-    diagram.remove(dummyFeature)
-
-    expect(diagram.values).toEqual([])
+    expect(component.values).toEqual([])
   })
 
   it('writes JSON to the input', () => {
     document.body.innerHTML = diagramWithAFeatureMarked
-    const $root = document.querySelector(
-      `[data-module='${BreastDiagram.moduleName}']`
+
+    const [component] = createAll(BreastDiagram)
+    component.write()
+
+    expect(component.$input.value).toBe(
+      '[{"x":0,"y":0,"name":"Pending","id":"abc"}]'
     )
-
-    /** @type {HTMLInputElement} */
-    const $input = $root.querySelector('input[name="features"]')
-
-    const diagram = new BreastDiagram($root)
-    diagram.write()
-
-    expect($input.value).toBe('[{"x":0,"y":0,"name":"Pending","id":"abc"}]')
   })
 })
 

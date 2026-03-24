@@ -1,4 +1,5 @@
 import { userEvent } from '@testing-library/user-event'
+import { createAll } from 'nhsuk-frontend'
 
 import { ImageMap } from './image-map.js'
 
@@ -23,16 +24,20 @@ describe('Image map', () => {
 
   it("rejects SVGs if the selectors don't match anything", () => {
     document.body.innerHTML = emptySvg
-    const $root = document.querySelector(
-      `[data-module='${ImageMap.moduleName}']`
-    )
 
-    expect(
-      () =>
-        new ImageMap($root, {
+    expect(() =>
+      createAll(
+        ImageMap,
+        {
           imageClass: 'app-image-map__svg',
           selectors: ['path']
-        })
+        },
+        {
+          onError(error) {
+            throw error
+          }
+        }
+      )
     ).toThrow(
       `${ImageMap.moduleName}: Image paths and polygons (\`path\`) not found`
     )
@@ -40,42 +45,42 @@ describe('Image map', () => {
 
   it('parses the paths from the image', () => {
     document.body.innerHTML = multiPathSvg
-    const $root = document.querySelector('[data-module="app-image-map"]')
-    const map = new ImageMap($root, {
+
+    const [component] = createAll(ImageMap, {
       imageClass: 'app-image-map__svg',
       selectors: ['path', 'polygon']
     })
 
-    expect(map.$paths).toHaveLength(2)
+    expect(component.$paths).toHaveLength(2)
   })
 
   it('notifies on hover', async () => {
     document.body.innerHTML = multiPathSvg
-    const $root = document.querySelector('[data-module="app-image-map"]')
-    const map = new ImageMap($root, {
+
+    const [component] = createAll(ImageMap, {
       imageClass: 'app-image-map__svg',
       selectors: ['path', 'polygon']
     })
 
     const callback = jest.fn()
-    map.addEventListener('hover', callback)
+    component.addEventListener('hover', callback)
 
-    await user.hover(map.$paths[0])
+    await user.hover(component.$paths[0])
     expect(callback).toHaveBeenCalled()
   })
 
   it('notifies on click', async () => {
     document.body.innerHTML = multiPathSvg
-    const $root = document.querySelector('[data-module="app-image-map"]')
-    const map = new ImageMap($root, {
+
+    const [component] = createAll(ImageMap, {
       imageClass: 'app-image-map__svg',
       selectors: ['path', 'polygon']
     })
 
     const callback = jest.fn()
-    map.addEventListener('click', callback)
+    component.addEventListener('click', callback)
 
-    await user.click(map.$paths[0])
+    await user.click(component.$paths[0])
     expect(callback).toHaveBeenCalled()
   })
 })

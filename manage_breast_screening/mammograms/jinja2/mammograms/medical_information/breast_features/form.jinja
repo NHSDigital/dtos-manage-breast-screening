@@ -9,22 +9,9 @@
 
 {% from "components/breast-diagram/macro.jinja" import app_breast_diagram %}
 
-{% set diagram_debug = "debug" in request.GET %}
-{% set diagram_read_only = false %}
-
 {% set form_attributes = {
-  "class": "app-breast-diagram",
   "action": request.path,
   "method": "post",
-  "data-module": "app-breast-diagram",
-  "data-debug": {
-    "value": "true" if diagram_debug else false,
-    "optional": true
-  },
-  "data-read-only": {
-    "value": "true" if diagram_read_only else false,
-    "optional": true
-  },
   "novalidate": {
     "value": true,
     "optional": true
@@ -47,24 +34,24 @@
     <form {{- nhsukAttributes(form_attributes) }}>
       {{ csrf_input }}
 
-      <p class="nhsuk-body" id="breast-diagram-description">
-        Click the diagram to add notable features such as scars, moles, or warts that image readers may need to be aware of. These could be observed by you or reported by the participant.
-      </p>
-
-      <div class="breast-features-diagram-header">
-        <h2 class="nhsuk-heading-m">Where is the feature?</h2>
-      </div>
-
-      {{ app_breast_diagram({
-        "debug": diagram_debug,
-        "read_only": diagram_read_only,
-        "version": diagram_version,
-        "attributes": {
-          "aria-labelledby": "breast-diagram-description"
-        }
-      }) }}
-
       {{ form.features }}
+
+      {% call app_breast_diagram({
+        "debug": "debug" in request.GET,
+        "image_map": {
+          "attributes": {
+            "aria-describedby": "breast-diagram-description"
+          }
+        },
+        "read_only": false,
+        "version": diagram_version
+      }) %}
+        <p class="nhsuk-body" id="breast-diagram-description">
+          Click the diagram to add notable features such as scars, moles, or warts that image readers may need to be aware of. These could be observed by you or reported by the participant.
+        </p>
+
+        <h2 class="nhsuk-heading-m">Where is the feature?</h2>
+      {% endcall %}
 
       <div class="nhsuk-button-group">
         {{ button({
