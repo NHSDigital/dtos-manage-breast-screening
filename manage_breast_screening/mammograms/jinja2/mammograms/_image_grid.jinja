@@ -4,7 +4,7 @@
 {% if image_count > 0 %}
   {% set inset_text_html %}
     <p>
-      {{ image_count }} image{{ " has" if image_count == 1 else "s have" }} been received
+      Receiving images... {{ image_count }} image{{ "" if image_count == 1 else "s" }} received
     </p>
   {% endset %}
 {% else %}
