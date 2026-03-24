@@ -1,20 +1,37 @@
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
 
-<div class="app-breast-diagram__side-labels">
-  <span>Right</span>
-  <span>Left</span>
-</div>
+<div {{- nhsukAttributes({
+  "class": "app-breast-diagram",
+  "data-module": "app-breast-diagram",
+  "data-debug": {
+    "value": "true" if params.debug else false,
+    "optional": true
+  },
+  "data-read-only": {
+    "value": "true" if params.read_only else false,
+    "optional": true
+  }
+}) -}}>
+  <p class="nhsuk-body" id="breast-diagram-description">
+    Click the diagram to add notable features such as scars, moles, or warts that image readers may need to be aware of. These could be observed by you or reported by the participant.
+  </p>
 
-<figure
-  {{- nhsukAttributes({
+  <h2 class="nhsuk-heading-m">Where is the feature?</h2>
+
+  <div class="app-breast-diagram__side-labels">
+    <span>Right</span>
+    <span>Left</span>
+  </div>
+
+  <figure {{- nhsukAttributes({
     "class": "app-breast-diagram__image-map nhsuk-u-width-full",
+    "aria-describedby": "breast-diagram-description",
     "data-module": "app-image-map"
-  }) -}}
-
-  {{- nhsukAttributes(params.attributes) -}}>
+  }) -}}>
 {% if params.version == 1 %}
 {% include "components/breast-diagram/v1.svg" %}
 {% endif %}
+  </figure>
 
 {% if params.debug %}
   {{ summaryList({
@@ -59,4 +76,4 @@
     ]
   }) }}
 {% endif %}
-</figure>
+</div>

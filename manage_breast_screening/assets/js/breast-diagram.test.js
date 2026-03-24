@@ -47,15 +47,19 @@ beforeEach(() => {
 
 describe('Breast diagram', () => {
   const diagramWithNoFeatures = `
-    <form data-module="app-breast-diagram">
-      <div data-module="app-image-map"></div>
-      <input name="features" type="hidden" value="[]">
+    <form>
+      <div data-module="app-breast-diagram">
+        <input name="features" type="hidden" value="[]">
+        <div data-module="app-image-map"></div>
+      </div>
     </form>`
 
   const diagramWithAFeatureMarked = `
-    <form data-module="app-breast-diagram">
-      <div data-module="app-image-map"></div>
-      <input name="features" type="hidden" value='[{"x": 0, "y": 0, "name": "Pending", "id": "abc"}]'>
+    <form>
+      <div data-module="app-breast-diagram">
+        <input name="features" type="hidden" value='[{"x": 0, "y": 0, "name": "Pending", "id": "abc"}]'>
+        <div data-module="app-image-map"></div>
+      </div>
     </form>`
 
   it('parses an empty list of values when the feature JSON is empty', () => {
