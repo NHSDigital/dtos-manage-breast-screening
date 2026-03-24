@@ -48,16 +48,16 @@ beforeEach(() => {
 describe('Breast diagram', () => {
   const diagramWithNoFeatures = `
     <form>
+      <input name="features" type="hidden" value="[]">
       <div data-module="app-breast-diagram">
-        <input name="features" type="hidden" value="[]">
         <div data-module="app-image-map"></div>
       </div>
     </form>`
 
   const diagramWithAFeatureMarked = `
     <form>
+      <input name="features" type="hidden" value='[{"x": 0, "y": 0, "name": "Pending", "id": "abc"}]'>
       <div data-module="app-breast-diagram">
-        <input name="features" type="hidden" value='[{"x": 0, "y": 0, "name": "Pending", "id": "abc"}]'>
         <div data-module="app-image-map"></div>
       </div>
     </form>`
@@ -115,13 +115,12 @@ describe('Breast diagram', () => {
       `[data-module='${BreastDiagram.moduleName}']`
     )
 
-    /** @type {HTMLInputElement} */
-    const $input = $root.querySelector('input[name="features"]')
-
     const diagram = new BreastDiagram($root)
     diagram.write()
 
-    expect($input.value).toBe('[{"x":0,"y":0,"name":"Pending","id":"abc"}]')
+    expect(diagram.$input.value).toBe(
+      '[{"x":0,"y":0,"name":"Pending","id":"abc"}]'
+    )
   })
 })
 
