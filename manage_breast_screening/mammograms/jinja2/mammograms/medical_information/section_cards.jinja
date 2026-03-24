@@ -136,12 +136,12 @@
     {% endset %}
     {{ insetText({
       "html": insetHtml,
-      "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+      "classes": "nhsuk-u-margin-top-0" ~ (" nhsuk-u-margin-bottom-4" if not read_only else "")
     }) }}
   {% endif %}
 
   {% if not read_only %}
-    <div class="nhsuk-form-group">
+    <div class="nhsuk-button-group">
       {{ button({
         "text": presented_medical_info.add_or_update_breast_features_button.text,
         "href": presented_medical_info.add_or_update_breast_features_button.href,
