@@ -3,7 +3,7 @@ from uuid import uuid4
 
 import pytest
 from django.conf import settings
-from jinja2 import ChainableUndefined, Environment, FileSystemLoader
+from jinja2 import ChainableUndefined, ChoiceLoader, Environment, FileSystemLoader
 
 from manage_breast_screening.config.jinja2_env import environment
 from manage_breast_screening.participants.models.appointment import Appointment
@@ -12,7 +12,12 @@ from manage_breast_screening.participants.models.appointment import Appointment
 @pytest.fixture
 def jinja_env() -> Environment:
     return environment(
-        loader=FileSystemLoader(settings.BASE_DIR / "mammograms" / "jinja2"),
+        loader=ChoiceLoader(
+            [
+                FileSystemLoader(settings.BASE_DIR / "mammograms" / "jinja2"),
+                FileSystemLoader(settings.BASE_DIR / "core" / "jinja2"),
+            ]
+        ),
         undefined=ChainableUndefined,
         trim_blocks=True,
         lstrip_blocks=True,

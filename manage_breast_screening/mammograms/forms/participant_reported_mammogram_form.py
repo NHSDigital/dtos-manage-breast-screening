@@ -22,10 +22,12 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
     def __init__(
         self,
         *args,
+        user,
         appointment,
         instance=None,
         **kwargs,
     ):
+        self.user = user
         self.instance = instance
 
         participant = appointment.screening_episode.participant
@@ -211,6 +213,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
 
         instance = ParticipantReportedMammogram(
             appointment=appointment,
+            created_by=self.user,
             **field_values,
         )
 

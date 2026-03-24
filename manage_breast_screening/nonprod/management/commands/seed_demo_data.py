@@ -25,6 +25,7 @@ from manage_breast_screening.participants.tests.factories import (
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
     BreastFeatureAnnotationFactory,
+    ConfirmedPreviousMammogramFactory,
     CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
@@ -270,10 +271,17 @@ class Command(BaseCommand):
 
     def create_participant(self, **participant_key):
         address_key = participant_key.pop("address", None)
+        confirmed_previous_mammograms = participant_key.pop(
+            "confirmed_previous_mammograms", None
+        )
         participant = ParticipantFactory(**participant_key, address=None)
 
         if address_key is not None:
             ParticipantAddressFactory(**address_key, participant=participant)
+
+        if confirmed_previous_mammograms is not None:
+            for mammogram in confirmed_previous_mammograms:
+                ConfirmedPreviousMammogramFactory(participant=participant, **mammogram)
 
         return participant
 
@@ -290,8 +298,6 @@ class Command(BaseCommand):
             if created_at_date is not None:
                 appointment_mammogram.created_at = created_at_date
                 appointment_mammogram.save()
-
-            return appointment_mammogram
 
     def create_study(self, appointment, study_key):
         study = StudyFactory(

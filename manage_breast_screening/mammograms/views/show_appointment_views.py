@@ -4,7 +4,6 @@ from django.views import View
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesPresenterFactory,
 )
-from manage_breast_screening.participants.models import ParticipantReportedMammogram
 
 from ..presenters import (
     AppointmentPresenter,
@@ -23,16 +22,8 @@ class ShowAppointment(AppointmentTabMixin, View):
 
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(
             appointment, tab_description="Appointment details"
-        )
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_mammograms,
-            appointment_pk=appointment.pk,
-            current_url=self.request.path,
         )
 
         context = {
@@ -41,7 +32,6 @@ class ShowAppointment(AppointmentTabMixin, View):
             "page_title": appointment_presenter.page_title,
             "presented_appointment": appointment_presenter,
             "presented_participant": appointment_presenter.participant,
-            "presented_mammograms": last_known_mammogram_presenter,
             "appointment_note": appointment_presenter.note,
             "secondary_nav_items": present_secondary_nav(
                 appointment,
@@ -59,15 +49,7 @@ class ShowAppointment(AppointmentTabMixin, View):
 class ParticipantDetails(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
         appointment_presenter = AppointmentPresenter(appointment)
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_mammograms,
-            appointment_pk=appointment.pk,
-            current_url=self.request.path,
-        )
 
         context = {
             "heading": appointment_presenter.participant.full_name,
@@ -75,7 +57,6 @@ class ParticipantDetails(AppointmentTabMixin, View):
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
             "presented_participant": appointment_presenter.participant,
-            "presented_mammograms": last_known_mammogram_presenter,
             "secondary_nav_items": present_secondary_nav(
                 appointment,
                 current_tab="participant",
@@ -93,12 +74,19 @@ class MedicalInformation(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=appointment.pk
-        ).order_by("-created_at")
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
-            last_known_mammograms,
-            appointment_pk=appointment.pk,
+        participant = appointment.participant
+        last_confirmed_mammogram = participant.last_confirmed_mammogram
+        reported_mammograms = self.appointment.recent_reported_mammograms(
+            since_date=last_confirmed_mammogram.exact_date
+            if last_confirmed_mammogram
+            else None
+        )
+
+        presented_mammograms = LastKnownMammogramPresenter(
+            self.request.user,
+            reported_mammograms=reported_mammograms,
+            last_confirmed_mammogram=last_confirmed_mammogram,
+            appointment_pk=self.appointment.pk,
             current_url=self.request.path,
         )
 
@@ -108,7 +96,7 @@ class MedicalInformation(AppointmentTabMixin, View):
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
             "presenter": MedicalInformationPresenter(appointment),
-            "presented_mammograms": last_known_mammogram_presenter,
+            "presented_mammograms": presented_mammograms,
             "secondary_nav_items": present_secondary_nav(
                 appointment,
                 current_tab="medical_information",

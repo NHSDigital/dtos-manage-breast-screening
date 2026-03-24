@@ -46,7 +46,6 @@ from manage_breast_screening.manual_images.services import StudyService
 from manage_breast_screening.participants.models import (
     Appointment,
     MedicalInformationSection,
-    ParticipantReportedMammogram,
 )
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
@@ -109,12 +108,17 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         participant = self.participant
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=self.appointment.pk
-        ).order_by("-created_at")
+        last_confirmed_mammogram = participant.last_confirmed_mammogram
+        reported_mammograms = self.appointment.recent_reported_mammograms(
+            since_date=last_confirmed_mammogram.exact_date
+            if last_confirmed_mammogram
+            else None
+        )
 
         presented_mammograms = LastKnownMammogramPresenter(
-            last_known_mammograms,
+            self.request.user,
+            reported_mammograms=reported_mammograms,
+            last_confirmed_mammogram=last_confirmed_mammogram,
             appointment_pk=self.appointment.pk,
             current_url=self.request.path,
         )
