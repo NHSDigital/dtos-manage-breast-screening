@@ -1,3 +1,6 @@
 {% macro app_breast_diagram(params) %}
+  {% if caller %}
+  {# noop for Jinja support #}
+  {% endif %}
   {%- include "components/breast-diagram/template.jinja" -%}
 {% endmacro %}
