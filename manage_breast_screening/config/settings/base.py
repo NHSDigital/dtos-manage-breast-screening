@@ -297,7 +297,7 @@ LOGGING = {
         },
         "faker": {"level": "INFO"},
         "msal": {"level": "INFO"},
-        "azure.monitor.opentelemetry": {"level": "INFO"},
+        "azure.monitor.opentelemetry": {"level": "WARNING"},
         "azure.core.pipeline.policies.http_logging_policy": {"level": "WARNING"},
     },
 }
