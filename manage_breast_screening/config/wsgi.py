@@ -7,6 +7,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/
 """
 
+import logging
 import os
 
 from django.core.wsgi import get_wsgi_application
@@ -16,3 +17,22 @@ os.environ.setdefault(
 )
 
 application = get_wsgi_application()
+
+# Warm up the database connection so the first user request does not pay
+# the TCP+TLS+IMDS+Postgres-auth round-trip cost.
+#
+# Django reuses persistent connections (CONN_MAX_AGE), but does not create
+# them eagerly. Without this, the first real request in each gunicorn worker
+# would pay that cost (typically 1–5 s after an idle period in Azure).
+#
+# Gunicorn does not preload the app by default, so this code runs once in
+# each worker process before it starts accepting connections.
+_logger = logging.getLogger(__name__)
+try:
+    from django.db import connection
+
+    connection.ensure_connection()
+    connection.close()
+    _logger.info("Database connection warmed up")
+except Exception:
+    _logger.warning("Database connection warmup failed", exc_info=True)
