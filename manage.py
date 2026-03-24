@@ -8,7 +8,7 @@ import sys
 def main():
     """Run administrative tasks."""
     os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE", "manage_breast_screening.config.settings"
+        "DJANGO_SETTINGS_MODULE", "manage_breast_screening.config.settings.local"
     )
     try:
         from django.core.management import execute_from_command_line

@@ -3,7 +3,7 @@ import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
 
-from manage_breast_screening.config.settings import boolean_env
+from manage_breast_screening.config.settings.base import boolean_env
 
 
 class ApplicationInsightsLogging:
