@@ -13,9 +13,7 @@ from factory.declarations import (
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
-from manage_breast_screening.clinics.tests.factories import (
-    ClinicSlotFactory,
-)
+from manage_breast_screening.clinics.tests.factories import ClinicSlotFactory
 from manage_breast_screening.participants.models import (
     BenignLumpHistoryItem,
     BreastCancerHistoryItem,
@@ -24,6 +22,9 @@ from manage_breast_screening.participants.models import (
     MastectomyOrLumpectomyHistoryItem,
     MedicalInformationSection,
     OtherProcedureHistoryItem,
+)
+from manage_breast_screening.participants.models.breast_features import (
+    BreastFeatureAnnotation,
 )
 from manage_breast_screening.participants.models.other_information.hormone_replacement_therapy import (
     HormoneReplacementTherapy,
@@ -342,6 +343,13 @@ class PregnancyAndBreastfeedingFactory(DjangoModelFactory):
     appointment = SubFactory(AppointmentFactory)
     pregnancy_status = PregnancyAndBreastfeeding.PregnancyStatus.NO
     breastfeeding_status = PregnancyAndBreastfeeding.BreastfeedingStatus.NO
+
+
+class BreastFeatureAnnotationFactory(DjangoModelFactory):
+    class Meta:
+        model = BreastFeatureAnnotation
+
+    appointment = SubFactory(AppointmentFactory)
 
 
 class OtherMedicalInformationFactory(DjangoModelFactory):

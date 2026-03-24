@@ -24,6 +24,7 @@ from manage_breast_screening.participants.tests.factories import (
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
+    BreastFeatureAnnotationFactory,
     CystHistoryItemFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
     MastectomyOrLumpectomyHistoryItemFactory,
@@ -166,6 +167,9 @@ class Command(BaseCommand):
         if "study" in appointment_key:
             self.create_study(appointment, appointment_key["study"])
 
+        if "breast_features" in appointment_key:
+            self.create_breast_features(appointment, appointment_key["breast_features"])
+
         return appointment
 
     def create_screening_episode(self, screening_episode_key):
@@ -248,6 +252,9 @@ class Command(BaseCommand):
 
     def create_breast_augmentation_history_item(self, appointment, item):
         BreastAugmentationHistoryItemFactory(appointment=appointment, **item)
+
+    def create_breast_features(self, appointment, breast_features):
+        BreastFeatureAnnotationFactory(appointment=appointment, **breast_features)
 
     def create_other_procedure_history_item(
         self, appointment, other_procedure_history_item
