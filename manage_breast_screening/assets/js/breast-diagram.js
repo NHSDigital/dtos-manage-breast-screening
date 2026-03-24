@@ -106,9 +106,9 @@ export class BreastDiagram extends ConfigurableComponent {
   render() {
     const { $imageMap, markers, values } = this
 
-    values.forEach(({ id, x, y }, index) => {
-      const $path = $imageMap.getPathById(id)
-      const point = $imageMap.createPoint(x, y, id)
+    values.forEach(({ region_id, x, y }, index) => {
+      const $path = $imageMap.getPathById(region_id)
+      const point = $imageMap.createPoint(x, y, region_id)
 
       // Render active region
       $imageMap.setState('active', $path)
@@ -205,8 +205,8 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     this.add({
-      id: $path.classList.value,
-      name: 'Pending',
+      region_id: $path.classList.value,
+      id: 'pending',
       x: point.x,
       y: point.y
     })
@@ -344,9 +344,11 @@ function isValidObject(value) {
   }
 
   return (
-    Object.keys(value).every((key) => ['id', 'name', 'x', 'y'].includes(key)) &&
+    Object.keys(value).every((key) =>
+      ['id', 'region_id', 'x', 'y'].includes(key)
+    ) &&
     typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
+    typeof value.region_id === 'string' &&
     typeof value.x === 'number' &&
     typeof value.y === 'number'
   )
@@ -378,8 +380,8 @@ function isValid(value) {
  * Breast feature input value
  *
  * @typedef {object} BreastFeature
- * @property {string} id - Image map region ID
- * @property {string} name - Breast feature name
+ * @property {string} id - Breast feature ID
+ * @property {string} region_id - Image map region ID
  * @property {number} x - X coordinate of breast feature
  * @property {number} y - Y coordinate of breast feature
  */

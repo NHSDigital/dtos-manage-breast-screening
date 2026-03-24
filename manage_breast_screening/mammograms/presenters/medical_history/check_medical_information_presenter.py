@@ -1,7 +1,11 @@
+import logging
 from functools import cached_property
 
 from django.urls import reverse
 
+from manage_breast_screening.participants.models.breast_features import (
+    BreastFeatureAnnotation,
+)
 from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
     BreastAugmentationHistoryItem,
 )
@@ -27,6 +31,8 @@ from manage_breast_screening.participants.models.symptom import (
     SymptomType,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class CheckMedicalInformationPresenter:
     def __init__(self, appointment):
@@ -50,6 +56,10 @@ class CheckMedicalInformationPresenter:
     @cached_property
     def symptoms_url(self):
         return self.record_medical_information_url + "#symptoms"
+
+    @cached_property
+    def breast_features_url(self):
+        return self.record_medical_information_url + "#breast-features"
 
     @cached_property
     def other_relevant_information_url(self):
@@ -81,6 +91,20 @@ class CheckMedicalInformationPresenter:
             item["visuallyHiddenText"] = "medical history"
         else:
             item["text"] = "Add medical history"
+        return {"items": [item]}
+
+    @cached_property
+    def breast_features_action(self):
+        has_data = bool(self.breast_features)
+        item = {
+            "href": self.breast_features_url,
+            "classes": "nhsuk-link--no-visited-state",
+        }
+        if has_data:
+            item["text"] = "View or change"
+            item["visuallyHiddenText"] = "breast features"
+        else:
+            item["text"] = "Add breast features"
         return {"items": [item]}
 
     @cached_property
@@ -121,6 +145,27 @@ class CheckMedicalInformationPresenter:
                 return "1 additional mammogram added"
             case _:
                 return f"{self._previous_mammograms_count} additional mammograms added"
+
+    @cached_property
+    def breast_features(self):
+        features = []
+        if not getattr(self.appointment, "breast_features", None):
+            return features
+
+        for feature in self.appointment.breast_features.annotations_json:
+            region_id = feature["region_id"]
+            region_label = region_id.replace("_", " ")
+            feature_id = feature["id"]
+
+            try:
+                feature_label = BreastFeatureAnnotation.FeatureType(feature_id)
+            except ValueError:
+                logger.exception(f"Unknown feature {feature_id}")
+                feature_label = feature_id.replace("_", " ")
+
+            features.append(f"{feature_label} ({region_label})")
+
+        return features
 
     @cached_property
     def symptoms(self):

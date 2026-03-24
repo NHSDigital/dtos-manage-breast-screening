@@ -17,6 +17,7 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
+    BreastFeatureAnnotationFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
 )
 
@@ -255,6 +256,13 @@ class TestCheckInformation(SystemTestCase):
             removal_year=2022,
         )
 
+        BreastFeatureAnnotationFactory.create(
+            appointment=self.appointment,
+            annotations_json=[
+                {"x": 1, "y": 1, "id": "mole", "region_id": "left_upper_outer"}
+            ],
+        )
+
     def and_the_appointment_has_images(self):
         study = Study.objects.create(
             appointment=self.appointment,
@@ -324,6 +332,10 @@ class TestCheckInformation(SystemTestCase):
         row = section.locator(".nhsuk-summary-list__row", has_text="Symptoms")
         value = row.locator(".nhsuk-summary-list__value")
         expect(value).to_contain_text("No symptoms recorded")
+
+        row = section.locator(".nhsuk-summary-list__row", has_text="Breast features")
+        value = row.locator(".nhsuk-summary-list__value")
+        expect(value).to_contain_text("mole (left upper outer)")
 
         row = section.locator(
             ".nhsuk-summary-list__row", has_text="Other relevant information"

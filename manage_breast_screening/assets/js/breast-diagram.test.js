@@ -35,8 +35,8 @@ const dummyPoint = {
  * @type {BreastFeature}
  */
 const dummyFeature = {
-  id: 'abc',
-  name: 'Pending',
+  region_id: 'abc',
+  id: 'pending',
   x: dummyPoint.x,
   y: dummyPoint.y
 }
@@ -58,7 +58,7 @@ describe('Breast diagram', () => {
 
   const diagramWithAFeatureMarked = `
     <form>
-      <input name="features" type="hidden" value='[{"x": 0, "y": 0, "name": "Pending", "id": "abc"}]'>
+      <input name="features" type="hidden" value='[{"x": 0, "y": 0, "id": "pending", "region_id": "abc"}]'>
       <div data-module="app-breast-diagram">
         <div data-module="app-image-map"></div>
       </div>
@@ -105,7 +105,7 @@ describe('Breast diagram', () => {
     component.write()
 
     expect(component.$input.value).toBe(
-      '[{"x":0,"y":0,"name":"Pending","id":"abc"}]'
+      '[{"x":0,"y":0,"id":"pending","region_id":"abc"}]'
     )
   })
 })

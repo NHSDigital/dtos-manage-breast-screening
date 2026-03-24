@@ -20,11 +20,11 @@ class BreastFeatureForm(Form):
             "type": "object",
             "properties": {
                 "id": {"type": "string"},
-                "name": {"type": "string"},
+                "region_id": {"type": "string"},
                 "x": {"type": "number"},
                 "y": {"type": "number"},
             },
-            "required": ["id", "name", "x", "y"],
+            "required": ["id", "region_id", "x", "y"],
             "additionalProperties": False,
         },
     }
