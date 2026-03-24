@@ -116,17 +116,15 @@
   <p>Non-surgical scars, moles and other features that may appear on mammogram images</p>
   {% if presented_medical_info.breast_features %}
     {% set count = presented_medical_info.breast_features.feature_count %}
-    <p>
-      {{ count }} breast {{ "feature" | plural(count) }} recorded
-    </p>
 
     <form>
       <input name="features" type="hidden" value="{{ presented_medical_info.breast_features.features }}" readonly>
       <div class="nhsuk-grid-row">
         <div class="nhsuk-grid-column-two-thirds">
           {{ app_breast_diagram({
-            "version": presented_medical_info.breast_features.diagram_version,
-            "read_only": true
+            "read_only": true,
+            "text": count ~ " breast " ~ "feature" | plural(count) ~ " recorded",
+            "version": presented_medical_info.breast_features.diagram_version
           }) }}
         </div>
       </div>
