@@ -13,3 +13,4 @@
 ## Review checklist
 
 - [ ] Check database queries are correctly scoped to current_provider
+- [ ] If this changes the gateway API (`/api/v1/`), confirm whether it is a breaking change — if so, a new major version (`/api/v2/`) is required (see [ADR-006](../docs/adr/ADR-006-Gateway_API_versioning_strategy.md))
