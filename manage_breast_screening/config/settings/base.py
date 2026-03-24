@@ -37,8 +37,8 @@ DJANGO_ENV = environ.get("DJANGO_ENV", "production")
 ALLOWED_HOSTS = list_env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = list_env("CSRF_TRUSTED_ORIGINS")
 
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = boolean_env("CSRF_COOKIE_SECURE", default=True)
+SESSION_COOKIE_SECURE = boolean_env("SESSION_COOKIE_SECURE", default=True)
 # SECURE_SSL_REDIRECT is set to False because TLS termination is handled at the Azure Container Apps layer
 SECURE_SSL_REDIRECT = False
 
