@@ -1,7 +1,6 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
-{% from "components/participant-details/summary_list_rows.jinja" import last_mammogram_html %}
 {% from "mammograms/medical_information/medical_history/cards/benign_lump_history_card.jinja" import benign_lump_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/breast_augmentation_history_card.jinja" import breast_augmentation_history_card %}
 {% from "mammograms/medical_information/medical_history/cards/breast_cancer_history_card.jinja" import breast_cancer_history_card %}
@@ -15,18 +14,44 @@
 {% macro mammogram_history_content(presented_medical_info, presented_mammograms, read_only=false) %}
   <p>The last confirmed mammogram and any added manually since then</p>
 
+  <h3 class="nhsuk-heading-s">From screening records</h3>
   {{ summaryList({
     "rows": [
       {
         "key": {
-          "text": "Last known mammograms"
+          "text": "Last known mammogram"
         },
         "value": {
-          "html": last_mammogram_html(presented_mammograms, read_only=read_only)
+          "html": confirmed_mammogram_html(presented_mammograms.last_confirmed_mammogram)
         }
-      },
+      }
     ]
   }) }}
+
+  {% set mammogram_rows = [] %}
+  {% for mammogram in presented_mammograms.reported_mammograms %}
+    {% set mammogram_label_html %}
+      {{ mammogram.label }}{% if mammogram.created_by %}<br><span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">{{ mammogram.created_by }}</span>{% endif %}
+    {% endset %}
+    {% set _ = mammogram_rows.append({
+      "key": {
+        "html": mammogram_label_html
+      },
+      "value": {
+        "html": reported_mammogram_html(mammogram)
+      },
+      "actions": {
+        "items": [mammogram.change_link] if not read_only else []
+      },
+    }) %}
+  {% endfor %}
+
+  {% if mammogram_rows %}
+    <h3 class="nhsuk-heading-s">Reported mammograms</h3>
+    {{ summaryList({
+      "rows": mammogram_rows
+    }) }}
+  {% endif %}
 
   {% if not read_only %}
     {{ button({
@@ -34,6 +59,37 @@
       "href": presented_medical_info.add_mammogram_button.href,
       "classes": "nhsuk-button--secondary nhsuk-button--small"
     }) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro reported_mammogram_html(mammogram) %}
+  {% if mammogram.date.is_exact %}
+    {{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-colour">({{ mammogram.date.relative }})</span>
+  {% else %}
+    {{ mammogram.date.value }}
+  {% endif %}
+
+  <br>{{ mammogram.location }}
+
+  {% if mammogram.reason_for_continuing %}
+    <br>Reason for continuing with mammograms: {{ mammogram.reason_for_continuing | nl2br }}
+  {% endif %}
+
+  {% if mammogram.different_name %}
+    <br>Previous name: {{ mammogram.different_name }}
+  {% endif %}
+
+  {% if mammogram.additional_information %}
+    <br>Additional information: {{ mammogram.additional_information | nl2br }}
+  {% endif %}
+{% endmacro %}
+
+{% macro confirmed_mammogram_html(mammogram) %}
+  {% if mammogram %}
+    {{ mammogram.date.absolute }} <span class="nhsuk-u-secondary-text-colour">({{ mammogram.date.relative }})</span>
+    <br>{{ mammogram.location }}
+  {% else %}
+    <span class="nhsuk-u-secondary-text-colour">Not known</span>
   {% endif %}
 {% endmacro %}
 

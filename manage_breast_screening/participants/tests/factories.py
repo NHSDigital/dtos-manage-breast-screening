@@ -170,6 +170,7 @@ class ParticipantReportedMammogramFactory(DjangoModelFactory):
 
     appointment = SubFactory(AppointmentFactory)
     location_type = models.ParticipantReportedMammogram.LocationType.SAME_PROVIDER
+    created_by = SubFactory(UserFactory)
 
     class Params:
         outside_uk = Trait(
@@ -180,6 +181,15 @@ class ParticipantReportedMammogramFactory(DjangoModelFactory):
             location_type=models.ParticipantReportedMammogram.LocationType.ELSEWHERE_UK,
             location_details="private provider",
         )
+
+
+class ConfirmedPreviousMammogramFactory(DjangoModelFactory):
+    class Meta:
+        model = models.ConfirmedPreviousMammogram
+
+    participant = SubFactory(ParticipantFactory)
+    exact_date = date(2020, 1, 1)
+    location_details = "Some details about the previous mammogram"
 
 
 class MedicalInformationReviewFactory(DjangoModelFactory):

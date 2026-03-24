@@ -32,6 +32,10 @@ class Participant(BaseModel):
     )
 
     @property
+    def last_confirmed_mammogram(self):
+        return self.confirmed_previous_mammograms.order_by("-exact_date").first()
+
+    @property
     def appointments(self):
         return Appointment.objects.filter(screening_episode__participant=self)
 
