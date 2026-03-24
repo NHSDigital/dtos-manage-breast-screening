@@ -11,6 +11,9 @@ DATABASE_HOST=localhost
 LOG_QUERIES=0
 PERSONAS_ENABLED=1
 
+CSRF_COOKIE_SECURE=False
+SESSION_COOKIE_SECURE=False
+
 # Set to FQDN in deployed environments
 BASE_URL=http://localhost:8000
 
