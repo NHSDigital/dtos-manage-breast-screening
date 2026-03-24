@@ -180,11 +180,24 @@ DATABASES = {
         "PASSWORD": environ.get("DATABASE_PASSWORD", ""),
         "HOST": environ.get("DATABASE_HOST", ""),
         "PORT": environ.get("DATABASE_PORT", "5432"),
-        "OPTIONS": {"sslmode": environ.get("DATABASE_SSLMODE", "prefer")},
+        "OPTIONS": {
+            "sslmode": environ.get("DATABASE_SSLMODE", "prefer"),
+            # Prevent Azure NAT from silently dropping idle connections.
+            # Azure's NAT idle timeout is ~4 minutes; keepalives ensure the OS
+            # detects a dead connection quickly rather than waiting for TCP
+            # retransmit timeout (~10 s) on the next request.
+            "keepalives": 1,
+            "keepalives_idle": 60,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
+        },
         "TIME_ZONE": "Europe/London",
-        # The pod authenticates to PostgreSQL via Azure AD managed identity (DefaultAzureCredential).
-        # Tokens last ~60-75 minutes. CONN_MAX_AGE must be shorter than the token lifetime to avoid reusing connections with expired tokens.
-        "CONN_MAX_AGE": int(environ.get("DATABASE_CONN_MAX_AGE", "0")),
+        # Persistent connections: Django reuses the connection for up to 3 minutes,
+        # then closes and reopens it on the next request. This keeps connections
+        # alive well within Azure's NAT idle timeout (~4 min) so they are never
+        # silently dropped, and ensures get_connection_params() is called for each
+        # new connection so a fresh Azure AD token is always used.
+        "CONN_MAX_AGE": 180,
         "CONN_HEALTH_CHECKS": True,
     }
 }
@@ -314,7 +327,7 @@ LOGGING = {
         },
         "faker": {"level": "INFO"},
         "msal": {"level": "INFO"},
-        "azure.monitor.opentelemetry": {"level": "INFO"},
+        "azure.monitor.opentelemetry": {"level": "WARNING"},
         "azure.core.pipeline.policies.http_logging_policy": {"level": "WARNING"},
     },
 }

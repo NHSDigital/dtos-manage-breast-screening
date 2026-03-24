@@ -2,8 +2,24 @@ import logging
 import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
+from opentelemetry.instrumentation.psycopg import PsycopgInstrumentor
+from opentelemetry.sdk.trace.sampling import ALWAYS_ON, ParentBased, TraceIdRatioBased
+from opentelemetry.trace.span import TraceState
+from opentelemetry.util.types import Attributes
 
 from manage_breast_screening.config.settings import boolean_env
+
+
+class _HealthCheckSampler(ParentBased):
+    _healthcheck_sampler = TraceIdRatioBased(0.01)
+
+    def should_sample(self, parent_context, trace_id, name, kind=None, attributes: Attributes = None, links=None, trace_state: TraceState = None):
+        if attributes and str(attributes.get("http.target", "")).startswith("/healthcheck"):
+            return self._healthcheck_sampler.should_sample(parent_context, trace_id, name, kind, attributes, links, trace_state)
+        return super().should_sample(parent_context, trace_id, name, kind, attributes, links, trace_state)
+
+    def __init__(self):
+        super().__init__(root=ALWAYS_ON)
 
 
 class ApplicationInsightsLogging:
@@ -20,7 +36,8 @@ class ApplicationInsightsLogging:
         ):
             # Configure OpenTelemetry to use Azure Monitor with the
             # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
-            configure_azure_monitor()
+            configure_azure_monitor(sampler=_HealthCheckSampler())
+            PsycopgInstrumentor().instrument(capture_parameters=True)
         else:
             default_logger = logging.getLogger(__name__)
             default_logger.info("Application Insights logging not enabled")
