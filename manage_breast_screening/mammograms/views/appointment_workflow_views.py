@@ -109,12 +109,21 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         participant = self.participant
-        last_known_mammograms = ParticipantReportedMammogram.objects.filter(
-            appointment_id=self.appointment.pk
-        ).order_by("-created_at")
+        reported_mammograms = (
+            ParticipantReportedMammogram.objects.filter(
+                appointment_id=self.appointment.pk
+            )
+            .select_related(
+                "created_by",
+                "appointment__clinic_slot__clinic__setting__provider",
+            )
+            .order_by("-created_at")
+        )
 
         presented_mammograms = LastKnownMammogramPresenter(
-            last_known_mammograms,
+            self.request.user,
+            reported_mammograms=reported_mammograms,
+            last_confirmed_mammogram=participant.last_confirmed_mammogram,
             appointment_pk=self.appointment.pk,
             current_url=self.request.path,
         )

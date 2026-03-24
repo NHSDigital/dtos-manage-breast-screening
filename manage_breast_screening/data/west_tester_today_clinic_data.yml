@@ -32,6 +32,33 @@ clinic:
                 - 216 Clinic Road
                 - Sheffield
               postcode: L3 4N8
+            confirmed_previous_mammograms:
+              - location_details: West of London BSS
+                exact_date: '2025-07-25'
+              - location_details: East of London BSS
+                exact_date: '2025-07-26'
+        previous_mammograms:
+          - location_type: OUTSIDE_UK
+            location_details: Paris, France
+            approx_date: 'Summer 1990'
+            date_type: MORE_THAN_SIX_MONTHS
+          - location_type: ELSEWHERE_UK
+            location_details: Nuffield health clinic, Cornwall
+            exact_date: '2000-01-01'
+            date_type: EXACT
+          - location_type: ANOTHER_NHS_PROVIDER
+            location_details: Doncaster & Bassetlaw
+            exact_date: '2024-08-30'
+            date_type: EXACT
+          - location_type: SAME_PROVIDER
+            exact_date: '2025-07-25'
+            date_type: EXACT
+            different_name: Claire Smith
+            additional_information: Had a name change since my last mammogram
+          - location_type: PREFER_NOT_TO_SAY
+            approx_date: 'January 2026'
+            date_type: LESS_THAN_SIX_MONTHS
+            reason_for_continuing: A reason for continuing
     - id: 85c73ada-3a17-4df3-91fe-1b0ee0648670
       duration_in_minutes: 8
       starts_at_time: 09:08
