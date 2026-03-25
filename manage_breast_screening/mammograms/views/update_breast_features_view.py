@@ -17,12 +17,18 @@ class UpdateBreastFeaturesView(InProgressAppointmentMixin, FormView):
         return form_class(appointment=self.appointment, **self.get_form_kwargs())
 
     def get_context_data(self, **kwargs):
+        if hasattr(self.appointment, "breast_features"):
+            features = self.appointment.breast_features.annotations_json
+        else:
+            features = []
+
         context = super().get_context_data(**kwargs)
         context.update(
             {
                 "heading": "Record breast features",
                 "caption": self.participant.full_name,
                 "page_title": "Record breast features",
+                "features": features,
                 "diagram_version": 1,
                 "back_link_params": {
                     "href": reverse(

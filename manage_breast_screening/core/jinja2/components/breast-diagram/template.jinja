@@ -1,5 +1,6 @@
-{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+{% from "components/breast-features/macro.jinja" import app_breast_features %}
 
 <div {{- nhsukAttributes({
   "class": "app-breast-diagram",
@@ -37,6 +38,13 @@
     {% include "components/breast-diagram/v1.svg" %}
   {% endif %}
   </figure>
+
+{% if params.features | length %}
+  {{ app_breast_features({
+    "items": params.features,
+    "read_only": params.read_only
+  }) | trim | indent(2) }}
+{% endif %}
 
 {% if params.debug %}
   {{ summaryList({
@@ -79,6 +87,6 @@
         "classes": "nhsuk-summary-list__row--no-border"
       }
     ]
-  }) }}
+  }) | trim | indent(2) }}
 {% endif %}
 </div>
