@@ -62,10 +62,12 @@ class StudyService:
         grouped_images = {
             "LCC": [],
             "LMLO": [],
-            "Left Eklund": [],
+            "LCCID": [],
+            "LMLOID": [],
             "RCC": [],
             "RMLO": [],
-            "Right Eklund": [],
+            "RCCID": [],
+            "RMLOID": [],
         }
         for image in images:
             if image.laterality_and_view in grouped_images:

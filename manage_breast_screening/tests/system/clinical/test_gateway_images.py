@@ -122,13 +122,13 @@ class TestGatewayImages(SystemTestCase):
         )
 
     def and_i_see_the_images(self):
-        expect(self.page.get_by_test_id("mammogram-image-RMLO-1")).to_be_visible()
         expect(self.page.get_by_test_id("mammogram-image-RCC-1")).to_be_visible()
         expect(self.page.get_by_test_id("mammogram-image-RCC-2")).to_be_visible()
-        expect(self.page.get_by_test_id("mammogram-image-LMLO-1")).to_be_visible()
+        expect(self.page.get_by_test_id("mammogram-image-RMLO-1")).to_be_visible()
+        expect(self.page.get_by_test_id("mammogram-image-RMLOID-1")).to_be_visible()
         expect(self.page.get_by_test_id("mammogram-image-LCC-1")).to_be_visible()
-        expect(self.page.get_by_test_id("mammogram-image-Right Eklund-1")).to_be_visible()
-        expect(self.page.get_by_test_id("mammogram-image-Left Eklund-1")).to_be_visible()
+        expect(self.page.get_by_test_id("mammogram-image-LMLO-1")).to_be_visible()
+        expect(self.page.get_by_test_id("mammogram-image-LCCID-1")).to_be_visible()
 
     def when_i_fill_in_additional_details_for_the_images(self):
         self.page.get_by_label("Notes for reader (optional)").fill(
@@ -153,9 +153,9 @@ class TestGatewayImages(SystemTestCase):
         expect(
             self.page.get_by_role("heading", name="Check information")
         ).to_be_visible()
-        expect(self.page.get_by_text("1× RMLO")).to_be_visible()
+        expect(self.page.get_by_text("1× RMLO", exact=True)).to_be_visible()
         expect(self.page.get_by_text("2× RCC")).to_be_visible()
-        expect(self.page.get_by_text("1× Right Eklund")).to_be_visible()
+        expect(self.page.get_by_text("1× RMLOID", exact=True)).to_be_visible()
         expect(self.page.get_by_text("1× LMLO")).to_be_visible()
-        expect(self.page.get_by_text("1× LCC")).to_be_visible()
-        expect(self.page.get_by_text("1× Left Eklund")).to_be_visible()
+        expect(self.page.get_by_text("1× LCC", exact=True)).to_be_visible()
+        expect(self.page.get_by_text("1× LCCID", exact=True)).to_be_visible()
