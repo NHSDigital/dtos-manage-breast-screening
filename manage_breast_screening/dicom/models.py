@@ -94,11 +94,11 @@ class Image(models.Model):
     implant_present = models.BooleanField(default=False)
 
     def laterality_and_view(self):
-        if self.laterality and self.implant_present:
-            laterality = "Left" if self.laterality == "L" else "Right"
-            return f"{laterality} Eklund"
-        elif self.laterality and self.view_position:
-            return f"{self.laterality}{self.view_position}".upper()
+        if self.laterality and self.view_position:
+            result = f"{self.laterality}{self.view_position}".upper()
+            if self.implant_present:
+                result = f"{result}ID"
+            return result
         return None
 
     def __str__(self):
