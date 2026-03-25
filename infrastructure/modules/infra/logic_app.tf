@@ -98,7 +98,7 @@ resource "azurerm_logic_app_action_custom" "query_app_insights" {
           "Content-Type": "application/json"
         },
         "body": {
-          "query": "exceptions | where timestamp > ago(10m) | project type, outerMessage, url = tostring(customDimensions['url']), operation_Id | order by timestamp desc | take 1"
+          "query": "exceptions | where timestamp > ago(10m) | top 1 by timestamp desc | project type, outerMessage, url = tostring(customDimensions['url']), operation_Id"
         },
         "authentication": {
           "type": "ManagedServiceIdentity",
