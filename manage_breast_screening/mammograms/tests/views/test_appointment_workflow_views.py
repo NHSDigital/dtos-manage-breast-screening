@@ -311,7 +311,6 @@ class TestTakeImages:
             ),
         )
 
-    @pytest.mark.xfail(reason="The additional details view is not implemented yet")
     def test_additional_info_redirects_to_additional_details(
         self, clinical_user_client, appointment
     ):

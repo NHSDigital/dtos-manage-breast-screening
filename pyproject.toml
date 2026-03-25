@@ -77,6 +77,7 @@ markers = [
   "integration: mark a test as an integration test",
   "skip_insights_mock: don't auto use the mock_insights_logging fixture",
 ]
+xfail_strict = true
 
 [tool.ruff]
 exclude = ["*/migrations/*.py"]
@@ -97,4 +98,4 @@ omit = [
 [tool.djlint]
 ignore = "T003"
 preserve_blank_lines = true
-profile="django"
+profile = "django"
