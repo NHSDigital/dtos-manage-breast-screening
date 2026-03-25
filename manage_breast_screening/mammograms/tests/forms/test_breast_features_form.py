@@ -16,7 +16,7 @@ from manage_breast_screening.participants.models.breast_features import (
 @pytest.mark.django_db
 class TestCreateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
-        json_obj = [{"id": "abc", "region_id": "def", "x": 1, "y": 2}]
+        json_obj = [{"id": "mole", "region_id": "def", "x": 1, "y": 2}]
         form = AddBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -77,18 +77,32 @@ class TestCreateBreastFeatureForm:
             "features": ["There was a problem saving the annotations"]
         }
 
+    def test_pending_feature_id(self, in_progress_appointment):
+        form = AddBreastFeatureForm(
+            QueryDict(
+                urlencode(
+                    {
+                        "features": '[{"region_id": "abc", "id": "pending", "x": 1, "y": 1}]',
+                    },
+                    doseq=True,
+                )
+            ),
+            appointment=in_progress_appointment,
+        )
+
+        assert not form.is_valid()
+        assert form.errors == {"features": ["Select a feature type"]}
+
 
 @pytest.mark.django_db
 class TestUpdateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
         BreastFeatureAnnotation.objects.create(
-            annotations_json=[
-                {"id": "existing", "region_id": "features", "x": 0, "y": 0}
-            ],
+            annotations_json=[{"id": "mole", "region_id": "features", "x": 0, "y": 0}],
             appointment=in_progress_appointment,
         )
 
-        json_obj = [{"id": "abc", "region_id": "def", "x": 1, "y": 2}]
+        json_obj = [{"id": "scar", "region_id": "def", "x": 1, "y": 2}]
         form = UpdateBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -108,7 +122,7 @@ class TestUpdateBreastFeatureForm:
         assert instance.annotations_json == json_obj
 
     def test_populates_initial_data(self, in_progress_appointment):
-        initial_features = [{"id": "abc", "region_id": "def", "x": 1, "y": 2}]
+        initial_features = [{"id": "mole", "region_id": "def", "x": 1, "y": 2}]
         BreastFeatureAnnotation.objects.create(
             annotations_json=initial_features,
             appointment=in_progress_appointment,

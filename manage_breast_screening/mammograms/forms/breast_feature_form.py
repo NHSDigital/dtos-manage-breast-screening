@@ -55,6 +55,13 @@ class BreastFeatureForm(Form):
                 code="invalid",
             )
 
+        for feature in data:
+            if feature["id"] not in BreastFeatureAnnotation.FeatureType:
+                raise ValidationError(
+                    message="Select a feature type",
+                    code="invalid",
+                )
+
         return data
 
 
