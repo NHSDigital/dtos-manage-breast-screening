@@ -5,10 +5,12 @@ module "monitor_action_group" {
   resource_group_name = azurerm_resource_group.main.name
   location            = var.region
   short_name          = "ag-${var.environment}"
-  email_receiver = {
-    email = {
-      name          = "email"
-      email_address = data.azurerm_key_vault_secret.infra.value
+
+  webhook_receiver = var.enable_alerting ? {
+    slack = {
+      name                    = "slack-alert-transformer"
+      service_uri             = azurerm_logic_app_trigger_http_request.azure_monitor_alert[0].callback_url
+      use_common_alert_schema = true
     }
-  }
+  } : null
 }
