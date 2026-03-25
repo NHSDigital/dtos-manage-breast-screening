@@ -250,7 +250,7 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         images = get_images_for_appointment(self.appointment)
-        title = "Review image details"
+        title = "Image transfer in progress"
 
         context.update(
             {
@@ -259,7 +259,7 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
                 "images": DicomStudyService.images_by_laterality_and_view(images),
                 "image_count": len(images),
                 "appointment_pk": self.appointment.pk,
-                "continue_button_text": "Confirm images",
+                "continue_button_text": "Confirm all images received",
                 "form_container_classes": "nhsuk-grid-column-full",
             }
         )
