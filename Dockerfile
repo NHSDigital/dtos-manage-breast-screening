@@ -8,7 +8,7 @@ WORKDIR /app
 RUN apk add --no-cache bash
 
 # Compile static assets
-COPY .browserslistrc babel.config.cjs package.json package-lock.json rollup.config.js  ./
+COPY .browserslistrc babel.config.cjs package.json package-lock.json postcss.config.js rollup.config.js  ./
 COPY manage_breast_screening/assets ./manage_breast_screening/assets
 RUN npm ci
 RUN npm run compile
