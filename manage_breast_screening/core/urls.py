@@ -22,7 +22,10 @@ from django.urls import include, path
 from django.views.decorators.http import require_GET
 from django.views.generic.base import RedirectView
 
-from manage_breast_screening.core.decorators import basic_auth_exempt
+from manage_breast_screening.core.decorators import (
+    basic_auth_exempt,
+    service_enabled_exempt,
+)
 
 from ..clinics import views as clinic_views
 from .admin import admin_site
@@ -35,6 +38,7 @@ handler500 = "manage_breast_screening.core.views.errors.server_error"
 
 @require_GET
 @basic_auth_exempt
+@service_enabled_exempt
 @login_not_required
 def sha_view(request):
     return HttpResponse(settings.COMMIT_SHA)
@@ -42,6 +46,7 @@ def sha_view(request):
 
 @require_GET
 @basic_auth_exempt
+@service_enabled_exempt
 @login_not_required
 def health_check(request):
     return HttpResponse("OK")
@@ -54,6 +59,7 @@ Disallow: /
 
 @require_GET
 @basic_auth_exempt
+@service_enabled_exempt
 @login_not_required
 def robots_txt(request):
     return HttpResponse(ROBOTS_TXT, content_type="text/plain")
