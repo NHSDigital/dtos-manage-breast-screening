@@ -1,14 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 from rules.contrib.views import permission_required
 
 from manage_breast_screening.auth.models import Permission
-from manage_breast_screening.mammograms.services.appointment_services import (
-    AppointmentStatusUpdater,
-)
 
 from ..core.decorators import current_provider_exempt
 from ..core.utils.relative_redirects import extract_relative_redirect_url
@@ -59,21 +55,6 @@ def list_clinic_appointments(request, pk, filter="remaining"):
             "page_title": presented_clinic.heading,
         },
     )
-
-
-@require_http_methods(["POST"])
-def check_in_appointment(request, pk, appointment_pk):
-    provider = request.user.current_provider
-    try:
-        appointment = provider.appointments.get(pk=appointment_pk)
-    except Appointment.DoesNotExist:
-        raise Http404("Appointment not found")
-
-    AppointmentStatusUpdater(
-        appointment=appointment, current_user=request.user
-    ).check_in()
-
-    return redirect("clinics:show_clinic", pk=pk)
 
 
 @current_provider_exempt
