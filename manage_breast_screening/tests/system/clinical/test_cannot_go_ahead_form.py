@@ -55,8 +55,15 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
                 "mammograms:appointment_cannot_go_ahead",
                 kwargs={"pk": self.appointment.pk},
             )
+            + "?return_url=/mammograms/dummy-return-url/"
         )
         self.assert_page_title_contains("Appointment cannot go ahead")
+        link = self.page.get_by_role("link", name="Add details of a previous mammogram")
+        expect(link).to_be_visible()
+        expect(link).to_have_attribute(
+            "href",
+            f"/mammograms/{self.appointment.pk}/previous-mammograms/add?return_url=/mammograms/{self.appointment.pk}/cannot-go-ahead/%3Freturn_url%3D/mammograms/dummy-return-url/",
+        )
 
     def when_i_submit_the_form(self):
         self.page.get_by_role("button", name="Continue").click()
@@ -65,7 +72,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.expect_validation_error(
             error_text="A reason for why this appointment cannot continue must be provided",
             fieldset_legend="Why has this appointment been stopped?",
-            field_label="Participant did not attend",
+            field_label="Failed identity check",
         )
         self.expect_validation_error(
             error_text="Select whether the participant needs to be invited for another appointment",

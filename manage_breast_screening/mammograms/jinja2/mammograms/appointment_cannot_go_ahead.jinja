@@ -1,8 +1,40 @@
-{% extends "wizard_step.jinja" %}
+{% extends "layout-form.jinja" %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
+{% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
+
+{% block beforeContent %}
+  {{ backLink({
+    "href": return_url,
+  }) }}
+{% endblock beforeContent %}
 
 {% block form %}
-{% for choice_value, _ in form.STOPPED_REASON_CHOICES %}
-  {% do form.stopped_reasons.add_conditional_html(choice_value, form[choice_value + "_details"].as_field_group()) %}
-{% endfor %}
-{{ form.stopped_reasons.as_field_group() }}
+  {% set inset_html %}
+    <p>
+      <a class="nhsuk-link nhsuk-link--no-visited-state" 
+         href="{{ url('mammograms:add_previous_mammogram', kwargs={"pk": presented_appointment.pk}) }}?return_url={{request.path}}{{('?return_url=' ~ return_url) | urlencode }}">
+        Add details of a previous mammogram
+      </a>
+      if the appointment is being stopped because the participant has recently had one
+    </p>
+  {% endset %}
+  {{ insetText({
+    "html": inset_html,
+    "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+  }) }}
+
+  {% for choice_value, _ in form.STOPPED_REASON_CHOICES %}
+    {% do form.stopped_reasons.add_conditional_html(choice_value, form[choice_value + "_details"].as_field_group()) %}
+  {% endfor %}
+  {% do form.stopped_reasons.add_divider_after("technical_issues", "or") %}
+  {{ form.stopped_reasons.as_field_group() }}
+
+  {{ form.decision.as_field_group() }}
+
+  <div class="nhsuk-button-group">
+    {{ button({
+      "text": "Continue"
+    }) }}
+  </div>
 {% endblock form %}

@@ -18,6 +18,7 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
 
         self.when_i_click_add_hormone_replacement_therapy()
         self.then_i_see_the_add_hormone_replacement_therapy_form()
+        self.and_i_see_the_appointment_cannot_proceed_link()
 
         self.when_i_click_continue()
         self.then_i_see_validation_error_for_missing_status()
@@ -85,6 +86,14 @@ class TestAddHormoneReplacementTherapy(SystemTestCase):
             self.page.get_by_text("Is Angela Jones currently taking HRT?")
         ).to_be_visible()
         self.assert_page_title_contains("Add hormone replacement therapy")
+
+    def and_i_see_the_appointment_cannot_proceed_link(self):
+        link = self.page.get_by_role("link", name="Appointment cannot proceed")
+        expect(link).to_be_visible()
+        expect(link).to_have_attribute(
+            "href",
+            f"/mammograms/{self.appointment.pk}/cannot-go-ahead/?return_url=/mammograms/{self.appointment.pk}/record-medical-information/hormone-replacement-therapy/",
+        )
 
     def then_i_see_the_edit_hormone_replacement_therapy_form(self):
         expect(
