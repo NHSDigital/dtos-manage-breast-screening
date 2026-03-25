@@ -7,15 +7,17 @@ resource "azurerm_logic_app_workflow" "slack_alert_transformer" {
   identity {
     type = "SystemAssigned"
   }
-}
 
-resource "azurerm_role_assignment" "logic_app_kv_secrets_user" {
-  count    = var.enable_alerting ? 1 : 0
-  provider = azurerm.hub
+  workflow_parameters = {
+    "slackWebhookUrl" = jsonencode({
+      type         = "SecureString"
+      defaultValue = ""
+    })
+  }
 
-  scope                = "${data.azurerm_key_vault.infra.id}/secrets/slack-webhook-url"
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_logic_app_workflow.slack_alert_transformer[0].identity[0].principal_id
+  parameters = {
+    "slackWebhookUrl" = data.azurerm_key_vault_secret.slack_webhook_url[0].value
+  }
 }
 
 resource "azurerm_role_assignment" "logic_app_app_insights_monitoring_reader" {
@@ -78,29 +80,6 @@ resource "azurerm_logic_app_trigger_http_request" "azure_monitor_alert" {
   })
 }
 
-resource "azurerm_logic_app_action_custom" "get_slack_webhook_url" {
-  count        = var.enable_alerting ? 1 : 0
-  name         = "Get_Slack_Webhook_URL"
-  logic_app_id = azurerm_logic_app_workflow.slack_alert_transformer[0].id
-
-  body = <<-BODY
-    {
-      "type": "Http",
-      "inputs": {
-        "method": "GET",
-        "uri": "https://${var.infra_key_vault_name}.vault.azure.net/secrets/slack-webhook-url/?api-version=7.4",
-        "authentication": {
-          "type": "ManagedServiceIdentity",
-          "audience": "https://vault.azure.net"
-        }
-      },
-      "runAfter": {}
-    }
-  BODY
-
-  depends_on = [azurerm_logic_app_trigger_http_request.azure_monitor_alert]
-}
-
 resource "azurerm_logic_app_action_custom" "query_app_insights" {
   count        = var.enable_alerting ? 1 : 0
   name         = "Query_App_Insights"
@@ -140,7 +119,7 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
       "type": "Http",
       "inputs": {
         "method": "POST",
-        "uri": "@body('Get_Slack_Webhook_URL')?['value']",
+        "uri": "@parameters('slackWebhookUrl')",
         "headers": {
           "Content-Type": "application/json"
         },
@@ -206,14 +185,10 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
         }
       },
       "runAfter": {
-        "Get_Slack_Webhook_URL": ["Succeeded"],
         "Query_App_Insights": ["Succeeded", "Failed", "Skipped", "TimedOut"]
       }
     }
   BODY
 
-  depends_on = [
-    azurerm_logic_app_action_custom.get_slack_webhook_url,
-    azurerm_logic_app_action_custom.query_app_insights
-  ]
+  depends_on = [azurerm_logic_app_action_custom.query_app_insights]
 }
