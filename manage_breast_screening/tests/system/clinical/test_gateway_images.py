@@ -106,7 +106,7 @@ class TestGatewayImages(SystemTestCase):
         )
 
     def and_i_click_confirm_images(self):
-        self.page.get_by_role("button", name="Confirm images").click()
+        self.page.get_by_role("button", name="Confirm all images received").click()
 
     def then_i_see_the_image_counts_on_the_check_information_page(self):
         expect(
