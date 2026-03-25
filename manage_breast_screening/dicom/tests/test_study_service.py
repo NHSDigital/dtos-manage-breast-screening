@@ -73,8 +73,10 @@ class TestStudyService:
         assert StudyService.images_by_laterality_and_view(series.images.all()) == {
             "LCC": [image1],
             "LMLO": [image3],
-            "Left Eklund": [image6],
+            "LCCID": [],
+            "LMLOID": [image6],
             "RCC": [image2],
             "RMLO": [image4, image5],
-            "Right Eklund": [image7],
+            "RCCID": [image7],
+            "RMLOID": [],
         }

@@ -11,7 +11,7 @@ from manage_breast_screening.core.models import BaseModel
 
 @dataclass(frozen=True)
 class ImageView:
-    view_position: Literal["CC", "MLO", "EKLUND"]
+    view_position: Literal["CC", "MLO", "EKLUND", "CCID", "MLOID"]
     laterality: Literal["R", "L"]
 
     @classmethod
@@ -29,6 +29,14 @@ class ImageView:
                 return cls("MLO", "L")
             case "Left Eklund":
                 return cls("EKLUND", "L")
+            case "LCCID":
+                return cls("CCID", "L")
+            case "LMLOID":
+                return cls("MLOID", "L")
+            case "RCCID":
+                return cls("CCID", "R")
+            case "RMLOID":
+                return cls("MLOID", "R")
             case _:
                 raise ValueError(short_name)
 
@@ -47,15 +55,41 @@ class ImageView:
                 return "LMLO"
             case ("EKLUND", "L"):
                 return "Left Eklund"
+            case ("CCID", "L"):
+                return "LCCID"
+            case ("MLOID", "L"):
+                return "LMLOID"
+            case ("CCID", "R"):
+                return "RCCID"
+            case ("MLOID", "R"):
+                return "RMLOID"
             case _:
                 return f"{self.view_position} {self.laterality}"
 
 
 ALL_VIEWS_RCC_FIRST = [
     ImageView.from_short_name(name)
-    for name in ["RCC", "RMLO", "Right Eklund", "LCC", "LMLO", "Left Eklund"]
+    for name in [
+        "RCC",
+        "RMLO",
+        "Right Eklund",
+        "LCC",
+        "LMLO",
+        "Left Eklund",
+        "RCCID",
+        "RMLOID",
+        "LCCID",
+        "LMLOID",
+    ]
 ]
-EKLUND_VIEWS = [ImageView("EKLUND", "R"), ImageView("EKLUND", "L")]
+EKLUND_VIEWS = [
+    ImageView("EKLUND", "R"),
+    ImageView("EKLUND", "L"),
+    ImageView("MLOID", "R"),
+    ImageView("MLOID", "L"),
+    ImageView("CCID", "R"),
+    ImageView("CCID", "L"),
+]
 
 
 class StudyCompleteness(models.TextChoices):

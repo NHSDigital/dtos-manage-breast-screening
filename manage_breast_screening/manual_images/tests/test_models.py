@@ -76,6 +76,10 @@ class TestStudy:
                 (ImageView("CC", "L"), 0),
                 (ImageView("MLO", "L"), 0),
                 (ImageView("EKLUND", "L"), 0),
+                (ImageView("CCID", "R"), 0),
+                (ImageView("MLOID", "R"), 0),
+                (ImageView("CCID", "L"), 0),
+                (ImageView("MLOID", "L"), 0),
             ]
 
 
