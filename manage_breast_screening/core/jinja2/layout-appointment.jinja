@@ -2,6 +2,7 @@
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'components/appointment-status/macro.jinja' import app_appointment_status %}
 {% from 'components/appointment-header/macro.jinja' import app_appointment_header %}
+{% from 'components/resume-appointment/macro.jinja' import app_resume_appointment %}
 {% from 'components/check-in/macro.jinja' import app_check_in %}
 {% from 'components/secondary-navigation/macro.jinja' import app_secondary_navigation %}
 {% from 'django_form_helpers.jinja' import form_error_summary %}
@@ -58,6 +59,21 @@
 
     {{ app_appointment_header(request.user, presented_appointment, csrf_input=csrf_input) }}
 
+    {% if presented_appointment.can_be_resumed_by(request.user) %}
+      {{ app_resume_appointment(
+        request.user,
+        presented_appointment,
+        resume_appointment_url=url(
+          "mammograms:resume_appointment",
+          kwargs={
+            'pk': presented_appointment.pk,
+          }
+        ),
+        csrf_input=csrf_input,
+        is_button=True
+      ) }}
+    {% endif %}
+    
     {{ app_secondary_navigation({
         "visuallyHiddenTitle": "Secondary menu",
         "items": secondary_nav_items
