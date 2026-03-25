@@ -300,7 +300,10 @@ def check_in(request, pk):
         appointment=appointment, current_user=request.user
     ).check_in()
 
-    return redirect("mammograms:show_appointment", pk=pk)
+    if request.accepts("text/html"):
+        return redirect("mammograms:show_appointment", pk=pk)
+    else:
+        return HttpResponse(status=201)
 
 
 @require_http_methods(["GET", "POST"])
@@ -317,7 +320,10 @@ def start_appointment(request, pk):
 
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
-    return redirect("mammograms:confirm_identity", pk=pk)
+    if request.accepts("text/html"):
+        return redirect("mammograms:confirm_identity", pk=pk)
+    else:
+        return HttpResponse(status=201)
 
 
 @require_http_methods(["GET", "POST"])
