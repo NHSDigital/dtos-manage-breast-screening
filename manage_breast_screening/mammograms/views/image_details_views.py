@@ -76,10 +76,6 @@ class UpdateImageDetailsView(InProgressAppointmentMixin, FormView):
             {
                 "heading": "Edit image details",
                 "page_title": "Edit image details",
-                "back_link_params": reverse(
-                    "mammograms:take_images",
-                    kwargs={"pk": self.appointment_pk},
-                ),
             }
         )
         return context
