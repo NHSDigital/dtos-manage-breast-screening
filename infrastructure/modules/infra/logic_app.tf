@@ -45,14 +45,17 @@ resource "azurerm_logic_app_trigger_http_request" "azure_monitor_alert" {
           essentials = {
             type = "object"
             properties = {
-              alertRuleName      = { type = "string" }
-              severity           = { type = "string" }
-              firedDateTime      = { type = "string" }
-              resolvedDateTime   = { type = "string" }
-              portalLink         = { type = "string" }
-              monitorCondition   = { type = "string" }
-              targetResourceName = { type = "string" }
-              description        = { type = "string" }
+              alertRule         = { type = "string" }
+              severity          = { type = "string" }
+              firedDateTime     = { type = "string" }
+              resolvedDateTime  = { type = "string" }
+              portalLink        = { type = "string" }
+              monitorCondition  = { type = "string" }
+              configurationItems = {
+                type  = "array"
+                items = { type = "string" }
+              }
+              description = { type = "string" }
             }
           }
           alertContext = {
@@ -129,7 +132,7 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
               "type": "header",
               "text": {
                 "type": "plain_text",
-                "text": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), concat('✅ Resolved – ', triggerBody()?['data']?['essentials']?['alertRuleName']), concat('🚨 Exception – ', triggerBody()?['data']?['essentials']?['alertRuleName']))}",
+                "text": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), concat('✅ Resolved – ', triggerBody()?['data']?['essentials']?['alertRule']), concat('🚨 Exception – ', triggerBody()?['data']?['essentials']?['alertRule']))}",
                 "emoji": true
               }
             },
@@ -138,7 +141,7 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
               "fields": [
                 {
                   "type": "mrkdwn",
-                  "text": "@{concat('*Environment*\n`', triggerBody()?['data']?['essentials']?['targetResourceName'], '`')}"
+                  "text": "@{concat('*Environment*\n`', triggerBody()?['data']?['essentials']?['configurationItems']?[0], '`')}"
                 },
                 {
                   "type": "mrkdwn",
