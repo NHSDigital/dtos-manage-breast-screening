@@ -98,7 +98,7 @@ resource "azurerm_logic_app_action_custom" "query_app_insights" {
           "Content-Type": "application/json"
         },
         "body": {
-          "query": "exceptions | where timestamp > ago(10m) | top 1 by timestamp desc | project type, outerMessage, url = tostring(customDimensions['url']), operation_Id"
+          "query": "exceptions | where timestamp between (datetime_add('minute', -15, todatetime('@{triggerBody()?['data']?['essentials']?['firedDateTime']}')) .. todatetime('@{triggerBody()?['data']?['essentials']?['firedDateTime']}')) | summarize Count=count(), ExceptionType=any(type), Message=substring(any(outerMessage), 0, 300), Url=any(tostring(customDimensions['url'])), OperationId=any(operation_Id), RoleName=any(cloud_RoleName), FirstSeen=format_datetime(min(timestamp), 'yyyy-MM-dd HH:mm:ss'), LastSeen=format_datetime(max(timestamp), 'yyyy-MM-dd HH:mm:ss')"
         },
         "authentication": {
           "type": "ManagedServiceIdentity",
@@ -141,7 +141,7 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
               "fields": [
                 {
                   "type": "mrkdwn",
-                  "text": "@{concat('*Environment*\n`', triggerBody()?['data']?['essentials']?['configurationItems']?[0], '`')}"
+                  "text": "@{concat('*Environment*\n`', toUpper(split(triggerBody()?['data']?['essentials']?['alertRule'], '-')[1]), '`')}"
                 },
                 {
                   "type": "mrkdwn",
@@ -165,17 +165,28 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
               "fields": [
                 {
                   "type": "mrkdwn",
-                  "text": "@{concat('*Exception Type*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[0], 'N/A'), '`')}"
+                  "text": "@{concat('*Exception Type*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[1], 'N/A'), '` ×', string(coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[0], 0)))}"
                 },
                 {
                   "type": "mrkdwn",
-                  "text": "@{concat('*Affected URL*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[2], 'N/A'), '`')}"
+                  "text": "@{concat('*Affected URL*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[3], 'N/A'), '`')}"
                 },
                 {
                   "type": "mrkdwn",
-                  "text": "@{concat('*Message*\n', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[1], 'N/A'))}"
+                  "text": "@{concat('*Cloud Role*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[5], 'N/A'), '`')}"
+                },
+                {
+                  "type": "mrkdwn",
+                  "text": "@{concat('*Time Range*\n', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[6], 'N/A'), ' → ', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[7], 'N/A'))}"
                 }
               ]
+            },
+            {
+              "type": "section",
+              "text": {
+                "type": "mrkdwn",
+                "text": "@{concat('*Message*\n> ', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[2], 'N/A'))}"
+              }
             },
             {
               "type": "section",
