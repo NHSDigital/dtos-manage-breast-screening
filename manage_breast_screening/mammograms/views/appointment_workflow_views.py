@@ -285,8 +285,11 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
         )
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def check_in(request, pk):
+    if request.method == "GET":
+        return redirect("mammograms:show_appointment", pk=pk)
+
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
@@ -300,9 +303,12 @@ def check_in(request, pk):
     return redirect("mammograms:show_appointment", pk=pk)
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def start_appointment(request, pk):
+    if request.method == "GET":
+        return redirect("mammograms:show_appointment", pk=pk)
+
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
@@ -314,9 +320,12 @@ def start_appointment(request, pk):
     return redirect("mammograms:confirm_identity", pk=pk)
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def resume_appointment(request, pk):
+    if request.method == "GET":
+        return redirect("mammograms:show_appointment", pk=pk)
+
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
@@ -396,7 +405,10 @@ class PauseAppointment(InProgressAppointmentMixin, FormView):
 
 
 class MarkSectionReviewed(InProgressAppointmentMixin, View):
-    http_method_names = ["post"]
+    def get(self, request, *args, **kwargs):
+        return redirect(
+            MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
+        )
 
     def post(self, request, *args, **kwargs):
         section = kwargs.get("section")
