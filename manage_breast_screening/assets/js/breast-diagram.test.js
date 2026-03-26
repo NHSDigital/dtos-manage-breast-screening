@@ -8,8 +8,8 @@ jest.mock('./image-key', () => {
 
   return {
     ImageKey: class MockImageKey extends Component {
+      addEventListener() {}
       render() {}
-      $button = { addEventListener() {} }
       static moduleName = 'app-image-key'
     }
   }
