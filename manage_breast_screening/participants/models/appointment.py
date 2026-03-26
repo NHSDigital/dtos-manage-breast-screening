@@ -88,7 +88,7 @@ class AppointmentQuerySet(models.QuerySet):
                 queryset=AppointmentStatus.objects.select_related(
                     "created_by"
                 ).order_by("-created_at")[:1],  # Limit to most recent
-                to_attr="_prefetched_current_status",  # Store in named attribute
+                to_attr="_cached_current_status",  # Store in named attribute
             )
         )
 
@@ -126,22 +126,19 @@ class Appointment(BaseModel):
         Check if a prefetched status is available, otherwise do a query.
         If there are no statuses for any reason, assume the default one.
         """
-        prefetched_current_status = getattr(self, "_prefetched_current_status", None)
+        prefetched_current_status = getattr(self, "_cached_current_status", None)
         if prefetched_current_status:
             return prefetched_current_status[0]
 
-        statuses = list(self.statuses.order_by("-created_at").all())
-        if not statuses:
+        status = self.statuses.order_by("-created_at").first()
+        if status is None:
             status = AppointmentStatus()
             logger.info(
                 f"Appointment {self.pk} has no statuses. Assuming {status.name}"
             )
-            return status
 
-        return statuses[0]
-
-    def has_status(self, required_status: str) -> bool:
-        return self.statuses.filter(name=required_status).exists()
+        setattr(self, "_cached_current_status", [status])
+        return status
 
     @property
     def active(self):
@@ -156,6 +153,7 @@ class Appointment(BaseModel):
             else:
                 return current_status
 
+        setattr(self, "_cached_current_status", None)
         return self.statuses.create(name=status_name, created_by=created_by)
 
     def series(self):
