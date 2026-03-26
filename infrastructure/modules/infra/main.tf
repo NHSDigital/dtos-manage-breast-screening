@@ -79,9 +79,8 @@ module "app_insights_audit" {
 
   log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 
-  action_group_id               = module.monitor_action_group.monitor_action_group.id
-  enable_alerting               = var.enable_alerting
-  use_log_based_exception_alert = var.enable_alerting
+  action_group_id = module.monitor_action_group.monitor_action_group.id
+  enable_alerting = var.enable_alerting
 }
 
 module "private_link_scoped_service_law" {
