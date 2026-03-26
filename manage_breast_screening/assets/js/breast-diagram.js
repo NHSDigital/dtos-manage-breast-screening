@@ -173,25 +173,25 @@ export class BreastDiagram extends ConfigurableComponent {
 
     /** @type {Element | null} */
     this.$debugInput =
-      this.$debugInput ?? this.$root.querySelector('.app-js-image-input')
+      this.$debugInput ?? this.$root.querySelector('.app-js-image-input code')
 
     const { $debugX, $debugY, $debugRegion, $debugInput } = this
     if (!$debugInput) {
       return
     }
 
-    $debugInput.textContent =
-      this.values.map(({ region_id }) => region_id).join(', ') || 'N/A'
+    $debugInput.innerHTML = JSON.stringify(this.values, undefined, 2)
 
     if (!$debugX || !$debugY || !$debugRegion) {
       return
     }
 
-    $debugX.textContent = point?.x.toString() ?? 'N/A'
-    $debugY.textContent = point?.y.toString() ?? 'N/A'
+    $debugX.innerHTML = point ? `<samp>${point.x}</samp>` : 'N/A'
+    $debugY.innerHTML = point ? `<samp>${point.y}</samp>` : 'N/A'
 
-    $debugRegion.textContent =
-      $path?.querySelector('title')?.textContent ?? 'N/A'
+    $debugRegion.innerHTML = $path
+      ? `<samp>${$path.classList.value}</samp>`
+      : 'N/A'
   }
 
   /**
