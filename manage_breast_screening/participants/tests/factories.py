@@ -13,9 +13,7 @@ from factory.declarations import (
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 
-from manage_breast_screening.clinics.tests.factories import (
-    ClinicSlotFactory,
-)
+from manage_breast_screening.clinics.tests.factories import ClinicSlotFactory
 from manage_breast_screening.participants.models import (
     BenignLumpHistoryItem,
     BreastCancerHistoryItem,
@@ -144,7 +142,7 @@ class AppointmentFactory(DjangoModelFactory):
             return
 
         obj.statuses.add(
-            AppointmentStatusFactory.create(name=extracted, appointment=obj)
+            AppointmentStatusFactory.create(name=extracted, appointment=obj, **kwargs)
         )
 
     # Allow passing an explicit status and created_by user
