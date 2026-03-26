@@ -2,6 +2,7 @@
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
 {% from "components/image-key/macro.jinja" import app_image_key %}
 {% from "components/image-map/macro.jinja" import app_image_map %}
+{% from "components/image-marker/macro.jinja" import app_image_marker %}
 
 <div {{- nhsukAttributes({
   "class": "app-breast-diagram",
@@ -27,6 +28,13 @@
     <span>Right</span>
     <span>Left</span>
   </div>
+
+  <template class="app-js-template-image-marker">
+    {{ app_image_marker({
+      "text": "?",
+      "href": "#" if not params.read_only else undefined
+    }) | trim | indent(4) }}
+  </template>
 
   {% call app_image_map(params.image_map) %}
     {% if params.version == 1 %}

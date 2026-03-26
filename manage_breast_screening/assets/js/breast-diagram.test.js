@@ -52,6 +52,9 @@ describe('Breast diagram', () => {
     <form>
       <input name="features" type="hidden" value="[]">
       <div data-module="app-breast-diagram">
+        <template class="app-js-template-image-marker">
+          <a class="app-image-marker" href="#">?</a>
+        </template>
         <div data-module="app-image-map"></div>
       </div>
     </form>`
@@ -60,6 +63,9 @@ describe('Breast diagram', () => {
     <form>
       <input name="features" type="hidden" value='[{"id": "pending", "region_id": "right_upper_outer", "x": 133, "y": 82}]'>
       <div data-module="app-breast-diagram">
+        <template class="app-js-template-image-marker">
+          <a class="app-image-marker" href="#">?</a>
+        </template>
         <div data-module="app-image-map"></div>
       </div>
     </form>`
