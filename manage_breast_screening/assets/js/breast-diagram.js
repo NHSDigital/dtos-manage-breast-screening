@@ -343,10 +343,10 @@ function isValidObject(value) {
     return false
   }
 
+  const keys = new Set(['id', 'region_id', 'x', 'y'])
+
   return (
-    Object.keys(value).every((key) =>
-      ['id', 'region_id', 'x', 'y'].includes(key)
-    ) &&
+    Object.keys(value).every((key) => keys.has(key)) &&
     typeof value.id === 'string' &&
     typeof value.region_id === 'string' &&
     typeof value.x === 'number' &&
