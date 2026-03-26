@@ -1,28 +1,25 @@
-<div class="nhsuk-u-margin-bottom-3">
+<div class="app-mammogram-view--{{ side }}">
   {% if (images | length) == 0 %}
-    <h3 class="nhsuk-u-margin-bottom-2 nhsuk-u-secondary-text-color">
-      0× {{ laterality }}
-    </h3>
-
-    <div class="app-mammogram-thumbnail__missing nhsuk-u-margin-bottom-3">
-      <div class="app-mammogram-thumbnail__placeholder">
-        <span class="nhsuk-u-secondary-text-color">No image</span>
+    <div class="app-mammogram-thumbnail app-mammogram-thumbnail--{{ side }}">
+      <div class="app-mammogram-thumbnail__image-wrapper app-mammogram-thumbnail__image-wrapper--large">
+          <span class="app-mammogram-thumbnail__label">{{ laterality }}</span>
+          <div class="app-mammogram-thumbnail__missing">
+            <span class="app-mammogram-thumbnail__missing-text">No image</span>
+          </div>
+        </div>
       </div>
     </div>
   {% else %}
-    <h3 class="nhsuk-u-margin-bottom-2">
-      {{ images | length }}× {{ laterality }}
-    </h3>
-
-    <div class="">
+    <div class="app-mammogram-thumbnail app-mammogram-thumbnail--{{ side }}">
       {% for image in images %}
         {% if image.image_file %}
-          <div class="app-mammogram-thumbnail nhsuk-u-margin-right-3 nhsuk-u-margin-bottom-2 nhsuk-u-float-right">
-            <img class="nhsuk-image__img" src="{{image.image_file.url}}" alt="Mammogram image thumbnail {{ laterality }} view">
+          <div class="app-mammogram-thumbnail__image-wrapper app-mammogram-thumbnail__image-wrapper--large">
+            <span class="app-mammogram-thumbnail__label">{{ laterality }}</span>
+              <img class="app-mammogram-thumbnail__image" src="{{ image.image_file.url }}" alt="{{ lateraliy }} view ({{ loop.index }} of {{ loop.length }})" data-testid="mammogram-image-{{ laterality }}-{{ loop.index }}">
+            </span>
           </div>
         {% endif %}
       {% endfor %}
-      <div class="nhsuk-u-clear"></div>
     </div>
   {% endif %}
 </div>
