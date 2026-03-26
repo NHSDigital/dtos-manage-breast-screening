@@ -1,6 +1,7 @@
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
 {% from "components/image-key/macro.jinja" import app_image_key %}
+{% from "components/image-map/macro.jinja" import app_image_map %}
 
 <div {{- nhsukAttributes({
   "class": "app-breast-diagram",
@@ -27,17 +28,11 @@
     <span>Left</span>
   </div>
 
-  <figure
-    {{- nhsukAttributes({
-      "class": "app-breast-diagram__image-map nhsuk-u-width-full",
-      "data-module": "app-image-map"
-    }) -}}
-
-    {{- nhsukAttributes(params.image_map.attributes) -}}>
-  {% if params.version == 1 %}
-    {% include "components/breast-diagram/v1.svg" %}
-  {% endif %}
-  </figure>
+  {% call app_image_map(params.image_map) %}
+    {% if params.version == 1 %}
+      {% include "components/breast-diagram/v1.svg" %}
+    {% endif %}
+  {% endcall %}
 
 {% if params.features | length %}
   {{ app_image_key({
