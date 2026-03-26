@@ -7,14 +7,10 @@
   ],
   "scripts": {
     "breast-diagram": "node manage_breast_screening/assets/breast-diagram/process-exported-svg.js",
-    "compile": "concurrently npm:compile:js npm:compile:css --group --prefix none",
-    "compile:css": "npm run compile:css:cli -- manage_breast_screening/assets/sass/main.scss manage_breast_screening/assets/compiled/css/main.css",
-    "compile:css:cli": "sass --color --embed-sources --load-path=node_modules --quiet-deps",
+    "compile": "npm run compile:css && npm run compile:js",
+    "compile:css": "sass --color --embed-sources --load-path=node_modules --quiet-deps manage_breast_screening/assets/sass/main.scss manage_breast_screening/assets/compiled/css/main.css",
     "postcompile:css": "postcss --map --dir manage_breast_screening/assets/compiled/css --ext .min.css manage_breast_screening/assets/compiled/css/main.css",
-    "precompile:css:watch": "npm run compile:css",
-    "compile:css:watch": "concurrently 'npm:compile:css -- --update --watch' 'npm:postcompile:css -- --watch' --group --prefix none",
     "compile:js": "rollup -c rollup.config.js --sourcemap",
-    "compile:js:watch": "npm run compile:js -- --watch",
     "lint": "npm run lint:js && npm run lint:types && npm run lint:prettier",
     "lint:js": "eslint --cache --cache-location .cache/eslint --cache-strategy content --color --max-warnings 0 .",
     "lint:js:fix": "npm run lint:js -- --fix",
@@ -22,7 +18,8 @@
     "lint:prettier:fix": "prettier --write .",
     "lint:types": "tsc --build tsconfig.json --pretty",
     "test": "jest --color",
-    "watch": "concurrently npm:*:watch --prefix none"
+    "prewatch": "npm run compile:css --ignore-scripts",
+    "watch": "concurrently \"npm:compile:css -- --update --watch\" \"npm:postcompile:css -- --watch\" \"npm:compile:js -- --watch\" --prefix none"
   },
   "dependencies": {
     "nhsuk-frontend": "^10.3.0"
