@@ -1,6 +1,7 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 {% from "nhsuk/components/tag/macro.jinja" import tag %}
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+{% from "components/image-key-item/macro.jinja" import app_image_key_item %}
 {% from "components/image-marker/macro.jinja" import app_image_marker %}
 
 {#- Set classes for this component #}
@@ -25,18 +26,12 @@
   </div>
   <ul class="app-image-key__items">
   {% for item in items %}
-    <li class="app-image-key__item">
-      {{ app_image_marker({
-        "text": loop.index,
-        "label": item.id | replace("_", " ") | capitalize,
-        "href": undefined if params.read_only else "#marker-" ~ loop.index
-      }) | trim | indent(6) }}
-
-      {{ tag({
-        "text": item.region_id | replace("_", " ") | capitalize,
-        "classes": "nhsuk-tag--white"
-      }) | trim | indent(6) }}
-    </li>
+    {{ app_image_key_item({
+      "index": loop.index,
+      "feature": item.id | replace("_", " ") | capitalize,
+      "region": item.region_id | replace("_", " ") | capitalize,
+      "href": undefined if params.read_only else "#marker-" ~ loop.index
+    }) | trim | indent(4) }}
   {% endfor %}
   </ul>
 </div>
