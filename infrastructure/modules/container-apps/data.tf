@@ -15,12 +15,6 @@ data "azurerm_key_vault_secret" "slack_webhook_url" {
   key_vault_id = data.azurerm_key_vault.infra[0].id
 }
 
-data "azurerm_application_insights" "app_insights" {
-  count               = var.enable_alerting ? 1 : 0
-  name                = split("/", var.app_insights_id)[8]
-  resource_group_name = split("/", var.app_insights_id)[4]
-}
-
 data "azurerm_subscription" "current" {}
 
 data "azuread_group" "postgres_sql_admin_group" {
