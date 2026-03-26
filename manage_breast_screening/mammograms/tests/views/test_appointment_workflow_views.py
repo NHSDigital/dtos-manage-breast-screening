@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-import django
 import pytest
 import statemachine
 from django.contrib import messages
@@ -42,14 +41,13 @@ from manage_breast_screening.users.tests.factories import UserFactory
 
 @pytest.mark.django_db
 class TestConfirmIdentity:
-    def test_renders_response_when_identity_not_confirmed(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response_when_identity_not_confirmed(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -63,20 +61,17 @@ class TestConfirmIdentity:
         )
 
     def test_renders_response_when_identity_confirmed_by_a_different_user(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         # Create CONFIRM_IDENTITY step for a different user before the POST, to confirm correct button text
-        appointment.completed_workflow_steps.create(
+        in_progress_appointment.completed_workflow_steps.create(
             step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=UserFactory.create(nhs_uid="different_user"),
         )
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -90,20 +85,17 @@ class TestConfirmIdentity:
         )
 
     def test_renders_response_when_identity_confirmed_by_same_user(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         # Create CONFIRM_IDENTITY step for this user before the POST, to confirm correct button text
-        appointment.completed_workflow_steps.create(
+        in_progress_appointment.completed_workflow_steps.create(
             step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=clinical_user_client.user,
         )
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -116,50 +108,43 @@ class TestConfirmIdentity:
             response.text,
         )
 
-    def test_redirects_to_medical_information_page(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_redirects_to_medical_information_page(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-    def test_records_completion(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_records_completion(self, clinical_user_client, in_progress_appointment):
         clinical_user_client.http.post(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
 
         assertQuerySetEqual(
-            appointment.completed_workflow_steps.filter(
+            in_progress_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             ).values_list("step_name", flat=True),
             [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
         )
 
     def test_does_record_completion_even_when_already_confirmed_by_different_user(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         # Create CONFIRM_IDENTITY for a different user before the POST, to confirm a new record is created
-        appointment.completed_workflow_steps.create(
+        in_progress_appointment.completed_workflow_steps.create(
             step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=UserFactory.create(nhs_uid="different_user"),
         )
@@ -167,25 +152,22 @@ class TestConfirmIdentity:
         clinical_user_client.http.post(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
 
         assertQuerySetEqual(
-            appointment.completed_workflow_steps.filter(
+            in_progress_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             ).values_list("step_name", flat=True),
             [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
         )
 
     def test_does_not_record_completion_if_already_confirmed_by_this_user(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         # Create CONFIRM_IDENTITY for this user before the POST, to confirm no duplicate is created
-        appointment.completed_workflow_steps.create(
+        in_progress_appointment.completed_workflow_steps.create(
             step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=clinical_user_client.user,
         )
@@ -193,12 +175,12 @@ class TestConfirmIdentity:
         clinical_user_client.http.post(
             reverse(
                 "mammograms:confirm_identity",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
 
         assertQuerySetEqual(
-            appointment.completed_workflow_steps.filter(
+            in_progress_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             ).values_list("step_name", flat=True),
             [AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY],
@@ -207,30 +189,24 @@ class TestConfirmIdentity:
 
 @pytest.mark.django_db
 class TestRecordMedicalInformation:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_records_completion(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_records_completion(self, clinical_user_client, in_progress_appointment):
         clinical_user_client.http.post(
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assertQuerySetEqual(
-            appointment.completed_workflow_steps.filter(
+            in_progress_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             )
             .values_list("step_name", flat=True)
@@ -239,33 +215,29 @@ class TestRecordMedicalInformation:
         )
 
     @patch("manage_breast_screening.gateway.relay_service.RelayService.send_action")
-    def test_creates_gateway_action(self, mock_send_action, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        relay = RelayFactory.create(provider=appointment.provider)
+    def test_creates_gateway_action(
+        self, mock_send_action, clinical_user_client, in_progress_appointment
+    ):
+        relay = RelayFactory.create(provider=in_progress_appointment.provider)
         clinical_user_client.http.post(
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
-        action = GatewayAction.objects.get(appointment=appointment)
+        action = GatewayAction.objects.get(appointment=in_progress_appointment)
         assert action.type == GatewayActionType.WORKLIST_CREATE
         assert (
             action.payload["parameters"]["worklist_item"]["participant"]["nhs_number"]
-            == appointment.participant.nhs_number
+            == in_progress_appointment.participant.nhs_number
         )
         mock_send_action.assert_called_once_with(relay, action)
 
     def test_redirects_to_gateway_images_when_enabled(
-        self, clinical_user_client, monkeypatch
+        self, clinical_user_client, monkeypatch, in_progress_appointment
     ):
         monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        RelayFactory.create(provider=appointment.provider)
+        RelayFactory.create(provider=in_progress_appointment.provider)
 
         with patch(
             "manage_breast_screening.gateway.relay_service.RelayService.send_action"
@@ -273,34 +245,36 @@ class TestRecordMedicalInformation:
             response = clinical_user_client.http.post(
                 reverse(
                     "mammograms:record_medical_information",
-                    kwargs={"pk": appointment.pk},
+                    kwargs={"pk": in_progress_appointment.pk},
                 )
             )
 
         assertRedirects(
             response,
-            reverse("mammograms:gateway_images", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:gateway_images", kwargs={"pk": in_progress_appointment.pk}
+            ),
         )
 
 
 @pytest.mark.django_db
 class TestTakeImages:
-    def test_renders_response(self, clinical_user_client, appointment):
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:take_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_no_images_redirects_to_cannot_continue(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, in_progress_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:take_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "standard_images": RecordImagesTakenForm.StandardImagesChoices.NO_IMAGES_TAKEN
@@ -309,17 +283,18 @@ class TestTakeImages:
         assertRedirects(
             response,
             reverse(
-                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+                "mammograms:appointment_cannot_go_ahead",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
     def test_additional_info_redirects_to_additional_details(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, in_progress_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:take_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "standard_images": RecordImagesTakenForm.StandardImagesChoices.NO_ADD_ADDITIONAL
@@ -327,16 +302,19 @@ class TestTakeImages:
         )
         assertRedirects(
             response,
-            reverse("mammograms:add_image_details", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:add_image_details",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
     def test_yes_marks_the_step_complete_and_redirects_to_check_info(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, in_progress_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:take_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "standard_images": RecordImagesTakenForm.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO
@@ -344,10 +322,13 @@ class TestTakeImages:
         )
         assertRedirects(
             response,
-            reverse("mammograms:check_information", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
         assertQuerySetEqual(
-            appointment.completed_workflow_steps.filter(
+            in_progress_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             )
             .values_list("step_name", flat=True)
@@ -356,32 +337,35 @@ class TestTakeImages:
         )
 
     def test_redirects_to_update_image_details_when_series_exist(
-        self, clinical_user_client, appointment
+        self, clinical_user_client, in_progress_appointment
     ):
-        study = Study.objects.create(appointment=appointment)
+        study = Study.objects.create(appointment=in_progress_appointment)
         study.series_set.create(view_position="CC", laterality="R", count=1)
 
         response = clinical_user_client.http.get(
-            reverse("mammograms:take_images", kwargs={"pk": appointment.pk})
+            reverse("mammograms:take_images", kwargs={"pk": in_progress_appointment.pk})
         )
         assertRedirects(
             response,
-            reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
             target_status_code=200,
         )
 
-    def test_yes_creates_the_study(self, clinical_user_client, appointment):
+    def test_yes_creates_the_study(self, clinical_user_client, in_progress_appointment):
         clinical_user_client.http.post(
             reverse(
                 "mammograms:take_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "standard_images": RecordImagesTakenForm.StandardImagesChoices.YES_TWO_CC_AND_TWO_MLO
             },
         )
         assertQuerySetEqual(
-            appointment.study.series_set.values_list(
+            in_progress_appointment.study.series_set.values_list(
                 "view_position", "laterality", "count"
             ),
             {("CC", "L", 1), ("CC", "R", 1), ("MLO", "L", 1), ("MLO", "R", 1)},
@@ -391,11 +375,11 @@ class TestTakeImages:
 
 @pytest.mark.django_db
 class TestGatewayImages:
-    def test_renders_response(self, clinical_user_client, appointment):
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:gateway_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rcc_count": 1,
@@ -412,17 +396,17 @@ class TestGatewayImages:
     )
     @pytest.mark.django_db
     def test_marks_the_step_complete_and_redirects_to_check_info(
-        self, _, clinical_user_client, appointment
+        self, _, clinical_user_client, in_progress_appointment
     ):
         dicom_study = DicomStudyFactory()
         GatewayActionFactory.create(
             id=str(dicom_study.source_message_id),
-            appointment=appointment,
+            appointment=in_progress_appointment,
         )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:gateway_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rcc_count": 1,
@@ -436,10 +420,13 @@ class TestGatewayImages:
         )
         assertRedirects(
             response,
-            reverse("mammograms:check_information", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
         assertQuerySetEqual(
-            appointment.completed_workflow_steps.filter(
+            in_progress_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             )
             .values_list("step_name", flat=True)
@@ -447,16 +434,16 @@ class TestGatewayImages:
             [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
         )
 
-    def test_updates_the_study(self, clinical_user_client, appointment):
+    def test_updates_the_study(self, clinical_user_client, in_progress_appointment):
         dicom_study = DicomStudyFactory()
         GatewayActionFactory.create(
             id=str(dicom_study.source_message_id),
-            appointment=appointment,
+            appointment=in_progress_appointment,
         )
         clinical_user_client.http.post(
             reverse(
                 "mammograms:gateway_images",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rcc_count": 1,
@@ -471,7 +458,7 @@ class TestGatewayImages:
             },
         )
 
-        study = DicomStudy.for_appointment(appointment)
+        study = DicomStudy.for_appointment(in_progress_appointment)
         assert study.additional_details == "Some details about the images"
         assert study.imperfect_but_best_possible is False
         assert not study.reasons_incomplete
@@ -480,10 +467,13 @@ class TestGatewayImages:
 
 @pytest.mark.django_db
 class TestAppointmentImagesStream:
-    def test_returns_sse_content_type(self, clinical_user_client, appointment):
+    def test_returns_sse_content_type(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_images_stream", kwargs={"pk": appointment.pk}
+                "mammograms:appointment_images_stream",
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -830,13 +820,13 @@ class TestResumeAppointment:
 
 @pytest.mark.django_db
 class TestAppointmentCannotGoAhead:
-    def test_status_and_audit_created(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_status_and_audit_created(
+        self, clinical_user_client, in_progress_appointment
+    ):
         clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+                "mammograms:appointment_cannot_go_ahead",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "stopped_reasons": ["failed_identity_check"],
@@ -845,22 +835,22 @@ class TestAppointmentCannotGoAhead:
         )
         assert (
             AuditLog.objects.filter(
-                object_id=appointment.pk,
+                object_id=in_progress_appointment.pk,
                 operation=AuditLog.Operations.UPDATE,
             ).count()
             == 1
         )
 
-    def test_flash_message_when_rescheduled(self, clinical_user_client):
+    def test_flash_message_when_rescheduled(
+        self, clinical_user_client, in_progress_appointment
+    ):
         from django.contrib.messages import get_messages
 
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        name = appointment.screening_episode.participant.full_name
+        name = in_progress_appointment.screening_episode.participant.full_name
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+                "mammograms:appointment_cannot_go_ahead",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "stopped_reasons": ["failed_identity_check"],
@@ -874,16 +864,16 @@ class TestAppointmentCannotGoAhead:
             for msg in message_strings
         )
 
-    def test_flash_message_when_not_rescheduled(self, clinical_user_client):
+    def test_flash_message_when_not_rescheduled(
+        self, clinical_user_client, in_progress_appointment
+    ):
         from django.contrib.messages import get_messages
 
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        name = appointment.screening_episode.participant.full_name
+        name = in_progress_appointment.screening_episode.participant.full_name
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+                "mammograms:appointment_cannot_go_ahead",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "stopped_reasons": ["failed_identity_check"],
@@ -900,74 +890,69 @@ class TestAppointmentCannotGoAhead:
 
 @pytest.mark.django_db
 class TestMarkSectionReviewed:
-    def test_creates_medical_information_review(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_creates_medical_information_review(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_section_reviewed",
-                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+                kwargs={"pk": in_progress_appointment.pk, "section": "SYMPTOMS"},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assert MedicalInformationReview.objects.filter(
-            appointment=appointment, section="SYMPTOMS"
+            appointment=in_progress_appointment, section="SYMPTOMS"
         ).exists()
         review = MedicalInformationReview.objects.get(
-            appointment=appointment, section="SYMPTOMS"
+            appointment=in_progress_appointment, section="SYMPTOMS"
         )
         assert review.reviewed_by == clinical_user_client.user
 
     def test_creates_medical_information_review_with_plain_response(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_section_reviewed",
-                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+                kwargs={"pk": in_progress_appointment.pk, "section": "SYMPTOMS"},
             ),
             headers={"Accept": "text/plain"},
         )
         assert response.status_code == 201
         assert MedicalInformationReview.objects.filter(
-            appointment=appointment, section="SYMPTOMS"
+            appointment=in_progress_appointment, section="SYMPTOMS"
         ).exists()
         review = MedicalInformationReview.objects.get(
-            appointment=appointment, section="SYMPTOMS"
+            appointment=in_progress_appointment, section="SYMPTOMS"
         )
         assert review.reviewed_by == clinical_user_client.user
 
     def test_does_not_update_reviewed_by_if_already_reviewed(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         original_user = UserFactory.create(first_name="Jane", last_name="Doe")
         MedicalInformationReviewFactory.create(
-            appointment=appointment, section="SYMPTOMS", reviewed_by=original_user
+            appointment=in_progress_appointment,
+            section="SYMPTOMS",
+            reviewed_by=original_user,
         )
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_section_reviewed",
-                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+                kwargs={"pk": in_progress_appointment.pk, "section": "SYMPTOMS"},
             ),
             follow=True,
         )
 
         review = MedicalInformationReview.objects.get(
-            appointment=appointment, section="SYMPTOMS"
+            appointment=in_progress_appointment, section="SYMPTOMS"
         )
         assert review.reviewed_by == original_user
         assertContains(
@@ -975,12 +960,11 @@ class TestMarkSectionReviewed:
             "This section has already been reviewed by Jane Doe",
         )
 
-    def test_noop_if_already_reviewed_by_same_user(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_noop_if_already_reviewed_by_same_user(
+        self, clinical_user_client, in_progress_appointment
+    ):
         MedicalInformationReviewFactory.create(
-            appointment=appointment,
+            appointment=in_progress_appointment,
             section="SYMPTOMS",
             reviewed_by=clinical_user_client.user,
         )
@@ -988,7 +972,7 @@ class TestMarkSectionReviewed:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_section_reviewed",
-                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+                kwargs={"pk": in_progress_appointment.pk, "section": "SYMPTOMS"},
             ),
             follow=True,
         )
@@ -997,13 +981,13 @@ class TestMarkSectionReviewed:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
         assert (
             MedicalInformationReview.objects.filter(
-                appointment=appointment, section="SYMPTOMS"
+                appointment=in_progress_appointment, section="SYMPTOMS"
             ).count()
             == 1
         )
@@ -1014,43 +998,32 @@ class TestMarkSectionReviewed:
         )
 
     def test_does_not_update_reviewed_by_if_already_reviewed_with_plain_response(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         original_user = UserFactory.create(first_name="Jane", last_name="Doe")
         MedicalInformationReviewFactory.create(
-            appointment=appointment, section="SYMPTOMS", reviewed_by=original_user
+            appointment=in_progress_appointment,
+            section="SYMPTOMS",
+            reviewed_by=original_user,
         )
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:mark_section_reviewed",
-                kwargs={"pk": appointment.pk, "section": "SYMPTOMS"},
+                kwargs={"pk": in_progress_appointment.pk, "section": "SYMPTOMS"},
             ),
             headers={"Accept": "text/plain"},
         )
         assert response.status_code == 409
 
         review = MedicalInformationReview.objects.get(
-            appointment=appointment, section="SYMPTOMS"
+            appointment=in_progress_appointment, section="SYMPTOMS"
         )
         assert review.reviewed_by == original_user
 
 
 @pytest.mark.django_db
 class TestPauseAppointment:
-    @pytest.fixture
-    def in_progress_appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": clinical_user_client.user,
-            },
-        )
-
     def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
