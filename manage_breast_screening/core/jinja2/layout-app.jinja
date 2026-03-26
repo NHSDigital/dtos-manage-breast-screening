@@ -22,23 +22,25 @@
       "items": header_account_items(request.user)
     },
     "navigation": {
-      "items": [
-        {
-          "href": url('mammograms:pause_appointment', kwargs={'pk': presented_appointment.pk}),
-          "text": "Pause appointment",
-        },
-      ] if presented_appointment.status_bar and presented_appointment.status_bar.show_status_bar_for(request.user) else [
-        {
-          "href": "/",
-          "text": "Home",
-          "current": true if navActive == "home"
-        },
-        {
-          "href": "/clinics/",
-          "text": "Screening",
-          'current': true if navActive == "clinics"
-        }
-      ]
+      "items": [] if request.resolver_match.url_name == 'pause_appointment' else (
+        [
+          {
+            "href": url('mammograms:pause_appointment', kwargs={'pk': presented_appointment.pk}),
+            "text": "Pause appointment",
+          },
+        ] if presented_appointment.status_bar and presented_appointment.status_bar.show_status_bar_for(request.user) else [
+          {
+            "href": "/",
+            "text": "Home",
+            "current": true if navActive == "home"
+          },
+          {
+            "href": "/clinics/",
+            "text": "Screening",
+            'current': true if navActive == "clinics"
+          }
+        ]
+      )
     },
     "containerClasses": containerClasses
   }) }}
