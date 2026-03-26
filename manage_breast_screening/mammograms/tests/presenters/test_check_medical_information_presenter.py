@@ -42,6 +42,7 @@ from manage_breast_screening.participants.tests.factories import (
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
+    BreastFeatureAnnotationFactory,
     CystHistoryItemFactory,
     HormoneReplacementTherapyFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
@@ -884,7 +885,7 @@ class TestCheckMedicalInformationPresenter:
             ),
         ],
     )
-    def test_sympton(self, expected, test_data):
+    def test_symptoms(self, expected, test_data):
         appointment = AppointmentFactory.create()
         SymptomFactory.create(
             appointment=appointment,
@@ -895,6 +896,55 @@ class TestCheckMedicalInformationPresenter:
         item = CheckMedicalInformationPresenter(appointment)
 
         assert item.symptoms == [expected]
+
+    def test_no_breast_features(self):
+        appointment = AppointmentFactory.create()
+        assert CheckMedicalInformationPresenter(appointment).breast_features == []
+
+    @pytest.mark.parametrize(
+        "feature_id, region_id, expected",
+        [
+            (
+                "mole",
+                "left_medial_upper_abdominal_wall",
+                "mole (left medial upper abdominal wall)",
+            ),
+            ("scar", "right_lower_outer", "scar (right lower outer)"),
+            # any unknown values are rendered without underscores
+            (
+                "mystery_value",
+                "yesterday_clockwise_strange",
+                "mystery value (yesterday clockwise strange)",
+            ),
+        ],
+    )
+    def test_one_breast_feature(self, feature_id, region_id, expected):
+        appointment = AppointmentFactory.create()
+        BreastFeatureAnnotationFactory.create(
+            appointment=appointment,
+            annotations_json=[
+                {"id": feature_id, "region_id": region_id, "x": 1, "y": 1}
+            ],
+        )
+
+        assert CheckMedicalInformationPresenter(appointment).breast_features == [
+            expected
+        ]
+
+    def test_two_breast_features(self):
+        appointment = AppointmentFactory.create()
+        BreastFeatureAnnotationFactory.create(
+            appointment=appointment,
+            annotations_json=[
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164},
+                {"id": "scar", "region_id": "right_upper_outer", "x": 133, "y": 82},
+            ],
+        )
+
+        assert CheckMedicalInformationPresenter(appointment).breast_features == [
+            "mole (left upper inner)",
+            "scar (right upper outer)",
+        ]
 
     def test_previous_mammograms_action_with_no_mammograms(self):
         appointment = AppointmentFactory.create()
@@ -988,6 +1038,30 @@ class TestCheckMedicalInformationPresenter:
         assert "Skin change: colour change (left breast)" in item.symptoms
         assert "Lump (right breast)" in item.symptoms
         assert "Swelling or shape change (right breast)" in item.symptoms
+
+    def test_breast_features_action_with_no_breast_features(self):
+        appointment = AppointmentFactory.create()
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.breast_features_action["items"]
+        assert action["text"] == "Add breast features"
+        assert action["href"].endswith("#breast-features")
+        assert "visuallyHiddenText" not in action
+
+    def test_breast_features_action_with_breast_features(self):
+        appointment = AppointmentFactory.create()
+        BreastFeatureAnnotationFactory.create(
+            appointment=appointment,
+            annotations_json=[
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
+            ],
+        )
+        item = CheckMedicalInformationPresenter(appointment)
+
+        [action] = item.breast_features_action["items"]
+        assert action["text"] == "View or change"
+        assert action["href"].endswith("#breast-features")
+        assert action["visuallyHiddenText"] == "breast features"
 
     def test_no_other_relevant_information(self):
         appointment = AppointmentFactory.create()

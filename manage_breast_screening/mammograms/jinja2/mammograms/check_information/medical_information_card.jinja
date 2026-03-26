@@ -36,6 +36,11 @@
           "actions": presented_medical_information.symptoms_action
         },
         {
+          "key": { "text": "Breast features" },
+          "value" : { "html": medical_history(presented_medical_information.breast_features, 'No breast features recorded') },
+          "actions": presented_medical_information.breast_features_action
+        },
+        {
           "key": { "text": "Other relevant information" },
           "value" : { "html": medical_history(presented_medical_information.other_relevant_information, 'No other information added') },
           "actions": presented_medical_information.other_relevant_information_action

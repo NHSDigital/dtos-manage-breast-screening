@@ -426,7 +426,9 @@ class TestRecordMedicalInformationPresenter:
     def test_update_breast_features_button(self, in_progress_appointment):
         in_progress_appointment.breast_features = BreastFeatureAnnotation(
             appointment=in_progress_appointment,
-            annotations_json=[{"name": "abc", "id": "abc", "x": 1, "y": 1}],
+            annotations_json=[
+                {"id": "scar", "region_id": "right_upper_outer", "x": 133, "y": 82}
+            ],
         )
 
         presenter = MedicalInformationPresenter(in_progress_appointment)

@@ -106,9 +106,9 @@ export class BreastDiagram extends ConfigurableComponent {
   render() {
     const { $imageMap, markers, values } = this
 
-    values.forEach(({ id, x, y }, index) => {
-      const $path = $imageMap.getPathById(id)
-      const point = $imageMap.createPoint(x, y, id)
+    values.forEach(({ region_id, x, y }, index) => {
+      const $path = $imageMap.getPathById(region_id)
+      const point = $imageMap.createPoint(x, y, region_id)
 
       // Render active region
       $imageMap.setState('active', $path)
@@ -180,7 +180,7 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     $debugInput.textContent =
-      this.values.map(({ id }) => id).join(', ') || 'N/A'
+      this.values.map(({ region_id }) => region_id).join(', ') || 'N/A'
 
     if (!$debugX || !$debugY || !$debugRegion) {
       return
@@ -205,8 +205,8 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     this.add({
-      id: $path.classList.value,
-      name: 'Pending',
+      id: 'pending',
+      region_id: $path.classList.value,
       x: point.x,
       y: point.y
     })
@@ -242,7 +242,7 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     const index = values.indexOf(entry)
-    const $path = $imageMap.getPathById(entry.id)
+    const $path = $imageMap.getPathById(entry.region_id)
 
     $imageMap.setState('active', $path, false)
     values.splice(index, 1)
@@ -343,10 +343,12 @@ function isValidObject(value) {
     return false
   }
 
+  const keys = new Set(['id', 'region_id', 'x', 'y'])
+
   return (
-    Object.keys(value).every((key) => ['id', 'name', 'x', 'y'].includes(key)) &&
+    Object.keys(value).every((key) => keys.has(key)) &&
     typeof value.id === 'string' &&
-    typeof value.name === 'string' &&
+    typeof value.region_id === 'string' &&
     typeof value.x === 'number' &&
     typeof value.y === 'number'
   )
@@ -378,8 +380,8 @@ function isValid(value) {
  * Breast feature input value
  *
  * @typedef {object} BreastFeature
- * @property {string} id - Image map region ID
- * @property {string} name - Breast feature name
+ * @property {string} id - Breast feature ID
+ * @property {string} region_id - Image map region ID
  * @property {number} x - X coordinate of breast feature
  * @property {number} y - Y coordinate of breast feature
  */

@@ -574,6 +574,16 @@ clinic:
             location_details: In the radiology department
             exact_date: '2025-07-25'
             date_type: EXACT
+        breast_features:
+          annotations_json:
+            [
+              {
+                'id': 'scar',
+                'region_id': 'left_axilla',
+                'x': 711.7478637695312,
+                'y': 53.868194580078125
+              }
+            ]
     - id: 6de03637-f52c-48dc-a793-18169b5882bd
       duration_in_minutes: 8
       starts_at_time: '12:56'

@@ -47,7 +47,7 @@
   presented_section=presenter.get_section(sections.BREAST_FEATURES),
   csrf_input=csrf_input,
   ) %}
-  {{ breast_features_content(presenter) }}
+  {{ breast_features_content(presenter, debug='debug' in request.GET) }}
 {% endcall %}
 
 {% call card_with_status(

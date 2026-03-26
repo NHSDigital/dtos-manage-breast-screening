@@ -20,11 +20,11 @@ class BreastFeatureForm(Form):
             "type": "object",
             "properties": {
                 "id": {"type": "string"},
-                "name": {"type": "string"},
+                "region_id": {"type": "string"},
                 "x": {"type": "number"},
                 "y": {"type": "number"},
             },
-            "required": ["id", "name", "x", "y"],
+            "required": ["id", "region_id", "x", "y"],
             "additionalProperties": False,
         },
     }
@@ -54,6 +54,18 @@ class BreastFeatureForm(Form):
                 message=self.fields["features"].error_messages["invalid"],
                 code="invalid",
             )
+
+        for feature in data:
+            if feature["id"] not in BreastFeatureAnnotation.FeatureType:
+                if feature["id"] == "pending":
+                    # Temporarily allow.
+                    # Remove this once the breast diagram component is fully complete.
+                    pass
+                else:
+                    raise ValidationError(
+                        message="Select a feature type",
+                        code="invalid",
+                    )
 
         return data
 
