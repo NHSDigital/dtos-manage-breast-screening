@@ -28,12 +28,12 @@
     <li class="app-image-key__item">
       {{ app_image_marker({
         "text": loop.index,
-        "label": item.id,
+        "label": item.id | replace("_", " ") | capitalize,
         "href": undefined if params.read_only else "#marker-" ~ loop.index
       }) | trim | indent(6) }}
 
       {{ tag({
-        "text": item.region_id,
+        "text": item.region_id | replace("_", " ") | capitalize,
         "classes": "nhsuk-tag--white"
       }) | trim | indent(6) }}
     </li>
