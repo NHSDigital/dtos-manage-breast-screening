@@ -105,7 +105,7 @@ class TestParticipant:
 
 
 @pytest.mark.django_db
-class TestScreeningEvent:
+class TestScreeningEpisode:
     def test_no_previous_screening_episode(self):
         episode = ScreeningEpisodeFactory.create()
         assert episode.previous() is None
