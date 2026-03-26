@@ -427,6 +427,6 @@ function isValid(value) {
  */
 
 /**
- * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
+ * @import { Schema } from 'nhsuk-frontend'
  * @import { ImageMapPayload, ImageMapListener } from './image-map.js'
  */
