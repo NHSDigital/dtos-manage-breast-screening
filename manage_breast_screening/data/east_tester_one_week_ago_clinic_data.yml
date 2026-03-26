@@ -597,7 +597,14 @@ clinic:
             created_at: '2019-12-10'
         breast_features:
           annotations_json:
-            [{ 'x': 715, 'y': 66, 'region_id': 'left_axilla', 'id': 'scar' }]
+            [
+              {
+                'id': 'scar',
+                'region_id': 'left_axilla',
+                'x': 711.7478637695312,
+                'y': 53.868194580078125
+              }
+            ]
     - id: bce8bbbe-0a1c-41d0-b1dc-2512b401a7e8
       duration_in_minutes: 8
       starts_at_time: '11:32'
