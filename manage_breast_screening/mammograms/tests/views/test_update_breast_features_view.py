@@ -22,7 +22,7 @@ class TestRecordBreastFeaturesView:
 
     @pytest.fixture
     def feature(self):
-        return {"x": 0, "y": 0, "id": "scar", "region_id": "right_upper_inner"}
+        return {"id": "scar", "region_id": "right_upper_outer", "x": 133, "y": 82}
 
     def test_post_creates_annotation_if_it_does_not_exist(
         self, clinical_user_client, in_progress_appointment, feature
@@ -51,7 +51,7 @@ class TestRecordBreastFeaturesView:
         BreastFeatureAnnotation.objects.create(
             appointment=in_progress_appointment,
             annotations_json=[
-                {"x": 1, "y": 1, "id": "mole", "region_id": "left_upper_inner"}
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
             ],
         )
 

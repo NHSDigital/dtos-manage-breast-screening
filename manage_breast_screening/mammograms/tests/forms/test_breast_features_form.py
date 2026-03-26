@@ -16,7 +16,7 @@ from manage_breast_screening.participants.models.breast_features import (
 @pytest.mark.django_db
 class TestCreateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
-        json_obj = [{"id": "mole", "region_id": "def", "x": 1, "y": 2}]
+        json_obj = [{"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}]
         form = AddBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -82,7 +82,7 @@ class TestCreateBreastFeatureForm:
             QueryDict(
                 urlencode(
                     {
-                        "features": '[{"region_id": "abc", "id": "pending", "x": 1, "y": 1}]',
+                        "features": '[{"id": "pending", "region_id": "right_upper_outer", "x": 133, "y": 82}]',
                     },
                     doseq=True,
                 )
@@ -98,11 +98,13 @@ class TestCreateBreastFeatureForm:
 class TestUpdateBreastFeatureForm:
     def test_saves_to_appointment(self, in_progress_appointment, clinical_user):
         BreastFeatureAnnotation.objects.create(
-            annotations_json=[{"id": "mole", "region_id": "features", "x": 0, "y": 0}],
+            annotations_json=[
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
+            ],
             appointment=in_progress_appointment,
         )
 
-        json_obj = [{"id": "scar", "region_id": "def", "x": 1, "y": 2}]
+        json_obj = [{"id": "scar", "region_id": "right_upper_outer", "x": 133, "y": 82}]
         form = UpdateBreastFeatureForm(
             QueryDict(
                 urlencode(
@@ -122,7 +124,9 @@ class TestUpdateBreastFeatureForm:
         assert instance.annotations_json == json_obj
 
     def test_populates_initial_data(self, in_progress_appointment):
-        initial_features = [{"id": "mole", "region_id": "def", "x": 1, "y": 2}]
+        initial_features = [
+            {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
+        ]
         BreastFeatureAnnotation.objects.create(
             annotations_json=initial_features,
             appointment=in_progress_appointment,

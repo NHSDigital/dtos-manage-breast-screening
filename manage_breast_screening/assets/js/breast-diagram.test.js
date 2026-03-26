@@ -21,8 +21,8 @@ jest.mock('./image-map', () => {
  * @type {DOMPoint}
  */
 const dummyPoint = {
-  x: 0,
-  y: 0,
+  x: 133,
+  y: 82,
   w: null,
   z: null,
   matrixTransform: jest.fn(),
@@ -35,8 +35,8 @@ const dummyPoint = {
  * @type {BreastFeature}
  */
 const dummyFeature = {
-  region_id: 'abc',
   id: 'pending',
+  region_id: 'right_upper_outer',
   x: dummyPoint.x,
   y: dummyPoint.y
 }
@@ -58,7 +58,7 @@ describe('Breast diagram', () => {
 
   const diagramWithAFeatureMarked = `
     <form>
-      <input name="features" type="hidden" value='[{"x": 0, "y": 0, "id": "pending", "region_id": "abc"}]'>
+      <input name="features" type="hidden" value='[{"id": "pending", "region_id": "right_upper_outer", "x": 133, "y": 82}]'>
       <div data-module="app-breast-diagram">
         <div data-module="app-image-map"></div>
       </div>
@@ -105,7 +105,7 @@ describe('Breast diagram', () => {
     component.write()
 
     expect(component.$input.value).toBe(
-      '[{"x":0,"y":0,"id":"pending","region_id":"abc"}]'
+      '[{"id":"pending","region_id":"right_upper_outer","x":133,"y":82}]'
     )
   })
 })

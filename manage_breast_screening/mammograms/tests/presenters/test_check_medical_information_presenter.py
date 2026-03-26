@@ -923,7 +923,7 @@ class TestCheckMedicalInformationPresenter:
         BreastFeatureAnnotationFactory.create(
             appointment=appointment,
             annotations_json=[
-                {"x": 1, "y": 1, "id": feature_id, "region_id": region_id}
+                {"id": feature_id, "region_id": region_id, "x": 1, "y": 1}
             ],
         )
 
@@ -936,14 +936,14 @@ class TestCheckMedicalInformationPresenter:
         BreastFeatureAnnotationFactory.create(
             appointment=appointment,
             annotations_json=[
-                {"x": 123, "y": 456, "id": "mole", "region_id": "left_central"},
-                {"x": 789, "y": 123, "id": "mole", "region_id": "right_central"},
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164},
+                {"id": "scar", "region_id": "right_upper_outer", "x": 133, "y": 82},
             ],
         )
 
         assert CheckMedicalInformationPresenter(appointment).breast_features == [
-            "mole (left central)",
-            "mole (right central)",
+            "mole (left upper inner)",
+            "scar (right upper outer)",
         ]
 
     def test_previous_mammograms_action_with_no_mammograms(self):
@@ -1053,7 +1053,7 @@ class TestCheckMedicalInformationPresenter:
         BreastFeatureAnnotationFactory.create(
             appointment=appointment,
             annotations_json=[
-                {"x": 123, "y": 456, "id": "mole", "region_id": "left_upper_inner"}
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
             ],
         )
         item = CheckMedicalInformationPresenter(appointment)

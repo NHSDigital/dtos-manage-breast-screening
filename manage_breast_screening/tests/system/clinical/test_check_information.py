@@ -259,7 +259,7 @@ class TestCheckInformation(SystemTestCase):
         BreastFeatureAnnotationFactory.create(
             appointment=self.appointment,
             annotations_json=[
-                {"x": 1, "y": 1, "id": "mole", "region_id": "left_upper_outer"}
+                {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
             ],
         )
 
@@ -335,7 +335,7 @@ class TestCheckInformation(SystemTestCase):
 
         row = section.locator(".nhsuk-summary-list__row", has_text="Breast features")
         value = row.locator(".nhsuk-summary-list__value")
-        expect(value).to_contain_text("mole (left upper outer)")
+        expect(value).to_contain_text("mole (left upper inner)")
 
         row = section.locator(
             ".nhsuk-summary-list__row", has_text="Other relevant information"
