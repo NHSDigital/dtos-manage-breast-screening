@@ -144,7 +144,7 @@
   {% endif %}
 
   {% if not read_only %}
-    <div class="nhsuk-button-group">
+    <div class="nhsuk-button-group {{ "nhsuk-u-margin-top-3" if presented_medical_info.breast_features else "" }}">
       {{ button({
         "text": presented_medical_info.add_or_update_breast_features_button.text,
         "href": presented_medical_info.add_or_update_breast_features_button.href,
