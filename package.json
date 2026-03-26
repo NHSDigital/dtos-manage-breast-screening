@@ -22,7 +22,7 @@
     "watch": "concurrently \"npm:compile:css -- --update --watch\" \"npm:postcompile:css -- --watch\" \"npm:compile:js -- --watch\" --prefix none"
   },
   "dependencies": {
-    "nhsuk-frontend": "^10.3.0"
+    "nhsuk-frontend": "^10.4.2"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.2",
