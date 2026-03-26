@@ -124,6 +124,10 @@ export class BreastDiagram extends ConfigurableComponent {
   render() {
     const { imageMap, markers, values } = this
 
+    if (!values.length) {
+      imageMap.unsetState('active')
+    }
+
     values.forEach(({ region_id, x, y }, index) => {
       const $path = imageMap.getPathById(region_id)
       const point = imageMap.createPoint(x, y, region_id)
@@ -275,7 +279,7 @@ export class BreastDiagram extends ConfigurableComponent {
     const index = values.indexOf(entry)
     const $path = imageMap.getPathById(entry.region_id)
 
-    imageMap.setState('active', $path, false)
+    imageMap.unsetState('active', $path)
     values.splice(index, 1)
 
     this.render()
