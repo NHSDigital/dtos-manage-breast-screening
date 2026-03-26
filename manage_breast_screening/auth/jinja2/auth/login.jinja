@@ -2,7 +2,12 @@
 {% from "nhsuk/components/button/macro.jinja" import button %}
 
 {% block header %}
-  {{ header({ "service": { "text": "Manage breast screening" }}) }}
+  {{ header({
+    "classes": "nhsuk-header--inline",
+    "service": {
+      "text": "Manage breast screening"
+    }
+  }) }}
 {% endblock %}
 
 {% block page_content %}
