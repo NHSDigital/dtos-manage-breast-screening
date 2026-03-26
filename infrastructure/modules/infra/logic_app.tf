@@ -45,17 +45,17 @@ resource "azurerm_logic_app_trigger_http_request" "azure_monitor_alert" {
           essentials = {
             type = "object"
             properties = {
-              alertRule         = { type = "string" }
-              severity          = { type = "string" }
-              firedDateTime     = { type = "string" }
-              resolvedDateTime  = { type = "string" }
-              portalLink        = { type = "string" }
-              monitorCondition  = { type = "string" }
+              alertRule        = { type = "string" }
+              severity         = { type = "string" }
+              firedDateTime    = { type = "string" }
+              resolvedDateTime = { type = "string" }
+              portalLink       = { type = "string" }
+              monitorCondition = { type = "string" }
+              description      = { type = "string" }
               configurationItems = {
                 type  = "array"
                 items = { type = "string" }
               }
-              description = { type = "string" }
             }
           }
           alertContext = {
@@ -70,6 +70,11 @@ resource "azurerm_logic_app_trigger_http_request" "azure_monitor_alert" {
                       type = "object"
                       properties = {
                         linkToSearchResultsUI = { type = "string" }
+                        metricName            = { type = "string" }
+                        metricValue           = { type = "number" }
+                        threshold             = { type = "number" }
+                        operator              = { type = "string" }
+                        timeAggregation       = { type = "string" }
                       }
                     }
                   }
@@ -83,26 +88,208 @@ resource "azurerm_logic_app_trigger_http_request" "azure_monitor_alert" {
   })
 }
 
-resource "azurerm_logic_app_action_custom" "query_app_insights" {
+resource "azurerm_logic_app_action_custom" "route_alert" {
   count        = var.enable_alerting ? 1 : 0
-  name         = "Query_App_Insights"
+  name         = "Route_Alert"
   logic_app_id = azurerm_logic_app_workflow.slack_alert_transformer[0].id
 
   body = <<-BODY
     {
-      "type": "Http",
-      "inputs": {
-        "method": "POST",
-        "uri": "https://api.applicationinsights.io/v1/apps/${module.app_insights_audit.app_id}/query",
-        "headers": {
-          "Content-Type": "application/json"
+      "type": "If",
+      "expression": {
+        "and": [
+          {
+            "contains": [
+              "@triggerBody()?['data']?['essentials']?['alertRule']",
+              "exceptions-alert"
+            ]
+          }
+        ]
+      },
+      "actions": {
+        "Query_App_Insights": {
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "https://api.applicationinsights.io/v1/apps/${module.app_insights_audit.app_id}/query",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "query": "exceptions | where timestamp between (datetime_add('minute', -15, todatetime('@{triggerBody()?['data']?['essentials']?['firedDateTime']}')) .. todatetime('@{triggerBody()?['data']?['essentials']?['firedDateTime']}')) | summarize Count=count(), ExceptionType=any(type), Message=substring(any(outerMessage), 0, 300), Url=any(tostring(customDimensions['url'])), OperationId=any(operation_Id), RoleName=any(cloud_RoleName), FirstSeen=format_datetime(min(timestamp), 'yyyy-MM-dd HH:mm:ss'), LastSeen=format_datetime(max(timestamp), 'yyyy-MM-dd HH:mm:ss')"
+            },
+            "authentication": {
+              "type": "ManagedServiceIdentity",
+              "audience": "https://api.applicationinsights.io"
+            }
+          },
+          "runAfter": {}
         },
-        "body": {
-          "query": "exceptions | where timestamp between (datetime_add('minute', -15, todatetime('@{triggerBody()?['data']?['essentials']?['firedDateTime']}')) .. todatetime('@{triggerBody()?['data']?['essentials']?['firedDateTime']}')) | summarize Count=count(), ExceptionType=any(type), Message=substring(any(outerMessage), 0, 300), Url=any(tostring(customDimensions['url'])), OperationId=any(operation_Id), RoleName=any(cloud_RoleName), FirstSeen=format_datetime(min(timestamp), 'yyyy-MM-dd HH:mm:ss'), LastSeen=format_datetime(max(timestamp), 'yyyy-MM-dd HH:mm:ss')"
-        },
-        "authentication": {
-          "type": "ManagedServiceIdentity",
-          "audience": "https://api.applicationinsights.io"
+        "Post_Exception_to_Slack": {
+          "type": "Http",
+          "inputs": {
+            "method": "POST",
+            "uri": "@parameters('slackWebhookUrl')",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), concat('✅ Resolved – ', triggerBody()?['data']?['essentials']?['alertRule']), concat('🚨 Exception – ', triggerBody()?['data']?['essentials']?['alertRule']))}",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Environment*\n`', toUpper(split(triggerBody()?['data']?['essentials']?['alertRule'], '-')[1]), '`')}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Severity*\n', triggerBody()?['data']?['essentials']?['severity'])}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Fired At*\n', triggerBody()?['data']?['essentials']?['firedDateTime'])}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Status*\n', triggerBody()?['data']?['essentials']?['monitorCondition'])}"
+                    }
+                  ]
+                },
+                {
+                  "type": "divider"
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Exception Type*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[1], 'N/A'), '` ×', string(coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[0], 0)))}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Affected URL*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[3], 'N/A'), '`')}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Cloud Role*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[5], 'N/A'), '`')}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Time Range*\n', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[6], 'N/A'), ' → ', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[7], 'N/A'))}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "@{concat('*Message*\n> ', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[2], 'N/A'))}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "@{concat(':azure: <', triggerBody()?['data']?['essentials']?['portalLink'], '|View Alert>    :mag: <', triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['linkToSearchResultsUI'], '|View in App Insights>')}"
+                  }
+                }
+              ]
+            }
+          },
+          "runAfter": {
+            "Query_App_Insights": ["Succeeded", "Failed", "Skipped", "TimedOut"]
+          }
+        }
+      },
+      "else": {
+        "actions": {
+          "Post_Infrastructure_to_Slack": {
+            "type": "Http",
+            "inputs": {
+              "method": "POST",
+              "uri": "@parameters('slackWebhookUrl')",
+              "headers": {
+                "Content-Type": "application/json"
+              },
+              "body": {
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), concat('✅ Resolved – ', triggerBody()?['data']?['essentials']?['alertRule']), concat('⚠️ Alert – ', triggerBody()?['data']?['essentials']?['alertRule']))}",
+                      "emoji": true
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Resource*\n`', coalesce(triggerBody()?['data']?['essentials']?['configurationItems']?[0], 'N/A'), '`')}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Severity*\n', triggerBody()?['data']?['essentials']?['severity'])}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Fired At*\n', triggerBody()?['data']?['essentials']?['firedDateTime'])}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Status*\n', triggerBody()?['data']?['essentials']?['monitorCondition'])}"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "@{concat('*Description*\n> ', coalesce(triggerBody()?['data']?['essentials']?['description'], 'N/A'))}"
+                    }
+                  },
+                  {
+                    "type": "divider"
+                  },
+                  {
+                    "type": "section",
+                    "fields": [
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Metric*\n`', coalesce(triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricName'], 'N/A'), '`')}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Current Value*\n', string(coalesce(triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['metricValue'], 'N/A')), ' (', coalesce(triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['operator'], ''), ' ', string(coalesce(triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['threshold'], 'N/A')), ')')}"
+                      },
+                      {
+                        "type": "mrkdwn",
+                        "text": "@{concat('*Aggregation*\n', coalesce(triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['timeAggregation'], 'N/A'))}"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "@{concat(':azure: <', triggerBody()?['data']?['essentials']?['portalLink'], '|View Alert>')}"
+                    }
+                  }
+                ]
+              }
+            },
+            "runAfter": {}
+          }
         }
       },
       "runAfter": {}
@@ -110,99 +297,4 @@ resource "azurerm_logic_app_action_custom" "query_app_insights" {
   BODY
 
   depends_on = [azurerm_logic_app_trigger_http_request.azure_monitor_alert]
-}
-
-resource "azurerm_logic_app_action_custom" "post_to_slack" {
-  count        = var.enable_alerting ? 1 : 0
-  name         = "Post_to_Slack"
-  logic_app_id = azurerm_logic_app_workflow.slack_alert_transformer[0].id
-
-  body = <<-BODY
-    {
-      "type": "Http",
-      "inputs": {
-        "method": "POST",
-        "uri": "@parameters('slackWebhookUrl')",
-        "headers": {
-          "Content-Type": "application/json"
-        },
-        "body": {
-          "blocks": [
-            {
-              "type": "header",
-              "text": {
-                "type": "plain_text",
-                "text": "@{if(equals(triggerBody()?['data']?['essentials']?['monitorCondition'], 'Resolved'), concat('✅ Resolved – ', triggerBody()?['data']?['essentials']?['alertRule']), concat('🚨 Exception – ', triggerBody()?['data']?['essentials']?['alertRule']))}",
-                "emoji": true
-              }
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Environment*\n`', toUpper(split(triggerBody()?['data']?['essentials']?['alertRule'], '-')[1]), '`')}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Severity*\n', triggerBody()?['data']?['essentials']?['severity'])}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Fired At*\n', triggerBody()?['data']?['essentials']?['firedDateTime'])}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Status*\n', triggerBody()?['data']?['essentials']?['monitorCondition'])}"
-                }
-              ]
-            },
-            {
-              "type": "divider"
-            },
-            {
-              "type": "section",
-              "fields": [
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Exception Type*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[1], 'N/A'), '` ×', string(coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[0], 0)))}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Affected URL*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[3], 'N/A'), '`')}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Cloud Role*\n`', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[5], 'N/A'), '`')}"
-                },
-                {
-                  "type": "mrkdwn",
-                  "text": "@{concat('*Time Range*\n', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[6], 'N/A'), ' → ', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[7], 'N/A'))}"
-                }
-              ]
-            },
-            {
-              "type": "section",
-              "text": {
-                "type": "mrkdwn",
-                "text": "@{concat('*Message*\n> ', coalesce(body('Query_App_Insights')?['tables']?[0]?['rows']?[0]?[2], 'N/A'))}"
-              }
-            },
-            {
-              "type": "section",
-              "text": {
-                "type": "mrkdwn",
-                "text": "@{concat(':azure: <', triggerBody()?['data']?['essentials']?['portalLink'], '|View Alert>    :mag: <', triggerBody()?['data']?['alertContext']?['condition']?['allOf']?[0]?['linkToSearchResultsUI'], '|View in App Insights>')}"
-              }
-            }
-          ]
-        }
-      },
-      "runAfter": {
-        "Query_App_Insights": ["Succeeded", "Failed", "Skipped", "TimedOut"]
-      }
-    }
-  BODY
-
-  depends_on = [azurerm_logic_app_action_custom.query_app_insights]
 }
