@@ -240,9 +240,10 @@ The smoke test verifies the deployed application is accessible and serving the c
 2. **Front Door not approved**
    - See [Error 504](#error-504) for private link approval steps
 
-3. **Container app not ready**
-   - The test waits up to 5 minutes for the app to become available
-   - Check container app logs in Azure Portal
+3. **Container app or Front Door not ready**
+   - The test waits up to 40 minutes for the endpoint to become available.
+   - While the container app normally starts within 5 minutes, Front Door propagation and SSL certificate provisioning can take up to 40 minutes for new endpoints (like Review Apps).
+   - Check container app logs in Azure Portal.
 
 4. **Wrong SHA deployed**
    - Verify the correct docker image tag was used in deployment
