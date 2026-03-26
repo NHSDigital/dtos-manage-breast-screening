@@ -43,6 +43,7 @@ def environment(**options):
             "static": static,
             "url": reverse,
             "inflector": inflector,
+            "DJANGO_ENV": settings.DJANGO_ENV,
             "ENV_CONFIG": os.environ.get("ENV_CONFIG", "unknown"),
         }
     )
