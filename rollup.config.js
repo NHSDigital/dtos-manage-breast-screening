@@ -14,7 +14,7 @@ export default {
   output: {
     compact: true,
     format: 'es',
-    file: 'manage_breast_screening/assets/compiled/js/bundle.js',
+    file: 'manage_breast_screening/assets/compiled/js/main.min.js',
 
     plugins: [
       // Minification using terser
