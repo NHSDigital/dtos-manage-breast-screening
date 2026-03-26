@@ -1,7 +1,7 @@
 import uuid
 
 from factory.declarations import Sequence, SubFactory
-from factory.django import DjangoModelFactory
+from factory.django import DjangoModelFactory, FileField
 
 from .. import models
 
@@ -36,3 +36,4 @@ class ImageFactory(DjangoModelFactory):
     instance_number = Sequence(lambda n: n)
     laterality = "L"
     view_position = "CC"
+    image_file = FileField(filename="image.jpg")
