@@ -343,16 +343,16 @@ class TestAppointment:
                 )
             )
 
-            prefetched_status = appointment_with_status._prefetched_current_status[0]
-            assert prefetched_status == latest_status
+            cached_status = appointment_with_status._cached_current_status[0]
+            assert cached_status == latest_status
             # Verify no additional queries when accessing created_by
             with django_assert_num_queries(0):
-                assert prefetched_status.created_by is not None
-                prefetched_status.created_by.nhs_uid
+                assert cached_status.created_by is not None
+                cached_status.created_by.nhs_uid
 
     @pytest.mark.django_db
     class TestCurrentStatus:
-        def test_returns_prefetched_current_status_if_available(
+        def test_returns_cached_current_status_if_available(
             self, django_assert_num_queries
         ):
             appointment = AppointmentFactory.create()
@@ -374,7 +374,7 @@ class TestAppointment:
                 fetched_appointment.current_status.created_by
             assert fetched_appointment.current_status == latest_status
 
-        def test_returns_current_status_even_if_not_prefetched(
+        def test_returns_current_status_even_if_not_cached(
             self, django_assert_num_queries
         ):
             appointment = AppointmentFactory.create()

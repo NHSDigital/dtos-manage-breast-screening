@@ -123,12 +123,12 @@ class Appointment(BaseModel):
     def current_status(self) -> "AppointmentStatus":
         """
         Fetch the most recent status associated with this appointment.
-        Check if a prefetched status is available, otherwise do a query.
+        Check if a cached status is available, otherwise do a query.
         If there are no statuses for any reason, assume the default one.
         """
-        prefetched_current_status = getattr(self, "_cached_current_status", None)
-        if prefetched_current_status:
-            return prefetched_current_status[0]
+        cached_current_status = getattr(self, "_cached_current_status", None)
+        if cached_current_status:
+            return cached_current_status[0]
 
         status = self.statuses.order_by("-created_at").first()
         if status is None:
