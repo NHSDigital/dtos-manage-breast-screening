@@ -180,7 +180,7 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     $debugInput.textContent =
-      this.values.map(({ id }) => id).join(', ') || 'N/A'
+      this.values.map(({ region_id }) => region_id).join(', ') || 'N/A'
 
     if (!$debugX || !$debugY || !$debugRegion) {
       return
@@ -205,8 +205,8 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     this.add({
-      region_id: $path.classList.value,
       id: 'pending',
+      region_id: $path.classList.value,
       x: point.x,
       y: point.y
     })
@@ -242,7 +242,7 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     const index = values.indexOf(entry)
-    const $path = $imageMap.getPathById(entry.id)
+    const $path = $imageMap.getPathById(entry.region_id)
 
     $imageMap.setState('active', $path, false)
     values.splice(index, 1)
