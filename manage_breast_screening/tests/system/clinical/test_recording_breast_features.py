@@ -1,6 +1,5 @@
 from datetime import date
 
-import pytest
 import time_machine
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -18,7 +17,6 @@ from manage_breast_screening.tests.system.system_test_setup import SystemTestCas
 
 @time_machine.travel(date(2025, 1, 1))
 class TestRecordingBreastFeatures(SystemTestCase):
-    @pytest.mark.xfail(reason="Missing a step to select feature type")
     def test_recording_breast_features(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment_with_no_medical_information_added()

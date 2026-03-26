@@ -57,10 +57,15 @@ class BreastFeatureForm(Form):
 
         for feature in data:
             if feature["id"] not in BreastFeatureAnnotation.FeatureType:
-                raise ValidationError(
-                    message="Select a feature type",
-                    code="invalid",
-                )
+                if feature["id"] == "pending":
+                    # Temporarily allow.
+                    # Remove this once the breast diagram component is fully complete.
+                    pass
+                else:
+                    raise ValidationError(
+                        message="Select a feature type",
+                        code="invalid",
+                    )
 
         return data
 

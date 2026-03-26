@@ -77,6 +77,7 @@ class TestCreateBreastFeatureForm:
             "features": ["There was a problem saving the annotations"]
         }
 
+    @pytest.mark.xfail(reason="This is pending changes to the breast diagram component")
     def test_pending_feature_id(self, in_progress_appointment):
         form = AddBreastFeatureForm(
             QueryDict(
