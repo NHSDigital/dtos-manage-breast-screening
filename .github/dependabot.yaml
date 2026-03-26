@@ -38,6 +38,12 @@ updates:
         patterns:
           - '@babel/*'
           - '@rollup/*'
+          - 'autoprefixer'
+          - 'baseline-browser-mapping'
+          - 'caniuse-lite'
+          - 'cssnano'
+          - 'postcss'
+          - 'postcss-*'
           - 'rollup'
           - 'rollup-*'
           - 'sass-embedded'
@@ -46,18 +52,25 @@ updates:
         patterns:
           - '@typescript-eslint/*'
           - '@eslint/*'
+          - '@types/*'
           - 'eslint'
           - 'eslint-*'
+          - 'globals'
           - 'prettier'
-          - 'typescript*'
-          - '@types/*'
+          - 'typed-query-selector'
+          - 'typescript'
+          - 'typescript-*'
 
       test:
         patterns:
           - '@testing-library/*'
+          - '@types/jest'
+          - '@types/jest-*'
           - 'babel-jest'
           - 'jest'
           - 'jest-*'
+          - 'jsdom'
+          - 'outdent'
 
       tools:
         patterns:
