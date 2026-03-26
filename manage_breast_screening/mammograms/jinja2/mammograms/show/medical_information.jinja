@@ -25,7 +25,7 @@
 {% call card({
   "heading": "Breast features"
 }) %}
-  {{ breast_features_content(presenter, read_only=true) }}
+  {{ breast_features_content(presenter, read_only=true, debug='debug' in request.GET) }}
 {% endcall %}
 
 {% call card({
