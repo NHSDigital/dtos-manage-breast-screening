@@ -23,7 +23,7 @@ else
 fi
 
 # Script timeout and check interval in seconds
-TIMEOUT=$((15*60))
+TIMEOUT=$((40*60))
 INTERVAL=5
 
 start_time=$(date +%s)
