@@ -1,6 +1,6 @@
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
-{% from "components/breast-features/macro.jinja" import app_breast_features %}
+{% from "components/image-key/macro.jinja" import app_image_key %}
 
 <div {{- nhsukAttributes({
   "class": "app-breast-diagram",
@@ -40,7 +40,7 @@
   </figure>
 
 {% if params.features | length %}
-  {{ app_breast_features({
+  {{ app_image_key({
     "items": params.features,
     "read_only": params.read_only
   }) | trim | indent(2) }}
