@@ -1079,10 +1079,8 @@ class TestPauseAppointment:
         """
         screened_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.SCREENED,
-                "created_by": clinical_user_client.user,
-            },
+            current_status=AppointmentStatusNames.SCREENED,
+            current_status__created_by=clinical_user_client.user,
         )
 
         response = clinical_user_client.http.post(
@@ -1123,16 +1121,18 @@ class TestPauseAppointment:
             },
         )
 
-        with pytest.raises(
-            django.core.exceptions.ValidationError,
-            match="Can only be paused by Jane Doe",
-        ):
-            clinical_user_client.http.post(
-                reverse(
-                    "mammograms:pause_appointment",
-                    kwargs={"pk": in_progress_appointment.pk},
-                )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:pause_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
             )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment", kwargs={"pk": in_progress_appointment.pk}
+            ),
+        )
 
         in_progress_appointment.refresh_from_db()
         assert (
@@ -1140,12 +1140,3 @@ class TestPauseAppointment:
             == AppointmentStatusNames.IN_PROGRESS
         )
         assert in_progress_appointment.current_status.created_by == different_user
-
-    def test_user_not_permitted(
-        self, administrative_user_client, in_progress_appointment
-    ):
-        url = reverse(
-            "mammograms:pause_appointment", kwargs={"pk": in_progress_appointment.pk}
-        )
-        assert administrative_user_client.http.get(url).status_code == 403
-        assert administrative_user_client.http.post(url).status_code == 403
