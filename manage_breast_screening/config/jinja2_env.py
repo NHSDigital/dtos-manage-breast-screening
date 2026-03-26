@@ -41,6 +41,8 @@ def environment(**options):
             "static": static,
             "url": reverse,
             "inflector": inflector,
+            "DJANGO_ENV": settings.DJANGO_ENV,
+            "IS_PRODUCTION": settings.IS_PRODUCTION,
         }
     )
 
