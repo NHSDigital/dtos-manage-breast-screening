@@ -19,11 +19,37 @@
   "data-read-only": {
     "value": "true" if params.read_only else false,
     "optional": true
+  },
+  "hidden": {
+    "value": true if not items | length else false,
+    "optional": true
   }
 }) -}}>
   <div class="app-image-key__header">
     <h3 class="app-image-key__title">Key</h3>
+  {% if not params.read_only %}
+    {{ button({
+      "text": "Clear all features",
+      "classes": "nhsuk-button--warning nhsuk-button--small app-image-key__button nhsuk-u-margin-bottom-0",
+      "attributes": {
+        "hidden": {
+          "value": true,
+          "optional": true
+        }
+      }
+    }) | trim | indent(4) }}
+  {% endif %}
   </div>
+
+  <template class="app-js-template-image-key-item">
+    {{ app_image_key_item({
+      "index": "?",
+      "feature": "Pending",
+      "region": "Unknown",
+      "href": "#" if not params.read_only else undefined
+    }) | trim | indent(4) }}
+  </template>
+
   <ul class="app-image-key__items">
   {% for item in items %}
     {{ app_image_key_item({

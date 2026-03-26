@@ -42,12 +42,10 @@
     {% endif %}
   {% endcall %}
 
-{% if params.features | length %}
   {{ app_image_key({
     "items": params.features,
     "read_only": params.read_only
   }) | trim | indent(2) }}
-{% endif %}
 
 {% if params.debug %}
   {% if not params.read_only %}
