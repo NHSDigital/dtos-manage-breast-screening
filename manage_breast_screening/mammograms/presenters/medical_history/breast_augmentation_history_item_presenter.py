@@ -20,11 +20,7 @@ class BreastAugmentationHistoryItemPresenter:
             self._procedure_text(choice) for choice in self._item.left_breast_procedures
         ]
 
-        self.implants_have_been_removed = (
-            "Yes" if self._item.implants_have_been_removed else "No"
-        )
-        if self._item.implants_have_been_removed and self._item.removal_year:
-            self.implants_have_been_removed += f" ({self._item.removal_year})"
+        self.implants_have_been_removed = self._item.implants_have_been_removed
 
         self.additional_details = nl2br(self._item.additional_details)
 

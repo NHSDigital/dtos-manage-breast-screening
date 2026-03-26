@@ -37,7 +37,7 @@ class TestBreastAugmentationHistoryItemPresenter:
         assert presenter.right_breast_procedures == ["Breast implants"]
         assert presenter.left_breast_procedures == ["No procedures"]
         assert presenter.procedure_year == "2000 (25 years ago)"
-        assert presenter.implants_have_been_removed == "Yes (2018)"
+        assert presenter.implants_have_been_removed is True
         assert presenter.additional_details == "some details"
 
     @time_machine.travel(date(2025, 1, 1))
