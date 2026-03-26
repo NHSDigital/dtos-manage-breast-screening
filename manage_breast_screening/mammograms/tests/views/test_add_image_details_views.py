@@ -13,31 +13,26 @@ from manage_breast_screening.manual_images.tests.factories import (
 from manage_breast_screening.participants.models.appointment import (
     AppointmentWorkflowStepCompletion,
 )
-from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 
 @pytest.mark.django_db
 class TestAddImageDetailsView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_valid_post_with_counts_for_all_images(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_with_counts_for_all_images(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "1",
@@ -53,11 +48,11 @@ class TestAddImageDetailsView:
             response,
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-        study = appointment.study
+        study = in_progress_appointment.study
         assert study.additional_details == "Some additional details"
 
         series_list = study.series_set.all()
@@ -68,16 +63,15 @@ class TestAddImageDetailsView:
         self._assert_series(series_list[3], "MLO", "L", 4)
         self._assert_series(series_list[4], "CC", "L", 5)
         self._assert_series(series_list[5], "EKLUND", "L", 6)
-        self._assert_take_images_step_not_completed(appointment)
+        self._assert_take_images_step_not_completed(in_progress_appointment)
 
-    def test_valid_post_with_high_count(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_with_high_count(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "0",
@@ -98,28 +92,25 @@ class TestAddImageDetailsView:
             response,
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-        study = appointment.study
+        study = in_progress_appointment.study
         assert study.additional_details == ""
 
         series_list = study.series_set.all()
         assert len(series_list) == 1
         self._assert_series(series_list[0], "CC", "L", 20)
-        self._assert_take_images_step_not_completed(appointment)
+        self._assert_take_images_step_not_completed(in_progress_appointment)
 
     def test_valid_post_with_all_counts_one_redirects_to_check_information(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "1",
@@ -135,23 +126,24 @@ class TestAddImageDetailsView:
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-        study = appointment.study
+        study = in_progress_appointment.study
         series_list = study.series_set.all()
         assert len(series_list) == 4
-        self._assert_take_images_step_completed(appointment, clinical_user_client.user)
-
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        self._assert_take_images_step_completed(
+            in_progress_appointment, clinical_user_client.user
         )
+
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "-1",
@@ -179,15 +171,12 @@ class TestAddImageDetailsView:
         )
 
     def test_zero_image_count_post_renders_response_with_errors(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "0",
@@ -231,26 +220,20 @@ class TestAddImageDetailsView:
 
 @pytest.mark.django_db
 class TestUpdateImageDetailsView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_existing_data_is_prepopulated_and_post_updates_db(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         study = StudyFactory.create(
-            appointment=appointment, additional_details="original notes"
+            appointment=in_progress_appointment, additional_details="original notes"
         )
         SeriesFactory.create(study=study, view_position="MLO", laterality="R", count=3)
         SeriesFactory.create(study=study, view_position="CC", laterality="R", count=1)
@@ -258,13 +241,19 @@ class TestUpdateImageDetailsView:
         SeriesFactory.create(study=study, view_position="CC", laterality="L", count=1)
 
         get_response = clinical_user_client.http.get(
-            reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk})
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
         )
         assert 'id="id_rmlo_count"' in get_response.text
         assert 'value="3"' in get_response.text
 
         clinical_user_client.http.post(
-            reverse("mammograms:update_image_details", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:update_image_details",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
             {
                 "rmlo_count": "5",
                 "rcc_count": "1",
@@ -281,15 +270,12 @@ class TestUpdateImageDetailsView:
         assert study.series_set.get(view_position="MLO", laterality="R").count == 5
 
     def test_valid_post_with_single_images_redirects_to_check_information(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "1",
@@ -303,20 +289,20 @@ class TestUpdateImageDetailsView:
         )
         assertRedirects(
             response,
-            reverse("mammograms:check_information", kwargs={"pk": appointment.pk}),
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
     def test_valid_post_with_multiple_images_redirects_to_add_multiple_images_information(
-        self, clinical_user_client
+        self, clinical_user_client, in_progress_appointment
     ):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        StudyFactory.create(appointment=appointment)
+        StudyFactory.create(appointment=in_progress_appointment)
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "2",
@@ -332,19 +318,18 @@ class TestUpdateImageDetailsView:
             response,
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        StudyFactory.create(appointment=appointment)
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        StudyFactory.create(appointment=in_progress_appointment)
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "rmlo_count": "-1",

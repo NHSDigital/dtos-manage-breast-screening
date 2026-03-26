@@ -14,34 +14,31 @@ from manage_breast_screening.participants.tests.factories import (
 
 @pytest.mark.django_db
 class TestAddPregnancyAndBreastfeedingView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_pregnancy_and_breastfeeding",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_redirects_if_already_exists(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        PregnancyAndBreastfeedingFactory.create(appointment=appointment)
+    def test_redirects_if_already_exists(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        PregnancyAndBreastfeedingFactory.create(appointment=in_progress_appointment)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_pregnancy_and_breastfeeding",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
-                "mammograms:record_medical_information", kwargs={"pk": appointment.pk}
+                "mammograms:record_medical_information",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
@@ -76,14 +73,13 @@ class TestAddPregnancyAndBreastfeedingView:
             ],
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_pregnancy_and_breastfeeding",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {},
         )
@@ -102,14 +98,10 @@ class TestAddPregnancyAndBreastfeedingView:
 @pytest.mark.django_db
 class TestChangePregnancyAndBreastfeedingView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    def pregnancy_and_breastfeeding(self, in_progress_appointment):
+        return PregnancyAndBreastfeedingFactory.create(
+            appointment=in_progress_appointment
         )
-
-    @pytest.fixture
-    def pregnancy_and_breastfeeding(self, appointment):
-        return PregnancyAndBreastfeedingFactory.create(appointment=appointment)
 
     def test_renders_response(self, clinical_user_client, pregnancy_and_breastfeeding):
         response = clinical_user_client.http.get(

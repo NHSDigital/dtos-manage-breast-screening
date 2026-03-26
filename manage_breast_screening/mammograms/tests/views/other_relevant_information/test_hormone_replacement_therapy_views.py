@@ -7,52 +7,47 @@ from manage_breast_screening.participants.models.other_information.hormone_repla
     HormoneReplacementTherapy,
 )
 from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
     HormoneReplacementTherapyFactory,
 )
 
 
 @pytest.mark.django_db
 class TestAddHormoneReplacementTherapyView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_redirects_if_already_exists(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        HormoneReplacementTherapyFactory.create(appointment=appointment)
+    def test_redirects_if_already_exists(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        HormoneReplacementTherapyFactory.create(appointment=in_progress_appointment)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
-                "mammograms:record_medical_information", kwargs={"pk": appointment.pk}
+                "mammograms:record_medical_information",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "status": HormoneReplacementTherapy.Status.NO,
@@ -62,7 +57,7 @@ class TestAddHormoneReplacementTherapyView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -75,14 +70,13 @@ class TestAddHormoneReplacementTherapyView:
             ],
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {},
         )
@@ -100,14 +94,10 @@ class TestAddHormoneReplacementTherapyView:
 @pytest.mark.django_db
 class TestChangeHormoneReplacementTherapyView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    def hrt(self, in_progress_appointment):
+        return HormoneReplacementTherapyFactory.create(
+            appointment=in_progress_appointment
         )
-
-    @pytest.fixture
-    def hrt(self, appointment):
-        return HormoneReplacementTherapyFactory.create(appointment=appointment)
 
     def test_renders_response(self, clinical_user_client, hrt):
         response = clinical_user_client.http.get(
