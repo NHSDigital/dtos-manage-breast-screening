@@ -1,0 +1,42 @@
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+{% from "components/image-marker/macro.jinja" import app_image_marker %}
+
+{#- Set classes for this component #}
+{%- set classNames = "app-breast-features" -%}
+
+{%- if params.classes %}
+  {% set classNames = classNames ~ " " ~ params.classes %}
+{% endif %}
+
+{% set items = params["items"] if "items" in params else [] %}
+
+<div {{- nhsukAttributes({
+  "class": classNames,
+  "data-module": "app-breast-features",
+  "data-read-only": {
+    "value": "true" if params.read_only else false,
+    "optional": true
+  }
+}) -}}>
+  <div class="app-breast-features__header">
+    <h3 class="app-breast-features__title">Key</h3>
+  </div>
+  <ul class="app-breast-features__items">
+  {% for item in items %}
+    <li class="app-breast-features__item">
+      {{ app_image_marker({
+        "text": loop.index,
+        "label": item.id,
+        "href": undefined if params.read_only else "#marker-" ~ loop.index
+      }) | trim | indent(6) }}
+
+      {{ tag({
+        "text": item.region_id,
+        "classes": "nhsuk-tag--white"
+      }) | trim | indent(6) }}
+    </li>
+  {% endfor %}
+  </ul>
+</div>
