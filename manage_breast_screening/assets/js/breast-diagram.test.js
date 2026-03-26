@@ -3,12 +3,25 @@ import { createAll } from 'nhsuk-frontend'
 import { BreastDiagram } from './breast-diagram.js'
 import { ImageMap } from './image-map.js'
 
+jest.mock('./image-key', () => {
+  const { Component } = jest.requireActual('nhsuk-frontend')
+
+  return {
+    ImageKey: class MockImageKey extends Component {
+      render() {}
+      $button = { addEventListener() {} }
+      static moduleName = 'app-image-key'
+    }
+  }
+})
+
 jest.mock('./image-map', () => {
   const { Component } = jest.requireActual('nhsuk-frontend')
 
   return {
     ImageMap: class MockImageMap extends Component {
       addEventListener() {}
+      unsetState() {}
       config = { readOnly: false }
       static moduleName = 'app-image-map'
     }
@@ -56,6 +69,7 @@ describe('Breast diagram', () => {
           <a class="app-image-marker" href="#">?</a>
         </template>
         <div data-module="app-image-map"></div>
+        <div data-module="app-image-key"></div>
       </div>
     </form>`
 
@@ -67,6 +81,7 @@ describe('Breast diagram', () => {
           <a class="app-image-marker" href="#">?</a>
         </template>
         <div data-module="app-image-map"></div>
+        <div data-module="app-image-key"></div>
       </div>
     </form>`
 
