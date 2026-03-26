@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -70,7 +69,6 @@ class TestMammogramWorkflow(SystemTestCase):
         self.and_i_click_continue()
         self.then_the_accessibility_baseline_is_met()
 
-    @pytest.mark.xfail
     def test_other_users_cannot_access_in_progress_workflow(self):
         self.given_i_have_two_users()
         self.and_there_is_an_appointment_started_by_the_first_user()
