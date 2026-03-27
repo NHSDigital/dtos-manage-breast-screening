@@ -9,10 +9,12 @@ from .appointment_presenters import (
 from .last_known_mammogram_presenter import LastKnownMammogramPresenter
 
 
-def present_secondary_nav(pk, current_tab=None, appointment_complete=False):
+def present_secondary_nav(appointment, current_tab=None):
     """
     Build a secondary nav for reviewing the information of screened/partially screened appointments.
     """
+    pk = appointment.pk
+
     tabs = [
         {
             "id": "appointment",
@@ -40,7 +42,7 @@ def present_secondary_nav(pk, current_tab=None, appointment_complete=False):
         },
     ]
 
-    if appointment_complete:
+    if appointment.has_study():
         tabs.insert(
             -1,
             {

@@ -44,9 +44,8 @@ class ShowAppointment(AppointmentTabMixin, View):
             "presented_mammograms": last_known_mammogram_presenter,
             "appointment_note": appointment_presenter.note,
             "secondary_nav_items": present_secondary_nav(
-                appointment.pk,
+                appointment,
                 current_tab="appointment",
-                appointment_complete=not appointment.active,
             ),
         }
 
@@ -78,9 +77,8 @@ class ParticipantDetails(AppointmentTabMixin, View):
             "presented_participant": appointment_presenter.participant,
             "presented_mammograms": last_known_mammogram_presenter,
             "secondary_nav_items": present_secondary_nav(
-                appointment.pk,
+                appointment,
                 current_tab="participant",
-                appointment_complete=not appointment.active,
             ),
         }
 
@@ -112,9 +110,8 @@ class MedicalInformation(AppointmentTabMixin, View):
             "presenter": MedicalInformationPresenter(appointment),
             "presented_mammograms": last_known_mammogram_presenter,
             "secondary_nav_items": present_secondary_nav(
-                appointment.pk,
+                appointment,
                 current_tab="medical_information",
-                appointment_complete=not appointment.active,
             ),
         }
 
@@ -137,9 +134,8 @@ class ImageDetails(AppointmentTabMixin, View):
             "presented_appointment": appointment_presenter,
             "presented_images": ImagesPresenterFactory.presenter_for(appointment),
             "secondary_nav_items": present_secondary_nav(
-                appointment.pk,
+                appointment,
                 current_tab="images",
-                appointment_complete=not appointment.active,
             ),
         }
 

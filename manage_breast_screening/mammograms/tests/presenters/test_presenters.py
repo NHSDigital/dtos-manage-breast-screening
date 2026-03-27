@@ -1,17 +1,32 @@
-from uuid import uuid4
+from unittest.mock import MagicMock
 
 import pytest
 
 from manage_breast_screening.mammograms.presenters import present_secondary_nav
+from manage_breast_screening.participants.models.appointment import Appointment
 
 
 class TestSecondaryNav:
-    @pytest.fixture(autouse=True)
-    def pk(self):
-        return uuid4()
+    @pytest.fixture
+    def mock_appointment_with_images(self):
+        mock_appointment = MagicMock(spec=Appointment)
+        mock_appointment.pk = "53ce8d3b-9e65-471a-b906-73809c0475d0"
+        mock_appointment.has_study.return_value = True
+        return mock_appointment
 
-    def test_active_appointment(self, pk):
-        assert present_secondary_nav(pk, current_tab="appointment") == [
+    @pytest.fixture
+    def mock_appointment_without_images(self):
+        mock_appointment = MagicMock(spec=Appointment)
+        mock_appointment.pk = "53ce8d3b-9e65-471a-b906-73809c0475d0"
+        mock_appointment.has_study.return_value = False
+        return mock_appointment
+
+    def test_active_appointment(self, mock_appointment_without_images):
+        pk = mock_appointment_without_images.pk
+        mock_appointment_without_images.has_study.return_value = False
+        assert present_secondary_nav(
+            mock_appointment_without_images, current_tab="appointment"
+        ) == [
             {
                 "current": True,
                 "href": f"/mammograms/{pk}/",
@@ -38,9 +53,10 @@ class TestSecondaryNav:
             },
         ]
 
-    def test_complete_appointment(self, pk):
+    def test_complete_appointment(self, mock_appointment_with_images):
+        pk = mock_appointment_with_images.pk
         assert present_secondary_nav(
-            pk, current_tab="appointment", appointment_complete=True
+            mock_appointment_with_images, current_tab="appointment"
         ) == [
             {
                 "current": True,
@@ -78,9 +94,9 @@ class TestSecondaryNav:
         "current_tab",
         ["appointment", "participant", "medical_information", "images", "note"],
     )
-    def test_current_tab(self, pk, current_tab):
+    def test_current_tab(self, mock_appointment_with_images, current_tab):
         tabs = present_secondary_nav(
-            pk, current_tab=current_tab, appointment_complete=True
+            mock_appointment_with_images, current_tab=current_tab
         )
         current = [tab for tab in tabs if tab["current"]]
 

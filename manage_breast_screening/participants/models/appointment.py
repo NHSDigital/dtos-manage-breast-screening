@@ -140,9 +140,6 @@ class Appointment(BaseModel):
 
         return statuses[0]
 
-    def has_status(self, required_status: str) -> bool:
-        return self.statuses.filter(name=required_status).exists()
-
     @property
     def active(self):
         return self.current_status.active
@@ -166,6 +163,13 @@ class Appointment(BaseModel):
             return self.study.series_set.all()
         except Study.DoesNotExist:
             return Series.objects.none()
+
+    def has_study(self):
+        try:
+            self.study
+            return True
+        except Study.DoesNotExist:
+            return False
 
 
 class AppointmentStatusNames(models.TextChoices):

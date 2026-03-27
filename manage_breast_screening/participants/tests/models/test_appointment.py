@@ -24,3 +24,14 @@ class TestSeries:
         result = appointment.series()
 
         assert result.exists() is False
+
+    def test_has_study_true(self):
+        appointment = AppointmentFactory.create()
+        StudyFactory.create(appointment=appointment)
+
+        assert appointment.has_study() is True
+
+    def test_has_study_false(self):
+        appointment = AppointmentFactory.create()
+
+        assert appointment.has_study() is False

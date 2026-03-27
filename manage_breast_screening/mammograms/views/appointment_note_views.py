@@ -59,9 +59,7 @@ class AppointmentNoteView(AppointmentNoteMixin, AppointmentTabMixin, FormView):
                 "page_title": appointment_presenter.page_title,
                 "presented_appointment": appointment_presenter,
                 "secondary_nav_items": present_secondary_nav(
-                    appointment.pk,
-                    current_tab="note",
-                    appointment_complete=not appointment.active,
+                    appointment, current_tab="note"
                 ),
                 "return_url": self.get_success_url(),
             }
@@ -97,9 +95,7 @@ class AppointmentNoteReviewView(
                 "page_title": appointment_presenter.page_title,
                 "presented_appointment": appointment_presenter,
                 "secondary_nav_items": present_secondary_nav(
-                    appointment.pk,
-                    current_tab="note",
-                    appointment_complete=not appointment.active,
+                    appointment, current_tab="note"
                 ),
                 "return_url": self.get_success_url(),
                 "back_link_params": {"href": self.request.GET.get("return_url")},
