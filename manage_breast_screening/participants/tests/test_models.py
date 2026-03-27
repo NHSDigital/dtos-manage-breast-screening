@@ -26,6 +26,7 @@ from .factories import (
 )
 
 
+@pytest.mark.django_db
 class TestParticipant:
     @pytest.mark.parametrize(
         "category,background_id",
@@ -70,9 +71,41 @@ class TestParticipant:
             == display_name
         )
 
+    def test_last_confirmed_mammogram_none(self):
+        participant = ParticipantFactory.create()
+        assert participant.last_confirmed_mammogram is None
+
+    def test_last_confirmed_mammogram_one(self):
+        participant = ParticipantFactory.create()
+
+        mammogram = participant.confirmed_previous_mammograms.create(
+            exact_date=datetime(2020, 1, 1, tzinfo=tz.utc)
+        )
+
+        assert participant.last_confirmed_mammogram == mammogram
+
+    def test_last_confirmed_mammogram(self):
+        participant = ParticipantFactory.create()
+        assert participant.last_confirmed_mammogram is None
+
+        participant.confirmed_previous_mammograms.create(
+            exact_date=datetime(2020, 1, 1, tzinfo=tz.utc)
+        )
+        participant.confirmed_previous_mammograms.create(
+            exact_date=datetime(2022, 12, 31, tzinfo=tz.utc)
+        )
+        last_confirmed_mammogram = participant.confirmed_previous_mammograms.create(
+            exact_date=datetime(2023, 1, 1, tzinfo=tz.utc)
+        )
+        participant.confirmed_previous_mammograms.create(
+            exact_date=datetime(2021, 1, 1, tzinfo=tz.utc)
+        )
+
+        assert participant.last_confirmed_mammogram == last_confirmed_mammogram
+
 
 @pytest.mark.django_db
-class TestScreeningEvent:
+class TestScreeningEpisode:
     def test_no_previous_screening_episode(self):
         episode = ScreeningEpisodeFactory.create()
         assert episode.previous() is None
@@ -312,91 +345,91 @@ class TestAppointment:
                 ordered=False,
             )
 
-    @pytest.mark.django_db
-    class TestEagerLoadCurrentStatus:
-        def test_eager_loads_most_recent_status_with_created_by(
-            self, django_assert_num_queries
-        ):
-            appointment = AppointmentFactory.create()
 
-            latest_status = AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.IN_PROGRESS,
-                created_at=datetime(2025, 1, 1, 10, tzinfo=tz.utc),
-            )
+@pytest.mark.django_db
+class TestEagerLoadCurrentStatus:
+    def test_eager_loads_most_recent_status_with_created_by(
+        self, django_assert_num_queries
+    ):
+        appointment = AppointmentFactory.create()
 
-            AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.CHECKED_IN,
-                created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-            )
+        latest_status = AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.IN_PROGRESS,
+            created_at=datetime(2025, 1, 1, 10, tzinfo=tz.utc),
+        )
 
-            AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.SCHEDULED,
-                created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
-            )
+        AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.CHECKED_IN,
+            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+        )
 
-            appointment_with_status = (
-                models.Appointment.objects.prefetch_current_status().get(
-                    pk=appointment.pk
-                )
-            )
+        AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.SCHEDULED,
+            created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
+        )
 
-            prefetched_status = appointment_with_status._prefetched_current_status[0]
-            assert prefetched_status == latest_status
-            # Verify no additional queries when accessing created_by
-            with django_assert_num_queries(0):
-                assert prefetched_status.created_by is not None
-                prefetched_status.created_by.nhs_uid
+        appointment_with_status = (
+            models.Appointment.objects.prefetch_current_status().get(pk=appointment.pk)
+        )
 
-    @pytest.mark.django_db
-    class TestCurrentStatus:
-        def test_returns_prefetched_current_status_if_available(
-            self, django_assert_num_queries
-        ):
-            appointment = AppointmentFactory.create()
-            latest_status = AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.IN_PROGRESS,
-                created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-            )
-            AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.CHECKED_IN,
-                created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
-            )
+        prefetched_status = appointment_with_status._prefetched_current_status[0]
+        assert prefetched_status == latest_status
+        # Verify no additional queries when accessing created_by
+        with django_assert_num_queries(0):
+            assert prefetched_status.created_by is not None
+            prefetched_status.created_by.nhs_uid
 
-            fetched_appointment = (
-                models.Appointment.objects.prefetch_current_status().first()
-            )
-            with django_assert_num_queries(0):
-                fetched_appointment.current_status.created_by
-            assert fetched_appointment.current_status == latest_status
 
-        def test_returns_current_status_even_if_not_prefetched(
-            self, django_assert_num_queries
-        ):
-            appointment = AppointmentFactory.create()
-            latest_status = AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.IN_PROGRESS,
-                created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-            )
-            AppointmentStatusFactory.create(
-                appointment=appointment,
-                name=AppointmentStatusNames.CHECKED_IN,
-                created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
-            )
+@pytest.mark.django_db
+class TestCurrentStatus:
+    def test_returns_prefetched_current_status_if_available(
+        self, django_assert_num_queries
+    ):
+        appointment = AppointmentFactory.create()
+        latest_status = AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.IN_PROGRESS,
+            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+        )
+        AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.CHECKED_IN,
+            created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
+        )
 
-            fetched_appointment = models.Appointment.objects.first()
-            with django_assert_num_queries(2):
-                fetched_appointment.current_status.created_by
-            assert fetched_appointment.current_status == latest_status
+        fetched_appointment = (
+            models.Appointment.objects.prefetch_current_status().first()
+        )
+        with django_assert_num_queries(0):
+            fetched_appointment.current_status.created_by
+        assert fetched_appointment.current_status == latest_status
 
-        def test_returns_default_status_if_no_statuses(self, django_assert_num_queries):
-            appointment = AppointmentFactory.create()
-            assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+    def test_returns_current_status_even_if_not_prefetched(
+        self, django_assert_num_queries
+    ):
+        appointment = AppointmentFactory.create()
+        latest_status = AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.IN_PROGRESS,
+            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
+        )
+        AppointmentStatusFactory.create(
+            appointment=appointment,
+            name=AppointmentStatusNames.CHECKED_IN,
+            created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
+        )
+
+        fetched_appointment = models.Appointment.objects.first()
+        with django_assert_num_queries(2):
+            fetched_appointment.current_status.created_by
+        assert fetched_appointment.current_status == latest_status
+
+    def test_returns_default_status_if_no_statuses(self, django_assert_num_queries):
+        appointment = AppointmentFactory.create()
+        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
 
 class TestAppointmentStatus:

@@ -32,6 +32,50 @@ clinic:
                 - 216 Clinic Road
                 - Sheffield
               postcode: L3 4N8
+            confirmed_previous_mammograms:
+              - location_details: West of London BSS
+                exact_date: '2025-07-25'
+              - location_details: East of London BSS
+                exact_date: '2025-07-26'
+        previous_mammograms:
+          - location_type: SAME_PROVIDER
+            date_type: MORE_THAN_SIX_MONTHS
+            approx_date: 'Should not appear as created long time before exact date of last confirmed mammogram'
+            created_at: '1990-12-31'
+          - location_type: SAME_PROVIDER
+            date_type: MORE_THAN_SIX_MONTHS
+            approx_date: 'Should not appear as created on same day as exact date of last confirmed mammogram'
+            created_at: '2025-07-26'
+          - location_type: SAME_PROVIDER
+            date_type: MORE_THAN_SIX_MONTHS
+            approx_date: 'Should appear as created the day after the exact date of last confirmed mammogram'
+            created_at: '2025-07-27'
+          - location_type: OUTSIDE_UK
+            location_details: Paris, France
+            date_type: MORE_THAN_SIX_MONTHS
+            approx_date: 'Summer 2025'
+            created_at: '2025-08-30'
+          - location_type: ELSEWHERE_UK
+            location_details: Nuffield health clinic, Cornwall
+            date_type: EXACT
+            exact_date: '2026-01-01'
+            created_at: '2026-01-02'
+          - location_type: ANOTHER_NHS_PROVIDER
+            location_details: Doncaster & Bassetlaw
+            date_type: EXACT
+            exact_date: '2025-08-30'
+            created_at: '2025-09-22'
+          - location_type: SAME_PROVIDER
+            date_type: EXACT
+            exact_date: '2025-07-25'
+            different_name: Claire Smith
+            additional_information: Had a name change since my last mammogram
+            created_at: '2025-08-18'
+          - location_type: PREFER_NOT_TO_SAY
+            date_type: LESS_THAN_SIX_MONTHS
+            approx_date: 'January 2026'
+            reason_for_continuing: A reason for continuing
+            created_at: '2026-02-20'
     - id: 85c73ada-3a17-4df3-91fe-1b0ee0648670
       duration_in_minutes: 8
       starts_at_time: 09:08

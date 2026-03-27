@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -220,7 +222,10 @@ class TestAppointmentTabs(SystemTestCase):
 
     def and_the_appointment_has_medical_history(self):
         SymptomType.objects.get_or_create(id=SymptomType.LUMP, name="Lump")
-        ParticipantReportedMammogramFactory(appointment=self.appointment)
+        ParticipantReportedMammogramFactory(
+            appointment=self.appointment,
+            created_by=UserFactory.create(first_name="Claire", last_name="Smith"),
+        )
         SymptomFactory(lump=True, appointment=self.appointment)
         BreastCancerHistoryItemFactory(
             appointment=self.appointment,
@@ -236,8 +241,10 @@ class TestAppointmentTabs(SystemTestCase):
         expect(card).to_contain_text(
             "The last confirmed mammogram and any added manually since then"
         )
-        expect(card).to_contain_text("Last known mammograms")
-        expect(card).to_contain_text("Added today")
+        expect(card).to_contain_text("Reported mammograms")
+        expect(card).to_contain_text(
+            f"Recorded {date.today().strftime('%-d %B %Y')}by C. Smith"
+        )
         expect(card).to_contain_text("Date unknown")
 
     def and_i_should_see_the_symptoms_section(self):
