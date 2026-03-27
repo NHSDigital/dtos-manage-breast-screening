@@ -79,7 +79,6 @@ class CommonFields:
         hint="Include where, when and the outcome",
         widget=Textarea(attrs={"rows": 5}),
         error_messages={"required": "Enter details of any investigations"},
-        classes="nhsuk-u-width-two-thirds",
     )
     additional_information = CharField(
         required=False,
