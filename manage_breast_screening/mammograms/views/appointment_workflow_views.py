@@ -285,8 +285,11 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
         )
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 def check_in(request, pk):
+    if request.method == "GET":
+        return redirect("mammograms:show_appointment", pk=pk)
+
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
@@ -297,12 +300,18 @@ def check_in(request, pk):
         appointment=appointment, current_user=request.user
     ).check_in()
 
-    return redirect("mammograms:show_appointment", pk=pk)
+    if request.accepts("text/html"):
+        return redirect("mammograms:show_appointment", pk=pk)
+    else:
+        return HttpResponse(status=201)
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def start_appointment(request, pk):
+    if request.method == "GET":
+        return redirect("mammograms:show_appointment", pk=pk)
+
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
@@ -311,12 +320,18 @@ def start_appointment(request, pk):
 
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 
-    return redirect("mammograms:confirm_identity", pk=pk)
+    if request.accepts("text/html"):
+        return redirect("mammograms:confirm_identity", pk=pk)
+    else:
+        return HttpResponse(status=201)
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["GET", "POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def resume_appointment(request, pk):
+    if request.method == "GET":
+        return redirect("mammograms:show_appointment", pk=pk)
+
     try:
         provider = request.user.current_provider
         appointment = provider.appointments.get(pk=pk)
@@ -396,7 +411,10 @@ class PauseAppointment(InProgressAppointmentMixin, FormView):
 
 
 class MarkSectionReviewed(InProgressAppointmentMixin, View):
-    http_method_names = ["post"]
+    def get(self, request, *args, **kwargs):
+        return redirect(
+            MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=self.appointment.pk
+        )
 
     def post(self, request, *args, **kwargs):
         section = kwargs.get("section")

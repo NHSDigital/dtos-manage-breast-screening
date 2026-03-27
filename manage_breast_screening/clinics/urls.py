@@ -59,11 +59,6 @@ urlpatterns = [
         kwargs={"filter": "complete"},
     ),
     path(
-        "<uuid:pk>/appointments/<uuid:appointment_pk>/check-in/",
-        views.check_in_appointment,
-        name="check_in_appointment",
-    ),
-    path(
         "<uuid:pk>/upload-csv/",
         participant_csv_upload_view.ParticipantCsvUploadView.as_view(),
         name="participant_csv_upload",

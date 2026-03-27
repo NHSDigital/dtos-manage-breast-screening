@@ -47,7 +47,7 @@ def user():
 
 
 def make_authenticated_request(user):
-    request = RequestFactory().get("/")
+    request = RequestFactory().get("/example-page")
     request.user = user
     request.session = MockSession()
     return request
@@ -88,6 +88,22 @@ class TestSessionTimeoutMiddleware:
 
         mock_logout.assert_called_once_with(request)
         assert response.status_code == 302
+
+    def test_redirect_to_login_remembers_the_current_page(
+        self, user, middleware, mock_logout, frozen_now
+    ):
+        request = make_authenticated_request(user)
+        past = frozen_now - timedelta(minutes=16)
+        request.session["login_time"] = past.isoformat()
+        request.session["last_activity"] = past.isoformat()
+
+        response = middleware(request)
+
+        assert response.status_code == 302
+
+        assert (
+            response.headers["Location"] == r"/auth/persona-login/?next=%2Fexample-page"
+        )
 
     def test_activity_within_timeout_does_not_logout(
         self, user, middleware, frozen_now

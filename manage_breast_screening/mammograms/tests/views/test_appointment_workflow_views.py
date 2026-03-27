@@ -510,6 +510,18 @@ class TestCheckIn:
             reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
         )
 
+    def test_get_request_redirects_to_appointment_page(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        response = clinical_user_client.http.get(
+            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
+        )
+
 
 @pytest.mark.django_db
 class TestStartAppointment:
@@ -531,6 +543,16 @@ class TestStartAppointment:
         )
         url = reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
         response = administrative_user_client.http.post(url)
+        assert response.status_code == 403
+
+    def test_get_request_redirects_to_appointment_page(
+        self, administrative_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=administrative_user_client.current_provider
+        )
+        url = reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
+        response = administrative_user_client.http.get(url)
         assert response.status_code == 403
 
 
@@ -791,6 +813,16 @@ class TestResumeAppointment:
             "mammograms:resume_appointment", kwargs={"pk": paused_appointment.pk}
         )
         response = administrative_user_client.http.post(url)
+        assert response.status_code == 403
+
+    def test_get_request_redirects_to_appointment_page(
+        self, administrative_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=administrative_user_client.current_provider
+        )
+        url = reverse("mammograms:resume_appointment", kwargs={"pk": appointment.pk})
+        response = administrative_user_client.http.get(url)
         assert response.status_code == 403
 
 

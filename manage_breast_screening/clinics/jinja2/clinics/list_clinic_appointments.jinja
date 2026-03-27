@@ -87,10 +87,9 @@
       {{ app_check_in(
         presented_appointment,
         check_in_url=url(
-          'clinics:check_in_appointment',
+          'mammograms:check_in',
            kwargs={
-            'pk': presented_clinic.pk,
-            'appointment_pk': presented_appointment.pk,
+            'pk': presented_appointment.pk,
             }
         ),
         csrf_input=csrf_input
