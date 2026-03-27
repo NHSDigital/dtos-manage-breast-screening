@@ -1,20 +1,5 @@
 data "azurerm_client_config" "current" {}
 
-data "azurerm_key_vault" "infra" {
-  count    = var.enable_alerting ? 1 : 0
-  provider = azurerm.hub
-
-  name                = var.infra_key_vault_name
-  resource_group_name = var.infra_key_vault_rg
-}
-
-data "azurerm_key_vault_secret" "slack_webhook_url" {
-  count        = var.enable_alerting ? 1 : 0
-  provider     = azurerm.hub
-  name         = "slack-webhook-url"
-  key_vault_id = data.azurerm_key_vault.infra[0].id
-}
-
 data "azurerm_subscription" "current" {}
 
 data "azuread_group" "postgres_sql_admin_group" {

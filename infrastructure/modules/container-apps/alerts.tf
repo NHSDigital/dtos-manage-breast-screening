@@ -6,7 +6,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "failure_event" {
   enabled                          = var.enable_alerting
   evaluation_frequency             = "PT5M"
   location                         = var.region
-  name                             = "${var.app_short_name}-batch-failed-alert"
+  name                             = "${var.app_short_name}-${var.environment}-batch-failed-alert"
   resource_group_name              = azurerm_resource_group.main.name
   scopes                           = [var.app_insights_id]
   severity                         = 2
