@@ -43,6 +43,7 @@ from manage_breast_screening.participants.models import (
     ParticipantReportedMammogram,
 )
 from manage_breast_screening.participants.models.appointment import (
+    AppointmentMachine,
     AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
@@ -308,6 +309,19 @@ def start_appointment(request, pk):
         appointment = provider.appointments.get(pk=pk)
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
+
+    if not AppointmentMachine.from_appointment(appointment).can("start"):
+        patient_name = appointment.participant.full_name
+        started_by = appointment.current_status.created_by.get_short_name()
+        messages.add_message(
+            request,
+            messages.WARNING,
+            f"Appointment for {patient_name} has already been started by {started_by}.",
+        )
+        return redirect(
+            "clinics:list_clinic_appointments_in_progress",
+            pk=appointment.clinic_slot.clinic.pk,
+        )
 
     AppointmentStatusUpdater(appointment=appointment, current_user=request.user).start()
 

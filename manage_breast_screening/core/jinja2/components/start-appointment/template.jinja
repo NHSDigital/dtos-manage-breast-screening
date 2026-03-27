@@ -2,7 +2,7 @@
   {{ raise('start_appointment_url is required') }}
 {% endif %}
 
-{% if user.has_perm('mammograms.do_mammogram_appointment') %}
+{% if presented_appointment.can_be_started_by(user) %}
 <div data-module="app-start-appointment" data-appointment-id="{{ presented_appointment.pk }}" {% if presented_appointment.can_be_checked_in %}hidden{% endif %}>
   <form action="{{ start_appointment_url }}" method="post" novalidate>
     <p>

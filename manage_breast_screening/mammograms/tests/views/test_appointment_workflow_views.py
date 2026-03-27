@@ -3,10 +3,12 @@ from unittest.mock import patch
 import django
 import pytest
 import statemachine
+from django.contrib import messages
 from django.urls import reverse
 from pytest_django.asserts import (
     assertContains,
     assertInHTML,
+    assertMessages,
     assertNotContains,
     assertQuerySetEqual,
     assertRedirects,
@@ -532,6 +534,38 @@ class TestStartAppointment:
         url = reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
         response = administrative_user_client.http.post(url)
         assert response.status_code == 403
+
+    def test_redirects_to_in_progress_tab_with_warning_when_already_started(
+        self, clinical_user_client
+    ):
+        other_user = UserFactory.create(first_name="Alice", last_name="Smith")
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status_params={
+                "name": AppointmentStatusNames.IN_PROGRESS,
+                "created_by": other_user,
+            },
+        )
+        response = clinical_user_client.http.post(
+            reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "clinics:list_clinic_appointments_in_progress",
+                kwargs={"pk": appointment.clinic_slot.clinic.pk},
+            ),
+        )
+        patient_name = appointment.participant.full_name
+        assertMessages(
+            response,
+            [
+                messages.Message(
+                    level=messages.WARNING,
+                    message=f"Appointment for {patient_name} has already been started by {other_user.get_short_name()}.",
+                )
+            ],
+        )
 
 
 @pytest.mark.django_db
