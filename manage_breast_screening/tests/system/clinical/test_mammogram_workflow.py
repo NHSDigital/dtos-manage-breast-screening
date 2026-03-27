@@ -1,3 +1,5 @@
+import re
+
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -21,11 +23,13 @@ class TestMammogramWorkflow(SystemTestCase):
         self.when_i_click_start_this_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
         self.and_i_see_the_appointment_status_bar()
+        self.and_i_see_the_appointment_cannot_proceed_link()
         self.and_the_confirm_identity_step_is_active()
 
         self.when_i_click_confirm_identity()
         self.then_i_should_be_on_the_record_medical_information_page()
         self.and_i_see_the_appointment_status_bar()
+        self.and_i_see_the_appointment_cannot_proceed_link()
         self.and_the_review_medical_information_step_is_active()
 
         self.when_i_mark_that_imaging_can_go_ahead()
@@ -99,6 +103,16 @@ class TestMammogramWorkflow(SystemTestCase):
     def then_i_should_be_on_the_confirm_identity_page(self):
         self.expect_url("mammograms:confirm_identity", pk=self.appointment.pk)
         self.assert_page_title_contains("Confirm identity")
+
+    def and_i_see_the_appointment_cannot_proceed_link(self):
+        link = self.page.get_by_role("link", name="Appointment cannot proceed")
+        expect(link).to_be_visible()
+        expect(link).to_have_attribute(
+            "href",
+            re.compile(
+                rf"^/mammograms/{self.appointment.pk}/cannot-go-ahead/\?return_url=/mammograms/{self.appointment.pk}/"
+            ),
+        )
 
     def and_i_see_the_appointment_status_bar(self):
         status_bar = self.page.locator("div.app-status-bar")

@@ -16,6 +16,9 @@ from django.views.generic import FormView, TemplateView
 
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 from manage_breast_screening.dicom.study_service import (
     StudyService as DicomStudyService,
 )
@@ -29,6 +32,9 @@ from manage_breast_screening.mammograms.forms.images.gateway_image_details_form 
 )
 from manage_breast_screening.mammograms.forms.images.record_images_taken_form import (
     RecordImagesTakenForm,
+)
+from manage_breast_screening.mammograms.presenters.appointment_presenters import (
+    AppointmentPresenter,
 )
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
@@ -177,6 +183,8 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
                 "heading": "Appointment cannot go ahead",
                 "caption": participant.full_name,
                 "page_title": "Appointment cannot go ahead",
+                "presented_appointment": AppointmentPresenter(self.appointment),
+                "return_url": extract_relative_redirect_url(self.request),
             }
         )
         return context

@@ -18,6 +18,7 @@ class TestAddPregnancyAndBreastfeeding(SystemTestCase):
 
         self.when_i_click_add_pregnancy_and_breastfeeding()
         self.then_i_see_the_pregnancy_and_breastfeeding_form()
+        self.and_i_see_the_appointment_cannot_proceed_link()
 
         self.when_i_click_continue()
         self.then_i_see_validation_error_for_missing_statuses()
@@ -83,6 +84,14 @@ class TestAddPregnancyAndBreastfeeding(SystemTestCase):
     def then_i_see_the_pregnancy_and_breastfeeding_form(self):
         expect(self.page.get_by_text("Pregnancy and breastfeeding")).to_be_visible()
         self.assert_page_title_contains("Pregnancy and breastfeeding")
+
+    def and_i_see_the_appointment_cannot_proceed_link(self):
+        link = self.page.get_by_role("link", name="Appointment cannot proceed")
+        expect(link).to_be_visible()
+        expect(link).to_have_attribute(
+            "href",
+            f"/mammograms/{self.appointment.pk}/cannot-go-ahead/?return_url=/mammograms/{self.appointment.pk}/record-medical-information/pregnancy-and-breastfeeding/",
+        )
 
     def when_i_select_no_for_pregnancy_and_breastfeeding(self):
         fieldset = self.page.get_by_role("group", name="Is Angela Jones pregnant?")

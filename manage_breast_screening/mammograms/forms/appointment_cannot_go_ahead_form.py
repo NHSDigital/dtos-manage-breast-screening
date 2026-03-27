@@ -12,17 +12,16 @@ from manage_breast_screening.nhsuk_forms.fields import (
 
 class AppointmentCannotGoAheadForm(forms.Form):
     STOPPED_REASON_CHOICES = (
-        ("participant_did_not_attend", "Participant did not attend"),
         ("failed_identity_check", "Failed identity check"),
-        ("language_difficulties", "Language difficulties"),
+        ("pain_during_screening", "Pain during screening"),
+        ("symptomatic_appointment", "Has a symptomatic appointment"),
+        ("participant_withdrew_consent", "Consent withdrawn"),
         ("physical_health_issue", "Physical health issue"),
         ("mental_health_issue", "Mental health issue"),
-        ("last_mammogram_within_6_months", "Last mammogram within 6 months"),
-        ("breast_implant_risks", "Breast implant risks"),
-        ("pain_during_screening", "Pain during screening"),
-        ("technical_issues", "Technical issues"),
-        ("participant_withdrew_consent", "Participant withdrew consent"),
-        ("other", "Other"),
+        ("language_difficulties", "Language difficulties"),
+        ("no_mammographer", "No qualified mammographer available"),
+        ("technical_issues", "Technical issues at clinic"),
+        ("other", "Other reason"),
     )
 
     def __init__(self, *args, **kwargs):
@@ -34,9 +33,16 @@ class AppointmentCannotGoAheadForm(forms.Form):
         # Dynamically add detail fields for each choice
         for choice_value, _ in self.STOPPED_REASON_CHOICES:
             details_field_name = f"{choice_value}_details"
-            self.fields[details_field_name] = CharField(
-                required=False, label="Provide details"
-            )
+            if choice_value == "other":
+                self.fields[details_field_name] = CharField(
+                    required=False,
+                    label="Provide details",
+                    widget=forms.Textarea(attrs={"rows": 5}),
+                )
+            else:
+                self.fields[details_field_name] = CharField(
+                    required=False, label="Provide details"
+                )
 
         # Ensure that the field order matches the order we want to render in
         details_fields = [
@@ -46,7 +52,6 @@ class AppointmentCannotGoAheadForm(forms.Form):
 
     stopped_reasons = MultipleChoiceField(
         label="Why has this appointment been stopped?",
-        hint="Select all that apply",
         choices=STOPPED_REASON_CHOICES,
         required=True,
         error_messages={
@@ -87,9 +92,14 @@ class AppointmentCannotGoAheadForm(forms.Form):
         ).mark_attended_not_screened()
 
         reasons_json = {}
-        reasons_json["stopped_reasons"] = self.cleaned_data["stopped_reasons"]
+        selected_stopped_reasons = self.cleaned_data["stopped_reasons"]
+        reasons_json["stopped_reasons"] = selected_stopped_reasons
         for field_name, value in self.cleaned_data.items():
-            if field_name.endswith("_details") and value:
+            if (
+                field_name.endswith("_details")
+                and field_name.replace("_details", "") in selected_stopped_reasons
+                and value
+            ):
                 reasons_json[field_name] = value
         self.instance.stopped_reasons = reasons_json
         self.instance.reinvite = self.cleaned_data["decision"]
