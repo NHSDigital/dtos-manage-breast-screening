@@ -9,7 +9,7 @@ module "monitor_action_group" {
   webhook_receiver = var.enable_alerting ? {
     slack = {
       name                    = "slack-alert-transformer"
-      service_uri             = azurerm_logic_app_trigger_http_request.azure_monitor_alert[0].callback_url
+      service_uri             = module.logic_app_slack_alert[0].trigger_callback_url
       use_common_alert_schema = true
     }
   } : null
