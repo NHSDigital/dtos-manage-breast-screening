@@ -69,6 +69,12 @@ describe('Breast diagram', () => {
           <a class="app-image-marker" href="#">?</a>
         </template>
         <div data-module="app-image-map"></div>
+        <div class="app-breast-diagram__card">
+          <span class="app-breast-diagram__caption"></span>
+          <strong class="app-breast-diagram__region"></strong>
+          <input type="radio" name="feature" value="pending">
+          <button class="app-breast-diagram__button">Save</button>
+        </div>
         <div data-module="app-image-key"></div>
       </div>
     </form>`
@@ -81,6 +87,12 @@ describe('Breast diagram', () => {
           <a class="app-image-marker" href="#">?</a>
         </template>
         <div data-module="app-image-map"></div>
+        <div class="app-breast-diagram__card">
+          <span class="app-breast-diagram__caption"></span>
+          <strong class="app-breast-diagram__region"></strong>
+          <input type="radio" name="feature" value="pending">
+          <button class="app-breast-diagram__button">Save</button>
+        </div>
         <div data-module="app-image-key"></div>
       </div>
     </form>`

@@ -69,7 +69,7 @@ describe('Image map', () => {
     expect(callback).toHaveBeenCalled()
   })
 
-  it('notifies on click', async () => {
+  it('notifies on create', async () => {
     document.body.innerHTML = multiPathSvg
 
     const [component] = createAll(ImageMap, {
@@ -78,7 +78,7 @@ describe('Image map', () => {
     })
 
     const callback = jest.fn()
-    component.addEventListener('click', callback)
+    component.addEventListener('create', callback)
 
     await user.click(component.$paths[0])
     expect(callback).toHaveBeenCalled()

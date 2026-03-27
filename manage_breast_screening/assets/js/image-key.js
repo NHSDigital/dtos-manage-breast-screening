@@ -15,19 +15,6 @@ export class ImageKey extends Component {
   constructor($root) {
     super($root)
 
-    const $button = this.$root.querySelector('.app-image-key__button')
-    if (!($button instanceof HTMLButtonElement)) {
-      throw new ElementError({
-        component: ImageKey,
-        expectedType: 'HTMLButtonElement',
-        identifier:
-          'Image key clear all (`<button class="app-image-key__button">`)'
-      })
-    }
-
-    this.$button = $button
-    this.$button.addEventListener('click', (event) => this.onReset(event))
-
     const $list = this.$root.querySelector('.app-image-key__items')
     if (!($list instanceof HTMLUListElement)) {
       throw new ElementError({
@@ -37,7 +24,14 @@ export class ImageKey extends Component {
       })
     }
 
-    this.$list = $list
+    const $button = this.$root.querySelector('button[type="reset"]')
+    if (!($button instanceof HTMLButtonElement)) {
+      throw new ElementError({
+        component: ImageKey,
+        expectedType: 'HTMLButtonElement',
+        identifier: 'Clear all features (`<button type="reset">`)'
+      })
+    }
 
     const $imageKeyItem = this.$root.querySelector(
       'template.app-js-template-image-key-item'
@@ -50,6 +44,8 @@ export class ImageKey extends Component {
       })
     }
 
+    this.$list = $list
+    this.$button = $button
     this.$imageKeyItem = $imageKeyItem
   }
 
@@ -67,6 +63,10 @@ export class ImageKey extends Component {
 
     // Render key items
     values.forEach(({ id, region_id }, index) => {
+      if (id === 'pending') {
+        return
+      }
+
       const $item = document.importNode(this.$imageKeyItem.content, true)
 
       const $marker = $item.querySelector('.app-image-marker')
@@ -83,8 +83,8 @@ export class ImageKey extends Component {
 
       $marker.setAttribute('href', `#marker-${index + 1}`)
       $number.textContent = `${index + 1}`
-      $label.textContent = this.format(id)
-      $region.textContent = this.format(region_id)
+      $label.textContent = ImageKey.format(id)
+      $region.textContent = ImageKey.format(region_id)
 
       $list.appendChild($item)
     })
@@ -95,19 +95,9 @@ export class ImageKey extends Component {
   }
 
   /**
-   * Format human readable text from ID
-   *
-   * @param {string} input - ID to format
-   */
-  format(input) {
-    const output = input.toLowerCase().replace(/_/g, ' ')
-    return output.charAt(0).toUpperCase() + output.slice(1)
-  }
-
-  /**
    * Add event listener for image key
    *
-   * @param {ImageKeyEvent} name - Event name, e.g. 'reset'
+   * @param {ImageKeyEvent} name - Event name, e.g. 'clear'
    * @param {ImageKeyListener} listener - Image key listener
    */
   addEventListener(name, listener) {
@@ -120,18 +110,32 @@ export class ImageKey extends Component {
   /**
    * Dispatch event for image key
    *
-   * @param {ImageKeyEvent} name - Event name, e.g. 'reset'
+   * @param {ImageKeyEvent} name - Event name, e.g. 'clear'
    */
   dispatchEvent(name) {
-    this.$root.dispatchEvent(new CustomEvent(`${ImageKey.moduleName}:${name}`))
+    this.$root.dispatchEvent(
+      new CustomEvent(`${ImageKey.moduleName}:${name}`, {
+        bubbles: true
+      })
+    )
   }
 
   /**
    * @param {MouseEvent} event
    */
-  onReset(event) {
+  onClear(event) {
     event.preventDefault()
-    this.dispatchEvent('reset')
+    this.dispatchEvent('clear')
+  }
+
+  /**
+   * Format human readable text from ID
+   *
+   * @param {string} input - ID to format
+   */
+  static format(input) {
+    const output = input.toLowerCase().replace(/_/g, ' ')
+    return output.charAt(0).toUpperCase() + output.slice(1)
   }
 
   /**
@@ -141,7 +145,7 @@ export class ImageKey extends Component {
 }
 
 /**
- * @typedef {'reset'} ImageKeyEvent - Image key event
+ * @typedef {'clear'} ImageKeyEvent - Image key event
  */
 
 /**
