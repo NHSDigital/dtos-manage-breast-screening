@@ -79,7 +79,6 @@ module "app_insights_audit" {
 
   log_analytics_workspace_id = module.log_analytics_workspace_audit.id
 
-  # alerts
   action_group_id = module.monitor_action_group.monitor_action_group.id
   enable_alerting = var.enable_alerting
 }

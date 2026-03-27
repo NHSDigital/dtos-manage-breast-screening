@@ -31,6 +31,7 @@ var roleID = {
   CDNContributor: 'ec156ff8-a8d1-4d15-830c-5b80698ca432'
   kvSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
   monitoringContributor: '749f88d5-cbae-40b8-bcfc-e573ddc772fa'
+  monitoringReader: '43d0d8ad-25c7-4714-9337-8ba259a9fe05'
   networkContributor: '4d97b98b-1d4f-4787-a291-c67834d212e7'
   rbacAdmin: 'f58310d9-a9f6-439a-9e8d-f62e7b41a168'
   reader: 'acdd72a7-3385-48ef-bd42-f606fba81ae7'
@@ -201,9 +202,9 @@ resource rbacAdminAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleID.rbacAdmin)
     principalId: managedIdentiyADOtoAZ.outputs.miPrincipalID
-    condition: '((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/write\'})) OR (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}, ${roleID.AzureConnectedMachineOnboarding}})) AND ((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/delete\'})) OR (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}, ${roleID.AzureConnectedMachineOnboarding}}))'
+    condition: '((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/write\'})) OR (@Request[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}, ${roleID.AzureConnectedMachineOnboarding}, ${roleID.monitoringReader}})) AND ((!(ActionMatches{\'Microsoft.Authorization/roleAssignments/delete\'})) OR (@Resource[Microsoft.Authorization/roleAssignments:RoleDefinitionId] ForAnyOfAnyValues:GuidEquals {${roleID.kvSecretsUser}, ${roleID.AzureConnectedMachineOnboarding}, ${roleID.monitoringReader}}))'
     conditionVersion: '2.0'
-    description: '${miADOtoAZname} Role Based Access Control Administrator access to subscription. Allows assigning Key Vault Secrets User and Azure Connected Machine Onboarding roles.'
+    description: '${miADOtoAZname} Role Based Access Control Administrator access to subscription. Allows assigning Key Vault Secrets User, Azure Connected Machine Onboarding, and Monitoring Reader roles.'
   }
 }
 
