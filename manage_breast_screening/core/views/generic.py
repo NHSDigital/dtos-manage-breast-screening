@@ -144,7 +144,7 @@ class UpdateWithAuditView(NamedThingMixin, SingleObjectMixin, FormView):
         if delete_href:
             context["delete_link"] = {
                 "text": self.confirm_delete_link_text(thing_name=thing_name),
-                "class": "nhsuk-link app-link--warning",
+                "class": "nhsuk-link app-link app-link--warning",
                 "href": delete_href,
             }
 
