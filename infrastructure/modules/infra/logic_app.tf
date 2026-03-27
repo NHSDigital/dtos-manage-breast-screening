@@ -108,7 +108,7 @@ resource "azurerm_logic_app_action_custom" "post_to_slack" {
               "type": "section",
               "text": {
                 "type": "mrkdwn",
-                "text": "@{concat(':mag: <https://portal.azure.com/#resource', triggerBody()?['data']?['essentials']?['alertTargetIDs']?[0], '/failures|View Failures in App Insights>')}"
+                "text": "@{if(contains(triggerBody()?['data']?['essentials']?['alertTargetIDs']?[0], 'microsoft.insights/components'), concat(':mag: <https://portal.azure.com/#resource', triggerBody()?['data']?['essentials']?['alertTargetIDs']?[0], '/failures|View Failures in App Insights>'), concat(':mag: <https://portal.azure.com/#resource', triggerBody()?['data']?['essentials']?['alertTargetIDs']?[0], '|View Resource in Azure Portal>'))}"
               }
             }
           ]
