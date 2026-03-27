@@ -171,6 +171,21 @@ class Appointment(BaseModel):
         except Study.DoesNotExist:
             return False
 
+    def recent_reported_mammograms(self, since_date=None):
+        """
+        Get reported mammograms for this appointment, optionally filtered
+        to those created after a given date (e.g. the last confirmed mammogram date).
+        """
+        qs = self.reported_mammograms.select_related(
+            "created_by",
+            "appointment__clinic_slot__clinic__setting__provider",
+        ).order_by("-created_at")
+
+        if since_date:
+            qs = qs.filter(created_at__gt=since_date)
+
+        return qs
+
 
 class AppointmentStatusNames(models.TextChoices):
     SCHEDULED = "SCHEDULED", "Scheduled"

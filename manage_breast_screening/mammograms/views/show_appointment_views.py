@@ -4,7 +4,6 @@ from django.views import View
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesPresenterFactory,
 )
-from manage_breast_screening.participants.models import ParticipantReportedMammogram
 
 from ..presenters import (
     AppointmentPresenter,
@@ -75,20 +74,19 @@ class MedicalInformation(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
-        reported_mammograms = (
-            ParticipantReportedMammogram.objects.filter(appointment_id=appointment.pk)
-            .select_related(
-                "created_by",
-                "appointment__clinic_slot__clinic__setting__provider",
-            )
-            .order_by("-created_at")
+        participant = appointment.participant
+        last_confirmed_mammogram = participant.last_confirmed_mammogram
+        reported_mammograms = self.appointment.recent_reported_mammograms(
+            since_date=last_confirmed_mammogram.exact_date
+            if last_confirmed_mammogram
+            else None
         )
 
-        last_known_mammogram_presenter = LastKnownMammogramPresenter(
+        presented_mammograms = LastKnownMammogramPresenter(
             self.request.user,
             reported_mammograms=reported_mammograms,
-            last_confirmed_mammogram=appointment.participant.last_confirmed_mammogram,
-            appointment_pk=appointment.pk,
+            last_confirmed_mammogram=last_confirmed_mammogram,
+            appointment_pk=self.appointment.pk,
             current_url=self.request.path,
         )
 
@@ -98,7 +96,7 @@ class MedicalInformation(AppointmentTabMixin, View):
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
             "presenter": MedicalInformationPresenter(appointment),
-            "presented_mammograms": last_known_mammogram_presenter,
+            "presented_mammograms": presented_mammograms,
             "secondary_nav_items": present_secondary_nav(
                 appointment,
                 current_tab="medical_information",
