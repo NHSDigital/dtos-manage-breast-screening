@@ -93,12 +93,26 @@ class TestGatewayImages(SystemTestCase):
         ImageFactory.create(series__study=study, laterality="R", view_position="CC")
         ImageFactory.create(series__study=study, laterality="L", view_position="MLO")
         ImageFactory.create(series__study=study, laterality="L", view_position="CC")
+        ImageFactory.create(
+            series__study=study,
+            laterality="L",
+            view_position="CC",
+            implant_present=True,
+        )
+        ImageFactory.create(
+            series__study=study,
+            laterality="R",
+            view_position="MLO",
+            implant_present=True,
+        )
 
     def and_i_see_the_images(self):
         expect(self.page.get_by_text("1× RMLO")).to_be_visible()
         expect(self.page.get_by_text("2× RCC")).to_be_visible()
+        expect(self.page.get_by_text("1× Right Eklund")).to_be_visible()
         expect(self.page.get_by_text("1× LMLO")).to_be_visible()
         expect(self.page.get_by_text("1× LCC")).to_be_visible()
+        expect(self.page.get_by_text("1× Left Eklund")).to_be_visible()
 
     def when_i_fill_in_additional_details_for_the_images(self):
         self.page.get_by_label("Notes for reader (optional)").fill(
@@ -114,5 +128,7 @@ class TestGatewayImages(SystemTestCase):
         ).to_be_visible()
         expect(self.page.get_by_text("1× RMLO")).to_be_visible()
         expect(self.page.get_by_text("2× RCC")).to_be_visible()
+        expect(self.page.get_by_text("1× Right Eklund")).to_be_visible()
         expect(self.page.get_by_text("1× LMLO")).to_be_visible()
         expect(self.page.get_by_text("1× LCC")).to_be_visible()
+        expect(self.page.get_by_text("1× Left Eklund")).to_be_visible()

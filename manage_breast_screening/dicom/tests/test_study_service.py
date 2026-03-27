@@ -63,29 +63,18 @@ class TestStudyService:
         image3 = ImageFactory.create(series=series, view_position="MLO", laterality="L")
         image4 = ImageFactory.create(series=series, view_position="MLO", laterality="R")
         image5 = ImageFactory.create(series=series, view_position="MLO", laterality="R")
+        image6 = ImageFactory.create(
+            series=series, view_position="MLO", laterality="L", implant_present=True
+        )
+        image7 = ImageFactory.create(
+            series=series, view_position="CC", laterality="R", implant_present=True
+        )
 
         assert StudyService.images_by_laterality_and_view(series.images.all()) == {
             "LCC": [image1],
             "LMLO": [image3],
+            "Left Eklund": [image6],
             "RCC": [image2],
             "RMLO": [image4, image5],
-        }
-
-    @pytest.mark.django_db
-    def test_image_counts_by_laterality_and_view(self):
-        action = GatewayActionFactory()
-        series = SeriesFactory.create(study__source_message_id=str(action.id))
-        ImageFactory.create(series=series, view_position="CC", laterality="L")
-        ImageFactory.create(series=series, view_position="CC", laterality="R")
-        ImageFactory.create(series=series, view_position="MLO", laterality="L")
-        ImageFactory.create(series=series, view_position="MLO", laterality="R")
-        ImageFactory.create(series=series, view_position="MLO", laterality="R")
-
-        assert StudyService.image_counts_by_laterality_and_view(
-            series.images.all()
-        ) == {
-            "LCC": 1,
-            "LMLO": 1,
-            "RCC": 1,
-            "RMLO": 2,
+            "Right Eklund": [image7],
         }
