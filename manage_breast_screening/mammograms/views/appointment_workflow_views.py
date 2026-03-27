@@ -10,6 +10,7 @@ from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils.html import escape, mark_safe
 from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import FormView, TemplateView
@@ -198,6 +199,21 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         instance = form.save(current_user=self.request.user)
         Auditor.from_request(self.request).audit_update(instance)
 
+        participant = instance.screening_episode.participant
+        escaped_name = escape(participant.full_name)
+        view_appointment_url = reverse(
+            "mammograms:show_appointment", kwargs={"pk": instance.pk}
+        )
+        messages.add_message(
+            self.request,
+            messages.SUCCESS,
+            mark_safe(
+                f'<p class="nhsuk-notification-banner__heading">'
+                f"{escaped_name} will be invited to the next routine appointment."
+                f' <a href="{view_appointment_url}" class="app-u-nowrap">View their appointment</a>'
+                f"</p>"
+            ),
+        )
         return super().form_valid(form)
 
 
