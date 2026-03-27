@@ -32,7 +32,7 @@
   <template class="app-js-template-image-marker">
     {{ app_image_marker({
       "text": "?",
-      "href": "#" if not params.read_only else undefined
+      "element": "button" if not params.read_only else undefined
     }) | trim | indent(4) }}
   </template>
 

@@ -260,9 +260,7 @@ export class BreastDiagram extends ConfigurableComponent {
     const { hash } = window.location
 
     // Click associated marker
-    markers
-      .find(({ $root }) => $root.getAttribute('href') === hash)
-      ?.$root.click()
+    markers.find(({ $root }) => $root.matches(hash))?.$root.click()
   }
 
   /**
@@ -340,7 +338,8 @@ export class BreastDiagram extends ConfigurableComponent {
       )
 
       markers[index] = new ImageMarker($root, {
-        href: config.readOnly ? undefined : `#marker-${index + 1}`,
+        id: `marker-${index + 1}`,
+        value: config.readOnly ? undefined : `${index + 1}`,
         width: width,
         height: height
       })
