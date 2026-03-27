@@ -32,6 +32,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.when_i_fill_in_other_details()
         self.when_i_submit_the_form()
         self.then_i_see_the_clinics_page()
+        self.and_i_see_a_success_flash_message()
         self.and_the_appointment_is_updated()
 
     def test_accessibility(self):
@@ -102,6 +103,11 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
             kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
+
+    def and_i_see_a_success_flash_message(self):
+        expect(
+            self.page.get_by_text("will be invited to the next routine appointment.")
+        ).to_be_visible()
 
     def and_the_appointment_is_updated(self):
         self.appointment.refresh_from_db()
