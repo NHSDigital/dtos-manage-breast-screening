@@ -1,44 +1,104 @@
 @use "../vendor/nhsuk-frontend/base" as *;
 
 .app-image-marker {
+  @include nhsuk-font(19, $weight: bold);
+}
+
+.app-image-marker,
+.app-image-marker__number {
   display: flex;
-
-  position: absolute;
-  z-index: 50;
-  top: 0;
-  left: 0;
-
   align-items: center;
   justify-content: center;
+}
 
+.app-image-marker[style],
+.app-image-marker__number {
   width: nhsuk-px-to-rem(40px);
   height: nhsuk-px-to-rem(40px);
-  margin-top: nhsuk-px-to-rem(-20px);
-  margin-left: nhsuk-px-to-rem(-20px);
 
   border: 2px solid nhsuk-colour("white");
   border-radius: 2px;
 
-  pointer-events: none;
-
   color: nhsuk-colour("white");
-  background-color: $nhsuk-link-colour;
+  background-color: $nhsuk-login-button-colour;
 
   user-select: none;
 
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-
-  @include nhsuk-font(19, $weight: bold);
 }
 
-.app-image-marker[href] {
+.app-image-marker[style] {
+  position: absolute;
+  z-index: 50;
+  top: 0;
+  left: 0;
+
+  margin-top: nhsuk-px-to-rem(-20px);
+  margin-left: nhsuk-px-to-rem(-20px);
+
+  pointer-events: none;
+
+  &:hover {
+    background-color: $nhsuk-login-button-hover-colour;
+  }
+
+  &:active {
+    background-color: $nhsuk-login-button-active-colour;
+  }
+}
+
+.app-image-marker[href],
+.app-image-marker[type] {
   pointer-events: auto;
   text-decoration: none;
   cursor: pointer;
   @include nhsuk-link-style-white;
 
-  &:link {
+  &,
+  &:focus .app-image-marker__label {
     text-decoration: none;
+  }
+
+  &:focus,
+  &:focus .app-image-marker__number {
+    border-color: transparent;
+  }
+
+  &:focus .app-image-marker__number {
+    color: $nhsuk-text-colour;
+    background-color: transparent;
+  }
+
+  &:not(:focus):hover .app-image-marker__label {
+    color: $nhsuk-link-hover-colour;
+    background-color: transparent;
+    text-decoration: underline;
+  }
+
+  &:not(:focus):active .app-image-marker__label {
+    color: $nhsuk-link-active-colour;
+  }
+}
+
+.app-image-marker__number {
+  margin: -2px; // Adjust for border width
+  margin-right: nhsuk-spacing(2) + 4px - 2px;
+
+  .app-image-marker[href]:hover & {
+    background-color: $nhsuk-login-button-hover-colour;
+  }
+
+  .app-image-marker[href]:active & {
+    background-color: $nhsuk-login-button-active-colour;
+  }
+}
+
+.app-image-marker__label {
+  padding-right: nhsuk-spacing(2) + 4px;
+  color: $nhsuk-text-colour;
+
+  @include nhsuk-media-query($from: tablet) {
+    @include nhsuk-font-size(16);
   }
 }

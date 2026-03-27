@@ -1,5 +1,12 @@
-{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes -%}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/card/macro.jinja" import card %}
+{% from "nhsuk/components/radios/macro.jinja" import radios %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+{% from "nhsuk/macros/attributes.jinja" import nhsukAttributes %}
+{% from "components/image-key/macro.jinja" import app_image_key %}
+{% from "components/image-map/macro.jinja" import app_image_map %}
+{% from "components/image-marker/macro.jinja" import app_image_marker %}
 
 <div {{- nhsukAttributes({
   "class": "app-breast-diagram",
@@ -26,19 +33,128 @@
     <span>Left</span>
   </div>
 
-  <figure
-    {{- nhsukAttributes({
-      "class": "app-breast-diagram__image-map nhsuk-u-width-full",
-      "data-module": "app-image-map"
-    }) -}}
+  <template class="app-js-template-image-marker">
+    {{ app_image_marker({
+      "text": "?",
+      "element": "button" if not params.read_only else undefined,
+      "type": "button" if not params.read_only else undefined
+    }) | trim | indent(4) }}
+  </template>
 
-    {{- nhsukAttributes(params.image_map.attributes) -}}>
-  {% if params.version == 1 %}
-    {% include "components/breast-diagram/v1.svg" %}
-  {% endif %}
-  </figure>
+  {% call app_image_map(params.image_map) %}
+    {% if params.version == 1 %}
+      {% include "components/breast-diagram/v1.svg" %}
+    {% endif %}
+  {% endcall %}
+
+{% if not params.read_only %}
+  {% set headingHtml %}
+    <span class="app-breast-diagram__caption nhsuk-caption-m app-js-feature-caption-add">
+      Add new feature
+    </span>
+    <span class="app-breast-diagram__caption nhsuk-caption-m app-js-feature-caption-edit" hidden>
+      Editing feature
+    </span>
+    <h2 class="nhsuk-fieldset__heading nhsuk-heading-m">
+      What is the feature?
+    </h2>
+  {% endset %}
+
+  {% set descriptionHtml %}
+    <p class="nhsuk-body">
+      This will be added to<br>
+      {{ tag({
+        "text": "Left lower inner",
+        "classes": "nhsuk-tag--white app-breast-diagram__region"
+      }) | trim | indent(6) }}
+    </p>
+  {% endset %}
+
+  {% call card({
+    "classes": "app-breast-diagram__card",
+    "secondary": true,
+    "attributes": {
+      "hidden": {
+        "value": true,
+        "optional": true
+      }
+    }
+  }) %}
+    {{ radios({
+      "fieldset": {
+        "legend": {
+          "html": headingHtml,
+          "size": "m"
+        }
+      },
+      "formGroup": {
+        "beforeInputs": {
+          "html": descriptionHtml
+        }
+      },
+      "name": "feature",
+      "classes": "nhsuk-radios--small",
+      "items": [
+        {
+          "text": "Mole",
+          "value": "mole"
+        },
+        {
+          "text": "Wart",
+          "value": "wart"
+        },
+        {
+          "text": "Scar",
+          "value": "scar"
+        },
+        {
+          "text": "Bruising or trauma",
+          "value": "bruising_or_trauma"
+        },
+        {
+          "text": "Other feature",
+          "value": "other_feature"
+        }
+      ]
+    }) | trim | indent(4) }}
+
+    <div class="nhsuk-button-group nhsuk-button-group--small">
+      {{ button({
+        "text": "Add",
+        "classes": "nhsuk-button--secondary nhsuk-button--small app-breast-diagram__button app-js-feature-add"
+      }) | trim | indent(6) }}
+
+      {{ button({
+        "text": "Save changes",
+        "classes": "nhsuk-button--secondary nhsuk-button--small app-breast-diagram__button app-js-feature-edit",
+        "attributes": {
+          "hidden": {
+            "value": true,
+            "optional": true
+          }
+        }
+      }) | trim | indent(6) }}
+
+      {{ button({
+        "text": "Cancel",
+        "type": "reset",
+        "classes": "nhsuk-button--secondary nhsuk-button--small app-breast-diagram__button app-js-feature-cancel"
+      }) | trim | indent(6) }}
+
+      <button class="nhsuk-link app-link app-link--warning app-js-feature-remove" type="reset">
+        Remove
+      </button>
+    </div>
+  {% endcall %}
+{% endif %}
+
+  {{ app_image_key({
+    "items": params.features,
+    "read_only": params.read_only
+  }) | trim | indent(2) }}
 
 {% if params.debug %}
+  {% if not params.read_only %}
   {{ summaryList({
     "rows": [
       {
@@ -49,7 +165,7 @@
           "text": "N/A",
           "classes": "app-js-image-x"
         }
-      } if params.read_only else none,
+      },
       {
         "key": {
           "text": "Image Y"
@@ -58,7 +174,7 @@
           "text": "N/A",
           "classes": "app-js-image-y"
         }
-      } if params.read_only else none,
+      },
       {
         "key": {
           "text": "Image region"
@@ -66,19 +182,15 @@
         "value": {
           "text": "N/A",
           "classes": "app-js-image-region"
-        }
-      } if params.read_only else none,
-      {
-        "key": {
-          "text": "Input values"
-        },
-        "value": {
-          "text": "N/A",
-          "classes": "app-js-image-input"
         },
         "classes": "nhsuk-summary-list__row--no-border"
       }
     ]
-  }) }}
+  }) | trim | indent(2) }}
+  {% endif %}
+
+  <div class="nhsuk-code nhsuk-u-margin-bottom-0 app-js-image-input" data-module="nhsuk-code">
+    <pre class="nhsuk-code__container"><code class="nhsuk-code__content">[]</code></pre>
+  </div>
 {% endif %}
 </div>

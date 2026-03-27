@@ -48,7 +48,7 @@ describe('Check in', () => {
               <div data-module="app-start-appointment" data-appointment-id="123" hidden>
                 <form action="/example" method="post" novalidate>
                   <p>
-                    <button class="app-button app-button--link">Start appointment</button>
+                    <button class="nhsuk-link app-link">Start appointment</button>
                   </p>
                 </form>
               </div>

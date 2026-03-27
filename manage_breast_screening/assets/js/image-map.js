@@ -38,8 +38,8 @@ export class ImageMap extends ConfigurableComponent {
     this.$paths = Array.from($paths).reverse()
     this.$image = $image
 
-    this.$image.addEventListener('mousemove', this.onMouseMove.bind(this))
-    this.$image.addEventListener('click', this.onClick.bind(this))
+    this.$root.addEventListener('mousemove', this.onMouseMove.bind(this))
+    this.$root.addEventListener('click', this.onClick.bind(this))
   }
 
   /**
@@ -70,16 +70,30 @@ export class ImageMap extends ConfigurableComponent {
   /**
    * Set image map state
    *
-   * @param {ImageMapState} state - State updated, e.g. 'active'
+   * @param {ImageMapState} state - State to set, e.g. 'active'
    * @param {SVGGeometryElement} [$activePath] - SVG path to set state for
-   * @param {boolean} [value] - Set state value
    */
-  setState(state, $activePath, value = true) {
-    if (value) {
-      $activePath?.setAttribute(`data-${state}`, 'true')
-    } else {
-      $activePath?.removeAttribute(`data-${state}`)
+  setState(state, $activePath) {
+    $activePath?.setAttribute(`data-${state}`, 'true')
+  }
+
+  /**
+   * Unset image map state
+   *
+   * @param {ImageMapState} state - State to unset, e.g. 'active'
+   * @param {SVGGeometryElement} [$activePath] - SVG path to unset state for
+   */
+  unsetState(state, $activePath) {
+    const { $paths } = this
+
+    // Reset state for all paths
+    if (!$activePath) {
+      $paths.forEach(($path) => this.unsetState(state, $path))
+      return
     }
+
+    // Reset state for active path only
+    $activePath.removeAttribute(`data-${state}`)
   }
 
   /**
@@ -165,7 +179,7 @@ export class ImageMap extends ConfigurableComponent {
   /**
    * Add event listener for image map
    *
-   * @param {ImageMapEvent} name - Event name, e.g. 'hover', 'click'
+   * @param {ImageMapEvent} name - Event name, e.g. 'hover', 'edit'
    * @param {ImageMapListener} listener - Image map listener
    */
   addEventListener(name, listener) {
@@ -178,12 +192,16 @@ export class ImageMap extends ConfigurableComponent {
   /**
    * Dispatch event for image map
    *
-   * @param {ImageMapEvent} name - Event name, e.g. 'hover', 'click'
+   * @param {ImageMapEvent} name - Event name, e.g. 'hover', 'edit'
    * @param {ImageMapPayload} detail - Image map payload
+   * @param {EventTarget} [target] - Event target
    */
-  dispatchEvent(name, detail) {
-    this.$root.dispatchEvent(
-      new CustomEvent(`${ImageMap.moduleName}:${name}`, { detail })
+  dispatchEvent(name, detail, target = this.$root) {
+    target.dispatchEvent(
+      new CustomEvent(`${ImageMap.moduleName}:${name}`, {
+        bubbles: true,
+        detail
+      })
     )
   }
 
@@ -210,7 +228,12 @@ export class ImageMap extends ConfigurableComponent {
     const point = this.getPoint(clientX, clientY)
     const $path = this.getPath(point)
 
-    this.dispatchEvent('click', { $path, point })
+    if (event.target instanceof HTMLButtonElement) {
+      this.dispatchEvent('edit', { $path, point }, event.target)
+      return
+    }
+
+    this.dispatchEvent('create', { $path, point })
   }
 
   /**
@@ -261,7 +284,7 @@ export class ImageMap extends ConfigurableComponent {
 
 /**
  * @typedef {'active'} ImageMapState - Image map state
- * @typedef {'hover' | 'click'} ImageMapEvent - Image map event
+ * @typedef {'hover' | 'create' | 'edit'} ImageMapEvent - Image map event
  */
 
 /**
@@ -282,5 +305,5 @@ export class ImageMap extends ConfigurableComponent {
  */
 
 /**
- * @import { Schema } from 'nhsuk-frontend/dist/nhsuk/common/configuration/index.mjs'
+ * @import { Schema } from 'nhsuk-frontend'
  */

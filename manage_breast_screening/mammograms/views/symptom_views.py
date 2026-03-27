@@ -104,7 +104,7 @@ class ChangeSymptomView(BaseSymptomFormView):
         context = super().get_context_data(**kwargs)
         context["delete_link"] = {
             "text": "Delete this symptom",
-            "class": "nhsuk-link app-link--warning",
+            "class": "nhsuk-link app-link app-link--warning",
             "href": reverse(
                 "mammograms:delete_symptom",
                 kwargs={

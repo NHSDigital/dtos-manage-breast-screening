@@ -151,7 +151,7 @@ class SystemTestCase(StaticLiveServerTestCase):
 
         if require_unique_link_text:
             links = self.page.get_by_role("link").or_(
-                self.page.locator("css=.app-button--link")
+                self.page.locator("css=.app-link")
             )
 
             counter = Counter(link.text_content().strip() for link in links.all())

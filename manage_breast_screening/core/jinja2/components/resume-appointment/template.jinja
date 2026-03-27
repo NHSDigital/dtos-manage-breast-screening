@@ -5,7 +5,7 @@
 <div data-module="app-resume-appointment" data-appointment-id="{{ presented_appointment.pk }}">
   <form action="{{ resume_appointment_url }}" method="post" novalidate>
     <p>
-      <button class="app-button {% if is_button %}nhsuk-button{% else %} app-button--link{% endif %}">Resume appointment<span class="nhsuk-u-visually-hidden"> for {{ presented_appointment.participant.full_name }}</span></button>
+      <button class="{{ "nhsuk-button" if is_button else "nhsuk-link app-link" }}">Resume appointment<span class="nhsuk-u-visually-hidden"> for {{ presented_appointment.participant.full_name }}</span></button>
     </p>
     {{ csrf_input }}
   </form>

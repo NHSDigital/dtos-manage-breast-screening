@@ -27,6 +27,8 @@ class TestRecordingBreastFeatures(SystemTestCase):
         self.then_i_am_on_the_breast_feature_form()
 
         self.when_i_click_on_the_right_central_region()
+        self.and_i_select_a_feature()
+        self.and_i_save_the_feature()
         self.and_i_save_the_form()
         self.then_i_am_back_on_the_record_medical_information_page()
         self.and_i_see_the_feature_is_added()
@@ -91,6 +93,12 @@ class TestRecordingBreastFeatures(SystemTestCase):
         self.page.locator(".app-breast-diagram__regions-right .right_central").click(
             force=True
         )
+
+    def and_i_select_a_feature(self):
+        self.page.get_by_label("Mole").check()
+
+    def and_i_save_the_feature(self):
+        self.page.get_by_role("button").filter(has_text="Add").click()
 
     def and_i_save_the_form(self):
         self.page.get_by_role("button").filter(has_text="Save").click()

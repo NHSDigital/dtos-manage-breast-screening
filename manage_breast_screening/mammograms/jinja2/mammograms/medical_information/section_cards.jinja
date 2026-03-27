@@ -115,15 +115,17 @@
 {% macro breast_features_content(presented_medical_info, read_only=false, debug=false) %}
   <p>Non-surgical scars, moles and other features that may appear on mammogram images</p>
   {% if presented_medical_info.breast_features %}
+    {% set features = presented_medical_info.breast_features.features %}
     {% set count = presented_medical_info.breast_features.feature_count %}
 
     <form>
-      <input name="features" type="hidden" value="{{ presented_medical_info.breast_features.features }}" readonly>
+      <input name="features" type="hidden" value="{{ presented_medical_info.breast_features.features_json }}" readonly>
       <div class="nhsuk-grid-row">
         <div class="nhsuk-grid-column-two-thirds">
           {{ app_breast_diagram({
-            "read_only": true,
             "debug": debug,
+            "features": features,
+            "read_only": true,
             "text": count ~ " breast " ~ "feature" | plural(count) ~ " recorded",
             "version": presented_medical_info.breast_features.diagram_version
           }) }}
@@ -142,7 +144,7 @@
   {% endif %}
 
   {% if not read_only %}
-    <div class="nhsuk-button-group">
+    <div class="nhsuk-button-group {{ "nhsuk-u-margin-top-3" if presented_medical_info.breast_features else "" }}">
       {{ button({
         "text": presented_medical_info.add_or_update_breast_features_button.text,
         "href": presented_medical_info.add_or_update_breast_features_button.href,
