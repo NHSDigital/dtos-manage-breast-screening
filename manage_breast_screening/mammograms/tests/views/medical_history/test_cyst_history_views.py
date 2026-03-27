@@ -7,52 +7,47 @@ from manage_breast_screening.participants.models.medical_history.cyst_history_it
     CystHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
     CystHistoryItemFactory,
 )
 
 
 @pytest.mark.django_db
 class TestAddCystHistoryView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_cyst_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_redirects_if_already_exists(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        CystHistoryItemFactory.create(appointment=appointment)
+    def test_redirects_if_already_exists(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        CystHistoryItemFactory.create(appointment=in_progress_appointment)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_cyst_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
-                "mammograms:record_medical_information", kwargs={"pk": appointment.pk}
+                "mammograms:record_medical_information",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_cyst_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "treatment": CystHistoryItem.Treatment.DRAINAGE_OR_REMOVAL,
@@ -62,7 +57,7 @@ class TestAddCystHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -75,14 +70,13 @@ class TestAddCystHistoryView:
             ],
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_cyst_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {},
         )
@@ -100,15 +94,10 @@ class TestAddCystHistoryView:
 @pytest.mark.django_db
 class TestChangeCystHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-
-    @pytest.fixture
-    def history_item(self, appointment):
+    def history_item(self, in_progress_appointment):
         return CystHistoryItemFactory.create(
-            appointment=appointment, treatment=CystHistoryItem.Treatment.NO_TREATMENT
+            appointment=in_progress_appointment,
+            treatment=CystHistoryItem.Treatment.NO_TREATMENT,
         )
 
     def test_renders_response(self, clinical_user_client, history_item):
@@ -124,12 +113,15 @@ class TestChangeCystHistoryView:
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, history_item
+        self, clinical_user_client, in_progress_appointment, history_item
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_cyst_history_item",
-                kwargs={"pk": appointment.pk, "history_item_pk": history_item.pk},
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
             ),
             {
                 "treatment": CystHistoryItem.Treatment.DRAINAGE_OR_REMOVAL,
@@ -139,7 +131,7 @@ class TestChangeCystHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -156,14 +148,8 @@ class TestChangeCystHistoryView:
 @pytest.mark.django_db
 class TestDeleteCystHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-
-    @pytest.fixture
-    def history_item(self, appointment):
-        return CystHistoryItemFactory.create(appointment=appointment)
+    def history_item(self, in_progress_appointment):
+        return CystHistoryItemFactory.create(appointment=in_progress_appointment)
 
     def test_get_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(

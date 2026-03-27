@@ -81,11 +81,12 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
-        if not appointment.active:
+        if not appointment.current_status.is_in_progress_with(request.user):
             return redirect(
                 "mammograms:show_appointment",
                 pk=appointment.pk,
             )
+
         return super().dispatch(request, *args, **kwargs)  # type: ignore
 
 
