@@ -4,7 +4,7 @@
 {% if image_count > 0 %}
   {% set inset_text_html %}
     <p>
-      {{ image_count }} image{{ " has" if image_count == 1 else "s have" }} been received
+      Receiving images... {{ image_count }} image{{ "" if image_count == 1 else "s" }} received
     </p>
   {% endset %}
 {% else %}
@@ -16,18 +16,24 @@
   {% endset %}
 {% endif %}
 
-{{ insetText({ "html": inset_text_html }) }}
+{{ insetText({
+  "html": inset_text_html,
+  "classes": "nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-2",
+  })
+}}
 
 {% if image_count > 0 %}
-  <div class="nhsuk-grid-row">
-    <div class="nhsuk-grid-column-one-half">
+  <div class="app-mammogram-cards">
+    <div class="app-mammogram-card">
       {% set right_views_html %}
-        {% with images=images["RMLO"], laterality="RMLO" %}
-          {% include "mammograms/_image_set.jinja" %}
-        {% endwith %}
-        {% with images=images["RCC"], laterality="RCC" %}
-          {% include "mammograms/_image_set.jinja" %}
-        {% endwith %}
+        <div class="app-mammogram-views">
+          {% with images=images["RMLO"], laterality="RMLO", side="right" %}
+            {% include "mammograms/_image_set.jinja" %}
+          {% endwith %}
+          {% with images=images["RCC"], laterality="RCC", side="right" %}
+            {% include "mammograms/_image_set.jinja" %}
+          {% endwith %}
+        </div>
       {% endset %}
       {{ card({
         "heading": "Right breast",
@@ -37,14 +43,16 @@
       }) }}
     </div>
 
-    <div class="nhsuk-grid-column-one-half">
+    <div class="app-mammogram-card">
       {% set left_views_html %}
-        {% with images=images["LMLO"], laterality="LMLO" %}
-          {% include "mammograms/_image_set.jinja" %}
-        {% endwith %}
-        {% with images=images["LCC"], laterality="LCC" %}
-          {% include "mammograms/_image_set.jinja" %}
-        {% endwith %}
+        <div class="app-mammogram-views">
+          {% with images=images["LMLO"], laterality="LMLO", side="left" %}
+            {% include "mammograms/_image_set.jinja" %}
+          {% endwith %}
+          {% with images=images["LCC"], laterality="LCC", side="left" %}
+            {% include "mammograms/_image_set.jinja" %}
+          {% endwith %}
+        </div>
       {% endset %}
       {{ card({
         "heading": "Left breast",
