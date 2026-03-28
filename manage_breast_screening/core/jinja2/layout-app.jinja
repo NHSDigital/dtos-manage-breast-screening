@@ -14,6 +14,17 @@
 {% block pageTitle %}{% if form and form.errors %}Error: {% endif %}{% if page_title %}{{ page_title }} – {% endif %}Manage breast screening – NHS{% endblock %}
 
 {% block header %}
+  {% if DJANGO_ENV != 'prod' %}
+    <div class="app-environment nhsuk-tag--grey">
+      <div class="nhsuk-width-container">
+        <strong class="nhsuk-tag nhsuk-tag--grey">
+          {{ DJANGO_ENV }}
+        </strong>
+        This is the {{ DJANGO_ENV }} environment.
+      </div>
+    </div>
+  {% endif %}
+
   {{ header({
     "service": {
       "text": "Manage breast screening"

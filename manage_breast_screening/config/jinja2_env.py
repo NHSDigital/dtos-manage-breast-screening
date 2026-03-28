@@ -1,3 +1,5 @@
+import os
+
 import inflect
 from django.conf import settings
 from django.templatetags.static import static
@@ -41,6 +43,8 @@ def environment(**options):
             "static": static,
             "url": reverse,
             "inflector": inflector,
+            "DJANGO_ENV": settings.DJANGO_ENV,
+            "ENV_CONFIG": os.environ.get("ENV_CONFIG", "unknown"),
         }
     )
 
