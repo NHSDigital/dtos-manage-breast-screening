@@ -99,7 +99,7 @@ jobs:
           DATABASE_HOST: localhost
 
       - name: Test Report
-        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2
         if: ${{ !cancelled() }} # run this step even if previous step failed
         with:
           name: Report python unit tests
@@ -107,7 +107,7 @@ jobs:
           reporter: python-xunit
 
       - name: Report javascript unit tests
-        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2
         if: ${{ !cancelled() }} # run this step even if previous step failed
         with:
           name: Unit tests (javascript)
@@ -167,7 +167,7 @@ jobs:
           DATABASE_HOST: localhost
 
       - name: Report UI tests
-        uses: dorny/test-reporter@3d76b34a4535afbd0600d347b09a6ee5deb3ed7f
+        uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2
         if: ${{ !cancelled() }} # run this step even if previous step failed
         with:
           name: UI tests
