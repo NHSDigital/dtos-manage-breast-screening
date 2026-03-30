@@ -1,5 +1,6 @@
 import uuid
-from datetime import time
+from datetime import date, datetime, time
+from zoneinfo import ZoneInfo
 
 import pytest
 from django.contrib import messages
@@ -416,12 +417,29 @@ class TestParticipantCsvUploadView:
             response.text,
         )
 
-    def test_valid_post_creates_participants(self, superuser_client, superuser_clinic):
+    @pytest.mark.parametrize(
+        "clinic_start_date",
+        [
+            date(year=2026, month=1, day=1),  # Winter GMT (UTC+0)
+            date(year=2026, month=6, day=1),  # Summer BST (UTC+1)
+        ],
+    )
+    def test_valid_post_creates_participants(self, superuser_client, clinic_start_date):
         """
         Test valid CSV creates records with correct data, and that audit logs are created for all changes.
 
         Creates on participant with all fields populated, and another participant with only required fields populated.
+
+        Run twice - once with a clinic start date in winter and once with a clinic start date in summer -
+        to verify that the time zone handling is correct when creating clinic slots based on the "Start Time" column in the CSV.
         """
+
+        superuser_clinic = ClinicFactory.create(
+            setting=SettingFactory.create(provider=superuser_client.current_provider),
+            starts_at=datetime.combine(
+                clinic_start_date, time(9, 0), tzinfo=ZoneInfo("Europe/London")
+            ),
+        )
 
         lines = [
             self._header(),
