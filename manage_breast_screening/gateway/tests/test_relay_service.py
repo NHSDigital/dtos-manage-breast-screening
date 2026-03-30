@@ -7,6 +7,7 @@ import urllib.parse
 from unittest.mock import AsyncMock, patch
 
 import pytest
+import time_machine
 from websockets.asyncio.client import ClientConnection
 
 from manage_breast_screening.gateway.relay_service import (
@@ -73,6 +74,21 @@ class TestRelayService:
         )
         assert "sb-hc-action=connect" in url
         assert "sb-hc-token=TOKEN" in url
+
+    @time_machine.travel("2024-01-01T00:00:00", tick=False)
+    def test_send_echo(self, relay):
+        subject = RelayService()
+
+        mock_ws = AsyncMock(spec=ClientConnection)
+        mock_ws.recv.return_value = json.dumps({"status": "ok"})
+
+        with patch(f"{RelayService.__module__}.connect") as mock_connect:
+            mock_connect.return_value.__aenter__.return_value = mock_ws
+            subject.send_echo(relay)
+
+        mock_ws.send.assert_called_once_with(
+            json.dumps({"action_type": "echo", "timestamp": "2024-01-01T00:00:00"})
+        )
 
     @pytest.mark.django_db(transaction=True)
     def test_send_action_success(self, relay, gateway_action):
