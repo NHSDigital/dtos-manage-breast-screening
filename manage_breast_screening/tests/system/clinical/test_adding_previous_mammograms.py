@@ -164,10 +164,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
         )
 
     def then_i_should_see_no_reported_mammograms(self):
-        expect(self.page.get_by_test_id("mammograms")).to_contain_text("Not known")
+        mammogram_history_section = self.find_mammogram_history_section()
+        expect(mammogram_history_section).to_contain_text("Mammogram history")
+        expect(mammogram_history_section).not_to_contain_text("Reported mammograms")
 
-    def when_i_click_on_add_mammogram(self):
-        self.page.get_by_text("Add mammogram").click()
+    and_the_previous_mammogram_is_gone = then_i_should_see_no_reported_mammograms
 
     def then_i_should_be_on_the_add_previous_mammogram_form(self):
         path = reverse(
@@ -207,9 +208,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def and_i_should_see_the_mammogram_with_the_same_provider(self):
         expected_inner_text = re.compile(
-            rf"Added today\n1 December 2023 \(.* ago\)\n{self.current_provider.name}\nAdditional information: RR"
+            rf"Recorded {date.today().strftime('%-d %B %Y')}\s+by {self.current_user.get_short_name()} \(you\)\s+1 December 2023 \(.* ago\)\n{re.escape(self.current_provider.name)}\nAdditional information: RR"
         )
-        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
+        mammogram_history_section = self.find_mammogram_history_section()
+        expect(mammogram_history_section).to_contain_text(
             expected_inner_text,
             use_inner_text=True,
         )
@@ -232,9 +234,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def and_i_should_see_the_mammogram_with_the_other_provider_and_name(self):
         expected_inner_text = re.compile(
-            r"Added today\nTaken 6 months or more ago: a year ago\nIn the UK: other place\nPrevious name: Taylor Swift\nAdditional information: RR"
+            rf"Recorded {date.today().strftime('%-d %B %Y')}\s+by {self.current_user.get_short_name()} \(you\)\s+Taken 6 months or more ago: a year ago\nIn the UK: other place\nPrevious name: Taylor Swift\nAdditional information: RR"
         )
-        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
+        mammogram_history_section = self.find_mammogram_history_section()
+        expect(mammogram_history_section).to_contain_text(
             expected_inner_text,
             use_inner_text=True,
         )
@@ -286,8 +289,9 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.get_by_text("Proceed with this appointment").click()
 
     def and_i_should_see_the_mammogram_with_the_reason_for_continuing(self):
-        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
-            "Reason for continuing: A reason for continuing even though recent mammogram",
+        mammogram_history_section = self.find_mammogram_history_section()
+        expect(mammogram_history_section).to_contain_text(
+            "Reason for continuing with mammograms: A reason for continuing even though recent mammogram",
             use_inner_text=True,
         )
 
@@ -332,18 +336,11 @@ class TestAddingPreviousMammograms(SystemTestCase):
     def and_i_click_delete_item(self):
         self.page.get_by_text("Delete item").click()
 
-    def and_the_previous_mammogram_is_gone(self):
-        expect(self.page.get_by_test_id("mammograms")).to_contain_text(
-            "Not known",
-            use_inner_text=True,
-        )
-        expect(self.page.get_by_test_id("mammograms")).not_to_contain_text(
-            "Added today",
-            use_inner_text=True,
-        )
-
     def and_the_message_says_mammogram_deleted(self):
         alert = self.page.get_by_role("alert")
 
         expect(alert).to_contain_text("Success")
         expect(alert).to_contain_text("Deleted a previous mammogram")
+
+    def find_mammogram_history_section(self):
+        return self.page.locator("#mammogram-history")
