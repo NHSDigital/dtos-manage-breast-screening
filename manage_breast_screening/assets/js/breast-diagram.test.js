@@ -3,12 +3,25 @@ import { createAll } from 'nhsuk-frontend'
 import { BreastDiagram } from './breast-diagram.js'
 import { ImageMap } from './image-map.js'
 
+jest.mock('./image-key', () => {
+  const { Component } = jest.requireActual('nhsuk-frontend')
+
+  return {
+    ImageKey: class MockImageKey extends Component {
+      addEventListener() {}
+      render() {}
+      static moduleName = 'app-image-key'
+    }
+  }
+})
+
 jest.mock('./image-map', () => {
   const { Component } = jest.requireActual('nhsuk-frontend')
 
   return {
     ImageMap: class MockImageMap extends Component {
       addEventListener() {}
+      unsetState() {}
       config = { readOnly: false }
       static moduleName = 'app-image-map'
     }
@@ -52,7 +65,17 @@ describe('Breast diagram', () => {
     <form>
       <input name="features" type="hidden" value="[]">
       <div data-module="app-breast-diagram">
+        <template class="app-js-template-image-marker">
+          <a class="app-image-marker" href="#">?</a>
+        </template>
         <div data-module="app-image-map"></div>
+        <div class="app-breast-diagram__card">
+          <span class="app-breast-diagram__caption"></span>
+          <strong class="app-breast-diagram__region"></strong>
+          <input type="radio" name="feature" value="pending">
+          <button class="app-breast-diagram__button">Save</button>
+        </div>
+        <div data-module="app-image-key"></div>
       </div>
     </form>`
 
@@ -60,7 +83,17 @@ describe('Breast diagram', () => {
     <form>
       <input name="features" type="hidden" value='[{"id": "pending", "region_id": "right_upper_outer", "x": 133, "y": 82}]'>
       <div data-module="app-breast-diagram">
+        <template class="app-js-template-image-marker">
+          <a class="app-image-marker" href="#">?</a>
+        </template>
         <div data-module="app-image-map"></div>
+        <div class="app-breast-diagram__card">
+          <span class="app-breast-diagram__caption"></span>
+          <strong class="app-breast-diagram__region"></strong>
+          <input type="radio" name="feature" value="pending">
+          <button class="app-breast-diagram__button">Save</button>
+        </div>
+        <div data-module="app-image-key"></div>
       </div>
     </form>`
 

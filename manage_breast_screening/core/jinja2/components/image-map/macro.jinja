@@ -1,0 +1,6 @@
+{% macro app_image_map(params) %}
+  {% if caller %}
+  {# noop for Jinja support #}
+  {% endif %}
+  {%- include "components/image-map/template.jinja" -%}
+{% endmacro %}

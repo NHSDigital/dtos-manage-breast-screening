@@ -1,21 +1,20 @@
 @use "sass:color";
-@use "../vendor/nhsuk-frontend" as *;
+@use "../vendor/nhsuk-frontend/base" as *;
 
-$state-highlight: nhsuk-tint(nhsuk-colour("yellow"), 50%);
-$state-active: nhsuk-tint(nhsuk-colour("blue"), 50%);
+$breast-diagram-highlight-colour: nhsuk-tint(nhsuk-colour("yellow"), 50%);
+$breast-diagram-active-colour: nhsuk-tint(nhsuk-colour("blue"), 50%);
 
-.app-breast-diagram__image-map {
-  position: relative;
-  margin: 0;
-  overflow: hidden;
-  border: 3px solid $nhsuk-text-colour;
-  background: nhsuk-colour("white");
-
+.app-breast-diagram {
   @include nhsuk-responsive-margin(4, "bottom");
+}
 
-  .app-breast-diagram:last-child & {
-    margin-bottom: 0;
-  }
+.app-breast-diagram[data-read-only] {
+  margin-bottom: 0;
+}
+
+.app-breast-diagram__button[hidden],
+.app-breast-diagram__caption[hidden] {
+  display: none;
 }
 
 .app-breast-diagram__side-labels {
@@ -42,7 +41,7 @@ $state-active: nhsuk-tint(nhsuk-colour("blue"), 50%);
 
 .app-breast-diagram[data-debug] {
   .app-breast-diagram__regions [data-active] {
-    fill: $state-active;
+    fill: $breast-diagram-active-colour;
   }
 }
 
@@ -63,10 +62,14 @@ $state-active: nhsuk-tint(nhsuk-colour("blue"), 50%);
 
   .app-breast-diagram__regions path:hover,
   .app-breast-diagram__regions polygon:hover {
-    fill: $state-highlight;
+    fill: $breast-diagram-highlight-colour;
   }
 
   .app-breast-diagram__regions [data-active]:hover {
-    fill: color.adjust(color.mix($state-active, $state-highlight, 75%), $lightness: 10%, $saturation: 25%);
+    fill: color.adjust(
+      color.mix($breast-diagram-active-colour, $breast-diagram-highlight-colour, 75%),
+      $lightness: 10%,
+      $saturation: 25%
+    );
   }
 }

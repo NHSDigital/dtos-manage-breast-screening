@@ -1,0 +1,15 @@
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+{% from "components/image-marker/macro.jinja" import app_image_marker %}
+
+<li class="app-image-key__item">
+  {{ app_image_marker({
+    "text": params.index,
+    "label": params.feature,
+    "href": params.href
+  }) | trim | indent(2) }}
+
+  {{ tag({
+    "text": params.region,
+    "classes": "nhsuk-tag--white app-image-key__region"
+  }) | trim | indent(2) }}
+</li>

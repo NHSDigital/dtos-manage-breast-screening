@@ -1,25 +1,32 @@
 @use "../vendor/nhsuk-frontend/base" as *;
 
-.app-button--link {
+.app-link {
   @include nhsuk-link-style-default;
-
-  & {
-    display: inline;
-    align-items: normal;
-    text-align: left;
-    font-size: inherit;
-    -webkit-appearance: none;
-    appearance: none;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    text-decoration: underline;
-    padding: 0;
-  }
 }
 
-.nhsuk-form-group .app-button--link {
-  display: block;
+.app-link[hidden] {
+  display: none;
+}
+
+// Button with text link styles
+button.app-link {
+  display: inline;
+
+  align-items: normal;
+
+  padding: 0;
+
+  border: none;
+
+  background-color: transparent;
+
+  font-size: inherit;
+  text-align: left;
+  text-decoration: underline;
+
+  cursor: pointer;
+
+  appearance: none;
 }
 
 .app-button--icon {
