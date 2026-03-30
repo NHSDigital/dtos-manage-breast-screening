@@ -851,6 +851,52 @@ class TestAppointmentCannotGoAhead:
             == 1
         )
 
+    def test_flash_message_when_rescheduled(self, clinical_user_client):
+        from django.contrib.messages import get_messages
+
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        name = appointment.screening_episode.participant.full_name
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+            ),
+            {
+                "stopped_reasons": ["failed_identity_check"],
+                "decision": "True",
+            },
+        )
+        message_strings = [str(m) for m in get_messages(response.wsgi_request)]
+        assert any(
+            f"Appointment cancelled and a reschedule request has been submitted for {name}"
+            in msg
+            for msg in message_strings
+        )
+
+    def test_flash_message_when_not_rescheduled(self, clinical_user_client):
+        from django.contrib.messages import get_messages
+
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        name = appointment.screening_episode.participant.full_name
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_cannot_go_ahead", kwargs={"pk": appointment.pk}
+            ),
+            {
+                "stopped_reasons": ["failed_identity_check"],
+                "decision": "False",
+            },
+        )
+        message_strings = [str(m) for m in get_messages(response.wsgi_request)]
+        assert any(
+            f"Appointment cancelled. {name} will be invited to their next routine appointment"
+            in msg
+            for msg in message_strings
+        )
+
 
 @pytest.mark.django_db
 class TestMarkSectionReviewed:
