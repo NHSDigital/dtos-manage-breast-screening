@@ -106,7 +106,10 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
 
     def and_i_see_a_success_flash_message(self):
         expect(
-            self.page.get_by_text("will be invited to the next routine appointment.")
+            self.page.get_by_text(
+                "Appointment cancelled and a reschedule request has been submitted for",
+                exact=False,
+            )
         ).to_be_visible()
 
     def and_the_appointment_is_updated(self):

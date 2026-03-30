@@ -195,14 +195,22 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         view_appointment_url = reverse(
             "mammograms:show_appointment", kwargs={"pk": instance.pk}
         )
+        view_link = f' <a href="{view_appointment_url}" class="app-u-nowrap">View their appointment</a>'
+        if form.cleaned_data["decision"] == "True":
+            message_text = (
+                f"Appointment cancelled and a reschedule request has been"
+                f" submitted for {escaped_name}.{view_link}"
+            )
+        else:
+            message_text = (
+                f"Appointment cancelled. {escaped_name} will be invited to"
+                f" their next routine appointment.{view_link}"
+            )
         messages.add_message(
             self.request,
             messages.SUCCESS,
             mark_safe(
-                f'<p class="nhsuk-notification-banner__heading">'
-                f"{escaped_name} will be invited to the next routine appointment."
-                f' <a href="{view_appointment_url}" class="app-u-nowrap">View their appointment</a>'
-                f"</p>"
+                f'<p class="nhsuk-notification-banner__heading">{message_text}</p>'
             ),
         )
         return super().form_valid(form)
