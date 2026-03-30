@@ -1,6 +1,9 @@
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
@@ -53,6 +56,8 @@ class TestAddPregnancyAndBreastfeeding(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
         )
 
     def and_i_am_on_the_record_medical_information_page(self):

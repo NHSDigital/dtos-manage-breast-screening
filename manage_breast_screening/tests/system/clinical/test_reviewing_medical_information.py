@@ -71,10 +71,8 @@ class TestReviewingMedicalInformation(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": self.current_user,
-            },
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
         )
 
     def and_i_am_on_the_record_medical_information_page(self):

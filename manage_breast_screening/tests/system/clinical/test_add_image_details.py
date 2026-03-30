@@ -3,6 +3,9 @@ import re
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
 from ..system_test_setup import SystemTestCase
@@ -74,7 +77,9 @@ class TestAddImageDetails(SystemTestCase):
 
     def and_there_is_an_appointment_for_my_provider(self):
         self.appointment = AppointmentFactory(
-            clinic_slot__clinic__setting__provider=self.current_provider
+            clinic_slot__clinic__setting__provider=self.current_provider,
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
         )
 
     def and_i_am_on_the_add_image_details_page(self):
