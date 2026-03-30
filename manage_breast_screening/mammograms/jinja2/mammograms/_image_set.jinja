@@ -15,7 +15,7 @@
         {% if image.image_file %}
           <div class="app-mammogram-thumbnail__image-wrapper app-mammogram-thumbnail__image-wrapper--large">
             <span class="app-mammogram-thumbnail__label">{{ laterality }}</span>
-              <img class="app-mammogram-thumbnail__image" src="{{ image.image_file.url }}" alt="{{ lateraliy }} view ({{ loop.index }} of {{ loop.length }})" data-testid="mammogram-image-{{ laterality }}-{{ loop.index }}">
+              <img class="app-mammogram-thumbnail__image" src="{{ image.image_file.url }}" alt="{{ laterality }} view ({{ loop.index }} of {{ loop.length }})" data-testid="mammogram-image-{{ laterality }}-{{ loop.index }}">
             </span>
           </div>
         {% endif %}
