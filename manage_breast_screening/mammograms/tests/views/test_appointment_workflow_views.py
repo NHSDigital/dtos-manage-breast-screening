@@ -531,10 +531,8 @@ class TestStartAppointment:
         other_user = UserFactory.create(first_name="Alice", last_name="Smith")
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": other_user,
-            },
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=other_user,
         )
         response = clinical_user_client.http.post(
             reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
@@ -573,10 +571,8 @@ class TestResumeAppointment:
         """
         in_progress_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": clinical_user_client.user,
-            },
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=clinical_user_client.user,
         )
         response = clinical_user_client.http.post(
             reverse(
@@ -600,10 +596,8 @@ class TestResumeAppointment:
         different_user = UserFactory.create(nhs_uid="different_user")
         in_progress_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": different_user,
-            },
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=different_user,
         )
 
         with pytest.raises(
@@ -1115,10 +1109,8 @@ class TestPauseAppointment:
         )
         in_progress_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": different_user,
-            },
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=different_user,
         )
 
         response = clinical_user_client.http.post(

@@ -148,14 +148,6 @@ class AppointmentFactory(DjangoModelFactory):
             AppointmentStatusFactory.create(name=extracted, appointment=obj, **kwargs)
         )
 
-    # Allow passing an explicit status and created_by user
-    # e.g. `current_status_params={'name': AppointmentStatusNames.IN_PROGRESS, 'created_by': self.current_user}`
-    @post_generation
-    def current_status_params(obj, create, extracted, **kwargs):
-        if not create or not extracted:
-            return
-        obj.statuses.add(AppointmentStatusFactory.create(appointment=obj, **extracted))
-
 
 class AppointmentNoteFactory(DjangoModelFactory):
     class Meta:
