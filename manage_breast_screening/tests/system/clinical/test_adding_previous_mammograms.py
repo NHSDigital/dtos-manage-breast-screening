@@ -117,7 +117,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.then_i_should_be_on_the_add_previous_mammogram_form()
 
         self.when_i_select_the_same_provider()
-        self.and_i_enter_an_exact_date(date.today() - relativedelta(months=5))
+        self.and_i_enter_an_approximate_date_less_than_six_months()
         self.and_i_select_yes_same_name()
         self.and_i_enter_additional_information()
         self.and_i_click_save()
@@ -193,6 +193,12 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.get_by_label("Day", exact=True).fill(str(exact_date.day))
         self.page.get_by_label("Month", exact=True).fill(str(exact_date.month))
         self.page.get_by_label("Year", exact=True).fill(str(exact_date.year))
+
+    def and_i_enter_an_approximate_date_less_than_six_months(self):
+        self.page.get_by_label("Not sure (less than 6 months ago)").click()
+        self.page.get_by_label(
+            "Approximate date (less than 6 months ago)", exact=True
+        ).fill("A few months ago")
 
     def and_i_select_yes_same_name(self):
         self.page.get_by_label("Yes").click()

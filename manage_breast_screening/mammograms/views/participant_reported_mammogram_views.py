@@ -48,10 +48,15 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
         return context
 
     def form_valid(self, form):
-        exact_date = form.cleaned_data.get("exact_date")
-        self.within_six_months = (
-            exact_date and exact_date > date.today() - relativedelta(months=6)
-        )
+        date_type = form.cleaned_data.get("date_type")
+        if date_type == ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS:
+            self.within_six_months = True
+        elif date_type == ParticipantReportedMammogram.DateType.EXACT:
+            exact_date = form.cleaned_data.get("exact_date")
+            self.within_six_months = (
+                exact_date and exact_date > date.today() - relativedelta(months=6)
+            )
+
         self.form = form
 
         return super().form_valid(form)
