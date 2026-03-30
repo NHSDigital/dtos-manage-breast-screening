@@ -30,6 +30,7 @@ class UserAdmin(admin.ModelAdmin):
     exclude = ["password"]
     inlines = [AssignmentInline]
     extra = 0
+    list_display = ["first_name", "last_name", "email", "is_staff", "is_superuser"]
 
 
 admin_site.register(User, UserAdmin)
