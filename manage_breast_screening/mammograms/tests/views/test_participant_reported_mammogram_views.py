@@ -228,24 +228,25 @@ class TestAddParticipantReportedMammogram:
 
         assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
 
-    def test_post_approx_within_last_six_months(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_post_approx_within_last_six_months(
+        self, clinical_user_client, in_progress_appointment
+    ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": appointment.pk},
+            kwargs={"pk": in_progress_appointment.pk},
         )
 
         assert (
-            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
+            ParticipantReportedMammogram.objects.filter(
+                appointment=in_progress_appointment
+            ).count()
             == 0
         )
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
@@ -256,14 +257,14 @@ class TestAddParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            appointment=appointment
+            appointment=in_progress_appointment
         ).first()
 
         appointment_should_not_proceed_redirect = (
             reverse(
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
-                    "appointment_pk": appointment.pk,
+                    "appointment_pk": in_progress_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
@@ -280,9 +281,12 @@ class TestAddParticipantReportedMammogram:
             "<p>The mammogram added took place less than 6 months ago. It is not recommended to take breast x-rays within 6 months of each other.</p>",
             should_not_proceed_response.text,
         )
-        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+        assert (
+            in_progress_appointment.current_status.name
+            == AppointmentStatusNames.IN_PROGRESS
+        )
 
-        assert_attended_not_screened_flow(clinical_user_client, appointment)
+        assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
 
 
 @pytest.mark.django_db
@@ -437,16 +441,18 @@ class TestChangeParticipantReportedMammogram:
     def test_post_approx_within_last_six_months(
         self,
         clinical_user_client,
-        appointment,
+        in_progress_appointment,
         participant_reported_mammogram,
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": appointment.pk},
+            kwargs={"pk": in_progress_appointment.pk},
         )
 
         assert (
-            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
+            ParticipantReportedMammogram.objects.filter(
+                appointment=in_progress_appointment
+            ).count()
             == 1
         )
 
@@ -454,7 +460,7 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": appointment.pk,
+                    "pk": in_progress_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -467,7 +473,7 @@ class TestChangeParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            appointment=appointment
+            appointment=in_progress_appointment
         ).first()
 
         assertRedirects(
@@ -475,15 +481,18 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
-                    "appointment_pk": appointment.pk,
+                    "appointment_pk": in_progress_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={return_url}",
         )
-        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+        assert (
+            in_progress_appointment.current_status.name
+            == AppointmentStatusNames.IN_PROGRESS
+        )
 
-        assert_attended_not_screened_flow(clinical_user_client, appointment)
+        assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
 
 
 @pytest.mark.django_db
