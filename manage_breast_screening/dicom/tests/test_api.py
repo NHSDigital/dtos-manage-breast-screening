@@ -41,13 +41,13 @@ def test_upload_success(dataset, dicom_file, monkeypatch):
         )
 
         assert response.status_code == 201
-        assert response.json() == {
-            "study_instance_uid": dataset.StudyInstanceUID,
-            "series_instance_uid": dataset.SeriesInstanceUID,
-            "sop_instance_uid": dataset.SOPInstanceUID,
-            "instance_id": 1,
-        }
-        assert Study.objects.last().source_message_id == "abc123"
+        json = response.json()
+        study = Study.objects.last()
+        assert json["study_instance_uid"] == dataset.StudyInstanceUID
+        assert json["series_instance_uid"] == dataset.SeriesInstanceUID
+        assert json["sop_instance_uid"] == dataset.SOPInstanceUID
+        assert json["instance_id"] == str(study.images().first().id)
+        assert study.source_message_id == "abc123"
 
 
 def test_upload_no_file(monkeypatch):

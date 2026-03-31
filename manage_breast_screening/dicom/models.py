@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.postgres.fields import ArrayField
 from django.core.files.storage import storages
 from django.db import models
@@ -20,6 +22,7 @@ class Study(models.Model):
             models.Index(fields=["source_message_id"]),
         ]
 
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     study_instance_uid = models.CharField(max_length=128, unique=True)
     source_message_id = models.CharField(max_length=128)
     patient_id = models.CharField(max_length=10, blank=True)
@@ -64,6 +67,7 @@ class Series(models.Model):
             models.Index(fields=["series_instance_uid"]),
         ]
 
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     series_instance_uid = models.CharField(max_length=128, unique=True)
     study = models.ForeignKey(Study, on_delete=models.CASCADE, related_name="series")
     modality = models.CharField(max_length=16, blank=True)
@@ -79,6 +83,7 @@ class Image(models.Model):
             models.Index(fields=["sop_instance_uid"]),
         ]
 
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     sop_instance_uid = models.CharField(max_length=128, unique=True)
     series = models.ForeignKey(Series, on_delete=models.CASCADE, related_name="images")
     instance_number = models.IntegerField(null=True, blank=True)
