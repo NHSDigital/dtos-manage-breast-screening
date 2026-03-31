@@ -60,7 +60,6 @@ def appointment_should_not_proceed(
         )
     except ParticipantReportedMammogram.DoesNotExist:
         raise Http404("Participant reported mammogram not found")
-    exact_date = mammogram.exact_date
 
     return_url = extract_relative_redirect_url(request, default="")
     change_previous_mammogram_url = (
@@ -83,6 +82,11 @@ def appointment_should_not_proceed(
         )
         + f"?return_url={return_url}"
     )
+    relative_date = (
+        format_relative_date(mammogram.exact_date)
+        if mammogram.exact_date
+        else "less than 6 months ago"
+    )
     return render(
         request,
         "mammograms/appointment_should_not_proceed.jinja",
@@ -94,7 +98,7 @@ def appointment_should_not_proceed(
                 "href": change_previous_mammogram_url,
             },
             "presented_appointment": AppointmentPresenter(appointment),
-            "time_since_previous_mammogram": format_relative_date(exact_date),
+            "time_since_previous_mammogram": relative_date,
             "change_previous_mammogram_url": change_previous_mammogram_url,
             "proceed_anyway_url": proceed_anyway_url,
             "return_url": return_url,

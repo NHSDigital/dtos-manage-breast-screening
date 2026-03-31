@@ -234,6 +234,62 @@ class TestAddParticipantReportedMammogram:
 
         assert_attended_not_screened_flow(clinical_user_client, appointment)
 
+    def test_post_approx_within_last_six_months(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+        )
+        return_url = reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": appointment.pk},
+        )
+
+        assert (
+            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
+            == 0
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_previous_mammogram",
+                kwargs={"pk": appointment.pk},
+            ),
+            {
+                "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+                "date_type": ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS,
+                "approx_date_LESS_THAN_SIX_MONTHS": "last month",
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+            },
+        )
+
+        mammogram = ParticipantReportedMammogram.objects.filter(
+            appointment=appointment
+        ).first()
+
+        appointment_should_not_proceed_redirect = (
+            reverse(
+                "mammograms:appointment_should_not_proceed",
+                kwargs={
+                    "appointment_pk": appointment.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+            + f"?return_url={return_url}"
+        )
+        assertRedirects(
+            response,
+            appointment_should_not_proceed_redirect,
+        )
+        should_not_proceed_response = clinical_user_client.http.get(
+            appointment_should_not_proceed_redirect
+        )
+        assertInHTML(
+            "<p>The mammogram added took place less than 6 months ago. It is not recommended to take breast x-rays within 6 months of each other.</p>",
+            should_not_proceed_response.text,
+        )
+        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+
+        assert_attended_not_screened_flow(clinical_user_client, appointment)
+
 
 @pytest.mark.django_db
 class TestChangeParticipantReportedMammogram:
@@ -358,6 +414,57 @@ class TestChangeParticipantReportedMammogram:
                 },
             ),
             build_exact_date_form_data(exact_date, return_url),
+        )
+
+        mammogram = ParticipantReportedMammogram.objects.filter(
+            appointment=appointment
+        ).first()
+
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:appointment_should_not_proceed",
+                kwargs={
+                    "appointment_pk": appointment.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+            + f"?return_url={return_url}",
+        )
+        assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
+
+        assert_attended_not_screened_flow(clinical_user_client, appointment)
+
+    def test_post_approx_within_last_six_months(
+        self,
+        clinical_user_client,
+        appointment,
+        participant_reported_mammogram,
+    ):
+        return_url = reverse(
+            "mammograms:record_medical_information",
+            kwargs={"pk": appointment.pk},
+        )
+
+        assert (
+            ParticipantReportedMammogram.objects.filter(appointment=appointment).count()
+            == 1
+        )
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": appointment.pk,
+                    "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
+                },
+            ),
+            {
+                "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+                "date_type": ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS,
+                "approx_date_LESS_THAN_SIX_MONTHS": "last month",
+                "name_is_the_same": ParticipantReportedMammogramForm.NameIsTheSame.YES,
+            },
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(

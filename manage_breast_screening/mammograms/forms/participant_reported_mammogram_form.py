@@ -122,7 +122,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             required=False,
             label="Approximate date",
             visually_hidden_label_suffix=" (at least 6 months ago)",
-            hint=f"For example, {format_relative_months(-9)} or {format_relative_seasons(-12)}",
+            hint=f"For example, {format_relative_months(-12)} or {format_relative_seasons(-4)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
                 "required": "Enter the approximate date when the x-rays were taken"
@@ -132,7 +132,7 @@ class ParticipantReportedMammogramForm(FormWithConditionalFields):
             required=False,
             label="Approximate date",
             visually_hidden_label_suffix=" (less than 6 months ago)",
-            hint=f"For example, {format_relative_months(-3)}",
+            hint=f"For example, {format_relative_months(-3)} or {format_relative_seasons(-1)}",
             classes="nhsuk-u-width-two-thirds",
             error_messages={
                 "required": "Enter the approximate date when the x-rays were taken"
