@@ -18,7 +18,7 @@ from manage_breast_screening.tests.system.system_test_setup import SystemTestCas
 
 
 @time_machine.travel(date(2025, 1, 1))
-class TestRecordingMedicalInformation(SystemTestCase):
+class TestRecordingMedicalHistory(SystemTestCase):
     def test_adding_medical_history(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
