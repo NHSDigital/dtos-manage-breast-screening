@@ -9,6 +9,8 @@ import { ImageKey } from './image-key.js'
 import { ImageMap } from './image-map.js'
 import { ImageMarker } from './image-marker.js'
 
+const FEATURE_ID_PENDING = 'pending'
+
 /**
  * Breast diagram component
  *
@@ -168,9 +170,11 @@ export class BreastDiagram extends ConfigurableComponent {
       this.$buttons = Array.from($buttons)
       this.$radios = Array.from($radios)
 
-      const imageKeys = createAll(ImageKey, undefined, {
-        scope: this.$root
-      })
+      const imageKeys = createAll(
+        ImageKey,
+        { allowlist: this.$radios.map(($radio) => $radio.value) },
+        { scope: this.$root }
+      )
 
       if (!imageKeys.length || !(imageKeys[0].$root instanceof HTMLElement)) {
         throw new ElementError({
@@ -258,6 +262,49 @@ export class BreastDiagram extends ConfigurableComponent {
   }
 
   /**
+   * Add breast feature
+   *
+   * @param {BreastFeature} feature
+   */
+  add(feature) {
+    this.values.push(feature)
+    this.render()
+    this.write()
+  }
+
+  /**
+   * Remove breast feature
+   *
+   * @param {Pick<BreastFeature, 'x' | 'y'> | DOMPoint} [point]
+   */
+  remove(point) {
+    const { imageMap, values } = this
+
+    const value = this.getValue(point)
+    if (!value) {
+      return
+    }
+
+    const index = values.indexOf(value)
+    const $path = imageMap.getPathById(value.region_id)
+
+    imageMap.unsetState('active', $path)
+    values.splice(index, 1)
+
+    this.render()
+    this.write()
+  }
+
+  /**
+   * Clear all features
+   */
+  clear() {
+    this.values.length = 0
+    this.render()
+    this.write()
+  }
+
+  /**
    * Update status messages
    *
    * @param {CustomEvent<ImageMapPayload>} [event] - Image map event
@@ -304,6 +351,52 @@ export class BreastDiagram extends ConfigurableComponent {
   }
 
   /**
+   * Show add or edit feature card
+   *
+   * @param {BreastFeature} feature
+   * @param {number | string} number
+   * @param {'add' | 'edit'} mode
+   */
+  showCard(feature, number, mode = 'edit') {
+    const { $card, $captions, $buttons, $radios, $region } = this
+    if (!$card || !$region) {
+      return
+    }
+
+    // Show add or edit feature caption
+    for (const $caption of $captions) {
+      $caption.setAttribute('hidden', '')
+
+      if ($caption.matches(`.app-js-feature-caption-${mode}`)) {
+        $caption.removeAttribute('hidden')
+      }
+    }
+
+    // Show add, edit, remove or cancel buttons
+    for (const $button of $buttons) {
+      $button.setAttribute('hidden', '')
+
+      if (
+        $button.matches(`.app-js-feature-${mode}`) ||
+        $button.matches(`.app-js-feature-remove`) ||
+        $button.matches(`.app-js-feature-cancel`)
+      ) {
+        $button.removeAttribute('hidden')
+      }
+    }
+
+    for (const $radio of $radios) {
+      $radio.checked = $radio.value === feature.id
+    }
+
+    $card.dataset.id = feature.id
+    $card.dataset.regionId = feature.region_id
+    $card.dataset.number = `${number}`
+    $region.textContent = ImageKey.format($card.dataset.regionId)
+    $card.removeAttribute('hidden')
+  }
+
+  /**
    * Handle image map add marker
    *
    * @type {ImageMapListener}
@@ -317,20 +410,20 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     const value = /** @type {BreastFeature} */ ({
-      id: 'pending',
+      id: FEATURE_ID_PENDING,
       region_id: $path.classList.value,
       x: point.x,
       y: point.y
     })
 
     // Save checked (but unsaved) feature when a marker is moved
-    const $checked = values.some(({ id }) => id === 'pending')
+    const $checked = values.some(({ id }) => id === FEATURE_ID_PENDING)
       ? $radios.find(($radio) => $radio.checked)
       : undefined
 
     this.onReset()
-    this.edit(value, markers.length + 1, 'add')
     this.add(value)
+    this.showCard(value, markers.length, 'add')
 
     if ($checked) {
       $checked.checked = true
@@ -361,52 +454,7 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     this.onReset()
-    this.edit(value, target.value)
-  }
-
-  /**
-   * Edit feature in add or edit mode
-   *
-   * @param {BreastFeature} feature
-   * @param {number | string} number
-   * @param {'add' | 'edit'} mode
-   */
-  edit(feature, number, mode = 'edit') {
-    const { $card, $captions, $buttons, $radios, $region } = this
-    if (!$card || !$region) {
-      return
-    }
-
-    // Show add or edit feature caption
-    for (const $caption of $captions) {
-      $caption.setAttribute('hidden', '')
-
-      if ($caption.matches(`.app-js-feature-caption-${mode}`)) {
-        $caption.removeAttribute('hidden')
-      }
-    }
-
-    // Show add, edit or cancel buttons
-    for (const $button of $buttons) {
-      $button.setAttribute('hidden', '')
-
-      if (
-        $button.matches(`.app-js-feature-${mode}`) ||
-        $button.matches(`.app-js-feature-cancel`)
-      ) {
-        $button.removeAttribute('hidden')
-      }
-    }
-
-    for (const $radio of $radios) {
-      $radio.checked = $radio.value === feature.id
-    }
-
-    $card.dataset.id = feature.id
-    $card.dataset.regionId = feature.region_id
-    $card.dataset.number = `${number}`
-    $region.textContent = ImageKey.format($card.dataset.regionId)
-    $card.removeAttribute('hidden')
+    this.showCard(value, target.value)
   }
 
   /**
@@ -452,10 +500,7 @@ export class BreastDiagram extends ConfigurableComponent {
     }
 
     // Handle form save button
-    if (
-      target.matches('.app-js-feature-save') &&
-      !$card.hasAttribute('hidden')
-    ) {
+    if (target.matches('.app-js-feature-save') && !this.canSubmit()) {
       event.preventDefault()
       imageMap.$root.scrollIntoView({ behavior: 'smooth' })
     }
@@ -473,19 +518,27 @@ export class BreastDiagram extends ConfigurableComponent {
   }
 
   /**
+   * Whether form can be submitted (card is hidden or not populated)
+   */
+  canSubmit() {
+    const { $card } = this
+
+    return (
+      !!$card?.hasAttribute('hidden') ||
+      !$card?.dataset.id ||
+      !$card.dataset.number ||
+      !$card.dataset.regionId
+    )
+  }
+
+  /**
    * Handle image map form submit
    *
    * @param {SubmitEvent} event
    */
   onSubmit(event) {
     const { $card, $radios } = this
-
-    // Allow submission when card is hidden or not populated
-    if (
-      $card?.hasAttribute('hidden') ||
-      !$card?.dataset.number ||
-      !$card.dataset.regionId
-    ) {
+    if (this.canSubmit()) {
       return
     }
 
@@ -501,7 +554,7 @@ export class BreastDiagram extends ConfigurableComponent {
       return
     }
 
-    const marker = this.getMarker($card.dataset.number)
+    const marker = this.getMarker($card?.dataset.number)
     const value = this.getValue(marker?.point)
     if (!value) {
       return
@@ -530,7 +583,7 @@ export class BreastDiagram extends ConfigurableComponent {
 
     // Remove pending (unsaved) features
     for (const value of values) {
-      if (value.id === 'pending') {
+      if (value.id === FEATURE_ID_PENDING) {
         this.remove(value)
       }
     }
@@ -538,49 +591,6 @@ export class BreastDiagram extends ConfigurableComponent {
     delete $card.dataset.id
     delete $card.dataset.regionId
     delete $card.dataset.number
-  }
-
-  /**
-   * Add breast feature
-   *
-   * @param {BreastFeature} feature
-   */
-  add(feature) {
-    this.values.push(feature)
-    this.render()
-    this.write()
-  }
-
-  /**
-   * Remove breast feature
-   *
-   * @param {Pick<BreastFeature, 'x' | 'y'> | DOMPoint} [point]
-   */
-  remove(point) {
-    const { imageMap, values } = this
-
-    const value = this.getValue(point)
-    if (!value) {
-      return
-    }
-
-    const index = values.indexOf(value)
-    const $path = imageMap.getPathById(value.region_id)
-
-    imageMap.unsetState('active', $path)
-    values.splice(index, 1)
-
-    this.render()
-    this.write()
-  }
-
-  /**
-   * Clear all features
-   */
-  clear() {
-    this.values.length = 0
-    this.render()
-    this.write()
   }
 
   /**
@@ -628,7 +638,7 @@ export class BreastDiagram extends ConfigurableComponent {
 
     const marker = markers[index]
     const point = imageMap.createPoint(x, y, region_id)
-    const number = feature.id === 'pending' ? '?' : index + 1
+    const number = feature.id === FEATURE_ID_PENDING ? '?' : index + 1
 
     // Set marker position
     marker.setPosition(point, number)
