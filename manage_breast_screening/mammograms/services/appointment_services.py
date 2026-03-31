@@ -122,14 +122,22 @@ class AppointmentWorkflowService:
         self.current_user = current_user
 
     def is_identity_confirmed_by_user(self):
-        return self.appointment.completed_workflow_steps.filter(
+        result = self.appointment.completed_workflow_steps.filter(
             step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=self.current_user,
         ).exists()
 
+        logger.info(f"Checking identity confirmed for {self.current_user.pk}: {result}")
+
+        return result
+
     def get_completed_steps(self):
-        return set(
+        step_names = set(
             self.appointment.completed_workflow_steps.values_list(
                 "step_name", flat=True
             ).distinct()
         )
+
+        logger.info(f"Completed steps for {self.current_user.pk}: {step_names}")
+
+        return step_names
