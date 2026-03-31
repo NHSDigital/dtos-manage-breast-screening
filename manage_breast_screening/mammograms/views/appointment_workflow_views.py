@@ -339,6 +339,15 @@ def check_in(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
+    machine = AppointmentMachine.from_appointment(appointment)
+    if not machine.can("check_in"):
+        messages.add_message(
+            request,
+            messages.INFO,
+            f"{appointment.participant.full_name} has already been checked in.",
+        )
+        return redirect("clinics:show_clinic", pk=appointment.clinic_slot.clinic.pk)
+
     AppointmentStatusUpdater(
         appointment=appointment, current_user=request.user
     ).check_in()
