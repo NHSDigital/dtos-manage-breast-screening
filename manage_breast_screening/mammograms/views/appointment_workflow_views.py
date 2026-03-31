@@ -99,6 +99,10 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
                 created_by=request.user,
             )
 
+            logger.info(f"Confirmed identity for {self.request.user.pk}")
+        else:
+            logger.info(f"Identity already confirmed for user {self.request.user.pk}")
+
         return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
 
 
@@ -111,9 +115,11 @@ class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
         participant = self.participant
         last_confirmed_mammogram = participant.last_confirmed_mammogram
         reported_mammograms = self.appointment.recent_reported_mammograms(
-            since_date=last_confirmed_mammogram.exact_date
-            if last_confirmed_mammogram
-            else None
+            since_date=(
+                last_confirmed_mammogram.exact_date
+                if last_confirmed_mammogram
+                else None
+            )
         )
 
         presented_mammograms = LastKnownMammogramPresenter(
