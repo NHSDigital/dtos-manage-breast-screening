@@ -80,6 +80,39 @@ class SendActionResult:
 
 
 class RelayService:
+    def send_echo(self, relay: Relay):
+        """Sends an echo message to the relay and logs the response."""
+        try:
+            relay_uri = RelayURI(relay)
+            url = relay_uri.connection_url()
+            logger.info(f"Connecting to relay {relay.id} at {url}")
+            asyncio.run(self._async_send_echo(url, relay.id))
+        except Exception as e:
+            logger.error(f"Error sending echo to relay {relay.id}: {e}")
+
+    async def _async_send_echo(self, url: str, relay_id: int):
+        try:
+            async with connect(
+                url, compression=None, open_timeout=OPEN_CONNECTION_TIMEOUT_SECONDS
+            ) as conn:
+                echo_message = {
+                    "action_type": "echo",
+                    "timestamp": datetime.now().isoformat(),
+                }
+                await conn.send(json.dumps(echo_message))
+                logger.info(f"Sent echo message to relay {relay_id}")
+
+                response = await asyncio.wait_for(
+                    conn.recv(), timeout=RECEIVE_TIMEOUT_SECONDS
+                )
+                logger.info(f"Received response from relay {relay_id}: {response}")
+
+        except asyncio.TimeoutError:
+            logger.error(f"Timeout waiting for response from relay {relay_id}")
+
+        except Exception as e:
+            logger.error(f"Error during echo communication with relay {relay_id}: {e}")
+
     def send_action(self, relay: Relay, action: GatewayAction):
         """
         Synchronous wrapper around async_send_action.
