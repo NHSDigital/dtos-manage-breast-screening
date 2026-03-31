@@ -40,7 +40,8 @@ export default ($form, options = {}) => {
     const fetchOptions = {
       method: method,
       body: new FormData($form),
-      headers: { Accept: 'text/plain' }
+      headers: { Accept: 'text/plain' },
+      redirect: 'error'
     }
 
     // Check for timeout support
