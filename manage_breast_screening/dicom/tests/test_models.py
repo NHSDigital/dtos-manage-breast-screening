@@ -56,22 +56,38 @@ class TestSeries:
 
         assert series.extra_count == 1
 
+    def test_series_laterality(self):
+        series = SeriesFactory.create()
+        ImageFactory.create(series=series, laterality="R")
 
-@pytest.mark.parametrize(
-    "laterality, view_position, expected",
-    [
-        ("R", "MLO", "RMLO"),
-        ("R", "CC", "RCC"),
-        ("L", "MLO", "LMLO"),
-        ("L", "CC", "LCC"),
-        ("R", "", ""),
-        ("", "MLO", ""),
-        ("", "", ""),
-    ],
-)
+        assert series.laterality == "R"
+
+    def test_series_view_position(self):
+        series = SeriesFactory.create()
+        ImageFactory.create(series=series, view_position="MLO")
+
+        assert series.view_position == "MLO"
+
+
 @pytest.mark.django_db
 class TestImage:
+    @pytest.mark.parametrize(
+        "laterality, view_position, expected",
+        [
+            ("R", "MLO", "RMLO"),
+            ("R", "CC", "RCC"),
+            ("L", "MLO", "LMLO"),
+            ("L", "CC", "LCC"),
+            ("R", "", ""),
+            ("", "MLO", ""),
+            ("", "", ""),
+        ],
+    )
     def test_laterality_and_view(self, laterality, view_position, expected):
-        image = ImageFactory.create(laterality=laterality, view_position=view_position)
+        image = ImageFactory.build(laterality=laterality, view_position=view_position)
 
-        assert image.laterality_and_view() == expected
+        assert image.laterality_and_view == expected
+
+    def test_image_str_representation(self):
+        image = ImageFactory.build(laterality="R", view_position="MLO")
+        assert str(image) == "RMLO"

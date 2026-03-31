@@ -100,8 +100,16 @@ class Series(models.Model):
     def extra_count(self):
         return self.images.filter(implant_present=True).count()
 
+    @property
+    def laterality(self):
+        return self.images.first().laterality
+
+    @property
+    def view_position(self):
+        return self.images.first().view_position
+
     def __str__(self):
-        return self.series_instance_uid
+        return str(self.images.first())
 
 
 class Image(models.Model):
@@ -120,10 +128,11 @@ class Image(models.Model):
     view_position = models.CharField(max_length=16, blank=True)
     implant_present = models.BooleanField(default=False)
 
+    @property
     def laterality_and_view(self):
         if self.laterality and self.view_position:
             return f"{self.laterality}{self.view_position}".upper()
         return ""
 
     def __str__(self):
-        return self.sop_instance_uid
+        return self.laterality_and_view
