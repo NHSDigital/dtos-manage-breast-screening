@@ -31,7 +31,7 @@
   {% set mammogram_rows = [] %}
   {% for mammogram in presented_mammograms.reported_mammograms %}
     {% set mammogram_label_html %}
-      {{ mammogram.label }}{% if mammogram.created_by %}<br><span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">{{ mammogram.created_by }}</span>{% endif %}
+      {{ mammogram.label }}{% if mammogram.created_by %}<br><span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">{{ mammogram.created_by }}</span>{% endif %}
     {% endset %}
     {% set _ = mammogram_rows.append({
       "key": {
