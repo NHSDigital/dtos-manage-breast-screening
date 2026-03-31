@@ -315,6 +315,8 @@ class Command(BaseCommand):
             )
 
     def reset_db(self):
+        logger.warning("Clearing all user, provider, and participant data")
+
         with connection.cursor() as c:
             c.execute("TRUNCATE TABLE users_user CASCADE")
             c.execute("TRUNCATE TABLE clinics_provider CASCADE")
