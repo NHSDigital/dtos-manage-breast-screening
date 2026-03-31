@@ -54,6 +54,16 @@ def clinical_user(current_provider):
 
 
 @pytest.fixture
+def another_clinical_user(current_provider):
+    user = UserFactory.create(nhs_uid="clinical2")
+    assignment = UserAssignmentFactory.create(
+        user=user, clinical=True, provider=current_provider
+    )
+    assignment.make_current()
+    return user
+
+
+@pytest.fixture
 def superuser(current_provider):
     user = UserFactory.create(nhs_uid="superuser1", is_superuser=True)
     assignment = UserAssignmentFactory.create(

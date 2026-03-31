@@ -10,33 +10,28 @@ from manage_breast_screening.participants.models.medical_history.benign_lump_his
     BenignLumpHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
     BenignLumpHistoryItemFactory,
 )
 
 
 @pytest.mark.django_db
 class TestAddBenignLumpHistoryView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_benign_lump_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_benign_lump_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "left_breast_procedures": BenignLumpHistoryItem.Procedure.LUMP_REMOVED,
@@ -49,7 +44,7 @@ class TestAddBenignLumpHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -62,14 +57,13 @@ class TestAddBenignLumpHistoryView:
             ],
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_benign_lump_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {},
         )
@@ -89,14 +83,8 @@ class TestAddBenignLumpHistoryView:
 @pytest.mark.django_db
 class TestChangeBenignLumpHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-
-    @pytest.fixture
-    def history_item(self, appointment):
-        return BenignLumpHistoryItemFactory.create(appointment=appointment)
+    def history_item(self, in_progress_appointment):
+        return BenignLumpHistoryItemFactory.create(appointment=in_progress_appointment)
 
     def test_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(
@@ -159,14 +147,8 @@ class TestChangeBenignLumpHistoryView:
 @pytest.mark.django_db
 class TestDeleteBenignLumpHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-
-    @pytest.fixture
-    def history_item(self, appointment):
-        return BenignLumpHistoryItemFactory.create(appointment=appointment)
+    def history_item(self, in_progress_appointment):
+        return BenignLumpHistoryItemFactory.create(appointment=in_progress_appointment)
 
     def test_get_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(

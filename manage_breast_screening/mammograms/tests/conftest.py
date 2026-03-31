@@ -25,6 +25,7 @@ def completed_appointment(clinical_user_client):
 def in_progress_appointment(clinical_user_client):
     return AppointmentFactory.create(
         current_status=AppointmentStatusNames.IN_PROGRESS,
+        current_status__created_by=clinical_user_client.user,
         reinvite=False,
         clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
     )

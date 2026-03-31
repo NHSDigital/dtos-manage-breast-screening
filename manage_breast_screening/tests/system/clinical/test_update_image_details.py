@@ -5,6 +5,7 @@ from playwright.sync_api import expect
 
 from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
@@ -30,6 +31,8 @@ class TestUpdateImageDetails(SystemTestCase):
     def and_there_is_an_appointment_with_existing_image_details(self):
         self.appointment = AppointmentFactory(
             clinic_slot__clinic__setting__provider=self.current_provider,
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
         )
         study = Study.objects.create(appointment=self.appointment)
         Series.objects.create(study=study, view_position="MLO", laterality="R", count=3)

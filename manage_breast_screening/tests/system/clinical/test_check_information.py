@@ -244,6 +244,7 @@ class TestCheckInformation(SystemTestCase):
             clinic_slot__clinic=self.clinic,
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
             screening_episode__participant__ethnic_background_id="any_other_ethnic_background",
         )
 

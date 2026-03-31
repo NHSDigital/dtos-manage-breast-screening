@@ -7,33 +7,28 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
     ImplantedMedicalDeviceHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
 )
 
 
 @pytest.mark.django_db
 class TestAddImplantedMedicalDeviceHistoryView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_implanted_medical_device_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_implanted_medical_device_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "device": ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
@@ -43,7 +38,7 @@ class TestAddImplantedMedicalDeviceHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -56,14 +51,13 @@ class TestAddImplantedMedicalDeviceHistoryView:
             ],
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_implanted_medical_device_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {},
         )
@@ -81,15 +75,9 @@ class TestAddImplantedMedicalDeviceHistoryView:
 @pytest.mark.django_db
 class TestChangeImplantedMedicalDeviceHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-
-    @pytest.fixture
-    def history_item(self, appointment):
+    def history_item(self, in_progress_appointment):
         return ImplantedMedicalDeviceHistoryItemFactory.create(
-            appointment=appointment,
+            appointment=in_progress_appointment,
             device=ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
         )
 
@@ -106,12 +94,15 @@ class TestChangeImplantedMedicalDeviceHistoryView:
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, appointment, history_item
+        self, clinical_user_client, in_progress_appointment, history_item
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_implanted_medical_device_history_item",
-                kwargs={"pk": appointment.pk, "history_item_pk": history_item.pk},
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
             ),
             {
                 "device": ImplantedMedicalDeviceHistoryItem.Device.CARDIAC_DEVICE,
@@ -121,7 +112,7 @@ class TestChangeImplantedMedicalDeviceHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -138,14 +129,10 @@ class TestChangeImplantedMedicalDeviceHistoryView:
 @pytest.mark.django_db
 class TestDeleteImplantedMedicalDeviceHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    def history_item(self, in_progress_appointment):
+        return ImplantedMedicalDeviceHistoryItemFactory.create(
+            appointment=in_progress_appointment
         )
-
-    @pytest.fixture
-    def history_item(self, appointment):
-        return ImplantedMedicalDeviceHistoryItemFactory.create(appointment=appointment)
 
     def test_get_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(

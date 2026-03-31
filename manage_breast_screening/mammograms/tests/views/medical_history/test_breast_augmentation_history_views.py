@@ -10,33 +10,28 @@ from manage_breast_screening.participants.models.medical_history.breast_augmenta
     BreastAugmentationHistoryItem,
 )
 from manage_breast_screening.participants.tests.factories import (
-    AppointmentFactory,
     BreastAugmentationHistoryItemFactory,
 )
 
 
 @pytest.mark.django_db
 class TestAddBreastAugmentationHistoryView:
-    def test_renders_response(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_breast_augmentation_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assert response.status_code == 200
 
-    def test_valid_post_redirects_to_appointment(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_valid_post_redirects_to_appointment(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_breast_augmentation_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {
                 "left_breast_procedures": BreastAugmentationHistoryItem.Procedure.BREAST_IMPLANTS,
@@ -47,7 +42,7 @@ class TestAddBreastAugmentationHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         assertMessages(
@@ -60,14 +55,13 @@ class TestAddBreastAugmentationHistoryView:
             ],
         )
 
-    def test_invalid_post_renders_response_with_errors(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
+    def test_invalid_post_renders_response_with_errors(
+        self, clinical_user_client, in_progress_appointment
+    ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_breast_augmentation_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {},
         )
@@ -82,22 +76,22 @@ class TestAddBreastAugmentationHistoryView:
             response.text,
         )
 
-    def test_redirects_if_already_exists(self, clinical_user_client):
-        appointment = AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
-        )
-        BreastAugmentationHistoryItemFactory.create(appointment=appointment)
+    def test_redirects_if_already_exists(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        BreastAugmentationHistoryItemFactory.create(appointment=in_progress_appointment)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_breast_augmentation_history_item",
-                kwargs={"pk": appointment.pk},
+                kwargs={"pk": in_progress_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
-                "mammograms:record_medical_information", kwargs={"pk": appointment.pk}
+                "mammograms:record_medical_information",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
@@ -105,14 +99,10 @@ class TestAddBreastAugmentationHistoryView:
 @pytest.mark.django_db
 class TestChangeBreastAugmentationHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    def history_item(self, in_progress_appointment):
+        return BreastAugmentationHistoryItemFactory.create(
+            appointment=in_progress_appointment
         )
-
-    @pytest.fixture
-    def history_item(self, appointment):
-        return BreastAugmentationHistoryItemFactory.create(appointment=appointment)
 
     def test_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(
@@ -172,14 +162,10 @@ class TestChangeBreastAugmentationHistoryView:
 @pytest.mark.django_db
 class TestDeleteBreastAugmentationHistoryView:
     @pytest.fixture
-    def appointment(self, clinical_user_client):
-        return AppointmentFactory.create(
-            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider
+    def history_item(self, in_progress_appointment):
+        return BreastAugmentationHistoryItemFactory.create(
+            appointment=in_progress_appointment
         )
-
-    @pytest.fixture
-    def history_item(self, appointment):
-        return BreastAugmentationHistoryItemFactory.create(appointment=appointment)
 
     def test_get_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(

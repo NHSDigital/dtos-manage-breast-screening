@@ -1,15 +1,26 @@
 import re
+from datetime import datetime, timedelta
 
 from django.urls import reverse
 from playwright.sync_api import expect
 
+from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics.models import Clinic
+from manage_breast_screening.clinics.tests.factories import (
+    ProviderFactory,
+    UserAssignmentFactory,
+)
 from manage_breast_screening.core.utils.string_formatting import format_nhs_number
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 from ..system_test_setup import SystemTestCase
 
@@ -60,6 +71,23 @@ class TestMammogramWorkflow(SystemTestCase):
         self.when_i_select_yes_2_cc_and_2_mlo()
         self.and_i_click_continue()
         self.then_the_accessibility_baseline_is_met()
+
+    def test_other_users_cannot_access_in_progress_workflow(self):
+        self.given_i_have_two_users()
+        self.and_there_is_an_appointment_started_by_the_first_user()
+        self.and_i_am_logged_in_as_the_second_user()
+
+        self.when_i_go_to_confirm_identity()
+        self.then_i_am_redirected_to_the_appointment_show_page()
+        self.and_the_message_says_in_progress_with_someone_else()
+
+        self.when_i_go_to_medical_information()
+        self.then_i_am_redirected_to_the_appointment_show_page()
+        self.and_the_message_says_in_progress_with_someone_else()
+
+        self.when_i_go_to_take_images()
+        self.then_i_am_redirected_to_the_appointment_show_page()
+        self.and_the_message_says_in_progress_with_someone_else()
 
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
@@ -218,3 +246,95 @@ class TestMammogramWorkflow(SystemTestCase):
             "clinics:show_clinic", pk=self.appointment.clinic_slot.clinic.pk
         )
         self.assert_page_title_contains("Routine risk screening clinic")
+
+    def given_i_have_two_users(self):
+        self.current_provider = ProviderFactory.create()
+        self.user_one = UserFactory.create(first_name="User", last_name="One")
+        self.user_two = UserFactory.create(first_name="User", last_name="Two")
+        UserAssignmentFactory.create(
+            user=self.user_one,
+            provider=self.current_provider,
+            roles=[Role.CLINICAL.value],
+        )
+        UserAssignmentFactory.create(
+            user=self.user_two,
+            provider=self.current_provider,
+            roles=[Role.CLINICAL.value],
+        )
+
+    def and_i_am_logged_in_as_the_first_user(self):
+        self.login_as_user(self.user_one)
+
+    def and_i_am_logged_in_as_the_second_user(self):
+        self.login_as_user(self.user_two)
+
+    def and_there_is_an_appointment_started_by_the_first_user(self):
+        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
+        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=self.screening_episode,
+            clinic_slot__clinic__setting__provider=self.current_provider,
+            clinic_slot__clinic__risk_type=Clinic.RiskType.ROUTINE_RISK,
+        )
+
+        self.appointment.statuses.create(
+            name=AppointmentStatusNames.CHECKED_IN,
+            created_by=self.user_one,
+            created_at=datetime.now() - timedelta(seconds=1),
+        )
+        self.appointment.statuses.create(
+            name=AppointmentStatusNames.IN_PROGRESS, created_by=self.user_one
+        )
+        assert (
+            self.appointment.current_status.name == AppointmentStatusNames.IN_PROGRESS
+        )
+
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=self.user_one,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.user_one,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=self.user_one,
+        )
+
+    def when_i_go_to_confirm_identity(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:confirm_identity",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+
+    def when_i_go_to_medical_information(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+
+    def when_i_go_to_take_images(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:take_images",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+
+    def then_i_am_redirected_to_the_appointment_show_page(self):
+        self.expect_url("mammograms:show_appointment", pk=self.appointment.pk)
+
+    def and_the_message_says_in_progress_with_someone_else(self):
+        alert = self.page.get_by_role("alert")
+        expect(alert).to_contain_text("Important")
+        expect(alert).to_contain_text(
+            "This appointment is currently being run by U. One"
+        )

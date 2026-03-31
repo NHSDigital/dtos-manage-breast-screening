@@ -102,10 +102,8 @@ class TestRecordingSymptoms(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.IN_PROGRESS,
-                "created_by": self.current_user,
-            },
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
         )
 
     def and_there_is_an_appointment_with_a_symptom_added_in_the_last_three_months(self):
@@ -114,6 +112,8 @@ class TestRecordingSymptoms(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=self.current_user,
         )
         self.symptom = SymptomFactory(
             appointment=self.appointment,
