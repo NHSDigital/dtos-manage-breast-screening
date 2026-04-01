@@ -1,6 +1,16 @@
 import pytest
 from django.http import QueryDict
 
+from manage_breast_screening.dicom.study_service import (
+    StudyService as DicomStudyService,
+)
+from manage_breast_screening.dicom.tests.factories import (
+    ImageFactory as DicomImageFactory,
+)
+from manage_breast_screening.dicom.tests.factories import (
+    SeriesFactory as DicomSeriesFactory,
+)
+from manage_breast_screening.gateway.tests.factories import GatewayActionFactory
 from manage_breast_screening.mammograms.forms.multiple_images_information_form import (
     MultipleImagesInformationForm,
 )
@@ -33,6 +43,12 @@ def get_fingerprint(instance):
 def make_study_service(study):
     user = UserFactory()
     return StudyService(study.appointment, user)
+
+
+def dicom_study_service(study):
+    user = UserFactory()
+    action = GatewayActionFactory(id=study.source_message_id)
+    return DicomStudyService(action.appointment, user)
 
 
 @pytest.mark.django_db
@@ -118,6 +134,109 @@ class TestMultipleImagesInformationForm:
             assert form.is_valid()
 
             form.update(make_study_service(study))
+
+            series.refresh_from_db()
+            assert series.repeat_type == RepeatType.ALL_REPEATS.value
+            assert series.repeat_reasons == [
+                RepeatReason.PATIENT_MOVED.value,
+                RepeatReason.TECHNICAL_FAULT.value,
+            ]
+            assert series.repeat_count == 1
+
+    class TestDicomSeriesWithCount2:
+        """Tests for DICOM series with count == 2 (single additional image)."""
+
+        def test_no_data_requires_repeat_type(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                2, series=series, laterality="R", view_position="MLO"
+            )
+            study = series.study
+
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict({"series_fingerprint": fingerprint}),
+                instance=study,
+            )
+
+            assert not form.is_valid()
+            assert form.errors == {
+                "rmlo_repeat_type": [
+                    "Select whether the additional RMLO image was a repeat"
+                ],
+            }
+
+        def test_all_repeats_requires_reasons(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                2, series=series, laterality="R", view_position="MLO"
+            )
+            study = series.study
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
+                    }
+                ),
+                instance=study,
+            )
+
+            assert not form.is_valid()
+            assert form.errors == {
+                "rmlo_all_repeats_reasons": [
+                    "Select why a repeat RMLO image was needed"
+                ],
+            }
+
+        def test_no_repeats_does_not_require_reasons(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                2, series=series, laterality="R", view_position="MLO"
+            )
+            study = series.study
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
+                    }
+                ),
+                instance=study,
+            )
+
+            assert form.is_valid()
+
+        def test_all_repeats_with_reasons_saves_data(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                2, series=series, laterality="R", view_position="MLO"
+            )
+            study = series.study
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "rmlo_repeat_type": RepeatType.ALL_REPEATS.value,
+                        "rmlo_all_repeats_reasons": [
+                            RepeatReason.PATIENT_MOVED.value,
+                            RepeatReason.TECHNICAL_FAULT.value,
+                        ],
+                    }
+                ),
+                instance=study,
+            )
+
+            assert form.is_valid()
+
+            form.update(dicom_study_service(study))
 
             series.refresh_from_db()
             assert series.repeat_type == RepeatType.ALL_REPEATS.value
@@ -373,6 +492,83 @@ class TestMultipleImagesInformationForm:
             RepeatReason.TECHNICAL_FAULT.value,
             RepeatReason.OTHER.value,
         ]
+
+    class TestDicomSeriesWithCountGreaterThan2:
+        """Tests for series with count > 2 (multiple additional images)."""
+
+        def test_some_repeats_requires_count_and_reasons(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                3, series=series, laterality="L", view_position="CC"
+            )
+            study = series.study
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "lcc_repeat_type": RepeatType.SOME_REPEATS.value,
+                    }
+                ),
+                instance=study,
+            )
+
+            assert not form.is_valid()
+            assert "lcc_repeat_count" in form.errors
+            assert "lcc_some_repeats_reasons" in form.errors
+
+        def test_all_repeats_does_not_require_count(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                3, series=series, laterality="L", view_position="CC"
+            )
+            study = series.study
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "lcc_repeat_type": RepeatType.ALL_REPEATS.value,
+                        "lcc_all_repeats_reasons": [RepeatReason.TECHNICAL_FAULT.value],
+                    }
+                ),
+                instance=study,
+            )
+
+            assert form.is_valid()
+
+        def test_some_repeats_with_count_and_reasons_saves_data(self):
+            series = DicomSeriesFactory()
+            DicomImageFactory.create_batch(
+                3, series=series, laterality="L", view_position="CC"
+            )
+            study = series.study
+            fingerprint = get_fingerprint(study)
+
+            form = MultipleImagesInformationForm(
+                make_query_dict(
+                    {
+                        "series_fingerprint": fingerprint,
+                        "lcc_repeat_type": RepeatType.SOME_REPEATS.value,
+                        "lcc_repeat_count": 2,
+                        "lcc_some_repeats_reasons": [
+                            RepeatReason.POSITIONING_ERROR.value
+                        ],
+                    }
+                ),
+                instance=study,
+            )
+
+            assert form.is_valid()
+
+            form.update(dicom_study_service(study))
+
+            series.refresh_from_db()
+            assert series.repeat_type == RepeatType.SOME_REPEATS.value
+            assert series.repeat_count == 2
+            assert series.repeat_reasons == [RepeatReason.POSITIONING_ERROR.value]
 
     class TestStaleFormDetection:
         """Tests for stale form detection using series fingerprint."""
