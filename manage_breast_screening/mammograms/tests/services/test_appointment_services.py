@@ -18,6 +18,13 @@ from manage_breast_screening.participants.tests.factories import (
 )
 from manage_breast_screening.users.tests.factories import UserFactory
 
+StepNames = AppointmentWorkflowStepCompletion.StepNames
+
+
+@pytest.fixture
+def different_user():
+    return UserFactory.create(nhs_uid="different_user")
+
 
 @pytest.mark.django_db
 class TestAppointmentStatusUpdater:
@@ -271,11 +278,11 @@ class TestAppointmentWorkflowService:
             appointment, clinical_user
         ).is_identity_confirmed_by_user()
 
-    def test_confirmed_by_different_user(self, clinical_user):
+    def test_confirmed_by_different_user(self, clinical_user, different_user):
         appointment = AppointmentFactory()
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=UserFactory.create(nhs_uid="different_user"),
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=different_user,
         )
 
         assert not AppointmentWorkflowService(
@@ -285,23 +292,23 @@ class TestAppointmentWorkflowService:
     def test_confirmed_by_user(self, clinical_user):
         appointment = AppointmentFactory()
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=UserFactory.create(nhs_uid=clinical_user.nhs_uid),
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user,
         )
 
         assert AppointmentWorkflowService(
             appointment, clinical_user
         ).is_identity_confirmed_by_user()
 
-    def test_confirmed_by_user_and_another_user(self, clinical_user):
+    def test_confirmed_by_user_and_another_user(self, clinical_user, different_user):
         appointment = AppointmentFactory()
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=UserFactory.create(nhs_uid="different_user"),
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=different_user,
         )
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=UserFactory.create(nhs_uid=clinical_user.nhs_uid),
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user,
         )
 
         assert AppointmentWorkflowService(
@@ -315,42 +322,45 @@ class TestAppointmentWorkflowService:
             appointment, clinical_user
         ).get_completed_steps()
 
-    def test_all_workflow_steps_by_different_user(self, clinical_user):
+    def test_steps_carried_out_by_different_user(self, clinical_user, different_user):
         appointment = AppointmentFactory()
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=UserFactory.create(nhs_uid="different_user"),
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=different_user,
         )
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
-            created_by=UserFactory.create(nhs_uid="different_user"),
+            step_name=StepNames.TAKE_IMAGES,
+            created_by=different_user,
         )
 
         assert AppointmentWorkflowService(
             appointment, clinical_user
         ).get_completed_steps() == {"REVIEW_MEDICAL_INFORMATION", "TAKE_IMAGES"}
 
-    def test_all_workflow_steps_by_current_and_different_user(self, clinical_user):
+    def test_steps_carried_out_by_different_user_and_identity_check_repeated(
+        self, clinical_user
+    ):
+        different_user = UserFactory.create(nhs_uid="different_user")
         appointment = AppointmentFactory()
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=UserFactory.create(nhs_uid="different_user"),
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=different_user,
         )
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=different_user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.TAKE_IMAGES,
+            created_by=different_user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.CHECK_INFORMATION,
             created_by=UserFactory.create(nhs_uid=clinical_user.nhs_uid),
         )
         appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=UserFactory.create(nhs_uid="different_user"),
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
-            created_by=UserFactory.create(nhs_uid="different_user"),
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION,
-            created_by=UserFactory.create(nhs_uid=clinical_user.nhs_uid),
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user,
         )
 
         assert AppointmentWorkflowService(
@@ -358,6 +368,36 @@ class TestAppointmentWorkflowService:
         ).get_completed_steps() == {
             "CHECK_INFORMATION",
             "CONFIRM_IDENTITY",
+            "REVIEW_MEDICAL_INFORMATION",
+            "TAKE_IMAGES",
+        }
+
+    def test_steps_carried_out_by_different_user_and_identity_check_not_repeated(
+        self, clinical_user
+    ):
+        different_user = UserFactory.create(nhs_uid="different_user")
+        appointment = AppointmentFactory()
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=different_user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=different_user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.TAKE_IMAGES,
+            created_by=different_user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.CHECK_INFORMATION,
+            created_by=UserFactory.create(nhs_uid=clinical_user.nhs_uid),
+        )
+
+        assert AppointmentWorkflowService(
+            appointment, clinical_user
+        ).get_completed_steps() == {
+            "CHECK_INFORMATION",
             "REVIEW_MEDICAL_INFORMATION",
             "TAKE_IMAGES",
         }
