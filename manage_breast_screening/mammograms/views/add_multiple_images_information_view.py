@@ -62,12 +62,7 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
                 messages.INFO,
                 "The image details have changed. Please review and continue.",
             )
-            return redirect(
-                reverse(
-                    "mammograms:add_image_details",
-                    kwargs={"pk": self.appointment_pk},
-                )
-            )
+            return redirect(self.get_redirect_back_url())
 
         return super().post(request, *args, **kwargs)
 
@@ -83,19 +78,31 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        title = (
+            "Image transfer in progress"
+            if gateway_images_enabled(self.appointment)
+            else "Add image information"
+        )
+
         context.update(
             {
-                "heading": "Add image information",
-                "page_title": "Add image information",
-                "back_link_params": {
-                    "href": reverse(
-                        "mammograms:add_image_details",
-                        kwargs={"pk": self.appointment_pk},
-                    ),
-                },
+                "heading": title,
+                "page_title": title,
+                "back_link_params": {"href": self.get_redirect_back_url()},
             },
         )
         return context
+
+    def get_redirect_back_url(self):
+        if gateway_images_enabled(self.appointment):
+            return reverse(
+                "mammograms:gateway_images", kwargs={"pk": self.appointment_pk}
+            )
+        else:
+            return reverse(
+                "mammograms:add_image_details", kwargs={"pk": self.appointment_pk}
+            )
 
     @transaction.atomic
     def form_valid(self, form):
