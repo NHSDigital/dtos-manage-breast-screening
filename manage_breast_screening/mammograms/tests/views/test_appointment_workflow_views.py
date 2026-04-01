@@ -14,11 +14,9 @@ from pytest_django.asserts import (
     assertRedirects,
 )
 
+import manage_breast_screening.dicom.tests.factories as dicom_factories
 from manage_breast_screening.core.models import AuditLog
 from manage_breast_screening.dicom.models import Study as DicomStudy
-from manage_breast_screening.dicom.tests.factories import (
-    StudyFactory as DicomStudyFactory,
-)
 from manage_breast_screening.gateway.models import GatewayAction, GatewayActionType
 from manage_breast_screening.gateway.tests.factories import (
     GatewayActionFactory,
@@ -399,7 +397,7 @@ class TestGatewayImages:
     def test_marks_the_step_complete_and_redirects_to_check_info(
         self, _, clinical_user_client, in_progress_appointment
     ):
-        dicom_study = DicomStudyFactory()
+        dicom_study = dicom_factories.StudyFactory()
         GatewayActionFactory.create(
             id=str(dicom_study.source_message_id),
             appointment=in_progress_appointment,
@@ -435,8 +433,49 @@ class TestGatewayImages:
             [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
         )
 
+    @patch(
+        "manage_breast_screening.mammograms.presenters.appointment_presenters.gateway_images_enabled",
+        return_value=True,
+    )
+    @pytest.mark.django_db
+    def test_repeat_images_redirects_to_multiple_images_page(
+        self, _, clinical_user_client, in_progress_appointment
+    ):
+        series = dicom_factories.SeriesFactory()
+        study = series.study
+        dicom_factories.ImageFactory.create_batch(
+            2, laterality="R", view_position="CC", series=series
+        )
+        GatewayActionFactory.create(
+            id=str(study.source_message_id),
+            appointment=in_progress_appointment,
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:gateway_images",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+            {
+                "rcc_count": 2,
+                "rmlo_count": 1,
+                "lcc_count": 1,
+                "lmlo_count": 1,
+                "additional_details": "Some details about the images",
+                "not_all_mammograms_taken": False,
+                "imperfect_but_best_possible": False,
+            },
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:add_multiple_images_information",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+            fetch_redirect_response=False,
+        )
+
     def test_updates_the_study(self, clinical_user_client, in_progress_appointment):
-        dicom_study = DicomStudyFactory()
+        dicom_study = dicom_factories.StudyFactory()
         GatewayActionFactory.create(
             id=str(dicom_study.source_message_id),
             appointment=in_progress_appointment,
