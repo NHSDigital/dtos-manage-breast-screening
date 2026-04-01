@@ -18,7 +18,15 @@
         <li {{ nhsukAttributes({"class": item.classes}) }}>
           {% if item.disabled %}
             <span class="app-workflow-side-nav__step app-workflow-side-nav__step--disabled">
-              <span class="app-workflow-side-nav__number">{{ loop.index }}</span>
+              <span class="app-workflow-side-nav__number">
+                {% if item.completed %}
+                  {{ nhsukIcon("tick", {
+                    "classes": "app-icon--tick"
+                  }) }}
+                {% else %}
+                  {{ loop.index }}
+                {% endif %}
+              </span>
               <span class="app-workflow-side-nav__label">{{ item.label }}</span>
             </span>
           {% elif item.current %}

@@ -164,6 +164,13 @@ a.app-workflow-side-nav__step:focus .app-workflow-side-nav__number {
     background-color: nhsuk-colour("grey-4");
     color: nhsuk-colour("grey-1");
   }
+
+  .app-icon--tick {
+    path {
+      fill: nhsuk-colour("grey-1");
+      stroke: nhsuk-colour("grey-1");
+    }
+  }
 }
 
 // Responsive - use full width on mobile
