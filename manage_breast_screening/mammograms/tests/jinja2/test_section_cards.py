@@ -133,7 +133,7 @@ class TestMammogramHistoryContent:
             <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">
                     Recorded 1 January 2025<br>
-                    <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">
+                    <span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">
                         by X. Lastname (you)
                     </span>
                 </dt>
@@ -246,7 +246,7 @@ class TestMammogramHistoryContent:
             <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">
                     Recorded 1 January 2025<br>
-                    <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">
+                    <span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">
                         by X. Lastname (you)
                     </span>
                 </dt>
@@ -264,7 +264,7 @@ class TestMammogramHistoryContent:
             <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">
                     Recorded 1 January 2025<br>
-                    <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">
+                    <span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">
                         by X. Lastname (you)
                     </span>
                 </dt>
@@ -282,7 +282,7 @@ class TestMammogramHistoryContent:
             <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">
                     Recorded 1 January 2025<br>
-                    <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">
+                    <span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">
                         by X. Lastname (you)
                     </span>
                 </dt>
@@ -300,7 +300,7 @@ class TestMammogramHistoryContent:
             <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">
                     Recorded 1 January 2025<br>
-                    <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">
+                    <span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">
                         by X. Lastname (you)
                     </span>
                 </dt>
@@ -318,7 +318,7 @@ class TestMammogramHistoryContent:
             <div class="nhsuk-summary-list__row">
                 <dt class="nhsuk-summary-list__key">
                     Recorded 1 January 2025<br>
-                    <span class="app-text-grey app-nowrap nhsuk-body-s nhsuk-u-font-weight-normal nhsuk-u-margin-bottom-0">
+                    <span class="nhsuk-u-secondary-text-colour nhsuk-body-s nhsuk-u-margin-bottom-0">
                         by X. Lastname (you)
                     </span>
                 </dt>
