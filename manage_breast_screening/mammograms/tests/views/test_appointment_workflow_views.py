@@ -3,6 +3,7 @@ from unittest.mock import patch
 import pytest
 import statemachine
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import (
     assertContains,
@@ -514,6 +515,46 @@ class TestCheckIn:
             reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
         )
 
+    def test_already_checked_in_redirects_with_flash_message(
+        self, clinical_user_client
+    ):
+        other_user = UserFactory.create()
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.CHECKED_IN,
+            current_status__created_by=other_user,
+        )
+        response = clinical_user_client.http.post(
+            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "clinics:show_clinic",
+                kwargs={"pk": appointment.clinic_slot.clinic.pk},
+            ),
+        )
+        messages_list = list(get_messages(response.wsgi_request))
+        expected = f"{appointment.participant.full_name} has already been checked in."
+        assert any(str(m) == expected for m in messages_list)
+
+    def test_already_checked_in_by_current_user_redirects_to_appointment(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.CHECKED_IN,
+            current_status__created_by=clinical_user_client.user,
+        )
+        response = clinical_user_client.http.post(
+            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
+        )
+        assert not list(get_messages(response.wsgi_request))
+
 
 @pytest.mark.django_db
 class TestStartAppointment:
@@ -870,8 +911,6 @@ class TestAppointmentCannotGoAhead:
     def test_flash_message_when_rescheduled(
         self, clinical_user_client, in_progress_appointment
     ):
-        from django.contrib.messages import get_messages
-
         name = in_progress_appointment.screening_episode.participant.full_name
         response = clinical_user_client.http.post(
             reverse(
@@ -893,8 +932,6 @@ class TestAppointmentCannotGoAhead:
     def test_flash_message_when_not_rescheduled(
         self, clinical_user_client, in_progress_appointment
     ):
-        from django.contrib.messages import get_messages
-
         name = in_progress_appointment.screening_episode.participant.full_name
         response = clinical_user_client.http.post(
             reverse(
