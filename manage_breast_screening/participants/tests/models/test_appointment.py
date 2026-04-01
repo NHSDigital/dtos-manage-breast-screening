@@ -1,6 +1,7 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime
 
 import pytest
+from django.utils import timezone
 
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
@@ -55,15 +56,15 @@ class TestRecentReportedMammograms:
         appointment = AppointmentFactory.create()
         long_time_ago = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(1970, 6, 15, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(1970, 6, 15)),
         )
         years_ago = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2020, 10, 22, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2020, 10, 22)),
         )
         today = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime.now(tz=timezone.utc),
+            created_at=timezone.make_aware(datetime.now()),
         )
 
         result = appointment.recent_reported_mammograms()
@@ -74,27 +75,27 @@ class TestRecentReportedMammograms:
         appointment = AppointmentFactory.create()
         on_since_date = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2023, 6, 15, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2023, 6, 15)),
         )
         day_before = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2023, 6, 14, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2023, 6, 14)),
         )
         day_after = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2023, 6, 16, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2023, 6, 16)),
         )
         year_before = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2022, 12, 31, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2022, 12, 31)),
         )
         year_after = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2024, 1, 1, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2024, 1, 1)),
         )
         today = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime.now(tz=timezone.utc),
+            created_at=timezone.make_aware(datetime.now()),
         )
 
         result = appointment.recent_reported_mammograms(since_date=date(2023, 6, 15))
@@ -108,11 +109,11 @@ class TestRecentReportedMammograms:
         appointment = AppointmentFactory.create()
         duplicate_1 = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2020, 8, 12, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2020, 8, 12)),
         )
         duplicate_2 = self.create_mammogram_with_created_at(
             appointment=appointment,
-            created_at=datetime(2020, 8, 12, tzinfo=timezone.utc),
+            created_at=timezone.make_aware(datetime(2020, 8, 12)),
         )
 
         result = appointment.recent_reported_mammograms()
