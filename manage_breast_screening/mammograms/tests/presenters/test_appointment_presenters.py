@@ -17,6 +17,10 @@ from manage_breast_screening.mammograms.presenters import (
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesTakenPresenter,
     ViewSummary,
+    WorkflowPresenter,
+)
+from manage_breast_screening.mammograms.services.appointment_services import (
+    AppointmentWorkflowService,
 )
 from manage_breast_screening.manual_images.models import ImageView, Series, Study
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
@@ -403,278 +407,6 @@ class TestAppointmentPresenter:
         mock_appointment.current_status.is_final_status.return_value = is_final_status
         presenter = AppointmentPresenter(mock_appointment)
         assert presenter.status_attribution == expected_result
-
-    def test_workflow_steps_confirm_identity(self, mock_appointment):
-        mock_appointment.completed_workflow_steps = MagicMock()
-        mock_appointment.completed_workflow_steps.values_list.return_value = []
-
-        steps = AppointmentPresenter(mock_appointment).workflow_steps(
-            "CONFIRM_IDENTITY"
-        )
-
-        assert steps == [
-            {
-                "label": "Confirm identity",
-                "completed": False,
-                "current": True,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
-            },
-            {
-                "label": "Review medical information",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
-            },
-            {
-                "label": "Take images",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
-            },
-            {
-                "label": "Check information",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
-            },
-        ]
-
-    def test_workflow_steps_review_medical_information(self, mock_appointment):
-        mock_appointment.completed_workflow_steps = MagicMock()
-        mock_appointment.completed_workflow_steps.values_list.return_value = [
-            "CONFIRM_IDENTITY"
-        ]
-
-        steps = AppointmentPresenter(mock_appointment).workflow_steps(
-            "REVIEW_MEDICAL_INFORMATION"
-        )
-        assert steps == [
-            {
-                "label": "Confirm identity",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
-            },
-            {
-                "label": "Review medical information",
-                "completed": False,
-                "current": True,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
-            },
-            {
-                "label": "Take images",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
-            },
-            {
-                "label": "Check information",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
-            },
-        ]
-
-    def test_workflow_steps_take_images(self, mock_appointment):
-        mock_appointment.completed_workflow_steps = MagicMock()
-        mock_appointment.completed_workflow_steps.values_list.return_value = [
-            "CONFIRM_IDENTITY",
-            "REVIEW_MEDICAL_INFORMATION",
-        ]
-
-        steps = AppointmentPresenter(mock_appointment).workflow_steps("TAKE_IMAGES")
-        assert steps == [
-            {
-                "label": "Confirm identity",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
-            },
-            {
-                "label": "Review medical information",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
-            },
-            {
-                "label": "Take images",
-                "completed": False,
-                "current": True,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
-            },
-            {
-                "label": "Check information",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
-            },
-        ]
-
-    def test_workflow_steps_check_information(self, mock_appointment):
-        mock_appointment.completed_workflow_steps = MagicMock()
-        mock_appointment.completed_workflow_steps.values_list.return_value = [
-            "CONFIRM_IDENTITY",
-            "REVIEW_MEDICAL_INFORMATION",
-            "TAKE_IMAGES",
-        ]
-
-        steps = AppointmentPresenter(mock_appointment).workflow_steps(
-            "CHECK_INFORMATION"
-        )
-        assert steps == [
-            {
-                "label": "Confirm identity",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
-            },
-            {
-                "label": "Review medical information",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
-            },
-            {
-                "label": "Take images",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
-            },
-            {
-                "label": "Check information",
-                "completed": False,
-                "current": True,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
-            },
-        ]
-
-    def test_workflow_steps_on_review_medical_information_when_already_reviewed(
-        self, mock_appointment
-    ):
-        mock_appointment.completed_workflow_steps = MagicMock()
-        mock_appointment.completed_workflow_steps.values_list.return_value = [
-            "CONFIRM_IDENTITY",
-            "REVIEW_MEDICAL_INFORMATION",
-        ]
-
-        steps = AppointmentPresenter(mock_appointment).workflow_steps(
-            "REVIEW_MEDICAL_INFORMATION"
-        )
-
-        assert steps == [
-            {
-                "label": "Confirm identity",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
-            },
-            {
-                "label": "Review medical information",
-                "completed": True,
-                "current": True,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
-            },
-            {
-                "label": "Take images",
-                "completed": False,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
-            },
-            {
-                "label": "Check information",
-                "completed": False,
-                "current": False,
-                "disabled": True,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
-            },
-        ]
-
-    def test_workflow_steps_on_confirm_identity_when_already_taken_images(
-        self, mock_appointment
-    ):
-        mock_appointment.completed_workflow_steps = MagicMock()
-        mock_appointment.completed_workflow_steps.values_list.return_value = [
-            "CONFIRM_IDENTITY",
-            "REVIEW_MEDICAL_INFORMATION",
-            "TAKE_IMAGES",
-        ]
-
-        steps = AppointmentPresenter(mock_appointment).workflow_steps(
-            "CONFIRM_IDENTITY"
-        )
-        assert steps == [
-            {
-                "label": "Confirm identity",
-                "completed": True,
-                "current": True,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
-            },
-            {
-                "label": "Review medical information",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
-            },
-            {
-                "label": "Take images",
-                "completed": True,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
-            },
-            {
-                "label": "Check information",
-                "completed": False,
-                "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item",
-                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
-            },
-        ]
 
 
 class TestStatusBarPresenter:
@@ -1123,3 +855,272 @@ class TestViewSummary:
             count=repeats + extra + 1, repeat_count=repeats, extra_count=extra
         )
         assert summary.repeat_and_extra_count_string == expected
+
+
+class TestWorkflowPresenter:
+    @pytest.fixture
+    def mock_service(self):
+        return MagicMock(
+            spec=AppointmentWorkflowService,
+            appointment=MagicMock(
+                spec=Appointment, pk=UUID("53ce8d3b-9e65-471a-b906-73809c0475d0")
+            ),
+        )
+
+    def test_workflow_steps_confirm_identity(self, mock_service):
+        mock_service.get_completed_steps.return_value = set()
+
+        steps = WorkflowPresenter(mock_service).workflow_steps("CONFIRM_IDENTITY")
+
+        assert steps == [
+            {
+                "label": "Confirm identity",
+                "completed": False,
+                "current": True,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
+            },
+            {
+                "label": "Review medical information",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
+            },
+            {
+                "label": "Take images",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
+            },
+            {
+                "label": "Check information",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
+            },
+        ]
+
+    def test_workflow_steps_review_medical_information(self, mock_service):
+        mock_service.get_completed_steps.return_value = {"CONFIRM_IDENTITY"}
+
+        steps = WorkflowPresenter(mock_service).workflow_steps(
+            "REVIEW_MEDICAL_INFORMATION"
+        )
+        assert steps == [
+            {
+                "label": "Confirm identity",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
+            },
+            {
+                "label": "Review medical information",
+                "completed": False,
+                "current": True,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
+            },
+            {
+                "label": "Take images",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
+            },
+            {
+                "label": "Check information",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
+            },
+        ]
+
+    def test_workflow_steps_take_images(self, mock_service):
+        mock_service.get_completed_steps.return_value = {
+            "CONFIRM_IDENTITY",
+            "REVIEW_MEDICAL_INFORMATION",
+        }
+
+        steps = WorkflowPresenter(mock_service).workflow_steps("TAKE_IMAGES")
+        assert steps == [
+            {
+                "label": "Confirm identity",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
+            },
+            {
+                "label": "Review medical information",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
+            },
+            {
+                "label": "Take images",
+                "completed": False,
+                "current": True,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
+            },
+            {
+                "label": "Check information",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
+            },
+        ]
+
+    def test_workflow_steps_check_information(self, mock_service):
+        mock_service.get_completed_steps.return_value = {
+            "CONFIRM_IDENTITY",
+            "REVIEW_MEDICAL_INFORMATION",
+            "TAKE_IMAGES",
+        }
+
+        steps = WorkflowPresenter(mock_service).workflow_steps("CHECK_INFORMATION")
+        assert steps == [
+            {
+                "label": "Confirm identity",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
+            },
+            {
+                "label": "Review medical information",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
+            },
+            {
+                "label": "Take images",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
+            },
+            {
+                "label": "Check information",
+                "completed": False,
+                "current": True,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
+            },
+        ]
+
+    def test_workflow_steps_on_review_medical_information_when_already_reviewed(
+        self, mock_service
+    ):
+        mock_service.get_completed_steps.return_value = {
+            "CONFIRM_IDENTITY",
+            "REVIEW_MEDICAL_INFORMATION",
+        }
+
+        steps = WorkflowPresenter(mock_service).workflow_steps(
+            "REVIEW_MEDICAL_INFORMATION"
+        )
+
+        assert steps == [
+            {
+                "label": "Confirm identity",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
+            },
+            {
+                "label": "Review medical information",
+                "completed": True,
+                "current": True,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
+            },
+            {
+                "label": "Take images",
+                "completed": False,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
+            },
+            {
+                "label": "Check information",
+                "completed": False,
+                "current": False,
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
+            },
+        ]
+
+    def test_workflow_steps_on_confirm_identity_when_already_taken_images(
+        self, mock_service
+    ):
+        mock_service.get_completed_steps.return_value = {
+            "CONFIRM_IDENTITY",
+            "REVIEW_MEDICAL_INFORMATION",
+            "TAKE_IMAGES",
+        }
+
+        steps = WorkflowPresenter(mock_service).workflow_steps("CONFIRM_IDENTITY")
+        assert steps == [
+            {
+                "label": "Confirm identity",
+                "completed": True,
+                "current": True,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
+            },
+            {
+                "label": "Review medical information",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
+            },
+            {
+                "label": "Take images",
+                "completed": True,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
+            },
+            {
+                "label": "Check information",
+                "completed": False,
+                "current": False,
+                "disabled": False,
+                "classes": "app-workflow-side-nav__item",
+                "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
+            },
+        ]

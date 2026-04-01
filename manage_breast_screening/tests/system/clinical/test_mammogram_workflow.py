@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, timedelta
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -143,7 +142,6 @@ class TestMammogramWorkflow(SystemTestCase):
         self.when_i_click_resume_appointment()
         self.then_i_should_be_on_the_confirm_identity_page()
 
-    @pytest.mark.xfail(reason="DTOSS-12593")
     def test_taking_over_the_appointment(self):
         self.given_i_have_two_users()
         self.and_there_is_an_appointment_started_by_the_first_user()
