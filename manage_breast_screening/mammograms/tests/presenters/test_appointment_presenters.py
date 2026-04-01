@@ -1080,11 +1080,10 @@ class TestWorkflowPresenter:
             },
         ]
 
-    def test_workflow_steps_on_confirm_identity_when_already_taken_images(
+    def test_workflow_steps_when_later_steps_are_completed_but_another_identity_check_is_needed(
         self, mock_service
     ):
         mock_service.get_completed_steps.return_value = {
-            "CONFIRM_IDENTITY",
             "REVIEW_MEDICAL_INFORMATION",
             "TAKE_IMAGES",
         }
@@ -1093,34 +1092,34 @@ class TestWorkflowPresenter:
         assert steps == [
             {
                 "label": "Confirm identity",
-                "completed": True,
+                "completed": False,
                 "current": True,
                 "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current app-workflow-side-nav__item--completed",
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--current",
                 "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/confirm-identity/",
             },
             {
                 "label": "Review medical information",
                 "completed": True,
                 "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed app-workflow-side-nav__item--disabled",
                 "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/",
             },
             {
                 "label": "Take images",
                 "completed": True,
                 "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed",
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--completed app-workflow-side-nav__item--disabled",
                 "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/take-images/",
             },
             {
                 "label": "Check information",
                 "completed": False,
                 "current": False,
-                "disabled": False,
-                "classes": "app-workflow-side-nav__item",
+                "disabled": True,
+                "classes": "app-workflow-side-nav__item app-workflow-side-nav__item--disabled",
                 "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
             },
         ]

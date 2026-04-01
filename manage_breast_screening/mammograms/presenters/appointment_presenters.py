@@ -463,9 +463,7 @@ class WorkflowPresenter:
         for step in AppointmentWorkflowStepCompletion.StepNames:
             is_completed = step.name in self.completed_steps
             is_current = step.name == active_workflow_step
-            is_disabled = not (
-                all_previous_steps_completed or is_completed or is_current
-            )
+            is_disabled = not all_previous_steps_completed and not is_current
             all_previous_steps_completed = all_previous_steps_completed and is_completed
 
             classes = "app-workflow-side-nav__item"
