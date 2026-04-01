@@ -521,10 +521,8 @@ class TestCheckIn:
         other_user = UserFactory.create()
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status_params={
-                "name": AppointmentStatusNames.CHECKED_IN,
-                "created_by": other_user,
-            },
+            current_status=AppointmentStatusNames.CHECKED_IN,
+            current_status__created_by=other_user,
         )
         response = clinical_user_client.http.post(
             reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
@@ -539,6 +537,23 @@ class TestCheckIn:
         messages_list = list(get_messages(response.wsgi_request))
         expected = f"{appointment.participant.full_name} has already been checked in."
         assert any(str(m) == expected for m in messages_list)
+
+    def test_already_checked_in_by_current_user_redirects_to_appointment(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.CHECKED_IN,
+            current_status__created_by=clinical_user_client.user,
+        )
+        response = clinical_user_client.http.post(
+            reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
+        )
+        assert not list(get_messages(response.wsgi_request))
 
 
 @pytest.mark.django_db
