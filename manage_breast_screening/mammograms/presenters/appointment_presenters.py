@@ -113,60 +113,6 @@ class AppointmentPresenter:
     def start_time(self):
         return self.clinic_slot.starts_at
 
-    def workflow_steps(self, active_workflow_step):
-        completed_workflow_steps = (
-            self._appointment.completed_workflow_steps.values_list(
-                "step_name", flat=True
-            )
-        )
-
-        steps = []
-
-        all_previous_steps_completed = True
-        for i, step in enumerate(AppointmentWorkflowStepCompletion.StepNames):
-            is_completed = step.name in completed_workflow_steps
-            is_current = step.name == active_workflow_step
-            is_disabled = not (
-                all_previous_steps_completed or is_completed or is_current
-            )
-            all_previous_steps_completed = all_previous_steps_completed and is_completed
-
-            classes = "app-workflow-side-nav__item"
-            if is_current:
-                classes += " app-workflow-side-nav__item--current"
-            if is_completed:
-                classes += " app-workflow-side-nav__item--completed"
-            if is_disabled:
-                classes += " app-workflow-side-nav__item--disabled"
-
-            match step:
-                case AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY:
-                    view_name = "confirm_identity"
-                case AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION:
-                    view_name = "record_medical_information"
-                case AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES:
-                    view_name = "take_images"
-                case AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION:
-                    view_name = "check_information"
-
-            steps.append(
-                {
-                    "label": step.label,
-                    "completed": is_completed,
-                    "current": is_current,
-                    "disabled": is_disabled,
-                    "classes": classes,
-                    "url": reverse(
-                        "mammograms:" + view_name,
-                        kwargs={
-                            "pk": self._appointment.pk,
-                        },
-                    ),
-                }
-            )
-
-        return steps
-
     @cached_property
     def has_appointment_note(self):
         return hasattr(self._appointment, "note")
@@ -502,3 +448,58 @@ class ImagesTakenPresenter(ImagesPresenter):
                 }
             ]
         }
+
+
+class WorkflowPresenter:
+    def __init__(self, appointment_workflow_service):
+        self._appointment = appointment_workflow_service.appointment
+        service = appointment_workflow_service
+        self.completed_steps = service.get_completed_steps()
+
+    def workflow_steps(self, active_workflow_step):
+        steps = []
+
+        all_previous_steps_completed = True
+        for step in AppointmentWorkflowStepCompletion.StepNames:
+            is_completed = step.name in self.completed_steps
+            is_current = step.name == active_workflow_step
+            is_disabled = not (
+                all_previous_steps_completed or is_completed or is_current
+            )
+            all_previous_steps_completed = all_previous_steps_completed and is_completed
+
+            classes = "app-workflow-side-nav__item"
+            if is_current:
+                classes += " app-workflow-side-nav__item--current"
+            if is_completed:
+                classes += " app-workflow-side-nav__item--completed"
+            if is_disabled:
+                classes += " app-workflow-side-nav__item--disabled"
+
+            match step:
+                case AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY:
+                    view_name = "confirm_identity"
+                case AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION:
+                    view_name = "record_medical_information"
+                case AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES:
+                    view_name = "take_images"
+                case AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION:
+                    view_name = "check_information"
+
+            steps.append(
+                {
+                    "label": step.label,
+                    "completed": is_completed,
+                    "current": is_current,
+                    "disabled": is_disabled,
+                    "classes": classes,
+                    "url": reverse(
+                        "mammograms:" + view_name,
+                        kwargs={
+                            "pk": self._appointment.pk,
+                        },
+                    ),
+                }
+            )
+
+        return steps

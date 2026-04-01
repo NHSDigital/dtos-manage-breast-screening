@@ -17,7 +17,7 @@
 <div class="app-workflow-container">
   <div class="nhsuk-grid-row app-workflow-container__row">
     <div class="nhsuk-grid-column-one-quarter app-workflow-container__sidebar">
-      {{ workflow_steps(presented_appointment, active_workflow_step) }}
+      {{ workflow_steps(presented_workflow.workflow_steps(active_workflow_step)) }}
     </div>
     <div class="nhsuk-grid-column-three-quarters app-workflow-container__main" id="workflow_content">
       {% set info_notification_params = get_notification_banner_params(
