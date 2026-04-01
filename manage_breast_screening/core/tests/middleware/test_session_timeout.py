@@ -1,5 +1,6 @@
 from datetime import timedelta
 from unittest.mock import Mock, patch
+from urllib.parse import parse_qs, urlparse
 
 import pytest
 from django.http import HttpResponse
@@ -164,6 +165,22 @@ class TestSessionTimeoutMiddleware:
 
         mock_logout.assert_called_once_with(request)
         assert response.status_code == 302
+
+    def test_redirect_does_not_include_next_for_logout_path(
+        self, user, middleware, mock_logout, frozen_now
+    ):
+        request = RequestFactory().get("/auth/log-out/")
+        request.user = user
+        request.session = MockSession()
+        past = frozen_now - timedelta(minutes=16)
+        request.session["login_time"] = past.isoformat()
+        request.session["last_activity"] = past.isoformat()
+
+        response = middleware(request)
+
+        assert response.status_code == 302
+        query_params = parse_qs(urlparse(response.headers["Location"]).query)
+        assert "next" not in query_params
 
     def test_api_path_bypasses_middleware(self, middleware):
         request = RequestFactory().get("/api/some-endpoint/")

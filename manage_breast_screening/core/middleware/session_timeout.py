@@ -34,7 +34,9 @@ class SessionTimeoutMiddleware:
     def _logout_and_redirect(self, request):
         auth_logout(request)
 
-        query = {"next": request.get_full_path()}
+        current_path = request.get_full_path()
+        logout_path = reverse("auth:logout")
+        query = {} if current_path.startswith(logout_path) else {"next": current_path}
 
         return redirect(reverse(settings.LOGIN_URL, query=query))
 
