@@ -1,7 +1,6 @@
-import logging
-
 from django.urls import reverse
 
+from manage_breast_screening.core.models import get_object_or_none
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     DeleteWithAuditView,
@@ -10,16 +9,11 @@ from manage_breast_screening.core.views.generic import (
 from manage_breast_screening.mammograms.presenters.medical_information_presenter import (
     MedicalInformationPresenter,
 )
-from manage_breast_screening.participants.models.medical_history.mastectomy_or_lumpectomy_history_item import (
-    MastectomyOrLumpectomyHistoryItem,
-)
 
 from ...forms.medical_history.mastectomy_or_lumpectomy_history_item_form import (
     MastectomyOrLumpectomyHistoryItemForm,
 )
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddMastectomyOrLumpectomyHistoryView(MedicalInformationMixin, AddWithAuditView):
@@ -53,14 +47,10 @@ class UpdateMastectomyOrLumpectomyHistoryView(
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return MastectomyOrLumpectomyHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except MastectomyOrLumpectomyHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return get_object_or_none(
+            self.appointment.mastectomy_or_lumpectomy_history_items,
+            pk=self.kwargs.get("history_item_pk"),
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()

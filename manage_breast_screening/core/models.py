@@ -6,6 +6,13 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 
 
+def get_object_or_none(queryset, **kwargs):
+    try:
+        return queryset.get(**kwargs)
+    except queryset.model.DoesNotExist:
+        return None
+
+
 class ReferenceDataModel(models.Model):
     """
     Base class for reference data - static data that categorises other data

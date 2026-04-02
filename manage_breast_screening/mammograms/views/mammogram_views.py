@@ -1,5 +1,3 @@
-import logging
-
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import Http404
@@ -11,6 +9,7 @@ from django.views.decorators.http import require_http_methods
 from rules.contrib.views import PermissionRequiredMixin
 
 from manage_breast_screening.auth.models import Permission
+from manage_breast_screening.core.models import get_object_or_none
 from manage_breast_screening.core.utils.date_formatting import format_relative_date
 from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
@@ -36,8 +35,6 @@ from manage_breast_screening.participants.models.appointment import (
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 
 APPOINTMENT_NOT_FOUND = "Appointment not found"
-
-logger = logging.getLogger(__name__)
 
 
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
@@ -135,15 +132,10 @@ class AppointmentProceedAnywayView(
         return "You are continuing despite a recent mammogram"
 
     def get_object(self):
-        try:
-            return ParticipantReportedMammogram.objects.get(
-                pk=self.kwargs["participant_reported_mammogram_pk"],
-            )
-        except ParticipantReportedMammogram.DoesNotExist:
-            logger.exception(
-                "ParticipantReportedMammogram does not exist for kwargs=%s", self.kwargs
-            )
-            return None
+        return get_object_or_none(
+            self.appointment.reported_mammograms,
+            pk=self.kwargs.get("participant_reported_mammogram_pk"),
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
