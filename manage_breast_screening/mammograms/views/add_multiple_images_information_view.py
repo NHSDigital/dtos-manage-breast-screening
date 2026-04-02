@@ -8,6 +8,11 @@ from django.urls import reverse
 from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
+from manage_breast_screening.dicom.models import Study as DicomStudy
+from manage_breast_screening.dicom.study_service import (
+    StudyService as DicomStudyService,
+)
+from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.mammograms.views.mixins import InProgressAppointmentMixin
 from manage_breast_screening.manual_images.models import Study
 from manage_breast_screening.manual_images.services import StudyService
@@ -26,7 +31,10 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
 
     def get_study(self):
         try:
-            return self.appointment.study
+            if gateway_images_enabled(self.appointment):
+                return DicomStudy.for_appointment(self.appointment)
+            else:
+                return self.appointment.study
         except Study.DoesNotExist:
             return None
 
@@ -54,12 +62,7 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
                 messages.INFO,
                 "The image details have changed. Please review and continue.",
             )
-            return redirect(
-                reverse(
-                    "mammograms:add_image_details",
-                    kwargs={"pk": self.appointment_pk},
-                )
-            )
+            return redirect(self.get_redirect_back_url())
 
         return super().post(request, *args, **kwargs)
 
@@ -75,24 +78,35 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        title = (
+            "Image transfer in progress"
+            if gateway_images_enabled(self.appointment)
+            else "Add image information"
+        )
+
         context.update(
             {
-                "heading": "Add image information",
-                "page_title": "Add image information",
-                "back_link_params": {
-                    "href": reverse(
-                        "mammograms:add_image_details",
-                        kwargs={"pk": self.appointment_pk},
-                    ),
-                },
+                "heading": title,
+                "page_title": title,
+                "back_link_params": {"href": self.get_redirect_back_url()},
             },
         )
         return context
 
+    def get_redirect_back_url(self):
+        if gateway_images_enabled(self.appointment):
+            return reverse(
+                "mammograms:gateway_images", kwargs={"pk": self.appointment_pk}
+            )
+        else:
+            return reverse(
+                "mammograms:add_image_details", kwargs={"pk": self.appointment_pk}
+            )
+
     @transaction.atomic
     def form_valid(self, form):
-        study_service = StudyService(self.appointment, self.request.user)
-        form.update(study_service)
+        form.update(self.study_service)
 
         auditor = Auditor.from_request(self.request)
         auditor.audit_bulk_update(form.series_list)
@@ -105,3 +119,10 @@ class AddMultipleImagesInformationView(InProgressAppointmentMixin, FormView):
             step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
             defaults={"created_by": self.request.user},
         )
+
+    @property
+    def study_service(self):
+        if gateway_images_enabled(self.appointment):
+            return DicomStudyService(self.appointment, self.request.user)
+        else:
+            return StudyService(self.appointment, self.request.user)
