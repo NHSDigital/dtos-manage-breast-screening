@@ -49,6 +49,12 @@ class NamedThingMixin:
 
         raise ValueError("thing_name is unset")
 
+    def get_object_or_none(self, queryset, **kwargs):
+        try:
+            return queryset.get(**kwargs)
+        except queryset.model.DoesNotExist:
+            return None
+
 
 class AddWithAuditView(NamedThingMixin, FormView):
     """

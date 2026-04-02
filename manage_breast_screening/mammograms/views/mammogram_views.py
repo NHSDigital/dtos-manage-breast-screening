@@ -3,7 +3,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -135,7 +135,7 @@ class AppointmentProceedAnywayView(
         return "You are continuing despite a recent mammogram"
 
     def get_object(self):
-        return get_object_or_404(
+        return self.get_object_or_none(
             self.appointment.reported_mammograms,
             pk=self.kwargs.get("participant_reported_mammogram_pk"),
         )

@@ -1,6 +1,6 @@
 import logging
 
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
@@ -49,7 +49,7 @@ class UpdateBreastAugmentationHistoryView(MedicalInformationMixin, UpdateWithAud
         return "Delete this item"
 
     def get_object(self):
-        return get_object_or_404(
+        return self.get_object_or_none(
             self.appointment.breast_augmentation_history_items,
             pk=self.kwargs.get("history_item_pk"),
         )
