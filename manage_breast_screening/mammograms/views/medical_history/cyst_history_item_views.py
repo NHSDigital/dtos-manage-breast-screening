@@ -1,5 +1,3 @@
-import logging
-
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -11,8 +9,6 @@ from manage_breast_screening.core.views.generic import (
 
 from ...forms.medical_history.cyst_history_item_form import CystHistoryItemForm
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddCystHistoryView(MedicalInformationMixin, AddWithAuditView):

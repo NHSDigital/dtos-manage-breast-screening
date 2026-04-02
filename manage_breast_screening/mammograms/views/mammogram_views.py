@@ -1,5 +1,3 @@
-import logging
-
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import Http404
@@ -36,8 +34,6 @@ from manage_breast_screening.participants.models.appointment import (
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 
 APPOINTMENT_NOT_FOUND = "Appointment not found"
-
-logger = logging.getLogger(__name__)
 
 
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)

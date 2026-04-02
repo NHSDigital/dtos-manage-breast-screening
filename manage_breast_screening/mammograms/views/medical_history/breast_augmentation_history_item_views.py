@@ -1,5 +1,3 @@
-import logging
-
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -13,8 +11,6 @@ from ...forms.medical_history.breast_augmentation_history_item_form import (
     BreastAugmentationHistoryItemForm,
 )
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddBreastAugmentationHistoryView(MedicalInformationMixin, AddWithAuditView):

@@ -1,5 +1,3 @@
-import logging
-
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
@@ -12,8 +10,6 @@ from manage_breast_screening.mammograms.forms.medical_history.benign_lump_histor
 )
 
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddBenignLumpHistoryItemView(MedicalInformationMixin, AddWithAuditView):

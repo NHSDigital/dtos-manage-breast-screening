@@ -1,4 +1,3 @@
-import logging
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -16,8 +15,6 @@ from manage_breast_screening.participants.models import ParticipantReportedMammo
 
 from ..forms.participant_reported_mammogram_form import ParticipantReportedMammogramForm
 from .mixins import InProgressAppointmentMixin
-
-logger = logging.getLogger(__name__)
 
 
 class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
