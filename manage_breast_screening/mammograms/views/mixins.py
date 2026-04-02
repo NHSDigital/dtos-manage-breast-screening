@@ -9,6 +9,10 @@ from rules.contrib.views import PermissionRequiredMixin
 from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
+    WorkflowPresenter,
+)
+from manage_breast_screening.mammograms.services.appointment_services import (
+    AppointmentWorkflowService,
 )
 from manage_breast_screening.participants.models import Appointment
 
@@ -121,6 +125,17 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
                 "caption": participant.full_name,
                 "participant_first_name": participant.first_name,
             },
+        )
+
+        return context
+
+
+class WorkflowSidebarMixin(AppointmentMixin):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["presented_workflow"] = WorkflowPresenter(
+            AppointmentWorkflowService(self.appointment, self.request.user)
         )
 
         return context

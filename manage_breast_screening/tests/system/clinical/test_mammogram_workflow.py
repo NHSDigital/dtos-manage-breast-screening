@@ -24,6 +24,8 @@ from manage_breast_screening.users.tests.factories import UserFactory
 
 from ..system_test_setup import SystemTestCase
 
+StepNames = AppointmentWorkflowStepCompletion.StepNames
+
 
 class TestMammogramWorkflow(SystemTestCase):
     def test_completing_workflow(self):
@@ -75,6 +77,11 @@ class TestMammogramWorkflow(SystemTestCase):
     def test_other_users_cannot_access_in_progress_workflow(self):
         self.given_i_have_two_users()
         self.and_there_is_an_appointment_started_by_the_first_user()
+        self.and_the_first_user_has_completed_steps(
+            StepNames.CHECK_INFORMATION,
+            StepNames.REVIEW_MEDICAL_INFORMATION,
+            StepNames.TAKE_IMAGES,
+        )
         self.and_i_am_logged_in_as_the_second_user()
 
         self.when_i_go_to_confirm_identity()
@@ -88,6 +95,80 @@ class TestMammogramWorkflow(SystemTestCase):
         self.when_i_go_to_take_images()
         self.then_i_am_redirected_to_the_appointment_show_page()
         self.and_the_message_says_in_progress_with_someone_else()
+
+    def test_pausing_and_resuming_the_workflow(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_appointment_show_page()
+
+        self.when_i_click_start_this_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+        self.and_i_see_the_appointment_status_bar()
+        self.and_i_see_the_appointment_cannot_proceed_link()
+        self.and_the_confirm_identity_step_is_active()
+
+        self.when_i_click_confirm_identity()
+        self.then_i_should_be_on_the_record_medical_information_page()
+        self.and_i_see_the_appointment_status_bar()
+        self.and_i_see_the_appointment_cannot_proceed_link()
+        self.and_the_review_medical_information_step_is_active()
+
+        self.when_i_mark_that_imaging_can_go_ahead()
+        self.then_i_should_be_on_the_record_images_page()
+        self.and_the_take_images_step_is_active()
+
+        self.when_i_select_pause_appointment()
+        self.then_i_should_be_on_the_pause_appointment_page()
+
+        self.when_i_click_confirm()
+        self.then_i_should_be_on_the_clinic_page()
+
+        self.when_i_select_view_appointment()
+
+        self.then_i_see_the_resume_appointment_button()
+        self.when_i_click_resume_appointment()
+        self.then_i_should_be_on_the_record_images_page()
+        self.and_the_take_images_step_is_active()
+
+    def test_appointments_are_resumable_by_the_same_user(self):
+        self.given_i_am_logged_in_as_a_clinical_user()
+        self.and_there_is_an_appointment()
+        self.and_i_am_on_the_appointment_show_page()
+
+        self.when_i_click_start_this_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+
+        self.given_i_load_the_appointment_show_page()
+        self.when_i_click_resume_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+
+    def test_taking_over_the_appointment(self):
+        self.given_i_have_two_users()
+        self.and_there_is_an_appointment_started_by_the_first_user()
+
+        self.and_i_am_logged_in_as_the_first_user()
+        self.and_i_am_on_the_confirm_identity_page()
+        self.and_the_confirm_identity_step_is_active()
+
+        self.when_i_click_confirm_identity()
+        self.then_i_should_be_on_the_record_medical_information_page()
+        self.and_i_see_the_appointment_status_bar()
+        self.and_i_see_the_appointment_cannot_proceed_link()
+        self.and_the_review_medical_information_step_is_active()
+
+        self.when_i_select_pause_appointment()
+        self.then_i_should_be_on_the_pause_appointment_page()
+
+        self.when_i_click_confirm()
+        self.then_i_should_be_on_the_clinic_page()
+
+        self.given_i_am_logged_in_as_the_second_user()
+        self.and_i_am_on_the_appointment_show_page()
+        self.when_i_click_resume_appointment()
+        self.then_i_should_be_on_the_confirm_identity_page()
+        self.and_i_see_the_appointment_status_bar()
+        self.and_i_see_the_appointment_cannot_proceed_link()
+        self.and_the_confirm_identity_step_is_active()
 
     def and_there_is_an_appointment(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
@@ -103,6 +184,17 @@ class TestMammogramWorkflow(SystemTestCase):
             self.live_server_url
             + reverse(
                 "mammograms:show_appointment",
+                kwargs={"pk": self.appointment.pk},
+            )
+        )
+
+    given_i_load_the_appointment_show_page = and_i_am_on_the_appointment_show_page
+
+    def and_i_am_on_the_confirm_identity_page(self):
+        self.page.goto(
+            self.live_server_url
+            + reverse(
+                "mammograms:confirm_identity",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -124,6 +216,9 @@ class TestMammogramWorkflow(SystemTestCase):
         self,
     ):
         self.page.get_by_text("Start this appointment").click()
+
+    def when_i_click_resume_this_appointment(self):
+        self.page.get_by_text("Resume this appointment").click()
 
     def when_i_submit_the_form(self):
         self.page.get_by_role("button", name="Continue").click()
@@ -268,6 +363,8 @@ class TestMammogramWorkflow(SystemTestCase):
     def and_i_am_logged_in_as_the_second_user(self):
         self.login_as_user(self.user_two)
 
+    given_i_am_logged_in_as_the_second_user = and_i_am_logged_in_as_the_second_user
+
     def and_there_is_an_appointment_started_by_the_first_user(self):
         self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
@@ -285,14 +382,17 @@ class TestMammogramWorkflow(SystemTestCase):
         self.appointment.statuses.create(
             name=AppointmentStatusNames.IN_PROGRESS, created_by=self.user_one
         )
+
         assert (
             self.appointment.current_status.name == AppointmentStatusNames.IN_PROGRESS
         )
 
-        self.appointment.completed_workflow_steps.create(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
-            created_by=self.user_one,
-        )
+    def and_the_first_user_has_completed_steps(self, *step_names):
+        for step_name in step_names:
+            self.appointment.completed_workflow_steps.create(
+                step_name=step_name,
+                created_by=self.user_one,
+            )
         self.appointment.completed_workflow_steps.create(
             step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
             created_by=self.user_one,
@@ -302,14 +402,7 @@ class TestMammogramWorkflow(SystemTestCase):
             created_by=self.user_one,
         )
 
-    def when_i_go_to_confirm_identity(self):
-        self.page.goto(
-            self.live_server_url
-            + reverse(
-                "mammograms:confirm_identity",
-                kwargs={"pk": self.appointment.pk},
-            )
-        )
+    when_i_go_to_confirm_identity = and_i_am_on_the_confirm_identity_page
 
     def when_i_go_to_medical_information(self):
         self.page.goto(
@@ -338,3 +431,35 @@ class TestMammogramWorkflow(SystemTestCase):
         expect(alert).to_contain_text(
             "This appointment is currently being run by U. One"
         )
+
+    def when_i_select_pause_appointment(self):
+        self.page.get_by_text("Pause appointment").click()
+
+    def when_i_select_view_appointment(self):
+        self.page.get_by_text("View appointment").click()
+
+    def then_i_should_be_on_the_pause_appointment_page(self):
+        path = reverse(
+            "mammograms:pause_appointment",
+            kwargs={"pk": self.appointment.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))
+        self.assert_page_title_contains("Pause this appointment")
+
+    def when_i_click_confirm(self):
+        self.page.get_by_role("button").filter(has_text="Confirm").click()
+
+    def then_i_should_be_on_the_clinic_page(self):
+        path = reverse(
+            "clinics:list_clinic_appointments_in_progress",
+            kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
+        )
+        expect(self.page).to_have_url(re.compile(path))
+
+    def then_i_see_the_resume_appointment_button(self):
+        expect(
+            self.page.get_by_role("button").filter(has_text="Resume appointment")
+        ).to_be_visible()
+
+    def when_i_click_resume_appointment(self):
+        self.page.get_by_role("button").filter(has_text="Resume appointment").click()
