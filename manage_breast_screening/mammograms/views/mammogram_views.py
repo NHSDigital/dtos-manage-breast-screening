@@ -3,7 +3,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
@@ -135,15 +135,10 @@ class AppointmentProceedAnywayView(
         return "You are continuing despite a recent mammogram"
 
     def get_object(self):
-        try:
-            return ParticipantReportedMammogram.objects.get(
-                pk=self.kwargs["participant_reported_mammogram_pk"],
-            )
-        except ParticipantReportedMammogram.DoesNotExist:
-            logger.exception(
-                "ParticipantReportedMammogram does not exist for kwargs=%s", self.kwargs
-            )
-            return None
+        return get_object_or_404(
+            self.appointment.reported_mammograms,
+            pk=self.kwargs.get("participant_reported_mammogram_pk"),
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

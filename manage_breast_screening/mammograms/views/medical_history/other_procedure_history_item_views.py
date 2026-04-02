@@ -1,14 +1,12 @@
 import logging
 
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     DeleteWithAuditView,
     UpdateWithAuditView,
-)
-from manage_breast_screening.participants.models.medical_history.other_procedure_history_item import (
-    OtherProcedureHistoryItem,
 )
 
 from ...forms.medical_history.other_procedure_history_item_form import (
@@ -48,14 +46,10 @@ class UpdateOtherProcedureHistoryView(MedicalInformationMixin, UpdateWithAuditVi
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return OtherProcedureHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except OtherProcedureHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return get_object_or_404(
+            self.appointment.other_procedure_history_items,
+            pk=self.kwargs.get("history_item_pk"),
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

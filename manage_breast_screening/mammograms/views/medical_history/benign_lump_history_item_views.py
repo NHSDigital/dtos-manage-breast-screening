@@ -1,5 +1,6 @@
 import logging
 
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
@@ -9,9 +10,6 @@ from manage_breast_screening.core.views.generic import (
 )
 from manage_breast_screening.mammograms.forms.medical_history.benign_lump_history_item_form import (
     BenignLumpHistoryItemForm,
-)
-from manage_breast_screening.participants.models.medical_history.benign_lump_history_item import (
-    BenignLumpHistoryItem,
 )
 
 from ..mixins import MedicalInformationMixin
@@ -43,14 +41,10 @@ class UpdateBenignLumpHistoryItemView(MedicalInformationMixin, UpdateWithAuditVi
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return BenignLumpHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except BenignLumpHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return get_object_or_404(
+            self.appointment.benign_lump_history_items,
+            pk=self.kwargs.get("history_item_pk"),
+        )
 
     def get_delete_url(self):
         return reverse(

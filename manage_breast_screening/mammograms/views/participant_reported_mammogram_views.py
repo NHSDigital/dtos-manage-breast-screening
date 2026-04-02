@@ -2,6 +2,7 @@ import logging
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from manage_breast_screening.core.utils.relative_redirects import (
@@ -109,16 +110,10 @@ class UpdateParticipantReportedMammogramView(
         return "Delete this mammogram"
 
     def get_object(self):
-        try:
-            return ParticipantReportedMammogram.objects.get(
-                pk=self.kwargs["participant_reported_mammogram_pk"],
-            )
-        except ParticipantReportedMammogram.DoesNotExist:
-            logger.exception(
-                "Participant reported mammogram does not exist for kwargs=%s",
-                self.kwargs,
-            )
-            return None
+        return get_object_or_404(
+            self.appointment.reported_mammograms,
+            pk=self.kwargs.get("participant_reported_mammogram_pk"),
+        )
 
     def get_delete_url(self):
         return (

@@ -1,15 +1,12 @@
 import logging
 
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     DeleteWithAuditView,
     UpdateWithAuditView,
-)
-from manage_breast_screening.participants.models.medical_history.breast_augmentation_history_item import (
-    BreastAugmentationHistoryItem,
 )
 
 from ...forms.medical_history.breast_augmentation_history_item_form import (
@@ -52,14 +49,10 @@ class UpdateBreastAugmentationHistoryView(MedicalInformationMixin, UpdateWithAud
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return BreastAugmentationHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except BreastAugmentationHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return get_object_or_404(
+            self.appointment.breast_augmentation_history_items,
+            pk=self.kwargs.get("history_item_pk"),
+        )
 
     def get_delete_url(self):
         return reverse(
