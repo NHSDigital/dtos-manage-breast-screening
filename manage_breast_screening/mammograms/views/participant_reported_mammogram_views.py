@@ -1,4 +1,3 @@
-import logging
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -16,8 +15,6 @@ from manage_breast_screening.participants.models import ParticipantReportedMammo
 
 from ..forms.participant_reported_mammogram_form import ParticipantReportedMammogramForm
 from .mixins import InProgressAppointmentMixin
-
-logger = logging.getLogger(__name__)
 
 
 class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
@@ -109,16 +106,10 @@ class UpdateParticipantReportedMammogramView(
         return "Delete this mammogram"
 
     def get_object(self):
-        try:
-            return ParticipantReportedMammogram.objects.get(
-                pk=self.kwargs["participant_reported_mammogram_pk"],
-            )
-        except ParticipantReportedMammogram.DoesNotExist:
-            logger.exception(
-                "Participant reported mammogram does not exist for kwargs=%s",
-                self.kwargs,
-            )
-            return None
+        return self.get_object_or_none(
+            self.appointment.reported_mammograms,
+            pk=self.kwargs.get("participant_reported_mammogram_pk"),
+        )
 
     def get_delete_url(self):
         return (

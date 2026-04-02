@@ -1,5 +1,3 @@
-import logging
-
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
@@ -7,16 +5,11 @@ from manage_breast_screening.core.views.generic import (
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
-    ImplantedMedicalDeviceHistoryItem,
-)
 
 from ...forms.medical_history.implanted_medical_device_history_item_form import (
     ImplantedMedicalDeviceHistoryItemForm,
 )
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddImplantedMedicalDeviceHistoryView(MedicalInformationMixin, AddWithAuditView):
@@ -50,14 +43,10 @@ class UpdateImplantedMedicalDeviceHistoryView(
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return ImplantedMedicalDeviceHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except ImplantedMedicalDeviceHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return self.get_object_or_none(
+            self.appointment.implanted_medical_device_history_items,
+            pk=self.kwargs.get("history_item_pk"),
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

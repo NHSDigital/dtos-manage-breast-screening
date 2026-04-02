@@ -1,5 +1,3 @@
-import logging
-
 from django.urls import reverse
 
 from manage_breast_screening.core.views.generic import (
@@ -10,13 +8,8 @@ from manage_breast_screening.core.views.generic import (
 from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_history_item_form import (
     BreastCancerHistoryItemForm,
 )
-from manage_breast_screening.participants.models.medical_history.breast_cancer_history_item import (
-    BreastCancerHistoryItem,
-)
 
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddBreastCancerHistoryView(MedicalInformationMixin, AddWithAuditView):
@@ -43,14 +36,10 @@ class UpdateBreastCancerHistoryView(MedicalInformationMixin, UpdateWithAuditView
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return self.appointment.breast_cancer_history_items.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except BreastCancerHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return self.get_object_or_none(
+            self.appointment.breast_cancer_history_items,
+            pk=self.kwargs.get("history_item_pk"),
+        )
 
     def get_delete_url(self):
         return reverse(
