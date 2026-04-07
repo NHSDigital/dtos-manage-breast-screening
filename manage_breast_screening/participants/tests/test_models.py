@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import timezone as tz
-from random import choice
 
 import pytest
 from pytest_django.asserts import assertQuerySetEqual
@@ -17,7 +16,7 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
 )
 
 from .. import models
-from ..models import AppointmentStatus, Ethnicity
+from ..models import AppointmentStatus
 from .factories import (
     AppointmentFactory,
     AppointmentStatusFactory,
@@ -54,7 +53,7 @@ class TestParticipant:
             ("pakistani", "custom ethnicity", "Pakistani"),
             ("any_other_white_background", None, "Any other White background"),
             (
-                choice(Ethnicity.non_specific_ethnic_backgrounds()),
+                "any_other_ethnic_background",
                 "custom ethnicity",
                 "custom ethnicity",
             ),
