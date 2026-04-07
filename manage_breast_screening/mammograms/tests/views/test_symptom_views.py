@@ -10,11 +10,85 @@ from manage_breast_screening.participants.models.symptom import (
     SkinChangeChoices,
     Symptom,
     SymptomAreas,
+    SymptomSubType,
     SymptomType,
 )
 from manage_breast_screening.participants.tests.factories import (
     SymptomFactory,
 )
+
+
+@pytest.fixture(autouse=True)
+def setup_symptom_types():
+    SymptomType.objects.get_or_create(id=SymptomType.LUMP, name="Lump")
+    SymptomType.objects.get_or_create(
+        id=SymptomType.SWELLING_OR_SHAPE_CHANGE, name="Swelling or shape change"
+    )
+    SymptomType.objects.get_or_create(id=SymptomType.SKIN_CHANGE, name="Skin change")
+    SymptomType.objects.get_or_create(
+        id=SymptomType.NIPPLE_CHANGE, name="Nipple change"
+    )
+    SymptomType.objects.get_or_create(id=SymptomType.OTHER, name="Other")
+    SymptomType.objects.get_or_create(id=SymptomType.BREAST_PAIN, name="Breast pain")
+
+    SymptomSubType.objects.get_or_create(
+        id=SkinChangeChoices.SORES_OR_CYSTS,
+        name="Sores or cysts",
+        symptom_type_id=SymptomType.SKIN_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=SkinChangeChoices.DIMPLES_OR_INDENTATION,
+        name="Dimples or indentation",
+        symptom_type_id=SymptomType.SKIN_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=SkinChangeChoices.RASH, name="Rash", symptom_type_id=SymptomType.SKIN_CHANGE
+    )
+    SymptomSubType.objects.get_or_create(
+        id=SkinChangeChoices.COLOUR_CHANGE,
+        name="Colour change",
+        symptom_type_id=SymptomType.SKIN_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.BLOODY_DISCHARGE,
+        name="Bloody discharge",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.OTHER_DISCHARGE,
+        name="Other discharge",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.INVERSION,
+        name="Inversion",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.RASH_OR_ECZEMA,
+        name="Rash or eczema",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.SHAPE_CHANGE,
+        name="Shape change",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.COLOUR_CHANGE,
+        name="Colour change",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=NippleChangeChoices.OTHER,
+        name="Other",
+        symptom_type_id=SymptomType.NIPPLE_CHANGE,
+    )
+    SymptomSubType.objects.get_or_create(
+        id=SkinChangeChoices.OTHER,
+        name="Other",
+        symptom_type_id=SymptomType.SKIN_CHANGE,
+    )
 
 
 @pytest.fixture
