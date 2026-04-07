@@ -1,45 +1,38 @@
 import os
 import re
 from collections import Counter
+from unittest import TestCase
 
 import pytest
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from django.test.client import Client
 from django.urls import reverse
 from django.utils import timezone
-from playwright.sync_api import expect, sync_playwright
+from playwright.sync_api import expect
 
 from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.core.utils.accessibility import AxeAdapter
 from manage_breast_screening.users.tests.factories import UserFactory
 
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
+
 
 @pytest.mark.system
-class SystemTestCase(StaticLiveServerTestCase):
-    @classmethod
-    def setUpClass(cls):
-        os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
-        super().setUpClass()
-        cls.playwright = sync_playwright().start()
-        cls.browser = cls.playwright.chromium.launch()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls.browser.close()
-        cls.playwright.stop()
-
-    def setUp(self):
-        self.context = self.browser.new_context()
+class SystemTestCase(TestCase):
+    @pytest.fixture(autouse=True)
+    def setup_playwright(self, context, live_server):
+        self.context = context
         self.page = self.context.new_page()
         self.page.set_default_timeout(5000)
         self.axe = AxeAdapter()
-        settings.BASE_URL = self.live_server_url
+        self.live_server = live_server
+        self.live_server_url = live_server.url
+        settings.BASE_URL = live_server.url
 
-    def tearDown(self):
+        yield
+
         self.page.close()
 
     def login_as_user(self, user: User):
