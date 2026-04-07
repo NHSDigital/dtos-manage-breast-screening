@@ -50,6 +50,7 @@ from manage_breast_screening.participants.models import (
 )
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
+    AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
@@ -339,6 +340,14 @@ def check_in(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
+    if _should_redirect_stale_check_in(request, appointment):
+        messages.add_message(
+            request,
+            messages.INFO,
+            f"{appointment.participant.full_name} has already been checked in.",
+        )
+        return redirect("clinics:show_clinic", pk=appointment.clinic_slot.clinic.pk)
+
     AppointmentStatusUpdater(
         appointment=appointment, current_user=request.user
     ).check_in()
@@ -347,6 +356,19 @@ def check_in(request, pk):
         return redirect("mammograms:show_appointment", pk=pk)
     else:
         return HttpResponse(status=201)
+
+
+def _should_redirect_stale_check_in(request, appointment):
+    machine = AppointmentMachine.from_appointment(appointment)
+    current_status = appointment.current_status
+    checked_in_by_current_user = (
+        current_status.name == AppointmentStatusNames.CHECKED_IN
+        and current_status.created_by == request.user
+    )
+    # Don't redirect if it's a valid state transition, or if the same user is re-submitting
+    # the check-in (e.g. due to a double form submission). Redirect in all other cases,
+    # which would indicate a stale form submission.
+    return not machine.can("check_in") and not checked_in_by_current_user
 
 
 @require_http_methods(["GET", "POST"])
