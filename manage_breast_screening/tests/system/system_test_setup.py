@@ -1,4 +1,3 @@
-import os
 import re
 from collections import Counter
 
@@ -14,8 +13,6 @@ from manage_breast_screening.auth.models import Role
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
 from manage_breast_screening.core.utils.accessibility import AxeAdapter
 from manage_breast_screening.users.tests.factories import UserFactory
-
-os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 @pytest.mark.system
