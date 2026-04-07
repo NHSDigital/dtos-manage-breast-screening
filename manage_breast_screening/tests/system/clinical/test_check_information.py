@@ -142,8 +142,36 @@ class TestCheckInformation(SystemTestCase):
         self.page.get_by_role("button", name="Continue").click()
 
         # Images with count > 1 trigger the multiple images information form
-        for radio in self.page.locator("input[value='NO_REPEATS']").all():
-            radio.check()
+        self.page.locator("fieldset").filter(
+            has_text="3 RMLO images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="5 Right Eklund images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="2 LCC images were taken. Was the additional image a repeat?"
+        ).get_by_label(
+            "No, an extra image was needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="4 LMLO images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="6 Left Eklund images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
         self.page.get_by_role("button", name="Continue").click()
 
         self.expect_url("mammograms:check_information", pk=self.appointment.pk)
