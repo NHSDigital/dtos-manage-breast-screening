@@ -11,9 +11,15 @@ from django.utils import timezone
 from playwright.sync_api import expect
 from qsessions.backends.db import SessionStore
 
+from manage_breast_screening.clinics.models import Clinic
 from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
     UserAssignmentFactory,
+)
+from manage_breast_screening.participants.tests.factories import (
+    AppointmentFactory,
+    ParticipantFactory,
+    ScreeningEpisodeFactory,
 )
 from manage_breast_screening.users.tests.factories import UserFactory
 
@@ -70,6 +76,16 @@ class TestLogin(SystemTestCase):
         self.then_header_shows_log_out()
         self.and_i_am_logged_out_after_inactivity_timeout()
 
+    def test_redirected_to_original_page_after_session_timeout_and_re_login(self):
+        self.given_a_user_with_single_provider()
+        self.given_i_am_on_the_home_page()
+        self.when_i_log_in_via_cis2()
+        self.then_i_am_redirected_to_home()
+        self.and_there_is_an_appointment()
+        self.when_my_session_expires_and_i_navigate_to_the_appointment_page()
+        self.when_i_click_the_cis2_login_button()
+        self.then_i_am_on_the_appointment_page()
+
     def given_a_user_with_no_providers(self):
         self.user = UserFactory(nhs_uid="cis2-user-1")
 
@@ -93,6 +109,9 @@ class TestLogin(SystemTestCase):
 
     def when_i_log_in_via_cis2(self):
         self.page.get_by_role("link", name="Log in").click()
+        self.when_i_click_the_cis2_login_button()
+
+    def when_i_click_the_cis2_login_button(self):
         self.page.get_by_role("button", name="Log in with my Care Identity").click()
 
     def then_i_am_redirected_to_home(self):
@@ -154,6 +173,32 @@ class TestLogin(SystemTestCase):
         store = SessionStore(session_key=session.session_key)
         store["last_activity"] = activity_time.isoformat()
         store.save()
+
+    def and_there_is_an_appointment(self):
+        participant = ParticipantFactory()
+        screening_episode = ScreeningEpisodeFactory(participant=participant)
+        self.appointment = AppointmentFactory(
+            screening_episode=screening_episode,
+            clinic_slot__clinic__setting__provider=self.provider,
+            clinic_slot__clinic__risk_type=Clinic.RiskType.ROUTINE_RISK,
+        )
+
+    def when_my_session_expires_and_i_navigate_to_the_appointment_page(self):
+        appointment_path = reverse(
+            "mammograms:show_appointment", kwargs={"pk": self.appointment.pk}
+        )
+        after_timeout = timezone.now() + timedelta(minutes=16)
+        with time_machine.travel(after_timeout, tick=False):
+            self.page.goto(self.live_server_url + appointment_path)
+        # Session expired — now on login page with ?next=<appointment>.
+        # Navigate to CIS2 login with the same next param, matching production behaviour
+        # where LOGIN_URL = "auth:login".
+        self.page.goto(
+            self.live_server_url + reverse("auth:login") + "?next=" + appointment_path
+        )
+
+    def then_i_am_on_the_appointment_page(self):
+        self.expect_url("mammograms:show_appointment", pk=self.appointment.pk)
 
     def and_i_am_logged_out_after_inactivity_timeout(self):
         before_timeout = timezone.now() + timedelta(minutes=14)

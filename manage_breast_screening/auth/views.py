@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urlencode
 
 from authlib.integrations.base_client.errors import MismatchingStateError, OAuthError
 from django.conf import settings
@@ -23,6 +24,9 @@ from manage_breast_screening.core.decorators import (
     basic_auth_exempt,
     current_provider_exempt,
 )
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 
 from .oauth import cis2_redirect_uri, get_cis2_client, jwk_from_public_key
 from .services import InvalidLogoutToken, decode_logout_token
@@ -34,11 +38,17 @@ logger = logging.getLogger(__name__)
 @login_not_required
 def login(request):
     """Entry point for authentication with CIS2"""
+    next_path = extract_relative_redirect_url(request, parameter_name="next")
+    if next_path:
+        request.session["next_path"] = next_path
+    else:
+        request.session.pop("next_path", None)
     return render(
         request,
         "auth/login.jinja",
         {
             "page_title": "Log in",
+            "cis2_login_url": reverse("auth:cis2_login"),
         },
     )
 
@@ -115,10 +125,16 @@ def cis2_callback(request):
     request.session["login_time"] = now.isoformat()
     request.session["last_activity"] = now.isoformat()
 
-    if user.is_superuser:
-        return redirect(reverse("admin:index"))
+    next_path = request.session.pop("next_path", None)
 
-    return redirect(reverse("select_provider"))
+    if user.is_superuser and not next_path:
+        redirect_url = reverse("admin:index")
+    else:
+        redirect_url = reverse("select_provider")
+        if next_path:
+            redirect_url = f"{redirect_url}?{urlencode({'next': next_path})}"
+
+    return redirect(redirect_url)
 
 
 @current_provider_exempt
