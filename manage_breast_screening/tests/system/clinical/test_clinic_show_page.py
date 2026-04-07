@@ -2,7 +2,6 @@ import re
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -26,11 +25,6 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestUserViewsClinicShowPage(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
-        self.clinic_start_time = today
-
     def test_user_views_clinic_show_page(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_a_clinic_exists_that_is_run_by_my_provider()
@@ -83,9 +77,10 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.then_i_can_see_status_attribution_for_these_appointments()
 
     def and_a_clinic_exists_that_is_run_by_my_provider(self):
+        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
         user_assignment = self.current_user.assignments.first()
         self.clinic = ClinicFactory(
-            starts_at=self.clinic_start_time,
+            starts_at=today,
             setting__name="West London BSS",
             setting__provider=user_assignment.provider,
             risk_type=Clinic.RiskType.ROUTINE_RISK,

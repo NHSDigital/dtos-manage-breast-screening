@@ -1,7 +1,6 @@
 import os
 import re
 from collections import Counter
-from unittest import TestCase
 
 import pytest
 from django.conf import settings
@@ -20,7 +19,7 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
 
 @pytest.mark.system
-class SystemTestCase(TestCase):
+class SystemTestCase:
     @pytest.fixture(autouse=True)
     def setup_playwright(self, context, live_server):
         self.context = context
@@ -140,7 +139,7 @@ class SystemTestCase(TestCase):
         """
         self.page.wait_for_selector("main")
         results = self.axe.run(page=self.page)
-        self.assertEqual(results.violations_count, 0, results.generate_report())
+        assert results.violations_count == 0, results.generate_report()
 
         if require_unique_link_text:
             links = self.page.get_by_role("link").or_(
@@ -151,7 +150,7 @@ class SystemTestCase(TestCase):
 
             duplicates = {k: v for k, v in counter.items() if v > 1}
 
-            self.assertEqual(len(duplicates), 0, duplicates)
+            assert len(duplicates) == 0, duplicates
 
     def page_title_components(self):
         return self.page.title().split(" – ")

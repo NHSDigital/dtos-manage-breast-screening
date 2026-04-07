@@ -16,12 +16,8 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 from ..system_test_setup import SystemTestCase
 
 
+@pytest.mark.usefixtures("known_datetime")
 class TestRoleChangePermissions(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
-        self.clinic_start_time = today
-
     def test_changing_role_to_clinical_grants_ability_to_start_appointments(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_a_clinic_exists_that_is_run_by_my_provider()
@@ -38,8 +34,9 @@ class TestRoleChangePermissions(SystemTestCase):
 
     def and_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
+        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
         self.clinic = ClinicFactory(
-            starts_at=self.clinic_start_time,
+            starts_at=today,
             setting__provider=user_assignment.provider,
             risk_type=Clinic.RiskType.ROUTINE_RISK,
         )

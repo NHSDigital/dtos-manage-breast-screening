@@ -123,15 +123,12 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
 
     def and_the_appointment_is_updated(self):
         self.appointment.refresh_from_db()
-        self.assertEqual(
-            self.appointment.current_status.name,
-            AppointmentStatusNames.ATTENDED_NOT_SCREENED,
+        assert (
+            self.appointment.current_status.name
+            == AppointmentStatusNames.ATTENDED_NOT_SCREENED
         )
-        self.assertEqual(self.appointment.reinvite, True)
-        self.assertEqual(
-            self.appointment.stopped_reasons,
-            {
-                "stopped_reasons": ["failed_identity_check", "other"],
-                "other_details": "Explain other choice",
-            },
-        )
+        assert self.appointment.reinvite
+        assert self.appointment.stopped_reasons == {
+            "stopped_reasons": ["failed_identity_check", "other"],
+            "other_details": "Explain other choice",
+        }

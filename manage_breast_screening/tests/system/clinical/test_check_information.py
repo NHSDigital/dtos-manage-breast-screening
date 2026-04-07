@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, timezone
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -25,11 +24,6 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestCheckInformation(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
-        self.clinic_start_time = today
-
     def test_check_information(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
@@ -232,8 +226,9 @@ class TestCheckInformation(SystemTestCase):
 
     def and_there_is_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
+        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
         self.clinic = ClinicFactory(
-            starts_at=self.clinic_start_time,
+            starts_at=today,
             setting__name="West London BSS",
             setting__provider=user_assignment.provider,
             risk_type=Clinic.RiskType.ROUTINE_RISK,
