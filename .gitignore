@@ -45,3 +45,4 @@ manage_breast_screening/data/dicom
 
 # Test reports
 reports/
+test-results/
