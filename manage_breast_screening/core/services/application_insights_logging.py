@@ -2,8 +2,8 @@ import logging
 import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
-from opentelemetry.instrumentation.psycopg import PsycopgInstrumentor
 from opentelemetry.instrumentation.django import DjangoInstrumentor
+from opentelemetry.instrumentation.psycopg import PsycopgInstrumentor
 from opentelemetry.sdk.trace.sampling import ALWAYS_ON, ParentBased, TraceIdRatioBased
 from opentelemetry.trace.span import TraceState
 from opentelemetry.util.types import Attributes
