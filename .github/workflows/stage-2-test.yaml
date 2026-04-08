@@ -90,6 +90,18 @@ jobs:
       - name: Install dependencies
         run: make dependencies
 
+      - name: Check for missing migrations
+        run: |
+          if ! uv run manage.py makemigrations --check --dry-run; then
+            echo "Error: makemigrations check failed! Failing build!"
+            exit 1
+          fi
+        env:
+          DATABASE_NAME: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_USER: postgres
+          DATABASE_HOST: localhost
+
       - name: 'Run unit test suite'
         run: make test-unit
         env:
