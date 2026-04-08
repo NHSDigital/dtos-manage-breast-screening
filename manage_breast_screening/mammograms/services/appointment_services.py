@@ -1,5 +1,7 @@
 import logging
 
+from django.db.models import Q
+
 from manage_breast_screening.participants.models.appointment import (
     AppointmentMachine,
     AppointmentStatusNames,
@@ -7,6 +9,8 @@ from manage_breast_screening.participants.models.appointment import (
 )
 
 logger = logging.getLogger(__name__)
+
+StepNames = AppointmentWorkflowStepCompletion.StepNames
 
 
 class AppointmentStatusUpdater:
@@ -123,7 +127,7 @@ class AppointmentWorkflowService:
 
     def is_identity_confirmed_by_user(self):
         result = self.appointment.completed_workflow_steps.filter(
-            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            step_name=StepNames.CONFIRM_IDENTITY,
             created_by=self.current_user,
         ).exists()
 
@@ -133,9 +137,12 @@ class AppointmentWorkflowService:
 
     def get_completed_steps(self):
         step_names = set(
-            self.appointment.completed_workflow_steps.values_list(
-                "step_name", flat=True
-            ).distinct()
+            self.appointment.completed_workflow_steps.filter(
+                Q(created_by=self.current_user)
+                | ~Q(step_name=StepNames.CONFIRM_IDENTITY)
+            )
+            .values_list("step_name", flat=True)
+            .distinct()
         )
 
         logger.info(f"Completed steps for {self.current_user.pk}: {step_names}")
