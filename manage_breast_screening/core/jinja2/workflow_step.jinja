@@ -1,4 +1,4 @@
-{% extends 'layout-app.jinja' %}
+{% extends "layout-app.jinja" %}
 {% from 'nhsuk/components/button/macro.jinja' import button %}
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'django_form_helpers.jinja' import form_error_summary %}
@@ -70,7 +70,7 @@
                       "text": continue_button_text|default("Continue")
                     }) }}
 
-                    {{csrf_input}}
+                    {{ csrf_input }}
                   </div>
               </div>
             </form>

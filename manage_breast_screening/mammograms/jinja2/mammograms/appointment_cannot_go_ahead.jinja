@@ -13,7 +13,7 @@
   {% set inset_html %}
     <p>
       <a class="nhsuk-link nhsuk-link--no-visited-state" 
-         href="{{ url('mammograms:add_previous_mammogram', kwargs={"pk": presented_appointment.pk}) }}?return_url={{request.path}}{{('?return_url=' ~ return_url) | urlencode }}">
+         href="{{ url('mammograms:add_previous_mammogram', kwargs={"pk": presented_appointment.pk}) }}?return_url={{ request.path }}{{ ('?return_url=' ~ return_url) | urlencode }}">
         Add details of a previous mammogram</a>
       if the appointment is being stopped because the participant has recently had one
     </p>

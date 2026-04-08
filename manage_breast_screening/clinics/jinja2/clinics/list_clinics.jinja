@@ -1,4 +1,4 @@
-{% extends 'layout-app.jinja' %}
+{% extends "layout-app.jinja" %}
 
 {% from 'nhsuk/components/tag/macro.jinja' import tag %}
 {% from 'components/count/macro.jinja' import app_count %}
@@ -56,7 +56,7 @@
         </a>
       </td>
       <td>{{ presented_clinic.starts_at | no_wrap }}<br>
-        {{presented_clinic.time_range | as_hint }}
+        {{ presented_clinic.time_range | as_hint }}
       </td>
       <td class="nhsuk-table__cell--numeric">
         {{ presented_clinic.number_of_slots }}
@@ -65,7 +65,7 @@
         {{ tag({
         "html": presented_clinic.state.text | no_wrap,
         "classes": presented_clinic.state.classes
-        })}}
+        }) }}
       </td>
     </tr>
     {% endfor %}
