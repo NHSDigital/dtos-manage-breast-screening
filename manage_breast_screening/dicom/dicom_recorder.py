@@ -64,13 +64,28 @@ class DicomRecorder:
             },
         )
 
+        laterality = getattr(ds, "ImageLaterality", "")
+        view_position = getattr(ds, "ViewPosition", "")
+
+        if series.images.count() > 0:
+            series_laterality = series.images.first().laterality
+            series_view_position = series.images.first().view_position
+
+            if laterality != series_laterality or view_position != series_view_position:
+                raise DicomProcessingError(
+                    f"Inconsistent laterality and view position for series {series_uid}: "
+                    f"existing images have laterality={series_laterality} and "
+                    f"view_position={series_view_position}, but new image has "
+                    f"laterality={laterality} and view_position={view_position}."
+                )
+
         image, created = Image.objects.get_or_create(
             sop_instance_uid=sop_uid,
             series=series,
             defaults={
                 "instance_number": getattr(ds, "InstanceNumber", None),
-                "laterality": getattr(ds, "ImageLaterality", ""),
-                "view_position": getattr(ds, "ViewPosition", ""),
+                "laterality": laterality,
+                "view_position": view_position,
                 "implant_present": getattr(ds, "BreastImplantPresent", "").upper()
                 == "YES",
             },
