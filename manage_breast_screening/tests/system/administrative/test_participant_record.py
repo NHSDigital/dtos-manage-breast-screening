@@ -15,12 +15,14 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 
+@pytest.mark.system
 @pytest.mark.usefixtures("known_datetime", "live_server")
 @scenario("features/participant_record.feature", "Viewing the participant record")
 def test_viewing_participant_record_from_an_appointment():
     pass
 
 
+@pytest.mark.system
 @pytest.mark.usefixtures("live_server")
 @scenario("features/participant_record.feature", "Accessibility check")
 def test_accessibility():
