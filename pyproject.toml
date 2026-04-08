@@ -79,6 +79,7 @@ markers = [
   "skip_insights_mock: don't auto use the mock_insights_logging fixture",
 ]
 xfail_strict = true
+testpaths = ["manage_breast_screening/**/tests"]
 
 [tool.ruff]
 exclude = ["*/migrations/*.py"]
