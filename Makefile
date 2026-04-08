@@ -117,8 +117,9 @@ test-lint: # Lint files @Testing
 test-lint-templates: # Lint just the templates @Testing
 	uv run djlint -e jinja --lint --profile jinja manage_breast_screening
 
+# run with ARGS="--tracing on" to record a trace for each test and save to test-results/trace.zip
 test-ui: # Run UI tests @Testing
-	uv run pytest -m system --junit-xml=reports/test-ui.xml
+	uv run pytest -m system --junit-xml=reports/test-ui.xml $(ARGS)
 
 # ---------------------------------------------------------------------------
 # Build & Deploy

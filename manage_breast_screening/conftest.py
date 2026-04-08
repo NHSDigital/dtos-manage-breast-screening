@@ -1,3 +1,5 @@
+from datetime import datetime
+from datetime import timezone as tz
 from types import SimpleNamespace
 from unittest import TestCase
 
@@ -107,3 +109,14 @@ def superuser_client(superuser, current_provider):
     return SimpleNamespace(
         http=client, current_provider=current_provider, user=superuser
     )
+
+
+@pytest.fixture
+def known_datetime(time_machine):
+    """
+    Eliminate non-determinism caused by the current time, due to things
+    like the display of relative dates.
+    """
+    dt = datetime(2025, 1, 1, 10, tzinfo=tz.utc)
+    time_machine.move_to(dt)
+    return dt

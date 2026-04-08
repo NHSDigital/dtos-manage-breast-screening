@@ -171,7 +171,7 @@ jobs:
         run: uv run playwright install chromium --with-deps --only-shell
 
       - name: 'Run Playwright system tests'
-        run: make test-ui
+        run: make test-ui ARGS="--tracing on"
         env:
           DATABASE_NAME: postgres
           DATABASE_PASSWORD: postgres
@@ -185,6 +185,14 @@ jobs:
           name: UI tests
           path: reports/test-ui.xml
           reporter: python-xunit
+
+      - uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        if: ${{ !cancelled() }} # run this step even if previous step failed
+        with:
+          name: playwright-traces
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
   test-lint:
     name: 'Linting'

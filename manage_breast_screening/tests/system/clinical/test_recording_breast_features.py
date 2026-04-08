@@ -1,6 +1,4 @@
-from datetime import date
-
-import time_machine
+import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -15,7 +13,7 @@ from manage_breast_screening.participants.tests.factories import (
 from manage_breast_screening.tests.system.system_test_setup import SystemTestCase
 
 
-@time_machine.travel(date(2025, 1, 1))
+@pytest.mark.usefixtures("known_datetime")
 class TestRecordingBreastFeatures(SystemTestCase):
     def test_recording_breast_features(self):
         self.given_i_am_logged_in_as_a_clinical_user()

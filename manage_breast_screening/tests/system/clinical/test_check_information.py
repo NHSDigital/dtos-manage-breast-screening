@@ -1,7 +1,6 @@
 import re
 from datetime import datetime, timezone
 
-import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -25,11 +24,6 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestCheckInformation(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self):
-        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
-        self.clinic_start_time = today
-
     def test_check_information(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_a_clinic_exists_that_is_run_by_my_provider()
@@ -148,8 +142,36 @@ class TestCheckInformation(SystemTestCase):
         self.page.get_by_role("button", name="Continue").click()
 
         # Images with count > 1 trigger the multiple images information form
-        for radio in self.page.locator("input[value='NO_REPEATS']").all():
-            radio.check()
+        self.page.locator("fieldset").filter(
+            has_text="3 RMLO images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="5 Right Eklund images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="2 LCC images were taken. Was the additional image a repeat?"
+        ).get_by_label(
+            "No, an extra image was needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="4 LMLO images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
+        self.page.locator("fieldset").filter(
+            has_text="6 Left Eklund images were taken. Were the additional images repeats?"
+        ).get_by_label(
+            "No, all extra images were needed to capture the complete view"
+        ).check()
+
         self.page.get_by_role("button", name="Continue").click()
 
         self.expect_url("mammograms:check_information", pk=self.appointment.pk)
@@ -232,8 +254,9 @@ class TestCheckInformation(SystemTestCase):
 
     def and_there_is_a_clinic_exists_that_is_run_by_my_provider(self):
         user_assignment = self.current_user.assignments.first()
+        today = datetime.now(timezone.utc).replace(hour=9, minute=0)
         self.clinic = ClinicFactory(
-            starts_at=self.clinic_start_time,
+            starts_at=today,
             setting__name="West London BSS",
             setting__provider=user_assignment.provider,
             risk_type=Clinic.RiskType.ROUTINE_RISK,

@@ -16,13 +16,8 @@ from manage_breast_screening.participants.tests.factories import (
 from ..system_test_setup import SystemTestCase
 
 
+@pytest.mark.usefixtures("known_datetime")
 class TestParticipantRecord(SystemTestCase):
-    @pytest.fixture(autouse=True)
-    def before(self, time_machine):
-        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
-
-        time_machine.move_to(datetime(2025, 1, 1, 10, tzinfo=tz.utc))
-
     def test_viewing_participant_record_from_an_appointment(self):
         self.given_i_am_logged_in_as_an_administrative_user()
         self.and_the_participant_has_an_upcoming_appointment()
@@ -40,6 +35,7 @@ class TestParticipantRecord(SystemTestCase):
         self.then_the_accessibility_baseline_is_met()
 
     def and_the_participant_has_an_upcoming_appointment(self):
+        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
         clinic_slot = ClinicSlotFactory(
             starts_at=datetime(2025, 1, 2, 11, tzinfo=tz.utc),
             clinic__setting__provider=self.current_provider,
