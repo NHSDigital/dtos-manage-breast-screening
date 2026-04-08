@@ -9,8 +9,8 @@ from ..oauth import (
     _log_response,
     cis2_redirect_uri,
     get_cis2_client,
-    jwk_from_public_key,
     oauth,
+    public_jwk_from_rsa_private_key,
 )
 
 
@@ -30,11 +30,6 @@ class TestGetCIS2Client:
     @override_settings(CIS2_CLIENT_PRIVATE_KEY=None)
     def test_raises_when_private_key_missing(self):
         with pytest.raises(ValueError, match="CIS2_CLIENT_PRIVATE_KEY"):
-            get_cis2_client()
-
-    @override_settings(CIS2_CLIENT_PUBLIC_KEY=None)
-    def test_raises_when_public_key_missing(self):
-        with pytest.raises(ValueError, match="CIS2_CLIENT_PUBLIC_KEY"):
             get_cis2_client()
 
     @override_settings(CIS2_SERVER_METADATA_URL=None)
@@ -79,19 +74,26 @@ class TestCIS2RedirectUri:
         assert uri == "https://example.com/auth/cis2/callback"
 
 
-class TestJwkFromPublicKey:
-    def test_returns_jwk_from_configured_public_key(self):
-        jwk = jwk_from_public_key()
+class TestJwkFromPrivateKey:
+    def test_returns_public_jwk_from_configured_private_key(self):
+        jwk = public_jwk_from_rsa_private_key()
 
         assert jwk is not None
         assert jwk.as_dict()["kty"] == "RSA"
 
     def test_jwk_has_thumbprint(self):
-        jwk = jwk_from_public_key()
+        jwk = public_jwk_from_rsa_private_key()
 
         thumbprint = jwk.thumbprint()
         assert isinstance(thumbprint, str)
         assert len(thumbprint) > 0
+
+    def test_jwk_does_not_contain_private_components(self):
+        jwk = public_jwk_from_rsa_private_key()
+
+        jwk_dict = jwk.as_dict()
+        for private_field in ("d", "p", "q", "dp", "dq", "qi"):
+            assert private_field not in jwk_dict
 
 
 class TestCustomPrivateKeyJWT:

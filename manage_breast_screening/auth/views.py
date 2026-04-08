@@ -24,7 +24,7 @@ from manage_breast_screening.core.decorators import (
     current_provider_exempt,
 )
 
-from .oauth import cis2_redirect_uri, get_cis2_client, jwk_from_public_key
+from .oauth import cis2_redirect_uri, get_cis2_client, public_jwk_from_rsa_private_key
 from .services import InvalidLogoutToken, decode_logout_token
 
 logger = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ def cis2_callback(request):
 def jwks(request):
     """Publish JSON Web Key Set (JWKS) with the public key used for private_key_jwt."""
     try:
-        jwk = jwk_from_public_key()
+        jwk = public_jwk_from_rsa_private_key()
         if not jwk:
             return JsonResponse({"keys": []})
         # Use the thumbprint as the KID
