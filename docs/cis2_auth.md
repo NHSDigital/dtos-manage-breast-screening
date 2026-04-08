@@ -12,7 +12,7 @@ The CIS2 client is implemented in `manage_breast_screening/auth/oauth.py` using 
 
 - **`get_cis2_client()`** - Returns a configured OAuth client for CIS2
 - **`CustomPrivateKeyJWT`** - Custom JWT signing class that allows configurable expiration times
-- **`jwk_from_public_key()`** - Converts our public key PEM to a JSON Web Key format
+- **`jwk_from_private_key()`** - Derives the public JSON Web Key from the private key PEM
 
 ### Authentication Flow
 
@@ -30,7 +30,7 @@ The complete authentication process is in `manage_breast_screening/auth/views.py
 At the token request stage of the authentication flow, the client authenticates using private key JWT:
 
 1. Creates a JWT signed with our private key
-2. Includes the key ID (thumbprint of our public key) in the JWT header
+2. Includes the key ID (thumbprint derived from the private key's public components) in the JWT header
 3. Sends this JWT to CIS2's token endpoint for authentication
 4. CIS2 validates the JWT using our published public key (see [JWKS Endpoint](#jwks-endpoint))
 
@@ -40,8 +40,7 @@ The following settings in `manage_breast_screening/config/settings.py` provide t
 
 - **`CIS2_SERVER_METADATA_URL`** - URL to CIS2's OpenID Connect discovery document
 - **`CIS2_CLIENT_ID`** - Client identifier registered with CIS2
-- **`CIS2_CLIENT_PRIVATE_KEY`** - RSA private key in PEM format for JWT signing (supports `\n` escaped newlines)
-- **`CIS2_CLIENT_PUBLIC_KEY`** - Corresponding RSA public key in PEM format (supports `\n` escaped newlines)
+- **`CIS2_CLIENT_PRIVATE_KEY`** - RSA private key in PEM format for JWT signing (supports `\n` escaped newlines); the public key is derived from this automatically
 - **`CIS2_SCOPES`** - OAuth scopes requested
 - **`BASE_URL`** - Base URL for building absolute URLs (specifically for OAuth callbacks)
 

@@ -321,11 +321,6 @@ private_key_inline = environ.get("CIS2_CLIENT_PRIVATE_KEY")
 CIS2_CLIENT_PRIVATE_KEY = (
     private_key_inline.replace("\\n", "\n") if private_key_inline else None
 )
-# Load the public key used for public_key_jwt from environment (PEM format). Newlines may be provided as \n.
-public_key_inline = environ.get("CIS2_CLIENT_PUBLIC_KEY")
-CIS2_CLIENT_PUBLIC_KEY = (
-    public_key_inline.replace("\\n", "\n") if public_key_inline else None
-)
 CIS2_SCOPES = "openid profile email nhsperson associatedorgs"
 CIS2_DEBUG = boolean_env("CIS2_DEBUG", default=False)
 # Sent to CIS2 authorization endpoint during auth process
