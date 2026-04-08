@@ -103,7 +103,7 @@ shell:
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	uv run pytest -n auto -m 'not system' --ignore scripts/python/smoke_test --cov --cov-report term-missing:skip-covered --junit-xml=reports/test-python-units.xml
+	uv run pytest --numprocesses auto -m 'not system' --ignore scripts/python/smoke_test --cov --cov-report term-missing:skip-covered --junit-xml=reports/test-python-units.xml
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing
@@ -119,7 +119,7 @@ test-lint-templates: # Lint just the templates @Testing
 
 # run with ARGS="--tracing on" to record a trace for each test and save to test-results/trace.zip
 test-ui: # Run UI tests @Testing
-	uv run pytest -n auto --reuse-db -m system --junit-xml=reports/test-ui.xml $(ARGS)
+	uv run pytest --numprocesses auto --reuse-db -m system --junit-xml=reports/test-ui.xml $(ARGS)
 
 # ---------------------------------------------------------------------------
 # Build & Deploy
