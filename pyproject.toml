@@ -43,6 +43,7 @@ dependencies = [
   "jsonschema>=4.26.0",
   "django-csp>=4.0",
   "opentelemetry-instrumentation-psycopg>=0.60b0",
+  "opentelemetry-instrumentation-django>=0.60b0",
 ]
 
 [dependency-groups]

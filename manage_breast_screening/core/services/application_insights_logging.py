@@ -3,6 +3,7 @@ import os
 
 from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry.instrumentation.psycopg import PsycopgInstrumentor
+from opentelemetry.instrumentation.django import DjangoInstrumentor
 from opentelemetry.sdk.trace.sampling import ALWAYS_ON, ParentBased, TraceIdRatioBased
 from opentelemetry.trace.span import TraceState
 from opentelemetry.util.types import Attributes
@@ -38,6 +39,8 @@ class ApplicationInsightsLogging:
             # APPLICATIONINSIGHTS_CONNECTION_STRING environment variable.
             configure_azure_monitor(sampler=_HealthCheckSampler())
             PsycopgInstrumentor().instrument(capture_parameters=True)
+            # DjangoInstrumentor().instrument(exclude_urls=["/healthcheck"])
+            DjangoInstrumentor().instrument()
         else:
             default_logger = logging.getLogger(__name__)
             default_logger.info("Application Insights logging not enabled")
