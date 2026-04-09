@@ -130,15 +130,14 @@ class Appointment(BaseModel):
         if prefetched_current_status:
             return prefetched_current_status[0]
 
-        statuses = list(self.statuses.order_by("-created_at").all())
-        if not statuses:
+        status = self.statuses.order_by("-created_at").first()
+        if status is None:
             status = AppointmentStatus()
             logger.info(
                 f"Appointment {self.pk} has no statuses. Assuming {status.name}"
             )
-            return status
 
-        return statuses[0]
+        return status
 
     @property
     def active(self):
