@@ -130,13 +130,13 @@ class Migration(migrations.Migration):
                 default=uuid.uuid4, editable=False, primary_key=True, serialize=False
             ),
         ),
-        migrations.AddField(
-            model_name="screeningepisode",
-            name="participant",
-            field=models.ForeignKey(
-                on_delete=models.deletion.CASCADE, to="participants.participant"
-            ),
-        ),
+        # migrations.AddField(
+        #     model_name="screeningepisode",
+        #     name="participant",
+        #     field=models.ForeignKey(
+        #         on_delete=models.deletion.CASCADE, to="participants.participant"
+        #     ),
+        # ),
         migrations.AddField(
             model_name="appointment",
             name="id",
