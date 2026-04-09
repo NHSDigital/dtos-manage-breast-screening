@@ -35,6 +35,10 @@ class TestDicomRecorder:
         return str(uuid.uuid4())
 
     def test_get_or_create_records(self, source_message_id, dataset, gateway_action):
+        """
+        Test that when a valid DICOM file is processed, the correct Study, Series, and Image records
+        are created with the expected attributes, and that the DICOM and JPEG files are stored correctly.
+        """
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
                 temp_file.name, dataset, write_like_original=False
@@ -73,6 +77,10 @@ class TestDicomRecorder:
     def test_get_or_create_records_duplicate(
         self, source_message_id, dataset, gateway_action
     ):
+        """
+        Test that if a DICOM file with the same SOPInstanceUID is processed again,
+        it returns the existing records instead of creating new ones.
+        """
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
                 temp_file.name, dataset, write_like_original=False
@@ -91,9 +99,40 @@ class TestDicomRecorder:
                     image,
                 )
 
+    def test_get_or_create_records_invalid_laterality_and_view_position(
+        self, source_message_id, dataset, gateway_action
+    ):
+        """
+        Test that if a series already has an image with a certain laterality and view position,
+        then adding another image with a different laterality and view position raises an error.
+        """
+        dataset.ImageLaterality = "L"
+        dataset.ViewPosition = "CC"
+
+        with tempfile.NamedTemporaryFile() as temp_file:
+            pydicom.filewriter.dcmwrite(
+                temp_file.name, dataset, write_like_original=False
+            )
+            with open(temp_file.name, "rb") as dicom_file:
+                DicomRecorder.get_or_create_records(source_message_id, dicom_file)
+
+        dataset.ImageLaterality = "R"
+        dataset.ViewPosition = "MLO"
+
+        with tempfile.NamedTemporaryFile() as temp_file:
+            pydicom.filewriter.dcmwrite(
+                temp_file.name, dataset, write_like_original=False
+            )
+            with open(temp_file.name, "rb") as dicom_file:
+                with pytest.raises(DicomProcessingError):
+                    DicomRecorder.get_or_create_records(source_message_id, dicom_file)
+
     def test_get_or_create_records_invalid_dicom(
         self, source_message_id, gateway_action
     ):
+        """
+        Test that if the DICOM file is invalid (e.g. missing required attributes), it raises an error.
+        """
         with tempfile.NamedTemporaryFile() as temp_file:
             invalid_ds = pydicom.Dataset()
             invalid_ds.transfer_syntax_uid = pydicom.uid.ExplicitVRLittleEndian
@@ -113,6 +152,9 @@ class TestDicomRecorder:
     def test_get_or_create_records_appointment_not_in_progress(
         self, source_message_id, dataset
     ):
+        """
+        Test that if the associated appointment is not in progress, it raises an error.
+        """
         GatewayActionFactory(
             id=source_message_id,
             appointment=AppointmentFactory(
@@ -139,6 +181,9 @@ class TestDicomRecorder:
     def test_get_or_create_implant_presence(
         self, source_message_id, dataset, gateway_action, cs_value, expected
     ):
+        """
+        Test that the BreastImplantPresent attribute is correctly interpreted as a boolean value.
+        """
         dataset.add_new("BreastImplantPresent", "CS", cs_value)
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(
