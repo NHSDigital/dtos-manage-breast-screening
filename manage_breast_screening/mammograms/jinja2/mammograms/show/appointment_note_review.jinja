@@ -24,7 +24,7 @@
       }) }}
       {% if form.instance_is_saved %}
         <p>
-          <a href="{{ url('mammograms:delete_appointment_note', kwargs={'pk': presented_appointment.pk}) }}?return_url={{ return_url}}" class="nhsuk-link nhsuk-link--no-visited-state app-link app-link--warning">
+          <a href="{{ url('mammograms:delete_appointment_note', kwargs={'pk': presented_appointment.pk}) }}?return_url={{ return_url }}" class="nhsuk-link nhsuk-link--no-visited-state app-link app-link--warning">
             Delete appointment note
           </a>
         </p>

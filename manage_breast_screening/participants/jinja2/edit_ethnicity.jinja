@@ -1,4 +1,4 @@
-{% extends 'layout-form.jinja' %}
+{% extends "layout-form.jinja" %}
 {% from 'nhsuk/components/radios/macro.jinja' import radios %}
 {% from 'nhsuk/components/button/macro.jinja' import button %}
 {% from 'nhsuk/components/fieldset/macro.jinja' import fieldset %}
@@ -8,7 +8,7 @@
 
   {% set hasErrors = form.errors %}
 
-  <div class="nhsuk-form-group {{"nhsuk-form-group--error" if hasErrors}}">
+  <div class="nhsuk-form-group {{ "nhsuk-form-group--error" if hasErrors }}">
     {% call fieldset({
       "legend": {
         "text": "How does " ~ participant.full_name ~ " describe their ethnicity?",

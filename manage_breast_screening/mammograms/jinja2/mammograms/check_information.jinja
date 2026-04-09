@@ -1,4 +1,4 @@
-{% extends 'workflow_step.jinja' %}
+{% extends "workflow_step.jinja" %}
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 {% from "components/participant-details/summary_list_rows.jinja" import ethnicity_html %}
@@ -38,7 +38,6 @@
   {{ images_taken_card(presented_images) }}
   {{ appointment_details_card(presented_appointment, return_url) }}
 {% endblock %}
-
 
 {% block wizard_form %}
   <form action="{{ url('mammograms:complete_screening', kwargs={'pk': presented_appointment.pk}) }}" method="post" novalidate>

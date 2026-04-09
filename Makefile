@@ -110,9 +110,7 @@ test-lint: # Lint files @Testing
 	npm run lint
 	uv run ruff check manage_breast_screening
 	uv run python scripts/lint_model_usage_in_views.py
-
-	# Enable this once we have fixed all the issues
-	# make test-lint-templates
+	make test-lint-templates
 
 test-lint-templates: # Lint just the templates @Testing
 	uv run djlint -e jinja --lint --profile jinja manage_breast_screening

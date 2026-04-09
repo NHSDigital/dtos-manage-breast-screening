@@ -10,7 +10,7 @@
 
       <span class="nhsuk-caption-l">{{ caption }}</span>
 
-      <form action="{{request.path}}" method="post" novalidate>
+      <form action="{{ request.path }}" method="post" novalidate>
         {{ csrf_input }}
 
         {{ form.details.as_field_group() }}

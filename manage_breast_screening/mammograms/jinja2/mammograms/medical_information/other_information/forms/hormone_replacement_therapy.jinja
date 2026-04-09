@@ -11,7 +11,7 @@
 
       <span class="nhsuk-caption-l">{{ caption }}</span>
 
-      <form action="{{request.path}}" method="POST" novalidate>
+      <form action="{{ request.path }}" method="post" novalidate>
         {{ csrf_input }}
 
         {% set stopped_recently_html %}

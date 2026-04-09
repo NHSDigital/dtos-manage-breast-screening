@@ -1,4 +1,4 @@
-{% extends 'layout-app.jinja' %}
+{% extends "layout-app.jinja" %}
 
 {% from 'nhsuk/components/back-link/macro.jinja' import backLink %}
 {% from 'nhsuk/components/tables/macro.jinja' import table %}
@@ -26,7 +26,7 @@
         {{ tag({
             "html": presented_clinic.state.text | no_wrap,
             "classes": presented_clinic.state.classes,
-        })}}
+        }) }}
       </div>
   </h1>
   <p>{{ presented_clinic.time_range }} - {{ presented_clinic.starts_at }}</p>
@@ -75,7 +75,7 @@
         app_appointment_status(presented_appointment)
       }}
       {% if presented_appointment.status_attribution %}
-      <p class="nhsuk-u-secondary-text-colour">{{ presented_appointment.status_attribution }} {{presented_appointment.attribution_user_check(request.user)}}</p>
+      <p class="nhsuk-u-secondary-text-colour">{{ presented_appointment.status_attribution }} {{ presented_appointment.attribution_user_check(request.user) }}</p>
       {% endif %}
       <p class="nhsuk-u-margin-top-2 nhsuk-u-margin-bottom-0 app-u-nowrap">
         <a href="{{ url('mammograms:show_appointment', kwargs={"pk": presented_appointment.pk}) }}" class="nhsuk-link">

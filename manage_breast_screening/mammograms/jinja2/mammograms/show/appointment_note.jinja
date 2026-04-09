@@ -1,4 +1,4 @@
-{% extends 'layout-appointment.jinja' %}
+{% extends "layout-appointment.jinja" %}
 {% from 'nhsuk/components/button/macro.jinja' import button %}
 {% from 'nhsuk/components/inset-text/macro.jinja' import insetText %}
 
@@ -18,7 +18,7 @@
       "html": inset_html
     }) }}
 
-    <form action="{{ request.path }}" method="POST" novalidate>
+    <form action="{{ request.path }}" method="post" novalidate>
       {{ csrf_input }}
       <input type="hidden" name="return_url" value="{{ return_url }}">
       {{ form.content.as_field_group() }}
@@ -29,7 +29,7 @@
         }) }}
         {% if form.instance_is_saved %}
           <p>
-            <a href="{{ url('mammograms:delete_appointment_note', kwargs={'pk': presented_appointment.pk}) }}?return_url={{ return_url}}" class="nhsuk-link app-link app-link--warning">
+            <a href="{{ url('mammograms:delete_appointment_note', kwargs={'pk': presented_appointment.pk}) }}?return_url={{ return_url }}" class="nhsuk-link app-link app-link--warning">
               Delete appointment note
             </a>
           </p>
