@@ -118,9 +118,12 @@ class TestGatewayImageDetailsForm:
                     {
                         "rmlo_count": 0,
                         "rcc_count": 0,
-                        "right_eklund_count": 0,
+                        "rccid_count": 0,
+                        "rmloid_count": 0,
                         "lmlo_count": 1,
                         "lcc_count": 0,
+                        "lccid_count": 0,
+                        "lmloid_count": 0,
                         "left_eklund_count": 0,
                         "not_all_mammograms_taken": True,
                         "reasons_incomplete": [
@@ -162,10 +165,12 @@ class TestGatewayImageDetailsForm:
                     {
                         "rmlo_count": 0,
                         "rcc_count": 0,
-                        "right_eklund_count": 0,
+                        "rccid_count": 0,
+                        "rmloid_count": 0,
                         "lmlo_count": 1,
                         "lcc_count": 0,
-                        "left_eklund_count": 0,
+                        "lccid_count": 0,
+                        "lmloid_count": 0,
                         "not_all_mammograms_taken": True,
                         "reasons_incomplete": [
                             IncompleteImagesReason.UNABLE_TO_SCAN_TISSUE
@@ -199,9 +204,12 @@ class TestGatewayImageDetailsForm:
                     {
                         "rmlo_count": 1,
                         "rcc_count": 1,
-                        "right_eklund_count": 0,
+                        "rccid": 0,
+                        "rmloid": 0,
                         "lmlo_count": 0,
                         "lcc_count": 1,
+                        "lccid": 0,
+                        "lmloid": 0,
                         "left_eklund_count": 0,
                         "not_all_mammograms_taken": False,
                         "reasons_incomplete": [],
@@ -227,10 +235,12 @@ class TestGatewayImageDetailsForm:
                     {
                         "rmlo_count": 1,
                         "rcc_count": 1,
-                        "right_eklund_count": 0,
+                        "rccid": 0,
+                        "rmloid": 0,
                         "lmlo_count": 1,
                         "lcc_count": 0,
-                        "left_eklund_count": 0,
+                        "lccid": 0,
+                        "lmloid": 0,
                         "not_all_mammograms_taken": True,
                         "reasons_incomplete": [],
                         "reasons_incomplete_details": "",
@@ -267,6 +277,8 @@ class TestGatewayImageDetailsForm:
             "imperfect_but_best_possible": False,
             "lmlo_count": 1,
             "lcc_count": 0,
+            "lccid_count": 0,
+            "lmloid_count": 0,
             "not_all_mammograms_taken": True,
             "reasons_incomplete": [
                 IncompleteImagesReason.TECHNICAL_ISSUES,
@@ -274,5 +286,7 @@ class TestGatewayImageDetailsForm:
             "reasons_incomplete_details": "",
             "rmlo_count": 1,
             "rcc_count": 0,
+            "rccid_count": 0,
+            "rmloid_count": 0,
             "should_recall": GatewayImageDetailsForm.RecallChoices.TO_BE_RECALLED,
         }

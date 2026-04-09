@@ -52,7 +52,16 @@ class StudyService:
     def images_by_laterality_and_view(
         images: list["Image"],
     ) -> dict[str, list["Image"]]:
-        grouped_images = {"LCC": [], "LMLO": [], "RCC": [], "RMLO": []}
+        grouped_images = {
+            "LCC": [],
+            "LMLO": [],
+            "LCCID": [],
+            "LMLOID": [],
+            "RCC": [],
+            "RMLO": [],
+            "RCCID": [],
+            "RMLOID": [],
+        }
         for image in images:
             laterality_and_view = image.laterality_and_view()
             if laterality_and_view in grouped_images:
@@ -63,9 +72,7 @@ class StudyService:
     def image_counts_by_laterality_and_view(
         images: list["Image"],
     ) -> dict[str, int]:
-        counts = {"LCC": 0, "LMLO": 0, "RCC": 0, "RMLO": 0}
-        for image in images:
-            laterality_and_view = image.laterality_and_view()
-            if laterality_and_view in counts:
-                counts[laterality_and_view] += 1
-        return counts
+        return {
+            k: len(v)
+            for k, v in __class__.images_by_laterality_and_view(images).items()
+        }
