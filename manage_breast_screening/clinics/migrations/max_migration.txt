@@ -1,1 +1,1 @@
-0021_alter_clinicstatus_options
+0001_squashed_0021_alter_clinicstatus_options

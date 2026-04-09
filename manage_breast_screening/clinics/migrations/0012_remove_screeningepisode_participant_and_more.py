@@ -7,18 +7,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("clinics", "0011_recreate_participants_linkage"),
-        ("participants", "0010_screeningepisode_appointment"),
+        #("participants", "0010_screeningepisode_appointment"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="screeningepisode",
-            name="participant",
-        ),
-        migrations.DeleteModel(
-            name="Appointment",
-        ),
-        migrations.DeleteModel(
-            name="ScreeningEpisode",
-        ),
+        # migrations.RemoveField(
+        #     model_name="screeningepisode",
+        #     name="participant",
+        # ),
+        # migrations.DeleteModel(
+        #     name="Appointment",
+        # ),
+        # migrations.DeleteModel(
+        #     name="ScreeningEpisode",
+        # ),
     ]
