@@ -34,6 +34,8 @@ DEBUG = boolean_env("DEBUG", default=False)
 
 DJANGO_ENV = environ.get("DJANGO_ENV", "production")
 
+IS_PRODUCTION = DJANGO_ENV == "production"
+
 ALLOWED_HOSTS = list_env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = list_env("CSRF_TRUSTED_ORIGINS")
 
@@ -74,7 +76,7 @@ INSTALLED_APPS = [
     "csp",
 ]
 
-if DJANGO_ENV != "production":
+if not IS_PRODUCTION:
     INSTALLED_APPS.append("manage_breast_screening.nonprod")
 
 MIDDLEWARE = [
@@ -176,7 +178,7 @@ DATABASES = {
 }
 
 
-if DJANGO_ENV != "production":
+if not IS_PRODUCTION:
     if environ.get("BLOB_STORAGE_CONNECTION_STRING"):
         # Use connection string if provided (e.g., in local development using Azurite)
         dicom_storage_options = {
