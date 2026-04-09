@@ -29,6 +29,7 @@ from ...participants.presenters import ParticipantPresenter, status_colour
 class AppointmentPresenter:
     def __init__(self, appointment, tab_description="Appointment details"):
         self._appointment = appointment
+        self._current_status = appointment.current_status
         self.tab_description = tab_description
 
         self.allStatuses = AppointmentStatus
@@ -44,6 +45,10 @@ class AppointmentPresenter:
             if self.is_special_appointment
             else None
         )
+
+    @cached_property
+    def appointment_machine(self):
+        return AppointmentMachine.from_appointment(self._appointment)
 
     @cached_property
     def participant_url(self):
@@ -168,11 +173,11 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_made_special(self):
-        return not self.is_special_appointment and self._appointment.active
+        return not self.is_special_appointment and self.active
 
     @cached_property
     def can_be_checked_in(self):
-        return AppointmentMachine.from_appointment(self._appointment).can("check_in")
+        return self.appointment_machine.can("check_in")
 
     @cached_property
     def active(self):
@@ -181,7 +186,7 @@ class AppointmentPresenter:
     def can_be_started_by(self, user):
         return user.has_perm(
             Permission.DO_MAMMOGRAM_APPOINTMENT, self._appointment
-        ) and AppointmentMachine.from_appointment(self._appointment).can("start")
+        ) and self.appointment_machine.can("start")
 
     def can_be_resumed_by(self, user):
         if not user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT, self._appointment):
@@ -190,9 +195,9 @@ class AppointmentPresenter:
         # Allow the same user to return to an appointment they have in progress
         # This will only happen if there is a technical problem and the
         # user loses their browsing context.
-        return AppointmentMachine.from_appointment(self._appointment).can(
+        return self.appointment_machine.can(
             "resume"
-        ) or self._appointment.current_status.is_in_progress_with(user)
+        ) or self._current_status.is_in_progress_with(user)
 
     @cached_property
     def special_appointment_tag_properties(self):
@@ -210,7 +215,7 @@ class AppointmentPresenter:
 
     @cached_property
     def current_status(self):
-        current_status = self._appointment.current_status
+        current_status = self._current_status
         colour = status_colour(current_status)
         display_text = current_status.get_name_display()
 
@@ -226,17 +231,15 @@ class AppointmentPresenter:
 
     @cached_property
     def status_attribution(self):
-        if self._appointment.current_status.is_in_progress():
-            return (
-                "with " + self._appointment.current_status.created_by.get_short_name()
-            )
-        elif self._appointment.current_status.is_final_status():
-            return "by " + self._appointment.current_status.created_by.get_short_name()
+        if self._current_status.is_in_progress():
+            return "with " + self._current_status.created_by.get_short_name()
+        elif self._current_status.is_final_status():
+            return "by " + self._current_status.created_by.get_short_name()
         else:
             return None
 
     def attribution_user_check(self, user):
-        if user.pk == self._appointment.current_status.created_by.pk:
+        if user.pk == self._current_status.created_by.pk:
             return " (you)"
         else:
             return ""
@@ -261,7 +264,7 @@ class StatusBarPresenter:
 
     def show_status_bar_for(self, user):
         # The appointment status bar should only display if the current user is the one that has the appointment 'in progress'
-        current_status = self.appointment._appointment.current_status
+        current_status = self.appointment._current_status
         return (
             current_status.is_in_progress()
             and user.nhs_uid == current_status.created_by.nhs_uid
