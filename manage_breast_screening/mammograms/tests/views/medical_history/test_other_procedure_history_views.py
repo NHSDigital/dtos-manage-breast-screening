@@ -11,11 +11,6 @@ from manage_breast_screening.participants.tests.factories import (
 )
 
 
-@pytest.fixture
-def history_item(in_progress_appointment):
-    return OtherProcedureHistoryItemFactory.create(appointment=in_progress_appointment)
-
-
 @pytest.mark.django_db
 class TestAddOtherProcedureView:
     def test_renders_response(self, clinical_user_client, in_progress_appointment):
