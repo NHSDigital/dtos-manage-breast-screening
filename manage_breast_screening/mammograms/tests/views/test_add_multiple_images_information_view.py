@@ -1,8 +1,12 @@
+from unittest.mock import patch
+
 import pytest
 from django.contrib.messages import get_messages
 from django.urls import reverse
 from pytest_django.asserts import assertInHTML, assertQuerySetEqual, assertRedirects
 
+import manage_breast_screening.dicom.tests.factories as dicom_factories
+from manage_breast_screening.gateway.tests.factories import GatewayActionFactory
 from manage_breast_screening.mammograms.forms.multiple_images_information_form import (
     MultipleImagesInformationForm,
 )
@@ -331,6 +335,49 @@ class TestAddMultipleImagesInformationView:
                 response,
                 reverse(
                     "mammograms:add_image_details",
+                    kwargs={"pk": in_progress_appointment.pk},
+                ),
+                fetch_redirect_response=False,
+            )
+
+        def test_stale_form_when_dicom_series_is_updated(
+            self, clinical_user_client, in_progress_appointment
+        ):
+            series = dicom_factories.SeriesFactory()
+            study = series.study
+            GatewayActionFactory(
+                id=study.source_message_id, appointment=in_progress_appointment
+            )
+            dicom_factories.ImageFactory.create_batch(
+                2, series=series, laterality="L", view_position="CC"
+            )
+
+            old_fingerprint = _fingerprint_for(study)
+
+            # Simulate the series changing (e.g., new DICOM images arrive)
+            dicom_factories.ImageFactory(
+                series=series, laterality="L", view_position="CC"
+            )
+
+            view_module_path = "manage_breast_screening.mammograms.views.add_multiple_images_information_view"
+
+            with patch(f"{view_module_path}.gateway_images_enabled", return_value=True):
+                # Submit with old fingerprint
+                response = clinical_user_client.http.post(
+                    reverse(
+                        "mammograms:add_multiple_images_information",
+                        kwargs={"pk": in_progress_appointment.pk},
+                    ),
+                    {
+                        "series_fingerprint": old_fingerprint,
+                        "lcc_repeat_type": RepeatType.NO_REPEATS.value,
+                    },
+                )
+
+            assertRedirects(
+                response,
+                reverse(
+                    "mammograms:gateway_images",
                     kwargs={"pk": in_progress_appointment.pk},
                 ),
                 fetch_redirect_response=False,
