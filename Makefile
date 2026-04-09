@@ -103,7 +103,7 @@ shell:
 test: test-unit test-ui test-lint # Run all tests @Testing
 
 test-unit: # Run unit tests @Testing
-	uv run pytest --numprocesses auto -m 'not system' --ignore scripts/python/smoke_test --cov --cov-report term-missing:skip-covered --junit-xml=reports/test-python-units.xml
+	uv run pytest --numprocesses auto -m 'not system' --ignore scripts/python/smoke_test --cov --cov-report term-missing:skip-covered --junit-xml=reports/test-python-units.xml $(ARGS)
 	npm test -- --coverage
 
 test-lint: # Lint files @Testing

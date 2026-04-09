@@ -1,4 +1,3 @@
-import inflect
 from django.conf import settings
 from django.templatetags.static import static
 from django.urls import reverse
@@ -15,6 +14,8 @@ from manage_breast_screening.core.template_helpers import (
 
 
 def environment(**options):
+    import inflect
+
     env = Environment(**options, extensions=["jinja2.ext.do"])
     if env.loader:
         env.loader = ChoiceLoader(
