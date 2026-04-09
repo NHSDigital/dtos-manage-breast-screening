@@ -22,8 +22,6 @@ CIS2_SERVER_METADATA_URL=changeme
 CIS2_CLIENT_ID=changeme
 # Private key in PEM format (paste a multiline string)
 CIS2_CLIENT_PRIVATE_KEY="paste-pem-private-key-here"
-# Public key in PEM format (paste a multiline string)
-CIS2_CLIENT_PUBLIC_KEY="paste-pem-public-key-here"
 # Toggle debug logging for CIS2
 CIS2_DEBUG=False
 # ACR values - determines which authentication options are available to users

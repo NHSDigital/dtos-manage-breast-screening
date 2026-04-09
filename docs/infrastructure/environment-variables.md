@@ -69,27 +69,17 @@ The metadata endpoint for the CIS2 auth server, used to fetch info for the OIDC 
 
 ## CIS2_CLIENT_PRIVATE_KEY [Secret]
 
-Private key in PEM format. Used to sign our JWTs during the auth flow with CIS2.
+Private key in PEM format. Used to sign our JWTs during the auth flow with CIS2. The public key is derived from this automatically — no separate public key setting is required.
 
 To rotate:
 
-- Run the following to generate a new key pair:
+- Run the following to generate a new private key:
 
   ```
-  openssl genrsa -out private.pem 2048
-
-  openssl rsa -in private.pem -pubout -out public.pem
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out cis2_private_key.pem
   ```
 
-- With these files created locally, update the key vault with the new private key, following the instructions for [multi-line secrets](deployment.md#multi-line-secrets).
-
-## CIS2_CLIENT_PUBLIC_KEY [Secret]
-
-Public key in PEM format. Used by CIS2to verify the signature of JWTs during the auth flow with CIS2.
-
-To rotate:
-
-- As above for the CIS2 private key, ensuring the public.pem file is used to update the key vault.
+- Update the key vault with the new private key, following the instructions for [multi-line secrets](deployment.md#multi-line-secrets).
 
 ## DATABASE_HOST
 
