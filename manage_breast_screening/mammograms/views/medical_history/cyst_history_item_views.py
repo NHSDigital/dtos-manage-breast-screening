@@ -1,21 +1,15 @@
-import logging
-
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from manage_breast_screening.core.models import get_object_or_none
 from manage_breast_screening.core.views.generic import (
     AddWithAuditView,
     DeleteWithAuditView,
     UpdateWithAuditView,
 )
-from manage_breast_screening.participants.models.medical_history.cyst_history_item import (
-    CystHistoryItem,
-)
 
 from ...forms.medical_history.cyst_history_item_form import CystHistoryItemForm
 from ..mixins import MedicalInformationMixin
-
-logger = logging.getLogger(__name__)
 
 
 class AddCystHistoryView(MedicalInformationMixin, AddWithAuditView):
@@ -59,14 +53,9 @@ class UpdateCystHistoryView(MedicalInformationMixin, UpdateWithAuditView):
         return "Delete this item"
 
     def get_object(self):
-        try:
-            return CystHistoryItem.objects.get(
-                pk=self.kwargs["history_item_pk"],
-                appointment_id=self.kwargs["pk"],
-            )
-        except CystHistoryItem.DoesNotExist:
-            logger.exception("History item does not exist for kwargs=%s", self.kwargs)
-            return None
+        return get_object_or_none(
+            self.appointment.cyst_history_items, pk=self.kwargs.get("history_item_pk")
+        )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
