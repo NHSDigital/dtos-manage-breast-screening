@@ -1,12 +1,17 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
 from manage_breast_screening.core.services.application_insights_logging import (
     ApplicationInsightsLogging,
+    _HealthCheckSampler,
 )
 
 
+@patch(
+    "manage_breast_screening.core.services.application_insights_logging.PsycopgInstrumentor",
+    return_value=MagicMock(),
+)
 @patch(
     "manage_breast_screening.core.services.application_insights_logging.configure_azure_monitor",
     return_value=MagicMock(),
@@ -19,15 +24,21 @@ class TestApplicationInsightsLogging:
         monkeypatch.setenv("APPLICATIONINSIGHTS_LOGGER_NAME", "insights-logger")
 
     def test_configures_azure_monitor_when_env_correct(
-        self, mock_logging, mock_configure_azure, monkeypatch
+        self, mock_logging, mock_configure_azure, mock_psycopg, monkeypatch
     ):
         monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
         ApplicationInsightsLogging().configure_azure_monitor()
-        mock_configure_azure.assert_called_with()
+        mock_configure_azure.assert_called_once_with(sampler=ANY)
+        assert isinstance(
+            mock_configure_azure.call_args.kwargs["sampler"], _HealthCheckSampler
+        )
+        mock_psycopg.return_value.instrument.assert_called_once_with(
+            capture_parameters=True
+        )
 
     def test_does_not_configure_if_flag_not_enabled(
-        self, mock_logging, mock_configure_azure, monkeypatch
+        self, mock_logging, mock_configure_azure, mock_psycopg, monkeypatch
     ):
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "something")
         monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "False")
@@ -35,7 +46,7 @@ class TestApplicationInsightsLogging:
         mock_configure_azure.assert_not_called()
 
     def test_does_not_configure_if_connection_string_not_present(
-        self, mock_logging, mock_configure_azure, monkeypatch
+        self, mock_logging, mock_configure_azure, mock_psycopg, monkeypatch
     ):
         monkeypatch.delenv("APPLICATIONINSIGHTS_CONNECTION_STRING", False)
         monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
@@ -43,32 +54,32 @@ class TestApplicationInsightsLogging:
         mock_configure_azure.assert_not_called()
 
     def test_does_not_configure_if_connection_string_is_empty(
-        self, mock_logging, mock_configure_azure, monkeypatch
+        self, mock_logging, mock_configure_azure, mock_psycopg, monkeypatch
     ):
         monkeypatch.setenv("APPLICATIONINSIGHTS_CONNECTION_STRING", "")
         monkeypatch.setenv("APPLICATIONINSIGHTS_IS_ENABLED", "True")
         ApplicationInsightsLogging().configure_azure_monitor()
         mock_configure_azure.assert_not_called()
 
-    def test_getLogger(self, mock_logging, mock_configure_azure):
+    def test_getLogger(self, mock_logging, mock_configure_azure, mock_psycopg):
         ApplicationInsightsLogging().getLogger()
         mock_logging.getLogger.assert_called_with("insights-logger")
 
-    def test_raise_exception(self, mock_logging, mock_configure_azure):
+    def test_raise_exception(self, mock_logging, mock_configure_azure, mock_psycopg):
         ApplicationInsightsLogging().exception("CustomError")
         mock_logging.getLogger.assert_called_with("insights-logger")
         mock_logging.getLogger.return_value.exception.assert_called_with(
             "CustomError", extra=None
         )
 
-    def test_raise_exception_with_extra(self, mock_logging, mock_configure_azure):
+    def test_raise_exception_with_extra(self, mock_logging, mock_configure_azure, mock_psycopg):
         ApplicationInsightsLogging().exception("CustomError", extra={"key": "value"})
         mock_logging.getLogger.assert_called_with("insights-logger")
         mock_logging.getLogger.return_value.exception.assert_called_with(
             "CustomError", extra={"key": "value"}
         )
 
-    def test_custom_event_info(self, mock_logging, mock_configure_azure):
+    def test_custom_event_info(self, mock_logging, mock_configure_azure, mock_psycopg):
         ApplicationInsightsLogging().custom_event_info(
             "some information", "custom-event"
         )

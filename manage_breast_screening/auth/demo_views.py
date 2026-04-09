@@ -1,3 +1,5 @@
+import logging
+import time
 from collections import OrderedDict
 from urllib.parse import urlencode
 
@@ -13,6 +15,8 @@ from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
 )
 from manage_breast_screening.users.models import PERSONAS
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -43,16 +47,35 @@ def persona_login(request):
 
         return redirect(redirect_url)
     else:
-        return render(
+        t0 = time.perf_counter()
+
+        providers_with_users = _get_providers_with_users(request.user)
+        t1 = time.perf_counter()
+
+        superusers = _get_superusers(request.user)
+        t2 = time.perf_counter()
+
+        response = render(
             request,
             "auth/persona_login.jinja",
             context={
-                "providers_with_users": _get_providers_with_users(request.user),
-                "superusers": _get_superusers(request.user),
+                "providers_with_users": providers_with_users,
+                "superusers": superusers,
                 "page_title": "Persona logins",
                 "next": next_path,
             },
         )
+        t3 = time.perf_counter()
+
+        logger.info(
+            "persona_login GET timings: providers=%.3fs superusers=%.3fs render=%.3fs total=%.3fs",
+            t1 - t0,
+            t2 - t1,
+            t3 - t2,
+            t3 - t0,
+        )
+
+        return response
 
 
 def _persona_users(current_user):

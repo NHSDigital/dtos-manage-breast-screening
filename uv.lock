@@ -849,10 +849,12 @@ dependencies = [
     { name = "mesh-client" },
     { name = "nhsuk-frontend-jinja" },
     { name = "ninja-put-patch-file-upload-middleware" },
+    { name = "opentelemetry-instrumentation-django" },
+    { name = "opentelemetry-instrumentation-psycopg" },
     { name = "pandas" },
     { name = "phonenumbers" },
     { name = "pillow" },
-    { name = "psycopg", extra = ["binary"] },
+    { name = "psycopg", extra = ["binary", "pool"] },
     { name = "pydicom" },
     { name = "pynetdicom" },
     { name = "python-dateutil" },
@@ -904,10 +906,12 @@ requires-dist = [
     { name = "mesh-client", specifier = ">=3.2.3,<6.0.0" },
     { name = "nhsuk-frontend-jinja", specifier = "==0.7.2" },
     { name = "ninja-put-patch-file-upload-middleware", specifier = ">=0.1.4" },
+    { name = "opentelemetry-instrumentation-django", specifier = ">=0.60b0" },
+    { name = "opentelemetry-instrumentation-psycopg", specifier = ">=0.60b0" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
     { name = "phonenumbers", specifier = ">=9.0.22" },
     { name = "pillow", specifier = ">=12.1.0" },
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.2.7,<4.0.0" },
+    { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2.7,<4.0.0" },
     { name = "pydicom", specifier = ">=3.0.1" },
     { name = "pynetdicom", specifier = ">=3.0.4" },
     { name = "python-dateutil", specifier = ">=2.9.0.post0,<3.0.0" },
@@ -1226,6 +1230,20 @@ wheels = [
 ]
 
 [[package]]
+name = "opentelemetry-instrumentation-psycopg"
+version = "0.60b0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-instrumentation-dbapi" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/30/cb/b6622cbe99bf0c7ac9c0524683ac1813089cf53e25b81717e45791543c8d/opentelemetry_instrumentation_psycopg-0.60b0.tar.gz", hash = "sha256:3bc1dcc8a7c978fc42ef2f0ea105549fe2e232c846a84dbda2eb29505a96a2aa", size = 11522, upload-time = "2025-12-03T13:22:25.101Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/42/0f/dd2eef63f74e24582410c4cc2a08c5865f3389766abb053fdec4626057d4/opentelemetry_instrumentation_psycopg-0.60b0-py3-none-any.whl", hash = "sha256:48ba9c689aac490fde9f4133e3e241edf39c89ebf2b4682d23d2da265126f0ab", size = 11630, upload-time = "2025-12-03T13:21:29.033Z" },
+]
+
+[[package]]
 name = "opentelemetry-instrumentation-psycopg2"
 version = "0.61b0"
 source = { registry = "https://pypi.org/simple" }
@@ -1536,6 +1554,9 @@ wheels = [
 binary = [
     { name = "psycopg-binary", marker = "implementation_name != 'pypy'" },
 ]
+pool = [
+    { name = "psycopg-pool" },
+]
 
 [[package]]
 name = "psycopg-binary"
@@ -1553,6 +1574,18 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/fa/d0/c20f4e668e89494972e551c31be2a0016e3f50d552d7ae9ac07086407599/psycopg_binary-3.3.2-cp314-cp314-musllinux_1_2_riscv64.whl", hash = "sha256:1586e220be05547c77afc326741dd41cc7fba38a81f9931f616ae98865439678", size = 3928660, upload-time = "2025-12-06T17:34:46.757Z" },
     { url = "https://files.pythonhosted.org/packages/0f/e1/99746c171de22539fd5eb1c9ca21dc805b54cfae502d7451d237d1dbc349/psycopg_binary-3.3.2-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:458696a5fa5dad5b6fb5d5862c22454434ce4fe1cf66ca6c0de5f904cbc1ae3e", size = 4239169, upload-time = "2025-12-06T17:34:49.751Z" },
     { url = "https://files.pythonhosted.org/packages/72/f7/212343c1c9cfac35fd943c527af85e9091d633176e2a407a0797856ff7b9/psycopg_binary-3.3.2-cp314-cp314-win_amd64.whl", hash = "sha256:04bb2de4ba69d6f8395b446ede795e8884c040ec71d01dd07ac2b2d18d4153d1", size = 3642122, upload-time = "2025-12-06T17:34:52.506Z" },
+]
+
+[[package]]
+name = "psycopg-pool"
+version = "3.3.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/56/9a/9470d013d0d50af0da9c4251614aeb3c1823635cab3edc211e3839db0bcf/psycopg_pool-3.3.0.tar.gz", hash = "sha256:fa115eb2860bd88fce1717d75611f41490dec6135efb619611142b24da3f6db5", size = 31606, upload-time = "2025-12-01T11:34:33.11Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e7/c3/26b8a0908a9db249de3b4169692e1c7c19048a9bc41a4d3209cee7dbb758/psycopg_pool-3.3.0-py3-none-any.whl", hash = "sha256:2e44329155c410b5e8666372db44276a8b1ebd8c90f1c3026ebba40d4bc81063", size = 39995, upload-time = "2025-12-01T11:34:29.761Z" },
 ]
 
 [[package]]
