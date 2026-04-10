@@ -1,0 +1,30 @@
+{
+  "bssBatchID": "1236",
+  "bsoBatchID": " SOBATID ",
+  "totalSubjectsInBatch": "3",
+  "selectDate": "20151130",
+  "totalNormalCall": "",
+  "totalNormalRecall": "1",
+  "transferDate": "",
+  "transferTime": "20160422",
+  "records": [
+    {
+      "familyName": "SMITH",
+      "givenNames": "(From BSS) JANICE CAROLE",
+      "birthDate": "19540911",
+      "callRecallStatus": "N",
+      "namePrefix": "MRS",
+      "addressLine1": "THE MANSE",
+      "addressLine2": "HIGH STREET",
+      "addressLine3": "DIGBY",
+      "addressLine4": "HONITON",
+      "addressLine5": "DEVON",
+      "postcode": "EX15 0LS",
+      "gpPracticeCode": "A11324",
+      "gpPracticeName": "HODGKIN AND PARTNERS",
+      "prevActualScreeningDate": "20111102",
+      "category": "AR",
+      "lastEpisodeType": "R"
+    }
+  ]
+}
