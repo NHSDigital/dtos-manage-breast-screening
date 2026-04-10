@@ -1,9 +1,10 @@
 import uuid
-from datetime import date
+from datetime import date, datetime, time
 from logging import getLogger
 
 from django.db import models
 from django.db.models import OuterRef, Prefetch, Subquery
+from django.utils import timezone
 from statemachine import Event, StateMachine
 from statemachine.states import States
 
@@ -182,6 +183,23 @@ class Appointment(BaseModel):
         ).order_by("-created_at")
 
         if since_date:
+            if isinstance(since_date, datetime):
+                since_date = (
+                    timezone.make_aware(
+                        since_date,
+                        timezone.get_current_timezone(),
+                    )
+                    if timezone.is_naive(since_date)
+                    else since_date
+                )
+            elif isinstance(since_date, date):
+                since_date = timezone.make_aware(
+                    datetime.combine(since_date, time.min),
+                    timezone.get_current_timezone(),
+                )
+            else:
+                raise TypeError("since_date must be a date, datetime, or None")
+
             qs = qs.filter(created_at__gt=since_date)
 
         return qs
