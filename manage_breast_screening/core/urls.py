@@ -27,6 +27,7 @@ from manage_breast_screening.core.decorators import (
     service_enabled_exempt,
 )
 
+from ..batches import api as batches_api
 from ..clinics import views as clinic_views
 from .admin import admin_site
 from .api import api
@@ -69,6 +70,7 @@ urlpatterns = [
     path("admin/", admin_site.urls),
     path("robots.txt", robots_txt),
     path("api/v1/", api.urls),
+    path("api/batches/v1/", batches_api.batch_api.urls),
     path(
         "auth/",
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
