@@ -14,9 +14,9 @@ def test_content_security_policy(clinical_user_client):
 
     expected_directives = {
         "connect-src 'self'",
-        "script-src 'self' 'unsafe-inline'",
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
         "img-src 'self' data:",
-        "style-src 'self'",
+        "style-src 'self' https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
         "default-src 'self'",
         "object-src 'none'",
         "base-uri 'self'",

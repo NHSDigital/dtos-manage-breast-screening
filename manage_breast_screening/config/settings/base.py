@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.mammograms",
     "manage_breast_screening.manual_images",
     "manage_breast_screening.gateway",
+    "manage_breast_screening.batches",
     "rules.apps.AutodiscoverRulesConfig",
     "csp",
 ]
@@ -370,7 +371,14 @@ CONTENT_SECURITY_POLICY = {
         "frame-ancestors": ("'none'",),
         "img-src": (CSP_SELF, "data:"),
         "object-src": ("'none'",),
-        "script-src": (CSP_SELF, "'unsafe-inline'"),
-        "style-src": (CSP_SELF,),
+        "script-src": (
+            CSP_SELF,
+            "'unsafe-inline'",
+            "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js",
+        ),
+        "style-src": (
+            CSP_SELF,
+            "https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css",
+        ),
     }
 }
