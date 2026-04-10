@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from functools import cached_property
+from urllib.parse import urlencode
 
 from django.urls import reverse
 
@@ -66,12 +67,15 @@ class AppointmentPresenter:
                 "mammograms:appointment_note_review",
                 kwargs={"pk": self._appointment.pk},
             )
-            + f"?return_url={return_url}"
+            + "?"
+            + urlencode({"return_url": return_url})
         )
 
     def special_appointment_action(self, return_url):
         item = {
-            "href": self.special_appointment_url + f"?return_url={return_url}",
+            "href": self.special_appointment_url
+            + "?"
+            + urlencode({"return_url": return_url}),
             "classes": "nhsuk-link--no-visited-state",
         }
         item["text"] = "Change"

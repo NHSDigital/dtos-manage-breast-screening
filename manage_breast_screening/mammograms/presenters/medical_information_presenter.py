@@ -1,4 +1,4 @@
-from urllib.parse import quote
+from urllib.parse import urlencode
 
 from django.urls import reverse
 
@@ -314,7 +314,7 @@ class MedicalInformationPresenter:
     def _subpage_button(self, urlpattern, text, include_return_url=False):
         url = reverse(urlpattern, kwargs={"pk": self.appointment.pk})
         if include_return_url:
-            url += "?return_url=" + quote(self.medical_information_url)
+            url += "?" + urlencode({"return_url": self.medical_information_url})
 
         return {"href": url, "text": text}
 
