@@ -75,21 +75,21 @@ class TestCIS2RedirectUri:
 
 
 class TestJwkFromPrivateKey:
-    def test_returns_public_jwk_from_configured_private_key(self):
-        jwk = public_jwk_from_rsa_private_key()
+    def test_returns_public_jwk_from_given_private_key(self, settings):
+        jwk = public_jwk_from_rsa_private_key(settings.CIS2_CLIENT_PRIVATE_KEY)
 
         assert jwk is not None
         assert jwk.as_dict()["kty"] == "RSA"
 
-    def test_jwk_has_thumbprint(self):
-        jwk = public_jwk_from_rsa_private_key()
+    def test_jwk_has_thumbprint(self, settings):
+        jwk = public_jwk_from_rsa_private_key(settings.CIS2_CLIENT_PRIVATE_KEY)
 
         thumbprint = jwk.thumbprint()
         assert isinstance(thumbprint, str)
         assert len(thumbprint) > 0
 
-    def test_jwk_does_not_contain_private_components(self):
-        jwk = public_jwk_from_rsa_private_key()
+    def test_jwk_does_not_contain_private_components(self, settings):
+        jwk = public_jwk_from_rsa_private_key(settings.CIS2_CLIENT_PRIVATE_KEY)
 
         jwk_dict = jwk.as_dict()
         for private_field in ("d", "p", "q", "dp", "dq", "qi"):

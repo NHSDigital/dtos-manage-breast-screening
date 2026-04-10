@@ -29,7 +29,7 @@ def get_cis2_client():
     if client:
         return client
 
-    jwk = public_jwk_from_rsa_private_key()
+    jwk = public_jwk_from_rsa_private_key(settings.CIS2_CLIENT_PRIVATE_KEY)
     kid = jwk.thumbprint()
 
     client = oauth.register(
@@ -76,11 +76,9 @@ class CustomPrivateKeyJWT(PrivateKeyJWT):
         )
 
 
-def public_jwk_from_rsa_private_key():
-    """Derive a public JWK from the configured private key PEM."""
-    private_jwk = JsonWebKey.import_key(
-        settings.CIS2_CLIENT_PRIVATE_KEY, {"kty": "RSA"}
-    )
+def public_jwk_from_rsa_private_key(private_key_pem: str):
+    """Derive a public JWK from an RSA private key PEM string."""
+    private_jwk = JsonWebKey.import_key(private_key_pem, {"kty": "RSA"})
     return JsonWebKey.import_key(private_jwk.get_public_key(), {"kty": "RSA"})
 
 
