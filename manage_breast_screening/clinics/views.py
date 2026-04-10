@@ -37,9 +37,10 @@ def list_clinic_appointments(request, pk, filter="remaining"):
     presented_clinic = ClinicPresenter(clinic)
     appointments = (
         clinic.appointments.for_filter(filter)
-        .prefetch_current_status()
         .prefetch_related("note")
-        .select_related("clinic_slot__clinic", "screening_episode__participant")
+        .select_related(
+            "clinic_slot__clinic", "screening_episode__participant", "status_changed_by"
+        )
         .order_by_starts_at()
     )
     counts_by_filter = Appointment.filter_counts_for_clinic(clinic)

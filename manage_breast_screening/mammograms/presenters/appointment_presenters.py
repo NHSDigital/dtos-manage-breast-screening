@@ -17,7 +17,6 @@ from manage_breast_screening.manual_images.models import (
     RepeatReason,
 )
 from manage_breast_screening.participants.models.appointment import (
-    AppointmentMachine,
     AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
 )
@@ -176,7 +175,7 @@ class AppointmentPresenter:
 
     @cached_property
     def can_be_checked_in(self):
-        return AppointmentMachine.from_appointment(self._appointment).can("check_in")
+        return self._appointment.sm.can("check_in")
 
     @cached_property
     def active(self):
@@ -185,7 +184,7 @@ class AppointmentPresenter:
     def can_be_started_by(self, user):
         return user.has_perm(
             Permission.DO_MAMMOGRAM_APPOINTMENT, self._appointment
-        ) and AppointmentMachine.from_appointment(self._appointment).can("start")
+        ) and self._appointment.sm.can("start")
 
     def can_be_resumed_by(self, user):
         if not user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT, self._appointment):
@@ -194,7 +193,7 @@ class AppointmentPresenter:
         # Allow the same user to return to an appointment they have in progress
         # This will only happen if there is a technical problem and the
         # user loses their browsing context.
-        return AppointmentMachine.from_appointment(self._appointment).can(
+        return self._appointment.sm.can(
             "resume"
         ) or self._appointment.current_status.is_in_progress_with(user)
 

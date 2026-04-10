@@ -3,8 +3,8 @@ from datetime import date
 from logging import getLogger
 
 from django.db import models
-from django.db.models import OuterRef, Prefetch, Subquery
 from statemachine import Event, StateMachine
+from statemachine.mixins import MachineMixin
 from statemachine.states import States
 
 from manage_breast_screening.manual_images.models import Series, Study
@@ -22,24 +22,63 @@ class ActionPerformedByDifferentUser(Exception):
     """
 
 
+class AppointmentStatusNames(models.TextChoices):
+    SCHEDULED = "SCHEDULED", "Scheduled"
+    CHECKED_IN = "CHECKED_IN", "Checked in"
+    IN_PROGRESS = "IN_PROGRESS", "In progress"
+    CANCELLED = "CANCELLED", "Cancelled"
+    DID_NOT_ATTEND = "DID_NOT_ATTEND", "Did not attend"
+    SCREENED = "SCREENED", "Screened"
+    PARTIALLY_SCREENED = "PARTIALLY_SCREENED", "Partially screened"
+    ATTENDED_NOT_SCREENED = "ATTENDED_NOT_SCREENED", "Attended not screened"
+    PAUSED = "PAUSED", "Paused"
+
+
+YET_TO_BEGIN_STATUSES = [
+    AppointmentStatusNames.SCHEDULED,
+    AppointmentStatusNames.CHECKED_IN,
+]
+
+FINAL_STATUSES = [
+    AppointmentStatusNames.CANCELLED,
+    AppointmentStatusNames.DID_NOT_ATTEND,
+    AppointmentStatusNames.SCREENED,
+    AppointmentStatusNames.PARTIALLY_SCREENED,
+    AppointmentStatusNames.ATTENDED_NOT_SCREENED,
+]
+
+
+class AppointmentMachine(StateMachine):
+    _ = States.from_enum(
+        AppointmentStatusNames,
+        initial=AppointmentStatusNames.SCHEDULED,
+        final=FINAL_STATUSES,
+    )
+
+    check_in = Event(_.SCHEDULED.to(_.CHECKED_IN))
+    start = Event(_.SCHEDULED.to(_.IN_PROGRESS) | _.CHECKED_IN.to(_.IN_PROGRESS))
+    cancel = Event(_.SCHEDULED.to(_.CANCELLED))
+    mark_did_not_attend = Event(_.SCHEDULED.to(_.DID_NOT_ATTEND))
+    mark_attended_not_screened = Event(
+        _.SCHEDULED.to(_.ATTENDED_NOT_SCREENED)
+        | _.CHECKED_IN.to(_.ATTENDED_NOT_SCREENED)
+        | _.IN_PROGRESS.to(_.ATTENDED_NOT_SCREENED)
+    )
+    screen = Event(_.IN_PROGRESS.to(_.SCREENED))
+    partial_screen = Event(_.IN_PROGRESS.to(_.PARTIALLY_SCREENED))
+    pause = Event(_.IN_PROGRESS.to(_.PAUSED))
+    resume = Event(_.PAUSED.to(_.IN_PROGRESS))
+
+    def can(self, action) -> bool:
+        return action in self.allowed_events
+
+
 class AppointmentQuerySet(models.QuerySet):
     def in_status(self, *statuses):
-        # Get the most recent status name for each appointment
-        most_recent_status = (
-            AppointmentStatus.objects.filter(appointment=OuterRef("pk"))
-            .order_by("-created_at")
-            .values("name")[:1]
-        )
-
-        # Filter appointments where the most recent status name is in the provided list
-        return self.annotate(current_status_name=Subquery(most_recent_status)).filter(
-            current_status_name__in=statuses
-        )
+        return self.filter(status__in=statuses)
 
     def remaining(self):
-        return self.in_status(
-            *AppointmentStatus.YET_TO_BEGIN_STATUSES,
-        )
+        return self.in_status(*YET_TO_BEGIN_STATUSES)
 
     def checked_in(self):
         return self.in_status(AppointmentStatusNames.CHECKED_IN)
@@ -53,7 +92,7 @@ class AppointmentQuerySet(models.QuerySet):
         return self.filter(screening_episode__participant_id=participant_id)
 
     def complete(self):
-        return self.in_status(*AppointmentStatus.FINAL_STATUSES)
+        return self.in_status(*FINAL_STATUSES)
 
     def upcoming(self):
         return self.filter(clinic_slot__starts_at__date__gte=date.today())
@@ -81,19 +120,15 @@ class AppointmentQuerySet(models.QuerySet):
             "-clinic_slot__starts_at" if desc else "clinic_slot__starts_at"
         )
 
-    def prefetch_current_status(self):
-        return self.prefetch_related(
-            Prefetch(
-                "statuses",
-                queryset=AppointmentStatus.objects.select_related(
-                    "created_by"
-                ).order_by("-created_at")[:1],  # Limit to most recent
-                to_attr="_prefetched_current_status",  # Store in named attribute
-            )
-        )
 
+class Appointment(MachineMixin, BaseModel):
+    state_machine_name = (
+        "manage_breast_screening.participants.models.appointment.AppointmentMachine"
+    )
+    state_machine_attr = "sm"
+    state_field_name = "status"
+    bind_events_as_methods = True
 
-class Appointment(BaseModel):
     objects = AppointmentQuerySet.as_manager()
 
     screening_episode = models.ForeignKey(ScreeningEpisode, on_delete=models.PROTECT)
@@ -103,6 +138,24 @@ class Appointment(BaseModel):
     )
     reinvite = models.BooleanField(default=False)
     stopped_reasons = models.JSONField(null=True, blank=True)
+
+    status = models.CharField(
+        choices=AppointmentStatusNames,
+        max_length=50,
+        default=AppointmentStatusNames.SCHEDULED,
+    )
+    status_changed_by = models.ForeignKey(
+        User,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="appointment_status_changes",
+    )
+    status_changed_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def current_status(self):
+        return AppointmentStatus(appointment=self)
 
     @classmethod
     def filter_counts_for_clinic(cls, clinic):
@@ -120,40 +173,20 @@ class Appointment(BaseModel):
         return self.screening_episode.participant
 
     @property
-    def current_status(self) -> "AppointmentStatus":
-        """
-        Fetch the most recent status associated with this appointment.
-        Check if a prefetched status is available, otherwise do a query.
-        If there are no statuses for any reason, assume the default one.
-        """
-        prefetched_current_status = getattr(self, "_prefetched_current_status", None)
-        if prefetched_current_status:
-            return prefetched_current_status[0]
-
-        statuses = list(self.statuses.order_by("-created_at").all())
-        if not statuses:
-            status = AppointmentStatus()
-            logger.info(
-                f"Appointment {self.pk} has no statuses. Assuming {status.name}"
-            )
-            return status
-
-        return statuses[0]
-
-    @property
     def active(self):
-        return self.current_status.active
+        return self.is_in_progress() or self.is_yet_to_begin()
 
-    def set_status(self, status_name, created_by):
-        current_status = self.current_status
+    def is_yet_to_begin(self):
+        return self.status in YET_TO_BEGIN_STATUSES
 
-        if status_name == current_status.name:
-            if current_status.created_by != created_by:
-                raise ActionPerformedByDifferentUser(status_name)
-            else:
-                return current_status
+    def is_in_progress(self):
+        return self.status == AppointmentStatusNames.IN_PROGRESS
 
-        return self.statuses.create(name=status_name, created_by=created_by)
+    def is_in_progress_with(self, user):
+        return self.is_in_progress() and self.status_changed_by == user
+
+    def is_final_status(self):
+        return self.status in FINAL_STATUSES
 
     def series(self):
         """
@@ -187,98 +220,43 @@ class Appointment(BaseModel):
         return qs
 
 
-class AppointmentStatusNames(models.TextChoices):
-    SCHEDULED = "SCHEDULED", "Scheduled"
-    CHECKED_IN = "CHECKED_IN", "Checked in"
-    IN_PROGRESS = "IN_PROGRESS", "In progress"
-    CANCELLED = "CANCELLED", "Cancelled"
-    DID_NOT_ATTEND = "DID_NOT_ATTEND", "Did not attend"
-    SCREENED = "SCREENED", "Screened"
-    PARTIALLY_SCREENED = "PARTIALLY_SCREENED", "Partially screened"
-    ATTENDED_NOT_SCREENED = "ATTENDED_NOT_SCREENED", "Attended not screened"
-    PAUSED = "PAUSED", "Paused"
+class AppointmentStatus:
+    def __init__(self, appointment):
+        self.appointment = appointment
 
+    def get_name_display(self):
+        return self.appointment.get_status_display()
 
-class AppointmentStatus(models.Model):
-    YET_TO_BEGIN_STATUSES = [
-        AppointmentStatusNames.SCHEDULED,
-        AppointmentStatusNames.CHECKED_IN,
-    ]
+    @property
+    def name(self):
+        return self.appointment.status
 
-    FINAL_STATUSES = [
-        AppointmentStatusNames.CANCELLED,
-        AppointmentStatusNames.DID_NOT_ATTEND,
-        AppointmentStatusNames.SCREENED,
-        AppointmentStatusNames.PARTIALLY_SCREENED,
-        AppointmentStatusNames.ATTENDED_NOT_SCREENED,
-    ]
+    @property
+    def created_at(self):
+        return self.appointment.updated_at
 
-    name = models.CharField(
-        choices=AppointmentStatusNames,
-        max_length=50,
-        default=AppointmentStatusNames.SCHEDULED,
-    )
-
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    appointment = models.ForeignKey(
-        Appointment, on_delete=models.PROTECT, related_name="statuses"
-    )
-    created_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
-
-    class Meta:
-        ordering = ["-created_at"]
+    @property
+    def created_by(self):
+        return self.appointment.status_changed_by
 
     @property
     def active(self):
-        """
-        Is this status one of the active, non-final statuses?
-        """
-        return self.is_in_progress() or self.is_yet_to_begin()
+        return self.appointment.active
 
     def is_yet_to_begin(self):
-        return self.name in self.YET_TO_BEGIN_STATUSES
+        return self.appointment.is_yet_to_begin()
 
     def is_in_progress(self):
-        return self.name == AppointmentStatusNames.IN_PROGRESS
+        return self.appointment.is_in_progress()
 
     def is_in_progress_with(self, user):
-        return self.is_in_progress() and self.created_by == user
+        return self.appointment.is_in_progress_with(user)
 
     def is_final_status(self):
-        return self.name in self.FINAL_STATUSES
+        return self.appointment.is_final_status()
 
     def __str__(self):
         return self.name
-
-
-class AppointmentMachine(StateMachine):
-    _ = States.from_enum(
-        AppointmentStatusNames,
-        initial=AppointmentStatusNames.SCHEDULED,
-        final=AppointmentStatus.FINAL_STATUSES,
-    )
-
-    check_in = Event(_.SCHEDULED.to(_.CHECKED_IN))
-    start = Event(_.SCHEDULED.to(_.IN_PROGRESS) | _.CHECKED_IN.to(_.IN_PROGRESS))
-    cancel = Event(_.SCHEDULED.to(_.CANCELLED))
-    mark_did_not_attend = Event(_.SCHEDULED.to(_.DID_NOT_ATTEND))
-    mark_attended_not_screened = Event(
-        _.SCHEDULED.to(_.ATTENDED_NOT_SCREENED)
-        | _.CHECKED_IN.to(_.ATTENDED_NOT_SCREENED)
-        | _.IN_PROGRESS.to(_.ATTENDED_NOT_SCREENED)
-    )
-    screen = Event(_.IN_PROGRESS.to(_.SCREENED))
-    partial_screen = Event(_.IN_PROGRESS.to(_.PARTIALLY_SCREENED))
-    pause = Event(_.IN_PROGRESS.to(_.PAUSED))
-    resume = Event(_.PAUSED.to(_.IN_PROGRESS))
-
-    def can(self, action) -> bool:
-        return action in self.allowed_events
-
-    @classmethod
-    def from_appointment(cls, appointment):
-        return cls(start_value=appointment.current_status.name)
 
 
 class AppointmentWorkflowStepCompletion(models.Model):
