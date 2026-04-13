@@ -97,19 +97,27 @@ class Series(models.Model):
         return self.images.count()
 
     @property
+    def first_image(self):
+        return self.images.first()
+
+    @property
     def extra_count(self):
         return self.images.filter(implant_present=True).count()
 
     @property
     def laterality(self):
-        return self.images.first().laterality
+        if not self.first_image:
+            return ""
+        return self.first_image.laterality
 
     @property
     def view_position(self):
-        return self.images.first().view_position
+        if not self.first_image:
+            return ""
+        return self.first_image.view_position
 
     def __str__(self):
-        return str(self.images.first())
+        return str(self.first_image) if self.first_image else self.series_instance_uid
 
 
 class Image(models.Model):

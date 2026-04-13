@@ -62,11 +62,21 @@ class TestSeries:
 
         assert series.laterality == "R"
 
+    def test_series_laterality_no_images(self):
+        series = SeriesFactory.create()
+
+        assert series.laterality == ""
+
     def test_series_view_position(self):
         series = SeriesFactory.create()
         ImageFactory.create(series=series, view_position="MLO")
 
         assert series.view_position == "MLO"
+
+    def test_series_view_position_no_images(self):
+        series = SeriesFactory.create()
+
+        assert series.view_position == ""
 
 
 @pytest.mark.django_db
