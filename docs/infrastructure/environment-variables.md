@@ -71,15 +71,26 @@ The metadata endpoint for the CIS2 auth server, used to fetch info for the OIDC 
 
 Private key in PEM format. Used to sign our JWTs during the auth flow with CIS2. The public key is derived from this automatically — no separate public key setting is required.
 
-To rotate:
+Should be rotated regularly. See `CIS2_OLD_PRIVATE_KEY` below for instructions.
 
-- Run the following to generate a new private key:
+**NOTE:** If changing because the key is compromised, skip setting `CIS2_OLD_PRIVATE_KEY` and simply set a new key value on `CIS2_CLIENT_PRIVATE_KEY`.
 
-  ```
-  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out cis2_private_key.pem
-  ```
+## CIS2_OLD_PRIVATE_KEY [Secret]
 
-- Update the key vault with the new private key, following the instructions for [multi-line secrets](deployment.md#multi-line-secrets).
+Optional. The previous private key in PEM format. Can be used during key rotation to change the private key without downtime or disruption to user login attempts. When set, the corresponding public key is included in the JWKS endpoint alongside the current key, allowing CIS2 to verify tokens signed with either key.
+
+To rotate the current key:
+
+1. Generate a new RSA private key:
+
+   ```
+   openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:4096 -out cis2_private_key_new.pem
+   ```
+
+2. Set `CIS2_OLD_PRIVATE_KEY` to the current value of `CIS2_CLIENT_PRIVATE_KEY` in Key Vault.
+3. Set `CIS2_CLIENT_PRIVATE_KEY` to the new key in Key Vault, following the instructions for [multi-line secrets](deployment.md#multi-line-secrets).
+4. Deploy — the JWKS endpoint now advertises both public keys; new logins sign with the new key, any in-progress logins are unaffected.
+5. Remove `CIS2_OLD_PRIVATE_KEY` from the key vault and redeploy.
 
 ## DATABASE_HOST
 
