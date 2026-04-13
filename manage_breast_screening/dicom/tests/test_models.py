@@ -51,10 +51,20 @@ class TestSeries:
 
     def test_series_extra_count_property(self):
         series = SeriesFactory.create()
-        ImageFactory.create(series=series)
-        ImageFactory.create(series=series, implant_present=True)
+        ImageFactory.create_batch(3, series=series)
 
-        assert series.extra_count == 1
+        assert series.extra_count == 2
+
+    def test_series_count_property_no_images(self):
+        series = SeriesFactory.create()
+
+        assert series.count == 0
+
+    def test_series_extra_count_property_implant_images(self):
+        series = SeriesFactory.create()
+        ImageFactory.create_batch(2, series=series, implant_present=True)
+
+        assert series.extra_count == 0
 
     def test_series_laterality(self):
         series = SeriesFactory.create()

@@ -102,7 +102,9 @@ class Series(models.Model):
 
     @property
     def extra_count(self):
-        return self.images.filter(implant_present=True).count()
+        if not self.first_image or self.first_image.implant_present:
+            return 0
+        return self.images.count() - 1
 
     @property
     def laterality(self):
