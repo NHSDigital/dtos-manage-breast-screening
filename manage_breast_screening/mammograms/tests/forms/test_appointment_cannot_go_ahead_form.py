@@ -72,13 +72,8 @@ class TestAppointmentCannotGoAheadForm:
             "failed_identity_check_details": "Details about failed identity check",
         }
         assert not appointment.reinvite
-        assert (
-            appointment.statuses.filter(
-                name=AppointmentStatusNames.ATTENDED_NOT_SCREENED,
-                created_by=clinical_user,
-            ).count()
-            == 1
-        )
+        assert appointment.status == AppointmentStatusNames.ATTENDED_NOT_SCREENED
+        assert appointment.status_changed_by == clinical_user
 
     def test_select_other_reason_without_details(self, clinical_user):
         """
@@ -102,13 +97,7 @@ class TestAppointmentCannotGoAheadForm:
         assert form.errors == {
             "other_details": ["Explain why this appointment cannot proceed"]
         }
-        assert (
-            appointment.statuses.filter(
-                name=AppointmentStatusNames.ATTENDED_NOT_SCREENED,
-                created_by=clinical_user,
-            ).count()
-            == 0
-        )
+        assert appointment.status != AppointmentStatusNames.ATTENDED_NOT_SCREENED
 
     def test_select_unknown_reason(self, clinical_user):
         """
@@ -134,13 +123,7 @@ class TestAppointmentCannotGoAheadForm:
                 "Select a valid choice. made_up_reason is not one of the available choices."
             ]
         }
-        assert (
-            appointment.statuses.filter(
-                name=AppointmentStatusNames.ATTENDED_NOT_SCREENED,
-                created_by=clinical_user,
-            ).count()
-            == 0
-        )
+        assert appointment.status != AppointmentStatusNames.ATTENDED_NOT_SCREENED
 
     def test_select_all_reasons_with_full_details(self, clinical_user):
         """
@@ -209,13 +192,8 @@ class TestAppointmentCannotGoAheadForm:
             "other_details": "Details about other",
         }
         assert appointment.reinvite
-        assert (
-            appointment.statuses.filter(
-                name=AppointmentStatusNames.ATTENDED_NOT_SCREENED,
-                created_by=clinical_user,
-            ).count()
-            == 1
-        )
+        assert appointment.status == AppointmentStatusNames.ATTENDED_NOT_SCREENED
+        assert appointment.status_changed_by == clinical_user
 
     def test_select_all_reasons_with_minimum_details(self, clinical_user):
         """
@@ -276,10 +254,5 @@ class TestAppointmentCannotGoAheadForm:
             "other_details": "Details about other",
         }
         assert appointment.reinvite
-        assert (
-            appointment.statuses.filter(
-                name=AppointmentStatusNames.ATTENDED_NOT_SCREENED,
-                created_by=clinical_user,
-            ).count()
-            == 1
-        )
+        assert appointment.status == AppointmentStatusNames.ATTENDED_NOT_SCREENED
+        assert appointment.status_changed_by == clinical_user

@@ -16,7 +16,7 @@ def appointment(clinical_user_client):
 @pytest.fixture
 def completed_appointment(clinical_user_client):
     return AppointmentFactory.create(
-        current_status=AppointmentStatusNames.SCREENED,
+        status=AppointmentStatusNames.SCREENED,
         clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
     )
 
@@ -24,8 +24,8 @@ def completed_appointment(clinical_user_client):
 @pytest.fixture
 def in_progress_appointment(clinical_user_client):
     return AppointmentFactory.create(
-        current_status=AppointmentStatusNames.IN_PROGRESS,
-        current_status__created_by=clinical_user_client.user,
+        status=AppointmentStatusNames.IN_PROGRESS,
+        status_changed_by=clinical_user_client.user,
         reinvite=False,
         clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
     )

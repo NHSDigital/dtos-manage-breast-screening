@@ -31,7 +31,7 @@ class TestJavascriptLoadsInSystemTests(SystemTestCase):
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(
                 hour=9, minute=0, tzinfo=tzinfo
             ),
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
         )
 
     def when_i_visit_the_clinic_page(self):

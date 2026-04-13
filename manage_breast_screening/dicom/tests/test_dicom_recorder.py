@@ -25,9 +25,7 @@ class TestDicomRecorder:
     def gateway_action(self, source_message_id):
         return GatewayActionFactory(
             id=source_message_id,
-            appointment=AppointmentFactory(
-                current_status=AppointmentStatusNames.IN_PROGRESS
-            ),
+            appointment=AppointmentFactory(status=AppointmentStatusNames.IN_PROGRESS),
         )
 
     @pytest.fixture
@@ -156,9 +154,7 @@ class TestDicomRecorder:
         """
         GatewayActionFactory(
             id=source_message_id,
-            appointment=AppointmentFactory(
-                current_status=AppointmentStatusNames.SCREENED
-            ),
+            appointment=AppointmentFactory(status=AppointmentStatusNames.SCREENED),
         )
         with tempfile.NamedTemporaryFile() as temp_file:
             pydicom.filewriter.dcmwrite(

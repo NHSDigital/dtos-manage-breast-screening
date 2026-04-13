@@ -1,7 +1,6 @@
 from unittest.mock import patch
 
 import pytest
-import statemachine
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -30,6 +29,7 @@ from manage_breast_screening.mammograms.forms.images.record_images_taken_form im
 from manage_breast_screening.manual_images.models import Study
 from manage_breast_screening.participants.models import MedicalInformationReview
 from manage_breast_screening.participants.models.appointment import (
+    ActionPerformedByDifferentUser,
     AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
 )
@@ -521,8 +521,8 @@ class TestCheckIn:
         other_user = UserFactory.create()
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.CHECKED_IN,
-            current_status__created_by=other_user,
+            status=AppointmentStatusNames.CHECKED_IN,
+            status_changed_by=other_user,
         )
         response = clinical_user_client.http.post(
             reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
@@ -543,8 +543,8 @@ class TestCheckIn:
     ):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.CHECKED_IN,
-            current_status__created_by=clinical_user_client.user,
+            status=AppointmentStatusNames.CHECKED_IN,
+            status_changed_by=clinical_user_client.user,
         )
         response = clinical_user_client.http.post(
             reverse("mammograms:check_in", kwargs={"pk": appointment.pk})
@@ -584,8 +584,8 @@ class TestStartAppointment:
         other_user = UserFactory.create(first_name="Alice", last_name="Smith")
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=other_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=other_user,
         )
         response = clinical_user_client.http.post(
             reverse("mammograms:start_appointment", kwargs={"pk": appointment.pk})
@@ -625,7 +625,7 @@ class TestResumeAppointment:
     def paused_appointment(self, clinical_user_client):
         return AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.PAUSED,
+            status=AppointmentStatusNames.PAUSED,
         )
 
     def test_can_resume_when_in_progress_with_user(self, clinical_user_client):
@@ -634,8 +634,8 @@ class TestResumeAppointment:
         """
         in_progress_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=clinical_user_client.user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=clinical_user_client.user,
         )
         response = clinical_user_client.http.post(
             reverse(
@@ -659,13 +659,13 @@ class TestResumeAppointment:
         different_user = UserFactory.create(nhs_uid="different_user")
         in_progress_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=different_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=different_user,
         )
 
         with pytest.raises(
-            statemachine.exceptions.TransitionNotAllowed,
-            match="Can't Resume when in In progress.",
+            ActionPerformedByDifferentUser,
+            match="This action has already been performed by a different user.",
         ):
             clinical_user_client.http.post(
                 reverse(
@@ -1142,8 +1142,8 @@ class TestPauseAppointment:
         """
         screened_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.SCREENED,
-            current_status__created_by=clinical_user_client.user,
+            status=AppointmentStatusNames.SCREENED,
+            status_changed_by=clinical_user_client.user,
         )
 
         response = clinical_user_client.http.post(
@@ -1178,8 +1178,8 @@ class TestPauseAppointment:
         )
         in_progress_appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=different_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=different_user,
         )
 
         response = clinical_user_client.http.post(

@@ -78,8 +78,8 @@ class TestAddImageDetails(SystemTestCase):
     def and_there_is_an_appointment_for_my_provider(self):
         self.appointment = AppointmentFactory(
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=self.current_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=self.current_user,
         )
 
     def and_i_am_on_the_add_image_details_page(self):

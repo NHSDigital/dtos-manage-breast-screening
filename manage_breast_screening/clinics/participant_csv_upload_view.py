@@ -17,7 +17,6 @@ from manage_breast_screening.participants.models import (
     ParticipantAddress,
 )
 from manage_breast_screening.participants.models.appointment import (
-    AppointmentStatus,
     AppointmentStatusNames,
 )
 from manage_breast_screening.participants.models.screening_episode import (
@@ -279,15 +278,11 @@ class ParticipantCsvInsertService:
                 appointment = Appointment(
                     screening_episode=screening_episode,
                     clinic_slot=clinic_slot,
+                    status=AppointmentStatusNames.SCHEDULED,
+                    status_changed_by=self.user,
+                    status_changed_at=timezone.now(),
                 )
                 self.save_and_audit(appointment)
-
-                appointment_status = AppointmentStatus(
-                    appointment=appointment,
-                    name=AppointmentStatusNames.SCHEDULED,
-                    created_by=self.user,
-                )
-                self.save_and_audit(appointment_status)
 
     def save_and_audit(self, obj):
         obj.save()

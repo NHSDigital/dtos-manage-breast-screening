@@ -34,8 +34,10 @@ class AppointmentStatusUpdater:
             if appointment.status == target_status:
                 # Already in the target status - idempotent, but check user
                 if appointment.status_changed_by != self.current_user:
-                    raise ActionPerformedByDifferentUser(target_status)
-                return
+                    raise ActionPerformedByDifferentUser(
+                        "This action has already been performed by a different user."
+                    )
+                return appointment.status
 
             # Fire the state machine event
             # validates the transition and updates sm.current_state
@@ -59,34 +61,40 @@ class AppointmentStatusUpdater:
             self.appointment.status_changed_by = appointment.status_changed_by
             self.appointment.status_changed_at = appointment.status_changed_at
 
+            return appointment.status
+
     def check_in(self):
-        self._transition("check_in", AppointmentStatusNames.CHECKED_IN)
+        return self._transition("check_in", AppointmentStatusNames.CHECKED_IN)
 
     def start(self):
-        self._transition("start", AppointmentStatusNames.IN_PROGRESS)
+        return self._transition("start", AppointmentStatusNames.IN_PROGRESS)
 
     def cancel(self):
-        self._transition("cancel", AppointmentStatusNames.CANCELLED)
+        return self._transition("cancel", AppointmentStatusNames.CANCELLED)
 
     def mark_did_not_attend(self):
-        self._transition("mark_did_not_attend", AppointmentStatusNames.DID_NOT_ATTEND)
+        return self._transition(
+            "mark_did_not_attend", AppointmentStatusNames.DID_NOT_ATTEND
+        )
 
     def mark_attended_not_screened(self):
-        self._transition(
+        return self._transition(
             "mark_attended_not_screened", AppointmentStatusNames.ATTENDED_NOT_SCREENED
         )
 
     def partial_screen(self):
-        self._transition("partial_screen", AppointmentStatusNames.PARTIALLY_SCREENED)
+        return self._transition(
+            "partial_screen", AppointmentStatusNames.PARTIALLY_SCREENED
+        )
 
     def screen(self):
-        self._transition("screen", AppointmentStatusNames.SCREENED)
+        return self._transition("screen", AppointmentStatusNames.SCREENED)
 
     def pause(self):
-        self._transition("pause", AppointmentStatusNames.PAUSED)
+        return self._transition("pause", AppointmentStatusNames.PAUSED)
 
     def resume(self):
-        self._transition("resume", AppointmentStatusNames.IN_PROGRESS)
+        return self._transition("resume", AppointmentStatusNames.IN_PROGRESS)
 
 
 class RecallService:

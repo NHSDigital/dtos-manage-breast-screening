@@ -91,7 +91,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         self.scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=0, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
             first_name="Janet",
             last_name="Scheduled",
         )
@@ -100,27 +100,27 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             starts_at=datetime.now().replace(hour=9, minute=15, tzinfo=tzinfo),
             first_name="Also",
             last_name="Scheduled",
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=30, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.CHECKED_IN,
+            status=AppointmentStatusNames.CHECKED_IN,
         )
         self.screened_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=10, minute=45, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.SCREENED,
+            status=AppointmentStatusNames.SCREENED,
         )
         self.in_progress_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.IN_PROGRESS,
+            status=AppointmentStatusNames.IN_PROGRESS,
         )
         self.paused_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=11, minute=42, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.PAUSED,
+            status=AppointmentStatusNames.PAUSED,
         )
 
     def and_i_am_on_the_clinic_list(self):
@@ -267,7 +267,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=timezone.utc),
             first_name="Someone",
             last_name="Withnote",
-            current_status=AppointmentStatusNames.CHECKED_IN,
+            status=AppointmentStatusNames.CHECKED_IN,
         )
         AppointmentNoteFactory(
             appointment=appointment_with_note, content="This is a note."
@@ -279,7 +279,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             clinic_slot__starts_at=datetime.now(timezone.utc).replace(
                 hour=11, minute=10
             ),
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
             screening_episode__participant__first_name="Janet",
             screening_episode__participant__last_name="Special Appointment",
             screening_episode__participant__extra_needs={
@@ -317,7 +317,7 @@ class TestUserViewsClinicShowPage(SystemTestCase):
         # SCHEDULED status
         self.scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
             first_name="Participant",
             last_name="Scheduled",
         )
@@ -327,10 +327,8 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             clinic_slot__clinic=self.clinic,
             first_name="Participant",
             last_name="Screened",
-        )
-        self.screened_appointment.statuses.create(
-            name=AppointmentStatusNames.SCREENED,
-            created_by=user_screened,
+            status=AppointmentStatusNames.SCREENED,
+            status_changed_by=user_screened,
         )
 
         # CANCELLED status
@@ -338,10 +336,8 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             clinic_slot__clinic=self.clinic,
             first_name="Participant",
             last_name="Cancelled",
-        )
-        self.cancelled_appointment.statuses.create(
-            name=AppointmentStatusNames.CANCELLED,
-            created_by=user_cancelled,
+            status=AppointmentStatusNames.CANCELLED,
+            status_changed_by=user_cancelled,
         )
 
     def then_i_can_see_status_attribution_for_these_appointments(self):
@@ -371,8 +367,6 @@ class TestUserViewsClinicShowPage(SystemTestCase):
             clinic_slot__clinic=self.clinic,
             first_name="Participant",
             last_name="InProgress",
-        )
-        self.in_progress_appointment.statuses.create(
-            name=AppointmentStatusNames.IN_PROGRESS,
-            created_by=self.current_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=self.current_user,
         )

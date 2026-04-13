@@ -38,25 +38,19 @@ class TestViewMammogramAppointmentPermission:
 class TestAppointmentActionPermissions:
     @pytest.fixture
     def scheduled_appointment(self):
-        return AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
+        return AppointmentFactory.create(status=AppointmentStatusNames.SCHEDULED)
 
     @pytest.fixture
     def checked_in_appointment(self):
-        return AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CHECKED_IN
-        )
+        return AppointmentFactory.create(status=AppointmentStatusNames.CHECKED_IN)
 
     @pytest.fixture
     def screened_appointment(self):
-        return AppointmentFactory.create(current_status=AppointmentStatusNames.SCREENED)
+        return AppointmentFactory.create(status=AppointmentStatusNames.SCREENED)
 
     @pytest.fixture
     def in_progress_appointment(self):
-        return AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
-        )
+        return AppointmentFactory.create(status=AppointmentStatusNames.IN_PROGRESS)
 
     def test_can_start_if_user_is_clinical(self, clinical_user):
         assert clinical_user.has_perm(Permission.DO_MAMMOGRAM_APPOINTMENT)

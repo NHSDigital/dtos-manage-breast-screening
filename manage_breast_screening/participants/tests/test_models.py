@@ -9,6 +9,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
 )
 from manage_breast_screening.participants.models.appointment import (
+    Appointment,
     AppointmentStatusNames,
 )
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
@@ -16,10 +17,8 @@ from manage_breast_screening.participants.models.medical_history.implanted_medic
 )
 
 from .. import models
-from ..models import AppointmentStatus
 from .factories import (
     AppointmentFactory,
-    AppointmentStatusFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
 )
@@ -118,26 +117,18 @@ class TestScreeningEpisode:
 @pytest.mark.django_db
 class TestAppointment:
     def test_status_filtering(self):
-        confirmed = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
-        checked_in = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CHECKED_IN
-        )
-        screened = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCREENED
-        )
-        cancelled = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CANCELLED
-        )
+        confirmed = AppointmentFactory.create(status=AppointmentStatusNames.SCHEDULED)
+        checked_in = AppointmentFactory.create(status=AppointmentStatusNames.CHECKED_IN)
+        screened = AppointmentFactory.create(status=AppointmentStatusNames.SCREENED)
+        cancelled = AppointmentFactory.create(status=AppointmentStatusNames.CANCELLED)
         did_not_attend = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.DID_NOT_ATTEND
+            status=AppointmentStatusNames.DID_NOT_ATTEND
         )
         partially_screened = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.PARTIALLY_SCREENED
+            status=AppointmentStatusNames.PARTIALLY_SCREENED
         )
         attended_not_screened = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.ATTENDED_NOT_SCREENED
+            status=AppointmentStatusNames.ATTENDED_NOT_SCREENED
         )
 
         assertQuerySetEqual(
@@ -189,19 +180,13 @@ class TestAppointment:
         )
 
     def test_for_filter(self):
-        confirmed = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
-        checked_in = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CHECKED_IN
-        )
+        confirmed = AppointmentFactory.create(status=AppointmentStatusNames.SCHEDULED)
+        checked_in = AppointmentFactory.create(status=AppointmentStatusNames.CHECKED_IN)
         in_progress = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
+            status=AppointmentStatusNames.IN_PROGRESS
         )
-        paused = AppointmentFactory.create(current_status=AppointmentStatusNames.PAUSED)
-        screened = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCREENED
-        )
+        paused = AppointmentFactory.create(status=AppointmentStatusNames.PAUSED)
+        screened = AppointmentFactory.create(status=AppointmentStatusNames.SCREENED)
 
         assertQuerySetEqual(
             models.Appointment.objects.for_filter("remaining"),
@@ -237,26 +222,26 @@ class TestAppointment:
 
         # Create appointments with different statuses
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=AppointmentStatusNames.SCHEDULED
+            clinic_slot=clinic_slot1, status=AppointmentStatusNames.SCHEDULED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=AppointmentStatusNames.SCHEDULED
+            clinic_slot=clinic_slot2, status=AppointmentStatusNames.SCHEDULED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=AppointmentStatusNames.CHECKED_IN
+            clinic_slot=clinic_slot1, status=AppointmentStatusNames.CHECKED_IN
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot2, current_status=AppointmentStatusNames.SCREENED
+            clinic_slot=clinic_slot2, status=AppointmentStatusNames.SCREENED
         )
         AppointmentFactory.create(
-            clinic_slot=clinic_slot1, current_status=AppointmentStatusNames.CANCELLED
+            clinic_slot=clinic_slot1, status=AppointmentStatusNames.CANCELLED
         )
 
         # Create another clinic with appointments that shouldn't be counted
         other_clinic = ClinicFactory.create()
         other_slot = ClinicSlotFactory.create(clinic=other_clinic)
         AppointmentFactory.create(
-            clinic_slot=other_slot, current_status=AppointmentStatusNames.SCHEDULED
+            clinic_slot=other_slot, status=AppointmentStatusNames.SCHEDULED
         )
 
         counts = models.Appointment.filter_counts_for_clinic(clinic)
@@ -302,129 +287,15 @@ class TestAppointment:
             ordered=False,
         )
 
-    def test_in_status_only_matches_latest_status_not_history(
-        self, django_assert_num_queries
-    ):
-        appointment = AppointmentFactory.create()
-        appointment_with_history = AppointmentFactory.create()
-
-        AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-        )
-        AppointmentStatusFactory.create(
-            appointment=appointment_with_history,
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_at=datetime(2025, 1, 2, 10, tzinfo=tz.utc),
-        )
-        AppointmentStatusFactory.create(
-            appointment=appointment_with_history,
-            name=AppointmentStatusNames.SCREENED,
-            created_at=datetime(2025, 1, 2, 11, tzinfo=tz.utc),
-        )
-
-        with django_assert_num_queries(3):
-            assertQuerySetEqual(
-                models.Appointment.objects.in_status(AppointmentStatusNames.CHECKED_IN),
-                [appointment],
-                ordered=False,
-            )
-            assertQuerySetEqual(
-                models.Appointment.objects.in_status(
-                    AppointmentStatusNames.CHECKED_IN,
-                    AppointmentStatusNames.SCREENED,
-                ),
-                [appointment, appointment_with_history],
-                ordered=False,
-            )
-            assertQuerySetEqual(
-                models.Appointment.objects.in_status(AppointmentStatusNames.SCREENED),
-                [appointment_with_history],
-                ordered=False,
-            )
-
-
-@pytest.mark.django_db
-class TestEagerLoadCurrentStatus:
-    def test_eager_loads_most_recent_status_with_created_by(
-        self, django_assert_num_queries
-    ):
-        appointment = AppointmentFactory.create()
-
-        latest_status = AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.IN_PROGRESS,
-            created_at=datetime(2025, 1, 1, 10, tzinfo=tz.utc),
-        )
-
-        AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-        )
-
-        AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.SCHEDULED,
-            created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
-        )
-
-        appointment_with_status = (
-            models.Appointment.objects.prefetch_current_status().get(pk=appointment.pk)
-        )
-
-        prefetched_status = appointment_with_status._prefetched_current_status[0]
-        assert prefetched_status == latest_status
-        # Verify no additional queries when accessing created_by
-        with django_assert_num_queries(0):
-            assert prefetched_status.created_by is not None
-            prefetched_status.created_by.nhs_uid
-
 
 @pytest.mark.django_db
 class TestCurrentStatus:
-    def test_returns_prefetched_current_status_if_available(
-        self, django_assert_num_queries
-    ):
-        appointment = AppointmentFactory.create()
-        latest_status = AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.IN_PROGRESS,
-            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-        )
-        AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
-        )
-
-        fetched_appointment = (
-            models.Appointment.objects.prefetch_current_status().first()
-        )
-        with django_assert_num_queries(0):
-            fetched_appointment.current_status.created_by
-        assert fetched_appointment.current_status == latest_status
-
-    def test_returns_current_status_even_if_not_prefetched(
-        self, django_assert_num_queries
-    ):
-        appointment = AppointmentFactory.create()
-        latest_status = AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.IN_PROGRESS,
-            created_at=datetime(2025, 1, 1, 9, tzinfo=tz.utc),
-        )
-        AppointmentStatusFactory.create(
-            appointment=appointment,
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_at=datetime(2025, 1, 1, 8, tzinfo=tz.utc),
-        )
+    def test_returns_current_status(self, django_assert_num_queries):
+        latest_status = AppointmentStatusNames.IN_PROGRESS
+        AppointmentFactory.create(status=latest_status)
 
         fetched_appointment = models.Appointment.objects.first()
-        with django_assert_num_queries(2):
-            fetched_appointment.current_status.created_by
-        assert fetched_appointment.current_status == latest_status
+        assert fetched_appointment.current_status.name == latest_status
 
     def test_returns_default_status_if_no_statuses(self, django_assert_num_queries):
         appointment = AppointmentFactory.create()
@@ -434,20 +305,18 @@ class TestCurrentStatus:
 class TestAppointmentStatus:
     class TestActive:
         def test_active_statuses_return_true(self):
-            assert AppointmentStatus(name=AppointmentStatusNames.SCHEDULED).active
-            assert AppointmentStatus(name=AppointmentStatusNames.CHECKED_IN).active
-            assert AppointmentStatus(name=AppointmentStatusNames.IN_PROGRESS).active
-            assert not AppointmentStatus(name=AppointmentStatusNames.CANCELLED).active
-            assert not AppointmentStatus(
-                name=AppointmentStatusNames.DID_NOT_ATTEND
+            assert Appointment(status=AppointmentStatusNames.SCHEDULED).active
+            assert Appointment(status=AppointmentStatusNames.CHECKED_IN).active
+            assert Appointment(status=AppointmentStatusNames.IN_PROGRESS).active
+            assert not Appointment(status=AppointmentStatusNames.CANCELLED).active
+            assert not Appointment(status=AppointmentStatusNames.DID_NOT_ATTEND).active
+            assert not Appointment(
+                status=AppointmentStatusNames.ATTENDED_NOT_SCREENED
             ).active
-            assert not AppointmentStatus(
-                name=AppointmentStatusNames.ATTENDED_NOT_SCREENED
+            assert not Appointment(
+                status=AppointmentStatusNames.PARTIALLY_SCREENED
             ).active
-            assert not AppointmentStatus(
-                name=AppointmentStatusNames.PARTIALLY_SCREENED
-            ).active
-            assert not AppointmentStatus(name=AppointmentStatusNames.SCREENED).active
+            assert not Appointment(status=AppointmentStatusNames.SCREENED).active
 
 
 class TestImplantedMedicalDeviceHistoryItem:

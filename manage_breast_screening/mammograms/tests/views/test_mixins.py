@@ -41,9 +41,10 @@ class TestInProgressAppointmentMixin:
         clinical_user,
         another_clinical_user,
     ):
-        appointment.statuses.create(
-            name=AppointmentStatusNames.IN_PROGRESS, created_by=another_clinical_user
-        )
+        appointment.status = AppointmentStatusNames.IN_PROGRESS
+        appointment.status_changed_by = another_clinical_user
+        appointment.save()
+
         dummy_request.user = clinical_user
         response = dummy_view(request=dummy_request, pk=appointment.pk)
 
@@ -61,9 +62,10 @@ class TestInProgressAppointmentMixin:
         as they won't be allowed to start the appointment, but the mixin rechecks
         the permission on every request just to be safe.
         """
-        appointment.statuses.create(
-            name=AppointmentStatusNames.IN_PROGRESS, created_by=administrative_user
-        )
+        appointment.status = AppointmentStatusNames.IN_PROGRESS
+        appointment.status_changed_by = administrative_user
+        appointment.save()
+
         dummy_request.user = administrative_user
 
         with pytest.raises(PermissionDenied):

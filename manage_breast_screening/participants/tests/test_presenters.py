@@ -140,7 +140,11 @@ class TestParticipantAppointmentPresenter:
         appointment.clinic_slot.clinic.get_type_display.return_value = "screening"
         appointment.clinic_slot.clinic.setting.name = "West of London BSS"
         appointment.pk = UUID(pk)
-        appointment.current_status = AppointmentStatus(name=status_name)
+        appointment.status = status_name
+        appointment.get_status_display.return_value = " ".join(
+            status_name.lower().split("_")
+        ).capitalize()
+        appointment.current_status = AppointmentStatus(appointment)
 
         return appointment
 

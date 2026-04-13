@@ -509,8 +509,8 @@ class TestParticipantCsvUploadView:
         assert appointment.clinic_slot.duration_in_minutes == 15
         assert appointment.current_status.name == AppointmentStatusNames.SCHEDULED
 
-        # Expect 12 audit logs: 2 participants + 2 addresses + 2 clinic slots + 2 screening episodes + 2 appointments + 2 appointment statuses
-        assert AuditLog.objects.count() == 12
+        # Expect 12 audit logs: 2 participants + 2 addresses + 2 clinic slots + 2 screening episodes + 2 appointments
+        assert AuditLog.objects.count() == 10
 
     def test_valid_post_no_db_changes_when_row_has_errors(
         self, superuser_client, superuser_clinic

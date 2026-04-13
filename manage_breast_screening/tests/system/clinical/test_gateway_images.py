@@ -44,8 +44,8 @@ class TestGatewayImages(SystemTestCase):
     def and_there_is_an_appointment(self):
         self.appointment = AppointmentFactory(
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=self.current_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=self.current_user,
         )
 
     def and_gateway_images_are_enabled(self):

@@ -14,7 +14,6 @@ from manage_breast_screening.participants.models.appointment import (
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
-    AppointmentStatusFactory,
 )
 from manage_breast_screening.users.tests.factories import UserFactory
 
@@ -22,9 +21,7 @@ from manage_breast_screening.users.tests.factories import UserFactory
 @pytest.mark.django_db
 class TestAppointmentStatusUpdater:
     def test_invalid_check_in(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CANCELLED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.CANCELLED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
@@ -33,20 +30,16 @@ class TestAppointmentStatusUpdater:
             service.check_in()
 
     def test_valid_check_in(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.SCHEDULED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.check_in()
-        assert new_status.name == AppointmentStatusNames.CHECKED_IN
+        assert new_status == AppointmentStatusNames.CHECKED_IN
 
     def test_invalid_start(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CANCELLED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.CANCELLED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
@@ -59,18 +52,16 @@ class TestAppointmentStatusUpdater:
         [AppointmentStatusNames.SCHEDULED, AppointmentStatusNames.CHECKED_IN],
     )
     def test_valid_start(self, clinical_user, current_status):
-        appointment = AppointmentFactory.create(current_status=current_status)
+        appointment = AppointmentFactory.create(status=current_status)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.start()
-        assert new_status.name == AppointmentStatusNames.IN_PROGRESS
+        assert new_status == AppointmentStatusNames.IN_PROGRESS
 
     def test_invalid_cancel(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCREENED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.SCREENED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
@@ -79,20 +70,16 @@ class TestAppointmentStatusUpdater:
             service.cancel()
 
     def test_valid_cancel(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.SCHEDULED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.cancel()
-        assert new_status.name == AppointmentStatusNames.CANCELLED
+        assert new_status == AppointmentStatusNames.CANCELLED
 
     def test_invalid_mark_did_not_attend(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CANCELLED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.CANCELLED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
@@ -101,31 +88,27 @@ class TestAppointmentStatusUpdater:
             service.mark_did_not_attend()
 
     def test_valid_mark_did_not_attend(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.SCHEDULED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.mark_did_not_attend()
-        assert new_status.name == AppointmentStatusNames.DID_NOT_ATTEND
+        assert new_status == AppointmentStatusNames.DID_NOT_ATTEND
 
     def test_valid_mark_attended_not_screened(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
+            status=AppointmentStatusNames.IN_PROGRESS
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.mark_attended_not_screened()
-        assert new_status.name == AppointmentStatusNames.ATTENDED_NOT_SCREENED
+        assert new_status == AppointmentStatusNames.ATTENDED_NOT_SCREENED
 
     def test_invalid_mark_attended_not_screened(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCREENED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.SCREENED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
@@ -134,9 +117,7 @@ class TestAppointmentStatusUpdater:
             service.mark_attended_not_screened()
 
     def test_invalid_screen(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.CANCELLED
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.CANCELLED)
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
@@ -149,47 +130,44 @@ class TestAppointmentStatusUpdater:
 
     def test_valid_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
+            status=AppointmentStatusNames.IN_PROGRESS
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.screen()
-        assert new_status.name == AppointmentStatusNames.SCREENED
+        assert new_status == AppointmentStatusNames.SCREENED
 
     def test_valid_partial_screen(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
+            status=AppointmentStatusNames.IN_PROGRESS
         )
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.partial_screen()
-        assert new_status.name == AppointmentStatusNames.PARTIALLY_SCREENED
+        assert new_status == AppointmentStatusNames.PARTIALLY_SCREENED
 
     def test_check_in_is_idempotent(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
+            status=AppointmentStatusNames.CHECKED_IN,
+            status_changed_by=clinical_user,
         )
-        AppointmentStatusFactory.create(
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_by=clinical_user,
-            appointment=appointment,
-        )
-        assert appointment.current_status.name == AppointmentStatusNames.CHECKED_IN
+
+        assert appointment.status == AppointmentStatusNames.CHECKED_IN
 
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user
         )
 
         new_status = service.check_in()
-        assert new_status.name == AppointmentStatusNames.CHECKED_IN
+        assert new_status == AppointmentStatusNames.CHECKED_IN
 
     def test_cannot_start_appointment_started_by_someone_else(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
+            status=AppointmentStatusNames.IN_PROGRESS
         )
 
         service = AppointmentStatusUpdater(
@@ -201,13 +179,8 @@ class TestAppointmentStatusUpdater:
 
     def test_can_resume_an_appointment_paused_by_someone_else(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
-        )
-
-        AppointmentStatusFactory.create(
-            name=AppointmentStatusNames.PAUSED,
-            created_by=clinical_user,
-            appointment=appointment,
+            status=AppointmentStatusNames.PAUSED,
+            status_changed_by=clinical_user,
         )
 
         service = AppointmentStatusUpdater(
@@ -215,11 +188,11 @@ class TestAppointmentStatusUpdater:
         )
 
         new_status = service.resume()
-        assert new_status.name == AppointmentStatusNames.IN_PROGRESS
+        assert new_status == AppointmentStatusNames.IN_PROGRESS
 
     def test_can_pause_an_appointment(self, clinical_user):
         appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.IN_PROGRESS
+            status=AppointmentStatusNames.IN_PROGRESS
         )
 
         service = AppointmentStatusUpdater(
@@ -227,17 +200,10 @@ class TestAppointmentStatusUpdater:
         )
 
         new_status = service.pause()
-        assert new_status.name == AppointmentStatusNames.PAUSED
+        assert new_status == AppointmentStatusNames.PAUSED
 
     def test_invalid_pause(self, clinical_user):
-        appointment = AppointmentFactory.create(
-            current_status=AppointmentStatusNames.SCHEDULED
-        )
-        AppointmentStatusFactory.create(
-            name=AppointmentStatusNames.CANCELLED,
-            created_by=clinical_user,
-            appointment=appointment,
-        )
+        appointment = AppointmentFactory.create(status=AppointmentStatusNames.CANCELLED)
 
         service = AppointmentStatusUpdater(
             appointment=appointment, current_user=clinical_user

@@ -46,7 +46,7 @@ class TestAppointmentButtons(SystemTestCase):
         self.scheduled_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=0, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
             first_name="Janet",
             last_name="Scheduled",
         )
@@ -55,22 +55,22 @@ class TestAppointmentButtons(SystemTestCase):
             starts_at=datetime.now().replace(hour=9, minute=15, tzinfo=tzinfo),
             first_name="Also",
             last_name="Scheduled",
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
         )
         self.checked_in_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=30, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.CHECKED_IN,
+            status=AppointmentStatusNames.CHECKED_IN,
         )
         self.screened_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=10, minute=45, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.SCREENED,
+            status=AppointmentStatusNames.SCREENED,
         )
         self.in_progress_appointment = AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=11, minute=00, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.IN_PROGRESS,
+            status=AppointmentStatusNames.IN_PROGRESS,
         )
 
     def and_i_am_on_the_clinic_show_page(self):

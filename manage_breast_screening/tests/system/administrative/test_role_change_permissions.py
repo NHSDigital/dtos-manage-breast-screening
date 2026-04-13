@@ -46,14 +46,14 @@ class TestRoleChangePermissions(SystemTestCase):
         AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=0, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
             first_name="Janet",
             last_name="Scheduled",
         )
         AppointmentFactory(
             clinic_slot__clinic=self.clinic,
             starts_at=datetime.now().replace(hour=9, minute=15, tzinfo=tzinfo),
-            current_status=AppointmentStatusNames.CHECKED_IN,
+            status=AppointmentStatusNames.CHECKED_IN,
             first_name="Janet",
             last_name="CheckedIn",
         )

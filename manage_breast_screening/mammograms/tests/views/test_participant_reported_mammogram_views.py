@@ -85,6 +85,7 @@ def assert_attended_not_screened_flow(client, appointment):
             kwargs={"pk": appointment.clinic_slot.clinic.pk},
         ),
     )
+    appointment.refresh_from_db()
     assert (
         appointment.current_status.name == AppointmentStatusNames.ATTENDED_NOT_SCREENED
     )
@@ -626,8 +627,8 @@ class TestCompleteScreening:
         appointment = AppointmentFactory.create(
             screening_episode__participant=participant,
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=clinical_user_client.user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=clinical_user_client.user,
         )
 
         response = clinical_user_client.http.post(
@@ -663,6 +664,7 @@ class TestCompleteScreening:
             """,
         )
 
+        appointment.refresh_from_db()
         assert appointment.current_status.name == AppointmentStatusNames.SCREENED
         assertQuerySetEqual(
             appointment.completed_workflow_steps.filter(

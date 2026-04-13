@@ -211,8 +211,8 @@ class TestAppointmentNoteReviewView:
     def test_access_denied_when_not_in_progress(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.SCREENED,
-            current_status__created_by=UserFactory.create(),
+            status=AppointmentStatusNames.SCREENED,
+            status_changed_by=UserFactory.create(),
         )
         note = AppointmentNote.objects.create(
             appointment=appointment, content="Original note"
@@ -239,8 +239,8 @@ class TestAppointmentNoteReviewView:
     ):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=UserFactory.create(),
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=UserFactory.create(),
         )
         note = AppointmentNote.objects.create(
             appointment=appointment, content="Original note"

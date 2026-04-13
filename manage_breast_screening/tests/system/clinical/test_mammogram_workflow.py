@@ -1,5 +1,4 @@
 import re
-from datetime import datetime, timedelta
 
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -275,16 +274,10 @@ class TestMammogramWorkflow(SystemTestCase):
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
             clinic_slot__clinic__risk_type=Clinic.RiskType.ROUTINE_RISK,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=self.user_one,
         )
 
-        self.appointment.statuses.create(
-            name=AppointmentStatusNames.CHECKED_IN,
-            created_by=self.user_one,
-            created_at=datetime.now() - timedelta(seconds=1),
-        )
-        self.appointment.statuses.create(
-            name=AppointmentStatusNames.IN_PROGRESS, created_by=self.user_one
-        )
         assert (
             self.appointment.current_status.name == AppointmentStatusNames.IN_PROGRESS
         )

@@ -118,8 +118,8 @@ class TestAppointmentTabs(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=self.current_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=self.current_user,
         )
 
     def and_there_is_an_appointment_not_in_progress(self):
@@ -131,8 +131,8 @@ class TestAppointmentTabs(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.SCHEDULED,
-            current_status__created_by=another_user,
+            status=AppointmentStatusNames.SCHEDULED,
+            status_changed_by=another_user,
         )
 
     def and_there_is_a_completed_appointment(self):
@@ -141,8 +141,8 @@ class TestAppointmentTabs(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.SCREENED,
-            current_status__created_by=self.current_user,
+            status=AppointmentStatusNames.SCREENED,
+            status_changed_by=self.current_user,
         )
         self.study = StudyService(
             self.appointment, self.current_user
@@ -157,8 +157,8 @@ class TestAppointmentTabs(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=another_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=another_user,
         )
 
     def and_i_am_on_the_appointment_show_page(self):

@@ -18,9 +18,11 @@ from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
     StudyFactory,
 )
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentStatusNames,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
-    AppointmentStatusFactory,
     BenignLumpHistoryItemFactory,
     BreastAugmentationHistoryItemFactory,
     BreastCancerHistoryItemFactory,
@@ -140,17 +142,14 @@ class Command(BaseCommand):
                 appointment_key["screening_episode"]
             )
 
+        statuses = appointment_key.get("statuses", [])
+        status = statuses[-1] if statuses else AppointmentStatusNames.SCHEDULED
         appointment = AppointmentFactory(
             clinic_slot=clinic_slot,
             id=appointment_key["id"],
             screening_episode=screening_episode,
+            status=status,
         )
-
-        for status_key in appointment_key.get("statuses", []):
-            AppointmentStatusFactory(
-                appointment=appointment,
-                name=status_key,
-            )
 
         for symptom in appointment_key.get("symptoms", []):
             self.create_symptom(appointment, symptom)

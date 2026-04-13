@@ -8,7 +8,10 @@ import time_machine
 from django.urls import reverse
 
 from manage_breast_screening.auth.models import Permission
-from manage_breast_screening.clinics.models import ClinicSlot
+from manage_breast_screening.clinics.models import (
+    Clinic,
+    ClinicSlot,
+)
 from manage_breast_screening.mammograms.presenters import (
     AppointmentPresenter,
     ClinicSlotPresenter,
@@ -21,10 +24,12 @@ from manage_breast_screening.mammograms.presenters.appointment_presenters import
 from manage_breast_screening.manual_images.models import ImageView, Series, Study
 from manage_breast_screening.participants.models import Appointment, AppointmentStatus
 from manage_breast_screening.participants.models.appointment import (
+    AppointmentMachine,
     AppointmentStatusNames,
 )
-from manage_breast_screening.participants.tests.factories import (
-    AppointmentStatusFactory,
+from manage_breast_screening.participants.models.participant import Participant
+from manage_breast_screening.participants.models.screening_episode import (
+    ScreeningEpisode,
 )
 from manage_breast_screening.users.models import User
 
@@ -42,6 +47,26 @@ class TestAppointmentPresenter:
     @pytest.fixture
     def mock_user(self):
         return MagicMock(spec=User)
+
+    @pytest.fixture
+    def appointment(self):
+        mock = Appointment()
+        mock.pk = "53ce8d3b-9e65-471a-b906-73809c0475d0"
+        mock.clinic_slot = ClinicSlot()
+        mock.clinic_slot.clinic = Clinic()
+        mock.screening_episode = ScreeningEpisode()
+        mock.screening_episode.participant = Participant()
+        mock.screening_episode.participant.date_of_birth = date(1980, 1, 1)
+        mock.screening_episode.participant.nhs_number = "9990090082"
+        mock.screening_episode.participant.pk = uuid4()
+        mock.screening_episode.participant.phone = "07123456789"
+        return mock
+
+    @pytest.fixture
+    def user(self):
+        user = User()
+        user.pk = uuid4()
+        return user
 
     @pytest.mark.parametrize(
         "status, expected_classes, expected_text, expected_key, expected_is_confirmed, expected_is_screened",
@@ -90,7 +115,13 @@ class TestAppointmentPresenter:
         expected_is_confirmed,
         expected_is_screened,
     ):
-        mock_appointment.current_status = AppointmentStatus(name=status)
+        mock_appointment.status = status
+        mock_appointment.get_status_display.return_value = " ".join(
+            status.lower().split("_")
+        ).capitalize()
+        mock_appointment.current_status = AppointmentStatus(
+            appointment=mock_appointment
+        )
 
         result = AppointmentPresenter(mock_appointment).current_status
 
@@ -134,7 +165,17 @@ class TestAppointmentPresenter:
         self, mock_appointment, mock_user, has_permission, status_name, result
     ):
         mock_user.has_perm.return_value = has_permission
-        mock_appointment.current_status.name = status_name
+        mock_appointment.status = status_name
+        mock_appointment.status_changed_by = mock_user
+        mock_appointment.current_status = AppointmentStatus(
+            appointment=mock_appointment
+        )
+        mock_appointment.sm = MagicMock(spec=AppointmentMachine)
+        can_start = status_name in (
+            AppointmentStatusNames.SCHEDULED,
+            AppointmentStatusNames.CHECKED_IN,
+        )
+        mock_appointment.sm.can.return_value = can_start
 
         assert (
             AppointmentPresenter(mock_appointment).can_be_started_by(mock_user)
@@ -157,30 +198,42 @@ class TestAppointmentPresenter:
         self, mock_appointment, mock_user, has_permission, status_name, result
     ):
         mock_user.has_perm.return_value = has_permission
-        mock_appointment.current_status.name = status_name
-        mock_appointment.current_status.is_in_progress_with.return_value = False
+        mock_appointment.status = status_name
+        mock_appointment.status_changed_by = mock_user
+        mock_appointment.current_status = AppointmentStatus(
+            appointment=mock_appointment
+        )
+        mock_appointment.current_status.is_in_progress_with = MagicMock(
+            return_value=False
+        )
+        mock_appointment.sm = MagicMock(spec=AppointmentMachine)
+        can_resume = status_name in (AppointmentStatusNames.PAUSED,)
+        mock_appointment.sm.can.return_value = can_resume
 
         assert (
             AppointmentPresenter(mock_appointment).can_be_resumed_by(mock_user)
             == result
         )
 
-        mock_user.has_perm.assert_called_once_with(
-            Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
-        )
+    def test_can_be_resumed_by_the_same_user_when_in_progress(self, appointment, user):
+        user.active = True
+        user.is_superuser = True
+        appointment.status = AppointmentStatusNames.IN_PROGRESS
+        appointment.status_changed_by = user
 
-    def test_can_be_resumed_by_the_same_user_when_in_progress(
-        self, mock_appointment, mock_user
+        assert AppointmentPresenter(appointment).can_be_resumed_by(user)
+
+    def test_cannot_be_resumed_by_different_same_user_when_in_progress(
+        self, appointment, user
     ):
-        mock_user.has_perm.return_value = True
-        mock_appointment.current_status.name = AppointmentStatusNames.PAUSED
-        mock_appointment.current_status.is_in_progress_with.return_value = True
+        another_user = User()
+        another_user.pk = uuid4()
+        another_user.active = True
+        another_user.is_superuser = True
+        appointment.status = AppointmentStatusNames.IN_PROGRESS
+        appointment.status_changed_by = user
 
-        assert AppointmentPresenter(mock_appointment).can_be_resumed_by(mock_user)
-
-        mock_user.has_perm.assert_called_once_with(
-            Permission.DO_MAMMOGRAM_APPOINTMENT, mock_appointment
-        )
+        assert not AppointmentPresenter(appointment).can_be_resumed_by(another_user)
 
     def test_clinic_url(self, mock_appointment):
         mock_appointment.clinic_slot.clinic.pk = "ef742f9d-76fb-47f1-8292-f7dcf456fc71"
@@ -363,7 +416,7 @@ class TestAppointmentPresenter:
         )
         def test_current_status_properties(
             self,
-            mock_appointment,
+            appointment,
             status_name,
             expected_classes,
             expected_text,
@@ -371,10 +424,8 @@ class TestAppointmentPresenter:
             is_confirmed,
             is_screened,
         ):
-            mock_appointment.current_status = AppointmentStatusFactory.build(
-                name=status_name
-            )
-            presenter = AppointmentPresenter(mock_appointment)
+            appointment.status = status_name
+            presenter = AppointmentPresenter(appointment)
 
             expected = {
                 "classes": expected_classes,

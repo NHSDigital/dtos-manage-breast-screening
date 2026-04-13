@@ -77,7 +77,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
-            current_status=AppointmentStatusNames.SCHEDULED,
+            status=AppointmentStatusNames.SCHEDULED,
             clinic_slot__clinic__setting__provider=self.current_provider,
         )
 

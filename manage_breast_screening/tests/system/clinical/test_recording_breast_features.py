@@ -185,8 +185,8 @@ class TestRecordingBreastFeatures(SystemTestCase):
         self.appointment = AppointmentFactory(
             screening_episode=self.screening_episode,
             clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=self.current_user,
+            status=AppointmentStatusNames.IN_PROGRESS,
+            status_changed_by=self.current_user,
         )
 
     def given_i_am_on_the_record_medical_information_page(self):
