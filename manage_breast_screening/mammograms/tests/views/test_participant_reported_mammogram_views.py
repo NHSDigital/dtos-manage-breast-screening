@@ -1,4 +1,5 @@
 from datetime import date
+from urllib.parse import urlencode
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -268,7 +269,8 @@ class TestAddParticipantReportedMammogram:
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
-            + f"?return_url={return_url}"
+            + "?"
+            + urlencode({"return_url": return_url})
         )
         assertRedirects(
             response,

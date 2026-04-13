@@ -1,4 +1,5 @@
 from datetime import date
+from urllib.parse import urlencode
 
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
@@ -40,7 +41,7 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
                     "href": self.get_success_url(),
                 },
                 "caption": participant.full_name,
-                "return_url": self.request.GET.get("return_url", ""),
+                "return_url": extract_relative_redirect_url(self.request, default=""),
             },
         )
 
@@ -81,7 +82,8 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
                         "participant_reported_mammogram_pk": self.form.participant_reported_mammogram_pk,
                     },
                 )
-                + f"?return_url={return_url}"
+                + "?"
+                + urlencode({"return_url": return_url})
             )
         else:
             return return_url
@@ -123,7 +125,10 @@ class UpdateParticipantReportedMammogramView(
                     ],
                 },
             )
-            + f"?return_url={self.request.GET.get('return_url', '')}"
+            + "?"
+            + urlencode(
+                {"return_url": extract_relative_redirect_url(self.request, default="")}
+            )
         )
 
 

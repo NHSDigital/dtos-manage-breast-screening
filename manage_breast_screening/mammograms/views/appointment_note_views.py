@@ -98,7 +98,9 @@ class AppointmentNoteReviewView(
                     appointment, current_tab="note"
                 ),
                 "return_url": self.get_success_url(),
-                "back_link_params": {"href": self.request.GET.get("return_url")},
+                "back_link_params": {
+                    "href": extract_relative_redirect_url(self.request)
+                },
             }
         )
         return context

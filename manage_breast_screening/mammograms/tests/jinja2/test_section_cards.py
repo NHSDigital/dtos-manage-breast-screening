@@ -68,7 +68,7 @@ class TestMammogramHistoryContent:
 
             <a class="nhsuk-button nhsuk-button--secondary nhsuk-button--small"
                data-module="nhsuk-button" 
-               href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/previous-mammograms/add?return_url=/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/record-medical-information/"
+               href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/previous-mammograms/add?return_url=%2Fmammograms%2F53ce8d3b-9e65-471a-b906-73809c0475d0%2Frecord-medical-information%2F"
                role="button" draggable="false">
             Add another mammogram
             </a>
@@ -336,7 +336,7 @@ class TestMammogramHistoryContent:
             </dl>
 
             <a class="nhsuk-button nhsuk-button--secondary nhsuk-button--small" data-module="nhsuk-button"
-            href="/mammograms/{appointment.pk}/previous-mammograms/add?return_url=/mammograms/{appointment.pk}/record-medical-information/"
+            href="/mammograms/{appointment.pk}/previous-mammograms/add?return_url=%2Fmammograms%2F{appointment.pk}%2Frecord-medical-information%2F"
             role="button" draggable="false">
             Add another mammogram
             </a>

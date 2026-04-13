@@ -242,7 +242,7 @@ class TestAppointmentPresenter:
         assert action["text"] == "Change"
         assert (
             action["href"]
-            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=/return/"
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=%2Freturn%2F"
         )
         assert action["visuallyHiddenText"] == "special appointment"
 
@@ -259,7 +259,7 @@ class TestAppointmentPresenter:
         assert action["text"] == "Change"
         assert (
             action["href"]
-            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=/return/"
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/special-appointment/?return_url=%2Freturn%2F"
         )
         assert action["visuallyHiddenText"] == "special appointment"
 
@@ -279,7 +279,7 @@ class TestAppointmentPresenter:
         assert action["text"] == "Change"
         assert (
             action["href"]
-            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/note-review/?return_url=/return/"
+            == "/mammograms/68d758d0-792d-430f-9c52-1e7a0c2aa1dd/note-review/?return_url=%2Freturn%2F"
         )
         assert action["visuallyHiddenText"] == "appointment note"
 
@@ -675,6 +675,19 @@ class TestAppointmentPresenter:
                 "url": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/check-information/",
             },
         ]
+
+    def test_special_appointment_action(self, mock_appointment):
+        presenter = AppointmentPresenter(mock_appointment)
+        assert presenter.special_appointment_action("/xyz?x=1&y=2") == {
+            "items": [
+                {
+                    "classes": "nhsuk-link--no-visited-state",
+                    "href": "/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/special-appointment/?return_url=%2Fxyz%3Fx%3D1%26y%3D2",
+                    "text": "Change",
+                    "visuallyHiddenText": "special appointment",
+                }
+            ]
+        }
 
 
 class TestStatusBarPresenter:

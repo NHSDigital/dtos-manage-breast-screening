@@ -1,3 +1,5 @@
+from urllib.parse import urlencode
+
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import Http404
@@ -67,7 +69,8 @@ def appointment_should_not_proceed(
                 "participant_reported_mammogram_pk": participant_reported_mammogram_pk,
             },
         )
-        + f"?return_url={return_url}"
+        + "?"
+        + urlencode({"return_url": return_url})
     )
     proceed_anyway_url = (
         reverse(
@@ -77,7 +80,8 @@ def appointment_should_not_proceed(
                 "participant_reported_mammogram_pk": participant_reported_mammogram_pk,
             },
         )
-        + f"?return_url={return_url}"
+        + "?"
+        + urlencode({"return_url": return_url})
     )
     relative_date = (
         format_relative_date(mammogram.exact_date)
@@ -164,7 +168,8 @@ class AppointmentProceedAnywayView(
                     ],
                 },
             )
-            + f"?return_url={return_url}",
+            + "?"
+            + urlencode({"return_url": return_url}),
             "text": "Back",
         }
 
