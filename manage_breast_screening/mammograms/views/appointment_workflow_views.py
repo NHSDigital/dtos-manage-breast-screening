@@ -20,6 +20,7 @@ from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
 )
+from manage_breast_screening.dicom.models import Study as DicomStudy
 from manage_breast_screening.dicom.study_service import (
     StudyService as DicomStudyService,
 )
@@ -318,9 +319,15 @@ class GatewayImages(InProgressAppointmentMixin, FormView):
             RecallService(appointment=self.appointment, current_user=self.request.user),
         )
 
-        self.mark_workflow_step_complete()
+        study = DicomStudy.for_appointment(self.appointment)
 
-        return redirect("mammograms:check_information", pk=self.appointment_pk)
+        if study.has_series_with_multiple_images():
+            return redirect(
+                "mammograms:add_multiple_images_information", pk=self.appointment_pk
+            )
+        else:
+            self.mark_workflow_step_complete()
+            return redirect("mammograms:check_information", pk=self.appointment_pk)
 
     def mark_workflow_step_complete(self):
         self.appointment.completed_workflow_steps.get_or_create(

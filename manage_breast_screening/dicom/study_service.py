@@ -48,24 +48,29 @@ class StudyService:
 
         return study
 
+    def update_additional_details(self, study: Study, additional_details: str):
+        """Update the additional details of a Study and audit the change."""
+        study.additional_details = additional_details
+        study.save(update_fields=["additional_details"])
+        self.auditor.audit_update(study)
+
     @staticmethod
     def images_by_laterality_and_view(
         images: list["Image"],
     ) -> dict[str, list["Image"]]:
+        """Group images by their laterality and view position."""
         grouped_images = {"LCC": [], "LMLO": [], "RCC": [], "RMLO": []}
         for image in images:
-            laterality_and_view = image.laterality_and_view()
-            if laterality_and_view in grouped_images:
-                grouped_images[laterality_and_view].append(image)
+            if image.laterality_and_view in grouped_images:
+                grouped_images[image.laterality_and_view].append(image)
         return grouped_images
 
     @staticmethod
     def image_counts_by_laterality_and_view(
         images: list["Image"],
     ) -> dict[str, int]:
-        counts = {"LCC": 0, "LMLO": 0, "RCC": 0, "RMLO": 0}
-        for image in images:
-            laterality_and_view = image.laterality_and_view()
-            if laterality_and_view in counts:
-                counts[laterality_and_view] += 1
-        return counts
+        """Return a dictionary with the count of images for each laterality and view position."""
+        return {
+            k: len(v)
+            for k, v in __class__.images_by_laterality_and_view(images).items()
+        }

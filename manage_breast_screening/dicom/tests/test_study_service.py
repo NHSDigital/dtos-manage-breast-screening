@@ -12,12 +12,12 @@ from manage_breast_screening.dicom.tests.factories import (
 from manage_breast_screening.gateway.tests.factories import GatewayActionFactory
 
 
+@pytest.mark.django_db
 class TestStudyService:
     @pytest.fixture
     def current_user(self):
         return MagicMock()
 
-    @pytest.mark.django_db
     def test_save_success(self, current_user):
         gateway_action = GatewayActionFactory()
         study = StudyFactory(source_message_id=gateway_action.id)
@@ -41,20 +41,29 @@ class TestStudyService:
         assert study.completeness == "complete"
         mock_audit_update.assert_called_once_with(study)
 
-    @pytest.mark.django_db
     def test_save_no_action(self, current_user):
         service = StudyService(MagicMock(), current_user)
         result = service.save()
         assert result is None
 
-    @pytest.mark.django_db
     def test_save_no_study(self, current_user):
         gateway_action = GatewayActionFactory()
         service = StudyService(gateway_action.appointment, current_user)
         result = service.save()
         assert result is None
 
-    @pytest.mark.django_db
+    def test_update_additional_details(self, current_user):
+        gateway_action = GatewayActionFactory()
+        study = StudyFactory(source_message_id=gateway_action.id)
+
+        with patch.object(Auditor, "audit_update") as mock_audit_update:
+            service = StudyService(gateway_action.appointment, current_user)
+            service.update_additional_details(study, "updated details")
+
+        study.refresh_from_db()
+        assert study.additional_details == "updated details"
+        mock_audit_update.assert_called_once_with(study)
+
     def test_images_by_laterality_and_view(self):
         action = GatewayActionFactory()
         series = SeriesFactory.create(study__source_message_id=str(action.id))
@@ -71,7 +80,6 @@ class TestStudyService:
             "RMLO": [image4, image5],
         }
 
-    @pytest.mark.django_db
     def test_image_counts_by_laterality_and_view(self):
         action = GatewayActionFactory()
         series = SeriesFactory.create(study__source_message_id=str(action.id))

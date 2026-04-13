@@ -3,7 +3,7 @@ import os
 from django.urls import reverse
 from playwright.sync_api import expect
 
-from manage_breast_screening.dicom.tests.factories import ImageFactory, StudyFactory
+from manage_breast_screening.dicom.tests.factories import ImageFactory, SeriesFactory
 from manage_breast_screening.gateway.tests.factories import (
     GatewayActionFactory,
     RelayFactory,
@@ -39,6 +39,7 @@ class TestGatewayImages(SystemTestCase):
 
         self.when_i_fill_in_additional_details_for_the_images()
         self.and_i_click_confirm_images()
+        self.then_i_see_the_repeat_images_page()
         self.then_i_see_the_image_counts_on_the_check_information_page()
 
     def and_there_is_an_appointment(self):
@@ -83,14 +84,15 @@ class TestGatewayImages(SystemTestCase):
         ).to_be_visible()
 
     def and_there_are_images_for_the_appointment(self):
-        study = StudyFactory()
+        series = SeriesFactory()
+        study = series.study
         GatewayActionFactory.create(
             appointment=self.appointment,
             id=study.source_message_id,
         )
         ImageFactory.create(series__study=study, laterality="R", view_position="MLO")
-        ImageFactory.create(series__study=study, laterality="R", view_position="CC")
-        ImageFactory.create(series__study=study, laterality="R", view_position="CC")
+        ImageFactory.create(series=series, laterality="R", view_position="CC")
+        ImageFactory.create(series=series, laterality="R", view_position="CC")
         ImageFactory.create(series__study=study, laterality="L", view_position="MLO")
         ImageFactory.create(series__study=study, laterality="L", view_position="CC")
 
@@ -108,6 +110,17 @@ class TestGatewayImages(SystemTestCase):
 
     def and_i_click_confirm_images(self):
         self.page.get_by_role("button", name="Confirm all images received").click()
+
+    def then_i_see_the_repeat_images_page(self):
+        expect(
+            self.page.get_by_text(
+                "2 RCC images were taken. Was the additional image a repeat?"
+            )
+        ).to_be_visible()
+        self.page.get_by_role("radio", name="Yes, it was a repeat").click()
+        self.page.get_by_role("checkbox", name="Participant movement").click()
+        self.page.get_by_role("checkbox", name="Positioning error").click()
+        self.page.get_by_role("button", name="Continue").click()
 
     def then_i_see_the_image_counts_on_the_check_information_page(self):
         expect(

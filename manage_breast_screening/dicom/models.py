@@ -6,6 +6,8 @@ from django.db import models
 
 from manage_breast_screening.manual_images.models import (
     IncompleteImagesReason,
+    RepeatReason,
+    RepeatType,
     StudyCompleteness,
 )
 
@@ -57,6 +59,14 @@ class Study(models.Model):
 
         return cls.objects.filter(source_message_id=action.id).first()
 
+    def series_with_multiple_images(self):
+        return self.series.annotate(image_count=models.Count("images")).filter(
+            image_count__gt=1
+        )
+
+    def has_series_with_multiple_images(self):
+        return self.series_with_multiple_images().exists()
+
     def __str__(self):
         return self.study_instance_uid
 
@@ -72,9 +82,44 @@ class Series(models.Model):
     study = models.ForeignKey(Study, on_delete=models.CASCADE, related_name="series")
     modality = models.CharField(max_length=16, blank=True)
     series_number = models.IntegerField(null=True, blank=True)
+    repeat_type = models.CharField(
+        max_length=20, choices=RepeatType.choices, blank=True, null=True
+    )
+    repeat_count = models.PositiveSmallIntegerField(blank=True, null=True)
+    repeat_reasons = ArrayField(
+        base_field=models.CharField(max_length=30, choices=RepeatReason.choices),
+        default=list,
+        blank=True,
+    )
+
+    @property
+    def count(self):
+        return self.images.count()
+
+    @property
+    def first_image(self):
+        return self.images.first()
+
+    @property
+    def extra_count(self):
+        if not self.first_image or self.first_image.implant_present:
+            return 0
+        return self.images.count() - 1
+
+    @property
+    def laterality(self):
+        if not self.first_image:
+            return ""
+        return self.first_image.laterality
+
+    @property
+    def view_position(self):
+        if not self.first_image:
+            return ""
+        return self.first_image.view_position
 
     def __str__(self):
-        return self.series_instance_uid
+        return str(self.first_image) if self.first_image else self.series_instance_uid
 
 
 class Image(models.Model):
@@ -93,10 +138,11 @@ class Image(models.Model):
     view_position = models.CharField(max_length=16, blank=True)
     implant_present = models.BooleanField(default=False)
 
+    @property
     def laterality_and_view(self):
         if self.laterality and self.view_position:
             return f"{self.laterality}{self.view_position}".upper()
-        return None
+        return ""
 
     def __str__(self):
-        return self.sop_instance_uid
+        return self.laterality_and_view
