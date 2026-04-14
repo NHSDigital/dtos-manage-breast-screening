@@ -24,7 +24,7 @@ module "webapp" {
   # alerts
   action_group_id        = var.action_group_id
   enable_alerting        = var.enable_alerting
-  alert_memory_threshold = 60
+  alert_memory_threshold = 80
   alert_cpu_threshold    = 90
 
   resource_group_name              = azurerm_resource_group.main.name
