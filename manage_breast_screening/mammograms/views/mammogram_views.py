@@ -216,8 +216,10 @@ def check_information(request, pk):
             "presented_medical_information": CheckMedicalInformationPresenter(
                 appointment
             ),
-            "presented_workflow": WorkflowPresenter(
+            "presented_workflow_steps": WorkflowPresenter(
                 AppointmentWorkflowService(appointment, request.user)
+            ).workflow_steps(
+                AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION
             ),
         },
     )

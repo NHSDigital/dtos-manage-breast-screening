@@ -67,6 +67,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConfirmIdentity(InProgressAppointmentMixin, WorkflowSidebarMixin, TemplateView):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
     template_name = "mammograms/confirm_identity.jinja"
     CONFIRM_IDENTITY_LABEL = "Confirm identity"
 
@@ -111,6 +112,9 @@ class ConfirmIdentity(InProgressAppointmentMixin, WorkflowSidebarMixin, Template
 class RecordMedicalInformation(
     InProgressAppointmentMixin, WorkflowSidebarMixin, FormView
 ):
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
     template_name = "mammograms/record_medical_information.jinja"
     form_class = RecordMedicalInformationForm
 
@@ -240,6 +244,7 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
 
 
 class TakeImages(InProgressAppointmentMixin, WorkflowSidebarMixin, FormView):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/take_images.jinja"
     form_class = RecordImagesTakenForm
 
@@ -291,6 +296,7 @@ class TakeImages(InProgressAppointmentMixin, WorkflowSidebarMixin, FormView):
 
 
 class GatewayImages(InProgressAppointmentMixin, WorkflowSidebarMixin, FormView):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/gateway_images.jinja"
     form_class = GatewayImageDetailsForm
 

@@ -131,11 +131,20 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
 
 
 class WorkflowSidebarMixin(AppointmentMixin):
+    active_workflow_step = None
+
+    def dispatch(self, request, *args, **kwargs):
+        AppointmentWorkflowService(
+            self.appointment, self.request.user
+        ).is_valid_next_step(self.active_workflow_step)
+
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["presented_workflow"] = WorkflowPresenter(
+        context["presented_workflow_steps"] = WorkflowPresenter(
             AppointmentWorkflowService(self.appointment, self.request.user)
-        )
+        ).workflow_steps(self.active_workflow_step)
 
         return context

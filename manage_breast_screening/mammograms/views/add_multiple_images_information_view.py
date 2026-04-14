@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 class AddMultipleImagesInformationView(
     InProgressAppointmentMixin, WorkflowSidebarMixin, FormView
 ):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     form_class = MultipleImagesInformationForm
     template_name = "mammograms/multiple_images_information.jinja"
 

@@ -148,3 +148,16 @@ class AppointmentWorkflowService:
         logger.info(f"Completed steps for {self.current_user.pk}: {step_names}")
 
         return step_names
+
+    def is_valid_next_step(self, requested_step):
+        completed_steps = self.get_completed_steps()
+        for step in AppointmentWorkflowStepCompletion.StepNames:
+            if step == requested_step:
+                return True
+            elif step not in completed_steps:
+                raise Exception(
+                    f"Invalid workflow step configuration. Step {step} "
+                    f"is incomplete but appears before the requested step {requested_step}"
+                )
+
+        raise Exception(f"Requested step {requested_step} not found in workflow steps.")
