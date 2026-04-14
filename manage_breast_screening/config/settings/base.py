@@ -47,6 +47,9 @@ SERVICE_ENABLED = boolean_env("SERVICE_ENABLED", default=True)
 # SECURITY WARNING: don't run with PERSONAS_ENABLED turned on in production!
 PERSONAS_ENABLED = boolean_env("PERSONAS_ENABLED", default=False)
 
+# FEATURE FLAG: Enable the Batch API endpoints and documentation. This is intended to be used for testing the Batch API in non-production environments before it's ready to be enabled in production.
+BATCH_API_ENABLED = boolean_env("BATCH_API_ENABLED", default=False)
+
 # Application definition
 
 INSTALLED_APPS = [

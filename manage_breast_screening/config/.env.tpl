@@ -37,9 +37,11 @@ BASIC_AUTH_PASSWORD=changeme
 API_AUTH_TOKEN=changeme
 
 # Django Ninja API
+# Dicom API
 API_ENABLED=true
 API_DOCS_ENABLED=true
-BATCH_API_ENABLED=false
+# Batch API
+BATCH_API_ENABLED=true
 BATCH_API_AUTH_TOKEN=changeme
 
 # Automatic loading of PACS images from gateway

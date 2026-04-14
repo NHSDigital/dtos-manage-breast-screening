@@ -54,6 +54,10 @@ Username for basic authentication
 
 To rotate: generate a random word. Only used in test environments.
 
+## BATCH_API_ENABLED
+
+A feature flag to turn on/off the Batch API endpoint, which is currently WIP as part of the Cohort to Clinic team's work. Set to `true` to enable, or `false`/don't set to hide.
+
 ## CIS2_CLIENT_ID [Secret]
 
 The client ID we've registered for this service in the CIS2 Connection Manager.
