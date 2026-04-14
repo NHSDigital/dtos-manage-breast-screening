@@ -7,19 +7,19 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("clinics", "0010_introduce_uuid_fields"),
-        ("participants", "0009_fix_participant_id"),
+        #("participants", "0009_fix_participant_id"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="screeningepisode",
-            name="participant",
-        ),
-        migrations.AddField(
-            model_name="screeningepisode",
-            name="participant",
-            field=models.ForeignKey(
-                on_delete=models.deletion.CASCADE, to="participants.participant"
-            ),
-        ),
+        # migrations.RemoveField(
+        #     model_name="screeningepisode",
+        #     name="participant",
+        # ),
+        # migrations.AddField(
+        #     model_name="screeningepisode",
+        #     name="participant",
+        #     field=models.ForeignKey(
+        #         on_delete=models.deletion.CASCADE, to="participants.participant"
+        #     ),
+        # ),
     ]

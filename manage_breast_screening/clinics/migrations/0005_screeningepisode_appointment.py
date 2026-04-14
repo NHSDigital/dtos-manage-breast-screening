@@ -8,34 +8,33 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('clinics', '0004_clinic_risk_type_alter_clinic_type'),
-        ('participants', '__first__'),
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='ScreeningEpisode',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('participant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='participants.participant')),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='Appointment',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('status', models.CharField(choices=[('CONFIRMED', 'Confirmed'), ('CANCELLED', 'Cancelled'), ('DID_NOT_ATTEND', 'Did not attend'), ('CHECKED_IN', 'Checked in'), ('SCREENED', 'Screened'), ('ATTENDED_NOT_SCREEN', 'Attended not screened')], default='CONFIRMED', max_length=50)),
-                ('clinic_slot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='clinics.clinicslot')),
-                ('screening_episode', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='clinics.screeningepisode')),
-            ],
-            options={
-                'abstract': False,
-            },
-        ),
+        # migrations.CreateModel(
+        #     name='ScreeningEpisode',
+        #     fields=[
+        #         ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('created_at', models.DateTimeField(auto_now_add=True)),
+        #         ('updated_at', models.DateTimeField(auto_now=True)),
+        #         ('participant', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='participants.participant')),
+        #     ],
+        #     options={
+        #         'abstract': False,
+        #     },
+        # ),
+        # migrations.CreateModel(
+        #     name='Appointment',
+        #     fields=[
+        #         ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+        #         ('created_at', models.DateTimeField(auto_now_add=True)),
+        #         ('updated_at', models.DateTimeField(auto_now=True)),
+        #         ('status', models.CharField(choices=[('CONFIRMED', 'Confirmed'), ('CANCELLED', 'Cancelled'), ('DID_NOT_ATTEND', 'Did not attend'), ('CHECKED_IN', 'Checked in'), ('SCREENED', 'Screened'), ('ATTENDED_NOT_SCREEN', 'Attended not screened')], default='CONFIRMED', max_length=50)),
+        #         ('clinic_slot', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='clinics.clinicslot')),
+        #         ('screening_episode', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='clinics.screeningepisode')),
+        #     ],
+        #     options={
+        #         'abstract': False,
+        #     },
+        # ),
     ]
