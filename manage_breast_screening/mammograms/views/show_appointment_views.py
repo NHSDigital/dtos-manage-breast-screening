@@ -73,7 +73,6 @@ class ParticipantDetails(AppointmentTabMixin, View):
 class MedicalInformation(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
-        appointment_presenter = AppointmentPresenter(appointment)
         participant = appointment.participant
         last_confirmed_mammogram = participant.last_confirmed_mammogram
         reported_mammograms = self.appointment.recent_reported_mammograms(
@@ -90,12 +89,14 @@ class MedicalInformation(AppointmentTabMixin, View):
             current_url=self.request.path,
         )
 
+        medical_information_presenter = MedicalInformationPresenter(appointment)
+        appointment_presenter = medical_information_presenter.appointment
         context = {
             "heading": appointment_presenter.participant.full_name,
             "caption": appointment_presenter.caption,
             "page_title": appointment_presenter.caption,
             "presented_appointment": appointment_presenter,
-            "presenter": MedicalInformationPresenter(appointment),
+            "presenter": medical_information_presenter,
             "presented_mammograms": presented_mammograms,
             "secondary_nav_items": present_secondary_nav(
                 appointment,
