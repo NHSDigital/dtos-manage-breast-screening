@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('manual_images', '0001_initial'),
-        ('participants', '0057_alter_appointmentstatus_unique_together_and_more'),
+        ('participants', '0001_squashed_0067_participantreportedmammogram_created_by_and_more'),
     ]
 
     operations = [
