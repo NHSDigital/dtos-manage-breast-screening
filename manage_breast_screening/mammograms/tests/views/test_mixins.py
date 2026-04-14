@@ -8,12 +8,17 @@ from django.views import View
 from manage_breast_screening.mammograms.views.mixins import InProgressAppointmentMixin
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 
 
 @pytest.mark.django_db
 class TestInProgressAppointmentMixin:
     class DummyView(InProgressAppointmentMixin, View):
+        active_workflow_step = (
+            AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
+        )
+
         def get(self, request, pk):
             return HttpResponse(status=201)
 
@@ -68,3 +73,25 @@ class TestInProgressAppointmentMixin:
 
         with pytest.raises(PermissionDenied):
             dummy_view(request=dummy_request, pk=appointment.pk)
+
+    def test_current_appointment_owner_not_allowed_when_previous_step_incomplete(
+        self, in_progress_appointment, dummy_request, dummy_view, clinical_user
+    ):
+        class DummyViewRequiringConfirmedIdentity(InProgressAppointmentMixin, View):
+            active_workflow_step = (
+                AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+            )
+
+            def get(self, request, pk):
+                return HttpResponse(status=201)
+
+        dummy_request.user = clinical_user
+        response = DummyViewRequiringConfirmedIdentity.as_view()(
+            request=dummy_request, pk=in_progress_appointment.pk
+        )
+
+        assert response.status_code == 302
+        assert response.headers["location"] == reverse(
+            "mammograms:show_appointment",
+            kwargs={"pk": in_progress_appointment.pk},
+        )

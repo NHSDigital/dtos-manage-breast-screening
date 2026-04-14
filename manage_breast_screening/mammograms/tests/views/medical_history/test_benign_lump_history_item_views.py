@@ -16,22 +16,24 @@ from manage_breast_screening.participants.tests.factories import (
 
 @pytest.mark.django_db
 class TestAddBenignLumpHistoryView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_benign_lump_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_benign_lump_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "left_breast_procedures": BenignLumpHistoryItem.Procedure.LUMP_REMOVED,
@@ -44,7 +46,7 @@ class TestAddBenignLumpHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assertMessages(
@@ -58,12 +60,12 @@ class TestAddBenignLumpHistoryView:
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_benign_lump_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {},
         )
@@ -79,12 +81,31 @@ class TestAddBenignLumpHistoryView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_benign_lump_history_item",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeBenignLumpHistoryView:
     @pytest.fixture
-    def history_item(self, in_progress_appointment):
-        return BenignLumpHistoryItemFactory.create(appointment=in_progress_appointment)
+    def history_item(self, confirmed_identity_appointment):
+        return BenignLumpHistoryItemFactory.create(
+            appointment=confirmed_identity_appointment
+        )
 
     def test_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(
@@ -143,12 +164,37 @@ class TestChangeBenignLumpHistoryView:
             ],
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        history_item = BenignLumpHistoryItemFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_benign_lump_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestDeleteBenignLumpHistoryView:
     @pytest.fixture
-    def history_item(self, in_progress_appointment):
-        return BenignLumpHistoryItemFactory.create(appointment=in_progress_appointment)
+    def history_item(self, confirmed_identity_appointment):
+        return BenignLumpHistoryItemFactory.create(
+            appointment=confirmed_identity_appointment
+        )
 
     def test_get_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(

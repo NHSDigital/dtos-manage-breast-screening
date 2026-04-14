@@ -4,8 +4,6 @@
 {% from "mammograms/medical_information/section_cards.jinja" import mammogram_history_content, symptoms_content, medical_history_content, breast_features_content, other_information_content %}
 {% from "mammograms/macros.jinja" import appointment_cannot_proceed_link %}
 
-{% set active_workflow_step = 'REVIEW_MEDICAL_INFORMATION' %}
-
 {% block step_content %}
 
 {% set complete_all_button %}

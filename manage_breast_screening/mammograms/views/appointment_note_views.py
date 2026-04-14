@@ -9,6 +9,9 @@ from manage_breast_screening.core.utils.relative_redirects import (
 )
 from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.participants.models import AppointmentNote
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 from ..forms import AppointmentNoteForm
 from ..presenters import AppointmentPresenter, present_secondary_nav
@@ -78,6 +81,7 @@ class AppointmentNoteView(AppointmentNoteMixin, AppointmentTabMixin, FormView):
 class AppointmentNoteReviewView(
     AppointmentNoteMixin, InProgressAppointmentMixin, FormView
 ):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION
     template_name = "mammograms/show/appointment_note_review.jinja"
     form_class = AppointmentNoteForm
 

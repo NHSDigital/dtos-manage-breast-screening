@@ -13,41 +13,45 @@ from manage_breast_screening.participants.tests.factories import (
 
 @pytest.mark.django_db
 class TestAddHormoneReplacementTherapyView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_redirects_if_already_exists(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
-        HormoneReplacementTherapyFactory.create(appointment=in_progress_appointment)
+        HormoneReplacementTherapyFactory.create(
+            appointment=confirmed_identity_appointment
+        )
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "status": HormoneReplacementTherapy.Status.NO,
@@ -57,7 +61,7 @@ class TestAddHormoneReplacementTherapyView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assertMessages(
@@ -71,12 +75,12 @@ class TestAddHormoneReplacementTherapyView:
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_hormone_replacement_therapy",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {},
         )
@@ -90,13 +94,30 @@ class TestAddHormoneReplacementTherapyView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_hormone_replacement_therapy",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeHormoneReplacementTherapyView:
     @pytest.fixture
-    def hrt(self, in_progress_appointment):
+    def hrt(self, confirmed_identity_appointment):
         return HormoneReplacementTherapyFactory.create(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         )
 
     def test_renders_response(self, clinical_user_client, hrt):
@@ -135,4 +156,24 @@ class TestChangeHormoneReplacementTherapyView:
                     message="Updated hormone replacement therapy",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        HormoneReplacementTherapyFactory.create(appointment=in_progress_appointment)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_hormone_replacement_therapy",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )

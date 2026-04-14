@@ -14,7 +14,6 @@ from manage_breast_screening.dicom.study_service import (
 )
 from manage_breast_screening.mammograms.views import gateway_images_enabled
 from manage_breast_screening.mammograms.views.mixins import (
-    InProgressAppointmentMixin,
     WorkflowSidebarMixin,
 )
 from manage_breast_screening.manual_images.models import Study
@@ -28,9 +27,8 @@ from ..forms.multiple_images_information_form import MultipleImagesInformationFo
 logger = logging.getLogger(__name__)
 
 
-class AddMultipleImagesInformationView(
-    InProgressAppointmentMixin, WorkflowSidebarMixin, FormView
-):
+class AddMultipleImagesInformationView(WorkflowSidebarMixin, FormView):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     form_class = MultipleImagesInformationForm
     template_name = "mammograms/multiple_images_information.jinja"
 
