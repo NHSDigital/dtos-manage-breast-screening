@@ -6,15 +6,44 @@ from unittest import TestCase
 import pytest
 from django.test.client import Client
 from django.utils import timezone
+from openfeature import api
+from openfeature.provider.in_memory_provider import InMemoryFlag, InMemoryProvider
 
 from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
     UserAssignmentFactory,
 )
+from manage_breast_screening.core.apps import _FLAGS_YAML
+from manage_breast_screening.core.feature_flags import setup_feature_flags
 from manage_breast_screening.users.tests.factories import UserFactory
 
 # Show long diffs in failed test output
 TestCase.maxDiff = None
+
+
+@pytest.fixture
+def with_flag_enabled():
+    """Enable a named boolean OpenFeature flag for the duration of a test.
+
+    Usage::
+
+        def test_something(with_flag_enabled):
+            with_flag_enabled("my_flag")
+            ...
+    """
+
+    enabled_flags = {}
+
+    def enable(flag_name: str):
+        enabled_flags[flag_name] = InMemoryFlag(
+            default_variant="on",
+            variants={"on": True, "off": False},
+        )
+        api.set_provider(InMemoryProvider(enabled_flags))
+
+    yield enable
+
+    setup_feature_flags(_FLAGS_YAML)
 
 
 def force_mbs_login(client, user):
