@@ -5,7 +5,7 @@ import requests_mock
 from authlib.jose import JsonWebKey, jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.test.client import Client as TestClient
+from django.test.client import Client
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -84,7 +84,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
             nhs_uid="another-user", email="another@example.com"
         )
         # Log in with a different session
-        client = TestClient()
+        client = Client()
         client.force_login(self.another_user)
 
     def and_there_is_a_cis2_logout_token(self):
@@ -100,7 +100,7 @@ class TestCIS2BackChannelLogout(SystemTestCase):
         )
 
     def when_the_back_channel_logout_endpoint_is_called(self):
-        client = TestClient()
+        client = Client()
         url = reverse("auth:cis2_back_channel_logout")
         self.response = client.post(url, data={"logout_token": self.token})
 

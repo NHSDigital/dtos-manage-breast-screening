@@ -103,7 +103,7 @@ jobs:
           DATABASE_HOST: localhost
 
       - name: 'Run unit test suite'
-        run: make test-unit
+        run: make test-unit ARGS="--doctest-modules"
         env:
           DATABASE_NAME: postgres
           DATABASE_PASSWORD: postgres
