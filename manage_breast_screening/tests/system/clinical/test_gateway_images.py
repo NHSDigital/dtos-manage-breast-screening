@@ -1,5 +1,4 @@
-import os
-
+import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
 
@@ -18,6 +17,10 @@ from ..system_test_setup import SystemTestCase
 
 
 class TestGatewayImages(SystemTestCase):
+    @pytest.fixture(autouse=True)
+    def flags(self, with_flag_enabled):
+        self.with_flag_enabled = with_flag_enabled
+
     def test_renders_no_images_content(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -63,7 +66,7 @@ class TestGatewayImages(SystemTestCase):
         )
 
     def and_gateway_images_are_enabled(self):
-        os.environ["GATEWAY_IMAGES_ENABLED"] = "true"
+        self.with_flag_enabled("gateway_images")
         RelayFactory(setting=self.appointment.clinic_slot.clinic.setting)
 
     def when_i_visit_the_take_images_page(self):
