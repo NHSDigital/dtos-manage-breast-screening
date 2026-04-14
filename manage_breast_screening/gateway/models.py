@@ -55,7 +55,7 @@ class GatewayAction(BaseModel):
 
 
 class Relay(BaseModel):
-    provider = models.ForeignKey("clinics.Provider", on_delete=models.PROTECT)
+    setting = models.ForeignKey("clinics.Setting", on_delete=models.PROTECT)
     namespace = models.CharField(
         max_length=255,
         blank=True,
@@ -74,8 +74,8 @@ class Relay(BaseModel):
     )
 
     @classmethod
-    def for_provider(cls, provider):
-        return cls.objects.filter(provider=provider).first()
+    def for_setting(cls, setting):
+        return cls.objects.filter(setting=setting).first()
 
     @cached_property
     def shared_access_key(self) -> str:

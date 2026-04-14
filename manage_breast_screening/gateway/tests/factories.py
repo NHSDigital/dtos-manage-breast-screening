@@ -26,6 +26,6 @@ class RelayFactory(DjangoModelFactory):
     hybrid_connection_name = Sequence(lambda n: f"hybrid-connection-{n}")
     key_name = "RootManageSharedAccessKey"
     shared_access_key_variable_name = Sequence(lambda n: f"SHARED_ACCESS_KEY_{n}")
-    provider = SubFactory(
-        "manage_breast_screening.clinics.tests.factories.ProviderFactory"
+    setting = SubFactory(
+        "manage_breast_screening.clinics.tests.factories.SettingFactory"
     )

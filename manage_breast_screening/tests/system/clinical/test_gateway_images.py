@@ -51,7 +51,7 @@ class TestGatewayImages(SystemTestCase):
 
     def and_gateway_images_are_enabled(self):
         os.environ["GATEWAY_IMAGES_ENABLED"] = "true"
-        RelayFactory(provider=self.appointment.provider)
+        RelayFactory(setting=self.appointment.clinic_slot.clinic.setting)
 
     def when_i_visit_the_take_images_page(self):
         self.page.goto(

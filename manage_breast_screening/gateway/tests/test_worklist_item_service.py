@@ -22,7 +22,7 @@ from .factories import RelayFactory
 class TestWorklistItemService:
     def test_create_returns_gateway_action(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -35,7 +35,7 @@ class TestWorklistItemService:
     @time_machine.travel("2025-06-15 10:30:00", tick=False)
     def test_accession_number_format(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -43,7 +43,7 @@ class TestWorklistItemService:
 
     def test_send_action_is_called(self, mock_send_action):
         appointment = AppointmentFactory()
-        relay = RelayFactory(provider=appointment.provider)
+        relay = RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -59,7 +59,7 @@ class TestWorklistItemService:
 
     def test_payload_has_action_id(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
         participant = appointment.participant
@@ -73,7 +73,7 @@ class TestWorklistItemService:
 
     def test_payload_has_participant_name_in_dicom_format(self, _):
         appointment = AppointmentFactory(first_name="Jane", last_name="Smith")
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -84,7 +84,7 @@ class TestWorklistItemService:
         appointment = AppointmentFactory()
         appointment.participant.date_of_birth = date(1975, 3, 21)
         appointment.participant.save()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -95,7 +95,7 @@ class TestWorklistItemService:
         appointment = AppointmentFactory()
         appointment.participant.gender = ""
         appointment.participant.save()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -106,7 +106,7 @@ class TestWorklistItemService:
         appointment = AppointmentFactory(
             starts_at=datetime(2025, 7, 10, 14, 30, tzinfo=timezone.utc)
         )
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
@@ -118,7 +118,7 @@ class TestWorklistItemService:
         self, mock_send_action
     ):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         WorklistItemService.create(appointment)
         action = WorklistItemService.create(appointment)
