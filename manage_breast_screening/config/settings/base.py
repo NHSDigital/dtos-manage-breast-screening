@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "manage_breast_screening.gateway",
     "rules.apps.AutodiscoverRulesConfig",
     "csp",
+    "ninja",
 ]
 
 if DJANGO_ENV != "production":
