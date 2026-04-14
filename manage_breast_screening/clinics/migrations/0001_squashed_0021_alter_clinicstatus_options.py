@@ -10,9 +10,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('clinics', '0001_initial'), ('clinics', '0002_rename_setting_id_clinic_setting_and_more'), ('clinics', '0003_alter_clinic_created_at_alter_clinicslot_clinic_and_more'), ('clinics', '0004_clinic_risk_type_alter_clinic_type'), ('clinics', '0005_screeningepisode_appointment'), ('clinics', '0006_alter_appointment_status'), ('clinics', '0007_appointment_reinvite'), ('clinics', '0008_appointment_stopped_reasons'), ('clinics', '0007_alter_appointment_status'), ('clinics', '0009_merge_20250514_1140'), ('clinics', '0010_introduce_uuid_fields'), ('clinics', '0011_recreate_participants_linkage'), ('clinics', '0012_remove_screeningepisode_participant_and_more'), ('clinics', '0013_move_clinic_state_to_table'), ('clinics', '0013_alter_clinic_setting_alter_clinicslot_clinic_and_more'), ('clinics', '0014_merge_20250620_1113'), ('clinics', '0015_userassignment'), ('clinics', '0016_alter_userassignment_provider_and_more'), ('clinics', '0017_alter_userassignment_options'), ('clinics', '0018_userassignment_roles'), ('clinics', '0019_alter_clinic_type'), ('clinics', '0020_add_provider_config'), ('clinics', '0021_alter_clinicstatus_options')]
-
     initial = True
 
     dependencies = [
