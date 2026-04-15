@@ -59,14 +59,14 @@ from manage_breast_screening.participants.presenters import ParticipantPresenter
 from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
 from ..presenters import LastKnownMammogramPresenter
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
-from .mixins import InProgressAppointmentMixin
+from .mixins import InProgressAppointmentMixin, WorkflowSidebarMixin
 
 MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME = "mammograms:record_medical_information"
 
 logger = logging.getLogger(__name__)
 
 
-class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
+class ConfirmIdentity(InProgressAppointmentMixin, WorkflowSidebarMixin, TemplateView):
     template_name = "mammograms/confirm_identity.jinja"
     CONFIRM_IDENTITY_LABEL = "Confirm identity"
 
@@ -108,7 +108,9 @@ class ConfirmIdentity(InProgressAppointmentMixin, TemplateView):
         return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
 
 
-class RecordMedicalInformation(InProgressAppointmentMixin, FormView):
+class RecordMedicalInformation(
+    InProgressAppointmentMixin, WorkflowSidebarMixin, FormView
+):
     template_name = "mammograms/record_medical_information.jinja"
     form_class = RecordMedicalInformationForm
 
@@ -237,7 +239,7 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class TakeImages(InProgressAppointmentMixin, FormView):
+class TakeImages(InProgressAppointmentMixin, WorkflowSidebarMixin, FormView):
     template_name = "mammograms/take_images.jinja"
     form_class = RecordImagesTakenForm
 
@@ -288,7 +290,7 @@ class TakeImages(InProgressAppointmentMixin, FormView):
         )
 
 
-class GatewayImages(InProgressAppointmentMixin, FormView):
+class GatewayImages(InProgressAppointmentMixin, WorkflowSidebarMixin, FormView):
     template_name = "mammograms/gateway_images.jinja"
     form_class = GatewayImageDetailsForm
 

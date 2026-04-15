@@ -41,7 +41,18 @@ class TestUpdateImageDetails(SystemTestCase):
         Series.objects.create(study=study, view_position="CC", laterality="L", count=1)
         AppointmentWorkflowStepCompletion.objects.create(
             appointment=self.appointment,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        )
+        AppointmentWorkflowStepCompletion.objects.create(
+            appointment=self.appointment,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.current_user,
+        )
+        AppointmentWorkflowStepCompletion.objects.create(
+            appointment=self.appointment,
             step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=self.current_user,
         )
 
     def and_i_am_on_the_check_information_page(self):

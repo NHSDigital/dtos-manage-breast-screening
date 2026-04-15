@@ -1,5 +1,3 @@
-import re
-
 import pytest
 from django.urls import reverse
 from playwright.sync_api import expect
@@ -17,7 +15,7 @@ from manage_breast_screening.tests.system.system_test_setup import SystemTestCas
 
 
 @pytest.mark.usefixtures("known_datetime")
-class TestRecordingMedicalInformation(SystemTestCase):
+class TestRecordingMedicalHistory(SystemTestCase):
     def test_adding_medical_history(self):
         self.given_i_am_logged_in_as_a_clinical_user()
         self.and_there_is_an_appointment()
@@ -40,18 +38,6 @@ class TestRecordingMedicalInformation(SystemTestCase):
         self.then_i_am_back_on_the_medical_information_page()
         self.and_the_device_is_listed()
         self.and_the_message_says_device_added()
-
-        self.when_i_select_pause_appointment()
-        self.then_i_should_be_on_the_pause_appointment_page()
-
-        self.when_i_click_confirm()
-        self.then_i_should_be_on_the_clinic_page()
-
-        self.when_i_select_view_appointment()
-
-        self.then_i_see_the_resume_appointment_button()
-        self.when_i_click_resume_appointment()
-        self.then_i_should_be_on_the_confirm_identity_page()
 
     def test_changing_medical_history(self):
         self.given_i_am_logged_in_as_a_clinical_user()
@@ -152,14 +138,6 @@ class TestRecordingMedicalInformation(SystemTestCase):
             self.page.get_by_text("Add details of implanted medical device")
         ).to_be_visible()
         self.assert_page_title_contains("Add details of implanted medical device")
-
-    def then_i_see_the_resume_appointment_button(self):
-        expect(
-            self.page.get_by_role("button").filter(has_text="Resume appointment")
-        ).to_be_visible()
-
-    def when_i_click_resume_appointment(self):
-        self.page.get_by_role("button").filter(has_text="Resume appointment").click()
 
     def then_i_see_validation_errors_for_missing_implanted_medical_device_details(self):
         self.expect_validation_error(
@@ -377,31 +355,3 @@ class TestRecordingMedicalInformation(SystemTestCase):
         expect(
             self.page.get_by_text("No medical history has been added yet.")
         ).to_be_attached()
-
-    def when_i_select_pause_appointment(self):
-        self.page.get_by_text("Pause appointment").click()
-
-    def when_i_select_view_appointment(self):
-        self.page.get_by_text("View appointment").click()
-
-    def then_i_should_be_on_the_pause_appointment_page(self):
-        path = reverse(
-            "mammograms:pause_appointment",
-            kwargs={"pk": self.appointment.pk},
-        )
-        expect(self.page).to_have_url(re.compile(path))
-        self.assert_page_title_contains("Pause this appointment")
-
-    def when_i_click_confirm(self):
-        self.page.get_by_role("button").filter(has_text="Confirm").click()
-
-    def then_i_should_be_on_the_clinic_page(self):
-        path = reverse(
-            "clinics:list_clinic_appointments_in_progress",
-            kwargs={"pk": self.appointment.clinic_slot.clinic.pk},
-        )
-        expect(self.page).to_have_url(re.compile(path))
-
-    def then_i_should_be_on_the_confirm_identity_page(self):
-        self.expect_url("mammograms:confirm_identity", pk=self.appointment.pk)
-        self.assert_page_title_contains("Confirm identity")

@@ -20,12 +20,14 @@ from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
     ImagesPresenterFactory,
+    WorkflowPresenter,
 )
 from manage_breast_screening.mammograms.presenters.medical_history.check_medical_information_presenter import (
     CheckMedicalInformationPresenter,
 )
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
+    AppointmentWorkflowService,
 )
 from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
@@ -37,6 +39,7 @@ from manage_breast_screening.participants.models.appointment import (
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 
 APPOINTMENT_NOT_FOUND = "Appointment not found"
+WorkflowSteps = AppointmentWorkflowStepCompletion.StepNames
 
 
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
@@ -212,6 +215,9 @@ def check_information(request, pk):
             "presented_images": ImagesPresenterFactory.presenter_for(appointment),
             "presented_medical_information": CheckMedicalInformationPresenter(
                 appointment
+            ),
+            "presented_workflow": WorkflowPresenter(
+                AppointmentWorkflowService(appointment, request.user)
             ),
         },
     )
