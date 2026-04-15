@@ -419,7 +419,7 @@ class TestAppointmentWorkflowServiceIsValidNextStep:
             confirmed_identity_appointment, clinical_user
         ).is_valid_next_step(StepNames.REVIEW_MEDICAL_INFORMATION)
 
-    def test_review_medical_information_valid_when_first_completed_by_different_user(
+    def test_review_medical_information_invalid_when_identity_confirmed_by_different_user(
         self, clinical_user, different_user
     ):
         appointment = AppointmentFactory()
