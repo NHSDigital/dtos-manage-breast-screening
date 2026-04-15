@@ -97,7 +97,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
 
         if not self.active_workflow_step:
             raise ValueError(
-                f"active_workflow_step must be set on WorkflowSidebarMixin {self.__class__.__name__}"
+                f"InProgressAppointmentMixin requires active_workflow_step to be set for {self.__class__.__name__}"
             )
 
         if not AppointmentWorkflowService(
