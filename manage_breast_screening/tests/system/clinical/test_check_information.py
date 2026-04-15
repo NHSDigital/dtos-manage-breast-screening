@@ -19,6 +19,9 @@ from manage_breast_screening.participants.tests.factories import (
     BreastFeatureAnnotationFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
 )
+from manage_breast_screening.tests.system.clinical.test_mammogram_workflow import (
+    StepNames,
+)
 
 from ..system_test_setup import SystemTestCase
 
@@ -297,6 +300,18 @@ class TestCheckInformation(SystemTestCase):
         self._add_series(study, "MLO", "L", 4)
         self._add_series(study, "EKLUND", "R", 5)
         self._add_series(study, "EKLUND", "L", 6)
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.current_user,
+        )
 
     def and_the_appointment_has_a_note(self):
         AppointmentNote.objects.create(

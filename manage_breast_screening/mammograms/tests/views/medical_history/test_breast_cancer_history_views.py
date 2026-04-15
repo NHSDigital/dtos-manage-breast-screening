@@ -12,28 +12,32 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 @pytest.fixture
-def history_item(in_progress_appointment):
-    return BreastCancerHistoryItemFactory.create(appointment=in_progress_appointment)
+def history_item(confirmed_identity_appointment):
+    return BreastCancerHistoryItemFactory.create(
+        appointment=confirmed_identity_appointment
+    )
 
 
 @pytest.mark.django_db
 class TestBreastCancerHistoryView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_breast_cancer_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_breast_cancer_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "diagnosis_location": "RIGHT_BREAST",
@@ -53,7 +57,7 @@ class TestBreastCancerHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assertMessages(
@@ -67,12 +71,12 @@ class TestBreastCancerHistoryView:
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_breast_cancer_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {},
         )

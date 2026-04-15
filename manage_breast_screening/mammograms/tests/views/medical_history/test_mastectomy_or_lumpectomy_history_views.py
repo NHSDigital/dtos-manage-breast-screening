@@ -13,22 +13,24 @@ from manage_breast_screening.participants.tests.factories import (
 
 @pytest.mark.django_db
 class TestAddMastectomyOrLumpectomyHistoryView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_mastectomy_or_lumpectomy_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_mastectomy_or_lumpectomy_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "right_breast_procedure": MastectomyOrLumpectomyHistoryItem.Procedure.LUMPECTOMY,
@@ -48,7 +50,7 @@ class TestAddMastectomyOrLumpectomyHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assertMessages(
@@ -62,12 +64,12 @@ class TestAddMastectomyOrLumpectomyHistoryView:
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_mastectomy_or_lumpectomy_history_item",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {},
         )
@@ -89,9 +91,9 @@ class TestAddMastectomyOrLumpectomyHistoryView:
 @pytest.mark.django_db
 class TestUpdateMastectomyOrLumpectomyHistoryView:
     @pytest.fixture
-    def history_item(self, in_progress_appointment):
+    def history_item(self, confirmed_identity_appointment):
         return MastectomyOrLumpectomyHistoryItemFactory.create(
-            appointment=in_progress_appointment,
+            appointment=confirmed_identity_appointment,
             right_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
             left_breast_procedure=MastectomyOrLumpectomyHistoryItem.Procedure.NO_PROCEDURE,
             right_breast_other_surgery=[
@@ -118,13 +120,13 @@ class TestUpdateMastectomyOrLumpectomyHistoryView:
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment, history_item
+        self, clinical_user_client, confirmed_identity_appointment, history_item
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_mastectomy_or_lumpectomy_history_item",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "history_item_pk": history_item.pk,
                 },
             ),
@@ -140,7 +142,7 @@ class TestUpdateMastectomyOrLumpectomyHistoryView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assertMessages(
@@ -157,9 +159,9 @@ class TestUpdateMastectomyOrLumpectomyHistoryView:
 @pytest.mark.django_db
 class TestDeleteMastectomyOrLumpectomyHistoryView:
     @pytest.fixture
-    def history_item(self, in_progress_appointment):
+    def history_item(self, confirmed_identity_appointment):
         return MastectomyOrLumpectomyHistoryItemFactory.create(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         )
 
     def test_get_renders_response(self, clinical_user_client, history_item):

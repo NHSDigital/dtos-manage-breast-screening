@@ -3,6 +3,7 @@ from django.urls import reverse
 from playwright.sync_api import expect
 
 from manage_breast_screening.core.utils.string_formatting import format_nhs_number
+from manage_breast_screening.mammograms.services.appointment_services import StepNames
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
 )
@@ -105,16 +106,13 @@ class TestRecordingSymptoms(SystemTestCase):
             current_status=AppointmentStatusNames.IN_PROGRESS,
             current_status__created_by=self.current_user,
         )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        )
 
     def and_there_is_an_appointment_with_a_symptom_added_in_the_last_three_months(self):
-        self.participant = ParticipantFactory(first_name="Janet", last_name="Williams")
-        self.screening_episode = ScreeningEpisodeFactory(participant=self.participant)
-        self.appointment = AppointmentFactory(
-            screening_episode=self.screening_episode,
-            clinic_slot__clinic__setting__provider=self.current_provider,
-            current_status=AppointmentStatusNames.IN_PROGRESS,
-            current_status__created_by=self.current_user,
-        )
+        self.and_there_is_an_appointment()
         self.symptom = SymptomFactory(
             appointment=self.appointment,
             swelling_or_shape_change=True,

@@ -13,41 +13,45 @@ from manage_breast_screening.participants.tests.factories import (
 
 @pytest.mark.django_db
 class TestAddOtherMedicalInformationView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_other_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_redirects_if_already_exists(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
-        OtherMedicalInformationFactory.create(appointment=in_progress_appointment)
+        OtherMedicalInformationFactory.create(
+            appointment=confirmed_identity_appointment
+        )
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_other_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_other_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "details": "some other medical information",
@@ -57,7 +61,7 @@ class TestAddOtherMedicalInformationView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assertMessages(
@@ -71,12 +75,12 @@ class TestAddOtherMedicalInformationView:
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_other_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {},
         )
@@ -94,9 +98,9 @@ class TestAddOtherMedicalInformationView:
 @pytest.mark.django_db
 class TestChangeOtherMedicalInformationView:
     @pytest.fixture
-    def other_medical_information(self, in_progress_appointment):
+    def other_medical_information(self, confirmed_identity_appointment):
         return OtherMedicalInformationFactory.create(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         )
 
     def test_renders_response(self, clinical_user_client, other_medical_information):
@@ -145,9 +149,9 @@ class TestChangeOtherMedicalInformationView:
 @pytest.mark.django_db
 class TestDeleteOtherMedicalInformationView:
     @pytest.fixture
-    def other_medical_information(self, in_progress_appointment):
+    def other_medical_information(self, confirmed_identity_appointment):
         return OtherMedicalInformationFactory.create(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         )
 
     def test_get_renders_response(

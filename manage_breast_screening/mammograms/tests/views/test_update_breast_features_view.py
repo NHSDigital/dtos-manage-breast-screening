@@ -11,11 +11,13 @@ from manage_breast_screening.participants.models.breast_features import (
 
 @pytest.mark.django_db
 class TestRecordBreastFeaturesView:
-    def test_get_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_get_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:update_breast_features",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -25,12 +27,12 @@ class TestRecordBreastFeaturesView:
         return {"id": "scar", "region_id": "right_upper_outer", "x": 133, "y": 82}
 
     def test_post_creates_annotation_if_it_does_not_exist(
-        self, clinical_user_client, in_progress_appointment, feature
+        self, clinical_user_client, confirmed_identity_appointment, feature
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_breast_features",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {"features": json.dumps([feature])},
         )
@@ -39,28 +41,30 @@ class TestRecordBreastFeaturesView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
-        assert in_progress_appointment.breast_features.annotations_json == [feature]
+        assert confirmed_identity_appointment.breast_features.annotations_json == [
+            feature
+        ]
 
     def test_post_updates_annotation_if_it_exists(
-        self, clinical_user_client, in_progress_appointment, feature
+        self, clinical_user_client, confirmed_identity_appointment, feature
     ):
         BreastFeatureAnnotation.objects.create(
-            appointment=in_progress_appointment,
+            appointment=confirmed_identity_appointment,
             annotations_json=[
                 {"id": "mole", "region_id": "left_upper_inner", "x": 488, "y": 164}
             ],
         )
 
-        assert in_progress_appointment.breast_features
+        assert confirmed_identity_appointment.breast_features
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_breast_features",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {"features": json.dumps([feature])},
         )
@@ -69,20 +73,22 @@ class TestRecordBreastFeaturesView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
-        in_progress_appointment.refresh_from_db()
-        assert in_progress_appointment.breast_features.annotations_json == [feature]
+        confirmed_identity_appointment.refresh_from_db()
+        assert confirmed_identity_appointment.breast_features.annotations_json == [
+            feature
+        ]
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_breast_features",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "features": "abc",

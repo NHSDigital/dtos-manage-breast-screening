@@ -14,6 +14,9 @@ from manage_breast_screening.participants.tests.factories import (
     ParticipantFactory,
     ScreeningEpisodeFactory,
 )
+from manage_breast_screening.tests.system.clinical.test_mammogram_workflow import (
+    StepNames,
+)
 
 from ..system_test_setup import SystemTestCase
 
@@ -148,6 +151,10 @@ class TestAddingPreviousMammograms(SystemTestCase):
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status=AppointmentStatusNames.IN_PROGRESS,
             current_status__created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
         )
 
     def and_i_am_on_the_participant_details_page(self):
