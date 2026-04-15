@@ -15,6 +15,9 @@ from pytest_django.asserts import (
 from manage_breast_screening.mammograms.forms.participant_reported_mammogram_form import (
     ParticipantReportedMammogramForm,
 )
+from manage_breast_screening.mammograms.tests.services.test_appointment_services import (
+    StepNames,
+)
 from manage_breast_screening.manual_images.models import Study
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
@@ -619,16 +622,14 @@ class TestAppointmentProceedAnywayView:
 
 @pytest.mark.django_db
 class TestCompleteScreening:
-    def test_renders_response(
-        self, clinical_user_client, confirmed_identity_appointment
-    ):
+    def test_renders_response(self, clinical_user_client, taken_images_appointment):
         # check_information expects appointment to have a Study
-        Study.objects.create(appointment=confirmed_identity_appointment)
+        Study.objects.create(appointment=taken_images_appointment)
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:check_information",
                 kwargs={
-                    "pk": confirmed_identity_appointment.pk,
+                    "pk": taken_images_appointment.pk,
                 },
             )
         )
@@ -643,6 +644,18 @@ class TestCompleteScreening:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
             current_status=AppointmentStatusNames.IN_PROGRESS,
             current_status__created_by=clinical_user_client.user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user_client.user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=clinical_user_client.user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.TAKE_IMAGES,
+            created_by=clinical_user_client.user,
         )
 
         response = clinical_user_client.http.post(
@@ -684,6 +697,11 @@ class TestCompleteScreening:
                 created_by=clinical_user_client.user
             )
             .values_list("step_name", flat=True)
-            .distinct(),
-            [AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION],
+            .order_by("step_name"),
+            [
+                AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION,
+                AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+                AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+                AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            ],
         )

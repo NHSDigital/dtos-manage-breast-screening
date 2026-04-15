@@ -224,20 +224,20 @@ class TestAddImageDetailsView:
 
 @pytest.mark.django_db
 class TestUpdateImageDetailsView:
-    def test_renders_response(self, clinical_user_client, reviewed_appointment):
+    def test_renders_response(self, clinical_user_client, taken_images_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_existing_data_is_prepopulated_and_post_updates_db(
-        self, clinical_user_client, reviewed_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         study = StudyFactory.create(
-            appointment=reviewed_appointment, additional_details="original notes"
+            appointment=taken_images_appointment, additional_details="original notes"
         )
         SeriesFactory.create(study=study, view_position="MLO", laterality="R", count=3)
         SeriesFactory.create(study=study, view_position="CC", laterality="R", count=1)
@@ -247,7 +247,7 @@ class TestUpdateImageDetailsView:
         get_response = clinical_user_client.http.get(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assert 'id="id_rmlo_count"' in get_response.text
@@ -256,7 +256,7 @@ class TestUpdateImageDetailsView:
         clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
             {
                 "rmlo_count": "5",
@@ -274,12 +274,12 @@ class TestUpdateImageDetailsView:
         assert study.series_set.get(view_position="MLO", laterality="R").count == 5
 
     def test_valid_post_with_single_images_redirects_to_check_information(
-        self, clinical_user_client, reviewed_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
             {
                 "rmlo_count": "1",
@@ -295,18 +295,18 @@ class TestUpdateImageDetailsView:
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
         )
 
     def test_valid_post_with_multiple_images_redirects_to_add_multiple_images_information(
-        self, clinical_user_client, reviewed_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
-        StudyFactory.create(appointment=reviewed_appointment)
+        StudyFactory.create(appointment=taken_images_appointment)
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
             {
                 "rmlo_count": "2",
@@ -322,18 +322,18 @@ class TestUpdateImageDetailsView:
             response,
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, reviewed_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
-        StudyFactory.create(appointment=reviewed_appointment)
+        StudyFactory.create(appointment=taken_images_appointment)
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:update_image_details",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
             {
                 "rmlo_count": "-1",

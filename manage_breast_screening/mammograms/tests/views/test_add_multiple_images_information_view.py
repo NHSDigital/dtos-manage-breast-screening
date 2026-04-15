@@ -43,23 +43,23 @@ class TestAddMultipleImagesInformationView:
         assert "2 RMLO images were taken." in response.text
 
     def test_redirects_when_no_series_with_multiple_images(
-        self, clinical_user_client, reviewed_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
-        study = StudyFactory(appointment=reviewed_appointment)
+        study = StudyFactory(appointment=taken_images_appointment)
         SeriesFactory(study=study, rmlo=True, count=1)
         SeriesFactory(study=study, lcc=True, count=1)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": reviewed_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
         )
 

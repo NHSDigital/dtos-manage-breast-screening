@@ -273,6 +273,18 @@ class TestCheckInformation(SystemTestCase):
             current_status__created_by=self.current_user,
             screening_episode__participant__ethnic_background_id="any_other_ethnic_background",
         )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=StepNames.TAKE_IMAGES,
+            created_by=self.current_user,
+        )
 
     def and_there_is_medical_information_for_the_appointment(self):
         ImplantedMedicalDeviceHistoryItemFactory.create(
