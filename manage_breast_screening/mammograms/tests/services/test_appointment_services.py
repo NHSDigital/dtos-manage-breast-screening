@@ -405,33 +405,27 @@ class TestAppointmentWorkflowService:
 
 @pytest.mark.django_db
 class TestAppointmentWorkflowServiceIsValidNextStep:
-    def test_confirm_identity_is_always_valid(self, clinical_user):
-        appointment = AppointmentFactory()
-
+    def test_confirm_identity_is_always_valid(
+        self, clinical_user, in_progress_appointment
+    ):
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            in_progress_appointment, clinical_user
         ).is_valid_next_step(StepNames.CONFIRM_IDENTITY)
 
     def test_review_medical_information_valid_when_first_completed_by_same_user(
-        self, clinical_user
+        self, clinical_user, confirmed_identity_appointment
     ):
-        appointment = AppointmentFactory()
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=clinical_user,
-        )
-
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            confirmed_identity_appointment, clinical_user
         ).is_valid_next_step(StepNames.REVIEW_MEDICAL_INFORMATION)
 
     def test_review_medical_information_valid_when_first_completed_by_different_user(
-        self, clinical_user
+        self, clinical_user, different_user
     ):
         appointment = AppointmentFactory()
         appointment.completed_workflow_steps.create(
             step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=UserFactory.create(nhs_uid="different_user"),
+            created_by=different_user,
         )
 
         assert not AppointmentWorkflowService(
@@ -439,99 +433,51 @@ class TestAppointmentWorkflowServiceIsValidNextStep:
         ).is_valid_next_step(StepNames.REVIEW_MEDICAL_INFORMATION)
 
     def test_review_medical_information_invalid_when_first_not_completed(
-        self, clinical_user
+        self, clinical_user, in_progress_appointment
     ):
-        appointment = AppointmentFactory()
-
         assert not AppointmentWorkflowService(
-            appointment, clinical_user
+            in_progress_appointment, clinical_user
         ).is_valid_next_step(StepNames.REVIEW_MEDICAL_INFORMATION)
 
-    def test_take_images_valid_when_all_preceding_completed(self, clinical_user):
-        appointment = AppointmentFactory()
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=clinical_user,
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=clinical_user,
-        )
-
+    def test_take_images_valid_when_all_preceding_completed(
+        self, clinical_user, reviewed_appointment
+    ):
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            reviewed_appointment, clinical_user
         ).is_valid_next_step(StepNames.TAKE_IMAGES)
 
-    def test_take_images_invalid_when_preceding_step_incomplete(self, clinical_user):
-        appointment = AppointmentFactory()
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=clinical_user,
-        )
-
+    def test_take_images_invalid_when_preceding_step_incomplete(
+        self, clinical_user, confirmed_identity_appointment
+    ):
         assert not AppointmentWorkflowService(
-            appointment, clinical_user
+            confirmed_identity_appointment, clinical_user
         ).is_valid_next_step(StepNames.TAKE_IMAGES)
 
-    def test_check_information_valid_when_all_preceding_completed(self, clinical_user):
-        appointment = AppointmentFactory()
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=clinical_user,
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=clinical_user,
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.TAKE_IMAGES,
-            created_by=clinical_user,
-        )
-
+    def test_check_information_valid_when_all_preceding_completed(
+        self, clinical_user, taken_images_appointment
+    ):
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            taken_images_appointment, clinical_user
         ).is_valid_next_step(StepNames.CHECK_INFORMATION)
 
     def test_check_information_invalid_when_preceding_step_incomplete(
-        self, clinical_user
+        self, clinical_user, reviewed_appointment
     ):
-        appointment = AppointmentFactory()
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=clinical_user,
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=clinical_user,
-        )
-
         assert not AppointmentWorkflowService(
-            appointment, clinical_user
+            reviewed_appointment, clinical_user
         ).is_valid_next_step(StepNames.CHECK_INFORMATION)
 
-    def test_already_completed_steps_are_still_valid(self, clinical_user):
-        appointment = AppointmentFactory()
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=clinical_user,
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=clinical_user,
-        )
-        appointment.completed_workflow_steps.create(
-            step_name=StepNames.TAKE_IMAGES,
-            created_by=clinical_user,
-        )
-
+    def test_already_completed_steps_are_still_valid(
+        self, clinical_user, taken_images_appointment
+    ):
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            taken_images_appointment, clinical_user
         ).is_valid_next_step(StepNames.CONFIRM_IDENTITY)
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            taken_images_appointment, clinical_user
         ).is_valid_next_step(StepNames.REVIEW_MEDICAL_INFORMATION)
         assert AppointmentWorkflowService(
-            appointment, clinical_user
+            taken_images_appointment, clinical_user
         ).is_valid_next_step(StepNames.TAKE_IMAGES)
 
     def test_invalid_step_raises_value_error(self, clinical_user):
