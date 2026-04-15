@@ -13,6 +13,7 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
     SettingFactory,
+    UserAssignmentFactory,
 )
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
@@ -36,6 +37,7 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
     SymptomFactory,
 )
+from manage_breast_screening.users.tests.factories import UserFactory
 
 logger = logging.getLogger(__name__)
 
@@ -76,8 +78,20 @@ class Command(BaseCommand):
 
     def create_provider(self, provider_key):
         provider = ProviderFactory(name=provider_key["name"], id=provider_key["id"])
+        for user_key in provider_key.get("users", []):
+            self.create_user(provider, user_key)
         for setting_key in provider_key["settings"]:
             self.create_setting(provider, setting_key)
+
+    def create_user(self, provider, user_key):
+        first_name = user_key["first_name"]
+        last_name = user_key["last_name"]
+        user = UserFactory(
+            nhs_uid=f"{first_name.lower()}_{last_name.lower()}",
+            first_name=first_name,
+            last_name=last_name,
+        )
+        UserAssignmentFactory(user=user, provider=provider, roles=[user_key["role"]])
 
     def create_setting(self, provider, setting_key):
         setting = SettingFactory(
