@@ -61,6 +61,41 @@ urlpatterns = [
         name="resume_appointment",
     ),
     path(
+        "<uuid:pk>/confirm-identity/",
+        appointment_workflow_views.ConfirmIdentity.as_view(),
+        name="confirm_identity",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/",
+        appointment_workflow_views.RecordMedicalInformation.as_view(),
+        name="record_medical_information",
+    ),
+    path(
+        "<uuid:pk>/record-medical-information/mark-reviewed/<str:section>/",
+        appointment_workflow_views.MarkSectionReviewed.as_view(),
+        name="mark_section_reviewed",
+    ),
+    path(
+        "<uuid:pk>/take-images/",
+        appointment_workflow_views.TakeImages.as_view(),
+        name="take_images",
+    ),
+    path(
+        "<uuid:pk>/gateway-images/",
+        appointment_workflow_views.GatewayImages.as_view(),
+        name="gateway_images",
+    ),
+    path(
+        "<uuid:pk>/cannot-go-ahead/",
+        appointment_workflow_views.AppointmentCannotGoAhead.as_view(),
+        name="appointment_cannot_go_ahead",
+    ),
+    path(
+        "<uuid:pk>/images/stream",
+        appointment_workflow_views.appointment_images_stream,
+        name="appointment_images_stream",
+    ),
+    path(
         "<uuid:pk>/",
         show_appointment_views.ShowAppointment.as_view(),
         name="show_appointment",
@@ -94,36 +129,6 @@ urlpatterns = [
         "<uuid:pk>/note/delete/",
         appointment_note_views.DeleteAppointmentNoteView.as_view(),
         name="delete_appointment_note",
-    ),
-    path(
-        "<uuid:pk>/confirm-identity/",
-        appointment_workflow_views.ConfirmIdentity.as_view(),
-        name="confirm_identity",
-    ),
-    path(
-        "<uuid:pk>/record-medical-information/",
-        appointment_workflow_views.RecordMedicalInformation.as_view(),
-        name="record_medical_information",
-    ),
-    path(
-        "<uuid:pk>/record-medical-information/mark-reviewed/<str:section>/",
-        appointment_workflow_views.MarkSectionReviewed.as_view(),
-        name="mark_section_reviewed",
-    ),
-    path(
-        "<uuid:pk>/take-images/",
-        appointment_workflow_views.TakeImages.as_view(),
-        name="take_images",
-    ),
-    path(
-        "<uuid:pk>/gateway-images/",
-        appointment_workflow_views.GatewayImages.as_view(),
-        name="gateway_images",
-    ),
-    path(
-        "<uuid:pk>/cannot-go-ahead/",
-        appointment_workflow_views.AppointmentCannotGoAhead.as_view(),
-        name="appointment_cannot_go_ahead",
     ),
     path(
         "<uuid:pk>/special-appointment/",
@@ -359,11 +364,6 @@ urlpatterns = [
         "<uuid:pk>/multiple-images-information/add",
         add_multiple_images_information_view.AddMultipleImagesInformationView.as_view(),
         name="add_multiple_images_information",
-    ),
-    path(
-        "<uuid:pk>/images/stream",
-        appointment_workflow_views.appointment_images_stream,
-        name="appointment_images_stream",
     ),
     path(
         "<uuid:pk>/record-medical-information/hormone-replacement-therapy/",
