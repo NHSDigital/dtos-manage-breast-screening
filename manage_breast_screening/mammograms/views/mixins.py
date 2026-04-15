@@ -88,24 +88,20 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
     active_workflow_step = None
 
     def dispatch(self, request, *args, **kwargs):
-        appointment = self.appointment  # type: ignore
-        if not appointment.current_status.is_in_progress_with(request.user):
-            return redirect(
-                "mammograms:show_appointment",
-                pk=appointment.pk,
-            )
-
         if not self.active_workflow_step:
             raise ValueError(
                 f"InProgressAppointmentMixin requires active_workflow_step to be set for {self.__class__.__name__}"
             )
 
-        if not AppointmentWorkflowService(
-            self.appointment, self.request.user
+        appointment = self.appointment  # type: ignore
+        if not appointment.current_status.is_in_progress_with(
+            request.user
+        ) or not AppointmentWorkflowService(
+            appointment, self.request.user
         ).is_valid_next_step(self.active_workflow_step):
             return redirect(
                 "mammograms:show_appointment",
-                pk=self.appointment.pk,
+                pk=appointment.pk,
             )
 
         return super().dispatch(request, *args, **kwargs)  # type: ignore
