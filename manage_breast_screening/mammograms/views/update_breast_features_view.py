@@ -1,12 +1,19 @@
 from django.urls import reverse
 from django.views.generic import FormView
 
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
+
 from ..forms.breast_feature_form import AddBreastFeatureForm, UpdateBreastFeatureForm
 from .mixins import InProgressAppointmentMixin
 
 
 class UpdateBreastFeaturesView(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/medical_information/breast_features/form.jinja"
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
 
     def get_form(self):
         if hasattr(self.appointment, "breast_features"):

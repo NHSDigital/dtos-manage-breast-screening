@@ -14,6 +14,9 @@ from manage_breast_screening.core.views.generic import (
     UpdateWithAuditView,
 )
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 from ..forms.participant_reported_mammogram_form import ParticipantReportedMammogramForm
 from .mixins import InProgressAppointmentMixin
@@ -24,6 +27,9 @@ class ParticipantReportedMammogramMixin(InProgressAppointmentMixin):
     template_name = "mammograms/add_previous_mammogram.jinja"
     thing_name = "a previous mammogram"
     within_six_months = False
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -135,6 +141,10 @@ class UpdateParticipantReportedMammogramView(
 class DeleteParticipantReportedMammogramView(
     InProgressAppointmentMixin, DeleteWithAuditView
 ):
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
+
     def get_thing_name(self, object):
         return "item"
 

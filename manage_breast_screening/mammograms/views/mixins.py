@@ -15,6 +15,9 @@ from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentWorkflowService,
 )
 from manage_breast_screening.participants.models import Appointment
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 
 class AppointmentMixin:
@@ -82,6 +85,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
 
     permission_required = Permission.DO_MAMMOGRAM_APPOINTMENT
     raise_exception = True
+    active_workflow_step = None
 
     def dispatch(self, request, *args, **kwargs):
         appointment = self.appointment  # type: ignore
@@ -89,6 +93,19 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
             return redirect(
                 "mammograms:show_appointment",
                 pk=appointment.pk,
+            )
+
+        if not self.active_workflow_step:
+            raise ValueError(
+                f"active_workflow_step must be set on WorkflowSidebarMixin {self.__class__.__name__}"
+            )
+
+        if not AppointmentWorkflowService(
+            self.appointment, self.request.user
+        ).is_valid_next_step(self.active_workflow_step):
+            return redirect(
+                "mammograms:show_appointment",
+                pk=self.appointment.pk,
             )
 
         return super().dispatch(request, *args, **kwargs)  # type: ignore
@@ -101,6 +118,10 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
     These all follow a similar structure, and have the same onwards / back
     navigation.
     """
+
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
 
     def get_success_url(self):
         return reverse(
@@ -130,23 +151,7 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
         return context
 
 
-class WorkflowSidebarMixin(AppointmentMixin):
-    active_workflow_step = None
-
-    def dispatch(self, request, *args, **kwargs):
-        if not self.active_workflow_step:
-            raise ValueError("active_workflow_step must be set on WorkflowSidebarMixin")
-
-        if not AppointmentWorkflowService(
-            self.appointment, self.request.user
-        ).is_valid_next_step(self.active_workflow_step):
-            return redirect(
-                "mammograms:show_appointment",
-                pk=self.appointment.pk,
-            )
-
-        return super().dispatch(request, *args, **kwargs)
-
+class WorkflowSidebarMixin(InProgressAppointmentMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 

@@ -8,12 +8,17 @@ from django.views import View
 from manage_breast_screening.mammograms.views.mixins import InProgressAppointmentMixin
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 
 
 @pytest.mark.django_db
 class TestInProgressAppointmentMixin:
     class DummyView(InProgressAppointmentMixin, View):
+        active_workflow_step = (
+            AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
+        )
+
         def get(self, request, pk):
             return HttpResponse(status=201)
 

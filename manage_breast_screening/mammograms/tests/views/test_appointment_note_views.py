@@ -114,12 +114,12 @@ class TestAppointmentNoteView:
 @pytest.mark.django_db
 class TestAppointmentNoteReviewView:
     def test_delete_link_not_shown_when_note_does_not_exist(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -128,15 +128,15 @@ class TestAppointmentNoteReviewView:
         assert "Delete appointment note" not in response.content.decode()
 
     def test_delete_link_shown_when_note_exists(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         AppointmentNote.objects.create(
-            appointment=in_progress_appointment, content="Existing note"
+            appointment=taken_images_appointment, content="Existing note"
         )
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assert response.status_code == 200
