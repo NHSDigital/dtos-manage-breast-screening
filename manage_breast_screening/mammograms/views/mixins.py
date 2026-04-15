@@ -134,9 +134,13 @@ class WorkflowSidebarMixin(AppointmentMixin):
     active_workflow_step = None
 
     def dispatch(self, request, *args, **kwargs):
-        AppointmentWorkflowService(
+        if not AppointmentWorkflowService(
             self.appointment, self.request.user
-        ).is_valid_next_step(self.active_workflow_step)
+        ).is_valid_next_step(self.active_workflow_step):
+            return redirect(
+                "mammograms:show_appointment",
+                pk=self.appointment.pk,
+            )
 
         return super().dispatch(request, *args, **kwargs)
 

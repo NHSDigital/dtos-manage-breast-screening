@@ -8,14 +8,12 @@ from playwright.sync_api import expect
 from manage_breast_screening.core.utils.string_formatting import format_nhs_number
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     ParticipantFactory,
     ScreeningEpisodeFactory,
-)
-from manage_breast_screening.tests.system.clinical.test_mammogram_workflow import (
-    StepNames,
 )
 
 from ..system_test_setup import SystemTestCase
@@ -153,7 +151,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
             current_status__created_by=self.current_user,
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=self.current_user,
         )
 

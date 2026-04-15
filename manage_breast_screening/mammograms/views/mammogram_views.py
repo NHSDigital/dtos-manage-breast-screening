@@ -206,9 +206,13 @@ def check_information(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
-    AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
+    if not AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
         StepNames.CHECK_INFORMATION
-    )
+    ):
+        return redirect(
+            "mammograms:show_appointment",
+            pk=appointment.pk,
+        )
 
     return render(
         request,
@@ -240,9 +244,13 @@ def complete_screening(request, pk):
     except Appointment.DoesNotExist:
         raise Http404(APPOINTMENT_NOT_FOUND)
 
-    AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
+    if not AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
         StepNames.CHECK_INFORMATION
-    )
+    ):
+        return redirect(
+            "mammograms:show_appointment",
+            pk=appointment.pk,
+        )
 
     AppointmentStatusUpdater(
         appointment=appointment, current_user=request.user

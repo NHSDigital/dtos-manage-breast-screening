@@ -10,11 +10,9 @@ from manage_breast_screening.gateway.tests.factories import (
 )
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
-from manage_breast_screening.tests.system.clinical.test_mammogram_workflow import (
-    StepNames,
-)
 
 from ..system_test_setup import SystemTestCase
 
@@ -52,15 +50,15 @@ class TestGatewayImages(SystemTestCase):
             current_status__created_by=self.current_user,
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=self.current_user,
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
             created_by=self.current_user,
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.TAKE_IMAGES,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
             created_by=self.current_user,
         )
 

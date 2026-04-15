@@ -10,6 +10,7 @@ from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.participants.models.appointment import (
     AppointmentNote,
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
@@ -18,9 +19,6 @@ from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     BreastFeatureAnnotationFactory,
     ImplantedMedicalDeviceHistoryItemFactory,
-)
-from manage_breast_screening.tests.system.clinical.test_mammogram_workflow import (
-    StepNames,
 )
 
 from ..system_test_setup import SystemTestCase
@@ -274,15 +272,15 @@ class TestCheckInformation(SystemTestCase):
             screening_episode__participant__ethnic_background_id="any_other_ethnic_background",
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
             created_by=self.current_user,
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
             created_by=self.current_user,
         )
         self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.TAKE_IMAGES,
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
             created_by=self.current_user,
         )
 
@@ -312,18 +310,6 @@ class TestCheckInformation(SystemTestCase):
         self._add_series(study, "MLO", "L", 4)
         self._add_series(study, "EKLUND", "R", 5)
         self._add_series(study, "EKLUND", "L", 6)
-        self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.CONFIRM_IDENTITY,
-            created_by=self.current_user,
-        )
-        self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=self.current_user,
-        )
-        self.appointment.completed_workflow_steps.create(
-            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
-            created_by=self.current_user,
-        )
 
     def and_the_appointment_has_a_note(self):
         AppointmentNote.objects.create(

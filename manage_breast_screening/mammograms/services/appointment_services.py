@@ -155,9 +155,12 @@ class AppointmentWorkflowService:
             if step == requested_step:
                 return True
             elif step not in completed_steps:
-                raise Exception(
+                logger.info(
                     f"Invalid workflow step configuration. Step {step} "
                     f"is incomplete but appears before the requested step {requested_step}"
                 )
+                return False
 
-        raise Exception(f"Requested step {requested_step} not found in workflow steps.")
+        raise ValueError(
+            f"Requested step {requested_step} not found in workflow steps."
+        )
