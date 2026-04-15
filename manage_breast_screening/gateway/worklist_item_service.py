@@ -112,13 +112,12 @@ class WorklistItemService:
 
     def _create_action(self) -> GatewayAction | None:
         """Create and persist the gateway action."""
-        setting = self.appointment.clinic_slot.clinic.setting
-        relay = Relay.for_setting(setting)
+        relay = Relay.for_appointment(self.appointment)
 
         if not relay:
             logger.info(
-                "No relay found for setting %s, skipping create gateway action",
-                setting.name,
+                "No relay found for appointment %s, skipping create gateway action",
+                self.appointment.pk,
             )
             return None
 

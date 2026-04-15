@@ -77,6 +77,10 @@ class Relay(BaseModel):
     def for_setting(cls, setting):
         return cls.objects.filter(setting=setting).first()
 
+    @classmethod
+    def for_appointment(cls, appointment):
+        return cls.for_setting(appointment.clinic_slot.clinic.setting)
+
     @cached_property
     def shared_access_key(self) -> str:
         return os.getenv(self.shared_access_key_variable_name, "")
