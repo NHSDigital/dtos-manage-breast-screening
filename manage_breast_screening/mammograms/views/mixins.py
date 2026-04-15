@@ -97,7 +97,7 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
         if not appointment.current_status.is_in_progress_with(
             request.user
         ) or not AppointmentWorkflowService(
-            appointment, self.request.user
+            appointment, request.user
         ).is_valid_next_step(self.active_workflow_step):
             return redirect(
                 "mammograms:show_appointment",
