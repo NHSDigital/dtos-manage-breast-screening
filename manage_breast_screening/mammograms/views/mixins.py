@@ -134,6 +134,9 @@ class WorkflowSidebarMixin(AppointmentMixin):
     active_workflow_step = None
 
     def dispatch(self, request, *args, **kwargs):
+        if not self.active_workflow_step:
+            raise ValueError("active_workflow_step must be set on WorkflowSidebarMixin")
+
         if not AppointmentWorkflowService(
             self.appointment, self.request.user
         ).is_valid_next_step(self.active_workflow_step):
