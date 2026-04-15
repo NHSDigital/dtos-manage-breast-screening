@@ -1,7 +1,9 @@
+import logging
+
 from django.conf import settings
 from django.templatetags.static import static
 from django.urls import reverse
-from jinja2 import ChoiceLoader, Environment, PackageLoader
+from jinja2 import ChoiceLoader, Environment, ModuleLoader, PackageLoader
 
 from manage_breast_screening.core.template_helpers import (
     as_hint,
@@ -13,6 +15,7 @@ from manage_breast_screening.core.template_helpers import (
 )
 from manage_breast_screening.core.utils.string_formatting import plural
 
+logger = logging.getLogger(__name__)
 
 
 def environment(**options):
@@ -21,15 +24,18 @@ def environment(**options):
         env.loader = ChoiceLoader(
             [
                 env.loader,
+                PackageLoader("nhsuk_frontend_jinja"),
                 PackageLoader(
                     "nhsuk_frontend_jinja", package_path="templates/nhsuk/components"
                 ),
                 PackageLoader(
                     "nhsuk_frontend_jinja", package_path="templates/nhsuk/macros"
                 ),
-                PackageLoader("nhsuk_frontend_jinja"),
             ]
         )
+    if settings.USE_PRECOMPILED_TEMPLATES:
+        logger.info("Using precompiled templates")
+        env.loader = ModuleLoader(settings.BASE_DIR / "jinja2_compiled.zip")
 
     env.globals.update(
         {

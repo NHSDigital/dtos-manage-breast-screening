@@ -374,3 +374,5 @@ CONTENT_SECURITY_POLICY = {
         "style-src": (CSP_SELF,),
     }
 }
+
+USE_PRECOMPILED_TEMPLATES = boolean_env("USE_PRECOMPILED_TEMPLATES")

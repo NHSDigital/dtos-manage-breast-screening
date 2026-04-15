@@ -46,3 +46,6 @@ manage_breast_screening/data/dicom
 # Test reports
 reports/
 test-results/
+
+# Compiled templates
+jinja2_compiled.zip
