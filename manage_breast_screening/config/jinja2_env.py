@@ -11,11 +11,11 @@ from manage_breast_screening.core.template_helpers import (
     no_wrap,
     raise_helper,
 )
+from manage_breast_screening.core.utils.string_formatting import plural
+
 
 
 def environment(**options):
-    import inflect
-
     env = Environment(**options, extensions=["jinja2.ext.do"])
     if env.loader:
         env.loader = ChoiceLoader(
@@ -31,8 +31,6 @@ def environment(**options):
             ]
         )
 
-    inflector = inflect.engine()
-
     env.globals.update(
         {
             "STATIC_URL": settings.STATIC_URL,
@@ -41,13 +39,12 @@ def environment(**options):
             "raise": raise_helper,
             "static": static,
             "url": reverse,
-            "inflector": inflector,
         }
     )
 
     env.filters["no_wrap"] = no_wrap
     env.filters["as_hint"] = as_hint
     env.filters["nl2br"] = nl2br
-    env.filters["plural"] = inflector.plural
+    env.filters["plural"] = plural
 
     return env

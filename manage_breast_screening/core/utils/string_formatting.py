@@ -54,3 +54,19 @@ def format_phone_number(value: str) -> str:
         return value
 
     return phonenumbers.format_number(phone, phonenumbers.PhoneNumberFormat.NATIONAL)
+
+
+def plural(noun, count, plural_noun=None):
+    """
+    Conditionally pluralise the noun depending on the count.
+
+    If plural_noun is unspecified, add s to get the plural.
+    Otherwise, return plural_noun for the plural.
+    """
+    if count == 1:
+        return noun
+
+    if plural_noun:
+        return plural_noun
+
+    return f"{noun}s"
