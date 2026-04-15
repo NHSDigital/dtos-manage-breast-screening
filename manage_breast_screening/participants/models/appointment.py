@@ -103,6 +103,7 @@ class Appointment(BaseModel):
     )
     reinvite = models.BooleanField(default=False)
     stopped_reasons = models.JSONField(null=True, blank=True)
+    additional_information = models.CharField(blank=True, null=False)
 
     @classmethod
     def filter_counts_for_clinic(cls, clinic):
