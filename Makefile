@@ -4,7 +4,7 @@ include scripts/terraform/terraform.mk
 .DEFAULT_GOAL := help
 
 .PHONY: _clean-docker _install-uv assets build clean config db dependencies deploy \
-	diagrams githooks-config githooks-run help local migrate models personas rebuild-db run \
+	diagrams githooks-config githooks-run help local migrate models rebuild-db run \
 	seed seed-demo-data shell test test-end-to-end test-integration test-lint \ test-lint-templates test-ui test-unit
 .SILENT: help run
 
@@ -79,13 +79,10 @@ db: manage_breast_screening/config/.env # Start the development database @Develo
 
 local: config seed-demo-data run
 
-rebuild-db: _clean-docker db migrate seed-demo-data personas  # Create a fresh development database @Development
+rebuild-db: _clean-docker db migrate seed-demo-data  # Create a fresh development database @Development
 
 migrate:  # Run migrations
 	uv run ./manage.py migrate
-
-personas: # Add personas to the database @Development
-	uv run ./manage.py create_personas
 
 # run with ARGS="--noinput" to bypass confirmation prompt in CI etc
 seed-demo-data:
