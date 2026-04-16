@@ -1,22 +1,49 @@
-providers:
-  - name: 'West Tester Hospital Trust'
-    id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
-    settings:
-      - name: 'West Tester BSU'
-        id: 8f2a1b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
-        clinics:
-          - file: 'west_tester_three_years_ago_clinic_data.yml'
-          - file: 'west_tester_10_days_ago_clinic_data.yml'
-          - file: 'west_tester_today_clinic_data.yml'
-      - name: 'East Tester BSU'
-        id: 7e1d2c3b-4a5f-6e7d-8c9b-0a1f2e3d4c5b
-        clinics:
-          - file: 'east_tester_three_years_ago_clinic_data.yml'
-          - file: 'east_tester_one_week_ago_clinic_data.yml'
-          - file: 'east_tester_today_clinic_data.yml'
-  - name: 'Test Provider'
-    id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa5
-    settings:
-      - name: 'Test BSU'
-        id: 8f2a1b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5d
-        clinics: []
+demo_data:
+  super_users:
+    - first_name: Clarke
+      last_name: Kent
+  providers:
+    - name: 'West Tester Hospital Trust'
+      id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa4
+      users:
+        - first_name: Rachel
+          last_name: Bennett
+          role: Administrative
+        - first_name: Louise
+          last_name: Cooper
+          role: Administrative
+        - first_name: Catherine
+          last_name: Price
+          role: Clinical
+        - first_name: Diane
+          last_name: Hayes
+          role: Clinical
+      settings:
+        - name: 'West Tester Road Campus'
+          id: 8f2a1b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
+          clinics:
+            - file: 'west_tester_three_years_ago_clinic_data.yml'
+            - file: 'west_tester_10_days_ago_clinic_data.yml'
+            - file: 'west_tester_today_clinic_data.yml'
+    - name: 'East Tester Hospital Trust'
+      id: 2a3e50e9-7e49-4c2b-8c9c-9b1f7b3a1aa5
+      users:
+        - first_name: Margaret
+          last_name: Hughes
+          role: Administrative
+        - first_name: Janet
+          last_name: Clarke
+          role: Administrative
+        - first_name: Fiona
+          last_name: Campbell
+          role: Clinical
+        - first_name: Nicola
+          last_name: Stewart
+          role: Clinical
+      settings:
+        - name: 'East Tester Road Campus'
+          id: 7e1d2c3b-4a5f-6e7d-8c9b-0a1f2e3d4c5b
+          clinics:
+            - file: 'east_tester_three_years_ago_clinic_data.yml'
+            - file: 'east_tester_one_week_ago_clinic_data.yml'
+            - file: 'east_tester_today_clinic_data.yml'

@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 from manage_breast_screening.core.utils.relative_redirects import (
     extract_relative_redirect_url,
 )
-from manage_breast_screening.users.models import PERSONAS
 
 
 @csrf_exempt
@@ -55,12 +54,12 @@ def persona_login(request):
         )
 
 
-def _persona_users(current_user):
-    persona_usernames = [persona.username for persona in PERSONAS]
+def _demo_users():
     return (
         get_user_model()
-        .objects.filter(nhs_uid__in=persona_usernames)
+        .objects.filter(assignments__isnull=False)
         .prefetch_related("assignments__provider")
+        .distinct()
         .order_by("first_name")
     )
 
@@ -75,7 +74,7 @@ def _user_entry(user, current_user):
 
 def _get_providers_with_users(current_user):
     providers = OrderedDict()
-    for user in _persona_users(current_user).filter(is_superuser=False):
+    for user in _demo_users().filter(is_superuser=False):
         entry = _user_entry(user, current_user)
         for assignment in user.assignments.all():
             provider = assignment.provider
@@ -93,8 +92,7 @@ def _get_providers_with_users(current_user):
 
 
 def _get_superusers(current_user):
-    return [
-        _user_entry(user, current_user)
-        for user in _persona_users(current_user)
-        if user.is_superuser
-    ]
+    superusers = (
+        get_user_model().objects.filter(is_superuser=True).order_by("first_name")
+    )
+    return [_user_entry(user, current_user) for user in superusers]
