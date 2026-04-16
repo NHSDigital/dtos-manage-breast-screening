@@ -40,6 +40,7 @@ from manage_breast_screening.participants.models.appointment import (
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 
 APPOINTMENT_NOT_FOUND = "Appointment not found"
+SHOW_APPOINTMENT_URL_NAME = "mammograms:show_appointment"
 WorkflowSteps = AppointmentWorkflowStepCompletion.StepNames
 
 
@@ -210,7 +211,7 @@ def check_information(request, pk):
         StepNames.CHECK_INFORMATION
     ):
         return redirect(
-            "mammograms:show_appointment",
+            SHOW_APPOINTMENT_URL_NAME,
             pk=appointment.pk,
         )
 
@@ -248,7 +249,7 @@ def complete_screening(request, pk):
         StepNames.CHECK_INFORMATION
     ):
         return redirect(
-            "mammograms:show_appointment",
+            SHOW_APPOINTMENT_URL_NAME,
             pk=appointment.pk,
         )
 
@@ -261,7 +262,7 @@ def complete_screening(request, pk):
     )
 
     view_appointment_url = reverse(
-        "mammograms:show_appointment",
+        SHOW_APPOINTMENT_URL_NAME,
         kwargs={
             "pk": appointment.pk,
         },

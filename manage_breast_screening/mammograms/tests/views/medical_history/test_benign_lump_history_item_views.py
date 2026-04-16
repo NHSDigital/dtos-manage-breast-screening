@@ -165,7 +165,7 @@ class TestChangeBenignLumpHistoryView:
         )
 
     def test_identity_confirmed_step_incomplete(
-        self, clinical_user_client, in_progress_appointment, history_item
+        self, clinical_user_client, in_progress_appointment
     ):
         history_item = BenignLumpHistoryItemFactory.create(
             appointment=in_progress_appointment
