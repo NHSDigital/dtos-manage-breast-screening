@@ -4,3 +4,4 @@ CIS2_SERVER_METADATA_URL: https://am.nhsint.auth-ptl.cis2.spineservices.nhs.uk/o
 PERSONAS_ENABLED: 0
 CSRF_TRUSTED_ORIGINS: 'https://preprod.manage-breast-screening.nhs.uk'
 APPLICATIONINSIGHTS_IS_ENABLED: True
+API_ENABLED: True
