@@ -231,6 +231,23 @@ class TestAddMultipleImagesInformationView:
         assert series.repeat_count == 2
         assert series.repeat_reasons == [RepeatReason.TECHNICAL_FAULT.value]
 
+    def test_review_medical_information_step_incomplete(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_multiple_images_information",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            ),
+        )
+
     class TestStaleFormProtection:
         """Tests for stale form detection and redirection."""
 

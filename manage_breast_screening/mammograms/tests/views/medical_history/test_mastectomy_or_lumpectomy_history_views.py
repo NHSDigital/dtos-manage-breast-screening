@@ -87,6 +87,23 @@ class TestAddMastectomyOrLumpectomyHistoryView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_mastectomy_or_lumpectomy_history_item",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestUpdateMastectomyOrLumpectomyHistoryView:
@@ -153,6 +170,29 @@ class TestUpdateMastectomyOrLumpectomyHistoryView:
                     message="Updated mastectomy or lumpectomy",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        history_item = MastectomyOrLumpectomyHistoryItemFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_mastectomy_or_lumpectomy_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
 

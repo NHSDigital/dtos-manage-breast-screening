@@ -103,3 +103,20 @@ class TestRecordBreastFeaturesView:
             """,
             response.text,
         )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:update_breast_features",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )

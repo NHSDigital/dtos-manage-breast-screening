@@ -94,6 +94,23 @@ class TestAddHormoneReplacementTherapyView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_hormone_replacement_therapy",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeHormoneReplacementTherapyView:
@@ -139,4 +156,24 @@ class TestChangeHormoneReplacementTherapyView:
                     message="Updated hormone replacement therapy",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        HormoneReplacementTherapyFactory.create(appointment=in_progress_appointment)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_hormone_replacement_therapy",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )

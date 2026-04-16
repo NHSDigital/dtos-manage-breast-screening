@@ -99,6 +99,23 @@ class TestAddBreastAugmentationHistoryView:
             ),
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_breast_augmentation_history_item",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeBreastAugmentationHistoryView:
@@ -160,6 +177,29 @@ class TestChangeBreastAugmentationHistoryView:
                     message="Updated breast implants or augmentation",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        history_item = BreastAugmentationHistoryItemFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_breast_augmentation_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
 

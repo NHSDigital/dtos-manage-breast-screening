@@ -263,6 +263,23 @@ class TestRecordMedicalInformation:
             ),
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestTakeImages:
@@ -381,6 +398,23 @@ class TestTakeImages:
             ),
             {("CC", "L", 1), ("CC", "R", 1), ("MLO", "L", 1), ("MLO", "R", 1)},
             ordered=False,
+        )
+
+    def test_review_medical_information_step_incomplete(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:take_images",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            ),
         )
 
 
@@ -519,6 +553,23 @@ class TestGatewayImages:
         assert study.imperfect_but_best_possible is False
         assert not study.reasons_incomplete
         assert study.reasons_incomplete_details == ""
+
+    def test_review_medical_information_step_incomplete(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:gateway_images",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            ),
+        )
 
 
 @pytest.mark.django_db

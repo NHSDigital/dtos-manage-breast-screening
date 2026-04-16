@@ -94,6 +94,23 @@ class TestAddOtherMedicalInformationView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_other_medical_information",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeOtherMedicalInformationView:
@@ -143,6 +160,26 @@ class TestChangeOtherMedicalInformationView:
                     message="Updated other medical information",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        OtherMedicalInformationFactory.create(appointment=in_progress_appointment)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_other_medical_information",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
 

@@ -216,6 +216,23 @@ class TestAddImageDetailsView:
             ],
         )
 
+    def test_review_medical_information_step_incomplete(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_image_details",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            ),
+        )
+
     def _assert_take_images_step_not_completed(self, appointment):
         assert not appointment.completed_workflow_steps.filter(
             step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES

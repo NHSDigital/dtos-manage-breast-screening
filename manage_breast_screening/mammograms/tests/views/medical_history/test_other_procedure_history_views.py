@@ -74,6 +74,23 @@ class TestAddOtherProcedureView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_other_procedure_history_item",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeOtherProcedureView:
@@ -128,6 +145,29 @@ class TestChangeOtherProcedureView:
                     message="Updated other procedures",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        history_item = OtherProcedureHistoryItemFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_other_procedure_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
     def test_the_other_procedure_is_deleted(self, clinical_user_client, history_item):

@@ -81,6 +81,23 @@ class TestAddBenignLumpHistoryView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_benign_lump_history_item",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeBenignLumpHistoryView:
@@ -145,6 +162,29 @@ class TestChangeBenignLumpHistoryView:
                     message="Updated benign lumps",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment, history_item
+    ):
+        history_item = BenignLumpHistoryItemFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_benign_lump_history_item",
+                kwargs={
+                    "pk": history_item.appointment_id,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
 

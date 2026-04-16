@@ -302,6 +302,23 @@ class TestAddParticipantReportedMammogram:
             clinical_user_client, confirmed_identity_appointment
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_previous_mammogram",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeParticipantReportedMammogram:
@@ -510,6 +527,30 @@ class TestChangeParticipantReportedMammogram:
 
         assert_attended_not_screened_flow(
             clinical_user_client, confirmed_identity_appointment
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        mammogram = ParticipantReportedMammogramFactory.create(
+            appointment=in_progress_appointment,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
 

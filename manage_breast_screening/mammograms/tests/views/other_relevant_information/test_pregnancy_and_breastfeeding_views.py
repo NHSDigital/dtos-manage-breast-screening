@@ -96,6 +96,23 @@ class TestAddPregnancyAndBreastfeedingView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_pregnancy_and_breastfeeding",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangePregnancyAndBreastfeedingView:
@@ -144,4 +161,24 @@ class TestChangePregnancyAndBreastfeedingView:
                     message="Updated pregnancy and breastfeeding",
                 )
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        PregnancyAndBreastfeedingFactory.create(appointment=in_progress_appointment)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_pregnancy_and_breastfeeding",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )

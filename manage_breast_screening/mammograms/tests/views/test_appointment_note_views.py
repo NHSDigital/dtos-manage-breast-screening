@@ -260,6 +260,23 @@ class TestAppointmentNoteReviewView:
 
         assert AppointmentNote.objects.get(pk=note.pk).content == "Original note"
 
+    def test_images_taken_step_incomplete(
+        self, clinical_user_client, reviewed_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": reviewed_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": reviewed_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestDeleteAppointmentNoteView:
