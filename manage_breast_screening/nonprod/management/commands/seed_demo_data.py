@@ -73,7 +73,10 @@ class Command(BaseCommand):
         with override_settings(USE_TZ=False):
             with self.file_from_name("demo_data.yml") as data_file:
                 data = yaml.safe_load(data_file)
-                for provider_key in data["providers"]:
+                demo_data = data["demo_data"]
+                for super_user_key in demo_data["super_users"]:
+                    self.create_super_user(super_user_key)
+                for provider_key in demo_data["providers"]:
                     self.create_provider(provider_key)
 
     def create_provider(self, provider_key):
@@ -82,6 +85,17 @@ class Command(BaseCommand):
             self.create_user(provider, user_key)
         for setting_key in provider_key["settings"]:
             self.create_setting(provider, setting_key)
+
+    def create_super_user(self, super_user_key):
+        first_name = super_user_key["first_name"]
+        last_name = super_user_key["last_name"]
+        UserFactory(
+            nhs_uid=f"{first_name.lower()}_{last_name.lower()}",
+            first_name=first_name,
+            last_name=last_name,
+            is_superuser=True,
+            is_staff=True,
+        )
 
     def create_user(self, provider, user_key):
         first_name = user_key["first_name"]
