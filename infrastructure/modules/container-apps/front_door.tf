@@ -6,7 +6,7 @@ data "azurerm_cdn_frontdoor_profile" "this" {
 }
 
 resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
-  count    = 0 # temporarily disabled pending WAF smoke test investigation (DTOSS-12358)
+  count    = var.deploy_infra ? 1 : 0
   provider = azurerm.hub
 
   name                              = "wafmanbrs${replace(var.environment, "-", "")}"
@@ -28,26 +28,12 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "this" {
   }
 
   custom_rule {
-    name     = "BlockNonUK"
-    priority = 10
-    type     = "MatchRule"
-    action   = "Block"
-
-    match_condition {
-      match_variable     = "SocketAddr"
-      operator           = "GeoMatch"
-      negation_condition = true
-      match_values       = ["GB"]
-    }
-  }
-
-  custom_rule {
     name                           = "RateLimitPerIP"
     priority                       = 20
     type                           = "RateLimitRule"
     action                         = "Block"
     rate_limit_duration_in_minutes = 1
-    rate_limit_threshold           = 300
+    rate_limit_threshold           = 1000
 
     match_condition {
       match_variable     = "SocketAddr"
@@ -95,5 +81,10 @@ module "frontdoor_endpoint" {
     patterns_to_match      = local.patterns_to_match
   }
 
-  security_policies = {} # temporarily disabled pending WAF smoke test investigation (DTOSS-12358)
+  security_policies = var.deploy_infra ? {
+    WAF = {
+      cdn_frontdoor_firewall_policy_id = azurerm_cdn_frontdoor_firewall_policy.this[0].id
+      associated_domain_keys           = ["${var.environment}-domain"]
+    }
+  } : {}
 }
