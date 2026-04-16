@@ -217,7 +217,9 @@ class TestRecordMedicalInformation:
     def test_creates_gateway_action(
         self, mock_send_action, clinical_user_client, in_progress_appointment
     ):
-        relay = RelayFactory.create(provider=in_progress_appointment.provider)
+        relay = RelayFactory.create(
+            setting=in_progress_appointment.clinic_slot.clinic.setting
+        )
         clinical_user_client.http.post(
             reverse(
                 "mammograms:record_medical_information",
@@ -236,7 +238,7 @@ class TestRecordMedicalInformation:
         self, clinical_user_client, monkeypatch, in_progress_appointment
     ):
         monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
-        RelayFactory.create(provider=in_progress_appointment.provider)
+        RelayFactory.create(setting=in_progress_appointment.clinic_slot.clinic.setting)
 
         with patch(
             "manage_breast_screening.gateway.relay_service.RelayService.send_action"

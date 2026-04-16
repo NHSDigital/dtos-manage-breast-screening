@@ -18,7 +18,7 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 class TestGetImagesForAppointment:
     def test_returns_empty_queryset_when_no_gateway_action(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         images = get_images_for_appointment(appointment)
 
@@ -26,7 +26,7 @@ class TestGetImagesForAppointment:
 
     def test_returns_empty_queryset_when_no_images(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         WorklistItemService.create(appointment)
 
@@ -36,7 +36,7 @@ class TestGetImagesForAppointment:
 
     def test_returns_images_linked_via_gateway_action(self, _):
         appointment = AppointmentFactory()
-        RelayFactory(provider=appointment.provider)
+        RelayFactory(setting=appointment.clinic_slot.clinic.setting)
 
         action = WorklistItemService.create(appointment)
 
