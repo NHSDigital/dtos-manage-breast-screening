@@ -2,6 +2,7 @@ from django.conf import settings
 from django.templatetags.static import static
 from django.urls import reverse
 from jinja2 import ChoiceLoader, Environment, PackageLoader
+from opentelemetry.instrumentation.jinja2 import Jinja2Instrumentor
 
 from manage_breast_screening.core.template_helpers import (
     as_hint,
@@ -12,6 +13,8 @@ from manage_breast_screening.core.template_helpers import (
     raise_helper,
 )
 from manage_breast_screening.core.utils.string_formatting import plural
+
+Jinja2Instrumentor().instrument()
 
 
 def environment(**options):

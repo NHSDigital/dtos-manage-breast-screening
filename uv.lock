@@ -858,6 +858,7 @@ dependencies = [
     { name = "mesh-client" },
     { name = "nhsuk-frontend-jinja" },
     { name = "ninja-put-patch-file-upload-middleware" },
+    { name = "opentelemetry-instrumentation-jinja2" },
     { name = "pandas" },
     { name = "phonenumbers" },
     { name = "pillow" },
@@ -914,6 +915,7 @@ requires-dist = [
     { name = "mesh-client", specifier = ">=3.2.3,<6.0.0" },
     { name = "nhsuk-frontend-jinja", specifier = "==0.7.2" },
     { name = "ninja-put-patch-file-upload-middleware", specifier = ">=0.1.4" },
+    { name = "opentelemetry-instrumentation-jinja2", specifier = ">=0.61b0" },
     { name = "pandas", specifier = ">=2.3.0,<4.0.0" },
     { name = "phonenumbers", specifier = ">=9.0.22" },
     { name = "pillow", specifier = ">=12.1.0" },
@@ -1221,6 +1223,20 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d9/33/d6852d8f2c3eef86f2f8c858d6f5315983c7063e07e595519e96d4c31c06/opentelemetry_instrumentation_flask-0.61b0.tar.gz", hash = "sha256:e9faf58dfd9860a1868442d180142645abdafc1a652dd73d469a5efd106a7d49", size = 24071, upload-time = "2026-03-04T14:20:33.437Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3e/41/619f3530324a58491f2d20f216a10dd7393629b29db4610dda642a27f4ed/opentelemetry_instrumentation_flask-0.61b0-py3-none-any.whl", hash = "sha256:e8ce474d7ce543bfbbb3e93f8a6f8263348af9d7b45502f387420cf3afa71253", size = 15996, upload-time = "2026-03-04T14:19:31.304Z" },
+]
+
+[[package]]
+name = "opentelemetry-instrumentation-jinja2"
+version = "0.61b0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/22/9b/f19886dae0a1f35dcb0f50a5b5a48710c6cf85eec005d1f8b07900e5b8a5/opentelemetry_instrumentation_jinja2-0.61b0.tar.gz", hash = "sha256:08641ca2a4b17208d527304174c672bdb74e522da41c16fb3e4be749912d3b86", size = 8463, upload-time = "2026-03-04T14:20:36.19Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/0d/98/2ff543567bade305884db2d8ccb14256a2a9fdd0a88ac5f25301f6864ea1/opentelemetry_instrumentation_jinja2-0.61b0-py3-none-any.whl", hash = "sha256:16608f3f9cf916a059848bbf469165f14e5c7489b1fe0add801d48482bf37cd7", size = 9427, upload-time = "2026-03-04T14:19:34.627Z" },
 ]
 
 [[package]]
