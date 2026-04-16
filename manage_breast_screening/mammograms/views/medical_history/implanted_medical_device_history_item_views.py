@@ -64,21 +64,15 @@ class UpdateImplantedMedicalDeviceHistoryView(
         )
 
 
-class DeleteImplantedMedicalDeviceHistoryView(DeleteWithAuditView):
+class DeleteImplantedMedicalDeviceHistoryView(
+    MedicalInformationMixin, DeleteWithAuditView
+):
     thing_name = "item"
 
     def get_success_message_content(self, object):
         return "Deleted implanted medical device"
 
     def get_object(self):
-        provider = self.request.user.current_provider
-        appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.implanted_medical_device_history_items.get(
+        return self.appointment.implanted_medical_device_history_items.get(
             pk=self.kwargs["history_item_pk"]
-        )
-
-    def get_success_url(self) -> str:
-        return reverse(
-            "mammograms:record_medical_information",
-            kwargs={"pk": self.kwargs["pk"]},
         )

@@ -52,21 +52,13 @@ class UpdateBreastCancerHistoryView(MedicalInformationMixin, UpdateWithAuditView
         )
 
 
-class DeleteBreastCancerHistoryView(DeleteWithAuditView):
+class DeleteBreastCancerHistoryView(MedicalInformationMixin, DeleteWithAuditView):
     thing_name = "item"
 
     def get_success_message_content(self, object):
         return "Deleted breast cancer"
 
     def get_object(self):
-        provider = self.request.user.current_provider
-        appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.breast_cancer_history_items.get(
+        return self.appointment.breast_cancer_history_items.get(
             pk=self.kwargs["history_item_pk"]
-        )
-
-    def get_success_url(self) -> str:
-        return reverse(
-            "mammograms:record_medical_information",
-            kwargs={"pk": self.kwargs["pk"]},
         )
