@@ -12,7 +12,7 @@ jobs:
     timeout-minutes: 2
     steps:
       - name: 'Checkout code'
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0 # Full history is needed to scan all commits
       - name: 'Scan secrets'
@@ -20,7 +20,7 @@ jobs:
 
       - name: Notify slack
         if: ${{ failure() }}
-        uses: slackapi/slack-github-action@v3.0.1
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
           webhook: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS_URL }}
           webhook-type: incoming-webhook
