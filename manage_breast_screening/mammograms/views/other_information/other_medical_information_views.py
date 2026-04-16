@@ -75,19 +75,11 @@ class UpdateOtherMedicalInformationView(MedicalInformationMixin, UpdateWithAudit
         )
 
 
-class DeleteOtherMedicalInformationView(DeleteWithAuditView):
+class DeleteOtherMedicalInformationView(MedicalInformationMixin, DeleteWithAuditView):
     thing_name = THING_NAME
 
     def get_success_message_content(self, object):
         return "Deleted other medical information"
 
     def get_object(self):
-        provider = self.request.user.current_provider
-        appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.other_medical_information
-
-    def get_success_url(self) -> str:
-        return reverse(
-            "mammograms:record_medical_information",
-            kwargs={"pk": self.kwargs["pk"]},
-        )
+        return self.appointment.other_medical_information

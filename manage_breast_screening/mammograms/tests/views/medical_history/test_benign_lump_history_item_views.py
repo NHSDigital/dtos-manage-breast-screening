@@ -249,3 +249,27 @@ class TestDeleteBenignLumpHistoryView:
         )
 
         assert not BenignLumpHistoryItem.objects.filter(pk=history_item.pk).exists()
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        history_item = BenignLumpHistoryItemFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_benign_lump_history_item",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "history_item_pk": history_item.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+        assert BenignLumpHistoryItem.objects.filter(pk=history_item.pk).exists()
