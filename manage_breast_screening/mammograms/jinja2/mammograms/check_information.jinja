@@ -38,7 +38,7 @@
 {% endblock %}
 
 {% block wizard_form %}
-  <form action="{{ url('mammograms:complete_screening', kwargs={'pk': presented_appointment.pk}) }}" method="post" novalidate>
+  <form method="post" novalidate>
     {{ csrf_input }}
     {{ button({
       "text": "Complete screening and return to clinic",
