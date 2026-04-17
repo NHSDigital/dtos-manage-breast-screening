@@ -13,7 +13,6 @@ from manage_breast_screening.clinics.tests.factories import (
     ClinicSlotFactory,
     ProviderFactory,
     SettingFactory,
-    UserAssignmentFactory,
 )
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
@@ -37,7 +36,6 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
     SymptomFactory,
 )
-from manage_breast_screening.users.tests.factories import UserFactory
 
 logger = logging.getLogger(__name__)
 
@@ -73,39 +71,13 @@ class Command(BaseCommand):
         with override_settings(USE_TZ=False):
             with self.file_from_name("demo_data.yml") as data_file:
                 data = yaml.safe_load(data_file)
-                demo_data = data["demo_data"]
-                for super_user_key in demo_data["super_users"]:
-                    self.create_super_user(super_user_key)
-                for provider_key in demo_data["providers"]:
+                for provider_key in data["providers"]:
                     self.create_provider(provider_key)
 
     def create_provider(self, provider_key):
         provider = ProviderFactory(name=provider_key["name"], id=provider_key["id"])
-        for user_key in provider_key.get("users", []):
-            self.create_user(provider, user_key)
         for setting_key in provider_key["settings"]:
             self.create_setting(provider, setting_key)
-
-    def create_super_user(self, super_user_key):
-        first_name = super_user_key["first_name"]
-        last_name = super_user_key["last_name"]
-        UserFactory(
-            nhs_uid=f"{first_name.lower()}_{last_name.lower()}",
-            first_name=first_name,
-            last_name=last_name,
-            is_superuser=True,
-            is_staff=True,
-        )
-
-    def create_user(self, provider, user_key):
-        first_name = user_key["first_name"]
-        last_name = user_key["last_name"]
-        user = UserFactory(
-            nhs_uid=f"{first_name.lower()}_{last_name.lower()}",
-            first_name=first_name,
-            last_name=last_name,
-        )
-        UserAssignmentFactory(user=user, provider=provider, roles=[user_key["role"]])
 
     def create_setting(self, provider, setting_key):
         setting = SettingFactory(

@@ -1,9 +1,12 @@
+from dataclasses import dataclass
 from functools import cached_property
 
 import rules
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 from django.utils.crypto import salted_hmac
+
+from manage_breast_screening.auth.models import Role
 
 
 class UserManager(BaseUserManager):
@@ -101,3 +104,27 @@ class User(AbstractBaseUser):
         This is required to use Django admin.
         """
         return self.has_perm(package_name) or self.is_superuser
+
+
+@dataclass
+class Persona:
+    first_name: str
+    last_name: str
+    role: str
+    is_superuser: bool = False
+
+    @property
+    def username(self):
+        return f"{self.first_name.lower()}_{self.last_name.lower()}"
+
+
+ADMINISTRATIVE_PERSONA = Persona("Anna", "Davies", Role.ADMINISTRATIVE)
+CLINICAL_PERSONA = Persona("Chloë", "Robinson", Role.CLINICAL)
+SUPERUSER_PERSONA = Persona("Priya", "Bains", Role.ADMINISTRATIVE, is_superuser=True)
+PERSONAS = [
+    ADMINISTRATIVE_PERSONA,
+    CLINICAL_PERSONA,
+    Persona("Olivia", "Morgan", Role.ADMINISTRATIVE),
+    Persona("Ella", "Foster", Role.CLINICAL),
+    SUPERUSER_PERSONA,
+]

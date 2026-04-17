@@ -8,31 +8,23 @@ from django.urls import reverse
 from pytest_django.asserts import assertInHTML
 
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
+from manage_breast_screening.users.models import PERSONAS, Role
 
 
 @pytest.fixture(autouse=True)
-def demo_users():
-    User = get_user_model()
-    for first_name, last_name, role in [
-        ("Anna", "Davies", "administrative"),
-        ("Chloë", "Robinson", "clinical"),
-        ("Olivia", "Morgan", "administrative"),
-        ("Ella", "Foster", "clinical"),
-    ]:
-        user = User.objects.create(
-            nhs_uid=f"{first_name.lower()}_{last_name.lower()}",
-            first_name=first_name,
-            last_name=last_name,
+def personas():
+    for persona in PERSONAS:
+        user = get_user_model().objects.create(
+            nhs_uid=persona.username,
+            first_name=persona.first_name,
+            last_name=persona.last_name,
+            is_superuser=persona.is_superuser,
         )
-        UserAssignmentFactory(user=user, **{role: True})
-
-    User.objects.create(
-        nhs_uid="priya_bains",
-        first_name="Priya",
-        last_name="Bains",
-        is_superuser=True,
-        is_staff=True,
-    )
+        UserAssignmentFactory(
+            user=user,
+            administrative=persona.role == Role.ADMINISTRATIVE,
+            clinical=persona.role == Role.CLINICAL,
+        )
 
 
 @pytest.mark.django_db
