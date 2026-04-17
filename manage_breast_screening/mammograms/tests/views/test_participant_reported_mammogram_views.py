@@ -701,7 +701,7 @@ class TestCompleteScreening:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:complete_screening",
+                "mammograms:check_information",
                 kwargs={
                     "pk": appointment.pk,
                 },
@@ -745,4 +745,42 @@ class TestCompleteScreening:
                 AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
                 AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
             ],
+        )
+
+    def test_identity_confirmed_step_incomplete_for_get(
+        self, clinical_user_client, reviewed_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:check_information",
+                kwargs={
+                    "pk": reviewed_appointment.pk,
+                },
+            ),
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": reviewed_appointment.pk},
+            ),
+        )
+
+    def test_identity_confirmed_step_incomplete_for_post(
+        self, clinical_user_client, reviewed_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:check_information",
+                kwargs={
+                    "pk": reviewed_appointment.pk,
+                },
+            ),
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": reviewed_appointment.pk},
+            ),
         )

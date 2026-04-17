@@ -1,12 +1,9 @@
 from urllib.parse import urlencode
 
-from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from rules.contrib.views import PermissionRequiredMixin
 
@@ -19,16 +16,9 @@ from manage_breast_screening.core.utils.relative_redirects import (
 from manage_breast_screening.core.views.generic import UpdateWithAuditView
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     AppointmentPresenter,
-    ImagesPresenterFactory,
-    WorkflowPresenter,
-)
-from manage_breast_screening.mammograms.presenters.medical_history.check_medical_information_presenter import (
-    CheckMedicalInformationPresenter,
 )
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
-    AppointmentWorkflowService,
-    StepNames,
 )
 from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
@@ -40,7 +30,6 @@ from manage_breast_screening.participants.models.appointment import (
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 
 APPOINTMENT_NOT_FOUND = "Appointment not found"
-SHOW_APPOINTMENT_URL_NAME = "mammograms:show_appointment"
 WorkflowSteps = AppointmentWorkflowStepCompletion.StepNames
 
 
@@ -192,95 +181,3 @@ class AppointmentProceedAnywayView(
         )
 
         return context
-
-
-@require_http_methods(["GET"])
-@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def check_information(request, pk):
-    provider = request.user.current_provider
-    try:
-        appointment = provider.appointments.select_related(
-            "clinic_slot__clinic",
-            "screening_episode__participant",
-            "screening_episode__participant__address",
-        ).get(pk=pk)
-    except Appointment.DoesNotExist:
-        raise Http404("Appointment not found")
-
-    if not AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
-        StepNames.CHECK_INFORMATION
-    ):
-        return redirect(
-            SHOW_APPOINTMENT_URL_NAME,
-            pk=appointment.pk,
-        )
-
-    return render(
-        request,
-        "mammograms/check_information.jinja",
-        context={
-            "page_title": "Check information",
-            "heading": "Check information",
-            "presented_appointment": AppointmentPresenter(appointment),
-            "presented_images": ImagesPresenterFactory.presenter_for(appointment),
-            "presented_medical_information": CheckMedicalInformationPresenter(
-                appointment
-            ),
-            "presented_workflow_steps": WorkflowPresenter(
-                AppointmentWorkflowService(appointment, request.user)
-            ).workflow_steps(StepNames.CHECK_INFORMATION),
-        },
-    )
-
-
-@require_http_methods(["POST"])
-@permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def complete_screening(request, pk):
-    provider = request.user.current_provider
-    try:
-        appointment = provider.appointments.select_related(
-            "clinic_slot__clinic",
-            "screening_episode__participant",
-        ).get(pk=pk)
-    except Appointment.DoesNotExist:
-        raise Http404(APPOINTMENT_NOT_FOUND)
-
-    if not AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
-        StepNames.CHECK_INFORMATION
-    ):
-        return redirect(
-            SHOW_APPOINTMENT_URL_NAME,
-            pk=appointment.pk,
-        )
-
-    AppointmentStatusUpdater(
-        appointment=appointment, current_user=request.user
-    ).screen()
-    appointment.completed_workflow_steps.create(
-        step_name=StepNames.CHECK_INFORMATION,
-        created_by=request.user,
-    )
-
-    view_appointment_url = reverse(
-        SHOW_APPOINTMENT_URL_NAME,
-        kwargs={
-            "pk": appointment.pk,
-        },
-    )
-    escaped_full_name = escape(appointment.screening_episode.participant.full_name)
-    messages.add_message(
-        request,
-        messages.SUCCESS,
-        mark_safe(
-            f"""
-            <p class=\"nhsuk-notification-banner__heading\">
-                {escaped_full_name} has been screened.
-                <a href=\"{view_appointment_url}\" class=\"app-u-nowrap\">
-                    View their appointment
-                </a>
-            </p>
-            """
-        ),
-    )
-
-    return redirect("clinics:show_clinic", pk=appointment.clinic_slot.clinic.pk)
