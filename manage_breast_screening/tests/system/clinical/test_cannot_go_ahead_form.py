@@ -65,7 +65,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         expect(link).to_be_visible()
         expect(link).to_have_attribute(
             "href",
-            f"/mammograms/{self.appointment.pk}/previous-mammograms/add?return_url=/mammograms/{self.appointment.pk}/cannot-go-ahead/%3Freturn_url%3D/mammograms/dummy-return-url/",
+            f"/mammograms/{self.appointment.pk}/previous-mammograms/add/?return_url=/mammograms/{self.appointment.pk}/cannot-go-ahead/%3Freturn_url%3D/mammograms/dummy-return-url/",
         )
 
     def when_i_submit_the_form(self):

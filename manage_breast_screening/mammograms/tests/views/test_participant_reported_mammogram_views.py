@@ -538,7 +538,7 @@ class TestChangeParticipantReportedMammogram:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_previous_mammogram",
+                "mammograms:update_previous_mammogram",
                 kwargs={
                     "pk": in_progress_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,

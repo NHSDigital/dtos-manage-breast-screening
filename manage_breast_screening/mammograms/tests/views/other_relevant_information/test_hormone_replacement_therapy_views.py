@@ -164,7 +164,7 @@ class TestChangeHormoneReplacementTherapyView:
         HormoneReplacementTherapyFactory.create(appointment=in_progress_appointment)
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_hormone_replacement_therapy",
+                "mammograms:update_hormone_replacement_therapy",
                 kwargs={
                     "pk": in_progress_appointment.pk,
                 },

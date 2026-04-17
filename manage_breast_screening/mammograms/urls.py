@@ -91,7 +91,7 @@ urlpatterns = [
         name="appointment_cannot_go_ahead",
     ),
     path(
-        "<uuid:pk>/images/stream",
+        "<uuid:pk>/images/stream/",
         appointment_workflow_views.appointment_images_stream,
         name="appointment_images_stream",
     ),
@@ -196,7 +196,7 @@ urlpatterns = [
         name="update_symptom_other",
     ),
     path(
-        "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
+        "<uuid:pk>/record-medical-information/delete-symptom/<uuid:symptom_pk>/",
         symptom_views.DeleteSymptomView.as_view(),
         name="delete_symptom",
     ),
@@ -311,12 +311,12 @@ urlpatterns = [
         name="update_breast_features",
     ),
     path(
-        "<uuid:pk>/previous-mammograms/add",
+        "<uuid:pk>/previous-mammograms/add/",
         participant_reported_mammogram_views.AddParticipantReportedMammogramView.as_view(),
         name="add_previous_mammogram",
     ),
     path(
-        "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>",
+        "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>/",
         participant_reported_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
         name="update_previous_mammogram",
     ),
@@ -326,12 +326,12 @@ urlpatterns = [
         name="delete_previous_mammogram",
     ),
     path(
-        "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>",
+        "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>/",
         mammogram_views.appointment_should_not_proceed,
         name="appointment_should_not_proceed",
     ),
     path(
-        "<uuid:pk>/proceed_anyway/<uuid:participant_reported_mammogram_pk>",
+        "<uuid:pk>/proceed-anyway/<uuid:participant_reported_mammogram_pk>/",
         mammogram_views.AppointmentProceedAnywayView.as_view(),
         name="proceed_anyway",
     ),
@@ -361,7 +361,7 @@ urlpatterns = [
         name="update_image_details",
     ),
     path(
-        "<uuid:pk>/multiple-images-information/add",
+        "<uuid:pk>/multiple-images-information/add/",
         add_multiple_images_information_view.AddMultipleImagesInformationView.as_view(),
         name="add_multiple_images_information",
     ),

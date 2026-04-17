@@ -82,7 +82,7 @@ class TestLastKnownMammogramPresenter:
                 "different_name": "",
                 "additional_information": "",
                 "change_link": {
-                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}?return_url=/mammograms/abc",
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}/?return_url=/mammograms/abc",
                     "text": "Change",
                     "visuallyHiddenText": "mammogram item",
                     "classes": "nhsuk-link--no-visited-state",
@@ -127,7 +127,7 @@ class TestLastKnownMammogramPresenter:
                 "different_name": "",
                 "additional_information": "",
                 "change_link": {
-                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{mammogram.pk}?return_url=/mammograms/abc",
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{mammogram.pk}/?return_url=/mammograms/abc",
                     "text": "Change",
                     "visuallyHiddenText": "mammogram item",
                     "classes": "nhsuk-link--no-visited-state",
@@ -163,7 +163,7 @@ class TestLastKnownMammogramPresenter:
                 "different_name": "",
                 "additional_information": "",
                 "change_link": {
-                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}?return_url=/mammograms/abc",
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_today.pk}/?return_url=/mammograms/abc",
                     "text": "Change",
                     "visuallyHiddenText": "mammogram item 1",
                     "classes": "nhsuk-link--no-visited-state",
@@ -179,7 +179,7 @@ class TestLastKnownMammogramPresenter:
                 "different_name": "Janet Williams",
                 "additional_information": "Abcd",
                 "change_link": {
-                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_earlier.pk}?return_url=/mammograms/abc",
+                    "href": f"/mammograms/{appointment_pk}/previous-mammograms/{reported_earlier.pk}/?return_url=/mammograms/abc",
                     "text": "Change",
                     "visuallyHiddenText": "mammogram item 2",
                     "classes": "nhsuk-link--no-visited-state",
@@ -235,7 +235,7 @@ class TestLastKnownMammogramPresenter:
         )
 
         assert result.add_link == {
-            "href": f"/mammograms/{appointment_pk}/previous-mammograms/add?return_url={current_url}",
+            "href": f"/mammograms/{appointment_pk}/previous-mammograms/add/?return_url={current_url}",
             "text": "Add another",
             "visuallyHiddenText": "mammogram",
         }

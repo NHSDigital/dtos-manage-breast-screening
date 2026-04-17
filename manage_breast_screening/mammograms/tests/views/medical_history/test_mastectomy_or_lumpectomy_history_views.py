@@ -180,7 +180,7 @@ class TestUpdateMastectomyOrLumpectomyHistoryView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_mastectomy_or_lumpectomy_history_item",
+                "mammograms:update_mastectomy_or_lumpectomy_history_item",
                 kwargs={
                     "pk": history_item.appointment_id,
                     "history_item_pk": history_item.pk,
