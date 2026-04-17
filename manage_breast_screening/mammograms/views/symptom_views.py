@@ -7,6 +7,9 @@ from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.mammograms.presenters.symptom_presenter import (
     SymptomPresenter,
 )
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 from manage_breast_screening.participants.models.symptom import Symptom, SymptomType
 
 from ..forms.symptom_forms import (
@@ -26,6 +29,9 @@ class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
     """
 
     symptom_type_name = "symptom"
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
 
     def get_success_url(self):
         return reverse(

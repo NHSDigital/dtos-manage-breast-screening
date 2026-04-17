@@ -28,69 +28,67 @@ def _fingerprint_for(study):
 @pytest.mark.django_db
 class TestAddMultipleImagesInformationView:
     def test_renders_response_with_series(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         SeriesFactory(study=study, rmlo=True, count=2)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             )
         )
         assert response.status_code == 200
         assert "2 RMLO images were taken." in response.text
 
     def test_redirects_when_no_series_with_multiple_images(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=taken_images_appointment)
         SeriesFactory(study=study, rmlo=True, count=1)
         SeriesFactory(study=study, lcc=True, count=1)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
         )
 
-    def test_redirects_when_no_study(
-        self, clinical_user_client, in_progress_appointment
-    ):
+    def test_redirects_when_no_study(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             )
         )
         assertRedirects(
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             ),
             fetch_redirect_response=False,
         )
 
     def test_valid_post_saves_data_and_redirects(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         series = SeriesFactory(study=study, rmlo=True, count=2)
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             ),
             {
                 "series_fingerprint": _fingerprint_for(study),
@@ -105,7 +103,7 @@ class TestAddMultipleImagesInformationView:
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             ),
         )
 
@@ -117,24 +115,28 @@ class TestAddMultipleImagesInformationView:
         ]
 
         assertQuerySetEqual(
-            in_progress_appointment.completed_workflow_steps.filter(
+            reviewed_appointment.completed_workflow_steps.filter(
                 created_by=clinical_user_client.user
             )
             .values_list("step_name", flat=True)
-            .distinct(),
-            [AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES],
+            .order_by("step_name"),
+            [
+                AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+                AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+                AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            ],
         )
 
     def test_invalid_post_renders_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         SeriesFactory(study=study, rmlo=True, count=2)
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             ),
             {
                 "series_fingerprint": _fingerprint_for(study),
@@ -148,15 +150,15 @@ class TestAddMultipleImagesInformationView:
         )
 
     def test_shows_question_for_count_2(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         SeriesFactory(study=study, lcc=True, count=2)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             )
         )
 
@@ -164,15 +166,15 @@ class TestAddMultipleImagesInformationView:
         assert "Was the additional image a repeat?" in response.text
 
     def test_shows_question_for_count_greater_than_2(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         SeriesFactory(study=study, lcc=True, count=3)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             )
         )
 
@@ -180,16 +182,16 @@ class TestAddMultipleImagesInformationView:
         assert "Were the additional images repeats?" in response.text
 
     def test_multiple_series_all_shown(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         SeriesFactory(study=study, rmlo=True, count=2)
         SeriesFactory(study=study, lcc=True, count=3)
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             )
         )
 
@@ -198,15 +200,15 @@ class TestAddMultipleImagesInformationView:
         assert "3 LCC images were taken." in response.text
 
     def test_post_with_some_repeats_saves_count(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, reviewed_appointment
     ):
-        study = StudyFactory(appointment=in_progress_appointment)
+        study = StudyFactory(appointment=reviewed_appointment)
         series = SeriesFactory(study=study, lmlo=True, count=4)
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_multiple_images_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             ),
             {
                 "series_fingerprint": _fingerprint_for(study),
@@ -220,7 +222,7 @@ class TestAddMultipleImagesInformationView:
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": reviewed_appointment.pk},
             ),
         )
 
@@ -229,13 +231,30 @@ class TestAddMultipleImagesInformationView:
         assert series.repeat_count == 2
         assert series.repeat_reasons == [RepeatReason.TECHNICAL_FAULT.value]
 
+    def test_review_medical_information_step_incomplete(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_multiple_images_information",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            ),
+        )
+
     class TestStaleFormProtection:
         """Tests for stale form detection and redirection."""
 
         def test_stale_form_redirects_with_warning(
-            self, clinical_user_client, in_progress_appointment
+            self, clinical_user_client, reviewed_appointment
         ):
-            study = StudyFactory(appointment=in_progress_appointment)
+            study = StudyFactory(appointment=reviewed_appointment)
             series = SeriesFactory(
                 study=study, laterality="R", view_position="MLO", count=2
             )
@@ -249,7 +268,7 @@ class TestAddMultipleImagesInformationView:
             response = clinical_user_client.http.post(
                 reverse(
                     "mammograms:add_multiple_images_information",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 {
                     "series_fingerprint": old_fingerprint,
@@ -261,7 +280,7 @@ class TestAddMultipleImagesInformationView:
                 response,
                 reverse(
                     "mammograms:add_image_details",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 fetch_redirect_response=False,
             )
@@ -273,9 +292,9 @@ class TestAddMultipleImagesInformationView:
             )
 
         def test_valid_fingerprint_proceeds_normally(
-            self, clinical_user_client, in_progress_appointment
+            self, clinical_user_client, reviewed_appointment
         ):
-            study = StudyFactory(appointment=in_progress_appointment)
+            study = StudyFactory(appointment=reviewed_appointment)
             series = SeriesFactory(
                 study=study, laterality="R", view_position="MLO", count=2
             )
@@ -283,7 +302,7 @@ class TestAddMultipleImagesInformationView:
             response = clinical_user_client.http.post(
                 reverse(
                     "mammograms:add_multiple_images_information",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 {
                     "series_fingerprint": _fingerprint_for(study),
@@ -296,7 +315,7 @@ class TestAddMultipleImagesInformationView:
                 response,
                 reverse(
                     "mammograms:check_information",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
             )
 
@@ -304,9 +323,9 @@ class TestAddMultipleImagesInformationView:
             assert series.repeat_type == RepeatType.ALL_REPEATS.value
 
         def test_stale_form_when_series_disappears(
-            self, clinical_user_client, in_progress_appointment
+            self, clinical_user_client, reviewed_appointment
         ):
-            study = StudyFactory(appointment=in_progress_appointment)
+            study = StudyFactory(appointment=reviewed_appointment)
             SeriesFactory(study=study, laterality="R", view_position="MLO", count=2)
             disqualified_series = SeriesFactory(
                 study=study, laterality="L", view_position="CC", count=2
@@ -322,7 +341,7 @@ class TestAddMultipleImagesInformationView:
             response = clinical_user_client.http.post(
                 reverse(
                     "mammograms:add_multiple_images_information",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 {
                     "series_fingerprint": old_fingerprint,
@@ -335,18 +354,18 @@ class TestAddMultipleImagesInformationView:
                 response,
                 reverse(
                     "mammograms:add_image_details",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 fetch_redirect_response=False,
             )
 
         def test_stale_form_when_dicom_series_is_updated(
-            self, clinical_user_client, in_progress_appointment
+            self, clinical_user_client, reviewed_appointment
         ):
             series = dicom_factories.SeriesFactory()
             study = series.study
             GatewayActionFactory(
-                id=study.source_message_id, appointment=in_progress_appointment
+                id=study.source_message_id, appointment=reviewed_appointment
             )
             dicom_factories.ImageFactory.create_batch(
                 2, series=series, laterality="L", view_position="CC"
@@ -366,7 +385,7 @@ class TestAddMultipleImagesInformationView:
                 response = clinical_user_client.http.post(
                     reverse(
                         "mammograms:add_multiple_images_information",
-                        kwargs={"pk": in_progress_appointment.pk},
+                        kwargs={"pk": reviewed_appointment.pk},
                     ),
                     {
                         "series_fingerprint": old_fingerprint,
@@ -378,20 +397,20 @@ class TestAddMultipleImagesInformationView:
                 response,
                 reverse(
                     "mammograms:gateway_images",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 fetch_redirect_response=False,
             )
 
         def test_post_redirects_when_no_study(
-            self, clinical_user_client, in_progress_appointment
+            self, clinical_user_client, reviewed_appointment
         ):
             # No study created
 
             response = clinical_user_client.http.post(
                 reverse(
                     "mammograms:add_multiple_images_information",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 {
                     "rmlo_repeat_type": RepeatType.NO_REPEATS.value,
@@ -402,7 +421,7 @@ class TestAddMultipleImagesInformationView:
                 response,
                 reverse(
                     "mammograms:check_information",
-                    kwargs={"pk": in_progress_appointment.pk},
+                    kwargs={"pk": reviewed_appointment.pk},
                 ),
                 fetch_redirect_response=False,
             )

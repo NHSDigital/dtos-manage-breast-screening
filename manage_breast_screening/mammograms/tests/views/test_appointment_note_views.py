@@ -114,12 +114,12 @@ class TestAppointmentNoteView:
 @pytest.mark.django_db
 class TestAppointmentNoteReviewView:
     def test_delete_link_not_shown_when_note_does_not_exist(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assert response.status_code == 200
@@ -128,28 +128,28 @@ class TestAppointmentNoteReviewView:
         assert "Delete appointment note" not in response.content.decode()
 
     def test_delete_link_shown_when_note_exists(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         AppointmentNote.objects.create(
-            appointment=in_progress_appointment, content="Existing note"
+            appointment=taken_images_appointment, content="Existing note"
         )
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
         )
         assert response.status_code == 200
         assert "Delete appointment note" in response.content.decode()
 
-    def test_users_can_save_note(self, clinical_user_client, in_progress_appointment):
-        StudyFactory.create(appointment=in_progress_appointment)
+    def test_users_can_save_note(self, clinical_user_client, taken_images_appointment):
+        StudyFactory.create(appointment=taken_images_appointment)
 
         note_content = "Participant prefers left arm blood pressure readings."
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
             {"content": note_content},
         )
@@ -158,22 +158,22 @@ class TestAppointmentNoteReviewView:
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
         )
-        saved_note = AppointmentNote.objects.get(appointment=in_progress_appointment)
+        saved_note = AppointmentNote.objects.get(appointment=taken_images_appointment)
         assert saved_note.content == note_content
 
     def test_save_redirects_to_return_url(
-        self, clinical_user_client, clinical_user, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
         check_info_url = reverse(
-            "mammograms:check_information", kwargs={"pk": in_progress_appointment.pk}
+            "mammograms:check_information", kwargs={"pk": taken_images_appointment.pk}
         )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             )
             + f"?return_url={check_info_url}",
             {"content": "Test note content"},
@@ -181,18 +181,18 @@ class TestAppointmentNoteReviewView:
         assertRedirects(response, check_info_url, fetch_redirect_response=False)
 
     def test_users_can_update_note(
-        self, clinical_user_client, clinical_user, in_progress_appointment
+        self, clinical_user_client, taken_images_appointment
     ):
-        StudyFactory.create(appointment=in_progress_appointment)
+        StudyFactory.create(appointment=taken_images_appointment)
         note = AppointmentNote.objects.create(
-            appointment=in_progress_appointment, content="Original note"
+            appointment=taken_images_appointment, content="Original note"
         )
 
         updated_content = "Updated note content"
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:appointment_note_review",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
             {"content": updated_content},
         )
@@ -201,7 +201,7 @@ class TestAppointmentNoteReviewView:
             response,
             reverse(
                 "mammograms:check_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": taken_images_appointment.pk},
             ),
         )
         updated_note = AppointmentNote.objects.get(pk=note.pk)
@@ -259,6 +259,23 @@ class TestAppointmentNoteReviewView:
         )
 
         assert AppointmentNote.objects.get(pk=note.pk).content == "Original note"
+
+    def test_images_taken_step_incomplete(
+        self, clinical_user_client, reviewed_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": reviewed_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": reviewed_appointment.pk},
+            ),
+        )
 
 
 @pytest.mark.django_db

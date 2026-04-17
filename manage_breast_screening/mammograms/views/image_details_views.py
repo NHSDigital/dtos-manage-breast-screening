@@ -9,7 +9,6 @@ from manage_breast_screening.mammograms.services.appointment_services import (
     RecallService,
 )
 from manage_breast_screening.mammograms.views.mixins import (
-    InProgressAppointmentMixin,
     WorkflowSidebarMixin,
 )
 from manage_breast_screening.manual_images.services import StudyService
@@ -22,7 +21,8 @@ from ..forms.images.image_details_form import ImageDetailsForm
 logger = logging.getLogger(__name__)
 
 
-class AddImageDetailsView(InProgressAppointmentMixin, WorkflowSidebarMixin, FormView):
+class AddImageDetailsView(WorkflowSidebarMixin, FormView):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     form_class = ImageDetailsForm
     template_name = "mammograms/image_details.jinja"
 
@@ -69,9 +69,8 @@ class AddImageDetailsView(InProgressAppointmentMixin, WorkflowSidebarMixin, Form
         )
 
 
-class UpdateImageDetailsView(
-    InProgressAppointmentMixin, WorkflowSidebarMixin, FormView
-):
+class UpdateImageDetailsView(WorkflowSidebarMixin, FormView):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     form_class = ImageDetailsForm
     template_name = "mammograms/image_details.jinja"
 

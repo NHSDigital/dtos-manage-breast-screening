@@ -15,6 +15,9 @@ from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentWorkflowService,
 )
 from manage_breast_screening.participants.models import Appointment
+from manage_breast_screening.participants.models.appointment import (
+    AppointmentWorkflowStepCompletion,
+)
 
 
 class AppointmentMixin:
@@ -82,10 +85,20 @@ class InProgressAppointmentMixin(PermissionRequiredMixin, AppointmentMixin):
 
     permission_required = Permission.DO_MAMMOGRAM_APPOINTMENT
     raise_exception = True
+    active_workflow_step = None
 
     def dispatch(self, request, *args, **kwargs):
+        if not self.active_workflow_step:
+            raise ValueError(
+                "InProgressAppointmentMixin requires active_workflow_step to be set"
+            )
+
         appointment = self.appointment  # type: ignore
-        if not appointment.current_status.is_in_progress_with(request.user):
+        if not appointment.current_status.is_in_progress_with(
+            request.user
+        ) or not AppointmentWorkflowService(
+            appointment, request.user
+        ).is_valid_next_step(self.active_workflow_step):
             return redirect(
                 "mammograms:show_appointment",
                 pk=appointment.pk,
@@ -101,6 +114,10 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
     These all follow a similar structure, and have the same onwards / back
     navigation.
     """
+
+    active_workflow_step = (
+        AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
+    )
 
     def get_success_url(self):
         return reverse(
@@ -130,12 +147,12 @@ class MedicalInformationMixin(InProgressAppointmentMixin):
         return context
 
 
-class WorkflowSidebarMixin(AppointmentMixin):
+class WorkflowSidebarMixin(InProgressAppointmentMixin):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["presented_workflow"] = WorkflowPresenter(
+        context["presented_workflow_steps"] = WorkflowPresenter(
             AppointmentWorkflowService(self.appointment, self.request.user)
-        )
+        ).workflow_steps(self.active_workflow_step)
 
         return context

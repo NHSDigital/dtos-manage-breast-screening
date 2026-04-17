@@ -1,8 +1,6 @@
 {% extends "workflow_step.jinja" %}
 {% from "nhsuk/components/button/macro.jinja" import button %}
 
-{% set active_workflow_step = 'TAKE_IMAGES' %}
-
 {% block form %}
   {{ form.series_fingerprint }}
   <p>You have indicated multiple images were needed for some views.</p>

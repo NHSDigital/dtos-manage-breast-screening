@@ -10,6 +10,7 @@ from manage_breast_screening.manual_images.models import Series, Study
 from manage_breast_screening.participants.models.appointment import (
     AppointmentNote,
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.models.medical_history.implanted_medical_device_history_item import (
     ImplantedMedicalDeviceHistoryItem,
@@ -269,6 +270,18 @@ class TestCheckInformation(SystemTestCase):
             current_status=AppointmentStatusNames.IN_PROGRESS,
             current_status__created_by=self.current_user,
             screening_episode__participant__ethnic_background_id="any_other_ethnic_background",
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=self.current_user,
         )
 
     def and_there_is_medical_information_for_the_appointment(self):

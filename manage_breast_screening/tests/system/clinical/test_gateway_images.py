@@ -10,6 +10,7 @@ from manage_breast_screening.gateway.tests.factories import (
 )
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
+    AppointmentWorkflowStepCompletion,
 )
 from manage_breast_screening.participants.tests.factories import AppointmentFactory
 
@@ -47,6 +48,18 @@ class TestGatewayImages(SystemTestCase):
             clinic_slot__clinic__setting__provider=self.current_provider,
             current_status=AppointmentStatusNames.IN_PROGRESS,
             current_status__created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=self.current_user,
+        )
+        self.appointment.completed_workflow_steps.create(
+            step_name=AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            created_by=self.current_user,
         )
 
     def and_gateway_images_are_enabled(self):

@@ -15,6 +15,9 @@ from pytest_django.asserts import (
 from manage_breast_screening.mammograms.forms.participant_reported_mammogram_form import (
     ParticipantReportedMammogramForm,
 )
+from manage_breast_screening.mammograms.tests.services.test_appointment_services import (
+    StepNames,
+)
 from manage_breast_screening.manual_images.models import Study
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
 from manage_breast_screening.participants.models.appointment import (
@@ -104,9 +107,9 @@ def assert_success_message(response, message_text):
 
 
 @pytest.fixture
-def participant_reported_mammogram(in_progress_appointment):
+def participant_reported_mammogram(confirmed_identity_appointment):
     return ParticipantReportedMammogramFactory.create(
-        appointment=in_progress_appointment,
+        appointment=confirmed_identity_appointment,
         location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
     )
 
@@ -124,33 +127,38 @@ def valid_mammogram_form_data():
 
 @pytest.mark.django_db
 class TestAddParticipantReportedMammogram:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_invalid_post_displays_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert_mammogram_validation_errors(response)
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, valid_mammogram_form_data, in_progress_appointment
+        self,
+        clinical_user_client,
+        valid_mammogram_form_data,
+        confirmed_identity_appointment,
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             valid_mammogram_form_data,
         )
@@ -158,24 +166,24 @@ class TestAddParticipantReportedMammogram:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assert_success_message(response, "Added a previous mammogram")
 
     @pytest.mark.parametrize("exact_date", DATES_SIX_MONTHS_OR_MORE)
     def test_post_exact_date_six_months_or_more(
-        self, clinical_user_client, exact_date, in_progress_appointment
+        self, clinical_user_client, exact_date, confirmed_identity_appointment
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": in_progress_appointment.pk},
+            kwargs={"pk": confirmed_identity_appointment.pk},
         )
 
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             build_exact_date_form_data(exact_date, return_url),
         )
@@ -185,16 +193,16 @@ class TestAddParticipantReportedMammogram:
 
     @pytest.mark.parametrize("exact_date", DATES_WITHIN_LAST_SIX_MONTHS)
     def test_post_exact_date_within_last_six_months(
-        self, clinical_user_client, exact_date, in_progress_appointment
+        self, clinical_user_client, exact_date, confirmed_identity_appointment
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": in_progress_appointment.pk},
+            kwargs={"pk": confirmed_identity_appointment.pk},
         )
 
         assert (
             ParticipantReportedMammogram.objects.filter(
-                appointment=in_progress_appointment
+                appointment=confirmed_identity_appointment
             ).count()
             == 0
         )
@@ -202,13 +210,13 @@ class TestAddParticipantReportedMammogram:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             build_exact_date_form_data(exact_date, return_url),
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         ).first()
 
         assertRedirects(
@@ -216,30 +224,32 @@ class TestAddParticipantReportedMammogram:
             reverse(
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
-                    "appointment_pk": in_progress_appointment.pk,
+                    "appointment_pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={return_url}",
         )
         assert (
-            in_progress_appointment.current_status.name
+            confirmed_identity_appointment.current_status.name
             == AppointmentStatusNames.IN_PROGRESS
         )
 
-        assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
+        assert_attended_not_screened_flow(
+            clinical_user_client, confirmed_identity_appointment
+        )
 
     def test_post_approx_within_last_six_months(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": in_progress_appointment.pk},
+            kwargs={"pk": confirmed_identity_appointment.pk},
         )
 
         assert (
             ParticipantReportedMammogram.objects.filter(
-                appointment=in_progress_appointment
+                appointment=confirmed_identity_appointment
             ).count()
             == 0
         )
@@ -247,7 +257,7 @@ class TestAddParticipantReportedMammogram:
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_previous_mammogram",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "location_type": ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
@@ -258,14 +268,14 @@ class TestAddParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         ).first()
 
         appointment_should_not_proceed_redirect = (
             reverse(
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
-                    "appointment_pk": in_progress_appointment.pk,
+                    "appointment_pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
@@ -284,33 +294,52 @@ class TestAddParticipantReportedMammogram:
             should_not_proceed_response.text,
         )
         assert (
-            in_progress_appointment.current_status.name
+            confirmed_identity_appointment.current_status.name
             == AppointmentStatusNames.IN_PROGRESS
         )
 
-        assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
+        assert_attended_not_screened_flow(
+            clinical_user_client, confirmed_identity_appointment
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_previous_mammogram",
+                kwargs={"pk": in_progress_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
 
 
 @pytest.mark.django_db
 class TestChangeParticipantReportedMammogram:
     @pytest.fixture
-    def participant_reported_mammogram(self, in_progress_appointment):
+    def participant_reported_mammogram(self, confirmed_identity_appointment):
         return ParticipantReportedMammogramFactory.create(
-            appointment=in_progress_appointment,
+            appointment=confirmed_identity_appointment,
             location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         )
 
     def test_renders_response(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             )
@@ -320,14 +349,14 @@ class TestChangeParticipantReportedMammogram:
     def test_invalid_post_displays_errors(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -338,7 +367,7 @@ class TestChangeParticipantReportedMammogram:
     def test_valid_post_redirects_to_appointment(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
         valid_mammogram_form_data,
     ):
@@ -346,7 +375,7 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -356,7 +385,7 @@ class TestChangeParticipantReportedMammogram:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assert_success_message(response, "Updated a previous mammogram")
@@ -365,19 +394,19 @@ class TestChangeParticipantReportedMammogram:
     def test_post_exact_date_six_months_or_more(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
         exact_date,
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": in_progress_appointment.pk},
+            kwargs={"pk": confirmed_identity_appointment.pk},
         )
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -391,18 +420,18 @@ class TestChangeParticipantReportedMammogram:
     def test_post_exact_date_within_last_six_months(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
         exact_date,
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": in_progress_appointment.pk},
+            kwargs={"pk": confirmed_identity_appointment.pk},
         )
 
         assert (
             ParticipantReportedMammogram.objects.filter(
-                appointment=in_progress_appointment
+                appointment=confirmed_identity_appointment
             ).count()
             == 1
         )
@@ -411,7 +440,7 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -419,7 +448,7 @@ class TestChangeParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         ).first()
 
         assertRedirects(
@@ -427,33 +456,35 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
-                    "appointment_pk": in_progress_appointment.pk,
+                    "appointment_pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={return_url}",
         )
         assert (
-            in_progress_appointment.current_status.name
+            confirmed_identity_appointment.current_status.name
             == AppointmentStatusNames.IN_PROGRESS
         )
 
-        assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
+        assert_attended_not_screened_flow(
+            clinical_user_client, confirmed_identity_appointment
+        )
 
     def test_post_approx_within_last_six_months(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         return_url = reverse(
             "mammograms:record_medical_information",
-            kwargs={"pk": in_progress_appointment.pk},
+            kwargs={"pk": confirmed_identity_appointment.pk},
         )
 
         assert (
             ParticipantReportedMammogram.objects.filter(
-                appointment=in_progress_appointment
+                appointment=confirmed_identity_appointment
             ).count()
             == 1
         )
@@ -462,7 +493,7 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:change_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -475,7 +506,7 @@ class TestChangeParticipantReportedMammogram:
         )
 
         mammogram = ParticipantReportedMammogram.objects.filter(
-            appointment=in_progress_appointment
+            appointment=confirmed_identity_appointment
         ).first()
 
         assertRedirects(
@@ -483,18 +514,44 @@ class TestChangeParticipantReportedMammogram:
             reverse(
                 "mammograms:appointment_should_not_proceed",
                 kwargs={
-                    "appointment_pk": in_progress_appointment.pk,
+                    "appointment_pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
                 },
             )
             + f"?return_url={return_url}",
         )
         assert (
-            in_progress_appointment.current_status.name
+            confirmed_identity_appointment.current_status.name
             == AppointmentStatusNames.IN_PROGRESS
         )
 
-        assert_attended_not_screened_flow(clinical_user_client, in_progress_appointment)
+        assert_attended_not_screened_flow(
+            clinical_user_client, confirmed_identity_appointment
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        mammogram = ParticipantReportedMammogramFactory.create(
+            appointment=in_progress_appointment,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_previous_mammogram",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "participant_reported_mammogram_pk": mammogram.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
 
 
 @pytest.mark.django_db
@@ -502,7 +559,7 @@ class TestDeleteParticipantReportedMammogram:
     def test_delete_previous_mammogram(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         assert ParticipantReportedMammogram.objects.filter(
@@ -513,7 +570,7 @@ class TestDeleteParticipantReportedMammogram:
             reverse(
                 "mammograms:delete_previous_mammogram",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             )
@@ -527,23 +584,23 @@ class TestDeleteParticipantReportedMammogram:
 @pytest.mark.django_db
 class TestAppointmentProceedAnywayView:
     @pytest.fixture
-    def participant_reported_mammogram(self, in_progress_appointment):
+    def participant_reported_mammogram(self, confirmed_identity_appointment):
         return ParticipantReportedMammogramFactory.create(
-            appointment=in_progress_appointment,
+            appointment=confirmed_identity_appointment,
             location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
         )
 
     def test_renders_response(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:proceed_anyway",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             )
@@ -553,14 +610,14 @@ class TestAppointmentProceedAnywayView:
     def test_invalid_post_displays_errors(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:proceed_anyway",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -579,14 +636,14 @@ class TestAppointmentProceedAnywayView:
     def test_valid_post_redirects_to_appointment(
         self,
         clinical_user_client,
-        in_progress_appointment,
+        confirmed_identity_appointment,
         participant_reported_mammogram,
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:proceed_anyway",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
                 },
             ),
@@ -598,7 +655,7 @@ class TestAppointmentProceedAnywayView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
         assert_success_message(response, "Updated a previous mammogram")
@@ -606,14 +663,14 @@ class TestAppointmentProceedAnywayView:
 
 @pytest.mark.django_db
 class TestCompleteScreening:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(self, clinical_user_client, taken_images_appointment):
         # check_information expects appointment to have a Study
-        Study.objects.create(appointment=in_progress_appointment)
+        Study.objects.create(appointment=taken_images_appointment)
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:check_information",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": taken_images_appointment.pk,
                 },
             )
         )
@@ -628,6 +685,18 @@ class TestCompleteScreening:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
             current_status=AppointmentStatusNames.IN_PROGRESS,
             current_status__created_by=clinical_user_client.user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.CONFIRM_IDENTITY,
+            created_by=clinical_user_client.user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.REVIEW_MEDICAL_INFORMATION,
+            created_by=clinical_user_client.user,
+        )
+        appointment.completed_workflow_steps.create(
+            step_name=StepNames.TAKE_IMAGES,
+            created_by=clinical_user_client.user,
         )
 
         response = clinical_user_client.http.post(
@@ -669,6 +738,11 @@ class TestCompleteScreening:
                 created_by=clinical_user_client.user
             )
             .values_list("step_name", flat=True)
-            .distinct(),
-            [AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION],
+            .order_by("step_name"),
+            [
+                AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION,
+                AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY,
+                AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION,
+                AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES,
+            ],
         )

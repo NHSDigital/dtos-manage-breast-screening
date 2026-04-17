@@ -18,28 +18,30 @@ from manage_breast_screening.participants.tests.factories import (
 
 
 @pytest.fixture
-def lump(in_progress_appointment):
-    return SymptomFactory.create(appointment=in_progress_appointment, lump=True)
+def lump(confirmed_identity_appointment):
+    return SymptomFactory.create(appointment=confirmed_identity_appointment, lump=True)
 
 
 @pytest.mark.django_db
 class TestAddLumpView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_lump",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_lump",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -52,17 +54,17 @@ class TestAddLumpView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
     def test_invalid_post_renders_response_with_errors(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_lump",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {},
         )
@@ -91,7 +93,7 @@ class TestChangeLumpView:
         assert response.status_code == 200
 
     def test_non_existant_or_deleted_symptom_id_is_a_404(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         """
         Note: the behaviour we probably want here is to redirect back to
@@ -103,7 +105,7 @@ class TestChangeLumpView:
             reverse(
                 "mammograms:change_symptom_lump",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "symptom_pk": "beefbeef-beef-beef-beef-beefbeefbeef",
                 },
             )
@@ -112,15 +114,17 @@ class TestChangeLumpView:
         assert response.status_code == 404
 
     def test_different_type_of_symptom_is_a_404(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
-        SymptomFactory.create(colour_change=True, appointment=in_progress_appointment)
+        SymptomFactory.create(
+            colour_change=True, appointment=confirmed_identity_appointment
+        )
 
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:change_symptom_lump",
                 kwargs={
-                    "pk": in_progress_appointment.pk,
+                    "pk": confirmed_identity_appointment.pk,
                     "symptom_pk": "beefbeef-beef-beef-beef-beefbeefbeef",
                 },
             )
@@ -174,22 +178,24 @@ class TestChangeLumpView:
 
 @pytest.mark.django_db
 class TestAddSkinChangeView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_skin_change",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_skin_change",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -203,7 +209,7 @@ class TestAddSkinChangeView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
@@ -211,9 +217,9 @@ class TestAddSkinChangeView:
 @pytest.mark.django_db
 class TestChangeSkinChangeView:
     @pytest.fixture
-    def colour_change(self, in_progress_appointment):
+    def colour_change(self, confirmed_identity_appointment):
         return SymptomFactory.create(
-            colour_change=True, appointment=in_progress_appointment
+            colour_change=True, appointment=confirmed_identity_appointment
         )
 
     def test_renders_response(self, clinical_user_client, colour_change):
@@ -258,22 +264,24 @@ class TestChangeSkinChangeView:
 
 @pytest.mark.django_db
 class TestAddNippleChangeView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_nipple_change",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_nipple_change",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "area": [SymptomAreas.RIGHT_BREAST.value],
@@ -286,7 +294,7 @@ class TestAddNippleChangeView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
@@ -294,9 +302,9 @@ class TestAddNippleChangeView:
 @pytest.mark.django_db
 class TestChangeNippleChangeView:
     @pytest.fixture
-    def inversion(self, in_progress_appointment):
+    def inversion(self, confirmed_identity_appointment):
         return SymptomFactory.create(
-            inversion=True, appointment=in_progress_appointment
+            inversion=True, appointment=confirmed_identity_appointment
         )
 
     def test_renders_response(self, clinical_user_client, inversion):
@@ -332,22 +340,24 @@ class TestChangeNippleChangeView:
 
 @pytest.mark.django_db
 class TestAddOtherSymptomView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_other",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_other",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -361,7 +371,7 @@ class TestAddOtherSymptomView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
@@ -369,8 +379,10 @@ class TestAddOtherSymptomView:
 @pytest.mark.django_db
 class TestChangeOtherSymptomView:
     @pytest.fixture
-    def other_symptom(self, in_progress_appointment):
-        return SymptomFactory.create(other=True, appointment=in_progress_appointment)
+    def other_symptom(self, confirmed_identity_appointment):
+        return SymptomFactory.create(
+            other=True, appointment=confirmed_identity_appointment
+        )
 
     def test_renders_response(self, clinical_user_client, other_symptom):
         response = clinical_user_client.http.get(
@@ -414,22 +426,24 @@ class TestChangeOtherSymptomView:
 
 @pytest.mark.django_db
 class TestAddBreastPainView:
-    def test_renders_response(self, clinical_user_client, in_progress_appointment):
+    def test_renders_response(
+        self, clinical_user_client, confirmed_identity_appointment
+    ):
         response = clinical_user_client.http.get(
             reverse(
                 "mammograms:add_symptom_breast_pain",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
         assert response.status_code == 200
 
     def test_valid_post_redirects_to_appointment(
-        self, clinical_user_client, in_progress_appointment
+        self, clinical_user_client, confirmed_identity_appointment
     ):
         response = clinical_user_client.http.post(
             reverse(
                 "mammograms:add_symptom_breast_pain",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
                 "area": SymptomAreas.RIGHT_BREAST.value,
@@ -442,7 +456,7 @@ class TestAddBreastPainView:
             response,
             reverse(
                 "mammograms:record_medical_information",
-                kwargs={"pk": in_progress_appointment.pk},
+                kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
 
@@ -450,9 +464,10 @@ class TestAddBreastPainView:
 @pytest.mark.django_db
 class TestChangeBreastPainView:
     @pytest.fixture
-    def breast_pain(self, in_progress_appointment):
+    def breast_pain(self, confirmed_identity_appointment):
         return SymptomFactory.create(
-            symptom_type_id=SymptomType.BREAST_PAIN, appointment=in_progress_appointment
+            symptom_type_id=SymptomType.BREAST_PAIN,
+            appointment=confirmed_identity_appointment,
         )
 
     def test_renders_response(self, clinical_user_client, breast_pain):

@@ -28,6 +28,7 @@ from manage_breast_screening.mammograms.presenters.medical_history.check_medical
 from manage_breast_screening.mammograms.services.appointment_services import (
     AppointmentStatusUpdater,
     AppointmentWorkflowService,
+    StepNames,
 )
 from manage_breast_screening.mammograms.views.mixins import AppointmentMixin
 from manage_breast_screening.participants.models import ParticipantReportedMammogram
@@ -39,6 +40,7 @@ from manage_breast_screening.participants.models.appointment import (
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 
 APPOINTMENT_NOT_FOUND = "Appointment not found"
+SHOW_APPOINTMENT_URL_NAME = "mammograms:show_appointment"
 WorkflowSteps = AppointmentWorkflowStepCompletion.StepNames
 
 
@@ -205,6 +207,14 @@ def check_information(request, pk):
     except Appointment.DoesNotExist:
         raise Http404("Appointment not found")
 
+    if not AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
+        StepNames.CHECK_INFORMATION
+    ):
+        return redirect(
+            SHOW_APPOINTMENT_URL_NAME,
+            pk=appointment.pk,
+        )
+
     return render(
         request,
         "mammograms/check_information.jinja",
@@ -216,9 +226,9 @@ def check_information(request, pk):
             "presented_medical_information": CheckMedicalInformationPresenter(
                 appointment
             ),
-            "presented_workflow": WorkflowPresenter(
+            "presented_workflow_steps": WorkflowPresenter(
                 AppointmentWorkflowService(appointment, request.user)
-            ),
+            ).workflow_steps(StepNames.CHECK_INFORMATION),
         },
     )
 
@@ -235,16 +245,24 @@ def complete_screening(request, pk):
     except Appointment.DoesNotExist:
         raise Http404(APPOINTMENT_NOT_FOUND)
 
+    if not AppointmentWorkflowService(appointment, request.user).is_valid_next_step(
+        StepNames.CHECK_INFORMATION
+    ):
+        return redirect(
+            SHOW_APPOINTMENT_URL_NAME,
+            pk=appointment.pk,
+        )
+
     AppointmentStatusUpdater(
         appointment=appointment, current_user=request.user
     ).screen()
     appointment.completed_workflow_steps.create(
-        step_name=AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION,
+        step_name=StepNames.CHECK_INFORMATION,
         created_by=request.user,
     )
 
     view_appointment_url = reverse(
-        "mammograms:show_appointment",
+        SHOW_APPOINTMENT_URL_NAME,
         kwargs={
             "pk": appointment.pk,
         },

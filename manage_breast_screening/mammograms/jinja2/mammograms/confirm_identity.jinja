@@ -6,8 +6,6 @@
 {% from "mammograms/macros.jinja" import appointment_cannot_proceed_link %}
 {% from "components/participant-details/summary_list_rows.jinja" import address_html, date_of_birth_and_age_html, ethnicity_html %}
 
-{% set active_workflow_step = 'CONFIRM_IDENTITY' %}
-
 {% block step_content %}
   {% set return_url = request.path %}
   {% set confirm_button %}
