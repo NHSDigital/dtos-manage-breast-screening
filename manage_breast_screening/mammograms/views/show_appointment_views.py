@@ -14,7 +14,7 @@ from ..presenters.medical_information_presenter import MedicalInformationPresent
 from .mixins import AppointmentTabMixin
 
 
-class ShowAppointment(AppointmentTabMixin, View):
+class ShowAppointmentView(AppointmentTabMixin, View):
     """
     Show a completed appointment. Redirects to the start screening form
     if the apppointment is in progress.
@@ -46,7 +46,7 @@ class ShowAppointment(AppointmentTabMixin, View):
         )
 
 
-class ParticipantDetails(AppointmentTabMixin, View):
+class ParticipantDetailsView(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
@@ -70,7 +70,7 @@ class ParticipantDetails(AppointmentTabMixin, View):
         )
 
 
-class MedicalInformation(AppointmentTabMixin, View):
+class MedicalInformationView(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         participant = appointment.participant
@@ -111,7 +111,7 @@ class MedicalInformation(AppointmentTabMixin, View):
         )
 
 
-class ImageDetails(AppointmentTabMixin, View):
+class ImageDetailsView(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)

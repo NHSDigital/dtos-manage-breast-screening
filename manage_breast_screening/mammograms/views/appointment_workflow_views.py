@@ -66,7 +66,7 @@ MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME = "mammograms:record_medical_info
 logger = logging.getLogger(__name__)
 
 
-class ConfirmIdentity(WorkflowSidebarMixin, TemplateView):
+class ConfirmIdentityView(WorkflowSidebarMixin, TemplateView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
     template_name = "mammograms/confirm_identity.jinja"
     CONFIRM_IDENTITY_LABEL = "Confirm identity"
@@ -109,7 +109,7 @@ class ConfirmIdentity(WorkflowSidebarMixin, TemplateView):
         return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
 
 
-class RecordMedicalInformation(WorkflowSidebarMixin, FormView):
+class RecordMedicalInformationView(WorkflowSidebarMixin, FormView):
     active_workflow_step = (
         AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
     )
@@ -180,7 +180,7 @@ class RecordMedicalInformation(WorkflowSidebarMixin, FormView):
         return redirect("mammograms:take_images", pk=self.appointment.pk)
 
 
-class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
+class AppointmentCannotGoAheadView(InProgressAppointmentMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
     template_name = "mammograms/appointment_cannot_go_ahead.jinja"
     form_class = AppointmentCannotGoAheadForm
@@ -242,7 +242,7 @@ class AppointmentCannotGoAhead(InProgressAppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class TakeImages(WorkflowSidebarMixin, FormView):
+class TakeImagesView(WorkflowSidebarMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/take_images.jinja"
     form_class = RecordImagesTakenForm
@@ -294,7 +294,7 @@ class TakeImages(WorkflowSidebarMixin, FormView):
         )
 
 
-class GatewayImages(WorkflowSidebarMixin, FormView):
+class GatewayImagesView(WorkflowSidebarMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/gateway_images.jinja"
     form_class = GatewayImageDetailsForm
@@ -458,7 +458,7 @@ def resume_appointment(request, pk):
     return redirect(next_step, pk=pk)
 
 
-class PauseAppointment(InProgressAppointmentMixin, FormView):
+class PauseAppointmentView(InProgressAppointmentMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
     template_name = "mammograms/pause_appointment.jinja"
     form_class = Form
@@ -503,7 +503,7 @@ class PauseAppointment(InProgressAppointmentMixin, FormView):
         )
 
 
-class MarkSectionReviewed(InProgressAppointmentMixin, View):
+class MarkSectionReviewedView(InProgressAppointmentMixin, View):
     active_workflow_step = (
         AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
     )

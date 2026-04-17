@@ -19,7 +19,7 @@ from manage_breast_screening.participants.tests.factories import AppointmentFact
 
 
 @pytest.mark.django_db
-class TestShowAppointment:
+class TestShowAppointmentView:
     def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -31,7 +31,7 @@ class TestShowAppointment:
 
 
 @pytest.mark.django_db
-class TestMedicalInformation:
+class TestMedicalInformationView:
     def test_displays_medical_information_sections(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider

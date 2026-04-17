@@ -52,7 +52,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/pause-appointment/",
-        appointment_workflow_views.PauseAppointment.as_view(),
+        appointment_workflow_views.PauseAppointmentView.as_view(),
         name="pause_appointment",
     ),
     path(
@@ -62,32 +62,32 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/confirm-identity/",
-        appointment_workflow_views.ConfirmIdentity.as_view(),
+        appointment_workflow_views.ConfirmIdentityView.as_view(),
         name="confirm_identity",
     ),
     path(
         "<uuid:pk>/record-medical-information/",
-        appointment_workflow_views.RecordMedicalInformation.as_view(),
+        appointment_workflow_views.RecordMedicalInformationView.as_view(),
         name="record_medical_information",
     ),
     path(
         "<uuid:pk>/record-medical-information/mark-reviewed/<str:section>/",
-        appointment_workflow_views.MarkSectionReviewed.as_view(),
+        appointment_workflow_views.MarkSectionReviewedView.as_view(),
         name="mark_section_reviewed",
     ),
     path(
         "<uuid:pk>/take-images/",
-        appointment_workflow_views.TakeImages.as_view(),
+        appointment_workflow_views.TakeImagesView.as_view(),
         name="take_images",
     ),
     path(
         "<uuid:pk>/gateway-images/",
-        appointment_workflow_views.GatewayImages.as_view(),
+        appointment_workflow_views.GatewayImagesView.as_view(),
         name="gateway_images",
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
-        appointment_workflow_views.AppointmentCannotGoAhead.as_view(),
+        appointment_workflow_views.AppointmentCannotGoAheadView.as_view(),
         name="appointment_cannot_go_ahead",
     ),
     path(
@@ -97,22 +97,22 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/",
-        show_appointment_views.ShowAppointment.as_view(),
+        show_appointment_views.ShowAppointmentView.as_view(),
         name="show_appointment",
     ),
     path(
         "<uuid:pk>/participant/",
-        show_appointment_views.ParticipantDetails.as_view(),
+        show_appointment_views.ParticipantDetailsView.as_view(),
         name="participant_details",
     ),
     path(
         "<uuid:pk>/images/",
-        show_appointment_views.ImageDetails.as_view(),
+        show_appointment_views.ImageDetailsView.as_view(),
         name="appointment_image_details",
     ),
     path(
         "<uuid:pk>/medical-information/",
-        show_appointment_views.MedicalInformation.as_view(),
+        show_appointment_views.MedicalInformationView.as_view(),
         name="medical_information",
     ),
     path(
@@ -132,7 +132,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/special-appointment/",
-        special_appointment_views.ProvideSpecialAppointmentDetails.as_view(),
+        special_appointment_views.ProvideSpecialAppointmentDetailsView.as_view(),
         name="provide_special_appointment_details",
     ),
     path(

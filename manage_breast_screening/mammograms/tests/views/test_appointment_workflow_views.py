@@ -39,7 +39,7 @@ from manage_breast_screening.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db
-class TestConfirmIdentity:
+class TestConfirmIdentityView:
     def test_renders_response_when_identity_not_confirmed(
         self, clinical_user_client, in_progress_appointment
     ):
@@ -187,7 +187,7 @@ class TestConfirmIdentity:
 
 
 @pytest.mark.django_db
-class TestRecordMedicalInformation:
+class TestRecordMedicalInformationView:
     def test_renders_response(
         self, clinical_user_client, confirmed_identity_appointment
     ):
@@ -245,7 +245,9 @@ class TestRecordMedicalInformation:
         self, clinical_user_client, monkeypatch, confirmed_identity_appointment
     ):
         monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
-        RelayFactory.create(setting=confirmed_identity_appointment.clinic_slot.clinic.setting)
+        RelayFactory.create(
+            setting=confirmed_identity_appointment.clinic_slot.clinic.setting
+        )
 
         with patch(
             "manage_breast_screening.gateway.relay_service.RelayService.send_action"
@@ -284,7 +286,7 @@ class TestRecordMedicalInformation:
 
 
 @pytest.mark.django_db
-class TestTakeImages:
+class TestTakeImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -421,7 +423,7 @@ class TestTakeImages:
 
 
 @pytest.mark.django_db
-class TestGatewayImages:
+class TestGatewayImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -994,7 +996,7 @@ class TestResumeAppointment:
 
 
 @pytest.mark.django_db
-class TestAppointmentCannotGoAhead:
+class TestAppointmentCannotGoAheadView:
     def test_status_and_audit_created(
         self, clinical_user_client, in_progress_appointment
     ):
@@ -1060,7 +1062,7 @@ class TestAppointmentCannotGoAhead:
 
 
 @pytest.mark.django_db
-class TestMarkSectionReviewed:
+class TestMarkSectionReviewedView:
     def test_creates_medical_information_review(
         self, clinical_user_client, confirmed_identity_appointment
     ):
@@ -1194,7 +1196,7 @@ class TestMarkSectionReviewed:
 
 
 @pytest.mark.django_db
-class TestPauseAppointment:
+class TestPauseAppointmentView:
     def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
