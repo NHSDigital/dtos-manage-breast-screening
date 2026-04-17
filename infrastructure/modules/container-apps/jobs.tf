@@ -9,7 +9,7 @@ module "db_setup" {
 
   container_args = [
     var.seed_demo_data
-    ? "python manage.py migrate && python manage.py seed_demo_data --noinput && python manage.py create_personas"
+    ? "python manage.py migrate && python manage.py seed_demo_data --noinput"
     : "python manage.py migrate"
   ]
   docker_image = var.docker_image
