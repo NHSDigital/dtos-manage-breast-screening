@@ -122,7 +122,7 @@ class TestBreastCancerHistoryUpdateView:
     def test_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:change_breast_cancer_history_item",
+                "mammograms:update_breast_cancer_history_item",
                 kwargs={
                     "pk": history_item.appointment_id,
                     "history_item_pk": history_item.pk,
@@ -136,7 +136,7 @@ class TestBreastCancerHistoryUpdateView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_breast_cancer_history_item",
+                "mammograms:update_breast_cancer_history_item",
                 kwargs={
                     "pk": history_item.appointment_id,
                     "history_item_pk": history_item.pk,

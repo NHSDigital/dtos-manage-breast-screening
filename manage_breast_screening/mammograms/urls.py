@@ -142,8 +142,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/lump/<uuid:symptom_pk>/",
-        symptom_views.ChangeLumpView.as_view(),
-        name="change_symptom_lump",
+        symptom_views.UpdateLumpView.as_view(),
+        name="update_symptom_lump",
     ),
     path(
         "<uuid:pk>/record-medical-information/swelling-or-shape-change/",
@@ -152,8 +152,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/swelling-or-shape-change/<uuid:symptom_pk>/",
-        symptom_views.ChangeSwellingOrShapeChangeView.as_view(),
-        name="change_symptom_swelling_or_shape_change",
+        symptom_views.UpdateSwellingOrShapeChangeView.as_view(),
+        name="update_symptom_swelling_or_shape_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/skin-change/",
@@ -162,8 +162,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/skin-change/<uuid:symptom_pk>/",
-        symptom_views.ChangeSkinChangeView.as_view(),
-        name="change_symptom_skin_change",
+        symptom_views.UpdateSkinChangeView.as_view(),
+        name="update_symptom_skin_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/nipple-change/",
@@ -172,8 +172,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/nipple-change/<uuid:symptom_pk>/",
-        symptom_views.ChangeNippleChangeView.as_view(),
-        name="change_symptom_nipple_change",
+        symptom_views.UpdateNippleChangeView.as_view(),
+        name="update_symptom_nipple_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-pain/",
@@ -182,8 +182,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-pain/<uuid:symptom_pk>/",
-        symptom_views.ChangeBreastPainView.as_view(),
-        name="change_symptom_breast_pain",
+        symptom_views.UpdateBreastPainView.as_view(),
+        name="update_symptom_breast_pain",
     ),
     path(
         "<uuid:pk>/record-medical-information/other/",
@@ -192,8 +192,8 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/other/<uuid:symptom_pk>/",
-        symptom_views.ChangeOtherSymptomView.as_view(),
-        name="change_symptom_other",
+        symptom_views.UpdateOtherSymptomView.as_view(),
+        name="update_symptom_other",
     ),
     path(
         "<uuid:pk>/record-medical-information/delete_symptom/<uuid:symptom_pk>/",
@@ -208,7 +208,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/",
         breast_cancer_history_item_views.UpdateBreastCancerHistoryView.as_view(),
-        name="change_breast_cancer_history_item",
+        name="update_breast_cancer_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-cancer-history/<uuid:history_item_pk>/delete/",
@@ -223,7 +223,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>/",
         implanted_medical_device_history_item_views.UpdateImplantedMedicalDeviceHistoryView.as_view(),
-        name="change_implanted_medical_device_history_item",
+        name="update_implanted_medical_device_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/implanted-medical-device-history/<uuid:history_item_pk>/delete/",
@@ -238,7 +238,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>/",
         cyst_history_item_views.UpdateCystHistoryView.as_view(),
-        name="change_cyst_history_item",
+        name="update_cyst_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/cyst-history/<uuid:history_item_pk>/delete/",
@@ -253,7 +253,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>/",
         breast_augmentation_history_item_views.UpdateBreastAugmentationHistoryView.as_view(),
-        name="change_breast_augmentation_history_item",
+        name="update_breast_augmentation_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-augmentation-history/<uuid:history_item_pk>/delete/",
@@ -268,7 +268,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/benign-lump-history/<uuid:history_item_pk>/",
         benign_lump_history_item_views.UpdateBenignLumpHistoryItemView.as_view(),
-        name="change_benign_lump_history_item",
+        name="update_benign_lump_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/benign-lump-history/<uuid:history_item_pk>/delete/",
@@ -283,7 +283,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>/",
         mastectomy_or_lumpectomy_history_item_views.UpdateMastectomyOrLumpectomyHistoryView.as_view(),
-        name="change_mastectomy_or_lumpectomy_history_item",
+        name="update_mastectomy_or_lumpectomy_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/mastectomy-or-lumpectomy-history/<uuid:history_item_pk>/delete/",
@@ -298,7 +298,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/",
         other_procedure_history_item_views.UpdateOtherProcedureHistoryView.as_view(),
-        name="change_other_procedure_history_item",
+        name="update_other_procedure_history_item",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-procedure-history/<uuid:history_item_pk>/delete/",
@@ -318,7 +318,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>",
         participant_reported_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
-        name="change_previous_mammogram",
+        name="update_previous_mammogram",
     ),
     path(
         "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>/delete/",
@@ -373,7 +373,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/hormone-replacement-therapy/update/",
         hormone_replacement_therapy_views.UpdateHormoneReplacementTherapyView.as_view(),
-        name="change_hormone_replacement_therapy",
+        name="update_hormone_replacement_therapy",
     ),
     path(
         "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/",
@@ -383,7 +383,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/pregnancy-and-breastfeeding/update/",
         pregnancy_and_breastfeeding_views.UpdatePregnancyAndBreastfeedingView.as_view(),
-        name="change_pregnancy_and_breastfeeding",
+        name="update_pregnancy_and_breastfeeding",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-medical-information/",
@@ -393,7 +393,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/other-medical-information/update/",
         other_medical_information_views.UpdateOtherMedicalInformationView.as_view(),
-        name="change_other_medical_information",
+        name="update_other_medical_information",
     ),
     path(
         "<uuid:pk>/record-medical-information/other-medical-information/delete/",

@@ -18,7 +18,7 @@ class CystHistoryItemPresenter:
     def change_link(self):
         return {
             "href": reverse(
-                "mammograms:change_cyst_history_item",
+                "mammograms:update_cyst_history_item",
                 kwargs={
                     "pk": self._item.appointment_id,
                     "history_item_pk": self._item.pk,

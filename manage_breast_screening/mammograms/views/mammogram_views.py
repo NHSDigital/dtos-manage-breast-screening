@@ -66,9 +66,9 @@ def appointment_should_not_proceed(
         raise Http404("Participant reported mammogram not found")
 
     return_url = extract_relative_redirect_url(request, default="")
-    change_previous_mammogram_url = (
+    update_previous_mammogram_url = (
         reverse(
-            "mammograms:change_previous_mammogram",
+            "mammograms:update_previous_mammogram",
             kwargs={
                 "pk": appointment_pk,
                 "participant_reported_mammogram_pk": participant_reported_mammogram_pk,
@@ -101,11 +101,11 @@ def appointment_should_not_proceed(
             "page_title": "This appointment should not proceed",
             "heading": "This appointment should not proceed",
             "back_link_params": {
-                "href": change_previous_mammogram_url,
+                "href": update_previous_mammogram_url,
             },
             "presented_appointment": AppointmentPresenter(appointment),
             "time_since_previous_mammogram": relative_date,
-            "change_previous_mammogram_url": change_previous_mammogram_url,
+            "update_previous_mammogram_url": update_previous_mammogram_url,
             "proceed_anyway_url": proceed_anyway_url,
             "return_url": return_url,
         },
