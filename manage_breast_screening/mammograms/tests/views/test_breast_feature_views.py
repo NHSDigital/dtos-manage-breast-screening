@@ -10,7 +10,7 @@ from manage_breast_screening.participants.models.breast_features import (
 
 
 @pytest.mark.django_db
-class TestRecordBreastFeaturesView:
+class TestUpsertBreastFeaturesView:
     def test_get_renders_response(
         self, clinical_user_client, confirmed_identity_appointment
     ):

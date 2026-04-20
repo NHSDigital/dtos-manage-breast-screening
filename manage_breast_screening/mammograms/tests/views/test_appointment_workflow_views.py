@@ -286,7 +286,7 @@ class TestMedicalInformationView:
 
 
 @pytest.mark.django_db
-class TestImagesView:
+class TestUpsertImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -423,7 +423,7 @@ class TestImagesView:
 
 
 @pytest.mark.django_db
-class TestGatewayImagesView:
+class TestUpsertGatewayImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(

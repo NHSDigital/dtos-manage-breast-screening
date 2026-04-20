@@ -262,7 +262,7 @@ class ConfirmAppointmentCannotGoAheadView(InProgressAppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class ImagesView(WorkflowSidebarMixin, FormView):
+class UpsertImagesView(WorkflowSidebarMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/take_images.jinja"
     form_class = RecordImagesTakenForm
@@ -314,7 +314,7 @@ class ImagesView(WorkflowSidebarMixin, FormView):
         )
 
 
-class GatewayImagesView(WorkflowSidebarMixin, FormView):
+class UpsertGatewayImagesView(WorkflowSidebarMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/gateway_images.jinja"
     form_class = GatewayImageDetailsForm
@@ -467,7 +467,7 @@ class AddMultipleImagesInformationView(WorkflowSidebarMixin, FormView):
             return StudyService(self.appointment, self.request.user)
 
 
-class BreastFeaturesView(InProgressAppointmentMixin, FormView):
+class UpsertBreastFeaturesView(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/medical_information/breast_features/form.jinja"
     active_workflow_step = (
         AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
