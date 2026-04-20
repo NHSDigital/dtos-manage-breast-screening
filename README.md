@@ -55,6 +55,8 @@ make test
 
 Running `make config` beforehand will ensure you have necessary dependencies installed, including the browser needed by playwright for system tests.
 
+For more details about writing tests see: [Testing approach](docs/testing-approach.md).
+
 ### Dependency management
 
 Python dependencies are managed via [uv](https://docs.astral.sh/uv/).
@@ -115,7 +117,7 @@ You must be logged in as a superuser to access it.
 
 ## Design
 
-The service will be deployed as a web application, backed by a postgres database with authentication provided by NHS CIS2. In addtion to these elements we will deploy a gateway application to each breast screening unit that uses the service that will be responsible for interop with local hospital systems. The gateway will be developed in a future phase of this project and is not currently under active development.
+The service is deployed as a web application, backed by a postgres database with authentication provided by NHS CIS2. In addtion to these elements we will deploy a gateway application to each breast screening unit that uses the service that will be responsible for interop with local hospital systems. The gateway will be developed in a future phase of this project and is not currently under active development.
 
 ![](docs/diagrams/svg/structurizr-1-SystemContext-001.svg)
 
