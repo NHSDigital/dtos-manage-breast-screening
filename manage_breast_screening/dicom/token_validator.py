@@ -13,6 +13,7 @@ ALLOWED_ALGORITHMS = ["RS256"]
 
 class TokenValidator(HttpBearer):
     def __init__(self):
+        self.bypass_auth = os.getenv("BYPASS_API_TOKEN_AUTH", "false").lower() == "true"
         self.api_audience = os.getenv("API_AUDIENCE", "")
         self.tenant_id = os.getenv("TENANT_ID", "")
         self.discovery_keys_url = (
@@ -23,6 +24,10 @@ class TokenValidator(HttpBearer):
         self.issuer_url = "https://sts.windows.net/" + self.tenant_id + "/"
 
     def authenticate(self, request, token) -> dict | None:
+        if self.bypass_auth:
+            logger.warning("Authentication bypass is enabled.")
+            return {"sub": "bypass_user"}
+
         rsa_key = self._rsa_key(token)
         if rsa_key:
             return self._decode(token, rsa_key)

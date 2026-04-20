@@ -119,3 +119,10 @@ class TestTokenValidator:
         assert validator(Mock(headers={"Authorization": "Bearer abc123"})) == {
             "sub": "1234567890"
         }
+
+    def test_authentication_bypass_enabled(self, mock_logger):
+        with patch.dict("os.environ", {"BYPASS_API_TOKEN_AUTH": "true"}):
+            validator = TokenValidator()
+            assert validator(Mock(headers={"Authorization": "Bearer anytoken"})) == {
+                "sub": "bypass_user"
+            }
