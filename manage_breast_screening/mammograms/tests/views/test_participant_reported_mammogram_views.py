@@ -582,7 +582,7 @@ class TestDeleteParticipantReportedMammogram:
 
 
 @pytest.mark.django_db
-class TestAppointmentProceedAnywayView:
+class TestConfirmAppointmentProceedAnywayView:
     @pytest.fixture
     def participant_reported_mammogram(self, confirmed_identity_appointment):
         return ParticipantReportedMammogramFactory.create(

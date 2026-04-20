@@ -82,7 +82,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
-        appointment_workflow_views.AppointmentCannotGoAheadView.as_view(),
+        appointment_workflow_views.ConfirmAppointmentCannotGoAheadView.as_view(),
         name="appointment_cannot_go_ahead",
     ),
     path(
@@ -327,7 +327,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/proceed-anyway/<uuid:participant_reported_mammogram_pk>/",
-        appointment_workflow_views.AppointmentProceedAnywayView.as_view(),
+        appointment_workflow_views.ConfirmAppointmentProceedAnywayView.as_view(),
         name="proceed_anyway",
     ),
     path(

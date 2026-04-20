@@ -996,7 +996,7 @@ class TestResumeAppointment:
 
 
 @pytest.mark.django_db
-class TestAppointmentCannotGoAheadView:
+class TestConfirmAppointmentCannotGoAheadView:
     def test_status_and_audit_created(
         self, clinical_user_client, in_progress_appointment
     ):

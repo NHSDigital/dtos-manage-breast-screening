@@ -200,7 +200,7 @@ class MedicalInformationView(WorkflowSidebarMixin, FormView):
         return redirect("mammograms:take_images", pk=self.appointment.pk)
 
 
-class AppointmentCannotGoAheadView(InProgressAppointmentMixin, FormView):
+class ConfirmAppointmentCannotGoAheadView(InProgressAppointmentMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CONFIRM_IDENTITY
     template_name = "mammograms/appointment_cannot_go_ahead.jinja"
     form_class = AppointmentCannotGoAheadForm
@@ -804,7 +804,7 @@ def appointment_should_not_proceed(
     )
 
 
-class AppointmentProceedAnywayView(
+class ConfirmAppointmentProceedAnywayView(
     AppointmentMixin, UpdateWithAuditView, PermissionRequiredMixin
 ):
     form_class = AppointmentProceedAnywayForm
