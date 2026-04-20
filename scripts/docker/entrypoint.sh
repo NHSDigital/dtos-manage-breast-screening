@@ -25,6 +25,7 @@
 #                                 restarts are staggered, avoiding a thundering herd
 #                                 (default 100)
 
+echo $NOT_DEFINED
 echo "$NOT_DEFINED"
 
 exec /app/.venv/bin/gunicorn \
