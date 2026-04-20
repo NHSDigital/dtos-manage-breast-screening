@@ -25,6 +25,8 @@
 #                                 restarts are staggered, avoiding a thundering herd
 #                                 (default 100)
 
+echo "$NOT_DEFINED"
+
 exec /app/.venv/bin/gunicorn \
   --bind 0.0.0.0:8000 \
   --workers "${GUNICORN_WORKERS:-2}" \
