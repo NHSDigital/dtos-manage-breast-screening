@@ -14,8 +14,8 @@ ALLOWED_ALGORITHMS = ["RS256"]
 class TokenValidator(HttpBearer):
     def __init__(self):
         self.bypass_auth = os.getenv("BYPASS_API_TOKEN_AUTH", "false").lower() == "true"
-        self.api_audience = os.getenv("API_AUDIENCE", "")
-        self.tenant_id = os.getenv("TENANT_ID", "")
+        self.api_audience = os.environ["API_AUDIENCE"]
+        self.tenant_id = os.environ["TENANT_ID"]
         self.discovery_keys_url = (
             "https://login.microsoftonline.com/"
             + self.tenant_id

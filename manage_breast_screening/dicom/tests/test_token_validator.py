@@ -9,6 +9,18 @@ from ..token_validator import TokenValidator
 
 @patch(f"{TokenValidator.__module__}.logger")
 class TestTokenValidator:
+    @pytest.fixture(autouse=True)
+    def setup_env(self):
+        with patch.dict(
+            "os.environ",
+            {
+                "API_AUDIENCE": "test_audience",
+                "TENANT_ID": "test_tenant_id",
+                "BYPASS_API_TOKEN_AUTH": "false",
+            },
+        ):
+            yield
+
     @pytest.fixture
     def mock_urlopen_response(self):
         return {
