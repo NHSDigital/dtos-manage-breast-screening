@@ -109,7 +109,7 @@ class ConfirmIdentityView(WorkflowSidebarMixin, TemplateView):
         return redirect(MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME, pk=pk)
 
 
-class RecordMedicalInformationView(WorkflowSidebarMixin, FormView):
+class MedicalInformationView(WorkflowSidebarMixin, FormView):
     active_workflow_step = (
         AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION
     )
@@ -242,7 +242,7 @@ class AppointmentCannotGoAheadView(InProgressAppointmentMixin, FormView):
         return super().form_valid(form)
 
 
-class TakeImagesView(WorkflowSidebarMixin, FormView):
+class ImagesView(WorkflowSidebarMixin, FormView):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES
     template_name = "mammograms/take_images.jinja"
     form_class = RecordImagesTakenForm

@@ -11,7 +11,7 @@ from ..forms import ProvideSpecialAppointmentDetailsForm
 from .mixins import AppointmentMixin
 
 
-class ProvideSpecialAppointmentDetailsView(AppointmentMixin, FormView):
+class SpecialAppointmentDetailsView(AppointmentMixin, FormView):
     """
     The first form you see when editing/adding special appointment details.
     The data for this is currently stored on a JSONField on the participant model.

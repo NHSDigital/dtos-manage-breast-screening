@@ -9,7 +9,7 @@ from ..forms.breast_feature_form import AddBreastFeatureForm, UpdateBreastFeatur
 from .mixins import InProgressAppointmentMixin
 
 
-class UpdateBreastFeaturesView(InProgressAppointmentMixin, FormView):
+class BreastFeaturesView(InProgressAppointmentMixin, FormView):
     template_name = "mammograms/medical_information/breast_features/form.jinja"
     active_workflow_step = (
         AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION

@@ -67,7 +67,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/",
-        appointment_workflow_views.RecordMedicalInformationView.as_view(),
+        appointment_workflow_views.MedicalInformationView.as_view(),
         name="record_medical_information",
     ),
     path(
@@ -77,7 +77,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/take-images/",
-        appointment_workflow_views.TakeImagesView.as_view(),
+        appointment_workflow_views.ImagesView.as_view(),
         name="take_images",
     ),
     path(
@@ -132,7 +132,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/special-appointment/",
-        special_appointment_views.ProvideSpecialAppointmentDetailsView.as_view(),
+        special_appointment_views.SpecialAppointmentDetailsView.as_view(),
         name="provide_special_appointment_details",
     ),
     path(
@@ -307,7 +307,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-features/update/",
-        update_breast_features_view.UpdateBreastFeaturesView.as_view(),
+        update_breast_features_view.BreastFeaturesView.as_view(),
         name="update_breast_features",
     ),
     path(
