@@ -6,6 +6,7 @@ import pydicom
 import pytest
 from django.core.files.uploadedfile import SimpleUploadedFile
 from ninja.testing import TestClient
+from pydicom.uid import generate_uid
 
 from manage_breast_screening.core.api import api
 from manage_breast_screening.gateway.models import GatewayActionStatus
@@ -21,8 +22,10 @@ client = TestClient(api)
 
 
 @pytest.fixture(autouse=True)
-def enable_api(monkeypatch):
+def setup(monkeypatch):
     monkeypatch.setenv("API_ENABLED", "true")
+    monkeypatch.setenv("API_AUDIENCE", "test_audience")
+    monkeypatch.setenv("TENANT_ID", "test_tenant_id")
 
 
 @pytest.fixture
@@ -179,6 +182,26 @@ def test_upload_invalid_auth(dicom_file):
     assert response.json() == {
         "detail": "Unauthorized",
     }
+
+
+def test_upload_bypass_token_validation(dicom_file):
+    with patch.object(TokenValidator, "bypass_authentication", return_value=True):
+        with patch.object(
+            DicomRecorder,
+            "get_or_create_records",
+            return_value=(
+                MagicMock(study_instance_uid=generate_uid()),
+                MagicMock(series_instance_uid=generate_uid()),
+                MagicMock(sop_instance_uid=generate_uid(), id=1),
+            ),
+        ):
+            response = client.put(
+                "/dicom/abc123",
+                FILES={"file": dicom_file},
+                headers={"Authorization": "Bearer anytoken"},
+            )
+
+    assert response.status_code == 201
 
 
 @pytest.mark.django_db

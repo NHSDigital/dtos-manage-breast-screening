@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch
 
 import jwt
 import pytest
+from django.conf import settings
 
 from ..token_validator import TokenValidator
 
@@ -133,7 +134,7 @@ class TestTokenValidator:
         }
 
     def test_authentication_bypass_enabled(self, mock_logger):
-        with patch.dict("os.environ", {"BYPASS_API_TOKEN_AUTH": "true"}):
+        with patch.object(settings, "BYPASS_API_TOKEN_AUTH", return_value=True):
             validator = TokenValidator()
             assert validator(Mock(headers={"Authorization": "Bearer anytoken"})) == {
                 "sub": "bypass_user"

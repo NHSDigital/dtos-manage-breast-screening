@@ -4,6 +4,7 @@ import os
 from urllib.request import urlopen
 
 import jwt
+from django.conf import settings
 from ninja.security import HttpBearer
 
 logger = logging.getLogger(__name__)
@@ -12,19 +13,8 @@ ALLOWED_ALGORITHMS = ["RS256"]
 
 
 class TokenValidator(HttpBearer):
-    def __init__(self):
-        self.bypass_auth = os.getenv("BYPASS_API_TOKEN_AUTH", "false").lower() == "true"
-        self.api_audience = os.environ["API_AUDIENCE"]
-        self.tenant_id = os.environ["TENANT_ID"]
-        self.discovery_keys_url = (
-            "https://login.microsoftonline.com/"
-            + self.tenant_id
-            + "/discovery/v2.0/keys"
-        )
-        self.issuer_url = "https://sts.windows.net/" + self.tenant_id + "/"
-
     def authenticate(self, request, token) -> dict | None:
-        if self.bypass_auth:
+        if self.bypass_authentication:
             logger.warning("Authentication bypass is enabled.")
             return {"sub": "bypass_user"}
 
@@ -49,7 +39,7 @@ class TokenValidator(HttpBearer):
                         "e": key["e"],
                     }
         except Exception:
-            logger.error("Unable to parse authentication token.", exc_info=True)
+            logger.exception("Unable to parse authentication token.")
 
     def _decode(self, token: str, rsa_key: dict) -> dict | None:
         try:
@@ -57,8 +47,8 @@ class TokenValidator(HttpBearer):
                 token,
                 rsa_key,
                 algorithms=ALLOWED_ALGORITHMS,
-                audience=self.api_audience,
-                issuer=self.issuer_url,
+                audience=os.getenv("API_AUDIENCE"),
+                issuer=f"https://sts.windows.net/{self.tenant_id}/",
             )
             return payload
         except jwt.ExpiredSignatureError:
@@ -69,3 +59,15 @@ class TokenValidator(HttpBearer):
             logger.exception("Token is invalid")
         except Exception:
             logger.exception("Unable to parse authentication token.")
+
+    @property
+    def discovery_keys_url(self) -> str:
+        return f"https://login.microsoftonline.com/{self.tenant_id}/discovery/v2.0/keys"
+
+    @property
+    def tenant_id(self) -> str | None:
+        return os.getenv("TENANT_ID", "")
+
+    @property
+    def bypass_authentication(self) -> bool:
+        return getattr(settings, "BYPASS_API_TOKEN_AUTH", False)
