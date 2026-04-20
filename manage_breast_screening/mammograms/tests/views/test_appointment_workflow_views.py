@@ -1,7 +1,10 @@
+from datetime import date, datetime
+from datetime import timezone as tz
 from unittest.mock import patch
 
 import pytest
 import statemachine
+import time_machine
 from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.urls import reverse
@@ -31,9 +34,13 @@ from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
 )
+from manage_breast_screening.participants.models.reported_mammograms import (
+    ParticipantReportedMammogram,
+)
 from manage_breast_screening.participants.tests.factories import (
     AppointmentFactory,
     MedicalInformationReviewFactory,
+    ParticipantReportedMammogramFactory,
 )
 from manage_breast_screening.users.tests.factories import UserFactory
 
@@ -245,7 +252,9 @@ class TestRecordMedicalInformation:
         self, clinical_user_client, monkeypatch, confirmed_identity_appointment
     ):
         monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
-        RelayFactory.create(setting=confirmed_identity_appointment.clinic_slot.clinic.setting)
+        RelayFactory.create(
+            setting=confirmed_identity_appointment.clinic_slot.clinic.setting
+        )
 
         with patch(
             "manage_breast_screening.gateway.relay_service.RelayService.send_action"
@@ -279,6 +288,110 @@ class TestRecordMedicalInformation:
             reverse(
                 "mammograms:show_appointment",
                 kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
+    @pytest.mark.parametrize(
+        "mammogram_kwargs",
+        [
+            {
+                "date_type": ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS,
+                "reason_for_continuing": "reason for continuing",
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 8, 21),
+                "reason_for_continuing": "reason for continuing",
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 7, 31),
+                "reason_for_continuing": "reason for continuing",
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 2, 24),
+                "reason_for_continuing": "reason for continuing",
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 2, 23),
+                "reason_for_continuing": "reason for continuing",
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 2, 22),
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2024, 8, 21),
+            },
+            {"date_type": ParticipantReportedMammogram.DateType.MORE_THAN_SIX_MONTHS},
+        ],
+    )
+    @time_machine.travel(datetime(2025, 8, 22, 10, tzinfo=tz.utc))
+    def test_recent_mammogram_appointment_can_proceed(
+        self, clinical_user_client, confirmed_identity_appointment, mammogram_kwargs
+    ):
+        ParticipantReportedMammogramFactory.create(
+            appointment=confirmed_identity_appointment,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+            **mammogram_kwargs,
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+
+    @pytest.mark.parametrize(
+        "mammogram_kwargs",
+        [
+            {"date_type": ParticipantReportedMammogram.DateType.LESS_THAN_SIX_MONTHS},
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 8, 21),
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 7, 31),
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 2, 24),
+            },
+            {
+                "date_type": ParticipantReportedMammogram.DateType.EXACT,
+                "exact_date": date(2025, 2, 23),
+            },
+        ],
+    )
+    @time_machine.travel(datetime(2025, 8, 22, 10, tzinfo=tz.utc))
+    def test_recent_mammogram_appointment_should_not_proceed(
+        self, clinical_user_client, confirmed_identity_appointment, mammogram_kwargs
+    ):
+        recent_mammogram = ParticipantReportedMammogramFactory.create(
+            appointment=confirmed_identity_appointment,
+            location_type=ParticipantReportedMammogram.LocationType.SAME_PROVIDER,
+            **mammogram_kwargs,
+        )
+
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:record_medical_information",
+                kwargs={"pk": confirmed_identity_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:appointment_should_not_proceed",
+                kwargs={
+                    "appointment_pk": confirmed_identity_appointment.pk,
+                    "participant_reported_mammogram_pk": recent_mammogram.pk,
+                },
             ),
         )
 
