@@ -378,7 +378,9 @@ class TestAddMultipleImagesInformationView:
                 series=series, laterality="L", view_position="CC"
             )
 
-            view_module_path = "manage_breast_screening.mammograms.views.add_multiple_images_information_view"
+            view_module_path = (
+                "manage_breast_screening.mammograms.views.appointment_workflow_views"
+            )
 
             with patch(f"{view_module_path}.gateway_images_enabled", return_value=True):
                 # Submit with old fingerprint
