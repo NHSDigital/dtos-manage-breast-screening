@@ -735,6 +735,7 @@ class MarkSectionReviewedView(InProgressAppointmentMixin, View):
             return HttpResponse(status=201)
 
 
+@require_http_methods(["GET"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
 def appointment_should_not_proceed(
     request, appointment_pk, participant_reported_mammogram_pk
