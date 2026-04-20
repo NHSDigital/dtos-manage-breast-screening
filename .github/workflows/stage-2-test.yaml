@@ -220,6 +220,9 @@ jobs:
       - name: Run linting
         run: make test-lint
 
+      - name: Run ShellCheck
+        run: find ./scripts -type f -name "*.sh" -exec shellcheck {} +
+
   perform-static-analysis:
     name: 'Perform static analysis'
     needs: [test]
