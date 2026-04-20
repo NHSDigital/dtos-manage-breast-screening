@@ -1,10 +1,6 @@
 from django.urls import path
 from django.views.decorators.http import require_http_methods
 
-from manage_breast_screening.mammograms.views import (
-    mammogram_views,
-    update_breast_features_view,
-)
 from manage_breast_screening.mammograms.views.other_information import (
     hormone_replacement_therapy_views,
     other_medical_information_views,
@@ -12,7 +8,6 @@ from manage_breast_screening.mammograms.views.other_information import (
 )
 
 from .views import (
-    add_multiple_images_information_view,
     appointment_note_views,
     appointment_workflow_views,
     image_details_views,
@@ -307,7 +302,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-features/update/",
-        update_breast_features_view.BreastFeaturesView.as_view(),
+        appointment_workflow_views.BreastFeaturesView.as_view(),
         name="update_breast_features",
     ),
     path(
@@ -327,27 +322,27 @@ urlpatterns = [
     ),
     path(
         "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>/",
-        mammogram_views.appointment_should_not_proceed,
+        appointment_workflow_views.appointment_should_not_proceed,
         name="appointment_should_not_proceed",
     ),
     path(
         "<uuid:pk>/proceed-anyway/<uuid:participant_reported_mammogram_pk>/",
-        mammogram_views.AppointmentProceedAnywayView.as_view(),
+        appointment_workflow_views.AppointmentProceedAnywayView.as_view(),
         name="proceed_anyway",
     ),
     path(
         "<uuid:appointment_pk>/attended-not-screened/",
-        mammogram_views.attended_not_screened,
+        appointment_workflow_views.attended_not_screened,
         name="attended_not_screened",
     ),
     path(
         "<uuid:pk>/check-information/",
-        mammogram_views.check_information,
+        appointment_workflow_views.check_information,
         name="check_information",
     ),
     path(
         "<uuid:pk>/complete-screening/",
-        mammogram_views.complete_screening,
+        appointment_workflow_views.complete_screening,
         name="complete_screening",
     ),
     path(
@@ -362,7 +357,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/multiple-images-information/add/",
-        add_multiple_images_information_view.AddMultipleImagesInformationView.as_view(),
+        appointment_workflow_views.AddMultipleImagesInformationView.as_view(),
         name="add_multiple_images_information",
     ),
     path(
