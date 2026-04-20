@@ -62,12 +62,10 @@ class TokenValidator(HttpBearer):
             )
             return payload
         except jwt.ExpiredSignatureError:
-            logger.error("Token is expired", exc_info=True)
+            logger.exception("Token is expired")
         except (jwt.InvalidAudienceError, jwt.InvalidIssuerError):
-            logger.error(
-                "Invalid claims. Please check the audience and issuer.", exc_info=True
-            )
+            logger.exception("Invalid claims. Please check the audience and issuer.")
         except jwt.InvalidTokenError:
-            logger.error("Token is invalid", exc_info=True)
+            logger.exception("Token is invalid")
         except Exception:
-            logger.error("Unable to parse authentication token.", exc_info=True)
+            logger.exception("Unable to parse authentication token.")

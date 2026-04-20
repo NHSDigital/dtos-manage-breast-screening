@@ -65,7 +65,7 @@ class TestTokenValidator:
     ):
         validator = TokenValidator()
         assert validator(Mock(headers={"Authorization": "Bearer abc123"})) is None
-        mock_logger.error.assert_called_with("Token is expired", exc_info=True)
+        mock_logger.exception.assert_called_with("Token is expired")
 
     @patch(
         f"{TokenValidator.__module__}.jwt.decode", side_effect=jwt.InvalidAudienceError
@@ -75,8 +75,8 @@ class TestTokenValidator:
     ):
         validator = TokenValidator()
         assert validator(Mock(headers={"Authorization": "Bearer abc123"})) is None
-        mock_logger.error.assert_called_with(
-            "Invalid claims. Please check the audience and issuer.", exc_info=True
+        mock_logger.exception.assert_called_with(
+            "Invalid claims. Please check the audience and issuer."
         )
 
     @patch(
@@ -87,8 +87,8 @@ class TestTokenValidator:
     ):
         validator = TokenValidator()
         assert validator(Mock(headers={"Authorization": "Bearer abc123"})) is None
-        mock_logger.error.assert_called_with(
-            "Invalid claims. Please check the audience and issuer.", exc_info=True
+        mock_logger.exception.assert_called_with(
+            "Invalid claims. Please check the audience and issuer."
         )
 
     @patch(f"{TokenValidator.__module__}.jwt.decode", side_effect=jwt.InvalidTokenError)
@@ -97,7 +97,7 @@ class TestTokenValidator:
     ):
         validator = TokenValidator()
         assert validator(Mock(headers={"Authorization": "Bearer abc123"})) is None
-        mock_logger.error.assert_called_with("Token is invalid", exc_info=True)
+        mock_logger.exception.assert_called_with("Token is invalid")
 
     @patch(f"{TokenValidator.__module__}.jwt.decode", side_effect=Exception)
     def test_with_unexpected_exception(
@@ -105,8 +105,8 @@ class TestTokenValidator:
     ):
         validator = TokenValidator()
         assert validator(Mock(headers={"Authorization": "Bearer abc123"})) is None
-        mock_logger.error.assert_called_with(
-            "Unable to parse authentication token.", exc_info=True
+        mock_logger.exception.assert_called_with(
+            "Unable to parse authentication token."
         )
 
     @patch(
