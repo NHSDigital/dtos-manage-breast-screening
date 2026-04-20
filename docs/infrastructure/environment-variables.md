@@ -103,6 +103,17 @@ Postgres server port. Defaults to 5432. Required for review apps as each databas
 
 Database server admin user name. When using a managed identity, name of the managed identity.
 
+## DEPLOYED_TO
+
+Describes the environment the application is running in.
+
+**Values:**
+
+- `dev`
+- `review`
+- `preprod`
+- `production`
+
 ## DJANGO_ENV
 
 Specifies the Django environment configuration. This variable controls environment-specific behaviour throughout the application. It's primarily for ensuring non-production code is not run or made available in production.
