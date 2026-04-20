@@ -521,7 +521,7 @@ class UpsertBreastFeaturesView(InProgressAppointmentMixin, FormView):
 
 
 @require_http_methods(["GET", "POST"])
-def check_in(request, pk):
+def check_in_view(request, pk):
     if request.method == "GET":
         return redirect("mammograms:show_appointment", pk=pk)
 
@@ -564,7 +564,7 @@ def _should_redirect_stale_check_in(request, appointment):
 
 @require_http_methods(["GET", "POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def start_appointment(request, pk):
+def start_appointment_view(request, pk):
     if request.method == "GET":
         return redirect("mammograms:show_appointment", pk=pk)
 
@@ -597,7 +597,7 @@ def start_appointment(request, pk):
 
 @require_http_methods(["GET", "POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def resume_appointment(request, pk):
+def resume_appointment_view(request, pk):
     if request.method == "GET":
         return redirect("mammograms:show_appointment", pk=pk)
 
@@ -737,7 +737,7 @@ class MarkSectionReviewedView(InProgressAppointmentMixin, View):
 
 @require_http_methods(["GET"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def appointment_should_not_proceed(
+def appointment_should_not_proceed_view(
     request, appointment_pk, participant_reported_mammogram_pk
 ):
     provider = request.user.current_provider
@@ -872,7 +872,7 @@ class ConfirmAppointmentProceedAnywayView(
 
 @require_http_methods(["GET"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def check_information(request, pk):
+def check_information_view(request, pk):
     provider = request.user.current_provider
     try:
         appointment = provider.appointments.select_related(
@@ -911,7 +911,7 @@ def check_information(request, pk):
 
 @require_http_methods(["POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def complete_screening(request, pk):
+def complete_screening_view(request, pk):
     provider = request.user.current_provider
     try:
         appointment = provider.appointments.select_related(
@@ -964,7 +964,7 @@ def complete_screening(request, pk):
 
 @require_http_methods(["POST"])
 @permission_required(Permission.DO_MAMMOGRAM_APPOINTMENT, raise_exception=True)
-def attended_not_screened(request, appointment_pk):
+def attended_not_screened_view(request, appointment_pk):
     provider = request.user.current_provider
     try:
         appointment = provider.appointments.get(pk=appointment_pk)
@@ -986,7 +986,7 @@ def format_sse_event(event: str, data: str) -> str:
 
 @login_required
 @require_http_methods(["GET"])
-def appointment_images_stream(request, pk):
+def appointment_images_stream_view(request, pk):
     """SSE endpoint for streaming appointment images as they arrive."""
     try:
         provider = request.user.current_provider

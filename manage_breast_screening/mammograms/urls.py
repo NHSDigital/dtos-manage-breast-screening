@@ -37,12 +37,12 @@ def not_implemented_view(request, pk):
 urlpatterns = [
     path(
         "<uuid:pk>/check-in/",
-        appointment_workflow_views.check_in,
+        appointment_workflow_views.check_in_view,
         name="check_in",
     ),
     path(
         "<uuid:pk>/start-appointment/",
-        appointment_workflow_views.start_appointment,
+        appointment_workflow_views.start_appointment_view,
         name="start_appointment",
     ),
     path(
@@ -52,7 +52,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/resume-appointment/",
-        appointment_workflow_views.resume_appointment,
+        appointment_workflow_views.resume_appointment_view,
         name="resume_appointment",
     ),
     path(
@@ -87,7 +87,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/images/stream/",
-        appointment_workflow_views.appointment_images_stream,
+        appointment_workflow_views.appointment_images_stream_view,
         name="appointment_images_stream",
     ),
     path(
@@ -322,7 +322,7 @@ urlpatterns = [
     ),
     path(
         "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>/",
-        appointment_workflow_views.appointment_should_not_proceed,
+        appointment_workflow_views.appointment_should_not_proceed_view,
         name="appointment_should_not_proceed",
     ),
     path(
@@ -332,17 +332,17 @@ urlpatterns = [
     ),
     path(
         "<uuid:appointment_pk>/attended-not-screened/",
-        appointment_workflow_views.attended_not_screened,
+        appointment_workflow_views.attended_not_screened_view,
         name="attended_not_screened",
     ),
     path(
         "<uuid:pk>/check-information/",
-        appointment_workflow_views.check_information,
+        appointment_workflow_views.check_information_view,
         name="check_information",
     ),
     path(
         "<uuid:pk>/complete-screening/",
-        appointment_workflow_views.complete_screening,
+        appointment_workflow_views.complete_screening_view,
         name="complete_screening",
     ),
     path(

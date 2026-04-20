@@ -74,11 +74,13 @@ urlpatterns = [
         include(("manage_breast_screening.auth.urls", "auth"), namespace="auth"),
     ),
     path(
-        "current-provider/select/", clinic_views.select_provider, name="select_provider"
+        "current-provider/select/",
+        clinic_views.select_provider_view,
+        name="select_provider",
     ),
     path(
         "current-provider/settings/",
-        clinic_views.update_provider_settings,
+        clinic_views.update_provider_settings_view,
         name="update_provider_settings",
     ),
     path(
