@@ -24,63 +24,35 @@
 
 {% if image_count > 0 %}
   <div class="app-mammogram-cards">
-    <div class="app-mammogram-card">
-      {% set right_views_html %}
-        <div class="app-mammogram-views">
-          {% with images=images["RCC"], laterality="RCC", side="right" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-          {% with images=images["RMLO"], laterality="RMLO", side="right" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-          {% if images["RCCID"] | length > 0 %}
-            {% with images=images["RCCID"], laterality="RCCID", side="right" %}
-              {% include "mammograms/_image_set.jinja" %}
-            {% endwith %}
+    {% for side in ["Right", "Left"] %}
+      <div class="app-mammogram-card">
+        {% set rh_keys = [] %}
+        {% for k in images %}
+          {% if k[0] == side[0] %}
+            {% set _ = rh_keys.append(k) %}
           {% endif %}
-          {% if images["RMLOID"] | length > 0 %}
-            {% with images=images["RMLOID"], laterality="RMLOID", side="right" %}
-              {% include "mammograms/_image_set.jinja" %}
-            {% endwith %}
-          {% endif %}
-        </div>
-      {% endset %}
-      {{ card({
-        "heading": "Right breast",
-        "headingLevel": "2",
-        "feature": true,
-        "descriptionHtml": right_views_html
-      }) }}
-    </div>
-
-    <div class="app-mammogram-card">
-      {% set left_views_html %}
-        <div class="app-mammogram-views">
-          {% with images=images["LCC"], laterality="LCC", side="left" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-          {% with images=images["LMLO"], laterality="LMLO", side="left" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-          {% if images["LCCID"] | length > 0 %}
-            {% with images=images["LCCID"], laterality="LCCID", side="left" %}
-              {% include "mammograms/_image_set.jinja" %}
-            {% endwith %}
-          {% endif %}
-          {% if images["LMLOID"] | length > 0 %}
-            {% with images=images["LMLOID"], laterality="LMLOID", side="left" %}
-              {% include "mammograms/_image_set.jinja" %}
-            {% endwith %}
-          {% endif %}
-        </div>
-      {% endset %}
-      {{ card({
-        "heading": "Left breast",
-        "headingLevel": "2",
-        "feature": true,
-        "descriptionHtml": left_views_html
-      }) }}
-    </div>
+        {% endfor %}
+        {% set side_html %}
+          <div class="app-mammogram-views">
+            {% for laterality in rh_keys %}
+              {% with images=images[laterality], side=side.lower() %}
+                {% if not laterality.endswith("ID") %}
+                  {% include "mammograms/_image_set.jinja" %}
+                {% elif images | length > 0 %}
+                  {% include "mammograms/_image_set.jinja" %}
+                {% endif %}
+              {% endwith %}
+            {% endfor %}
+          </div>
+        {% endset %}
+        {{ card({
+          "heading": side ~ " breast",
+          "headingLevel": "2",
+          "feature": true,
+          "descriptionHtml": side_html
+        }) }}
+      </div>
+    {% endfor %}
   </div>
 {% endif %}
 
