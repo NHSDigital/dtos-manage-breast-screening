@@ -321,6 +321,10 @@ private_key_inline = environ.get("CIS2_CLIENT_PRIVATE_KEY")
 CIS2_CLIENT_PRIVATE_KEY = (
     private_key_inline.replace("\\n", "\n") if private_key_inline else None
 )
+old_private_key_inline = environ.get("CIS2_OLD_PRIVATE_KEY")
+CIS2_OLD_PRIVATE_KEY = (
+    old_private_key_inline.replace("\\n", "\n") if old_private_key_inline else None
+)
 CIS2_SCOPES = "openid profile email nhsperson associatedorgs"
 CIS2_DEBUG = boolean_env("CIS2_DEBUG", default=False)
 # Sent to CIS2 authorization endpoint during auth process

@@ -125,19 +125,27 @@ def cis2_callback(request):
 @basic_auth_exempt
 @login_not_required
 def jwks(request):
-    """Publish JSON Web Key Set (JWKS) with the public key used for private_key_jwt."""
+    """Publish JSON Web Key Set (JWKS) with the public keys used for private_key_jwt."""
     try:
-        jwk = public_jwk_from_rsa_private_key()
-        if not jwk:
-            return JsonResponse({"keys": []})
-        # Use the thumbprint as the KID
-        kid = jwk.thumbprint()
+        keys = []
+        key_pems = [
+            k
+            for k in [
+                settings.CIS2_CLIENT_PRIVATE_KEY,
+                settings.CIS2_OLD_PRIVATE_KEY,
+            ]
+            if k
+        ]
 
-        jwk_dict = jwk.as_dict()
-        jwk_dict["kid"] = kid
-        jwk_dict["use"] = "sig"
-        jwk_dict["alg"] = "RS512"
-        return JsonResponse({"keys": [jwk_dict]})
+        for pem in key_pems:
+            jwk = public_jwk_from_rsa_private_key(pem)
+            jwk_dict = jwk.as_dict()
+            jwk_dict["kid"] = jwk.thumbprint()
+            jwk_dict["use"] = "sig"
+            jwk_dict["alg"] = "RS512"
+            keys.append(jwk_dict)
+
+        return JsonResponse({"keys": keys})
     except Exception:
         logger.exception("Failed to build JWKS response")
         return JsonResponse({"keys": []}, status=500)

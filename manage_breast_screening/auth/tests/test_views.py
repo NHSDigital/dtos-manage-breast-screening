@@ -1,6 +1,7 @@
 from unittest.mock import ANY, Mock
 
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.test import override_settings
@@ -269,3 +270,37 @@ class TestCis2Callback:
 
         assert response.status_code == 302
         assert response.headers["location"] == "/admin/"
+
+
+@pytest.mark.django_db
+class TestJwksView:
+    def test_returns_single_key_when_only_current_key_configured(self, client):
+        response = client.get(reverse("auth:jwks"))
+
+        assert response.status_code == 200
+        keys = response.json()["keys"]
+        assert len(keys) == 1
+        assert keys[0]["kty"] == "RSA"
+        assert keys[0]["use"] == "sig"
+        assert keys[0]["alg"] == "RS512"
+        assert "kid" in keys[0]
+
+    @override_settings(CIS2_OLD_PRIVATE_KEY=settings.CIS2_CLIENT_PRIVATE_KEY)
+    def test_returns_two_keys_when_old_key_configured(self, client):
+        response = client.get(reverse("auth:jwks"))
+
+        assert response.status_code == 200
+        keys = response.json()["keys"]
+        assert len(keys) == 2
+        assert all(k["kty"] == "RSA" for k in keys)
+
+    def test_returns_500_on_error(self, client, monkeypatch):
+        monkeypatch.setattr(
+            "manage_breast_screening.auth.views.public_jwk_from_rsa_private_key",
+            Mock(side_effect=Exception("boom")),
+        )
+
+        response = client.get(reverse("auth:jwks"))
+
+        assert response.status_code == 500
+        assert response.json() == {"keys": []}
