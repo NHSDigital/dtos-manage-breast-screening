@@ -1,0 +1,564 @@
+studies:
+  - id: c6ff5cea-a5b8-4823-b307-e5faf587b474
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-02/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-02/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-02/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-02/lmlo.png
+  - id: 51a2f9a8-a8d4-4bcc-ad3f-7f20f4d71655
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-03/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-03/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-03/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-03/lmlo.png
+
+  - id: e468ecb0-33f2-4c27-a930-107c3fabd2d4
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: image-library/repeat-large-a-rcc.png
+          - image_file: image-library/repeat-large-b-rcc.png
+        repeat_count: 0
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: image-library/repeat-large-a-lcc.png
+          - image_file: image-library/repeat-large-b-lcc.png
+        repeat_count: 0
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: image-library/repeat-large-a-rmlo.png
+          - image_file: image-library/repeat-large-b-rmlo.png
+        repeat_count: 0
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: image-library/repeat-large-a-lmlo.png
+          - image_file: image-library/repeat-large-b-lmlo.png
+        repeat_count: 0
+  - id: bedbcf0b-b9d8-4d78-960f-ede6c05563d7
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-04/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-04/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-04/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-04/lmlo.png
+  - id: 378f42d7-3361-43b8-bae6-0ce9113cba80
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-05/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-05/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-05/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-05/lmlo.png
+  - id: 15564f66-1d9d-4acd-b78f-1a32b4685124
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-06/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-06/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-06/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-06/lmlo.png
+  - id: 7dffd1de-88ae-4ac3-93d7-a8d4d0820e6b
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: image-library/positioning-short-rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: image-library/positioning-short-lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: image-library/positioning-front-missing-rmlo.png
+          - image_file: image-library/positioning-short-rmlo.png
+        repeat_count: 1
+        repeat_reasons:
+          - POSITIONING_ERROR
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: image-library/positioning-front-missing-lmlo.png
+          - image_file: image-library/positioning-short-lmlo.png
+        repeat_count: 1
+        repeat_reasons:
+          - POSITIONING_ERROR
+
+  - id: 3a447fe4-f4b3-4961-a83c-5bab17a2cda7
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-07/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-07/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-07/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-07/lmlo.png
+  - id: 8fc7d736-f2d9-45ad-93cc-f289da5b720b
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-08/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-08/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-08/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-08/lmlo.png
+  - id: f61faccf-d9ea-4a9b-a284-021680565523
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-09/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-09/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-09/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-09/lmlo.png
+  - id: c089a4e6-8f66-4148-a14c-ec039e831c44
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-10/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-10/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-10/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-10/lmlo.png
+  - id: 3b25ff17-47b3-417c-9a8a-340c657f6578
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-11/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-11/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-11/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-11/lmlo.png
+  - id: 779b425a-b733-4fa9-89d5-fddbb58f09ea
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-12/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-12/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-12/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-12/lmlo.png
+  - id: 0378ff58-baa5-4484-8afb-258ebfd1e5ef
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-13/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-13/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-13/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-13/lmlo.png
+  - id: bb2ba1d3-1f72-428a-9c5a-39b50a5d9353
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-14/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-14/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-14/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-14/lmlo.png
+  - id: f0c600bf-dab2-44d5-aa5e-3b6481deeb48
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-15/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-15/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-15/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-15/lmlo.png
+  - id: bb2187a1-cd82-440f-94b1-46cef5938a23
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-16/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-16/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-16/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-16/lmlo.png
+  - id: 9ce6e923-aa30-4118-ac64-725f0fc37698
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-17/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-17/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-17/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-17/lmlo.png
+  - id: 9162a72b-3506-4b33-9acc-ef71bce07cb6
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-18/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-18/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-18/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-18/lmlo.png
+  - id: 72233799-7179-435f-be6d-e493a8c6ce78
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-19/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-19/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-19/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-19/lmlo.png
+  - id: 813a60ef-940c-4d39-bc5b-0167b2dc214c
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-20/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-20/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-20/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-20/lmlo.png
+  - id: 716f887d-8083-4cc8-9fea-d32213ca8fff
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-21/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-21/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-21/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-21/lmlo.png
+  - id: 4469102f-b8c6-4cba-9ed7-d77ee4f0ced8
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-22/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-22/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-22/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-22/lmlo.png
+  - id: 1ecd140e-c427-4c6d-bf20-d138610b3c0b
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-23/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-23/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-23/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-23/lmlo.png
+  - id: 4ba01e6b-2c5f-4373-9740-4fa6ca22ca1f
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-24/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-24/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-24/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-24/lmlo.png
+  - id: f082c62a-25b4-4aef-8fdf-415f31d296a4
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-25/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-25/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-25/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-25/lmlo.png
+  - id: d7d2c799-53fe-46c8-a81c-1cfb0e5fd4af
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-26/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-26/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-26/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-26/lmlo.png
+  - id: ff3fdaa4-9b7d-4d24-b91a-36e45d4c7dfb
+    series:
+      - view_position: CC
+        laterality: R
+        images:
+          - image_file: set-27/rcc.png
+      - view_position: CC
+        laterality: L
+        images:
+          - image_file: set-27/lcc.png
+      - view_position: MLO
+        laterality: R
+        images:
+          - image_file: set-27/rmlo.png
+      - view_position: MLO
+        laterality: L
+        images:
+          - image_file: set-27/lmlo.png
+
+reading_sessions:
+  - id: 16fdfca7-cbe9-4e0c-8700-2ce070ede415
+    reader:
+      first_name: Janet
+      last_name: Clarke
+    session_size: 3
+    items:
+      - study_id: c6ff5cea-a5b8-4823-b307-e5faf587b474
+        reading:
+          opinion: NORMAL
+
+      - study_id: 51a2f9a8-a8d4-4bcc-ad3f-7f20f4d71655
+        reading:
+          opinion: RECALL
+          recall_for_assessment_details:
+            right_breast_opinion: ABNORMAL
+            left_breast_opinion: NORMAL
+
+      - study_id: e468ecb0-33f2-4c27-a930-107c3fabd2d4
+        reading:
+          opinion: TECHNICAL_RECALL
+          retake_requests:
+            - laterality: L
+              view_position: MLO
+            - laterality: R
+              view_position: CC
+
+  - id: e27aac8c-ec7f-4f50-9e35-d5ceabb74f0d
+    reader:
+      first_name: Fiona
+      last_name: Campbell
+    session_size: 2
+    items:
+      - study_id: c6ff5cea-a5b8-4823-b307-e5faf587b474
+        reading:
+          opinion: NORMAL
+
+      - study_id: 51a2f9a8-a8d4-4bcc-ad3f-7f20f4d71655
+        reading:
+          opinion: NORMAL
