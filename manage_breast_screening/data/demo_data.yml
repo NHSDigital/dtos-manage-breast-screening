@@ -36,6 +36,9 @@ demo_data:
         - first_name: Olivia
           last_name: Evans
           role: Clinical
+        - first_name: Carol
+          last_name: Morris
+          role: Reader
       settings:
         - name: 'West Tester Road Campus'
           id: 8f2a1b3c-4d5e-6f7a-8b9c-0d1e2f3a4b5c
@@ -76,6 +79,9 @@ demo_data:
         - first_name: Susan
           last_name: Wilson
           role: Clinical
+        - first_name: Beverley
+          last_name: Wilson
+          role: Reader
       settings:
         - name: 'East Tester Road Campus'
           id: 7e1d2c3b-4a5f-6e7d-8c9b-0a1f2e3d4c5b

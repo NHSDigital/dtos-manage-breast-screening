@@ -85,3 +85,4 @@ class UserAssignmentFactory(DjangoModelFactory):
     class Params:
         clinical = Trait(roles=[Role.CLINICAL])
         administrative = Trait(roles=[Role.ADMINISTRATIVE])
+        reader = Trait(roles=[Role.READER])

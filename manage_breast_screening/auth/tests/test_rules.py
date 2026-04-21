@@ -4,6 +4,7 @@ from manage_breast_screening.auth.models import Permission
 from manage_breast_screening.auth.rules import (
     is_administrative,
     is_clinical,
+    is_reader,
     is_superuser,
 )
 from manage_breast_screening.clinics.tests.factories import UserAssignmentFactory
@@ -60,6 +61,32 @@ class TestIsAdministrative:
         user_assignment.make_current()
 
         assert not is_administrative(user_assignment.user)
+
+
+@pytest.mark.django_db
+class TestIsReader:
+    def test_returns_true_for_reader_assignment(self):
+        user_assignment = UserAssignmentFactory.create(reader=True)
+        user_assignment.make_current()
+
+        assert is_reader(user_assignment.user)
+
+    def test_returns_false_when_no_provider(self):
+        user_assignment = UserAssignmentFactory.create()
+
+        assert not is_reader(user_assignment.user)
+
+    def test_returns_false_for_non_reader_assignment(self):
+        user_assignment = UserAssignmentFactory.create(clinical=True)
+        user_assignment.make_current()
+
+        assert not is_reader(user_assignment.user)
+
+    def test_returns_false_for_no_assigned_roles(self):
+        user_assignment = UserAssignmentFactory.create()
+        user_assignment.make_current()
+
+        assert not is_reader(user_assignment.user)
 
 
 @pytest.mark.django_db
