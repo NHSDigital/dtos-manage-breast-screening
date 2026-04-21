@@ -60,7 +60,7 @@ class TestImages:
 
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_image_details",
+                "mammograms:show_image_details",
                 kwargs={"pk": completed_appointment.pk},
             )
         )
@@ -85,7 +85,7 @@ class TestImages:
 
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_image_details",
+                "mammograms:show_image_details",
                 kwargs={"pk": completed_appointment.pk},
             )
         )

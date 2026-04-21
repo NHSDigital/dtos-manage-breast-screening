@@ -103,7 +103,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/images/",
         show_appointment_views.ShowImageDetailsView.as_view(),
-        name="appointment_image_details",
+        name="show_image_details",
     ),
     path(
         "<uuid:pk>/medical-information/",
