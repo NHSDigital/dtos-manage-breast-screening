@@ -97,17 +97,17 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/participant/",
-        show_appointment_views.ParticipantDetailsView.as_view(),
+        show_appointment_views.ShowParticipantDetailsView.as_view(),
         name="participant_details",
     ),
     path(
         "<uuid:pk>/images/",
-        show_appointment_views.ImageDetailsView.as_view(),
+        show_appointment_views.ShowImageDetailsView.as_view(),
         name="appointment_image_details",
     ),
     path(
         "<uuid:pk>/medical-information/",
-        show_appointment_views.MedicalInformationView.as_view(),
+        show_appointment_views.ShowMedicalInformationView.as_view(),
         name="medical_information",
     ),
     path(

@@ -31,7 +31,7 @@ class TestShowAppointmentView:
 
 
 @pytest.mark.django_db
-class TestMedicalInformationView:
+class TestShowMedicalInformationView:
     def test_displays_medical_information_sections(self, clinical_user_client):
         appointment = AppointmentFactory.create(
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider

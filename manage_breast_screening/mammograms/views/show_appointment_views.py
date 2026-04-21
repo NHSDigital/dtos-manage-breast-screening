@@ -46,7 +46,7 @@ class ShowAppointmentView(AppointmentTabMixin, View):
         )
 
 
-class ParticipantDetailsView(AppointmentTabMixin, View):
+class ShowParticipantDetailsView(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
@@ -70,7 +70,7 @@ class ParticipantDetailsView(AppointmentTabMixin, View):
         )
 
 
-class MedicalInformationView(AppointmentTabMixin, View):
+class ShowMedicalInformationView(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         participant = appointment.participant
@@ -111,7 +111,7 @@ class MedicalInformationView(AppointmentTabMixin, View):
         )
 
 
-class ImageDetailsView(AppointmentTabMixin, View):
+class ShowImageDetailsView(AppointmentTabMixin, View):
     def get(self, request, *args, **kwargs):
         appointment = self.appointment
         appointment_presenter = AppointmentPresenter(appointment)
