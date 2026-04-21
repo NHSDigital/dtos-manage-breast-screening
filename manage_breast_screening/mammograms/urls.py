@@ -112,12 +112,12 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/note/",
-        appointment_note_views.AppointmentNoteView.as_view(),
+        show_appointment_views.UpsertAppointmentNoteView.as_view(),
         name="appointment_note",
     ),
     path(
         "<uuid:pk>/note-review/",
-        appointment_note_views.AppointmentNoteReviewView.as_view(),
+        appointment_workflow_views.UpsertAppointmentNoteView.as_view(),
         name="appointment_note_review",
     ),
     path(

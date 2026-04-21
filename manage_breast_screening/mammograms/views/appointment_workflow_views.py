@@ -70,12 +70,17 @@ from manage_breast_screening.participants.models.appointment import (
 )
 from manage_breast_screening.participants.presenters import ParticipantPresenter
 
-from ..forms import AppointmentCannotGoAheadForm, RecordMedicalInformationForm
+from ..forms import (
+    AppointmentCannotGoAheadForm,
+    AppointmentNoteForm,
+    RecordMedicalInformationForm,
+)
 from ..forms.appointment_proceed_anyway_form import AppointmentProceedAnywayForm
 from ..forms.breast_feature_form import AddBreastFeatureForm, UpdateBreastFeatureForm
 from ..forms.multiple_images_information_form import MultipleImagesInformationForm
-from ..presenters import LastKnownMammogramPresenter
+from ..presenters import LastKnownMammogramPresenter, present_secondary_nav
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
+from .appointment_note_views import AppointmentNoteMixin
 from .mixins import AppointmentMixin, InProgressAppointmentMixin, WorkflowSidebarMixin
 
 MAMMOGRAMS_RECORD_MEDICAL_INFORMATION_VIEWNAME = "mammograms:record_medical_information"
@@ -1024,3 +1029,43 @@ def appointment_images_stream_view(request, pk):
     response["Cache-Control"] = "no-cache"
     response["X-Accel-Buffering"] = "no"
     return response
+
+
+class UpsertAppointmentNoteView(
+    AppointmentNoteMixin, InProgressAppointmentMixin, FormView
+):
+    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION
+    template_name = "mammograms/check_information/appointment_note.jinja"
+    form_class = AppointmentNoteForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(
+            appointment, tab_description="Note"
+        )
+
+        context.update(
+            {
+                "heading": "Appointment note",
+                "caption": appointment_presenter.participant.full_name,
+                "page_title": appointment_presenter.page_title,
+                "presented_appointment": appointment_presenter,
+                "secondary_nav_items": present_secondary_nav(
+                    appointment, current_tab="note"
+                ),
+                "return_url": self.get_success_url(),
+                "back_link_params": {
+                    "href": extract_relative_redirect_url(self.request)
+                },
+            }
+        )
+        return context
+
+    def get_success_url(self):
+        return extract_relative_redirect_url(
+            self.request,
+            default=reverse(
+                "mammograms:check_information", kwargs={"pk": self.kwargs["pk"]}
+            ),
+        )

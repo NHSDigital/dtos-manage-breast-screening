@@ -1,16 +1,23 @@
 from django.shortcuts import render
+from django.urls import reverse
 from django.views import View
+from django.views.generic import FormView
 
+from manage_breast_screening.core.utils.relative_redirects import (
+    extract_relative_redirect_url,
+)
 from manage_breast_screening.mammograms.presenters.appointment_presenters import (
     ImagesPresenterFactory,
 )
 
+from ..forms import AppointmentNoteForm
 from ..presenters import (
     AppointmentPresenter,
     LastKnownMammogramPresenter,
     present_secondary_nav,
 )
 from ..presenters.medical_information_presenter import MedicalInformationPresenter
+from .appointment_note_views import AppointmentNoteMixin
 from .mixins import AppointmentTabMixin
 
 
@@ -132,4 +139,38 @@ class ShowImageDetailsView(AppointmentTabMixin, View):
             request,
             template_name="mammograms/show/images.jinja",
             context=context,
+        )
+
+
+class UpsertAppointmentNoteView(AppointmentNoteMixin, AppointmentTabMixin, FormView):
+    template_name = "mammograms/show/appointment_note.jinja"
+    form_class = AppointmentNoteForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        appointment = self.appointment
+        appointment_presenter = AppointmentPresenter(
+            appointment, tab_description="Note"
+        )
+
+        context.update(
+            {
+                "heading": appointment_presenter.participant.full_name,
+                "caption": appointment_presenter.caption,
+                "page_title": appointment_presenter.page_title,
+                "presented_appointment": appointment_presenter,
+                "secondary_nav_items": present_secondary_nav(
+                    appointment, current_tab="note"
+                ),
+                "return_url": self.get_success_url(),
+            }
+        )
+        return context
+
+    def get_success_url(self):
+        return extract_relative_redirect_url(
+            self.request,
+            default=reverse(
+                "mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]}
+            ),
         )
