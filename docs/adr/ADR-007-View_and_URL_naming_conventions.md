@@ -110,4 +110,4 @@ Following Django conventions, start with `views.py` and extract cohesive groups 
 
 ## Consequences
 
-- Non-CRUD views require judgement on naming; the `{DomainConcept}View` fallback is intentionally permissive to avoid forcing awkward verb prefixes onto views that don't fit the pattern.
+- Non-CRUD views require judgement on naming; the `{Verb}{DomainConcept}View` fallback is intentionally permissive to avoid forcing awkward verb prefixes onto views that don't fit the pattern.
