@@ -234,7 +234,7 @@ class TestCheckInformation(SystemTestCase):
         expect(self.page).to_have_url(
             re.compile(
                 reverse(
-                    "participants:edit_ethnicity",
+                    "participants:update_ethnicity",
                     kwargs={"pk": self.appointment.participant.pk},
                 )
             )

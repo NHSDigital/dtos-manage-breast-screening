@@ -18,7 +18,7 @@ class TestShowParticipant:
             clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
         )
         response = clinical_user_client.http.get(
-            reverse("participants:show", kwargs={"pk": participant.pk}),
+            reverse("participants:show_participant", kwargs={"pk": participant.pk}),
         )
 
         assertRedirects(
@@ -33,7 +33,7 @@ class TestShowParticipant:
         participant = ParticipantFactory.create()
 
         response = clinical_user_client.http.get(
-            reverse("participants:show", kwargs={"pk": participant.pk}),
+            reverse("participants:show_participant", kwargs={"pk": participant.pk}),
         )
 
         assertRedirects(
