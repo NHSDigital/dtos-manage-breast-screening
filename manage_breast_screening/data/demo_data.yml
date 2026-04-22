@@ -12,11 +12,29 @@ demo_data:
         - first_name: Louise
           last_name: Cooper
           role: Administrative
+        - first_name: Michelle
+          last_name: Turner
+          role: Administrative
+        - first_name: Angela
+          last_name: Parker
+          role: Administrative
+        - first_name: Emily
+          last_name: Evans
+          role: Administrative
         - first_name: Catherine
           last_name: Price
           role: Clinical
         - first_name: Diane
           last_name: Hayes
+          role: Clinical
+        - first_name: Sarah
+          last_name: Turner
+          role: Clinical
+        - first_name: Emma
+          last_name: Parker
+          role: Clinical
+        - first_name: Olivia
+          last_name: Evans
           role: Clinical
       settings:
         - name: 'West Tester Road Campus'
@@ -34,11 +52,29 @@ demo_data:
         - first_name: Janet
           last_name: Clarke
           role: Administrative
+        - first_name: Laura
+          last_name: Mitchell
+          role: Administrative
+        - first_name: Karen
+          last_name: Ward
+          role: Administrative
+        - first_name: Helen
+          last_name: Baker
+          role: Administrative
         - first_name: Fiona
           last_name: Campbell
           role: Clinical
         - first_name: Nicola
           last_name: Stewart
+          role: Clinical
+        - first_name: Rebecca
+          last_name: Adams
+          role: Clinical
+        - first_name: Lisa
+          last_name: Johnson
+          role: Clinical
+        - first_name: Susan
+          last_name: Wilson
           role: Clinical
       settings:
         - name: 'East Tester Road Campus'
