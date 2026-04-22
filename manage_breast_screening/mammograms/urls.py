@@ -132,52 +132,52 @@ urlpatterns = [
     ),
     path(
         "<uuid:pk>/record-medical-information/lump/",
-        symptom_views.AddLumpView.as_view(),
+        symptom_views.AddSymptomLumpView.as_view(),
         name="add_symptom_lump",
     ),
     path(
         "<uuid:pk>/record-medical-information/lump/<uuid:symptom_pk>/",
-        symptom_views.UpdateLumpView.as_view(),
+        symptom_views.UpdateSymptomLumpView.as_view(),
         name="update_symptom_lump",
     ),
     path(
         "<uuid:pk>/record-medical-information/swelling-or-shape-change/",
-        symptom_views.AddSwellingOrShapeChangeView.as_view(),
+        symptom_views.AddSymptomSwellingOrShapeChangeView.as_view(),
         name="add_symptom_swelling_or_shape_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/swelling-or-shape-change/<uuid:symptom_pk>/",
-        symptom_views.UpdateSwellingOrShapeChangeView.as_view(),
+        symptom_views.UpdateSymptomSwellingOrShapeChangeView.as_view(),
         name="update_symptom_swelling_or_shape_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/skin-change/",
-        symptom_views.AddSkinChangeView.as_view(),
+        symptom_views.AddSymptomSkinChangeView.as_view(),
         name="add_symptom_skin_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/skin-change/<uuid:symptom_pk>/",
-        symptom_views.UpdateSkinChangeView.as_view(),
+        symptom_views.UpdateSymptomSkinChangeView.as_view(),
         name="update_symptom_skin_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/nipple-change/",
-        symptom_views.AddNippleChangeView.as_view(),
+        symptom_views.AddSymptomNippleChangeView.as_view(),
         name="add_symptom_nipple_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/nipple-change/<uuid:symptom_pk>/",
-        symptom_views.UpdateNippleChangeView.as_view(),
+        symptom_views.UpdateSymptomNippleChangeView.as_view(),
         name="update_symptom_nipple_change",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-pain/",
-        symptom_views.AddBreastPainView.as_view(),
+        symptom_views.AddSymptomBreastPainView.as_view(),
         name="add_symptom_breast_pain",
     ),
     path(
         "<uuid:pk>/record-medical-information/breast-pain/<uuid:symptom_pk>/",
-        symptom_views.UpdateBreastPainView.as_view(),
+        symptom_views.UpdateSymptomBreastPainView.as_view(),
         name="update_symptom_breast_pain",
     ),
     path(

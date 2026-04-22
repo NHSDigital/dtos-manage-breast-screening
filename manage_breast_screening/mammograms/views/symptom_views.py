@@ -128,7 +128,7 @@ class UpdateSymptomView(BaseSymptomFormView):
         raise NotImplementedError
 
 
-class AddLumpView(AddSymptomView):
+class AddSymptomLumpView(AddSymptomView):
     """
     Add a symptom: lump
     """
@@ -145,7 +145,7 @@ class AddLumpView(AddSymptomView):
         return context
 
 
-class AddSwellingOrShapeChangeView(AddSymptomView):
+class AddSymptomSwellingOrShapeChangeView(AddSymptomView):
     """
     Add a symptom: swelling or shape change
     """
@@ -155,7 +155,7 @@ class AddSwellingOrShapeChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/forms/simple_symptom.jinja"
 
 
-class AddSkinChangeView(AddSymptomView):
+class AddSymptomSkinChangeView(AddSymptomView):
     """
     Add a symptom: skin change
     """
@@ -165,7 +165,7 @@ class AddSkinChangeView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/forms/skin_change.jinja"
 
 
-class AddNippleChangeView(AddSymptomView):
+class AddSymptomNippleChangeView(AddSymptomView):
     """
     Add a symptom: nipple change
     """
@@ -190,7 +190,7 @@ class AddOtherSymptomView(AddSymptomView):
         return context
 
 
-class AddBreastPainView(AddSymptomView):
+class AddSymptomBreastPainView(AddSymptomView):
     """
     Add a symptom: breast pain
     """
@@ -200,7 +200,7 @@ class AddBreastPainView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/forms/breast_pain.jinja"
 
 
-class UpdateLumpView(UpdateSymptomView):
+class UpdateSymptomLumpView(UpdateSymptomView):
     """
     Update a symptom: lump
     """
@@ -220,7 +220,7 @@ class UpdateLumpView(UpdateSymptomView):
         return context
 
 
-class UpdateSwellingOrShapeChangeView(UpdateSymptomView):
+class UpdateSymptomSwellingOrShapeChangeView(UpdateSymptomView):
     """
     Update a symptom: swelling or shape change
     """
@@ -233,7 +233,7 @@ class UpdateSwellingOrShapeChangeView(UpdateSymptomView):
         return {"symptom_type_id": SymptomType.SWELLING_OR_SHAPE_CHANGE}
 
 
-class UpdateSkinChangeView(UpdateSymptomView):
+class UpdateSymptomSkinChangeView(UpdateSymptomView):
     """
     Update a symptom: skin change
     """
@@ -246,7 +246,7 @@ class UpdateSkinChangeView(UpdateSymptomView):
         return {"symptom_type_id": SymptomType.SKIN_CHANGE}
 
 
-class UpdateNippleChangeView(UpdateSymptomView):
+class UpdateSymptomNippleChangeView(UpdateSymptomView):
     """
     Update a symptom: nipple change
     """
@@ -277,7 +277,7 @@ class UpdateOtherSymptomView(UpdateSymptomView):
         return context
 
 
-class UpdateBreastPainView(UpdateSymptomView):
+class UpdateSymptomBreastPainView(UpdateSymptomView):
     """
     Update a symptom: breast pain
     """
