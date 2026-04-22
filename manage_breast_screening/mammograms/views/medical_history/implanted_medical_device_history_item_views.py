@@ -13,7 +13,9 @@ from ...forms.medical_history.implanted_medical_device_history_item_form import 
 from ..mixins import MedicalInformationMixin
 
 
-class AddImplantedMedicalDeviceHistoryView(MedicalInformationMixin, AddWithAuditView):
+class AddImplantedMedicalDeviceHistoryItemView(
+    MedicalInformationMixin, AddWithAuditView
+):
     form_class = ImplantedMedicalDeviceHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/implanted_medical_device_history.jinja"
     thing_name = "implanted medical device"
@@ -30,7 +32,7 @@ class AddImplantedMedicalDeviceHistoryView(MedicalInformationMixin, AddWithAudit
         return {"appointment": self.appointment}
 
 
-class UpdateImplantedMedicalDeviceHistoryView(
+class UpdateImplantedMedicalDeviceHistoryItemView(
     MedicalInformationMixin, UpdateWithAuditView
 ):
     form_class = ImplantedMedicalDeviceHistoryItemForm
@@ -64,7 +66,7 @@ class UpdateImplantedMedicalDeviceHistoryView(
         )
 
 
-class DeleteImplantedMedicalDeviceHistoryView(DeleteWithAuditView):
+class DeleteImplantedMedicalDeviceHistoryItemView(DeleteWithAuditView):
     thing_name = "item"
 
     def get_success_message_content(self, object):
