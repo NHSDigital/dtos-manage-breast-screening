@@ -1031,7 +1031,7 @@ def appointment_images_stream_view(request, pk):
     return response
 
 
-class UpsertAppointmentNoteView(
+class UpsertWorkflowAppointmentNoteView(
     AppointmentNoteMixin, InProgressAppointmentMixin, FormView
 ):
     active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION

@@ -1326,7 +1326,7 @@ class TestUpsertAppointmentNoteView:
     ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": taken_images_appointment.pk},
             )
         )
@@ -1343,7 +1343,7 @@ class TestUpsertAppointmentNoteView:
         )
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": taken_images_appointment.pk},
             )
         )
@@ -1356,7 +1356,7 @@ class TestUpsertAppointmentNoteView:
         note_content = "Participant prefers left arm blood pressure readings."
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": taken_images_appointment.pk},
             ),
             {"content": note_content},
@@ -1380,7 +1380,7 @@ class TestUpsertAppointmentNoteView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": taken_images_appointment.pk},
             )
             + f"?return_url={check_info_url}",
@@ -1399,7 +1399,7 @@ class TestUpsertAppointmentNoteView:
         updated_content = "Updated note content"
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": taken_images_appointment.pk},
             ),
             {"content": updated_content},
@@ -1429,7 +1429,8 @@ class TestUpsertAppointmentNoteView:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note_review", kwargs={"pk": appointment.pk}
+                "mammograms:upsert_workflow_appointment_note",
+                kwargs={"pk": appointment.pk},
             ),
             {"content": "Updated note content"},
         )
@@ -1457,7 +1458,8 @@ class TestUpsertAppointmentNoteView:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note_review", kwargs={"pk": appointment.pk}
+                "mammograms:upsert_workflow_appointment_note",
+                kwargs={"pk": appointment.pk},
             ),
             {"content": "Updated note content"},
         )
@@ -1473,7 +1475,7 @@ class TestUpsertAppointmentNoteView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": reviewed_appointment.pk},
             )
         )

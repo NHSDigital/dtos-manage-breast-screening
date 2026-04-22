@@ -171,6 +171,6 @@ class UpsertAppointmentNoteView(AppointmentNoteMixin, AppointmentTabMixin, FormV
         return extract_relative_redirect_url(
             self.request,
             default=reverse(
-                "mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]}
+                "mammograms:upsert_appointment_note", kwargs={"pk": self.kwargs["pk"]}
             ),
         )

@@ -37,7 +37,7 @@ def present_secondary_nav(appointment, current_tab=None):
         {
             "id": "note",
             "text": "Note",
-            "href": reverse("mammograms:appointment_note", kwargs={"pk": pk}),
+            "href": reverse("mammograms:upsert_appointment_note", kwargs={"pk": pk}),
             "current": current_tab == "note",
         },
     ]

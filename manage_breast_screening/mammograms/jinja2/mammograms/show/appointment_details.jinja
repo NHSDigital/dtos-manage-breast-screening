@@ -11,7 +11,7 @@
 
   {{ appointment_note_banner(
     appointment_note,
-    change_url=url('mammograms:appointment_note', kwargs={'pk': presented_appointment.pk})
+    change_url=url('mammograms:upsert_appointment_note', kwargs={'pk': presented_appointment.pk})
   ) }}
 
   {% set appointment_details_html %}

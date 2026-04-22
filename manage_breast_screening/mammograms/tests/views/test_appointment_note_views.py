@@ -17,7 +17,8 @@ class TestDeleteAppointmentNoteView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:appointment_note", kwargs={"pk": in_progress_appointment.pk}
+                "mammograms:upsert_appointment_note",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 
@@ -33,7 +34,8 @@ class TestDeleteAppointmentNoteView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:appointment_note", kwargs={"pk": in_progress_appointment.pk}
+                "mammograms:upsert_appointment_note",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
 

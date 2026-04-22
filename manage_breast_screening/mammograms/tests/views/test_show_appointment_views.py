@@ -103,7 +103,7 @@ class TestUpsertAppointmentNoteView:
     ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_note",
+                "mammograms:upsert_appointment_note",
                 kwargs={"pk": in_progress_appointment.pk},
             )
         )
@@ -118,7 +118,7 @@ class TestUpsertAppointmentNoteView:
         )
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:appointment_note",
+                "mammograms:upsert_appointment_note",
                 kwargs={"pk": in_progress_appointment.pk},
             )
         )
@@ -136,7 +136,7 @@ class TestUpsertAppointmentNoteView:
         note_content = "Participant prefers left arm blood pressure readings."
         response = client.http.post(
             reverse(
-                "mammograms:appointment_note",
+                "mammograms:upsert_appointment_note",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {"content": note_content},
@@ -145,7 +145,8 @@ class TestUpsertAppointmentNoteView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:appointment_note", kwargs={"pk": in_progress_appointment.pk}
+                "mammograms:upsert_appointment_note",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         saved_note = AppointmentNote.objects.get(appointment=in_progress_appointment)
@@ -159,7 +160,8 @@ class TestUpsertAppointmentNoteView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_note", kwargs={"pk": in_progress_appointment.pk}
+                "mammograms:upsert_appointment_note",
+                kwargs={"pk": in_progress_appointment.pk},
             )
             + f"?return_url={check_info_url}",
             {"content": "Test note content"},
@@ -180,7 +182,8 @@ class TestUpsertAppointmentNoteView:
         updated_content = "Updated note content"
         response = client.http.post(
             reverse(
-                "mammograms:appointment_note", kwargs={"pk": in_progress_appointment.pk}
+                "mammograms:upsert_appointment_note",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
             {"content": updated_content},
         )
@@ -188,7 +191,8 @@ class TestUpsertAppointmentNoteView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:appointment_note", kwargs={"pk": in_progress_appointment.pk}
+                "mammograms:upsert_appointment_note",
+                kwargs={"pk": in_progress_appointment.pk},
             ),
         )
         updated_note = AppointmentNote.objects.get(pk=note.pk)

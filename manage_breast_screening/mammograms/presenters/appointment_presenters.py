@@ -69,7 +69,7 @@ class AppointmentPresenter:
     def appointment_note_url(self, return_url):
         return (
             reverse(
-                "mammograms:appointment_note_review",
+                "mammograms:upsert_workflow_appointment_note",
                 kwargs={"pk": self._appointment.pk},
             )
             + "?"

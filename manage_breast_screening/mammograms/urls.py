@@ -113,12 +113,12 @@ urlpatterns = [
     path(
         "<uuid:pk>/note/",
         show_appointment_views.UpsertAppointmentNoteView.as_view(),
-        name="appointment_note",
+        name="upsert_appointment_note",
     ),
     path(
         "<uuid:pk>/note-review/",
-        appointment_workflow_views.UpsertAppointmentNoteView.as_view(),
-        name="appointment_note_review",
+        appointment_workflow_views.UpsertWorkflowAppointmentNoteView.as_view(),
+        name="upsert_workflow_appointment_note",
     ),
     path(
         "<uuid:pk>/note/delete/",
