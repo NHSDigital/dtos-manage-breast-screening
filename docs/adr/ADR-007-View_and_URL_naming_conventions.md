@@ -106,7 +106,7 @@ appointment_workflow_views.py
 symptom_views.py
 ```
 
-Following Django conventions, start with `views.py` and extract cohesive groups into separate files as the module grows (e.g. `appointment_workflow_views.py`, `symptom_views.py`, `/medical_history`).
+Following Django conventions, start with `views.py` and extract cohesive groups into separate files and subpackages as the module grows (e.g. `appointment_workflow_views.py`, `symptom_views.py`, `/medical_history`).
 
 ## Consequences
 
