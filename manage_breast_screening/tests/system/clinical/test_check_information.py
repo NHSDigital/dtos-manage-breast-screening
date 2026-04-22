@@ -116,7 +116,7 @@ class TestCheckInformation(SystemTestCase):
         section = self.page.locator(".nhsuk-card").filter(has=images_taken_heading)
 
         take_images_url = reverse(
-            "mammograms:take_images",
+            "mammograms:upsert_images",
             kwargs={"pk": self.appointment.pk},
         )
 
@@ -234,7 +234,7 @@ class TestCheckInformation(SystemTestCase):
         expect(self.page).to_have_url(
             re.compile(
                 reverse(
-                    "participants:edit_ethnicity",
+                    "participants:update_ethnicity",
                     kwargs={"pk": self.appointment.participant.pk},
                 )
             )

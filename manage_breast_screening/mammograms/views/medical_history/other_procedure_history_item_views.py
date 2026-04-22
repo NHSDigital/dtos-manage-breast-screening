@@ -13,7 +13,7 @@ from ...forms.medical_history.other_procedure_history_item_form import (
 from ..mixins import MedicalInformationMixin
 
 
-class AddOtherProcedureHistoryView(MedicalInformationMixin, AddWithAuditView):
+class AddOtherProcedureHistoryItemView(MedicalInformationMixin, AddWithAuditView):
     form_class = OtherProcedureHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/other_procedure_history.jinja"
     thing_name = "other procedures"
@@ -30,7 +30,7 @@ class AddOtherProcedureHistoryView(MedicalInformationMixin, AddWithAuditView):
         return {"appointment": self.appointment}
 
 
-class UpdateOtherProcedureHistoryView(MedicalInformationMixin, UpdateWithAuditView):
+class UpdateOtherProcedureHistoryItemView(MedicalInformationMixin, UpdateWithAuditView):
     form_class = OtherProcedureHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/other_procedure_history.jinja"
     thing_name = "other procedures"
@@ -62,7 +62,7 @@ class UpdateOtherProcedureHistoryView(MedicalInformationMixin, UpdateWithAuditVi
         )
 
 
-class DeleteOtherProcedureHistoryView(DeleteWithAuditView):
+class DeleteOtherProcedureHistoryItemView(DeleteWithAuditView):
     def get_thing_name(self, object):
         return "item"
 

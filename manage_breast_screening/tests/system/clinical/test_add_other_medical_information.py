@@ -176,7 +176,7 @@ class TestAddOtherMedicalInformation(SystemTestCase):
         buttons.first.click()
 
     def then_i_should_be_on_the_record_images_page(self):
-        self.expect_url("mammograms:take_images", pk=self.appointment.pk)
+        self.expect_url("mammograms:upsert_images", pk=self.appointment.pk)
         self.assert_page_title_contains("Record images taken")
 
     def when_i_select_yes_2_cc_and_2_mlo(self):

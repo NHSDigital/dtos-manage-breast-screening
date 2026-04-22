@@ -55,7 +55,7 @@ class TestUserSubmitsCannotGoAheadForm(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:appointment_cannot_go_ahead",
+                "mammograms:confirm_appointment_cannot_go_ahead",
                 kwargs={"pk": self.appointment.pk},
             )
             + "?return_url=/mammograms/dummy-return-url/"

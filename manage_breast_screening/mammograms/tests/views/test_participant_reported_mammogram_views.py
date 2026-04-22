@@ -132,7 +132,7 @@ class TestAddParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
@@ -143,7 +143,7 @@ class TestAddParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
@@ -157,7 +157,7 @@ class TestAddParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             valid_mammogram_form_data,
@@ -182,7 +182,7 @@ class TestAddParticipantReportedMammogram:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             build_exact_date_form_data(exact_date, return_url),
@@ -209,7 +209,7 @@ class TestAddParticipantReportedMammogram:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             build_exact_date_form_data(exact_date, return_url),
@@ -256,7 +256,7 @@ class TestAddParticipantReportedMammogram:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
@@ -307,7 +307,7 @@ class TestAddParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": in_progress_appointment.pk},
             )
         )
@@ -337,7 +337,7 @@ class TestChangeParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -354,7 +354,7 @@ class TestChangeParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -373,7 +373,7 @@ class TestChangeParticipantReportedMammogram:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -404,7 +404,7 @@ class TestChangeParticipantReportedMammogram:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -438,7 +438,7 @@ class TestChangeParticipantReportedMammogram:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -491,7 +491,7 @@ class TestChangeParticipantReportedMammogram:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -538,7 +538,7 @@ class TestChangeParticipantReportedMammogram:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": in_progress_appointment.pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
@@ -568,7 +568,7 @@ class TestDeleteParticipantReportedMammogram:
 
         clinical_user_client.http.post(
             reverse(
-                "mammograms:delete_previous_mammogram",
+                "mammograms:delete_participant_reported_mammogram",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -598,7 +598,7 @@ class TestConfirmAppointmentProceedAnywayView:
     ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:proceed_anyway",
+                "mammograms:confirm_appointment_proceed_anyway",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -615,7 +615,7 @@ class TestConfirmAppointmentProceedAnywayView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:proceed_anyway",
+                "mammograms:confirm_appointment_proceed_anyway",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,
@@ -641,7 +641,7 @@ class TestConfirmAppointmentProceedAnywayView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:proceed_anyway",
+                "mammograms:confirm_appointment_proceed_anyway",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "participant_reported_mammogram_pk": participant_reported_mammogram.pk,

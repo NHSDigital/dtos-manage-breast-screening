@@ -56,11 +56,13 @@ class ParticipantPresenter:
         self.date_of_birth = format_date(participant.date_of_birth)
         self.age = format_age(participant.age())
         self.risk_level = sentence_case(participant.risk_level)
-        self.url = reverse("participants:show", kwargs={"pk": participant.pk})
+        self.url = reverse(
+            "participants:show_participant", kwargs={"pk": participant.pk}
+        )
 
     def ethnicity_url(self, return_url):
         url = reverse(
-            "participants:edit_ethnicity", kwargs={"pk": self._participant.pk}
+            "participants:update_ethnicity", kwargs={"pk": self._participant.pk}
         )
         if return_url:
             url += "?return_url=" + quote(return_url)

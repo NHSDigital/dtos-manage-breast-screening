@@ -14,7 +14,7 @@ from ...forms.medical_history.breast_augmentation_history_item_form import (
 from ..mixins import MedicalInformationMixin
 
 
-class AddBreastAugmentationHistoryView(MedicalInformationMixin, AddWithAuditView):
+class AddBreastAugmentationHistoryItemView(MedicalInformationMixin, AddWithAuditView):
     form_class = BreastAugmentationHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/breast_augmentation_history.jinja"
     thing_name = "breast implants or augmentation"
@@ -34,7 +34,9 @@ class AddBreastAugmentationHistoryView(MedicalInformationMixin, AddWithAuditView
         return {"appointment": self.appointment}
 
 
-class UpdateBreastAugmentationHistoryView(MedicalInformationMixin, UpdateWithAuditView):
+class UpdateBreastAugmentationHistoryItemView(
+    MedicalInformationMixin, UpdateWithAuditView
+):
     form_class = BreastAugmentationHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/breast_augmentation_history.jinja"
     thing_name = "breast implants or augmentation"
@@ -61,7 +63,7 @@ class UpdateBreastAugmentationHistoryView(MedicalInformationMixin, UpdateWithAud
         )
 
 
-class DeleteBreastAugmentationHistoryView(DeleteWithAuditView):
+class DeleteBreastAugmentationHistoryItemView(DeleteWithAuditView):
     thing_name = "item"
 
     def get_success_message_content(self, object):

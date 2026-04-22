@@ -25,19 +25,19 @@ def present_secondary_nav(appointment, current_tab=None):
         {
             "id": "participant",
             "text": "Participant",
-            "href": reverse("mammograms:participant_details", kwargs={"pk": pk}),
+            "href": reverse("mammograms:show_participant_details", kwargs={"pk": pk}),
             "current": current_tab == "participant",
         },
         {
             "id": "medical_information",
             "text": "Medical information",
-            "href": reverse("mammograms:medical_information", kwargs={"pk": pk}),
+            "href": reverse("mammograms:show_medical_information", kwargs={"pk": pk}),
             "current": current_tab == "medical_information",
         },
         {
             "id": "note",
             "text": "Note",
-            "href": reverse("mammograms:appointment_note", kwargs={"pk": pk}),
+            "href": reverse("mammograms:upsert_appointment_note", kwargs={"pk": pk}),
             "current": current_tab == "note",
         },
     ]

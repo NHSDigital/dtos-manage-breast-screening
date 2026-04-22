@@ -13,7 +13,7 @@ from manage_breast_screening.mammograms.forms.medical_history.breast_cancer_hist
 from ..mixins import MedicalInformationMixin
 
 
-class AddBreastCancerHistoryView(MedicalInformationMixin, AddWithAuditView):
+class AddBreastCancerHistoryItemView(MedicalInformationMixin, AddWithAuditView):
     form_class = BreastCancerHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/breast_cancer_history_item_form.jinja"
     thing_name = "breast cancer"
@@ -25,7 +25,7 @@ class AddBreastCancerHistoryView(MedicalInformationMixin, AddWithAuditView):
         return {"appointment": self.appointment}
 
 
-class UpdateBreastCancerHistoryView(MedicalInformationMixin, UpdateWithAuditView):
+class UpdateBreastCancerHistoryItemView(MedicalInformationMixin, UpdateWithAuditView):
     form_class = BreastCancerHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/breast_cancer_history_item_form.jinja"
     thing_name = "breast cancer"
@@ -52,7 +52,7 @@ class UpdateBreastCancerHistoryView(MedicalInformationMixin, UpdateWithAuditView
         )
 
 
-class DeleteBreastCancerHistoryView(DeleteWithAuditView):
+class DeleteBreastCancerHistoryItemView(DeleteWithAuditView):
     thing_name = "item"
 
     def get_success_message_content(self, object):

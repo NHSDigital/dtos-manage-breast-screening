@@ -102,7 +102,7 @@ class TestEditingSpecialAppointments(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:provide_special_appointment_details",
+                "mammograms:upsert_special_appointment_details",
                 kwargs={"pk": self.appointment.pk},
             )
         )

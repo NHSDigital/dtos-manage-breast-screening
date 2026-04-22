@@ -17,7 +17,7 @@ class TestProvideDetails:
         )
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:provide_special_appointment_details",
+                "mammograms:upsert_special_appointment_details",
                 kwargs={"pk": appointment.pk},
             )
         )
@@ -29,7 +29,7 @@ class TestProvideDetails:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:provide_special_appointment_details",
+                "mammograms:upsert_special_appointment_details",
                 kwargs={"pk": appointment.pk},
             ),
             {
@@ -54,7 +54,7 @@ class TestProvideDetails:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:provide_special_appointment_details",
+                "mammograms:upsert_special_appointment_details",
                 kwargs={"pk": appointment.pk},
             )
             + f"?return_url={check_info_url}",
@@ -71,7 +71,7 @@ class TestProvideDetails:
         )
         clinical_user_client.http.post(
             reverse(
-                "mammograms:provide_special_appointment_details",
+                "mammograms:upsert_special_appointment_details",
                 kwargs={"pk": appointment.pk},
             ),
             {
@@ -95,7 +95,7 @@ class TestProvideDetails:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:provide_special_appointment_details",
+                "mammograms:upsert_special_appointment_details",
                 kwargs={"pk": appointment.pk},
             ),
             {},

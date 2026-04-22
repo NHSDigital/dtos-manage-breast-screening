@@ -15,7 +15,7 @@ from .models import Participant
 logger = getLogger(__name__)
 
 
-def show(request, pk):
+def show_view(request, pk):
     provider = request.user.current_provider
     try:
         appointment_id = (
@@ -29,10 +29,10 @@ def show(request, pk):
         logger.exception(f"Appointment not found for participant {pk}")
         return redirect(reverse("clinics:list_clinics"))
 
-    return redirect("mammograms:participant_details", pk=appointment_id)
+    return redirect("mammograms:show_participant_details", pk=appointment_id)
 
 
-def edit_ethnicity(request, pk):
+def update_ethnicity_view(request, pk):
     try:
         provider = request.user.current_provider
         participant = provider.participants.get(pk=pk)
@@ -40,7 +40,7 @@ def edit_ethnicity(request, pk):
         raise Http404("Participant not found")
 
     return_url = extract_relative_redirect_url(
-        request, reverse("participants:show", kwargs={"pk": participant.pk})
+        request, reverse("participants:show_participant", kwargs={"pk": participant.pk})
     )
 
     if request.method == "POST":

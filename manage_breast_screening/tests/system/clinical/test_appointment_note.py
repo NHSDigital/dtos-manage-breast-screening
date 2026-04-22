@@ -47,9 +47,11 @@ class TestAppointmentNote(SystemTestCase):
     def and_i_am_on_the_appointment_note_page(self):
         self.page.goto(
             self.live_server_url
-            + reverse("mammograms:appointment_note", kwargs={"pk": self.appointment.pk})
+            + reverse(
+                "mammograms:upsert_appointment_note", kwargs={"pk": self.appointment.pk}
+            )
         )
-        self.expect_url("mammograms:appointment_note", pk=self.appointment.pk)
+        self.expect_url("mammograms:upsert_appointment_note", pk=self.appointment.pk)
 
     def then_i_see_a_validation_error(self):
         self.expect_validation_error(
@@ -71,7 +73,7 @@ class TestAppointmentNote(SystemTestCase):
 
     def and_i_save_the_note(self):
         self.page.get_by_role("button", name="Save note").click()
-        self.expect_url("mammograms:appointment_note", pk=self.appointment.pk)
+        self.expect_url("mammograms:upsert_appointment_note", pk=self.appointment.pk)
 
     def when_i_save_the_note(self):
         self.and_i_save_the_note()

@@ -16,7 +16,9 @@ from ...forms.medical_history.mastectomy_or_lumpectomy_history_item_form import 
 from ..mixins import MedicalInformationMixin
 
 
-class AddMastectomyOrLumpectomyHistoryView(MedicalInformationMixin, AddWithAuditView):
+class AddMastectomyOrLumpectomyHistoryItemView(
+    MedicalInformationMixin, AddWithAuditView
+):
     form_class = MastectomyOrLumpectomyHistoryItemForm
     template_name = "mammograms/medical_information/medical_history/forms/mastectomy_or_lumpectomy_history.jinja"
     thing_name = "mastectomy or lumpectomy"
@@ -33,7 +35,7 @@ class AddMastectomyOrLumpectomyHistoryView(MedicalInformationMixin, AddWithAudit
         return context
 
 
-class UpdateMastectomyOrLumpectomyHistoryView(
+class UpdateMastectomyOrLumpectomyHistoryItemView(
     MedicalInformationMixin, UpdateWithAuditView
 ):
     form_class = MastectomyOrLumpectomyHistoryItemForm
@@ -69,7 +71,7 @@ class UpdateMastectomyOrLumpectomyHistoryView(
         )
 
 
-class DeleteMastectomyOrLumpectomyHistoryView(DeleteWithAuditView):
+class DeleteMastectomyOrLumpectomyHistoryItemView(DeleteWithAuditView):
     thing_name = "item"
 
     def get_success_message_content(self, object):

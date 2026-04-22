@@ -12,7 +12,7 @@ from ...forms.medical_history.cyst_history_item_form import CystHistoryItemForm
 from ..mixins import MedicalInformationMixin
 
 
-class AddCystHistoryView(MedicalInformationMixin, AddWithAuditView):
+class AddCystHistoryItemView(MedicalInformationMixin, AddWithAuditView):
     form_class = CystHistoryItemForm
     template_name = (
         "mammograms/medical_information/medical_history/forms/cyst_history.jinja"
@@ -39,7 +39,7 @@ class AddCystHistoryView(MedicalInformationMixin, AddWithAuditView):
         return {"appointment": self.appointment}
 
 
-class UpdateCystHistoryView(MedicalInformationMixin, UpdateWithAuditView):
+class UpdateCystHistoryItemView(MedicalInformationMixin, UpdateWithAuditView):
     form_class = CystHistoryItemForm
     template_name = (
         "mammograms/medical_information/medical_history/forms/cyst_history.jinja"
@@ -72,7 +72,7 @@ class UpdateCystHistoryView(MedicalInformationMixin, UpdateWithAuditView):
         )
 
 
-class DeleteCystHistoryView(DeleteWithAuditView):
+class DeleteCystHistoryItemView(DeleteWithAuditView):
     thing_name = "item"
 
     def get_success_message_content(self, object):

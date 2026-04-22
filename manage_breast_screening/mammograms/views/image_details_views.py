@@ -34,7 +34,7 @@ class AddImageDetailsView(WorkflowSidebarMixin, FormView):
                 "page_title": "Provide image details",
                 "back_link_params": {
                     "href": reverse(
-                        "mammograms:take_images",
+                        "mammograms:upsert_images",
                         kwargs={"pk": self.appointment_pk},
                     )
                 },

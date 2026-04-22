@@ -398,7 +398,7 @@ class TestAddMultipleImagesInformationView:
             assertRedirects(
                 response,
                 reverse(
-                    "mammograms:gateway_images",
+                    "mammograms:upsert_gateway_images",
                     kwargs={"pk": reviewed_appointment.pk},
                 ),
                 fetch_redirect_response=False,
