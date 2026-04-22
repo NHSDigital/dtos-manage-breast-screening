@@ -123,7 +123,7 @@ class TestChangeHormoneReplacementTherapyView:
     def test_renders_response(self, clinical_user_client, hrt):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:change_hormone_replacement_therapy",
+                "mammograms:update_hormone_replacement_therapy",
                 kwargs={
                     "pk": hrt.appointment.pk,
                 },
@@ -134,7 +134,7 @@ class TestChangeHormoneReplacementTherapyView:
     def test_valid_post_redirects_to_appointment(self, clinical_user_client, hrt):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_hormone_replacement_therapy",
+                "mammograms:update_hormone_replacement_therapy",
                 kwargs={"pk": hrt.appointment.pk},
             ),
             {
@@ -164,7 +164,7 @@ class TestChangeHormoneReplacementTherapyView:
         HormoneReplacementTherapyFactory.create(appointment=in_progress_appointment)
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_hormone_replacement_therapy",
+                "mammograms:update_hormone_replacement_therapy",
                 kwargs={
                     "pk": in_progress_appointment.pk,
                 },

@@ -26,7 +26,13 @@ from manage_breast_screening.mammograms.forms.images.record_images_taken_form im
     RecordImagesTakenForm,
 )
 from manage_breast_screening.manual_images.models import Study
-from manage_breast_screening.participants.models import MedicalInformationReview
+from manage_breast_screening.manual_images.tests.factories import (
+    StudyFactory as ManualStudyFactory,
+)
+from manage_breast_screening.participants.models import (
+    AppointmentNote,
+    MedicalInformationReview,
+)
 from manage_breast_screening.participants.models.appointment import (
     AppointmentStatusNames,
     AppointmentWorkflowStepCompletion,
@@ -39,7 +45,7 @@ from manage_breast_screening.users.tests.factories import UserFactory
 
 
 @pytest.mark.django_db
-class TestConfirmIdentity:
+class TestConfirmIdentityView:
     def test_renders_response_when_identity_not_confirmed(
         self, clinical_user_client, in_progress_appointment
     ):
@@ -187,7 +193,7 @@ class TestConfirmIdentity:
 
 
 @pytest.mark.django_db
-class TestRecordMedicalInformation:
+class TestMedicalInformationView:
     def test_renders_response(
         self, clinical_user_client, confirmed_identity_appointment
     ):
@@ -245,7 +251,9 @@ class TestRecordMedicalInformation:
         self, clinical_user_client, monkeypatch, confirmed_identity_appointment
     ):
         monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
-        RelayFactory.create(setting=confirmed_identity_appointment.clinic_slot.clinic.setting)
+        RelayFactory.create(
+            setting=confirmed_identity_appointment.clinic_slot.clinic.setting
+        )
 
         with patch(
             "manage_breast_screening.gateway.relay_service.RelayService.send_action"
@@ -284,7 +292,7 @@ class TestRecordMedicalInformation:
 
 
 @pytest.mark.django_db
-class TestTakeImages:
+class TestUpsertImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -421,7 +429,7 @@ class TestTakeImages:
 
 
 @pytest.mark.django_db
-class TestGatewayImages:
+class TestUpsertGatewayImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -994,7 +1002,7 @@ class TestResumeAppointment:
 
 
 @pytest.mark.django_db
-class TestAppointmentCannotGoAhead:
+class TestConfirmAppointmentCannotGoAheadView:
     def test_status_and_audit_created(
         self, clinical_user_client, in_progress_appointment
     ):
@@ -1060,7 +1068,7 @@ class TestAppointmentCannotGoAhead:
 
 
 @pytest.mark.django_db
-class TestMarkSectionReviewed:
+class TestMarkSectionReviewedView:
     def test_creates_medical_information_review(
         self, clinical_user_client, confirmed_identity_appointment
     ):
@@ -1194,7 +1202,7 @@ class TestMarkSectionReviewed:
 
 
 @pytest.mark.django_db
-class TestPauseAppointment:
+class TestPauseAppointmentView:
     def test_renders_response(self, clinical_user_client, in_progress_appointment):
         response = clinical_user_client.http.get(
             reverse(
@@ -1309,3 +1317,170 @@ class TestPauseAppointment:
             == AppointmentStatusNames.IN_PROGRESS
         )
         assert in_progress_appointment.current_status.created_by == different_user
+
+
+@pytest.mark.django_db
+class TestUpsertAppointmentNoteView:
+    def test_delete_link_not_shown_when_note_does_not_exist(
+        self, clinical_user_client, taken_images_appointment
+    ):
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": taken_images_appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+        assert "Appointment note" in response.content.decode()
+        assert "app-status-bar" in response.content.decode()
+        assert "Delete appointment note" not in response.content.decode()
+
+    def test_delete_link_shown_when_note_exists(
+        self, clinical_user_client, taken_images_appointment
+    ):
+        AppointmentNote.objects.create(
+            appointment=taken_images_appointment, content="Existing note"
+        )
+        response = clinical_user_client.http.get(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": taken_images_appointment.pk},
+            )
+        )
+        assert response.status_code == 200
+        assert "Delete appointment note" in response.content.decode()
+
+    def test_users_can_save_note(self, clinical_user_client, taken_images_appointment):
+        ManualStudyFactory.create(appointment=taken_images_appointment)
+
+        note_content = "Participant prefers left arm blood pressure readings."
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": taken_images_appointment.pk},
+            ),
+            {"content": note_content},
+        )
+
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": taken_images_appointment.pk},
+            ),
+        )
+        saved_note = AppointmentNote.objects.get(appointment=taken_images_appointment)
+        assert saved_note.content == note_content
+
+    def test_save_redirects_to_return_url(
+        self, clinical_user_client, taken_images_appointment
+    ):
+        check_info_url = reverse(
+            "mammograms:check_information", kwargs={"pk": taken_images_appointment.pk}
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": taken_images_appointment.pk},
+            )
+            + f"?return_url={check_info_url}",
+            {"content": "Test note content"},
+        )
+        assertRedirects(response, check_info_url, fetch_redirect_response=False)
+
+    def test_users_can_update_note(
+        self, clinical_user_client, taken_images_appointment
+    ):
+        ManualStudyFactory.create(appointment=taken_images_appointment)
+        note = AppointmentNote.objects.create(
+            appointment=taken_images_appointment, content="Original note"
+        )
+
+        updated_content = "Updated note content"
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": taken_images_appointment.pk},
+            ),
+            {"content": updated_content},
+        )
+
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:check_information",
+                kwargs={"pk": taken_images_appointment.pk},
+            ),
+        )
+        updated_note = AppointmentNote.objects.get(pk=note.pk)
+        assert updated_note.content == updated_content
+        assert AppointmentNote.objects.count() == 1
+
+    def test_access_denied_when_not_in_progress(self, clinical_user_client):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.SCREENED,
+            current_status__created_by=UserFactory.create(),
+        )
+        note = AppointmentNote.objects.create(
+            appointment=appointment, content="Original note"
+        )
+        ManualStudyFactory.create(appointment=appointment)
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review", kwargs={"pk": appointment.pk}
+            ),
+            {"content": "Updated note content"},
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
+        )
+
+        updated_note = AppointmentNote.objects.get(pk=note.pk)
+        assert updated_note.content == "Original note"
+        assert AppointmentNote.objects.count() == 1
+
+    def test_redirected_to_appointment_show_page_when_in_progress_with_another_user(
+        self, clinical_user_client
+    ):
+        appointment = AppointmentFactory.create(
+            clinic_slot__clinic__setting__provider=clinical_user_client.current_provider,
+            current_status=AppointmentStatusNames.IN_PROGRESS,
+            current_status__created_by=UserFactory.create(),
+        )
+        note = AppointmentNote.objects.create(
+            appointment=appointment, content="Original note"
+        )
+        ManualStudyFactory.create(appointment=appointment)
+
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review", kwargs={"pk": appointment.pk}
+            ),
+            {"content": "Updated note content"},
+        )
+        assertRedirects(
+            response,
+            reverse("mammograms:show_appointment", kwargs={"pk": appointment.pk}),
+        )
+
+        assert AppointmentNote.objects.get(pk=note.pk).content == "Original note"
+
+    def test_images_taken_step_incomplete(
+        self, clinical_user_client, reviewed_appointment
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:appointment_note_review",
+                kwargs={"pk": reviewed_appointment.pk},
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": reviewed_appointment.pk},
+            ),
+        )

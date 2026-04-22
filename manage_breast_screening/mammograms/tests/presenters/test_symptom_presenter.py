@@ -185,4 +185,4 @@ class TestSymptomPresenter:
     def test_change_view(self):
         symptom = SymptomFactory.create(symptom_type_id=SymptomType.BREAST_PAIN)
         presenter = SymptomPresenter(symptom)
-        assert presenter.change_view() == "mammograms:change_symptom_breast_pain"
+        assert presenter.change_view() == "mammograms:update_symptom_breast_pain"

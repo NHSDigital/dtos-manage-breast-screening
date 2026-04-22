@@ -125,7 +125,7 @@ class TestChangePregnancyAndBreastfeedingView:
     def test_renders_response(self, clinical_user_client, pregnancy_and_breastfeeding):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:change_pregnancy_and_breastfeeding",
+                "mammograms:update_pregnancy_and_breastfeeding",
                 kwargs={
                     "pk": pregnancy_and_breastfeeding.appointment.pk,
                 },
@@ -138,7 +138,7 @@ class TestChangePregnancyAndBreastfeedingView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_pregnancy_and_breastfeeding",
+                "mammograms:update_pregnancy_and_breastfeeding",
                 kwargs={"pk": pregnancy_and_breastfeeding.appointment.pk},
             ),
             {
@@ -169,7 +169,7 @@ class TestChangePregnancyAndBreastfeedingView:
         PregnancyAndBreastfeedingFactory.create(appointment=in_progress_appointment)
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_pregnancy_and_breastfeeding",
+                "mammograms:update_pregnancy_and_breastfeeding",
                 kwargs={
                     "pk": in_progress_appointment.pk,
                 },

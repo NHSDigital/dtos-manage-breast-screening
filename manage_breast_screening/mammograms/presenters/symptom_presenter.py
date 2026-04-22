@@ -165,7 +165,7 @@ class SymptomPresenter:
         return result
 
     def change_view(self):
-        return f"mammograms:change_symptom_{self._symptom.symptom_type_id.lower()}"
+        return f"mammograms:update_symptom_{self._symptom.symptom_type_id.lower()}"
 
     @property
     def delete_message_html(self):

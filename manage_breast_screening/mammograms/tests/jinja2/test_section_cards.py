@@ -68,7 +68,7 @@ class TestMammogramHistoryContent:
 
             <a class="nhsuk-button nhsuk-button--secondary nhsuk-button--small"
                data-module="nhsuk-button" 
-               href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/previous-mammograms/add?return_url=%2Fmammograms%2F53ce8d3b-9e65-471a-b906-73809c0475d0%2Frecord-medical-information%2F"
+               href="/mammograms/53ce8d3b-9e65-471a-b906-73809c0475d0/previous-mammograms/add/?return_url=%2Fmammograms%2F53ce8d3b-9e65-471a-b906-73809c0475d0%2Frecord-medical-information%2F"
                role="button" draggable="false">
             Add another mammogram
             </a>
@@ -257,7 +257,7 @@ class TestMammogramHistoryContent:
                 </dd>
                 <dd class="nhsuk-summary-list__actions">
                 <a class="nhsuk-link nhsuk-link--no-visited-state"
-                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram1.pk}?return_url=/">Change<span
+                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram1.pk}/?return_url=/">Change<span
                     class="nhsuk-u-visually-hidden"> mammogram item 1</span></a>
                 </dd>
             </div>
@@ -275,7 +275,7 @@ class TestMammogramHistoryContent:
                 </dd>
                 <dd class="nhsuk-summary-list__actions">
                 <a class="nhsuk-link nhsuk-link--no-visited-state"
-                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram2.pk}?return_url=/">Change<span
+                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram2.pk}/?return_url=/">Change<span
                     class="nhsuk-u-visually-hidden"> mammogram item 2</span></a>
                 </dd>
             </div>
@@ -293,7 +293,7 @@ class TestMammogramHistoryContent:
                 </dd>
                 <dd class="nhsuk-summary-list__actions">
                 <a class="nhsuk-link nhsuk-link--no-visited-state"
-                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram3.pk}?return_url=/">Change<span
+                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram3.pk}/?return_url=/">Change<span
                     class="nhsuk-u-visually-hidden"> mammogram item 3</span></a>
                 </dd>
             </div>
@@ -311,7 +311,7 @@ class TestMammogramHistoryContent:
                 </dd>
                 <dd class="nhsuk-summary-list__actions">
                 <a class="nhsuk-link nhsuk-link--no-visited-state"
-                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram4.pk}?return_url=/">Change<span
+                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram4.pk}/?return_url=/">Change<span
                     class="nhsuk-u-visually-hidden"> mammogram item 4</span></a>
                 </dd>
             </div>
@@ -329,14 +329,14 @@ class TestMammogramHistoryContent:
                 </dd>
                 <dd class="nhsuk-summary-list__actions">
                 <a class="nhsuk-link nhsuk-link--no-visited-state"
-                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram5.pk}?return_url=/">Change<span
+                    href="/mammograms/{appointment.pk}/previous-mammograms/{mammogram5.pk}/?return_url=/">Change<span
                     class="nhsuk-u-visually-hidden"> mammogram item 5</span></a>
                 </dd>
             </div>
             </dl>
 
             <a class="nhsuk-button nhsuk-button--secondary nhsuk-button--small" data-module="nhsuk-button"
-            href="/mammograms/{appointment.pk}/previous-mammograms/add?return_url=%2Fmammograms%2F{appointment.pk}%2Frecord-medical-information%2F"
+            href="/mammograms/{appointment.pk}/previous-mammograms/add/?return_url=%2Fmammograms%2F{appointment.pk}%2Frecord-medical-information%2F"
             role="button" draggable="false">
             Add another mammogram
             </a>

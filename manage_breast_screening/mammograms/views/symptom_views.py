@@ -81,9 +81,9 @@ class AddSymptomView(BaseSymptomFormView):
         return super().form_valid(form)
 
 
-class ChangeSymptomView(BaseSymptomFormView):
+class UpdateSymptomView(BaseSymptomFormView):
     """
-    Base class for views that change symptoms
+    Base class for views that update symptoms
     """
 
     def get_form_kwargs(self):
@@ -200,9 +200,9 @@ class AddBreastPainView(AddSymptomView):
     template_name = "mammograms/medical_information/symptoms/forms/breast_pain.jinja"
 
 
-class ChangeLumpView(ChangeSymptomView):
+class UpdateLumpView(UpdateSymptomView):
     """
-    Change a symptom: lump
+    Update a symptom: lump
     """
 
     symptom_type_name = "lump"
@@ -220,9 +220,9 @@ class ChangeLumpView(ChangeSymptomView):
         return context
 
 
-class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
+class UpdateSwellingOrShapeChangeView(UpdateSymptomView):
     """
-    Change a symptom: swelling or shape change
+    Update a symptom: swelling or shape change
     """
 
     symptom_type_name = "swelling or shape change"
@@ -233,9 +233,9 @@ class ChangeSwellingOrShapeChangeView(ChangeSymptomView):
         return {"symptom_type_id": SymptomType.SWELLING_OR_SHAPE_CHANGE}
 
 
-class ChangeSkinChangeView(ChangeSymptomView):
+class UpdateSkinChangeView(UpdateSymptomView):
     """
-    Change a symtom: skin change
+    Update a symptom: skin change
     """
 
     symptom_type_name = "Skin change"
@@ -246,9 +246,9 @@ class ChangeSkinChangeView(ChangeSymptomView):
         return {"symptom_type_id": SymptomType.SKIN_CHANGE}
 
 
-class ChangeNippleChangeView(ChangeSymptomView):
+class UpdateNippleChangeView(UpdateSymptomView):
     """
-    Change a symptom: nipple change
+    Update a symptom: nipple change
     """
 
     symptom_type_name = "Nipple change"
@@ -259,9 +259,9 @@ class ChangeNippleChangeView(ChangeSymptomView):
         return {"symptom_type_id": SymptomType.NIPPLE_CHANGE}
 
 
-class ChangeOtherSymptomView(ChangeSymptomView):
+class UpdateOtherSymptomView(UpdateSymptomView):
     """
-    Change a symptom: other
+    Update a symptom: other
     """
 
     symptom_type_name = "Other"
@@ -277,9 +277,9 @@ class ChangeOtherSymptomView(ChangeSymptomView):
         return context
 
 
-class ChangeBreastPainView(ChangeSymptomView):
+class UpdateBreastPainView(UpdateSymptomView):
     """
-    Change a symptom: breast pain
+    Update a symptom: breast pain
     """
 
     symptom_type_name = "Breast pain"

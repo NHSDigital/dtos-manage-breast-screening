@@ -348,7 +348,7 @@ class MedicalInformationPresenter:
                 "items": [
                     {
                         "href": reverse(
-                            "mammograms:change_hormone_replacement_therapy",
+                            "mammograms:update_hormone_replacement_therapy",
                             kwargs={
                                 "pk": self.appointment.pk,
                             },
@@ -376,7 +376,7 @@ class MedicalInformationPresenter:
                 "items": [
                     {
                         "href": reverse(
-                            "mammograms:change_pregnancy_and_breastfeeding",
+                            "mammograms:update_pregnancy_and_breastfeeding",
                             kwargs={
                                 "pk": self.appointment.pk,
                             },
@@ -404,7 +404,7 @@ class MedicalInformationPresenter:
                 "items": [
                     {
                         "href": reverse(
-                            "mammograms:change_other_medical_information",
+                            "mammograms:update_other_medical_information",
                             kwargs={
                                 "pk": self.appointment.pk,
                             },

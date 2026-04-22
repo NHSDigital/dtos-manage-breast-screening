@@ -68,7 +68,7 @@ class ImplantedMedicalDeviceHistoryItemPresenter:
     def change_link(self):
         return {
             "href": reverse(
-                "mammograms:change_implanted_medical_device_history_item",
+                "mammograms:update_implanted_medical_device_history_item",
                 kwargs={
                     "pk": self._item.appointment_id,
                     "history_item_pk": self._item.pk,

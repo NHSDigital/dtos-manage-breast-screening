@@ -26,7 +26,7 @@ class OtherProcedureHistoryItemPresenter:
     def change_link(self):
         return {
             "href": reverse(
-                "mammograms:change_other_procedure_history_item",
+                "mammograms:update_other_procedure_history_item",
                 kwargs={
                     "pk": self._item.appointment_id,
                     "history_item_pk": self._item.pk,

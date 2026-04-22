@@ -52,7 +52,7 @@ class LastKnownMammogramPresenter:
     def _present_mammogram(self, mammogram, item_index):
         href = (
             reverse(
-                "mammograms:change_previous_mammogram",
+                "mammograms:update_previous_mammogram",
                 kwargs={
                     "pk": self.appointment_pk,
                     "participant_reported_mammogram_pk": mammogram.pk,

@@ -48,9 +48,7 @@ def present_secondary_nav(appointment, current_tab=None):
             {
                 "id": "images",
                 "text": "Images",
-                "href": reverse(
-                    "mammograms:appointment_image_details", kwargs={"pk": pk}
-                ),
+                "href": reverse("mammograms:show_image_details", kwargs={"pk": pk}),
                 "current": current_tab == "images",
             },
         )

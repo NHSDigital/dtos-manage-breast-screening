@@ -123,7 +123,7 @@ class TestChangeOtherMedicalInformationView:
     def test_renders_response(self, clinical_user_client, other_medical_information):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:change_other_medical_information",
+                "mammograms:update_other_medical_information",
                 kwargs={
                     "pk": other_medical_information.appointment.pk,
                 },
@@ -136,7 +136,7 @@ class TestChangeOtherMedicalInformationView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_other_medical_information",
+                "mammograms:update_other_medical_information",
                 kwargs={
                     "pk": other_medical_information.appointment.pk,
                 },
@@ -168,7 +168,7 @@ class TestChangeOtherMedicalInformationView:
         OtherMedicalInformationFactory.create(appointment=in_progress_appointment)
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_other_medical_information",
+                "mammograms:update_other_medical_information",
                 kwargs={
                     "pk": in_progress_appointment.pk,
                 },

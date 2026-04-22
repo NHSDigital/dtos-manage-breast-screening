@@ -105,7 +105,7 @@ class TestChangeOtherProcedureView:
     def test_renders_response(self, clinical_user_client, history_item):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:change_other_procedure_history_item",
+                "mammograms:update_other_procedure_history_item",
                 kwargs={
                     "pk": history_item.appointment.pk,
                     "history_item_pk": history_item.pk,
@@ -119,7 +119,7 @@ class TestChangeOtherProcedureView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_other_procedure_history_item",
+                "mammograms:update_other_procedure_history_item",
                 kwargs={
                     "pk": confirmed_identity_appointment.pk,
                     "history_item_pk": history_item.pk,
@@ -155,7 +155,7 @@ class TestChangeOtherProcedureView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:change_other_procedure_history_item",
+                "mammograms:update_other_procedure_history_item",
                 kwargs={
                     "pk": history_item.appointment_id,
                     "history_item_pk": history_item.pk,

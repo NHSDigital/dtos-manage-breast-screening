@@ -15,7 +15,7 @@ from .presenters import AppointmentListPresenter, ClinicPresenter, ClinicsPresen
 from .services import get_user_providers_with_roles
 
 
-def list_clinics(request, filter="today"):
+def list_clinics_view(request, filter="today"):
     provider = request.user.current_provider
     clinics = provider.clinics.by_filter(filter).prefetch_related("setting")
     counts_by_filter = Clinic.filter_counts(provider.pk)
@@ -31,7 +31,7 @@ def list_clinics(request, filter="today"):
     )
 
 
-def list_clinic_appointments(request, pk, filter="remaining"):
+def list_clinic_appointments_view(request, pk, filter="remaining"):
     provider = request.user.current_provider
     clinic = provider.clinics.get(pk=pk)
     presented_clinic = ClinicPresenter(clinic)
@@ -59,7 +59,7 @@ def list_clinic_appointments(request, pk, filter="remaining"):
 
 @current_provider_exempt
 @login_required
-def select_provider(request):
+def select_provider_view(request):
     next_path = extract_relative_redirect_url(request, parameter_name="next")
 
     user_providers = get_user_providers_with_roles(request.user)
@@ -91,7 +91,7 @@ def select_provider(request):
 
 @require_http_methods(["GET", "POST"])
 @permission_required(Permission.MANAGE_PROVIDER_SETTINGS, raise_exception=True)
-def update_provider_settings(request):
+def update_provider_settings_view(request):
     provider = request.user.current_provider
     config = provider.get_config()
 

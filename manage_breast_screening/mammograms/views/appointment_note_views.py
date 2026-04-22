@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import FormView
 
 from manage_breast_screening.core.services.auditor import Auditor
 from manage_breast_screening.core.utils.relative_redirects import (
@@ -9,13 +8,6 @@ from manage_breast_screening.core.utils.relative_redirects import (
 )
 from manage_breast_screening.core.views.generic import DeleteWithAuditView
 from manage_breast_screening.participants.models import AppointmentNote
-from manage_breast_screening.participants.models.appointment import (
-    AppointmentWorkflowStepCompletion,
-)
-
-from ..forms import AppointmentNoteForm
-from ..presenters import AppointmentPresenter, present_secondary_nav
-from .mixins import AppointmentTabMixin, InProgressAppointmentMixin
 
 
 class AppointmentNoteMixin:
@@ -42,80 +34,6 @@ class AppointmentNoteMixin:
         )
         return_url = self.get_success_url()
         return redirect(return_url)
-
-
-class AppointmentNoteView(AppointmentNoteMixin, AppointmentTabMixin, FormView):
-    template_name = "mammograms/show/appointment_note.jinja"
-    form_class = AppointmentNoteForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        appointment = self.appointment
-        appointment_presenter = AppointmentPresenter(
-            appointment, tab_description="Note"
-        )
-
-        context.update(
-            {
-                "heading": appointment_presenter.participant.full_name,
-                "caption": appointment_presenter.caption,
-                "page_title": appointment_presenter.page_title,
-                "presented_appointment": appointment_presenter,
-                "secondary_nav_items": present_secondary_nav(
-                    appointment, current_tab="note"
-                ),
-                "return_url": self.get_success_url(),
-            }
-        )
-        return context
-
-    def get_success_url(self):
-        return extract_relative_redirect_url(
-            self.request,
-            default=reverse(
-                "mammograms:appointment_note", kwargs={"pk": self.kwargs["pk"]}
-            ),
-        )
-
-
-class AppointmentNoteReviewView(
-    AppointmentNoteMixin, InProgressAppointmentMixin, FormView
-):
-    active_workflow_step = AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION
-    template_name = "mammograms/show/appointment_note_review.jinja"
-    form_class = AppointmentNoteForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        appointment = self.appointment
-        appointment_presenter = AppointmentPresenter(
-            appointment, tab_description="Note"
-        )
-
-        context.update(
-            {
-                "heading": "Appointment note",
-                "caption": appointment_presenter.participant.full_name,
-                "page_title": appointment_presenter.page_title,
-                "presented_appointment": appointment_presenter,
-                "secondary_nav_items": present_secondary_nav(
-                    appointment, current_tab="note"
-                ),
-                "return_url": self.get_success_url(),
-                "back_link_params": {
-                    "href": extract_relative_redirect_url(self.request)
-                },
-            }
-        )
-        return context
-
-    def get_success_url(self):
-        return extract_relative_redirect_url(
-            self.request,
-            default=reverse(
-                "mammograms:check_information", kwargs={"pk": self.kwargs["pk"]}
-            ),
-        )
 
 
 class DeleteAppointmentNoteView(DeleteWithAuditView):
