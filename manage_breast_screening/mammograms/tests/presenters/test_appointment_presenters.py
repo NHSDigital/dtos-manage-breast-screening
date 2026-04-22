@@ -810,7 +810,7 @@ class TestImagesTakenPresenter:
 
         [action] = ImagesTakenPresenter(appointment).views_taken_action["items"]
 
-        expected_url = reverse("mammograms:take_images", kwargs={"pk": pk})
+        expected_url = reverse("mammograms:upsert_images", kwargs={"pk": pk})
         assert action["text"] == "Change"
         assert action["visuallyHiddenText"] == "views taken"
         assert action["href"] == expected_url

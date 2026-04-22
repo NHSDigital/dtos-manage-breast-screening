@@ -299,7 +299,7 @@ class MedicalInformationPresenter:
     @property
     def add_mammogram_button(self):
         return self._subpage_button(
-            "mammograms:add_previous_mammogram",
+            "mammograms:add_participant_reported_mammogram",
             "Add another mammogram",
             include_return_url=True,
         )
@@ -307,7 +307,7 @@ class MedicalInformationPresenter:
     @property
     def add_or_update_breast_features_button(self):
         return self._subpage_button(
-            "mammograms:update_breast_features",
+            "mammograms:upsert_breast_features",
             "View or edit breast features" if self.breast_features else "Add a feature",
         )
 

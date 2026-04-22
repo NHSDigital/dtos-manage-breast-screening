@@ -29,7 +29,7 @@ def show(request, pk):
         logger.exception(f"Appointment not found for participant {pk}")
         return redirect(reverse("clinics:list_clinics"))
 
-    return redirect("mammograms:participant_details", pk=appointment_id)
+    return redirect("mammograms:show_participant_details", pk=appointment_id)
 
 
 def edit_ethnicity(request, pk):

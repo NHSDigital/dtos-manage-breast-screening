@@ -39,7 +39,7 @@ class TestShowMedicalInformationView:
         )
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:medical_information",
+                "mammograms:show_medical_information",
                 kwargs={"pk": appointment.pk},
             )
         )

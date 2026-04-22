@@ -123,7 +123,7 @@ class UpdateParticipantReportedMammogramView(
     def get_delete_url(self):
         return (
             reverse(
-                "mammograms:delete_previous_mammogram",
+                "mammograms:delete_participant_reported_mammogram",
                 kwargs={
                     "pk": self.kwargs["pk"],
                     "participant_reported_mammogram_pk": self.kwargs[

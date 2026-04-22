@@ -268,7 +268,7 @@ class TestMedicalInformationView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:gateway_images",
+                "mammograms:upsert_gateway_images",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
         )
@@ -296,7 +296,7 @@ class TestUpsertImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": reviewed_appointment.pk},
             )
         )
@@ -307,7 +307,7 @@ class TestUpsertImagesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -317,7 +317,7 @@ class TestUpsertImagesView:
         assertRedirects(
             response,
             reverse(
-                "mammograms:appointment_cannot_go_ahead",
+                "mammograms:confirm_appointment_cannot_go_ahead",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
         )
@@ -327,7 +327,7 @@ class TestUpsertImagesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -347,7 +347,7 @@ class TestUpsertImagesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -381,7 +381,7 @@ class TestUpsertImagesView:
         study.series_set.create(view_position="CC", laterality="R", count=1)
 
         response = clinical_user_client.http.get(
-            reverse("mammograms:take_images", kwargs={"pk": reviewed_appointment.pk})
+            reverse("mammograms:upsert_images", kwargs={"pk": reviewed_appointment.pk})
         )
         assertRedirects(
             response,
@@ -395,7 +395,7 @@ class TestUpsertImagesView:
     def test_yes_creates_the_study(self, clinical_user_client, reviewed_appointment):
         clinical_user_client.http.post(
             reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -415,7 +415,7 @@ class TestUpsertImagesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
@@ -433,7 +433,7 @@ class TestUpsertGatewayImagesView:
     def test_renders_response(self, clinical_user_client, reviewed_appointment):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:gateway_images",
+                "mammograms:upsert_gateway_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -460,7 +460,7 @@ class TestUpsertGatewayImagesView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:gateway_images",
+                "mammograms:upsert_gateway_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -512,7 +512,7 @@ class TestUpsertGatewayImagesView:
         )
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:gateway_images",
+                "mammograms:upsert_gateway_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -542,7 +542,7 @@ class TestUpsertGatewayImagesView:
         )
         clinical_user_client.http.post(
             reverse(
-                "mammograms:gateway_images",
+                "mammograms:upsert_gateway_images",
                 kwargs={"pk": reviewed_appointment.pk},
             ),
             {
@@ -569,7 +569,7 @@ class TestUpsertGatewayImagesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:gateway_images",
+                "mammograms:upsert_gateway_images",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
@@ -911,7 +911,7 @@ class TestResumeAppointment:
         )
         assertRedirects(
             response,
-            reverse("mammograms:take_images", kwargs={"pk": paused_appointment.pk}),
+            reverse("mammograms:upsert_images", kwargs={"pk": paused_appointment.pk}),
         )
 
     def test_redirect_check_information(self, clinical_user_client, paused_appointment):
@@ -1008,7 +1008,7 @@ class TestConfirmAppointmentCannotGoAheadView:
     ):
         clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead",
+                "mammograms:confirm_appointment_cannot_go_ahead",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {
@@ -1030,7 +1030,7 @@ class TestConfirmAppointmentCannotGoAheadView:
         name = in_progress_appointment.screening_episode.participant.full_name
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead",
+                "mammograms:confirm_appointment_cannot_go_ahead",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {
@@ -1051,7 +1051,7 @@ class TestConfirmAppointmentCannotGoAheadView:
         name = in_progress_appointment.screening_episode.participant.full_name
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:appointment_cannot_go_ahead",
+                "mammograms:confirm_appointment_cannot_go_ahead",
                 kwargs={"pk": in_progress_appointment.pk},
             ),
             {

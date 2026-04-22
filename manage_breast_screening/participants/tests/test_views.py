@@ -24,7 +24,7 @@ class TestShowParticipant:
         assertRedirects(
             response,
             reverse(
-                "mammograms:participant_details",
+                "mammograms:show_participant_details",
                 kwargs={"pk": appointment.pk},
             ),
         )

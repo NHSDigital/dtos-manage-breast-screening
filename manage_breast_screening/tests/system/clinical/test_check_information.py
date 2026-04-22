@@ -116,7 +116,7 @@ class TestCheckInformation(SystemTestCase):
         section = self.page.locator(".nhsuk-card").filter(has=images_taken_heading)
 
         take_images_url = reverse(
-            "mammograms:take_images",
+            "mammograms:upsert_images",
             kwargs={"pk": self.appointment.pk},
         )
 

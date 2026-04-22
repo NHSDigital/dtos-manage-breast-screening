@@ -95,11 +95,11 @@ class TestParticipantPresenter:
     @pytest.mark.parametrize(
         "return_url,expected_url",
         [
-            (None, "/participants/{uuid}/edit-ethnicity"),
-            ("", "/participants/{uuid}/edit-ethnicity"),
+            (None, "/participants/{uuid}/edit-ethnicity/"),
+            ("", "/participants/{uuid}/edit-ethnicity/"),
             (
                 "/return/path/",
-                "/participants/{uuid}/edit-ethnicity?return_url=/return/path/",
+                "/participants/{uuid}/edit-ethnicity/?return_url=/return/path/",
             ),
         ],
     )
@@ -122,7 +122,7 @@ class TestParticipantPresenter:
         assert presenter.ethnicity_actions(return_url="/return") == {
             "items": [
                 {
-                    "href": f"/participants/{participant.pk}/edit-ethnicity?return_url=/return",
+                    "href": f"/participants/{participant.pk}/edit-ethnicity/?return_url=/return",
                     "classes": "nhsuk-link--no-visited-state",
                     "text": "Change",
                     "visuallyHiddenText": "ethnicity",

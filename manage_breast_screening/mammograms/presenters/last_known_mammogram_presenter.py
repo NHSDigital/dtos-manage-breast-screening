@@ -52,7 +52,7 @@ class LastKnownMammogramPresenter:
     def _present_mammogram(self, mammogram, item_index):
         href = (
             reverse(
-                "mammograms:update_previous_mammogram",
+                "mammograms:update_participant_reported_mammogram",
                 kwargs={
                     "pk": self.appointment_pk,
                     "participant_reported_mammogram_pk": mammogram.pk,
@@ -124,7 +124,7 @@ class LastKnownMammogramPresenter:
     def add_link(self):
         href = (
             reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": self.appointment_pk},
             )
             + f"?return_url={self.current_url}"

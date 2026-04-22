@@ -69,7 +69,9 @@ class TestGatewayImages(SystemTestCase):
     def when_i_visit_the_take_images_page(self):
         self.page.goto(
             self.live_server_url
-            + reverse("mammograms:gateway_images", kwargs={"pk": self.appointment.pk})
+            + reverse(
+                "mammograms:upsert_gateway_images", kwargs={"pk": self.appointment.pk}
+            )
         )
 
     def then_i_see_the_image_stream_container(self):

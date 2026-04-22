@@ -62,7 +62,7 @@ class AppointmentPresenter:
     @cached_property
     def special_appointment_url(self):
         return reverse(
-            "mammograms:provide_special_appointment_details",
+            "mammograms:upsert_special_appointment_details",
             kwargs={"pk": self._appointment.pk},
         )
 
@@ -294,7 +294,7 @@ class SpecialAppointmentPresenter:
     @cached_property
     def change_url(self):
         return reverse(
-            "mammograms:provide_special_appointment_details",
+            "mammograms:upsert_special_appointment_details",
             kwargs={"pk": self._appointment_pk},
         )
 
@@ -440,7 +440,7 @@ class ImagesTakenPresenter(ImagesPresenter):
             "items": [
                 {
                     "href": reverse(
-                        "mammograms:take_images", kwargs={"pk": self.appointment.pk}
+                        "mammograms:upsert_images", kwargs={"pk": self.appointment.pk}
                     ),
                     "text": "Change",
                     "visuallyHiddenText": "views taken",
@@ -480,7 +480,7 @@ class WorkflowPresenter:
                 case AppointmentWorkflowStepCompletion.StepNames.REVIEW_MEDICAL_INFORMATION:
                     view_name = "record_medical_information"
                 case AppointmentWorkflowStepCompletion.StepNames.TAKE_IMAGES:
-                    view_name = "take_images"
+                    view_name = "upsert_images"
                 case AppointmentWorkflowStepCompletion.StepNames.CHECK_INFORMATION:
                     view_name = "check_information"
 

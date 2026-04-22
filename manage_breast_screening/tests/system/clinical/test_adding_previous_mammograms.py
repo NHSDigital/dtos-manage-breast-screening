@@ -159,7 +159,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:participant_details",
+                "mammograms:show_participant_details",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -168,7 +168,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:add_previous_mammogram",
+                "mammograms:add_participant_reported_mammogram",
                 kwargs={"pk": self.appointment.pk},
             )
         )
@@ -182,7 +182,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_on_the_add_previous_mammogram_form(self):
         path = reverse(
-            "mammograms:add_previous_mammogram",
+            "mammograms:add_participant_reported_mammogram",
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))
@@ -190,7 +190,7 @@ class TestAddingPreviousMammograms(SystemTestCase):
 
     def then_i_should_be_back_on_the_appointment(self):
         path = reverse(
-            "mammograms:participant_details",
+            "mammograms:show_participant_details",
             kwargs={"pk": self.appointment.pk},
         )
         expect(self.page).to_have_url(re.compile(path))

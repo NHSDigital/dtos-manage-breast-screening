@@ -259,7 +259,7 @@ class TestMammogramWorkflow(SystemTestCase):
         buttons.first.click()
 
     def then_i_should_be_on_the_record_images_page(self):
-        self.expect_url("mammograms:take_images", pk=self.appointment.pk)
+        self.expect_url("mammograms:upsert_images", pk=self.appointment.pk)
         self.assert_page_title_contains("Record images taken")
 
     def then_i_am_prompted_to_answer_can_the_screening_go_ahead(self):
@@ -417,7 +417,7 @@ class TestMammogramWorkflow(SystemTestCase):
         self.page.goto(
             self.live_server_url
             + reverse(
-                "mammograms:take_images",
+                "mammograms:upsert_images",
                 kwargs={"pk": self.appointment.pk},
             )
         )

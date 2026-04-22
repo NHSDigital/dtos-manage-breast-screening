@@ -73,17 +73,17 @@ urlpatterns = [
     path(
         "<uuid:pk>/take-images/",
         appointment_workflow_views.UpsertImagesView.as_view(),
-        name="take_images",
+        name="upsert_images",
     ),
     path(
         "<uuid:pk>/gateway-images/",
         appointment_workflow_views.UpsertGatewayImagesView.as_view(),
-        name="gateway_images",
+        name="upsert_gateway_images",
     ),
     path(
         "<uuid:pk>/cannot-go-ahead/",
         appointment_workflow_views.ConfirmAppointmentCannotGoAheadView.as_view(),
-        name="appointment_cannot_go_ahead",
+        name="confirm_appointment_cannot_go_ahead",
     ),
     path(
         "<uuid:pk>/images/stream/",
@@ -98,7 +98,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/participant/",
         show_appointment_views.ShowParticipantDetailsView.as_view(),
-        name="participant_details",
+        name="show_participant_details",
     ),
     path(
         "<uuid:pk>/images/",
@@ -108,7 +108,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/medical-information/",
         show_appointment_views.ShowMedicalInformationView.as_view(),
-        name="medical_information",
+        name="show_medical_information",
     ),
     path(
         "<uuid:pk>/note/",
@@ -128,7 +128,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/special-appointment/",
         special_appointment_views.UpsertSpecialAppointmentDetailsView.as_view(),
-        name="provide_special_appointment_details",
+        name="upsert_special_appointment_details",
     ),
     path(
         "<uuid:pk>/record-medical-information/lump/",
@@ -303,22 +303,22 @@ urlpatterns = [
     path(
         "<uuid:pk>/record-medical-information/breast-features/update/",
         appointment_workflow_views.UpsertBreastFeaturesView.as_view(),
-        name="update_breast_features",
+        name="upsert_breast_features",
     ),
     path(
         "<uuid:pk>/previous-mammograms/add/",
         participant_reported_mammogram_views.AddParticipantReportedMammogramView.as_view(),
-        name="add_previous_mammogram",
+        name="add_participant_reported_mammogram",
     ),
     path(
         "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>/",
         participant_reported_mammogram_views.UpdateParticipantReportedMammogramView.as_view(),
-        name="update_previous_mammogram",
+        name="update_participant_reported_mammogram",
     ),
     path(
         "<uuid:pk>/previous-mammograms/<uuid:participant_reported_mammogram_pk>/delete/",
         participant_reported_mammogram_views.DeleteParticipantReportedMammogramView.as_view(),
-        name="delete_previous_mammogram",
+        name="delete_participant_reported_mammogram",
     ),
     path(
         "<uuid:appointment_pk>/appointment-should-not-proceed/<uuid:participant_reported_mammogram_pk>/",
@@ -328,7 +328,7 @@ urlpatterns = [
     path(
         "<uuid:pk>/proceed-anyway/<uuid:participant_reported_mammogram_pk>/",
         appointment_workflow_views.ConfirmAppointmentProceedAnywayView.as_view(),
-        name="proceed_anyway",
+        name="confirm_appointment_proceed_anyway",
     ),
     path(
         "<uuid:appointment_pk>/attended-not-screened/",

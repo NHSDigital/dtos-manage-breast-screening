@@ -16,7 +16,7 @@ class TestUpsertBreastFeaturesView:
     ):
         response = clinical_user_client.http.get(
             reverse(
-                "mammograms:update_breast_features",
+                "mammograms:upsert_breast_features",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             )
         )
@@ -31,7 +31,7 @@ class TestUpsertBreastFeaturesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_breast_features",
+                "mammograms:upsert_breast_features",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {"features": json.dumps([feature])},
@@ -63,7 +63,7 @@ class TestUpsertBreastFeaturesView:
 
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_breast_features",
+                "mammograms:upsert_breast_features",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {"features": json.dumps([feature])},
@@ -87,7 +87,7 @@ class TestUpsertBreastFeaturesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_breast_features",
+                "mammograms:upsert_breast_features",
                 kwargs={"pk": confirmed_identity_appointment.pk},
             ),
             {
@@ -109,7 +109,7 @@ class TestUpsertBreastFeaturesView:
     ):
         response = clinical_user_client.http.post(
             reverse(
-                "mammograms:update_breast_features",
+                "mammograms:upsert_breast_features",
                 kwargs={"pk": in_progress_appointment.pk},
             )
         )
