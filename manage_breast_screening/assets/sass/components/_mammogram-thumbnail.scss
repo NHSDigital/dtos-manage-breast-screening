@@ -66,6 +66,23 @@
   align-items: flex-start;
 }
 
+// Thumbnail grid for the reading opinion page
+.app-mammogram-thumbnails {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  gap: 8px;
+
+  // Match the tighter grid gap for same-view images within the reading layout
+  .app-mammogram-thumbnail {
+    gap: 8px;
+  }
+}
+
+// Slight smoothing for diagram thumbnails to reduce moiré
+.app-mammogram-thumbnail__image--diagram {
+  filter: blur(0.5px);
+}
+
 // Right breast images align right (inwards), left breast align left (inwards)
 .app-mammogram-thumbnail--right .app-mammogram-thumbnail__image-wrapper {
   justify-content: flex-end;

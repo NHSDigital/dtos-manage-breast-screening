@@ -1,0 +1,34 @@
+@use "../vendor/nhsuk-frontend/base" as *;
+
+$_font-size: 16;
+
+.nhsuk-forward-link {
+  background: none;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+  padding: 0;
+  padding-right: nhsuk-em($_font-size, $nhsuk-base-font-size);
+  position: relative;
+
+  @include nhsuk-font($_font-size);
+  @include nhsuk-link-style-default;
+  @include nhsuk-link-style-no-visited-state;
+  @include nhsuk-responsive-margin(4, "top");
+  @include nhsuk-print-hide; // [2]
+
+  &::before {
+    bottom: 0;
+    content: "";
+    right: 0;
+    margin: auto;
+    position: absolute;
+    top: 0;
+
+    @include nhsuk-shape-chevron(right, $colour: currentcolor, $font-size: 19);
+  }
+}
+
+.nhsuk-forward-link--reverse {
+  @include nhsuk-link-style-white;
+}

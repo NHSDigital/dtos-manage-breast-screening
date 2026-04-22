@@ -8,6 +8,7 @@
 @forward "components/breast-diagram";
 @forward "components/button";
 @forward "components/count";
+@forward "components/forward-link";
 @forward "components/icon";
 @forward "components/image-key";
 @forward "components/image-map";
@@ -153,4 +154,12 @@ a[href="#"] {
 
 body.nhsuk-frontend-supported .app-js-only {
   display: block;
+}
+
+.app-align-right {
+  text-align: right;
+}
+
+.app-button-full-width {
+  width: 100%;
 }

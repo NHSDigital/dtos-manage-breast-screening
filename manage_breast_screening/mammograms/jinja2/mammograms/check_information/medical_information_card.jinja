@@ -1,7 +1,7 @@
 {% from "nhsuk/components/card/macro.jinja" import card %}
 {% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
 
-{% macro medical_history(items, default_message) %}
+{% macro medical_history(items, default_message=None) %}
   {% if items %}
     {% for item in items %}
       <p class="nhsuk-u-margin-bottom-2">
@@ -47,5 +47,40 @@
         }
       ]
     }) }}
+  {% endcall %}
+{% endmacro %}
+
+{% macro medical_summary_card(presented_medical_information) %}
+  {% call card({
+    "heading": "Medical summary",
+    "feature": true
+  }) %}
+    {% set rows =
+        ( [{
+          "key": { "text": "Previous mammograms" },
+          "value" : { "text": presented_medical_information.previous_mammograms },
+          }] if previous_mammograms_count else [] ) +
+        ( [{
+          "key": { "text": "Medical history" },
+          "value" : { "html": medical_history(presented_medical_information.medical_history) },
+          }] if presented_medical_information.medical_history else [] ) +
+        ( [{
+          "key": { "text": "Symptoms" },
+          "value" : { "html": medical_history(presented_medical_information.symptoms) },
+          }] if presented_medical_information.symptoms else [] ) +
+        ( [{
+          "key": { "text": "Breast features" },
+          "value" : { "html": medical_history(presented_medical_information.breast_features) },
+          }] if presented_medical_information.breast_features else [] ) +
+        ( [{
+          "key": { "text": "Other relevant information" },
+          "value" : { "html": medical_history(presented_medical_information.other_relevant_information) },
+          }] if presented_medical_information.other_relevant_information else [] )
+    %}
+    {% if rows %}
+      {{ summaryList({ "rows": rows }) }}
+    {% else %}
+      <p class="nhsuk-body">No medical information recorded.</p>
+    {% endif %}
   {% endcall %}
 {% endmacro %}

@@ -1,0 +1,112 @@
+{% extends "layout-app.jinja" %}
+{% from "django_form_helpers.jinja" import form_error_summary %}
+{% from "nhsuk/components/button/macro.jinja" import button %}
+{% from "nhsuk/components/inset-text/macro.jinja" import insetText %}
+{% from "nhsuk/components/summary-list/macro.jinja" import summaryList %}
+{% from "nhsuk/components/tag/macro.jinja" import tag %}
+{% from "mammograms/check_information/medical_information_card.jinja" import medical_summary_card %}
+
+{# djlint:off H006 #}
+
+{% block beforeContent %}
+<div class="nhsuk-grid-row app-position-relative nhsuk-u-margin-bottom-3">
+  <div class="nhsuk-grid-column-two-thirds">
+    <a href="#" class="nhsuk-back-link">Previous case</a>
+   </div>
+  <div class="nhsuk-grid-column-one-third app-align-right">
+    <a href="#" class="nhsuk-forward-link">Skip to next</a>
+  </div>
+</div>
+{% endblock beforeContent %}
+
+{% block page_content %}
+<div class="nhsuk-grid-row">
+  <div class="nhsuk-grid-column-full">
+    {{ form_error_summary(form) }}
+ 
+    <div class="nhsuk-grid-row app-header">
+      <div class="nhsuk-grid-column-two-thirds app-header">
+        <h1 class="nhsuk-heading-l">
+          <span class="nhsuk-caption-l">{{ caption }}</span>
+          {{ heading }}
+        </h1>
+      </div>
+      <div class="nhsuk-grid-column-one-third app-header__status-tag">
+          <div class="nhsuk-u-margin-bottom-2">
+            {{ tag({
+            "html": "Urgent",
+            "classes": "nhsuk-tag app-nowrap nhsuk-tag--red",
+            }) }}
+          </div>
+          {{ tag({
+          "html": "Second read",
+          "classes": "nhsuk-tag app-nowrap nhsuk-tag--blue",
+          }) }}
+          {{ tag({
+          "html": "Previously skipped",
+          "classes": "nhsuk-tag app-nowrap nhsuk-tag--grey",
+          }) }}
+      </div>
+    </div>
+
+    <form method="post" novalidate>
+      {{ csrf_input }}
+
+      <div class="nhsuk-grid-row">
+        <div class="nhsuk-grid-column-one-third nhsuk-u-margin-bottom-4">
+          <h2 class="nhsuk-heading-s">Image thumbnails ({{ images | length }})</h2>
+          <div class="app-mammogram-thumbnails">
+            {% for image in images %}
+              <div class="app-mammogram-thumbnail {{ image.class }}">
+                <div class="app-mammogram-thumbnail__image-wrapper">
+                  <span class="app-mammogram-thumbnail__label">{{ image.name }}</span>
+                  <img class="app-mammogram-thumbnail__image app-mammogram-thumbnail__image--diagram" 
+                       src="{{ image.url }}" alt="{{ image.name }} view">
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="nhsuk-grid-column-two-thirds">
+          <h2 class="nhsuk-heading-m">What is your opinion of these images?</h2>
+
+          <div class="nhsuk-u-margin-bottom-4">
+            <button class="nhsuk-button app-button-full-width nhsuk-u-margin-bottom-3">
+              Normal <span class="app-shortcut-hint">(N)</span>
+            </button>
+            <p class="nhsuk-u-margin-bottom-4">
+              <a class="nhsuk-link nhsuk-link--no-visited-state" href="#">Normal, but add details</a>
+            </p>
+          </div>
+
+          <div class="nhsuk-u-margin-bottom-4">
+            <button class="nhsuk-button nhsuk-button--secondary app-button-full-width nhsuk-u-margin-bottom-3">
+            Technical recall <span class="app-shortcut-hint">(T)</span>
+            </button>
+          </div>
+
+          <div class="nhsuk-u-margin-bottom-4">
+            <button class="nhsuk-button nhsuk-button--warning app-button-full-width">
+            Recall for assessment <span class="app-shortcut-hint">(R)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    {% if notes_for_reader %}
+      {% set inset_html %}
+        <h3 class="nhsuk-heading-s nhsuk-u-margin-bottom-2">Notes for reader</h3>
+        <p>{{ notes_for_reader | nl2br }}</p>
+      {% endset %}
+      {{ insetText({
+        "html": inset_html,
+        "classes": "nhsuk-u-margin-top-0 nhsuk-u-margin-bottom-4"
+      }) }}
+    {% endif %}
+
+    {{ medical_summary_card(presented_medical_information) }}
+  </div>
+</div>
+{% endblock %}
