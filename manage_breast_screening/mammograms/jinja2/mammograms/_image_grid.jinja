@@ -24,43 +24,35 @@
 
 {% if image_count > 0 %}
   <div class="app-mammogram-cards">
-    <div class="app-mammogram-card">
-      {% set right_views_html %}
-        <div class="app-mammogram-views">
-          {% with images=images["RMLO"], laterality="RMLO", side="right" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-          {% with images=images["RCC"], laterality="RCC", side="right" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-        </div>
-      {% endset %}
-      {{ card({
-        "heading": "Right breast",
-        "headingLevel": "2",
-        "feature": true,
-        "descriptionHtml": right_views_html
-      }) }}
-    </div>
-
-    <div class="app-mammogram-card">
-      {% set left_views_html %}
-        <div class="app-mammogram-views">
-          {% with images=images["LMLO"], laterality="LMLO", side="left" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-          {% with images=images["LCC"], laterality="LCC", side="left" %}
-            {% include "mammograms/_image_set.jinja" %}
-          {% endwith %}
-        </div>
-      {% endset %}
-      {{ card({
-        "heading": "Left breast",
-        "headingLevel": "2",
-        "feature": true,
-        "descriptionHtml": left_views_html
-      }) }}
-    </div>
+    {% for side in ["Right", "Left"] %}
+      <div class="app-mammogram-card">
+        {% set rh_keys = [] %}
+        {% for k in images %}
+          {% if k[0] == side[0] %}
+            {% set _ = rh_keys.append(k) %}
+          {% endif %}
+        {% endfor %}
+        {% set side_html %}
+          <div class="app-mammogram-views">
+            {% for laterality in rh_keys %}
+              {% with images=images[laterality], side=side.lower() %}
+                {% if not laterality.endswith("ID") %}
+                  {% include "mammograms/_image_set.jinja" %}
+                {% elif images | length > 0 %}
+                  {% include "mammograms/_image_set.jinja" %}
+                {% endif %}
+              {% endwith %}
+            {% endfor %}
+          </div>
+        {% endset %}
+        {{ card({
+          "heading": side ~ " breast",
+          "headingLevel": "2",
+          "feature": true,
+          "descriptionHtml": side_html
+        }) }}
+      </div>
+    {% endfor %}
   </div>
 {% endif %}
 
@@ -70,7 +62,11 @@
   </p>
 </noscript>
 
-<input type="hidden" name="lmlo_count" value="{{ images["LMLO"]|length }}" />
-<input type="hidden" name="lcc_count" value="{{ images["LCC"]|length }}" />
-<input type="hidden" name="rmlo_count" value="{{ images["RMLO"]|length }}" />
 <input type="hidden" name="rcc_count" value="{{ images["RCC"]|length }}" />
+<input type="hidden" name="rmlo_count" value="{{ images["RMLO"]|length }}" />
+<input type="hidden" name="rccid_count" value="{{ images["RCCID"]|length }}" />
+<input type="hidden" name="rmloid_count" value="{{ images["RMLOID"]|length }}" />
+<input type="hidden" name="lcc_count" value="{{ images["LCC"]|length }}" />
+<input type="hidden" name="lmlo_count" value="{{ images["LMLO"]|length }}" />
+<input type="hidden" name="lccid_count" value="{{ images["LCCID"]|length }}" />
+<input type="hidden" name="lmloid_count" value="{{ images["LMLOID"]|length }}" />

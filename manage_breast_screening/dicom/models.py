@@ -141,7 +141,10 @@ class Image(models.Model):
     @property
     def laterality_and_view(self):
         if self.laterality and self.view_position:
-            return f"{self.laterality}{self.view_position}".upper()
+            result = f"{self.laterality}{self.view_position}".upper()
+            if self.implant_present:
+                result = f"{result}ID"
+            return result
         return ""
 
     def __str__(self):

@@ -4,6 +4,8 @@ from manage_breast_screening.core.services.auditor import Auditor
 
 from .models import Image, Study
 
+ORDERED_VIEWS = ["RCC", "RMLO", "RCCID", "RMLOID", "LCC", "LMLO", "LCCID", "LMLOID"]
+
 
 class StudyService:
     def __init__(self, appointment, current_user):
@@ -59,7 +61,7 @@ class StudyService:
         images: list["Image"],
     ) -> dict[str, list["Image"]]:
         """Group images by their laterality and view position."""
-        grouped_images = {"LCC": [], "LMLO": [], "RCC": [], "RMLO": []}
+        grouped_images = {view: [] for view in ORDERED_VIEWS}
         for image in images:
             if image.laterality_and_view in grouped_images:
                 grouped_images[image.laterality_and_view].append(image)
