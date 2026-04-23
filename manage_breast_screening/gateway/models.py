@@ -18,6 +18,18 @@ class GatewayActionType(models.TextChoices):
     WORKLIST_CREATE = "worklist.create_item", "Create Worklist Item"
 
 
+class Gateway(BaseModel):
+    """Represents a deployed gateway instance."""
+
+    name = models.CharField(max_length=255, unique=True)
+    description = models.TextField(blank=True)
+    oid = models.CharField(max_length=255, unique=True, null=True)
+    resource_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class GatewayAction(BaseModel):
     """Tracks actions sent to the screening gateway."""
 
@@ -43,6 +55,9 @@ class GatewayAction(BaseModel):
     retry_count = models.IntegerField(default=0)
     next_retry_at = models.DateTimeField(null=True, blank=True)
     last_error = models.TextField(blank=True)
+    gateway = models.ForeignKey(
+        "Gateway", on_delete=models.PROTECT, related_name="actions", null=True
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -71,6 +86,9 @@ class Relay(BaseModel):
         max_length=255,
         blank=True,
         help_text="Environment variable name containing the shared access key",
+    )
+    gateway = models.ForeignKey(
+        "Gateway", on_delete=models.PROTECT, related_name="relays", null=True
     )
 
     @classmethod
