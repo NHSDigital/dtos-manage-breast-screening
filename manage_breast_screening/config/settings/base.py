@@ -374,3 +374,5 @@ CONTENT_SECURITY_POLICY = {
         "style-src": (CSP_SELF,),
     }
 }
+
+READING_SESSION_DEFAULT_SIZE = 50
