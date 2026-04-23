@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from os import getenv
 
 import yaml
+from django.conf import settings
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.test import override_settings
@@ -14,6 +16,22 @@ from manage_breast_screening.clinics.tests.factories import (
     ProviderFactory,
     SettingFactory,
     UserAssignmentFactory,
+)
+from manage_breast_screening.dicom.tests.factories import (
+    ImageFactory as DicomImageFactory,
+)
+from manage_breast_screening.dicom.tests.factories import (
+    ReadingFactory,
+    ReadingSessionFactory,
+    ReadingSessionItemFactory,
+    RecallForAssessmentDetailsFactory,
+    RetakeRequestFactory,
+)
+from manage_breast_screening.dicom.tests.factories import (
+    SeriesFactory as DicomSeriesFactory,
+)
+from manage_breast_screening.dicom.tests.factories import (
+    StudyFactory as DicomStudyFactory,
 )
 from manage_breast_screening.manual_images.tests.factories import (
     SeriesFactory,
@@ -37,9 +55,13 @@ from manage_breast_screening.participants.tests.factories import (
     ScreeningEpisodeFactory,
     SymptomFactory,
 )
+from manage_breast_screening.users.models import User
 from manage_breast_screening.users.tests.factories import UserFactory
 
 logger = logging.getLogger(__name__)
+
+DATA_DIR = settings.BASE_DIR / "data"
+MAMMOGRAM_DIAGRAMS_DIR = DATA_DIR / "mammogram-diagrams"
 
 
 class Command(BaseCommand):
@@ -51,7 +73,10 @@ class Command(BaseCommand):
         )
 
     def file_from_name(self, file_name):
-        return open("manage_breast_screening/data/" + file_name)
+        return open(DATA_DIR / file_name)
+
+    def diagram_file(self, file_name):
+        return open(MAMMOGRAM_DIAGRAMS_DIR / file_name, "rb")
 
     def handle(self, *args, **kwargs):
         if getenv("DJANGO_ENV", "production") == "production":
@@ -78,6 +103,13 @@ class Command(BaseCommand):
                     self.create_super_user(super_user_key)
                 for provider_key in demo_data["providers"]:
                     self.create_provider(provider_key)
+
+            with self.file_from_name("image_reading.yml") as data_file:
+                data = yaml.safe_load(data_file)
+                for study in data["studies"]:
+                    self.create_dicom_study(study)
+                for session in data["reading_sessions"]:
+                    self.create_reading_session(session)
 
     def create_provider(self, provider_key):
         provider = ProviderFactory(name=provider_key["name"], id=provider_key["id"])
@@ -342,10 +374,63 @@ class Command(BaseCommand):
                 count=series_key.get("count", 1),
             )
 
+    def create_dicom_study(self, study_key):
+        study = DicomStudyFactory(id=study_key["id"])
+        for series_key in study_key["series"]:
+            images = series_key.pop("images")
+            view_position = series_key.pop("view_position")
+            laterality = series_key.pop("laterality")
+            series = DicomSeriesFactory(study=study, **series_key)
+            for image_key in images:
+                filename = image_key["image_file"]
+                image = DicomImageFactory.build(
+                    series=series,
+                    view_position=view_position,
+                    laterality=laterality,
+                )
+                image.image_file.save(filename, File(self.diagram_file(filename)))
+                image.save()
+
+    def create_reading_session(self, session_key):
+        items = session_key.pop("items")
+        reader_key = session_key.pop("reader")
+        reader = User.objects.get(**reader_key)
+        session = ReadingSessionFactory(reader=reader, **session_key)
+
+        for item in items:
+            reading_key = item.pop("reading", None)
+            if reading_key:
+                reading = self.create_reading(reader=reader, reading_key=reading_key)
+            else:
+                reading = None
+
+            ReadingSessionItemFactory(session=session, reading=reading, **item)
+
+    def create_reading(self, reader, reading_key):
+        retake_requests = reading_key.pop("retake_requests", [])
+        recall_for_assessment_details = reading_key.pop(
+            "recall_for_assessment_details", None
+        )
+
+        reading = ReadingFactory(reader=reader, opinion=reading_key["opinion"])
+
+        for retake_request in retake_requests:
+            RetakeRequestFactory(reading=reading, **retake_request)
+
+        if recall_for_assessment_details:
+            RecallForAssessmentDetailsFactory(
+                reading=reading, **recall_for_assessment_details
+            )
+
+        return reading
+
     def reset_db(self):
-        logger.warning("Clearing all user, provider, and participant data")
+        logger.warning("Clearing all user, provider, participant, and dicom data")
 
         with connection.cursor() as c:
             c.execute("TRUNCATE TABLE users_user CASCADE")
             c.execute("TRUNCATE TABLE clinics_provider CASCADE")
             c.execute("TRUNCATE TABLE participants_participant CASCADE")
+            c.execute("TRUNCATE TABLE dicom_study CASCADE")
+            c.execute("TRUNCATE TABLE participants_participant CASCADE")
+            c.execute("TRUNCATE TABLE dicom_study CASCADE")
