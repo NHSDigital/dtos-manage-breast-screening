@@ -11,10 +11,13 @@ from manage_breast_screening.core.api_schema import ErrorResponse, StatusRespons
 from manage_breast_screening.gateway.models import GatewayAction, GatewayActionStatus
 
 from .dicom_recorder import DicomRecorder
+from .token_validator import TokenValidator
 
-router = Router()
+router = Router(auth=TokenValidator())
 
 logger = logging.getLogger(__name__)
+
+MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
 
 
 class SuccessResponse(ninja.Schema):
@@ -41,8 +44,7 @@ def upload(request, source_message_id: str, file: File[UploadedFile]):
     """
     Accepts PUT with a single DICOM file in form field 'file'
     """
-    max_size = 100 * 1024 * 1024
-    if file.size > max_size:
+    if file.size > MAX_FILE_SIZE:
         return 400, {
             "title": "File too large",
             "status": 400,
