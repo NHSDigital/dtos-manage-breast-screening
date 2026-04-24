@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime, timedelta
-from os import getenv
 
 import yaml
+from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.test import override_settings
@@ -54,7 +54,7 @@ class Command(BaseCommand):
         return open("manage_breast_screening/data/" + file_name)
 
     def handle(self, *args, **kwargs):
-        if getenv("DJANGO_ENV", "production") == "production":
+        if settings.IS_PRODUCTION:
             raise Exception("This command cannot be run in production")
 
         if not kwargs["noinput"]:
