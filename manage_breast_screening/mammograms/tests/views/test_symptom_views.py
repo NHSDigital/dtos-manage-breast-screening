@@ -80,6 +80,27 @@ class TestAddLumpView:
             response.text,
         )
 
+    def test_identity_confirmed_step_incomplete(
+        self,
+        clinical_user_client,
+        in_progress_appointment,
+    ):
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:add_symptom_lump",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+
 
 @pytest.mark.django_db
 class TestChangeLumpView:
@@ -173,6 +194,29 @@ class TestChangeLumpView:
                 </ul>
             """,
             response.text,
+        )
+
+    def test_identity_confirmed_step_incomplete(
+        self,
+        clinical_user_client,
+        in_progress_appointment,
+    ):
+        lump = SymptomFactory.create(appointment=in_progress_appointment, lump=True)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:change_symptom_lump",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "symptom_pk": lump.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
         )
 
 
@@ -555,3 +599,27 @@ class TestDeleteSymptomView:
         )
 
         assert not Symptom.objects.filter(pk=lump.pk).exists()
+
+    def test_identity_confirmed_step_incomplete(
+        self,
+        clinical_user_client,
+        in_progress_appointment,
+    ):
+        lump = SymptomFactory.create(appointment=in_progress_appointment, lump=True)
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_symptom",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                    "symptom_pk": lump.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+        assert Symptom.objects.filter(pk=lump.pk).exists()

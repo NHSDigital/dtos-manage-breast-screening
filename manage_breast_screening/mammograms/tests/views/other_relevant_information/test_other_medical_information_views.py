@@ -247,3 +247,28 @@ class TestDeleteOtherMedicalInformationView:
         assert not OtherMedicalInformation.objects.filter(
             pk=other_medical_information.pk
         ).exists()
+
+    def test_identity_confirmed_step_incomplete(
+        self, clinical_user_client, in_progress_appointment
+    ):
+        other_medical_information = OtherMedicalInformationFactory.create(
+            appointment=in_progress_appointment
+        )
+        response = clinical_user_client.http.post(
+            reverse(
+                "mammograms:delete_other_medical_information",
+                kwargs={
+                    "pk": in_progress_appointment.pk,
+                },
+            )
+        )
+        assertRedirects(
+            response,
+            reverse(
+                "mammograms:show_appointment",
+                kwargs={"pk": in_progress_appointment.pk},
+            ),
+        )
+        assert OtherMedicalInformation.objects.filter(
+            pk=other_medical_information.pk
+        ).exists()

@@ -20,7 +20,7 @@ from ..forms.symptom_forms import (
     SkinChangeForm,
     SwellingOrShapeChangeForm,
 )
-from .mixins import InProgressAppointmentMixin
+from .mixins import InProgressAppointmentMixin, MedicalInformationMixin
 
 
 class BaseSymptomFormView(InProgressAppointmentMixin, FormView):
@@ -290,20 +290,12 @@ class ChangeBreastPainView(ChangeSymptomView):
         return {"symptom_type_id": SymptomType.BREAST_PAIN}
 
 
-class DeleteSymptomView(DeleteWithAuditView):
+class DeleteSymptomView(MedicalInformationMixin, DeleteWithAuditView):
     template_name = "mammograms/medical_information/symptoms/confirm_delete_lump.jinja"
     thing_name = "symptom"
 
-    def get_success_url(self):
-        return reverse(
-            "mammograms:record_medical_information",
-            kwargs={"pk": self.kwargs["pk"]},
-        )
-
     def get_object(self):
-        provider = self.request.user.current_provider
-        appointment = provider.appointments.get(pk=self.kwargs["pk"])
-        return appointment.symptoms.get(pk=self.kwargs["symptom_pk"])
+        return self.appointment.symptoms.get(pk=self.kwargs["symptom_pk"])
 
     def get_context_data(self, **kwargs):
         symptom = self.object
