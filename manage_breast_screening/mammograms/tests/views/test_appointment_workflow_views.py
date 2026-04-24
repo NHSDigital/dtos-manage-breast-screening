@@ -242,10 +242,12 @@ class TestRecordMedicalInformation:
         mock_send_action.assert_called_once_with(relay, action)
 
     def test_redirects_to_gateway_images_when_enabled(
-        self, clinical_user_client, monkeypatch, confirmed_identity_appointment
+        self, clinical_user_client, with_flag_enabled, confirmed_identity_appointment
     ):
-        monkeypatch.setenv("GATEWAY_IMAGES_ENABLED", "true")
-        RelayFactory.create(setting=confirmed_identity_appointment.clinic_slot.clinic.setting)
+        with_flag_enabled("gateway_images")
+        RelayFactory.create(
+            setting=confirmed_identity_appointment.clinic_slot.clinic.setting
+        )
 
         with patch(
             "manage_breast_screening.gateway.relay_service.RelayService.send_action"

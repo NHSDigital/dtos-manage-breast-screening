@@ -42,6 +42,7 @@ dependencies = [
   "inflect>=7.5.0",
   "jsonschema>=4.26.0",
   "django-csp>=4.0",
+  "openfeature-sdk>=0.8.4,<0.9.0",
 ]
 
 [dependency-groups]
