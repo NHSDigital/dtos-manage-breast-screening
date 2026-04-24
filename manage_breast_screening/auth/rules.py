@@ -20,6 +20,11 @@ def is_administrative(user):
 
 
 @rules.predicate
+def is_reader(user):
+    return user.has_role(Role.READER.value)
+
+
+@rules.predicate
 def is_superuser(user):
     return getattr(user, "is_superuser", False)
 

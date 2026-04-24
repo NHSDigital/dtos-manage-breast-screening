@@ -4,6 +4,7 @@ from enum import StrEnum
 class Role(StrEnum):
     ADMINISTRATIVE = "Administrative"
     CLINICAL = "Clinical"
+    READER = "Reader"
 
 
 class Permission(StrEnum):
