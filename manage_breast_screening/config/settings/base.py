@@ -32,7 +32,7 @@ SECRET_KEY = environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = boolean_env("DEBUG", default=False)
 
-DJANGO_ENV = environ.get("DJANGO_ENV", "production")
+DEPLOYED_TO = environ.get("DEPLOYED_TO", "production")
 
 ALLOWED_HOSTS = list_env("ALLOWED_HOSTS")
 CSRF_TRUSTED_ORIGINS = list_env("CSRF_TRUSTED_ORIGINS")
@@ -74,7 +74,7 @@ INSTALLED_APPS = [
     "csp",
 ]
 
-if DJANGO_ENV != "production":
+if DEPLOYED_TO != "production":
     INSTALLED_APPS.append("manage_breast_screening.nonprod")
 
 MIDDLEWARE = [
@@ -176,7 +176,7 @@ DATABASES = {
 }
 
 
-if DJANGO_ENV != "production":
+if DEPLOYED_TO != "production":
     if environ.get("BLOB_STORAGE_CONNECTION_STRING"):
         # Use connection string if provided (e.g., in local development using Azurite)
         dicom_storage_options = {

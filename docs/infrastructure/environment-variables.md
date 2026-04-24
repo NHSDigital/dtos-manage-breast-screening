@@ -105,27 +105,20 @@ Database server admin user name. When using a managed identity, name of the mana
 
 ## DEPLOYED_TO
 
-Describes the environment the application is running in.
+Describes the environment the application is running in. Defaults to `production`. Controls environment-specific behaviour throughout the application, primarily ensuring non-production code is not run or made available in production.
 
 **Values:**
 
+- `local`
+- `test`
 - `dev`
 - `review`
 - `preprod`
-- `production`
-
-## DJANGO_ENV
-
-Specifies the Django environment configuration. This variable controls environment-specific behaviour throughout the application. It's primarily for ensuring non-production code is not run or made available in production.
-
-**Example values:**
-
 - `production` (default)
-- `dev`
 
 **Example usage:**
 
-- When not set to "production", enables the `nonprod` Django app which provides development utilities
+- When not set to `production`, enables the `nonprod` Django app which provides development utilities
 - The `seed_demo_data` management command checks this env var to prevent execution in production environments
 
 ## NBSS_MESH_INBOX_NAME [Secret]

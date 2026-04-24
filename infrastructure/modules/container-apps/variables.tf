@@ -223,7 +223,6 @@ locals {
     local.env_vars_from_yaml,
     {
       SSL_MODE                                   = "require"
-      DJANGO_ENV                                 = var.env_config
       APPLICATIONINSIGHTS_STATSBEAT_DISABLED_ALL = true
     }
   )

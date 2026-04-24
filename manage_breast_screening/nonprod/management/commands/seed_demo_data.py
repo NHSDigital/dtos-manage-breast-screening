@@ -54,7 +54,7 @@ class Command(BaseCommand):
         return open("manage_breast_screening/data/" + file_name)
 
     def handle(self, *args, **kwargs):
-        if getenv("DJANGO_ENV", "production") == "production":
+        if getenv("DEPLOYED_TO", "production") == "production":
             raise Exception("This command cannot be run in production")
 
         if not kwargs["noinput"]:
