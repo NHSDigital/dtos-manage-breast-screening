@@ -35,7 +35,7 @@ class ReadImageView(PermissionRequiredMixin, AppointmentMixin, FormView):
                 for image in series.images.all():
                     images.append(
                         {
-                            "name": series.laterality + series.view_position,
+                            "name": image.laterality_and_view,
                             "url": image.image_file.url,
                             "class": "app-mammogram-thumbnail--"
                             + ("right" if series.laterality == "R" else "left"),
