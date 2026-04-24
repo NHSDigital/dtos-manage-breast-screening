@@ -1,9 +1,11 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.files.storage import storages
 from django.db import models
 
+from manage_breast_screening.core.models import BaseModel
 from manage_breast_screening.manual_images.models import (
     IncompleteImagesReason,
     RepeatReason,
@@ -146,3 +148,101 @@ class Image(models.Model):
 
     def __str__(self):
         return self.laterality_and_view
+
+
+class Opinions(models.TextChoices):
+    NORMAL = "NORMAL", "Normal"
+    TECHNICAL_RECALL = "TECHNICAL_RECALL", "Technical recall"
+    RECALL = "RECALL", "Recall for assessment"
+
+
+class BreastOpinions(models.TextChoices):
+    NORMAL = "NORMAL", "Normal"
+    ABNORMAL = "ABNORMAL", "Abnormal, recall for assessment"
+
+
+class Reading(BaseModel):
+    """
+    One reader's opinion of a study. All of the opinions feed into the consensus read.
+    """
+
+    study = models.ForeignKey(Study, on_delete=models.PROTECT, related_name="opinions")
+    reader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    opinion = models.CharField(choices=Opinions)
+    additional_details = models.TextField(null=False, blank=True, default="")
+
+    class Meta:
+        unique_together = [("study", "reader")]
+
+
+class ViewPositions(models.TextChoices):
+    CC = "CC"
+    MLO = "MLO"
+
+
+class Laterality(models.TextChoices):
+    L = "L"
+    R = "R"
+
+
+class RetakeRequest(BaseModel):
+    """
+    Indicates the views that need retaking, in the case of a technical recall opinion
+    """
+
+    reading = models.ForeignKey(
+        Reading, on_delete=models.PROTECT, related_name="retake_requests"
+    )
+    view_position = models.CharField(choices=ViewPositions)
+    laterality = models.CharField(choices=Laterality)
+
+    class Meta:
+        unique_together = [("reading", "view_position", "laterality")]
+
+
+class RecallForAssessmentDetails(BaseModel):
+    """
+    Further details of a recall for assessment opinion
+    """
+
+    reading = models.OneToOneField(
+        Reading,
+        on_delete=models.PROTECT,
+        related_name="recall_for_assessment_details",
+    )
+    right_breast_opinion = models.CharField(choices=BreastOpinions)
+    right_breast_comment = models.CharField(null=False, blank=True, default="")
+    left_breast_opinion = models.CharField(choices=BreastOpinions)
+    left_breast_comment = models.CharField(null=False, blank=True, default="")
+
+
+class ReadingSession(BaseModel):
+    """
+    A grouping of studies that are read by a reader in a single session
+    """
+
+    reader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    session_size = models.IntegerField()
+
+
+class ReadingSessionItem(BaseModel):
+    """
+    Assigns a study to a particular reading session, with an ordering.
+    """
+
+    session = models.ForeignKey(
+        ReadingSession, on_delete=models.CASCADE, related_name="items"
+    )
+    study = models.ForeignKey(
+        Study, on_delete=models.PROTECT, related_name="reading_session_items"
+    )
+    order = models.IntegerField()
+    reading = models.OneToOneField(
+        Reading,
+        on_delete=models.PROTECT,
+        related_name="reading_session_item",
+        null=True,
+    )
+
+    class Meta:
+        unique_together = [("session", "order")]
