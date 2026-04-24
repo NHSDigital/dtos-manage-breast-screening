@@ -53,6 +53,7 @@ COPY --from=python_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ${VIRTUA
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} ./manage_breast_screening /app/manage_breast_screening
 COPY --from=node_builder --chown=${CONTAINER_USER}:${CONTAINER_GROUP} /app/manage_breast_screening/assets/compiled /app/manage_breast_screening/assets/compiled
 COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} manage.py ./
+COPY --chown=${CONTAINER_USER}:${CONTAINER_GROUP} --chmod=444 flags*.yml ./
 COPY --chown=root:root --chmod=755 scripts/docker/entrypoint.sh /app/entrypoint.sh
 
 # Run django commands
